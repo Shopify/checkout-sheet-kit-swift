@@ -1,0 +1,2 @@
+STOREFRONT_DOMAIN = <yourdomainhere.myshopify.com>
+STOREFRONT_ACCESS_TOKEN = <storefront access token>

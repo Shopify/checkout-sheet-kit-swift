@@ -1,0 +1,18 @@
+ #!/usr/bin/env bash
+
+set -ex
+set -eo pipefail
+
+if [[ -n $CURRENT_SIMULATOR_UUID ]]; then
+    dest="id=$CURRENT_SIMULATOR_UUID"
+else
+    dest="platform=iOS Simulator,name=iPhone 14"
+fi
+
+cd Samples/
+
+touch SimpleAppIntegration/Storefront.xcconfig
+touch MobileBuyIntegration/Storefront.xcconfig
+
+xcodebuild clean build -scheme SimpleAppIntegration -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
+xcodebuild clean build -scheme MobileBuyIntegration -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c

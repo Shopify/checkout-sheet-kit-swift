@@ -1,0 +1,21 @@
+name: Run Lint Checks
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/swiftlint.yml"
+      - ".swiftlint.yml"
+      - "**/*.swift"
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run SwiftLint
+        uses: norio-nomura/action-swiftlint@master
+
+      - name: Check License Headers
+        run: ./Scripts/copy_license && git diff --name-only --exit-code
