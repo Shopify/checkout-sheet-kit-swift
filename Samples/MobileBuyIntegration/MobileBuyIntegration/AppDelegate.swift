@@ -28,6 +28,8 @@ import ShopifyCheckout
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
+        ShopifyChekcout
+
 		ShopifyCheckout.configure {
 			$0.colorScheme = .automatic
 
