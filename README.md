@@ -96,7 +96,13 @@ extension MyViewController: ShopifyCheckoutDelegate {
 
 ### Preloading
 
-The checkout experience is complex and can be costly to load, especially on mobile cellular networks. Therefore, we provide the ability for consuming apps to hint to the library that checkout may be presented soon and should preload in the background.
+The checkout experience is complex and can be costly to load, especially on mobile cellular networks. Therefore, we provide the ability for consuming apps to hint to the library that checkout may be presented soon and should preload in the background. This is a feature
+that needs to be enabled in the ShopifyChecout configuration
+
+```swift
+ShopifyCheckout.configure {
+  $0.preloading.enabled = true // defaults to false
+}
 
 ```swift
 ShopifyCheckout.preload(checkout: url)
