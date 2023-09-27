@@ -33,6 +33,8 @@ protocol CheckoutViewDelegate: AnyObject {
 
 	func checkoutViewDidClickContactLink(url: URL)
 
+	func checkoutViewDidClickLink(url: URL)
+
 	func checkoutViewDidFailWithError(_ error: Error)
 }
 
@@ -114,14 +116,25 @@ extension CheckoutView: WKScriptMessageHandler {
 
 extension CheckoutView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-		guard let url = action.request.url, ["mailto", "tel"].contains(url.scheme) else {
+
+		guard let url = action.request.url else {
 			decisionHandler(.allow)
 			return
 		}
 
-		delegate?.checkoutViewDidClickContactLink(url: url)
+		if ["mailto", "tel"].contains(url.scheme) {
+			delegate?.checkoutViewDidClickContactLink(url: url)
+			decisionHandler(.cancel)
+			return
+		}
 
-		decisionHandler(.cancel)
+		if action.navigationType == .linkActivated && action.targetFrame == nil {
+			delegate?.checkoutViewDidClickLink(url: url)
+			decisionHandler(.cancel)
+			return
+		}
+
+		decisionHandler(.allow)
 	}
 
 	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
