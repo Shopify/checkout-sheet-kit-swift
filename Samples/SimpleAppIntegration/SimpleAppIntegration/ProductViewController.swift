@@ -106,6 +106,12 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		}
 	}
 
+	func checkoutDidClickLink(url: URL) {
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
+	}
+
 	func checkoutDidFail(errors: [CheckoutError]) {
 		print(errors)
 	}
