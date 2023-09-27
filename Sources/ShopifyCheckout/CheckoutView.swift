@@ -121,13 +121,13 @@ extension CheckoutView: WKNavigationDelegate {
 			return
 		}
 
-		if ["mailto", "tel"].contains(url.scheme) {
+		if (["mailto", "tel"].contains(url.scheme)) {
 			delegate?.checkoutViewDidClickContactLink(url: url)
 			decisionHandler(.cancel)
 			return
 		}
 
-		if action.navigationType == .linkActivated && action.targetFrame == nil {
+		if (action.navigationType == .linkActivated && action.targetFrame == nil) {
 			delegate?.checkoutViewDidClickLink(url: url)
 			decisionHandler(.cancel)
 			return
