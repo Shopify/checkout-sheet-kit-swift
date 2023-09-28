@@ -43,27 +43,15 @@ public protocol CheckoutDelegate: AnyObject {
     func checkoutDidClickContactLink(url: URL)
 }
 
-open class CheckoutHandler: CheckoutDelegate {
-
-    public init() {}
-
-    /// Tells the delegate that the checkout successfully completed.
-    open func checkoutDidComplete() {}
-
-    /// Tells the delegate that the checkout was cancelled by the buyer.
-    open func checkoutDidCancel() {}
-
-    /// Tells the delegate that the checkout encoutered one or more errors.
-    open func checkoutDidFail(errors: [CheckoutError]) {}
-
-    /// hi there
-    open func checkoutDidClickLink(url: URL) {
+extension CheckoutDelegate {
+    /// Tells te delegate that the buyer clicked an external link
+    public func checkoutDidClickLink(url: URL) {
         handleUrl(url)
     }
 
     /// Tells the delegate that the buyer clicked a link which points to an
     /// email address or telephone number via `mailto:` or `tel:`.
-    open func checkoutDidClickContactLink(url: URL) {
+    public func checkoutDidClickContactLink(url: URL) {
         handleUrl(url)
     }
 
@@ -72,5 +60,4 @@ open class CheckoutHandler: CheckoutDelegate {
             UIApplication.shared.open(url)
         }
     }
-
 }

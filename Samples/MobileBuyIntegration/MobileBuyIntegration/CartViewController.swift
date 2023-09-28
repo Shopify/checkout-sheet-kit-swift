@@ -32,8 +32,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	private var bag = Set<AnyCancellable>()
 
-    private var checkoutHandler: CartCheckoutHandler?
-
 	@IBOutlet private var emptyView: UIView!
 
 	@IBOutlet private var tableView: UITableView!
@@ -48,7 +46,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
 		title = "Cart"
-        self.checkoutHandler = CartCheckoutHandler(viewController: self)
 
 		navigationItem.rightBarButtonItem = UIBarButtonItem(
 			title: "Reset", style: .plain, target: self, action: #selector(resetCart)
@@ -136,7 +133,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBAction private func presentCheckout() {
 		guard let url = CartManager.shared.cart?.checkoutUrl else { return }
-        ShopifyCheckout.present(checkout: url, from: self, delegate: self.checkoutHandler)
+        ShopifyCheckout.present(checkout: url, from: self, delegate: self)
 	}
 
 	@IBAction public func resetCart() {
@@ -154,19 +151,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 }
 
-class CartCheckoutHandler: CheckoutHandler {
-    var viewController: CartViewController
-
-    init(viewController: CartViewController) {
-        self.viewController = viewController
-        super.init()
+extension CartViewController: CheckoutDelegate {
+    func checkoutDidComplete() {
+        resetCart()
     }
 
-    override func checkoutDidComplete() {
-        CartManager.shared.resetCart()
+    func checkoutDidCancel() {
+        dismiss(animated: true)
     }
 
-    override func checkoutDidCancel() {
-        viewController.dismiss(animated: true)
+    func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
+        print(#function, errors)
     }
 }
+
