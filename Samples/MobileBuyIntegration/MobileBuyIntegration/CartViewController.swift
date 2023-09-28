@@ -32,6 +32,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	private var bag = Set<AnyCancellable>()
 
+    private var checkoutHandler: MyHandler?
+
 	@IBOutlet private var emptyView: UIView!
 
 	@IBOutlet private var tableView: UITableView!
@@ -40,12 +42,37 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBOutlet private var checkoutButton: UIButton!
 
+    class MyHandler: CheckoutDelegate {
+        weak var viewController: CartViewController?
+
+        init(viewController: CartViewController? = nil) {
+            self.viewController = viewController
+        }
+
+        func checkoutDidComplete() {
+            guard let viewController = viewController else { return }
+            viewController.resetCart()
+        }
+
+        func checkoutDidCancel() {
+            guard let viewController = viewController else { return }
+            viewController.dismiss(animated: true)
+        }
+
+        func checkoutDidClickLink(url: URL) {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
+        }
+    }
+
 	// MARK: Initializers
 
 	override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
 		super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
 		title = "Cart"
+        self.checkoutHandler = MyHandler(viewController: self)
 
 		navigationItem.rightBarButtonItem = UIBarButtonItem(
 			title: "Reset", style: .plain, target: self, action: #selector(resetCart)
@@ -133,7 +160,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBAction private func presentCheckout() {
 		guard let url = CartManager.shared.cart?.checkoutUrl else { return }
-		ShopifyCheckout.present(checkout: url, from: self, delegate: self)
+        ShopifyCheckout.present(checkout: url, from: self, delegate: self.checkoutHandler)
 	}
 
 	@IBAction private func resetCart() {
@@ -148,31 +175,5 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 			fatalError("invald index path")
 		}
 		return variant
-	}
-}
-
-extension CartViewController: CheckoutDelegate {
-	func checkoutDidComplete() {
-		resetCart()
-	}
-
-	func checkoutDidCancel() {
-		dismiss(animated: true)
-	}
-
-	func checkoutDidClickContactLink(url: URL) {
-		if UIApplication.shared.canOpenURL(url) {
-			UIApplication.shared.open(url)
-		}
-	}
-
-	func checkoutDidClickLink(url: URL) {
-		if UIApplication.shared.canOpenURL(url) {
-			UIApplication.shared.open(url)
-		}
-	}
-
-	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
-		print(#function, errors)
 	}
 }
