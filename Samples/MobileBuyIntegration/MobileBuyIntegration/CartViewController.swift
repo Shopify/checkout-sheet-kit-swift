@@ -42,24 +42,25 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBOutlet private var checkoutButton: UIButton!
 
-    class MyHandler: CheckoutDelegate {
+    class MyHandler: CheckoutHandler {
         weak var viewController: CartViewController?
 
-        init(viewController: CartViewController? = nil) {
+        init(viewController: CartViewController) {
             self.viewController = viewController
+            super.init()
         }
 
-        func checkoutDidComplete() {
+        override func checkoutDidComplete() {
             guard let viewController = viewController else { return }
             viewController.resetCart()
         }
 
-        func checkoutDidCancel() {
+        override func checkoutDidCancel() {
             guard let viewController = viewController else { return }
             viewController.dismiss(animated: true)
         }
 
-        func checkoutDidClickLink(url: URL) {
+        override func checkoutDidClickLink(url: URL) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
             }

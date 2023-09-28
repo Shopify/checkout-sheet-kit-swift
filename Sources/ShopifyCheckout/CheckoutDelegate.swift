@@ -36,24 +36,27 @@ public protocol CheckoutDelegate: AnyObject {
 	func checkoutDidFail(errors: [CheckoutError])
 }
 
-extension CheckoutDelegate {
+open class CheckoutHandler: CheckoutDelegate {
+
+    public init() {}
+
     /// Tells the delegate that the checkout successfully completed.
-    public func checkoutDidComplete() {}
+    open func checkoutDidComplete() {}
 
     /// Tells the delegate that the checkout was cancelled by the buyer.
-    public func checkoutDidCancel() {}
+    open func checkoutDidCancel() {}
 
     /// Tells the delegate that the checkout encoutered one or more errors.
-    public func checkoutDidFail(errors: [CheckoutError]) {}
+    open func checkoutDidFail(errors: [CheckoutError]) {}
 
     /// hi there
-    public func checkoutDidClickLink(url: URL) {
+    open func checkoutDidClickLink(url: URL) {
         handleUrl(url)
     }
 
     /// Tells the delegate that the buyer clicked a link which points to an
     /// email address or telephone number via `mailto:` or `tel:`.
-    public func checkoutDidClickContactLink(url: URL) {
+    open func checkoutDidClickContactLink(url: URL) {
         handleUrl(url)
     }
 
