@@ -36,7 +36,7 @@ class StorefrontClient {
 			let domain = infoPlist["StorefrontDomain"] as? String,
 			let token = infoPlist["StorefrontAccessToken"] as? String
 		else {
-			fatalError()
+			fatalError("unable to load storefront configuration")
 		}
 
 		client = Graph.Client(shopDomain: domain, apiKey: token)
