@@ -90,11 +90,11 @@ class StorefrontClient {
 	func createCart(variant: ProductVariant, _ handler: @escaping CartResultHandler) {
 		let query = """
 		mutation Foo {
-		cartCreate(input: { lines: { merchandiseId: "\(variant.id)" } }) {
-			  cart {
-				  checkoutUrl
-			  }
-		  }
+			cartCreate(input: { lines: { merchandiseId: "\(variant.id)" } }) {
+				cart {
+					checkoutUrl
+				}
+			}
 		}
 		"""
 

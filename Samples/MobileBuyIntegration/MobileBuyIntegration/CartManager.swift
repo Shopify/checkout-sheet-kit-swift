@@ -130,7 +130,7 @@ extension Storefront.CartQuery {
 							})
 							.product { $0
 								.title()
-                                				.vendor()
+								.vendor()
 								.featuredImage { $0
 									.url()
 								}

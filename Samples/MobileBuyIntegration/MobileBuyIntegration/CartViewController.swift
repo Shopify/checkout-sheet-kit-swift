@@ -107,7 +107,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 		var content = cell.defaultContentConfiguration()
 		content.text = variant.product.title
-    		content.secondaryText = variant.product.vendor
+		content.secondaryText = variant.product.vendor
 		cell.contentConfiguration = content
 
 		return cell
