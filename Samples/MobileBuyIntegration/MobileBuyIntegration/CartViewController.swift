@@ -32,7 +32,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	private var bag = Set<AnyCancellable>()
 
-    private var checkoutHandler: MyHandler?
+    private var checkoutHandler: CartCheckoutHandler?
 
 	@IBOutlet private var emptyView: UIView!
 
@@ -42,38 +42,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBOutlet private var checkoutButton: UIButton!
 
-    class MyHandler: CheckoutHandler {
-        weak var viewController: CartViewController?
-
-        init(viewController: CartViewController) {
-            self.viewController = viewController
-            super.init()
-        }
-
-        override func checkoutDidComplete() {
-            guard let viewController = viewController else { return }
-            viewController.resetCart()
-        }
-
-        override func checkoutDidCancel() {
-            guard let viewController = viewController else { return }
-            viewController.dismiss(animated: true)
-        }
-
-        override func checkoutDidClickLink(url: URL) {
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url)
-            }
-        }
-    }
-
 	// MARK: Initializers
 
 	override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
 		super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
 		title = "Cart"
-        self.checkoutHandler = MyHandler(viewController: self)
+        self.checkoutHandler = CartCheckoutHandler(viewController: self)
 
 		navigationItem.rightBarButtonItem = UIBarButtonItem(
 			title: "Reset", style: .plain, target: self, action: #selector(resetCart)
@@ -164,7 +139,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ShopifyCheckout.present(checkout: url, from: self, delegate: self.checkoutHandler)
 	}
 
-	@IBAction private func resetCart() {
+	@IBAction public func resetCart() {
 		CartManager.shared.resetCart()
 	}
 
@@ -177,4 +152,21 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		}
 		return variant
 	}
+}
+
+class CartCheckoutHandler: CheckoutHandler {
+    var viewController: CartViewController
+
+    init(viewController: CartViewController) {
+        self.viewController = viewController
+        super.init()
+    }
+
+    override func checkoutDidComplete() {
+        CartManager.shared.resetCart()
+    }
+
+    override func checkoutDidCancel() {
+        viewController.dismiss(animated: true)
+    }
 }
