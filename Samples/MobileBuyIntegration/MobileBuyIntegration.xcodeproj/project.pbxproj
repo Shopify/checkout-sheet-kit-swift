@@ -14,7 +14,6 @@
 		4EBBA7742A5F0CE200193E19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7732A5F0CE200193E19 /* Assets.xcassets */; };
 		4EBBA7772A5F0CE200193E19 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7752A5F0CE200193E19 /* LaunchScreen.storyboard */; };
 		4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = 4EBBA7A22A5F0F5600193E19 /* Buy */; };
-		4EBBA7A82A5F10C400193E19 /* Storefront.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7A72A5F10C400193E19 /* Storefront.xcconfig */; };
 		4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */; };
 		4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */; };
 		4EBBA7AE2A5F1BBF00193E19 /* UIImageView+URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */; };
@@ -144,6 +143,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4EBBA77B2A5F0CE200193E19 /* Build configuration list for PBXNativeTarget "MobileBuyIntegration" */;
 			buildPhases = (
+				4ECA613D2AC5D304005A59A7 /* Run SwiftLint */,
 				4EBBA7632A5F0CE200193E19 /* Sources */,
 				4EBBA7642A5F0CE200193E19 /* Frameworks */,
 				4EBBA7652A5F0CE200193E19 /* Resources */,
@@ -151,7 +151,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				4E5691692A66EEC3009FDC0E /* PBXTargetDependency */,
 			);
 			name = MobileBuyIntegration;
 			packageProductDependencies = (
@@ -170,7 +169,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					4EBBA7662A5F0CE200193E19 = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -188,7 +187,6 @@
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
 				4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
-				4E5691672A66EEB8009FDC0E /* XCRemoteSwiftPackageReference "SwiftLintPlugin" */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -205,7 +203,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4EBBA7772A5F0CE200193E19 /* LaunchScreen.storyboard in Resources */,
-				4EBBA7A82A5F10C400193E19 /* Storefront.xcconfig in Resources */,
 				4EF54F312A6F63C000F5E407 /* CartViewController.xib in Resources */,
 				4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */,
 				4EBBA7742A5F0CE200193E19 /* Assets.xcassets in Resources */,
@@ -213,6 +210,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4ECA613D2AC5D304005A59A7 /* Run SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4EBBA7632A5F0CE200193E19 /* Sources */ = {
@@ -233,13 +252,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		4E5691692A66EEC3009FDC0E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 4E5691682A66EEC3009FDC0E /* SwiftLint */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		4EBBA7752A5F0CE200193E19 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -257,6 +269,7 @@
 			baseConfigurationReference = 4EBBA7A72A5F10C400193E19 /* Storefront.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -318,6 +331,7 @@
 			baseConfigurationReference = 4EBBA7A72A5F10C400193E19 /* Storefront.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -444,14 +458,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		4E5691672A66EEB8009FDC0E /* XCRemoteSwiftPackageReference "SwiftLintPlugin" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/lukepistrol/SwiftLintPlugin";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.52.4;
-			};
-		};
 		4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Shopify/mobile-buy-sdk-ios";
@@ -463,11 +469,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4E5691682A66EEC3009FDC0E /* SwiftLint */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4E5691672A66EEB8009FDC0E /* XCRemoteSwiftPackageReference "SwiftLintPlugin" */;
-			productName = "plugin:SwiftLint";
-		};
 		4EBBA7A22A5F0F5600193E19 /* Buy */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;

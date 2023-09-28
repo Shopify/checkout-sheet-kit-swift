@@ -1,3 +1,1 @@
-disabled_rules:
-  - line_length
-reporter: "xcode"
+../../.swiftlint.yml

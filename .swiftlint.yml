@@ -1,6 +1,9 @@
 disabled_rules:
   - line_length
 
+opt_in_rules:
+  - indentation_width
+
 nesting:
   type_level:
     warning: 2

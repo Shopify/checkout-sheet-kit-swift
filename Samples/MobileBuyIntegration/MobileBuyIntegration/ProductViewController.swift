@@ -35,7 +35,7 @@ class ProductViewController: UIViewController {
 
 	@IBOutlet private var variantLabel: UILabel!
 
-  	@IBOutlet private var descriptionLabel: UILabel!
+	@IBOutlet private var descriptionLabel: UILabel!
 
 	@IBOutlet private var addToCartButton: UIButton!
 
@@ -92,7 +92,7 @@ class ProductViewController: UIViewController {
 					.id()
 					.title()
 					.description()
-          				.vendor()
+					.vendor()
 					.featuredImage { $0
 						.url()
 					}
@@ -123,8 +123,8 @@ class ProductViewController: UIViewController {
 		guard let product = self.product else { return }
 
 		titleLabel.text = product.title
-	        variantLabel.text = product.vendor
-	        descriptionLabel.text = product.description
+		variantLabel.text = product.vendor
+		descriptionLabel.text = product.description
 
 		if let featuredImageURL = product.featuredImage?.url {
 			image.load(url: featuredImageURL)
