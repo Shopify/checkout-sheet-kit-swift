@@ -123,7 +123,7 @@ class SettingsViewController: UITableViewController {
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		switch indexPath.section {
 		case 0:
-			preloadingSwitch.isOn = !preloadingSwitch.isOn
+			preloadingSwitch.isOn.toggle()
 			preloadingSwitchDidChange()
 		case 1:
 			let newColorScheme = colorScheme(at: indexPath)

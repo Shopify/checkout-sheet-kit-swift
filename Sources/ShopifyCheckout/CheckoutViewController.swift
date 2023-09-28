@@ -71,7 +71,7 @@ class CheckoutViewController: UIViewController {
 
 	// MARK: UIViewController Lifecycle
 
-	public override func viewDidLoad() {
+	override public func viewDidLoad() {
 		super.viewDidLoad()
 
 		view.backgroundColor = .systemBackground

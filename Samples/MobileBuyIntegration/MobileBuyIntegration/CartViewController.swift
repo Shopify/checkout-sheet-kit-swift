@@ -145,7 +145,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 			let lines = CartManager.shared.cart?.lines.nodes,
 			let variant = lines[indexPath.item].merchandise as? Storefront.ProductVariant
 		else {
-			fatalError()
+			fatalError("invald index path")
 		}
 		return variant
 	}
