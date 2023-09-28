@@ -43,7 +43,7 @@ public protocol CheckoutDelegate: AnyObject {
     func checkoutDidClickContactLink(url: URL)
 }
 
-extension CheckoutDelegate {
+extension CheckoutDelegate where Self: UIViewController {
     /// Tells te delegate that the buyer clicked an external link
     public func checkoutDidClickLink(url: URL) {
         handleUrl(url)

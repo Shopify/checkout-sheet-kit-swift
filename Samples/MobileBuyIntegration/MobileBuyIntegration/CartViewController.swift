@@ -136,7 +136,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ShopifyCheckout.present(checkout: url, from: self, delegate: self)
 	}
 
-	@IBAction public func resetCart() {
+	@IBAction private func resetCart() {
 		CartManager.shared.resetCart()
 	}
 
