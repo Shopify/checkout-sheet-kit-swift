@@ -69,7 +69,6 @@ class CheckoutView: WKWebView {
 
 	override init(frame: CGRect, configuration: WKWebViewConfiguration) {
 		configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
-		configuration.userContentController.addUserScript(CheckoutBridge.bootstrapScript)
 
 		super.init(frame: frame, configuration: configuration)
 

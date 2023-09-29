@@ -28,19 +28,6 @@ enum CheckoutBridge {
 
 	static let messageHandler = "mobileCheckoutSdk"
 
-	static let bootstrapScript: WKUserScript = {
-		let source = """
-		window.mobileCheckoutSdkVariant = "standard";
-		window.mobileCheckoutSdkSchemaVersion = "\(schemaVersion)";
-		window.mobileCheckoutSdkVersion = "\(ShopifyCheckout.version)";
-		"""
-		return WKUserScript(
-			source: source,
-			injectionTime: .atDocumentStart,
-			forMainFrameOnly: true
-		)
-	}()
-
 	static var applicationName: String {
 		let theme = ShopifyCheckout.configuration.colorScheme.rawValue
 		return "ShopifyCheckoutSDK/\(ShopifyCheckout.version) (\(schemaVersion);\(theme))"
