@@ -152,13 +152,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 }
 
 extension CartViewController: CheckoutDelegate {
-    func checkoutDidComplete() {
-        resetCart()
-    }
+	func checkoutDidComplete() {
+		resetCart()
+	}
 
-    func checkoutDidCancel() {
-        dismiss(animated: true)
-    }
+	func checkoutDidCancel() {
+		dismiss(animated: true)
+	}
 
 	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
 		print(#function, errors)

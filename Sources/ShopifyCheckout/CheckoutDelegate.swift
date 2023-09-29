@@ -45,19 +45,19 @@ public protocol CheckoutDelegate: AnyObject {
 
 extension CheckoutDelegate where Self: UIViewController {
     /// Tells te delegate that the buyer clicked an external link
-    public func checkoutDidClickLink(url: URL) {
-        handleUrl(url)
-    }
+	public func checkoutDidClickLink(url: URL) {
+		handleUrl(url)
+	}
 
-    /// Tells the delegate that the buyer clicked a link which points to an
-    /// email address or telephone number via `mailto:` or `tel:`.
-    public func checkoutDidClickContactLink(url: URL) {
-        handleUrl(url)
-    }
+	/// Tells the delegate that the buyer clicked a link which points to an
+	/// email address or telephone number via `mailto:` or `tel:`.
+	public func checkoutDidClickContactLink(url: URL) {
+		handleUrl(url)
+	}
 
-    private func handleUrl(_ url: URL) {
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        }
-    }
+	private func handleUrl(_ url: URL) {
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
+	}
 }
