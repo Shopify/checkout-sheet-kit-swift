@@ -133,7 +133,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBAction private func presentCheckout() {
 		guard let url = CartManager.shared.cart?.checkoutUrl else { return }
-        ShopifyCheckout.present(checkout: url, from: self, delegate: self)
+		ShopifyCheckout.present(checkout: url, from: self, delegate: self)
 	}
 
 	@IBAction private func resetCart() {
@@ -160,8 +160,7 @@ extension CartViewController: CheckoutDelegate {
         dismiss(animated: true)
     }
 
-    func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
-        print(#function, errors)
-    }
+	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
+		print(#function, errors)
+	}
 }
-
