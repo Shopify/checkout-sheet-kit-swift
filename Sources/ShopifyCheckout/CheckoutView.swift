@@ -143,7 +143,7 @@ extension CheckoutView: WKNavigationDelegate {
 	private func isMailOrTelLink(_ url: URL) -> Bool {
 		return ["mailto", "tel"].contains(url.scheme)
 	}
- }
+}
 
 extension CheckoutView {
 	fileprivate struct CacheEntry {
