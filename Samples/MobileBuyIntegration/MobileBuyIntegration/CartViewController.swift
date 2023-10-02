@@ -171,14 +171,14 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidFail(error: ShopifyCheckout.CheckoutError) {
-        switch error {
-        case .internalError(let underlying):
-            print(#function, underlying)
-        case .httpError(let statusCode, let message):
-            print(#function, statusCode, message)
-            dismiss(animated: true)
-            resetCart()
-            self.showAlert(message: message)
+		switch error {
+		case .internalError(let underlying):
+			print(#function, underlying)
+		case .httpError(let statusCode, let message):
+			print(#function, statusCode, message)
+			dismiss(animated: true)
+			resetCart()
+			self.showAlert(message: message)
         }
 	}
 }
