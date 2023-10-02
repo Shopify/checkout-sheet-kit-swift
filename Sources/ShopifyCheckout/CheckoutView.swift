@@ -108,6 +108,7 @@ extension CheckoutView: WKScriptMessageHandler {
 }
 
 extension CheckoutView: WKNavigationDelegate {
+
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
 		guard let url = action.request.url else {
@@ -115,11 +116,12 @@ extension CheckoutView: WKNavigationDelegate {
 			return
 		}
 
-		if isExternalLink(action) || isMailOrTelLink(url) {
+		if isExternalLink(action) || isMailOrTelLink(url) || isShopApp(url) {
 			viewDelegate?.checkoutViewDidClickLink(url: url)
 			decisionHandler(.cancel)
 			return
 		}
+
 
 		decisionHandler(.allow)
 	}
@@ -167,6 +169,10 @@ extension CheckoutView: WKNavigationDelegate {
 
 	private func isCheckout(url: URL?) -> Bool {
 		return self.url == url
+	}
+
+	private func isShopAppURL(_ url: URL) -> Bool {
+		return url.absoluteString.hasPrefix("https://go.shop.app")
 	}
 }
 
