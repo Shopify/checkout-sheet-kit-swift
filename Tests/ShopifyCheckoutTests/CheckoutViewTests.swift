@@ -36,34 +36,34 @@ class CheckoutViewTests: XCTestCase {
 		let link = URL(string: "mailto:contact@shopify.com")!
 
 		let delegate = MockCheckoutViewDelegate()
-		let didClickContactLinkExpectation = expectation(
-			description: "checkoutViewDidClickContactLink was called"
+		let didClickLinkExpectation = expectation(
+			description: "checkoutViewDidClickLink was called"
 		)
-		delegate.didClickContactLinkExpectation = didClickContactLinkExpectation
+		delegate.didClickLinkExpectation = didClickLinkExpectation
 		view.delegate = delegate
 
 		view.webView(view, decidePolicyFor: MockNavigationAction(url: link)) { policy in
 			XCTAssertEqual(policy, .cancel)
 		}
 
-		wait(for: [didClickContactLinkExpectation], timeout: 1)
+		wait(for: [didClickLinkExpectation], timeout: 1)
 	}
 
 	func testPhoneContactLinkDelegation() {
 		let link = URL(string: "tel:1234567890")!
 
 		let delegate = MockCheckoutViewDelegate()
-		let didClickContactLinkExpectation = expectation(
-			description: "checkoutViewDidClickContactLink was called"
+		let didCLickLinkExpectation = expectation(
+			description: "checkoutViewDidClickLink was called"
 		)
-		delegate.didClickContactLinkExpectation = didClickContactLinkExpectation
+		delegate.didClickLinkExpectation = didCLickLinkExpectation
 		view.delegate = delegate
 
 		view.webView(view, decidePolicyFor: MockNavigationAction(url: link)) { policy in
 			XCTAssertEqual(policy, .cancel)
 		}
 
-		wait(for: [didClickContactLinkExpectation], timeout: 1)
+		wait(for: [didCLickLinkExpectation], timeout: 1)
 	}
 
 	func testURLLinkDelegation() {

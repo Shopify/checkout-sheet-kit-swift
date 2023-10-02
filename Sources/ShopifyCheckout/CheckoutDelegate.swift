@@ -35,23 +35,13 @@ public protocol CheckoutDelegate: AnyObject {
 	/// Tells the delegate that the checkout encoutered one or more errors.
 	func checkoutDidFail(errors: [CheckoutError])
 
-	/// Tells te delegate that the buyer clicked an external link
+    /// Tells te delegate that the buyer clicked a link
+	/// This may include email address or telephone number via `mailto:` or `tel:`.
 	func checkoutDidClickLink(url: URL)
-
-	/// Tells the delegate that the buyer clicked a link which points to an
-	/// email address or telephone number via `mailto:` or `tel:`.
-	func checkoutDidClickContactLink(url: URL)
 }
 
-extension CheckoutDelegate where Self: UIViewController {
-    /// Tells te delegate that the buyer clicked an external link
+extension CheckoutDelegate {
 	public func checkoutDidClickLink(url: URL) {
-		handleUrl(url)
-	}
-
-	/// Tells the delegate that the buyer clicked a link which points to an
-	/// email address or telephone number via `mailto:` or `tel:`.
-	public func checkoutDidClickContactLink(url: URL) {
 		handleUrl(url)
 	}
 
