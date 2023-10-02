@@ -160,12 +160,6 @@ extension CartViewController: CheckoutDelegate {
 		dismiss(animated: true)
 	}
 
-	func checkoutDidClickContactLink(url: URL) {
-		if UIApplication.shared.canOpenURL(url) {
-			UIApplication.shared.open(url)
-		}
-	}
-
 	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
 		print(#function, errors)
 	}

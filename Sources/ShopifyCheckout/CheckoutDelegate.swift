@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import Foundation
+import UIKit
 
 /// A delegate protocol for managing checkout lifecycle events.
 public protocol CheckoutDelegate: AnyObject {
@@ -31,10 +32,22 @@ public protocol CheckoutDelegate: AnyObject {
 	/// Tells the delegate that the checkout was cancelled by the buyer.
 	func checkoutDidCancel()
 
-	/// Tells the delegate that the buyer clicked a link which points to an
-	/// email address or telephone number via `mailto:` or `tel:`.
-	func checkoutDidClickContactLink(url: URL)
-
 	/// Tells the delegate that the checkout encoutered one or more errors.
 	func checkoutDidFail(errors: [CheckoutError])
+
+    /// Tells te delegate that the buyer clicked a link
+	/// This includes email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
+	func checkoutDidClickLink(url: URL)
+}
+
+extension CheckoutDelegate {
+	public func checkoutDidClickLink(url: URL) {
+		handleUrl(url)
+	}
+
+	private func handleUrl(_ url: URL) {
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
+	}
 }

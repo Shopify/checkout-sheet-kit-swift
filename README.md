@@ -92,8 +92,8 @@ extension MyViewController: ShopifyCheckoutDelegate {
     // The buyer encountered an error during checkout.
   }
 
-  func checkoutDidClickContactLink(url: URL) {
-    // Called when the buyer clicked a link which points to an email address or telephone number via `mailto:` or `tel:`.
+  func checkoutDidClickLink(url: URL) {
+    // Called when the buyer clicked a link e.g mail address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
   }
 }
 ```

@@ -130,11 +130,11 @@ extension CheckoutViewController: CheckoutViewDelegate {
 		delegate?.checkoutDidComplete()
 	}
 
-	func checkoutViewDidClickContactLink(url: URL) {
-		delegate?.checkoutDidClickContactLink(url: url)
-	}
-
 	func checkoutViewDidFailWithError(_ error: Error) {
 		delegate?.checkoutDidFail(errors: [.internalError(underlying: error)])
+	}
+
+	func checkoutViewDidClickLink(url: URL) {
+		delegate?.checkoutDidClickLink(url: url)
 	}
 }

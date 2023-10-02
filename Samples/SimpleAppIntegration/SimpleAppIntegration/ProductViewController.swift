@@ -100,12 +100,6 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		dismiss(animated: true)
 	}
 
-	func checkoutDidClickContactLink(url: URL) {
-		if UIApplication.shared.canOpenURL(url) {
-			UIApplication.shared.open(url)
-		}
-	}
-
 	func checkoutDidFail(errors: [CheckoutError]) {
 		print(errors)
 	}
