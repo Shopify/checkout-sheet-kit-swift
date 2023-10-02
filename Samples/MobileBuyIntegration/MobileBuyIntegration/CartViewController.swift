@@ -179,7 +179,7 @@ extension CartViewController: CheckoutDelegate {
 			dismiss(animated: true)
 			resetCart()
 			self.showAlert(message: message)
-        }
+		}
 	}
 }
 
