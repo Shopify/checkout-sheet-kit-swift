@@ -88,7 +88,7 @@ extension MyViewController: ShopifyCheckoutDelegate {
     // The buyer cancelled the checkout. You should use this to call `dismiss(animated:)`.
   }
 
-  func checkoutDidFail(errors: [CheckoutError]) {
+  func checkoutDidFail(error: CheckoutError) {
     // The buyer encountered an error during checkout.
   }
 

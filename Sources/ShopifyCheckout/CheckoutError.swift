@@ -25,4 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 public enum CheckoutError: Swift.Error {
 	/// Represents an internal error within Shopify Checkout
 	case internalError(underlying: Swift.Error)
+
+	// Represents a http error encountered during a Shopify Checkout.
+	// eg: 410, "checkout token has expired"
+	case httpError(statusCode: Int, message: String)
 }

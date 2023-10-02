@@ -100,7 +100,7 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		dismiss(animated: true)
 	}
 
-	func checkoutDidFail(errors: [CheckoutError]) {
-		print(errors)
+	func checkoutDidFail(error: CheckoutError) {
+		print(error)
 	}
 }

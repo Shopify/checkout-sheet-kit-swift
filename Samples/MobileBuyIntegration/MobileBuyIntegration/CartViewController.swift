@@ -163,4 +163,31 @@ extension CartViewController: CheckoutDelegate {
 	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
 		print(#function, errors)
 	}
+
+	func checkoutDidClickContactLink(url: URL) {
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
+	}
+
+	func checkoutDidFail(error: ShopifyCheckout.CheckoutError) {
+		switch error {
+		case .internalError(let underlying):
+			print(#function, underlying)
+		case .httpError(let statusCode, let message):
+			print(#function, statusCode, message)
+			dismiss(animated: true)
+			resetCart()
+			self.showAlert(message: message)
+		}
+	}
+}
+
+extension CartViewController {
+    func showAlert(message: String) {
+		let alert = UIAlertController(title: "Checkout Failed", message: message, preferredStyle: .alert)
+		alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in }))
+
+		self.present(alert, animated: true, completion: nil)
+    }
 }

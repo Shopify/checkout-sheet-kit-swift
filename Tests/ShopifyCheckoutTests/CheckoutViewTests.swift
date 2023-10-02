@@ -27,9 +27,12 @@ import WebKit
 
 class CheckoutViewTests: XCTestCase {
 	private var view: CheckoutView!
+	private var mockDelegate: MockCheckoutViewDelegate!
 
 	override func setUp() {
-		view = CheckoutView()
+		view = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+        mockDelegate = MockCheckoutViewDelegate()
+        view.viewDelegate = mockDelegate
 	}
 
 	func testEmailContactLinkDelegation() {
@@ -40,7 +43,7 @@ class CheckoutViewTests: XCTestCase {
 			description: "checkoutViewDidClickLink was called"
 		)
 		delegate.didClickLinkExpectation = didClickLinkExpectation
-		view.delegate = delegate
+		view.viewDelegate = delegate
 
 		view.webView(view, decidePolicyFor: MockNavigationAction(url: link)) { policy in
 			XCTAssertEqual(policy, .cancel)
@@ -53,17 +56,17 @@ class CheckoutViewTests: XCTestCase {
 		let link = URL(string: "tel:1234567890")!
 
 		let delegate = MockCheckoutViewDelegate()
-		let didCLickLinkExpectation = expectation(
+		let didClickLinkExpectation = expectation(
 			description: "checkoutViewDidClickLink was called"
 		)
-		delegate.didClickLinkExpectation = didCLickLinkExpectation
-		view.delegate = delegate
+		delegate.didClickLinkExpectation = didClickLinkExpectation
+		view.viewDelegate = delegate
 
 		view.webView(view, decidePolicyFor: MockNavigationAction(url: link)) { policy in
 			XCTAssertEqual(policy, .cancel)
 		}
 
-		wait(for: [didCLickLinkExpectation], timeout: 1)
+		wait(for: [didClickLinkExpectation], timeout: 1)
 	}
 
 	func testURLLinkDelegation() {
@@ -74,7 +77,7 @@ class CheckoutViewTests: XCTestCase {
 			description: "checkoutViewDidClickLink was called"
 		)
 		delegate.didClickLinkExpectation = didClickLinkExpectation
-		view.delegate = delegate
+		view.viewDelegate = delegate
 
 		view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { policy in
 			XCTAssertEqual(policy, .cancel)
@@ -82,4 +85,36 @@ class CheckoutViewTests: XCTestCase {
 
 		wait(for: [didClickLinkExpectation], timeout: 1)
 	}
+
+    func test410responseOnCheckoutURLCodeDelegation() {
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 410, httpVersion: nil, headerFields: nil)!
+
+        let policy = view.handleResponse(urlResponse)
+        XCTAssertEqual(policy, .cancel)
+
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+
+	func testNormalresponseOnNonCheckoutURLCodeDelegation() {
+		let link = URL(string: "http://shopify.com/resource_url")!
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+		didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = HTTPURLResponse(url: link, statusCode: 410, httpVersion: nil, headerFields: nil)!
+
+        let policy = view.handleResponse(urlResponse)
+		XCTAssertEqual(policy, .allow)
+
+		waitForExpectations(timeout: 0.5, handler: nil)
+    }
 }
