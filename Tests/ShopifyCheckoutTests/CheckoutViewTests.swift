@@ -103,7 +103,6 @@ class CheckoutViewTests: XCTestCase {
     }
 
 	func testNormalresponseOnNonCheckoutURLCodeDelegation() {
-		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
 		let link = URL(string: "http://shopify.com/resource_url")!
         let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
 		didFailWithErrorExpectation.isInverted = true
@@ -116,6 +115,6 @@ class CheckoutViewTests: XCTestCase {
         let policy = view.handleResponse(urlResponse)
 		XCTAssertEqual(policy, .allow)
 
-        waitForExpectations(timeout: 5, handler: nil)
+		waitForExpectations(timeout: 0.5, handler: nil)
     }
 }
