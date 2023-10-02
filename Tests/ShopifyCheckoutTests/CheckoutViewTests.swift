@@ -30,7 +30,7 @@ class CheckoutViewTests: XCTestCase {
 	private var mockDelegate: MockCheckoutViewDelegate!
 
 	override func setUp() {
-		view = CheckoutView()
+		view = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
         mockDelegate = MockCheckoutViewDelegate()
         view.viewDelegate = mockDelegate
 	}
@@ -87,13 +87,14 @@ class CheckoutViewTests: XCTestCase {
 	}
 
     func test410responseOnCheckoutURLCodeDelegation() {
-        let link = URL(string: "http://shopify.com/checkouts/cn/123")!
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
         let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
 
         mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
         view.viewDelegate = mockDelegate
 
-        let urlResponse = HTTPURLResponse(url: link, statusCode: 410, httpVersion: nil, headerFields: nil)!
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 410, httpVersion: nil, headerFields: nil)!
 
         let policy = view.handleResponse(urlResponse)
         XCTAssertEqual(policy, .cancel)
@@ -102,7 +103,8 @@ class CheckoutViewTests: XCTestCase {
     }
 
 	func testNormalresponseOnNonCheckoutURLCodeDelegation() {
-        let link = URL(string: "http://shopify.com/some_resource_url")!
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = URL(string: "http://shopify.com/resource_url")!
         let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
 		didFailWithErrorExpectation.isInverted = true
 
