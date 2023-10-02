@@ -132,7 +132,7 @@ extension CheckoutViewController: CheckoutViewDelegate {
 	}
 
 	func checkoutViewDidFailWithError(error: CheckoutError) {
-		delegate?.checkoutDidFail(error: .internalError(underlying: error))
+		delegate?.checkoutDidFail(error: error)
 	}
 
 	func checkoutViewDidClickLink(url: URL) {

@@ -25,15 +25,11 @@ import UIKit
 import WebKit
 
 protocol CheckoutViewDelegate: AnyObject {
-    func checkoutViewDidStartNavigation()
-
-    func checkoutViewDidCompleteCheckout()
-
-    func checkoutViewDidFinishNavigation()
-
+	func checkoutViewDidStartNavigation()
+	func checkoutViewDidCompleteCheckout()
+	func checkoutViewDidFinishNavigation()
 	func checkoutViewDidClickLink(url: URL)
-
-    func checkoutViewDidFailWithError(error: CheckoutError)
+	func checkoutViewDidFailWithError(error: CheckoutError)
 }
 
 class CheckoutView: WKWebView {
@@ -170,10 +166,7 @@ extension CheckoutView: WKNavigationDelegate {
 	}
 
 	private func isCheckout(url: URL?) -> Bool {
-		guard let url = url else { return false }
-		return url.path.contains("checkouts/c/") ||
-		url.path.contains("checkouts/cn/") ||
-		url.path.contains("cart/c/")
+		return self.url == url
 	}
 }
 
