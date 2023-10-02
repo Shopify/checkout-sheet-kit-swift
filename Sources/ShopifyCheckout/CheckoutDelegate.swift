@@ -33,7 +33,7 @@ public protocol CheckoutDelegate: AnyObject {
 	func checkoutDidCancel()
 
 	/// Tells the delegate that the checkout encoutered one or more errors.
-	func checkoutDidFail(errors: [CheckoutError])
+	func checkoutDidFail(error: CheckoutError)
 
     /// Tells te delegate that the buyer clicked a link
 	/// This includes email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.

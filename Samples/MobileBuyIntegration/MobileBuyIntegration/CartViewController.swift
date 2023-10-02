@@ -163,4 +163,79 @@ extension CartViewController: CheckoutDelegate {
 	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
 		print(#function, errors)
 	}
+
+	func checkoutDidClickContactLink(url: URL) {
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
+	}
+
+	func checkoutDidFail(error: ShopifyCheckout.CheckoutError) {
+        switch error {
+        case .internalError(let underlying):
+            print(#function, underlying)
+        case .httpError(let statusCode, let message):
+            print(#function, statusCode, message)
+            dismiss(animated: true)
+            resetCart()
+            self.showAlert(message: message)
+        }
+	}
+}
+
+extension CartViewController {
+    func showAlert(message: String) {
+        let window = UIApplication
+            .shared
+            .connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .last { $0.isKeyWindow }
+        guard let window = window else { return }
+
+        let label = themedLabel(message: message)
+
+        window.addSubview(label)
+
+        UIView.animate(withDuration: 10.0, delay: 0.1, options: .curveEaseOut, animations: {
+            label.alpha = 0.0
+        }, completion: {(_) in
+            label.removeFromSuperview()
+        })
+    }
+
+    func themedLabel(message: String) -> UILabel {
+        let label = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height-100, width: 300, height: 35))
+		switch ShopifyCheckout.configuration.colorScheme {
+		case .dark: setDarkLabel(label)
+		case .light: setLightLabel(label)
+		case .web: setLightLabel(label)
+		case .automatic:
+			if traitCollection.userInterfaceStyle == .dark {
+				setDarkLabel(label)
+			} else {
+				setLightLabel(label)
+			}
+		}
+
+        label.textAlignment = .center
+        label.text = message
+        label.alpha = 1.0
+        label.layer.cornerRadius = 10
+        label.clipsToBounds  =  true
+
+        return label
+    }
+
+	func setDarkLabel(_ label: UILabel) {
+		label.backgroundColor = UIColor.white.withAlphaComponent(0.8)
+		label.textColor = UIColor.black
+		label.font = UIFont(name: "Montserrat-Dark", size: 12.0)
+	}
+
+	func setLightLabel(_ label: UILabel) {
+		label.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+		label.textColor = UIColor.white
+		label.font = UIFont(name: "Montserrat-Light", size: 12.0)
+	}
 }

@@ -25,15 +25,15 @@ import UIKit
 import WebKit
 
 protocol CheckoutViewDelegate: AnyObject {
-	func checkoutViewDidStartNavigation()
+    func checkoutViewDidStartNavigation()
 
-	func checkoutViewDidCompleteCheckout()
+    func checkoutViewDidCompleteCheckout()
 
-	func checkoutViewDidFinishNavigation()
+    func checkoutViewDidFinishNavigation()
 
 	func checkoutViewDidClickLink(url: URL)
 
-	func checkoutViewDidFailWithError(_ error: Error)
+    func checkoutViewDidFailWithError(error: CheckoutError)
 }
 
 class CheckoutView: WKWebView {
@@ -63,7 +63,7 @@ class CheckoutView: WKWebView {
 
 	// MARK: Properties
 
-	weak var delegate: CheckoutViewDelegate?
+	weak var viewDelegate: CheckoutViewDelegate?
 
 	// MARK: Initializers
 
@@ -103,10 +103,10 @@ extension CheckoutView: WKScriptMessageHandler {
 		do {
 			if case .checkoutComplete = try CheckoutBridge.decode(message) {
 				CheckoutView.cache = nil
-				delegate?.checkoutViewDidCompleteCheckout()
+				viewDelegate?.checkoutViewDidCompleteCheckout()
 			}
 		} catch {
-			delegate?.checkoutViewDidFailWithError(error)
+            viewDelegate?.checkoutViewDidFailWithError(error: .internalError(underlying: error))
 		}
 	}
 }
@@ -120,7 +120,7 @@ extension CheckoutView: WKNavigationDelegate {
 		}
 
 		if isExternalLink(action) || isMailOrTelLink(url) {
-			delegate?.checkoutViewDidClickLink(url: url)
+			viewDelegate?.checkoutViewDidClickLink(url: url)
 			decisionHandler(.cancel)
 			return
 		}
@@ -128,13 +128,38 @@ extension CheckoutView: WKNavigationDelegate {
 		decisionHandler(.allow)
 	}
 
-	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-		delegate?.checkoutViewDidStartNavigation()
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        if let response = navigationResponse.response as? HTTPURLResponse {
+            decisionHandler(handleResponse(response))
+            return
+        }
+        decisionHandler(.allow)
+    }
+
+    func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
+		if isCheckout(url: response.url) && response.statusCode >= 400 {
+			CheckoutView.cache = nil
+			let message = response.statusCode == 410 ? "Checkout token expired" : "Checkout not available"
+			viewDelegate?.checkoutViewDidFailWithError(error: .httpError(statusCode: response.statusCode, message: message))
+
+			return .cancel
+		}
+
+		return .allow
 	}
 
-	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-		delegate?.checkoutViewDidFinishNavigation()
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        viewDelegate?.checkoutViewDidStartNavigation()
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        viewDelegate?.checkoutViewDidFinishNavigation()
 	}
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        CheckoutView.cache = nil
+        viewDelegate?.checkoutViewDidFailWithError(error: .internalError(underlying: error))
+    }
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
 		return action.navigationType == .linkActivated && action.targetFrame == nil
@@ -142,6 +167,13 @@ extension CheckoutView: WKNavigationDelegate {
 
 	private func isMailOrTelLink(_ url: URL) -> Bool {
 		return ["mailto", "tel"].contains(url.scheme)
+	}
+
+	private func isCheckout(url: URL?) -> Bool {
+		guard let url = url else { return false }
+		return url.path.contains("checkouts/c/") ||
+		url.path.contains("checkouts/cn/") ||
+		url.path.contains("cart/c/")
 	}
 }
 

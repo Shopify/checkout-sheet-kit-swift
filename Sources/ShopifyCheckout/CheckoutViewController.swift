@@ -62,7 +62,7 @@ class CheckoutViewController: UIViewController {
 
 		navigationItem.rightBarButtonItem = closeBarButtonItem
 
-		checkoutView.delegate = self
+		checkoutView.viewDelegate = self
 	}
 
 	required init?(coder: NSCoder) {
@@ -111,6 +111,7 @@ class CheckoutViewController: UIViewController {
 }
 
 extension CheckoutViewController: CheckoutViewDelegate {
+
 	func checkoutViewDidStartNavigation() {
 		if initialNavigation {
 			spinner.startAnimating()
@@ -130,8 +131,8 @@ extension CheckoutViewController: CheckoutViewDelegate {
 		delegate?.checkoutDidComplete()
 	}
 
-	func checkoutViewDidFailWithError(_ error: Error) {
-		delegate?.checkoutDidFail(errors: [.internalError(underlying: error)])
+	func checkoutViewDidFailWithError(error: CheckoutError) {
+		delegate?.checkoutDidFail(error: .internalError(underlying: error))
 	}
 
 	func checkoutViewDidClickLink(url: URL) {
