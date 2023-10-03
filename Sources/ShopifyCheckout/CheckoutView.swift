@@ -116,12 +116,11 @@ extension CheckoutView: WKNavigationDelegate {
 			return
 		}
 
-		if isExternalLink(action) || isMailOrTelLink(url) || isShopApp(url) {
+		if isExternalLink(action) || isMailOrTelLink(url) || isShopAppURL(url) {
 			viewDelegate?.checkoutViewDidClickLink(url: url)
 			decisionHandler(.cancel)
 			return
 		}
-
 
 		decisionHandler(.allow)
 	}

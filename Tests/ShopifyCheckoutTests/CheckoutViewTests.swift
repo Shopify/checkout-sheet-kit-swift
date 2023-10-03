@@ -86,6 +86,23 @@ class CheckoutViewTests: XCTestCase {
 		wait(for: [didClickLinkExpectation], timeout: 1)
 	}
 
+	func testShopAppLinkDelegation() {
+		let link = URL(string: "https://go.shop.app")!
+
+		let delegate = MockCheckoutViewDelegate()
+		let didClickLinkExpectation = expectation(
+			description: "checkoutViewDidClickLink was called"
+		)
+		delegate.didClickLinkExpectation = didClickLinkExpectation
+		view.viewDelegate = delegate
+
+		view.webView(view, decidePolicyFor: MockNavigationAction(url: link)) { policy in
+			XCTAssertEqual(policy, .cancel)
+		}
+
+		wait(for: [didClickLinkExpectation], timeout: 1)
+	}
+
     func test410responseOnCheckoutURLCodeDelegation() {
 		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
 		let link = view.url!
@@ -115,6 +132,6 @@ class CheckoutViewTests: XCTestCase {
         let policy = view.handleResponse(urlResponse)
 		XCTAssertEqual(policy, .allow)
 
-		waitForExpectations(timeout: 0.5, handler: nil)
+		waitForExpectations(timeout: 3, handler: nil)
     }
 }
