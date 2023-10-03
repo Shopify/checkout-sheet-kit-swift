@@ -93,7 +93,7 @@ extension MyViewController: ShopifyCheckoutDelegate {
   }
 
   func checkoutDidClickLink(url: URL) {
-    // Called when the buyer clicked a link e.g mail address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
+    // Called when the buyer clicked a link e.g email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
   }
 }
 ```
