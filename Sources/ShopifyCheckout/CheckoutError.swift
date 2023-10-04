@@ -23,10 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 /// A type representing Shopify Checkout specific errors.
 public enum CheckoutError: Swift.Error {
-	/// Represents an internal error within Shopify Checkout
-	case internalError(underlying: Swift.Error)
+	/// Issued when an internal error within Shopify Checkout SDK
+	/// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
+	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
+	case sdkError(underlying: Swift.Error)
 
-	// Represents a http error encountered during a Shopify Checkout.
-	// eg: 410, "checkout token has expired"
-	case httpError(statusCode: Int, message: String)
+	/// Issued when checkout has encountered a unrecoverable serverside error, for example returning a http status code 500
+	/// In the event of a fatal error, you may be able to retry (eg using a circuit breaker)
+	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
+	case fatalError(message: String)
+
+	/// Issued when checkout is no longer available and will no longer be available with the checkout token supplied.
+	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout token
+	/// In event of checkoutNotAvailable, a new checkout token will need to be generated
+	case checkoutNotAvailable(message: String)
 }

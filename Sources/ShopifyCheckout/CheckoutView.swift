@@ -102,7 +102,7 @@ extension CheckoutView: WKScriptMessageHandler {
 				viewDelegate?.checkoutViewDidCompleteCheckout()
 			}
 		} catch {
-            viewDelegate?.checkoutViewDidFailWithError(error: .internalError(underlying: error))
+            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 		}
 	}
 }
@@ -133,11 +133,15 @@ extension CheckoutView: WKNavigationDelegate {
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
-		if isCheckout(url: response.url) && response.statusCode >= 400 {
+		if isCheckout(url: response.url) && response.statusCode >= 300 {
 			CheckoutView.cache = nil
-			let message = response.statusCode == 410 ? "Checkout token expired" : "Checkout not available"
-			viewDelegate?.checkoutViewDidFailWithError(error: .httpError(statusCode: response.statusCode, message: message))
+			let message = switch response.statusCode {
+			case 404 | 410: "Checkout Token Expired"
+			case 500: "Server error"
+			default: "Unknown Error"
+			}
 
+			viewDelegate?.checkoutViewDidFailWithError(error: .checkoutNotAvailable(message: message))
 			return .cancel
 		}
 
@@ -154,7 +158,7 @@ extension CheckoutView: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         CheckoutView.cache = nil
-        viewDelegate?.checkoutViewDidFailWithError(error: .internalError(underlying: error))
+        viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
     }
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
