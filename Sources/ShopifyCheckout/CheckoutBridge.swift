@@ -33,13 +33,13 @@ enum CheckoutBridge {
 		return "ShopifyCheckoutSDK/\(ShopifyCheckout.version) (\(schemaVersion);\(theme))"
 	}
 
-	static func decode(_ message: WKScriptMessage) throws -> Event {
+	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
 		guard let body = message.body as? String, let data = body.data(using: .utf8) else {
 			throw Error.invalidBridgeEvent()
 		}
 
 		do {
-			return try JSONDecoder().decode(Event.self, from: data)
+			return try JSONDecoder().decode(WebEvent.self, from: data)
 		} catch {
 			throw Error.invalidBridgeEvent(error)
 		}
@@ -53,9 +53,10 @@ extension CheckoutBridge {
 }
 
 extension CheckoutBridge {
-	enum Event: Decodable {
+	enum WebEvent: Decodable {
 		case checkoutComplete
 		case checkoutCanceled
+		case checkoutNotAvailable(String)
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -73,6 +74,8 @@ extension CheckoutBridge {
 				self = .checkoutComplete
 			case "close":
 				self = .checkoutCanceled
+			case "checkout_not_available":
+				self = .checkoutNotAvailable(name)
 			default:
 				self = .unsupported(name)
 			}

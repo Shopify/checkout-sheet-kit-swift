@@ -97,9 +97,14 @@ class CheckoutView: WKWebView {
 extension CheckoutView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
-			if case .checkoutComplete = try CheckoutBridge.decode(message) {
+			switch try CheckoutBridge.decode(message) {
+			case .checkoutComplete:
 				CheckoutView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout()
+			case .checkoutNotAvailable(let message):
+				CheckoutView.cache = nil
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutNotAvailable(message: message))
+			default: break
 			}
 		} catch {
             viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
