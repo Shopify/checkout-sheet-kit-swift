@@ -141,7 +141,7 @@ extension CheckoutView: WKNavigationDelegate {
 		if isCheckout(url: response.url) && response.statusCode >= 300 {
 			CheckoutView.cache = nil
 			let message = switch response.statusCode {
-			case 404 | 410: "Checkout Token Expired"
+			case 404, 410: "Checkout Token Expired"
 			case 500: "Server error"
 			default: "Unknown Error"
 			}
