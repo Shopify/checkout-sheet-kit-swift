@@ -101,9 +101,9 @@ extension CheckoutView: WKScriptMessageHandler {
 			case .checkoutComplete:
 				CheckoutView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout()
-			case .checkoutNotAvailable(let message):
+			case .checkoutNotAvailable:
 				CheckoutView.cache = nil
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutNotAvailable(message: message))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutNotAvailable(message: "Checkout not available."))
 			default: break
 			}
 		} catch {
