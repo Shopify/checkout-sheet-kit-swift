@@ -29,16 +29,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
 		ShopifyCheckout.configure {
+			/// Checkout color scheme setting
 			$0.colorScheme = .automatic
 
+			/// Enable preloading
 			$0.preloading.enabled = true
-
-			$0.confetti.enabled = true
-			$0.confetti.particles = [
-				UIImage(named: "confetti/red"),
-				UIImage(named: "confetti/purple"),
-				UIImage(named: "confetti/green")
-			].compactMap({ $0 })
 		}
 
 		UIBarButtonItem.appearance().tintColor = .label
