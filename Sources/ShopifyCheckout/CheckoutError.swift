@@ -31,10 +31,10 @@ public enum CheckoutError: Swift.Error {
 	/// Issued when checkout has encountered a unrecoverable serverside error, for example returning a http status code 500
 	/// In the event of a fatal error, you may be able to retry (eg using a circuit breaker)
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
-	case fatalError(message: String)
+	case serverError(message: String)
 
-	/// Issued when checkout is no longer available and will no longer be available with the checkout token supplied.
-	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout token
-	/// In event of checkoutNotAvailable, a new checkout token will need to be generated
+	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
+	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
+	/// In event of checkoutNotAvailable, a new checkout url will need to be generated
 	case checkoutNotAvailable(message: String)
 }

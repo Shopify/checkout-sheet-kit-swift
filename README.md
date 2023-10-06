@@ -103,9 +103,9 @@ extension MyViewController: ShopifyCheckoutDelegate {
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
 	case fatalError(message: String)
 
-	/// Issued when checkout is no longer available and will no longer be available with the checkout token supplied.
-	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout token
-	/// In event of checkoutNotAvailable, a new checkout token will need to be generated
+	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
+	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
+	/// In event of checkoutNotAvailable, a new checkout url will need to be generated
 	case checkoutNotAvailable(message: String)
   }
 

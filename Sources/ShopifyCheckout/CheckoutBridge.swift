@@ -74,7 +74,8 @@ extension CheckoutBridge {
 				self = .checkoutComplete
 			case "close":
 				self = .checkoutCanceled
-			case "checkoutNotAvailable":
+			case "error":
+				// TODO: support body and muliple error types here.
 				self = .checkoutNotAvailable
 			default:
 				self = .unsupported(name)

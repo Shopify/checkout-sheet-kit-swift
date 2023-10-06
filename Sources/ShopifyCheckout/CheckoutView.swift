@@ -104,7 +104,8 @@ extension CheckoutView: WKScriptMessageHandler {
 			case .checkoutNotAvailable:
 				CheckoutView.cache = nil
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutNotAvailable(message: "Checkout not available."))
-			default: break
+			default:
+				()
 			}
 		} catch {
             viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
@@ -141,7 +142,7 @@ extension CheckoutView: WKNavigationDelegate {
 		if isCheckout(url: response.url) && response.statusCode >= 300 {
 			CheckoutView.cache = nil
 			let message = switch response.statusCode {
-			case 404, 410: "Checkout Token Expired"
+			case 404, 410: "Checkout URL Expired"
 			case 500: "Server error"
 			default: "Unknown Error"
 			}
