@@ -98,7 +98,7 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
-	func testDecodeSupportsCheckoutNotAvailableEvent() throws {
+	func testDecodeSupportsCheckoutUnavailableEvent() throws {
 		let mock = WKScriptMessageMock(body: """
 		{
 			"name": "error"
@@ -107,8 +107,8 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case CheckoutBridge.WebEvent.checkoutNotAvailable = result else {
-			return XCTFail("expected CheckoutScriptMessage.checkoutNotAvailable, got \(result)")
+		guard case CheckoutBridge.WebEvent.checkoutUnavailable = result else {
+			return XCTFail("expected CheckoutScriptMessage.checkoutUnavailable, got \(result)")
 		}
 	}
 }

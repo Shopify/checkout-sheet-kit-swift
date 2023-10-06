@@ -56,7 +56,7 @@ extension CheckoutBridge {
 	enum WebEvent: Decodable {
 		case checkoutComplete
 		case checkoutCanceled
-		case checkoutNotAvailable
+		case checkoutUnavailable
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -75,7 +75,7 @@ extension CheckoutBridge {
 			case "close":
 				self = .checkoutCanceled
 			case "error":
-				self = .checkoutNotAvailable
+				self = .checkoutUnavailable
 			default:
 				self = .unsupported(name)
 			}

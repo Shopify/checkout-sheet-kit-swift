@@ -35,6 +35,6 @@ public enum CheckoutError: Swift.Error {
 
 	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
 	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
-	/// In event of checkoutNotAvailable, a new checkout url will need to be generated
-	case checkoutNotAvailable(message: String)
+	/// In event of checkoutUnavailable, a new checkout url will need to be generated
+	case checkoutUnavailable(message: String)
 }

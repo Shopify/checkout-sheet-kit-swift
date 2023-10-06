@@ -101,9 +101,9 @@ extension CheckoutView: WKScriptMessageHandler {
 			case .checkoutComplete:
 				CheckoutView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout()
-			case .checkoutNotAvailable:
+			case .checkoutUnavailable:
 				CheckoutView.cache = nil
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutNotAvailable(message: "Checkout not available."))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
 			default:
 				()
 			}
@@ -149,7 +149,7 @@ extension CheckoutView: WKNavigationDelegate {
 				}
 			}()
 
-			viewDelegate?.checkoutViewDidFailWithError(error: .checkoutNotAvailable(message: message))
+			viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message))
 			return .cancel
 		}
 

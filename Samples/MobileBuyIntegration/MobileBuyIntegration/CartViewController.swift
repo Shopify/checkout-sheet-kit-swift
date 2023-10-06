@@ -173,7 +173,7 @@ extension CartViewController: CheckoutDelegate {
 	func checkoutDidFail(error: ShopifyCheckout.CheckoutError) {
 		switch error {
 		case .sdkError(let underlying): print(#function, underlying)
-		case .checkoutNotAvailable(let message): forceCloseCheckout(message)
+		case .checkoutUnavailable(let message): forceCloseCheckout(message)
 		case .serverError(let message): forceCloseCheckout(message)
 		}
 	}
