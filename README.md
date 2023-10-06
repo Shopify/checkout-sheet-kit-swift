@@ -101,7 +101,7 @@ extension MyViewController: ShopifyCheckoutDelegate {
 	/// Issued when checkout has encountered a unrecoverable serverside error, for example returning a http status code 500
 	/// In the event of a fatal error, you may be able to retry (eg using a circuit breaker)
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
-	case fatalError(message: String)
+	case serverError(message: String)
 
 	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
 	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
