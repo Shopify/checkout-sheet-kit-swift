@@ -139,7 +139,7 @@ extension CheckoutView: WKNavigationDelegate {
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
-		if isCheckout(url: response.url) && response.statusCode >= 300 {
+		if isCheckout(url: response.url) && response.statusCode >= 400 {
 			CheckoutView.cache = nil
 			let message: String = {
 				switch response.statusCode {
