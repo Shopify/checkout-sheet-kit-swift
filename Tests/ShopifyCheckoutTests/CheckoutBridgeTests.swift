@@ -101,7 +101,7 @@ class CheckoutBridgeTests: XCTestCase {
 	func testDecodeSupportsCheckoutNotAvailableEvent() throws {
 		let mock = WKScriptMessageMock(body: """
 		{
-			"name": "checkoutNotAvailable"
+			"name": "error"
 		}
 		""")
 
