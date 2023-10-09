@@ -38,7 +38,7 @@ public enum CheckoutError: Swift.Error {
 	case checkoutExpired(message: String)
 }
 
-struct Constants {
+enum Constants {
 	static let defaultCheckoutExpiredMsg = "Checkout expired. Checkout needs to be reinitialised"
 	static let defaultCheckoutUnavailableMsg = "Checkout unavailable due to error"
 }
