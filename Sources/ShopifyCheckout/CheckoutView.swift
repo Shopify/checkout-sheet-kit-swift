@@ -170,7 +170,14 @@ extension CheckoutView: WKNavigationDelegate {
     }
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
-		return action.navigationType == .linkActivated && action.targetFrame == nil
+		if action.navigationType == .linkActivated && action.targetFrame == nil { return true }
+
+		guard let url = action.request.url else { return false }
+		guard let url = URLComponents(string: url.absoluteString) else { return false }
+
+		guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally"})?.value else { return false }
+
+		return openExternally == "true"
 	}
 
 	private func isMailOrTelLink(_ url: URL) -> Bool {
