@@ -141,15 +141,15 @@ extension CheckoutView: WKNavigationDelegate {
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
 		if isCheckout(url: response.url) && response.statusCode >= 400 {
 			CheckoutView.cache = nil
-			let message: String = {
-				switch response.statusCode {
-				case 404, 410: return "Checkout URL Expired"
-				case 500: return "Server error"
-				default: return "Unknown Error"
-				}
-			}()
+			switch response.statusCode {
+			case 404, 410:
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
+			case 500:
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable due to error"))
+			default:
+				()
+			}
 
-			viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message))
 			return .cancel
 		}
 

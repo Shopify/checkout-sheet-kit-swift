@@ -56,6 +56,7 @@ extension CheckoutBridge {
 	enum WebEvent: Decodable {
 		case checkoutComplete
 		case checkoutCanceled
+		case checkoutExpired
 		case checkoutUnavailable
 		case unsupported(String)
 
@@ -75,7 +76,8 @@ extension CheckoutBridge {
 			case "close":
 				self = .checkoutCanceled
 			case "error":
-				self = .checkoutUnavailable
+				// needs to support .checkoutUnavailable by parsing error payload on body
+				self = .checkoutExpired
 			default:
 				self = .unsupported(name)
 			}

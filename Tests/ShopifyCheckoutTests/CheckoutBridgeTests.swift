@@ -107,8 +107,8 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case CheckoutBridge.WebEvent.checkoutUnavailable = result else {
-			return XCTFail("expected CheckoutScriptMessage.checkoutUnavailable, got \(result)")
+		guard case CheckoutBridge.WebEvent.checkoutExpired = result else {
+			return XCTFail("expected CheckoutScriptMessage.checkoutExpired, got \(result)")
 		}
 	}
 }
