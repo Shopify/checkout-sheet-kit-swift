@@ -65,7 +65,7 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case CheckoutBridge.Event.unsupported = result else {
+		guard case CheckoutBridge.WebEvent.unsupported = result else {
 			return XCTFail("expected CheckoutScriptMessage.unsupportedEvent, got \(result)")
 		}
 	}
@@ -79,7 +79,7 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case CheckoutBridge.Event.checkoutCanceled = result else {
+		guard case CheckoutBridge.WebEvent.checkoutCanceled = result else {
 			return XCTFail("expected CheckoutScriptMessage.checkoutCanceled, got \(result)")
 		}
 	}
@@ -93,8 +93,22 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case CheckoutBridge.Event.checkoutComplete = result else {
+		guard case CheckoutBridge.WebEvent.checkoutComplete = result else {
 			return XCTFail("expected CheckoutScriptMessage.checkoutComplete, got \(result)")
+		}
+	}
+
+	func testDecodeSupportsCheckoutUnavailableEvent() throws {
+		let mock = WKScriptMessageMock(body: """
+		{
+			"name": "error"
+		}
+		""")
+
+		let result = try CheckoutBridge.decode(mock)
+
+		guard case CheckoutBridge.WebEvent.checkoutExpired = result else {
+			return XCTFail("expected CheckoutScriptMessage.checkoutExpired, got \(result)")
 		}
 	}
 }

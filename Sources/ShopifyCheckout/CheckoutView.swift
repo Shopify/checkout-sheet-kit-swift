@@ -97,12 +97,18 @@ class CheckoutView: WKWebView {
 extension CheckoutView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
-			if case .checkoutComplete = try CheckoutBridge.decode(message) {
+			switch try CheckoutBridge.decode(message) {
+			case .checkoutComplete:
 				CheckoutView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout()
+			case .checkoutUnavailable:
+				CheckoutView.cache = nil
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
+			default:
+				()
 			}
 		} catch {
-            viewDelegate?.checkoutViewDidFailWithError(error: .internalError(underlying: error))
+            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 		}
 	}
 }
@@ -135,8 +141,14 @@ extension CheckoutView: WKNavigationDelegate {
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
 		if isCheckout(url: response.url) && response.statusCode >= 400 {
 			CheckoutView.cache = nil
-			let message = response.statusCode == 410 ? "Checkout token expired" : "Checkout not available"
-			viewDelegate?.checkoutViewDidFailWithError(error: .httpError(statusCode: response.statusCode, message: message))
+			switch response.statusCode {
+			case 404, 410:
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
+			case 500:
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable due to error"))
+			default:
+				()
+			}
 
 			return .cancel
 		}
@@ -154,7 +166,7 @@ extension CheckoutView: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         CheckoutView.cache = nil
-        viewDelegate?.checkoutViewDidFailWithError(error: .internalError(underlying: error))
+        viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
     }
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
