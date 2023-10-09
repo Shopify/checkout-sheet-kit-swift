@@ -48,6 +48,8 @@ class SpinnerView: UIView {
 			imageView.bottomAnchor.constraint(equalTo: bottomAnchor)
 		])
 
+		imageView.tintColor = ShopifyCheckout.configuration.spinnerColor
+
 		isHidden = true
 	}
 

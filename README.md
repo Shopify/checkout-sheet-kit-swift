@@ -121,7 +121,7 @@ ShopifyCheckout.preload(checkout: url)
 
 The library provides a way to customize the checkout experience via the `ShopifyCheckout.configuration` object.
 
-#### Color Schemes
+#### `colorScheme`
 
 When checkout is presented, the look and feel can be configured using the `colorScheme` property. By default, it will match the user's device appearance. For example:
 
@@ -137,6 +137,18 @@ ShopifyCheckout.configuration.colorScheme = .dark
 
 // Match the look and feel of checkout via a desktop or mobile browser.
 ShopifyCheckout.configuration.colorScheme = .web
+```
+
+#### `spinnerColor`
+
+The loading spinner shown when checkout is presented can be modified through the `spinnerColor` property on the configuration object:
+
+```swift
+// Use a custom UI color
+ShopifyCheckout.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+
+// Use a system color
+ShopifyCheckout.configuration.spinnerColor = .systemBlue
 ```
 
 ### Customer Accounts
