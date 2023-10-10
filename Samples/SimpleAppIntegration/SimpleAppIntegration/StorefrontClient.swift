@@ -35,13 +35,13 @@ class StorefrontClient {
 		guard
 			let infoPlist = Bundle.main.infoDictionary,
 			let domain = infoPlist["StorefrontDomain"] as? String,
-			let token = infoPlist["StorefrontAccessToken"] as? String,
+			let token = infoPlist["StorefrontAccessToken"] as? String
 		else {
 			fatalError("unable to load storefront configuration")
 		}
 
-		self.requestURL = URL(string: "https://\(domain)/api/2023-07/graphql")!
-		self.accessToken = token
+		requestURL = URL(string: "https://\(domain)/api/2023-07/graphql")!
+		accessToken = token
 	}
 
 	typealias ProductResultHandler = (Result<Product, Error>) -> Void
