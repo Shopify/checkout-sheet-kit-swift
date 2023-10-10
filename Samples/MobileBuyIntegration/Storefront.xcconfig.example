@@ -1,2 +1,10 @@
 STOREFRONT_DOMAIN = <yourdomainhere.myshopify.com>
 STOREFRONT_ACCESS_TOKEN = <storefront access token>
+ADDRESS_1 = The Cloak & Dagger
+ADDRESS_2 = 1st Street Southeast
+CITY = Cagalry
+COUNTRY = CA
+FIRST_NAME = Test
+LAST_NAME = McTest
+PROVINCE = AB
+ZIP = T1X 0L3

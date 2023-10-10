@@ -42,11 +42,40 @@ class CartManager {
 	}
 
 	private let client: StorefrontClient
+	private let address1: String
+	private let address2: String
+	private let city: String
+	private let country: String
+	private let firstName: String
+	private let lastName: String
+	private let province: String
+	private let zip: String
 
 	// MARK: Initializers
-
 	init(client: StorefrontClient) {
 		self.client = client
+		guard
+			let infoPlist = Bundle.main.infoDictionary,
+			let address1 = infoPlist["Address1"] as? String,
+			let address2 = infoPlist["Address2"] as? String,
+			let city = infoPlist["City"] as? String,
+			let country = infoPlist["Country"] as? String,
+			let firstName = infoPlist["FirstName"] as? String,
+			let lastName = infoPlist["LastName"] as? String,
+			let province = infoPlist["Province"] as? String,
+			let zip = infoPlist["Zip"] as? String
+		else {
+			fatalError("unable to load storefront configuration")
+		}
+
+		self.address1 = address1
+		self.address2 = address2
+		self.city = city
+		self.country = country
+		self.firstName = firstName
+		self.lastName = lastName
+		self.province = province
+		self.zip = zip
 	}
 
 	// MARK: Cart Actions
@@ -116,16 +145,16 @@ class CartManager {
 
 	private func vaultedStateCart(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
 		let deliveryAddress = Storefront.MailingAddressInput.create(
-			address1: Input(orNull: "1st Street Southeast"),
-			address2: Input(orNull: ""),
-			city: Input(orNull: "Cagalry"),
+			address1: Input(orNull: address1),
+			address2: Input(orNull: address2),
+			city: Input(orNull: city),
 			company: Input(orNull: ""),
-			country: Input(orNull: "CA"),
-			firstName: Input(orNull: "Test"),
-			lastName: Input(orNull: "McTest"),
+			country: Input(orNull: country),
+			firstName: Input(orNull: firstName),
+			lastName: Input(orNull: lastName),
 			phone: Input(orNull: ""),
-			province: Input(orNull: "AB"),
-			zip: Input(orNull: "T1X 0L3"))
+			province: Input(orNull: province),
+			zip: Input(orNull: zip))
 
 		let deliveryAddressPreferences = [Storefront.DeliveryAddressInput.create(deliveryAddress: Input(orNull: deliveryAddress))]
 

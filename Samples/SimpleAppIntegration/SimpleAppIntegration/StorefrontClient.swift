@@ -30,18 +30,43 @@ class StorefrontClient {
 	private let requestURL: URL
 
 	private let accessToken: String
+	private let address1: String
+	private let address2: String
+	private let city: String
+	private let country: String
+	private let firstName: String
+	private let lastName: String
+	private let province: String
+	private let zip: String
 
 	private init() {
 		guard
 			let infoPlist = Bundle.main.infoDictionary,
 			let domain = infoPlist["StorefrontDomain"] as? String,
-			let token = infoPlist["StorefrontAccessToken"] as? String
+			let token = infoPlist["StorefrontAccessToken"] as? String,
+			let Address1 = infoPlist["ADDRESS_1"] as? String,
+			let Address2 = infoPlist["ADDRESS_2"] as? String,
+			let City = infoPlist["CITY"] as? String,
+			let Country = infoPlist["COUNTRY"] as? String,
+			let FirstName = infoPlist["FIRST_NAME"] as? String,
+			let LastName = infoPlist["LAST_NAME"] as? String,
+			let Province = infoPlist["PROVINCE"] as? String,
+			let Zip = infoPlist["ZIP"] as? String
 		else {
 			fatalError("unable to load storefront configuration")
 		}
 
-		requestURL = URL(string: "https://\(domain)/api/2023-07/graphql")!
-		accessToken = token
+		self.requestURL = URL(string: "https://\(domain)/api/2023-07/graphql")!
+		self.accessToken = token
+		self.address1 = address1
+		self.address2 = address2
+		self.city = city
+		self.country = country
+		self.firstName = firstName
+		self.lastName = lastName
+		self.province = province
+		self.zip = zip
+
 	}
 
 	typealias ProductResultHandler = (Result<Product, Error>) -> Void
