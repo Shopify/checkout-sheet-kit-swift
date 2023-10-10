@@ -92,10 +92,7 @@ class CartManager {
 	}
 
 	private func performCartCreate(items: [GraphQL.ID] = [], handler: @escaping CartResultHandler) {
-		let input = Storefront.CartInput.create(
-			lines: Input(orNull: items.map({ Storefront.CartLineInput.create(merchandiseId: $0) }))
-		)
-
+		let input = (appConfiguration.testVaultedState) ? vaultedStateCart(items) : defaultCart(items)
 		let mutation = Storefront.buildMutation { $0
 			.cartCreate(input: input) { $0
 				.cart { $0.cartManagerFragment() }
@@ -109,6 +106,37 @@ class CartManager {
 				handler(.failure(URLError(.unknown)))
 			}
 		}
+	}
+
+	private func defaultCart(_ items: [GraphQL.ID]) -> Storefront.CartInput {
+		return Storefront.CartInput.create(
+			lines: Input(orNull: items.map({ Storefront.CartLineInput.create(merchandiseId: $0) }))
+		)
+	}
+
+	private func vaultedStateCart(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
+		let deliveryAddress = Storefront.MailingAddressInput.create(
+			address1: Input(orNull: "1st Street Southeast"),
+			address2: Input(orNull: ""),
+			city: Input(orNull: "Cagalry"),
+			company: Input(orNull: ""),
+			country: Input(orNull: "CA"),
+			firstName: Input(orNull: "Test"),
+			lastName: Input(orNull: "McTest"),
+			phone: Input(orNull: ""),
+			province: Input(orNull: "AB"),
+			zip: Input(orNull: "T1X 0L3"))
+
+		let deliveryAddressPreferences = [Storefront.DeliveryAddressInput.create(deliveryAddress: Input(orNull: deliveryAddress))]
+
+		return Storefront.CartInput.create(
+			attributes: Input(orNull: [Storefront.AttributeInput(key: "isBuyWithPrimeIntent", value: "true")]),
+			lines: Input(orNull: items.map({ Storefront.CartLineInput.create(merchandiseId: $0) })),
+			buyerIdentity: Input(orNull: Storefront.CartBuyerIdentityInput.create(
+				email: Input(orNull: "test2@test.com"),
+				deliveryAddressPreferences: Input(orNull: deliveryAddressPreferences)
+			))
+		)
 	}
 }
 
