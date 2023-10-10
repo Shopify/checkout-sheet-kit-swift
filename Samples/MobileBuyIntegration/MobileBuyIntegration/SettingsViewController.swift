@@ -27,11 +27,16 @@ import ShopifyCheckout
 class SettingsViewController: UITableViewController {
 
 	// MARK: Properties
-	enum Section: Int {
+	enum Section: Int, CaseIterable {
 		case preloading = 0
 		case vaultedState = 1
 		case colorScheme = 2
 		case version = 3
+		case undefined = -1
+
+		static func from(_ rawValue: Int) -> Section {
+			return Section(rawValue: rawValue) ?? .undefined
+	   }
 	}
 
 	private lazy var preloadingSwitch: UISwitch = {
@@ -73,12 +78,12 @@ class SettingsViewController: UITableViewController {
 	// MARK: UITableViewDataSource
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
-		return 4
+		return Section.allCases.count
 	}
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		switch section {
-		case Section.colorScheme.rawValue:
+		switch Section.from(section) {
+		case Section.colorScheme:
 			return "Color Scheme"
 		default:
 			return nil
@@ -86,8 +91,8 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		switch section {
-		case Section.colorScheme.rawValue:
+		switch Section.from(section) {
+		case Section.colorScheme:
 			return "NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again."
 		default:
 			return nil
@@ -95,14 +100,14 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		switch section {
-		case Section.preloading.rawValue:
+		switch Section.from(section) {
+		case Section.preloading:
 			return 1
-		case Section.vaultedState.rawValue:
+		case Section.vaultedState:
 			return 1
-		case Section.colorScheme.rawValue:
+		case Section.colorScheme:
 			return ShopifyCheckout.Configuration.ColorScheme.allCases.count
-		case Section.version.rawValue:
+		case Section.version:
 			return 1
 		default:
 			return 0
@@ -114,18 +119,18 @@ class SettingsViewController: UITableViewController {
 
 		var content = cell.defaultContentConfiguration()
 
-		switch indexPath.section {
-		case Section.preloading.rawValue:
+		switch Section.from(indexPath.section) {
+		case Section.preloading:
 			content.text = "Use Preloading"
 			cell.accessoryView = preloadingSwitch
-		case Section.vaultedState.rawValue:
+		case Section.vaultedState:
 			content.text = "Test Vaulted State"
 			cell.accessoryView = vaultedStateSwitch
-		case Section.colorScheme.rawValue:
+		case Section.colorScheme:
 			let scheme = colorScheme(at: indexPath)
 			content.text = scheme.prettyTitle
 			content.secondaryText = ShopifyCheckout.configuration.colorScheme == scheme ? "Active" : ""
-		case Section.version.rawValue:
+		case Section.version:
 			content = UIListContentConfiguration.valueCell()
 			content.text = "Version"
 			content.secondaryText = currentVersion()
@@ -139,14 +144,14 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		switch indexPath.section {
-		case Section.preloading.rawValue:
+		switch Section.from(indexPath.section) {
+		case Section.preloading:
 			preloadingSwitch.isOn.toggle()
 			preloadingSwitchDidChange()
-		case Section.vaultedState.rawValue:
+		case Section.vaultedState:
 			vaultedStateSwitch.isOn.toggle()
 			vaultedStateSwitchDidChange()
-		case Section.colorScheme.rawValue:
+		case Section.colorScheme:
 			let newColorScheme = colorScheme(at: indexPath)
 			ShopifyCheckout.configuration.colorScheme = newColorScheme
 			let navigationBarAppearance = newColorScheme.navigationBarAppearance
