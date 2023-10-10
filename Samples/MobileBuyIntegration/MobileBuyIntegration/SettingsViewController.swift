@@ -48,7 +48,7 @@ class SettingsViewController: UITableViewController {
 
 	private lazy var vaultedStateSwitch: UISwitch = {
 		let view = UISwitch()
-		view.isOn = appConfiguration.testVaultedState
+		view.isOn = appConfiguration.useVaultedState
 		view.addTarget(self, action: #selector(vaultedStateSwitchDidChange), for: .valueChanged)
 		return view
 	}()
@@ -124,7 +124,7 @@ class SettingsViewController: UITableViewController {
 			content.text = "Use Preloading"
 			cell.accessoryView = preloadingSwitch
 		case Section.vaultedState:
-			content.text = "Test Vaulted State"
+			content.text = "Use Vaulted State"
 			cell.accessoryView = vaultedStateSwitch
 		case Section.colorScheme:
 			let scheme = colorScheme(at: indexPath)
@@ -173,7 +173,7 @@ class SettingsViewController: UITableViewController {
 	}
 
 	@objc private func vaultedStateSwitchDidChange() {
-		appConfiguration.testVaultedState = vaultedStateSwitch.isOn
+		appConfiguration.useVaultedState = vaultedStateSwitch.isOn
 	}
 
 	private func currentColorScheme() -> Configuration.ColorScheme {

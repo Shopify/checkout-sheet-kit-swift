@@ -121,7 +121,7 @@ class CartManager {
 	}
 
 	private func performCartCreate(items: [GraphQL.ID] = [], handler: @escaping CartResultHandler) {
-		let input = (appConfiguration.testVaultedState) ? vaultedStateCart(items) : defaultCart(items)
+		let input = (appConfiguration.useVaultedState) ? vaultedStateCart(items) : defaultCart(items)
 		let mutation = Storefront.buildMutation { $0
 			.cartCreate(input: input) { $0
 				.cart { $0.cartManagerFragment() }

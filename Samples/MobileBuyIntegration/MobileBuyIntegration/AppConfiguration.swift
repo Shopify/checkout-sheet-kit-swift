@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import ShopifyCheckout
 
 public struct AppConfiguration {
-	public var testVaultedState: Bool = false
+	public var useVaultedState: Bool = false
 }
 
 public var appConfiguration = AppConfiguration() {
