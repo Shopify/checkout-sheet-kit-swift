@@ -1,6 +1,6 @@
 # Mobile Checkout SDK - iOS
 
-**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to present a Shopify checkout flow to a prospective buyer. The presented experience is a fully-featured checkout that respects merchant configuration (settings, branding, etc), executes installed extensions, and provides idiomatic defaults such as support for light and dark mode, in addition to developer APIs and interfaces to easily initiate and manage the lifecycle of a checkout session. Check out our developer blog to [learn how Mobile Checkout SDK is built](TODO).
+**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Scripts, Functions, Web Pixels, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our developer blog to [learn how Mobile Checkout SDK is built](TODO).
 
 ### Requirements
 - Swift 5.7+
@@ -51,12 +51,12 @@ let query = Storefront.buildQuery { $0
 }
 
 let task = client.queryGraphWith(query) { response, error in
-  let checkoutUrl = response?.cart.checkoutUrl
+  let checkoutURL = response?.cart.checkoutUrl
 }
 task.resume()
 ```
 
-The `checkoutUrl` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application, provide the `checkoutUrl` alongside optional runtime configuration settings to the `present(checkout:)` function provided by the SDK:
+The `checkoutURL` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application, provide the `checkoutURL` alongside optional runtime configuration settings to the `present(checkout:)` function provided by the SDK:
 
 ```swift
 import UIKit
@@ -64,8 +64,8 @@ import ShopifyCheckout
 
 class MyViewController: UIViewController {
   func presentCheckout() {
-    let checkoutUrl: URL = // from cart object
-    ShopifyCheckout.present(checkout: checkoutUrl, from: self, delegate: self)
+    let checkoutURL: URL = // from cart object
+    ShopifyCheckout.present(checkout: checkoutURL, from: self, delegate: self)
   }
 }
 ```
@@ -115,7 +115,7 @@ ShopifyCheckout.configure {
 
 Once enabled, preloading a checkout is as simple as:
 ```swift
-ShopifyCheckout.preload(checkout: checkoutUrl)
+ShopifyCheckout.preload(checkout: checkoutURL)
 ```
 
 **Important considerations:**
@@ -148,12 +148,11 @@ extension MyViewController: ShopifyCheckoutDelegate {
 	case sdkError(underlying: Swift.Error)
 
 	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
-        /// You can inspect and log the provided message to identify the problem.
+        /// The provided message describes the error and may be logged and presented to the buyer.
 	case checkoutUnavailable(message: String)
 
-	/// Expired error: checkout session associated with provided checkoutUrl is no longer available.
-        /// You can inspect and log the provided message to identify the problem, and use this as a signal
-        /// to request a new checkoutUrl session or build a new cart.
+	/// Expired error: checkout session associated with provided checkoutURL is no longer available.
+        /// The provided message describes the error and may be logged and presented to the buyer. 
 	case checkoutExpired(message: String)
   }
 
