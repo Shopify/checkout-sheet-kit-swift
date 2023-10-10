@@ -22,6 +22,8 @@
 	<string>$(PROVINCE)</string>
 	<key>Zip</key>
 	<string>$(ZIP)</string>
+	<key>Email</key>
+	<string>$(EMAIL)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

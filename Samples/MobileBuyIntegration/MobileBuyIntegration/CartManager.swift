@@ -50,6 +50,7 @@ class CartManager {
 	private let lastName: String
 	private let province: String
 	private let zip: String
+	private let email: String
 
 	// MARK: Initializers
 	init(client: StorefrontClient) {
@@ -63,7 +64,8 @@ class CartManager {
 			let firstName = infoPlist["FirstName"] as? String,
 			let lastName = infoPlist["LastName"] as? String,
 			let province = infoPlist["Province"] as? String,
-			let zip = infoPlist["Zip"] as? String
+			let zip = infoPlist["Zip"] as? String,
+			let email = infoPlist["Email"] as? String
 		else {
 			fatalError("unable to load storefront configuration")
 		}
@@ -76,6 +78,7 @@ class CartManager {
 		self.lastName = lastName
 		self.province = province
 		self.zip = zip
+		self.email = email
 	}
 
 	// MARK: Cart Actions
@@ -162,7 +165,7 @@ class CartManager {
 			attributes: Input(orNull: [Storefront.AttributeInput(key: "isBuyWithPrimeIntent", value: "true")]),
 			lines: Input(orNull: items.map({ Storefront.CartLineInput.create(merchandiseId: $0) })),
 			buyerIdentity: Input(orNull: Storefront.CartBuyerIdentityInput.create(
-				email: Input(orNull: "test2@test.com"),
+				email: Input(orNull: email),
 				deliveryAddressPreferences: Input(orNull: deliveryAddressPreferences)
 			))
 		)
