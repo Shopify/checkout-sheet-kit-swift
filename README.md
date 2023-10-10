@@ -1,6 +1,6 @@
 # Mobile Checkout SDK - iOS
 
-**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to present a Shopify checkout flow to a prospective buyer. The presented experience is a fully-featured checkout that respects merchant configuration (settings, branding, etc), executes installed extensions, ..., and provides idiomatic defaults such as support for light and dark mode, in addition to developer APIs and interfaces to easily initiate and manage the lifecycle of a checkout session. Check out our developer blog to [learn how Mobile Checkout SDK is built](TODO).
+**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to present a Shopify checkout flow to a prospective buyer. The presented experience is a fully-featured checkout that respects merchant configuration (settings, branding, etc), executes installed extensions, and provides idiomatic defaults such as support for light and dark mode, in addition to developer APIs and interfaces to easily initiate and manage the lifecycle of a checkout session. Check out our developer blog to [learn how Mobile Checkout SDK is built](TODO).
 
 ### Requirements
 - Swift 5.7+
@@ -34,7 +34,7 @@ Once the SDK has been added as a dependency, you can import the library:
 import ShopifyCheckout
 ```
 
-To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GQL client to accomplish this and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
+To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GraphQL client to accomplish this and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
 
 ```swift
 import Buy
@@ -56,7 +56,7 @@ let task = client.queryGraphWith(query) { response, error in
 task.resume()
 ```
 
-The `checkoutUrl` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application provide the `checkoutUrl` alongside optional runtime configuration settings, to the `present(checkout:)` function provided by the SDK:
+The `checkoutUrl` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application, provide the `checkoutUrl` alongside optional runtime configuration settings to the `present(checkout:)` function provided by the SDK:
 
 ```swift
 import UIKit
