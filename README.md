@@ -51,12 +51,12 @@ let query = Storefront.buildQuery { $0
 }
 
 let task = client.queryGraphWith(query) { response, error in
-  let checkoutURL = response?.cart.checkoutUrl
+  let checkoutUrl = response?.cart.checkoutUrl
 }
 task.resume()
 ```
 
-The `checkoutURL` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application, all we have to do is provide the `checkoutUrl`, alongside optional runtime configuration settings, to the `present(checkout:)` function provided by the SDK:
+The `checkoutUrl` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application provide the `checkoutUrl` alongside optional runtime configuration settings, to the `present(checkout:)` function provided by the SDK:
 
 ```swift
 import UIKit
@@ -64,8 +64,8 @@ import ShopifyCheckout
 
 class MyViewController: UIViewController {
   func presentCheckout() {
-    let checkoutURL: URL = // from cart object
-    ShopifyCheckout.present(checkout: checkoutURL, from: self, delegate: self)
+    let checkoutUrl: URL = // from cart object
+    ShopifyCheckout.present(checkout: checkoutUrl, from: self, delegate: self)
   }
 }
 ```
@@ -115,7 +115,7 @@ ShopifyCheckout.configure {
 
 Once enabled, preloading a checkout is as simple as:
 ```swift
-ShopifyCheckout.preload(checkout: checkoutURL)
+ShopifyCheckout.preload(checkout: checkoutUrl)
 ```
 
 **Important considerations:**
