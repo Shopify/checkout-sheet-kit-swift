@@ -36,7 +36,7 @@ class SettingsViewController: UITableViewController {
 
 		static func from(_ rawValue: Int) -> Section {
 			return Section(rawValue: rawValue) ?? .undefined
-	   }
+		}
 	}
 
 	private lazy var preloadingSwitch: UISwitch = {
