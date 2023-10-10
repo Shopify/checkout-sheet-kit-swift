@@ -7,7 +7,7 @@
 - iOS SDK 13.0+
 
 ### Getting Started
-The SDK is an open-source [Swift Package library](https://www.swift.org/package-manager/). As a quick start, see [sample projects](Samples/README.md) or use one of the following ways to integrate SDK into your project:
+The SDK is an open-source [Swift Package library](https://www.swift.org/package-manager/). As a quick start, see [sample projects](Samples/README.md) or use one of the following ways to integrate the SDK into your project:
 
 #### Package.swift
 
@@ -34,7 +34,7 @@ Once the SDK has been added as a dependency, you can import the library:
 import ShopifyCheckout
 ```
 
-To present a checkout to the buyer your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GQL client to accomplish this and we recommend Shopify [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
+To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GQL client to accomplish this and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
 
 ```swift
 import Buy
@@ -104,7 +104,7 @@ ShopifyCheckout.configuration.spinnerColor = .systemBlue
 _Note: use preloading to optimize and deliver an instant buyer experience._
 
 ### Preloading
-Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in significant waiting time for the buyer. To help optimize and deliver the best experience the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
+Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in significant waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
 
 Preloading is an advanced feature and is disabled by default, to enable:
 ```swift
@@ -120,8 +120,8 @@ ShopifyCheckout.preload(checkout: checkoutURL)
 
 **Important considerations:**
 1. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout.
-2. Preloaded checkout session reflects the cart contents at the time when `preload` is called: if the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
-3. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `presentCheckout` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
+2. A preloaded checkout session reflects the cart contents at the time when `preload` is called. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
+3. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
 
 
 ### Monitoring the lifecycle of a checkout session
@@ -168,13 +168,13 @@ extension MyViewController: ShopifyCheckoutDelegate {
 ```
 
 ### Integrating identity & customer accounts
-Buyer-aware checkout experience reduces friction and increases conversion. Depending on the context of the buyer (guest or signed-in), knowledge of buyer preferences, or account/identity system, the application can use one of the following methods to initialize personalized and contextualized buyer experience.
+Buyer-aware checkout experience reduces friction and increases conversion. Depending on the context of the buyer (guest or signed-in), knowledge of buyer preferences, or account/identity system, the application can use one of the following methods to initialize a personalized and contextualized buyer experience.
 
 #### Cart: buyer bag, identity, and preferences
 In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc), and delivery and payment preferences: see [guide]([url](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage)). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
 
 #### Multipass
-[Shopify Plus](https://help.shopify.com/en/manual/intro-to-shopify/pricing-plans/plans-features/shopify-plus-plan) merchants using [Classic Customer Accounts](https://help.shopify.com/en/manual/customers/customer-accounts/classic-customer-accounts) can use [Multipass](https://shopify.dev/docs/api/multipass) ([API documentation](https://shopify.dev/docs/api/multipass)) to integrate external identity system and initialize a buyer-aware checkout session. 
+[Shopify Plus](https://help.shopify.com/en/manual/intro-to-shopify/pricing-plans/plans-features/shopify-plus-plan) merchants using [Classic Customer Accounts](https://help.shopify.com/en/manual/customers/customer-accounts/classic-customer-accounts) can use [Multipass](https://shopify.dev/docs/api/multipass) ([API documentation](https://shopify.dev/docs/api/multipass)) to integrate an external identity system and initialize a buyer-aware checkout session. 
 
 ```json
 {
@@ -192,7 +192,7 @@ In addition to specifying the line items, the Cart can include buyer identity (n
 _Note: above JSON omits useful customer attributes that should be provided where possible and encryption and signing should be done server-side to ensure multipass keys are kept secret._
 
 #### Shop Pay 
-To initialize accelerated Shop Pay checkout, the cart can set a [walletPreference]([url](https://shopify.dev/docs/api/storefront/2023-10/objects/CartBuyerIdentity#field-cartbuyeridentity-walletpreferences)) to 'SHOP_PAY'. The sign-in state of the buyer is app-local and the buyer will be prompted to sign in to their Shop account on first checkout, and their sign-in state will be remembered for future checkout sessions.
+To initialize accelerated Shop Pay checkout, the cart can set a [walletPreference]([url](https://shopify.dev/docs/api/storefront/2023-10/objects/CartBuyerIdentity#field-cartbuyeridentity-walletpreferences)) to 'SHOP_PAY'. The sign-in state of the buyer is app-local. The buyer will be prompted to sign in to their Shop account on first checkout, and their sign-in state will be remembered for future checkout sessions.
 
 #### Customer Account API
 We are working on a library to provide buyer sign-in and authentication powered by the [new Customer Account API](https://www.shopify.com/partners/blog/introducing-customer-account-api-for-headless-stores)—stay tuned.
