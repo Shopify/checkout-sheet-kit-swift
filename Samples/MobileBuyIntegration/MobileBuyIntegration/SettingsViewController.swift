@@ -27,11 +27,29 @@ import ShopifyCheckout
 class SettingsViewController: UITableViewController {
 
 	// MARK: Properties
+	enum Section: Int, CaseIterable {
+		case preloading = 0
+		case vaultedState = 1
+		case colorScheme = 2
+		case version = 3
+		case undefined = -1
+
+		static func from(_ rawValue: Int) -> Section {
+			return Section(rawValue: rawValue) ?? .undefined
+		}
+	}
 
 	private lazy var preloadingSwitch: UISwitch = {
 		let view = UISwitch()
 		view.isOn = ShopifyCheckout.configuration.preloading.enabled
 		view.addTarget(self, action: #selector(preloadingSwitchDidChange), for: .valueChanged)
+		return view
+	}()
+
+	private lazy var vaultedStateSwitch: UISwitch = {
+		let view = UISwitch()
+		view.isOn = appConfiguration.useVaultedState
+		view.addTarget(self, action: #selector(vaultedStateSwitchDidChange), for: .valueChanged)
 		return view
 	}()
 
@@ -60,12 +78,12 @@ class SettingsViewController: UITableViewController {
 	// MARK: UITableViewDataSource
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
-		return 3
+		return Section.allCases.count
 	}
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		switch section {
-		case 1:
+		switch Section.from(section) {
+		case Section.colorScheme:
 			return "Color Scheme"
 		default:
 			return nil
@@ -73,8 +91,8 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		switch section {
-		case 1:
+		switch Section.from(section) {
+		case Section.colorScheme:
 			return "NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again."
 		default:
 			return nil
@@ -82,12 +100,14 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		switch section {
-		case 0:
+		switch Section.from(section) {
+		case Section.preloading:
 			return 1
-		case 1:
+		case Section.vaultedState:
+			return 1
+		case Section.colorScheme:
 			return ShopifyCheckout.Configuration.ColorScheme.allCases.count
-		case 2:
+		case Section.version:
 			return 1
 		default:
 			return 0
@@ -99,15 +119,18 @@ class SettingsViewController: UITableViewController {
 
 		var content = cell.defaultContentConfiguration()
 
-		switch indexPath.section {
-		case 0:
+		switch Section.from(indexPath.section) {
+		case Section.preloading:
 			content.text = "Use Preloading"
 			cell.accessoryView = preloadingSwitch
-		case 1:
+		case Section.vaultedState:
+			content.text = "Use Vaulted State"
+			cell.accessoryView = vaultedStateSwitch
+		case Section.colorScheme:
 			let scheme = colorScheme(at: indexPath)
 			content.text = scheme.prettyTitle
 			content.secondaryText = ShopifyCheckout.configuration.colorScheme == scheme ? "Active" : ""
-		case 2:
+		case Section.version:
 			content = UIListContentConfiguration.valueCell()
 			content.text = "Version"
 			content.secondaryText = currentVersion()
@@ -121,11 +144,14 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		switch indexPath.section {
-		case 0:
+		switch Section.from(indexPath.section) {
+		case Section.preloading:
 			preloadingSwitch.isOn.toggle()
 			preloadingSwitchDidChange()
-		case 1:
+		case Section.vaultedState:
+			vaultedStateSwitch.isOn.toggle()
+			vaultedStateSwitchDidChange()
+		case Section.colorScheme:
 			let newColorScheme = colorScheme(at: indexPath)
 			ShopifyCheckout.configuration.colorScheme = newColorScheme
 			let navigationBarAppearance = newColorScheme.navigationBarAppearance
@@ -144,6 +170,10 @@ class SettingsViewController: UITableViewController {
 
 	@objc private func preloadingSwitchDidChange() {
 		ShopifyCheckout.configuration.preloading.enabled = preloadingSwitch.isOn
+	}
+
+	@objc private func vaultedStateSwitchDidChange() {
+		appConfiguration.useVaultedState = vaultedStateSwitch.isOn
 	}
 
 	private func currentColorScheme() -> Configuration.ColorScheme {
