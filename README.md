@@ -168,6 +168,9 @@ extension MyViewController: ShopifyCheckoutDelegate {
 }
 ```
 
+#### Integrating with Web Pixels, monitoring behavioral data
+App developers can use [lifecycle events](monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. Web Pixel events are currently not executed within rendered checkout. Support for customer events and behavioral analytics is under development and will be available prior to the general availability of SDK.
+
 ### Integrating identity & customer accounts
 Buyer-aware checkout experience reduces friction and increases conversion. Depending on the context of the buyer (guest or signed-in), knowledge of buyer preferences, or account/identity system, the application can use one of the following methods to initialize a personalized and contextualized buyer experience.
 
