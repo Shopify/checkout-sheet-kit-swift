@@ -160,7 +160,7 @@ class SettingsViewController: UITableViewController {
 			navigationController?.navigationBar.standardAppearance = navigationBarAppearance
 			navigationController?.navigationBar.scrollEdgeAppearance = navigationBarAppearance
 			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
-			tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
+            tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
 		default:
 			()
 		}
