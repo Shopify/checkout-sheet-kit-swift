@@ -35,6 +35,11 @@ class CheckoutViewTests: XCTestCase {
         view.viewDelegate = mockDelegate
 	}
 
+    override func tearDown() {
+        view.viewDelegate = nil
+        CheckoutView.invalidate()
+    }
+
 	func testEmailContactLinkDelegation() {
 		let link = URL(string: "mailto:contact@shopify.com")!
 
@@ -116,5 +121,56 @@ class CheckoutViewTests: XCTestCase {
 		XCTAssertEqual(policy, .allow)
 
 		waitForExpectations(timeout: 0.5, handler: nil)
+    }
+
+    func testForReturnsNewViewInstanceIfPreloadingDisabled() {
+        ShopifyCheckout.configure {
+            $0.preloading.enabled = false
+        }
+
+        let viewOne = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+
+        let viewTwo = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+
+        XCTAssertNotEqual(viewOne, viewTwo)
+    }
+
+    func testForReturnsNewViewInstanceIfPreloadingEnabledButPreloadNeverCalled() {
+        ShopifyCheckout.configure {
+            $0.preloading.enabled = true
+            $0.preloading.preloadCalledAtLeastOnce = false
+        }
+
+        let viewOne = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+
+        let viewTwo = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+
+        XCTAssertNotEqual(viewOne, viewTwo)
+    }
+
+    func testForReturnsNewViewInstanceIfPreloadingEnabledAndCalledButUrlChanged() {
+        ShopifyCheckout.configure {
+            $0.preloading.enabled = true
+            $0.preloading.preloadCalledAtLeastOnce = true
+        }
+
+        let viewOne = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+
+        let viewTwo = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/124")!)
+
+        XCTAssertNotEqual(viewOne, viewTwo)
+    }
+
+    func testForReturnsCachedViewInstanceIfPreloadingEnabledAndCalledAndURLUnchanged() {
+        ShopifyCheckout.configure {
+            $0.preloading.enabled = true
+            $0.preloading.preloadCalledAtLeastOnce = true
+        }
+
+        let viewOne = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+
+        let viewTwo = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+
+        XCTAssertEqual(viewOne, viewTwo)
     }
 }
