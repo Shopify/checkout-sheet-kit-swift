@@ -105,7 +105,7 @@ class CheckoutViewController: UIViewController {
 		}
 	}
 
-	@IBAction private func close() {
+	@IBAction internal func close() {
         CheckoutView.invalidate()
 		delegate?.checkoutDidCancel()
 	}
