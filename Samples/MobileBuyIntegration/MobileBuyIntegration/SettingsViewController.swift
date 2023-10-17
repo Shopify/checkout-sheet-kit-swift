@@ -121,10 +121,10 @@ class SettingsViewController: UITableViewController {
 
 		switch Section.from(indexPath.section) {
 		case Section.preloading:
-			content.text = "Use Preloading"
+			content.text = "Preload checkout"
 			cell.accessoryView = preloadingSwitch
 		case Section.vaultedState:
-			content.text = "Use Vaulted State"
+			content.text = "Prefill buyer information"
 			cell.accessoryView = vaultedStateSwitch
 		case Section.colorScheme:
 			let scheme = colorScheme(at: indexPath)
