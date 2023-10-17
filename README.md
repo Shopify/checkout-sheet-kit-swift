@@ -111,7 +111,7 @@ Initializing a checkout session requires communicating with Shopify servers and,
 Preloading is an advanced feature and is disabled by default, to enable:
 ```swift
 ShopifyCheckout.configure {
-  $0.preloading.enabled = true // defaults to false
+  $0.preloading.enabled = false // defaults to true
 }
 ```
 
