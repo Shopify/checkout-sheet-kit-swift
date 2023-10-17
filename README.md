@@ -108,7 +108,7 @@ _Note: use preloading to optimize and deliver an instant buyer experience._
 ### Preloading
 Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
 
-Preloading is an advanced feature and is disabled by default, to enable:
+Preloading is an advanced feature that can be disabled via a runtime flag:
 ```swift
 ShopifyCheckout.configure {
   $0.preloading.enabled = false // defaults to true
