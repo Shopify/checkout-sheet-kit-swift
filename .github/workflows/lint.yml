@@ -2,10 +2,6 @@ name: Run Lint Checks
 
 on:
   pull_request:
-    paths:
-      - ".github/workflows/swiftlint.yml"
-      - ".swiftlint.yml"
-      - "**/*.swift"
   workflow_dispatch:
 
 jobs:
