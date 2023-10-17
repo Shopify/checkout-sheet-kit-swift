@@ -66,6 +66,6 @@ extension Configuration {
 
 extension Configuration {
 	public struct Preloading {
-		public var enabled: Bool = false
+		public var enabled: Bool = true
 	}
 }
