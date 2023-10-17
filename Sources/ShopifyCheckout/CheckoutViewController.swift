@@ -105,7 +105,8 @@ class CheckoutViewController: UIViewController {
 		}
 	}
 
-	@IBAction private func close() {
+	@IBAction internal func close() {
+		CheckoutView.invalidate()
 		delegate?.checkoutDidCancel()
 	}
 }
@@ -128,10 +129,12 @@ extension CheckoutViewController: CheckoutViewDelegate {
 
 	func checkoutViewDidCompleteCheckout() {
 		ConfettiCannon.fire(in: view)
+		CheckoutView.invalidate()
 		delegate?.checkoutDidComplete()
 	}
 
 	func checkoutViewDidFailWithError(error: CheckoutError) {
+		CheckoutView.invalidate()
 		delegate?.checkoutDidFail(error: error)
 	}
 
