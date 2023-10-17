@@ -22,6 +22,7 @@
 		4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF54F232A6F456B00F5E407 /* CartManager.swift */; };
 		4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */; };
 		4EF54F312A6F63C000F5E407 /* CartViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EF54F2F2A6F63C000F5E407 /* CartViewController.xib */; };
+		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		4EF54F232A6F456B00F5E407 /* CartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartManager.swift; sourceTree = "<group>"; };
 		4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		4EF54F2F2A6F63C000F5E407 /* CartViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CartViewController.xib; sourceTree = "<group>"; };
+		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */,
+				86250DE32AD5521C002E45C2 /* AppConfiguration.swift */,
 				4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */,
 				4EF54F232A6F456B00F5E407 /* CartManager.swift */,
 				4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */,
@@ -244,6 +247,7 @@
 				4EBBA76F2A5F0CE200193E19 /* ProductViewController.swift in Sources */,
 				4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */,
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,
+				86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */,
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,
 				4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */,
 				4EA7F9B62A9D2B9D003276A1 /* SettingsViewController.swift in Sources */,
