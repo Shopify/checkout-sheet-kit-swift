@@ -29,6 +29,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 	private let checkoutURL = URL(string: "https://checkout-sdk.myshopify.com")!
 	private var viewController: CheckoutViewController!
+	private var navigationController: UINavigationController!
 
 	override func setUp() {
 		ShopifyCheckout.configure {
@@ -36,6 +37,8 @@ class CheckoutViewDelegateTests: XCTestCase {
 		}
 		viewController = CheckoutViewController(
 			checkoutURL: checkoutURL, delegate: ExampleDelegate())
+
+		navigationController = UINavigationController(rootViewController: viewController)
 	}
 
 	func testTitleIsSetToCheckout() {
@@ -96,5 +99,15 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 		let three = CheckoutView.for(checkout: checkoutURL)
 		XCTAssertEqual(two, three)
+	}
+
+	func testCheckoutViewDidToggleModalAddsAndRemovesNavigationBar() {
+		XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
+
+		viewController.checkoutViewDidToggleModal(modalVisible: true)
+		XCTAssertTrue(viewController.navigationController!.isNavigationBarHidden)
+
+		viewController.checkoutViewDidToggleModal(modalVisible: false)
+		XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
 	}
 }

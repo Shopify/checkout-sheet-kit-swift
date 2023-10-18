@@ -58,6 +58,7 @@ extension CheckoutBridge {
 		case checkoutCanceled
 		case checkoutExpired
 		case checkoutUnavailable
+		case checkoutModalToggled(modalVisible: Bool)
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -78,6 +79,9 @@ extension CheckoutBridge {
 			case "error":
 				// needs to support .checkoutUnavailable by parsing error payload on body
 				self = .checkoutExpired
+			case "checkoutBlockingEvent":
+				let modalVisible = try container.decode(String.self, forKey: .body)
+				self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)
 			default:
 				self = .unsupported(name)
 			}
