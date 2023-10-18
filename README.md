@@ -1,15 +1,15 @@
 # Mobile Checkout SDK - iOS
 
-The **Mobile Checkout SDK for iOS** is a Swift Package library that allows iOS apps to easily present a Shopify checkout flow to a prospective buyer.
+![image](https://github.com/Shopify/mobile-checkout-sdk-ios/assets/10652/1a06e4ff-bc78-4409-91e6-c0d8fccf5959)
+
+**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Scripts, Functions, Web Pixels, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how Mobile Checkout SDK is built](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
 ### Requirements
-
 - Swift 5.7+
 - iOS SDK 13.0+
 
 ### Getting Started
-
-The **Mobile Checkout SDK for iOS** is published as an open source, [Swift Package library](https://www.swift.org/package-manager/). There are two ways to add the dependency, depending on your consuming project:
+The SDK is an open-source [Swift Package library](https://www.swift.org/package-manager/). As a quick start, see [sample projects](Samples/README.md) or use one of the following ways to integrate the SDK into your project:
 
 #### Package.swift
 
@@ -30,17 +30,13 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 
 ### Basic Usage
 
-Once the package has been added as a dependency, you can import the library.
+Once the SDK has been added as a dependency, you can import the library:
 
 ```swift
 import ShopifyCheckout
 ```
 
-The library is designed to be used in conjunction with the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront). Shopify provides the [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) which can be used to communicate with the API, however, you are also able to bring your own implementation if you choose.
-
-Before you can present a checkout to the buyer, you must first retrieve a checkout URL. Currently, we only support checkout URLs retrieved via the [`Cart` endpoint in the Storefront GraphQL API](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage).
-
-If you are using the Mobile Buy SDK, you can do something similar to this:
+To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GraphQL client to accomplish this and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
 
 ```swift
 import Buy
@@ -62,7 +58,7 @@ let task = client.queryGraphWith(query) { response, error in
 task.resume()
 ```
 
-Once you have a checkout URL object, you can present a checkout experience to the buyer using the `present(checkout:)` function.
+The `checkoutURL` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application, provide the `checkoutURL` alongside optional runtime configuration settings to the `present(checkout:)` function provided by the SDK:
 
 ```swift
 import UIKit
@@ -76,89 +72,31 @@ class MyViewController: UIViewController {
 }
 ```
 
-We also provide a `ShopifyCheckoutDelegate` protocol which you can use to be notified of lifecycle events during checkout.
-
-```swift
-extension MyViewController: ShopifyCheckoutDelegate {
-  func checkoutDidComplete() {
-    // Called when the checkout was completed successfully by the buyer. Use this as an opportunity to reset any cart state.
-  }
-
-  func checkoutDidCancel() {
-    // The buyer cancelled the checkout. You should use this to call `dismiss(animated:)`.
-  }
-
-  func checkoutDidFail(error: CheckoutError) {
-    // The buyer encountered an error during checkout.
-    
-    // CheckoutError is an enum with the following possible values: 
-    
-	/// Issued when an internal error within Shopify Checkout SDK
-	/// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
-	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
-	case sdkError(underlying: Swift.Error)
-
-
-	/// Issued when checkout has encountered a unrecoverable error (for example server side error)
-	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
-	case checkoutUnavailable(message: String)
-
-	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
-	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
-	/// In event of checkoutExpired, a new checkout url will need to be generated
-	case checkoutExpired(message: String)
-  }
-
-  func checkoutDidClickLink(url: URL) {
-    // Called when the buyer clicked a link e.g email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
-  }
-}
-```
-
-### Preloading
-
-The checkout experience is complex and can be costly to load, especially on mobile cellular networks. Therefore, we provide the ability for consuming apps to hint to the library that checkout may be presented soon and should preload in the background. This is a feature
-that needs to be enabled in the ShopifyChecout configuration
-
-```swift
-ShopifyCheckout.configure {
-  $0.preloading.enabled = true // defaults to false
-}
-
-```swift
-ShopifyCheckout.preload(checkout: url)
-```
-
-**It is important to note a few things when utilizing preloading:**
-
-1. Once you call `preload(checkout:)` for a given URL, you **must** call it again if the matching cart's contents ever changes. Failure to do so may result in an out of date checkout being presented.
-2. Calling `preload(checkout:)` should be considered a hint and not a guarantee. The library may debounce or ignore calls to this API depending on various conditions.
+To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session in the background and ahead of time. 
 
 ### Configuration
 
-The library provides a way to customize the checkout experience via the `ShopifyCheckout.configuration` object.
+The SDK provides a way to customize the presented checkout experience via the `ShopifyCheckout.configuration` object.
 
 #### `colorScheme`
-
-When checkout is presented, the look and feel can be configured using the `colorScheme` property. By default, it will match the user's device appearance. For example:
+By default, the SDK will match the user's device color appearance. This behavior can be customized via the `colorScheme` property:
 
 ```swift
-// Automatically switch between light and dark themes based on device preference (`UITraitCollection`)
+// [Default] Automatically toggle idiomatic light and dark themes based on device preference (`UITraitCollection`)
 ShopifyCheckout.configuration.colorScheme = .automatic
 
-// Always force an idiomatic, light color scheme
+// Force idiomatic light color scheme
 ShopifyCheckout.configuration.colorScheme = .light
 
-// Always force an idiomatic, dark color scheme
+// Force idiomatic dark color scheme
 ShopifyCheckout.configuration.colorScheme = .dark
 
-// Match the look and feel of checkout via a desktop or mobile browser.
+// Force web theme, as rendered by a mobile browser
 ShopifyCheckout.configuration.colorScheme = .web
 ```
 
 #### `spinnerColor`
-
-The loading spinner shown when checkout is presented can be modified through the `spinnerColor` property on the configuration object:
+If the checkout session is not ready and being initialized, a loading spinner is shown and can be customized via `spinnerColor` property:
 
 ```swift
 // Use a custom UI color
@@ -167,14 +105,82 @@ ShopifyCheckout.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blu
 // Use a system color
 ShopifyCheckout.configuration.spinnerColor = .systemBlue
 ```
+_Note: use preloading to optimize and deliver an instant buyer experience._
 
-### Customer Accounts
+### Preloading
+Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
 
-An authenticated checkout experience reduces friction and increases conversion. A complete customer authentication solution is currently being designed. Until then [Shopify Plus](https://help.shopify.com/en/manual/intro-to-shopify/pricing-plans/plans-features/shopify-plus-plan) merchants using [Classic Customer Accounts](https://help.shopify.com/en/manual/customers/customer-accounts/classic-customer-accounts) can use [Multipass](https://shopify.dev/docs/api/multipass).
+Preloading is an advanced feature that can be disabled via a runtime flag:
+```swift
+ShopifyCheckout.configure {
+  $0.preloading.enabled = false // defaults to true
+}
+```
+
+Once enabled, preloading a checkout is as simple as:
+```swift
+ShopifyCheckout.preload(checkout: checkoutURL)
+```
+
+**Important considerations:**
+1. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout—e.g. when the buyer navigates to the cart overview or a similar app-specific experience.
+2. A preloaded checkout session reflects the cart contents at the time when `preload` is called. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
+3. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
+
+
+### Monitoring the lifecycle of a checkout session
+You can use the `ShopifyCheckoutDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
+
+```swift
+extension MyViewController: ShopifyCheckoutDelegate {
+  func checkoutDidComplete() {
+    // Called when the checkout was completed successfully by the buyer.
+    // Use this to update UI, reset cart state, etc.
+  }
+
+  func checkoutDidCancel() {
+    // Called when the checkout was canceled by the buyer.
+    // Use this to call `dismiss(animated:)`, etc.
+  }
+
+  func checkoutDidFail(error: CheckoutError) {
+    // Called when the checkout encountered an error and has been aborted. The callback
+    // provides a `CheckoutError` enum, with one of the following values:
+    
+	/// Internal error: exception within the Checkout SDK code
+	/// You can inspect and log the Erorr and stacktrace to identify the problem.
+	case sdkError(underlying: Swift.Error)
+
+	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
+        /// The provided message describes the error and may be logged and presented to the buyer.
+	case checkoutUnavailable(message: String)
+
+	/// Expired error: checkout session associated with provided checkoutURL is no longer available.
+        /// The provided message describes the error and may be logged and presented to the buyer. 
+	case checkoutExpired(message: String)
+  }
+
+  func checkoutDidClickLink(url: URL) {
+    // Called when the buyer clicks a link within the checkout experience:
+    //  - email address (`mailto:`),
+    //  - telephone number (`tel:`),
+    //  - web (`http:`)
+    // and is being directed outside the application.
+  }
+}
+```
+
+#### Integrating with Web Pixels, monitoring behavioral data
+App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. Web Pixel events are currently not executed within rendered checkout. Support for customer events and behavioral analytics is under development and will be available prior to the general availability of SDK.
+
+### Integrating identity & customer accounts
+Buyer-aware checkout experience reduces friction and increases conversion. Depending on the context of the buyer (guest or signed-in), knowledge of buyer preferences, or account/identity system, the application can use one of the following methods to initialize a personalized and contextualized buyer experience.
+
+#### Cart: buyer bag, identity, and preferences
+In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc.), and delivery and payment preferences: see [guide]([url](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage)). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
 
 #### Multipass
-
-Follow the [Multipass documentation](https://shopify.dev/docs/api/multipass) to create a multipass URL. The `'return_to'` attribute in the customer information JSON should be set to the checkout URL obtained from the Storefront API, e.g:
+[Shopify Plus](https://help.shopify.com/en/manual/intro-to-shopify/pricing-plans/plans-features/shopify-plus-plan) merchants using [Classic Customer Accounts](https://help.shopify.com/en/manual/customers/customer-accounts/classic-customer-accounts) can use [Multipass](https://shopify.dev/docs/api/multipass) ([API documentation](https://shopify.dev/docs/api/multipass)) to integrate an external identity system and initialize a buyer-aware checkout session. 
 
 ```json
 {
@@ -186,17 +192,18 @@ Follow the [Multipass documentation](https://shopify.dev/docs/api/multipass) to 
 }
 ```
 
-The resulting multipass URL should then be submitted to `ShopifyCheckout.present()`. When the WebView is presented, multipass authentication will complete before redirecting the authenticated customer to checkout.
+1. Follow the [Multipass documentation](https://shopify.dev/docs/api/multipass) to create a Multipass URL and set `return_to` to be the obtained `checkoutUrl`
+2. Provide the Multipass URL to `present(checkout:)`
 
-##### Notes
+_Note: the above JSON omits useful customer attributes that should be provided where possible and encryption and signing should be done server-side to ensure Multipass keys are kept secret._
 
-- The JSON above omits useful customer attributes that should be provided where possible,
-- Encryption and signing should be done server-side to ensure multipass keys can be kept secret.
+#### Shop Pay 
+To initialize accelerated Shop Pay checkout, the cart can set a [walletPreference](https://shopify.dev/docs/api/storefront/latest/mutations/cartBuyerIdentityUpdate#field-cartbuyeridentityinput-walletpreferences) to 'shop_pay'. The sign-in state of the buyer is app-local. The buyer will be prompted to sign in to their Shop account on their first checkout, and their sign-in state will be remembered for future checkout sessions.
 
-### Sample Projects
+#### Customer Account API
+We are working on a library to provide buyer sign-in and authentication powered by the [new Customer Account API](https://www.shopify.com/partners/blog/introducing-customer-account-api-for-headless-stores)—stay tuned.
 
-We provide sample projects in this repository which demonstrate integrating the package in various ways. For more information, see [`Samples/README.md`](Samples/README.md).
+---
 
 ### Contributing
-
-The filing of issues, feature requests, and code contributions via pull requests are welcome. For more details on how to contribute to this repository, please see [CONTRIBUTING.md](.github/CONTRIBUTING.md).
+We welcome code contributions, feature requests, and reporting of issues. Please see [guidelines and instructions](.github/CONTRIBUTING.md).
