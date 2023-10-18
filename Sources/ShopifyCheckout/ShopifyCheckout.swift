@@ -49,5 +49,6 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 	let viewController = UINavigationController(
 		rootViewController: CheckoutViewController(checkoutURL: url, delegate: delegate)
 	)
+	viewController.presentationController?.delegate = viewController.viewControllers[0] as? UIAdaptivePresentationControllerDelegate
 	from.present(viewController, animated: true)
 }

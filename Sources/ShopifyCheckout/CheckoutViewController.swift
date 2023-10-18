@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 import WebKit
 
-class CheckoutViewController: UIViewController {
+class CheckoutViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 
 	// MARK: Properties
 
@@ -106,6 +106,14 @@ class CheckoutViewController: UIViewController {
 	}
 
 	@IBAction internal func close() {
+		didCancel()
+	}
+
+	func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+		didCancel()
+	}
+
+	func didCancel() {
 		CheckoutView.invalidate()
 		delegate?.checkoutDidCancel()
 	}
