@@ -1,6 +1,6 @@
 # Mobile Checkout SDK - iOS
 
-**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Scripts, Functions, Web Pixels, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how Mobile Checkout SDK is built](TODO).
+**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Scripts, Functions, Web Pixels, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how Mobile Checkout SDK is built](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
 ### Requirements
 - Swift 5.7+
