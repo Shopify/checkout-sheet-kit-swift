@@ -1,11 +1,9 @@
-name: Run Tests
-
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      test-path:
+        required: true
+        type: string
 
 jobs:
   test:
@@ -25,8 +23,5 @@ jobs:
           CURRENT_SIMULATOR_UUID=$(xcrun simctl create TestDevice "iPhone 14")
           echo "CURRENT_SIMULATOR_UUID=$CURRENT_SIMULATOR_UUID" >> $GITHUB_ENV
 
-      - name: Run Package Tests
-        run: ./Scripts/test_package
-
-      - name: Run Samples Tests
-        run: ./Scripts/test_samples
+      - name: Run Tests
+        run: ${{ inputs.config-path }}
