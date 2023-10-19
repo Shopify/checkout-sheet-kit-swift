@@ -1,6 +1,6 @@
 # Mobile Checkout SDK - iOS
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/mobile-buy-sdk-ios/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-4BC51D.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/mobile-checkout-sdk-ios/actions/workflows/test.yml/badge.svg?branch=main)
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/mobile-buy-sdk-ios/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/mobile-checkout-sdk-ios/actions/workflows/test.yml/badge.svg?branch=main)
 
 ![image](https://github.com/Shopify/mobile-checkout-sdk-ios/assets/10652/1a06e4ff-bc78-4409-91e6-c0d8fccf5959)
 
