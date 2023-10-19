@@ -23,8 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 import WebKit
+import Foundation
 
-class CheckoutViewController: UIViewController {
+class CheckoutViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 
 	// MARK: Properties
 
@@ -58,9 +59,12 @@ class CheckoutViewController: UIViewController {
 
 		super.init(nibName: nil, bundle: nil)
 
-		title = "Checkout"
+		title = ShopifyCheckout.configuration.title
 
 		navigationItem.rightBarButtonItem = closeBarButtonItem
+
+		let deviceLanguage = Locale.preferredLanguages.first
+		print("Device language: \(deviceLanguage ?? "Unknown")")
 
 		checkoutView.viewDelegate = self
 	}
@@ -106,6 +110,14 @@ class CheckoutViewController: UIViewController {
 	}
 
 	@IBAction internal func close() {
+		didCancel()
+	}
+
+	internal func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+		didCancel()
+	}
+
+	private func didCancel() {
 		CheckoutView.invalidate()
 		delegate?.checkoutDidCancel()
 	}
