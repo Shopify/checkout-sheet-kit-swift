@@ -72,7 +72,7 @@ class MyViewController: UIViewController {
 }
 ```
 
-To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session in the background and ahead of time. 
+To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session in the background and ahead of time.
 
 ### Configuration
 
@@ -146,7 +146,7 @@ extension MyViewController: ShopifyCheckoutDelegate {
   func checkoutDidFail(error: CheckoutError) {
     // Called when the checkout encountered an error and has been aborted. The callback
     // provides a `CheckoutError` enum, with one of the following values:
-    
+
 	/// Internal error: exception within the Checkout SDK code
 	/// You can inspect and log the Erorr and stacktrace to identify the problem.
 	case sdkError(underlying: Swift.Error)
@@ -156,7 +156,7 @@ extension MyViewController: ShopifyCheckoutDelegate {
 	case checkoutUnavailable(message: String)
 
 	/// Expired error: checkout session associated with provided checkoutURL is no longer available.
-        /// The provided message describes the error and may be logged and presented to the buyer. 
+        /// The provided message describes the error and may be logged and presented to the buyer.
 	case checkoutExpired(message: String)
   }
 
@@ -180,7 +180,7 @@ Buyer-aware checkout experience reduces friction and increases conversion. Depen
 In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc.), and delivery and payment preferences: see [guide]([url](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage)). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
 
 #### Multipass
-[Shopify Plus](https://help.shopify.com/en/manual/intro-to-shopify/pricing-plans/plans-features/shopify-plus-plan) merchants using [Classic Customer Accounts](https://help.shopify.com/en/manual/customers/customer-accounts/classic-customer-accounts) can use [Multipass](https://shopify.dev/docs/api/multipass) ([API documentation](https://shopify.dev/docs/api/multipass)) to integrate an external identity system and initialize a buyer-aware checkout session. 
+[Shopify Plus](https://help.shopify.com/en/manual/intro-to-shopify/pricing-plans/plans-features/shopify-plus-plan) merchants using [Classic Customer Accounts](https://help.shopify.com/en/manual/customers/customer-accounts/classic-customer-accounts) can use [Multipass](https://shopify.dev/docs/api/multipass) ([API documentation](https://shopify.dev/docs/api/multipass)) to integrate an external identity system and initialize a buyer-aware checkout session.
 
 ```json
 {
@@ -197,7 +197,7 @@ In addition to specifying the line items, the Cart can include buyer identity (n
 
 _Note: the above JSON omits useful customer attributes that should be provided where possible and encryption and signing should be done server-side to ensure Multipass keys are kept secret._
 
-#### Shop Pay 
+#### Shop Pay
 To initialize accelerated Shop Pay checkout, the cart can set a [walletPreference](https://shopify.dev/docs/api/storefront/latest/mutations/cartBuyerIdentityUpdate#field-cartbuyeridentityinput-walletpreferences) to 'shop_pay'. The sign-in state of the buyer is app-local. The buyer will be prompted to sign in to their Shop account on their first checkout, and their sign-in state will be remembered for future checkout sessions.
 
 #### Customer Account API
@@ -207,3 +207,6 @@ We are working on a library to provide buyer sign-in and authentication powered 
 
 ### Contributing
 We welcome code contributions, feature requests, and reporting of issues. Please see [guidelines and instructions](.github/CONTRIBUTING.md).
+
+### License
+The Mobile Checkout SDK is provided under an [MIT License](LICENSE).
