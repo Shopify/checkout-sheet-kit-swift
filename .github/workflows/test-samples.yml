@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run Sample App Tests
 
 on:
   push:
@@ -28,5 +28,3 @@ jobs:
       - name: Run Package Tests
         run: ./Scripts/test_package
 
-      - name: Run Samples Tests
-        run: ./Scripts/test_samples
