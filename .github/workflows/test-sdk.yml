@@ -8,23 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: macOS-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Setup iOS Simulator
-        run: |
-          xcode-select -p
-          xcrun xcodebuild -version
-          xcrun simctl list runtimes
-          xcrun simctl list devicetypes
-          xcrun simctl delete all
-          CURRENT_SIMULATOR_UUID=$(xcrun simctl create TestDevice "iPhone 14")
-          echo "CURRENT_SIMULATOR_UUID=$CURRENT_SIMULATOR_UUID" >> $GITHUB_ENV
-
-      - name: Run Tests
-        run: ./Scripts/test_package
-
+  call-workflow-passing-data:
+    uses: ./.github/workflows/test-workflow.yml
+    with:
+      test-path: ./Scripts/test_package
