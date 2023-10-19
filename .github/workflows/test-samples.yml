@@ -25,6 +25,5 @@ jobs:
           CURRENT_SIMULATOR_UUID=$(xcrun simctl create TestDevice "iPhone 14")
           echo "CURRENT_SIMULATOR_UUID=$CURRENT_SIMULATOR_UUID" >> $GITHUB_ENV
 
-      - name: Run Package Tests
-        run: ./Scripts/test_package
-
+      - name: Run Tests
+        run: ./Scripts/test_samples
