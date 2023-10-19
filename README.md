@@ -2,7 +2,7 @@
 
 ![image](https://github.com/Shopify/mobile-checkout-sdk-ios/assets/10652/1a06e4ff-bc78-4409-91e6-c0d8fccf5959)
 
-**Mobile Checkout SDK for iOS** is a Swift Package library that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Scripts, Functions, Web Pixels, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how Mobile Checkout SDK is built](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
+**Mobile Checkout SDK for iOS** is a Swift Package library, part of [Shopify's Mobile Kit](https://shopify.dev/docs/custom-storefronts/mobile-kit), that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Mobile Checkout SDKs](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
 ### Requirements
 - Swift 5.7+
@@ -15,7 +15,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify-Partners/mobile-checkout-sdk-ios", from: "0.1.0")
+  .package(url: "https://github.com/Shopify/mobile-checkout-sdk-ios", from: "0.1.0")
 ]
 ```
 
@@ -23,7 +23,7 @@ dependencies: [
 
 1. Open your Xcode project
 2. Navigate to `File` > `Add Packages...`
-3. Enter `https://github.com/Shopify-Partners/mobile-checkout-sdk-ios` into the search box
+3. Enter `https://github.com/Shopify/mobile-checkout-sdk-ios` into the search box
 4. Click `Add Package`
 
 For more details on managing Swift Package dependencies in Xcode, please see [Apple's documentation](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
