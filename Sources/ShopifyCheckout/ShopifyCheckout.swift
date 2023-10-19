@@ -46,8 +46,8 @@ public func preload(checkout url: URL) {
 
 /// Presents the checkout from a given `UIViewController`.
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	let view = CheckoutViewController(checkoutURL: url, delegate: delegate)
-	let viewController = UINavigationController(rootViewController: view)
-	viewController.presentationController?.delegate = view
+	let rootViewController = CheckoutViewController(checkoutURL: url, delegate: delegate)
+	let viewController = UINavigationController(rootViewController: rootViewController)
+	viewController.presentationController?.delegate = rootViewController
 	from.present(viewController, animated: true)
 }
