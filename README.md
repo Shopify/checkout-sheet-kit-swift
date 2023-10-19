@@ -1,6 +1,6 @@
 # Mobile Checkout SDK - iOS
 
-![Tests](https://github.com/shopify/mobile-checkout-sdk-ios/actions/workflows/test.yml/badge.svg?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Tests](https://github.com/shopify/mobile-checkout-sdk-ios/actions/workflows/test.yml/badge.svg?branch=main)
 
 ![image](https://github.com/Shopify/mobile-checkout-sdk-ios/assets/10652/1a06e4ff-bc78-4409-91e6-c0d8fccf5959)
 
