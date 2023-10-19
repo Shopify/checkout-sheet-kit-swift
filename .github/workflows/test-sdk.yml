@@ -1,0 +1,14 @@
+name: Run SDK Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  call-workflow-passing-data:
+    uses: ./.github/workflows/test-workflow.yml
+    with:
+      test-path: ./Scripts/test_package
