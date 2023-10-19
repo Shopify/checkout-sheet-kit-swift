@@ -1,5 +1,7 @@
 # Mobile Checkout SDK - iOS
 
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/mobile-buy-sdk-ios/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/mobile-checkout-sdk-ios/actions/workflows/test.yml/badge.svg?branch=main)
+
 ![image](https://github.com/Shopify/mobile-checkout-sdk-ios/assets/10652/1a06e4ff-bc78-4409-91e6-c0d8fccf5959)
 
 **Mobile Checkout SDK for iOS** is a Swift Package library, part of [Shopify's Mobile Kit](https://shopify.dev/docs/custom-storefronts/mobile-kit), that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Mobile Checkout SDKs](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
