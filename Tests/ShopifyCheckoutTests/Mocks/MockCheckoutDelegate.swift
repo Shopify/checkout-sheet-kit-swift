@@ -21,27 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
-import ShopifyCheckout
+import XCTest
+@testable import ShopifyCheckout
 
-@main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-
-		ShopifyCheckout.configure {
-			/// Checkout color scheme setting
-			$0.colorScheme = .automatic
-
-			/// Enable preloading
-			$0.preloading.enabled = true
-		}
-
-		UIBarButtonItem.appearance().tintColor = .label
-
-		return true
+class ExampleDelegate: CheckoutDelegate {
+	func checkoutDidComplete() {
 	}
 
-	func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-		return UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
+	func checkoutDidCancel() {
+	}
+
+	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
+	}
+
+	func checkoutDidFail(error: ShopifyCheckout.CheckoutError) {
+	}
+
+	func checkoutDidClickContactLink(url: URL) {
 	}
 }
