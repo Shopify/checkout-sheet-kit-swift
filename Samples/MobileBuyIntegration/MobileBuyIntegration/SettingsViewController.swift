@@ -243,8 +243,10 @@ extension Configuration.ColorScheme {
 	var navigationBarAppearance: UINavigationBarAppearance {
 		switch self {
 		case .web:
+			UIBarButtonItem.appearance().tintColor = .white
 			let navBarAppearance = UINavigationBarAppearance()
-			navBarAppearance.backgroundImage = UIImage(named: "WebBrowserBarBackground")
+			navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+			navBarAppearance.backgroundColor = UIColor(red: 0.19, green: 0.05, blue: 0.48, alpha: 1.00)
 			return navBarAppearance
 		default:
 			let navBarAppearance = UINavigationBarAppearance()

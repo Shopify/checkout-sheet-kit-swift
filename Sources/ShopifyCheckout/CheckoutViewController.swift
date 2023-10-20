@@ -43,7 +43,7 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 	private let checkoutURL: URL
 
 	private lazy var closeBarButtonItem = UIBarButtonItem(
-		barButtonSystemItem: .close, target: self, action: #selector(close)
+		barButtonSystemItem: .stop, target: self, action: #selector(close)
 	)
 
 	// MARK: Initializers
