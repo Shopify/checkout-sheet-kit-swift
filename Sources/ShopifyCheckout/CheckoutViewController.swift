@@ -45,9 +45,10 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 	private lazy var closeBarButtonItem: UIBarButtonItem = {
 		switch ShopifyCheckout.configuration.colorScheme {
 			case .web:
-				return UIBarButtonItem(
-					barButtonSystemItem: .stop, target: self, action: #selector(close)
-				)
+				let closeIcon = UIImage(systemName: "xmark")?
+					.withConfiguration(UIImage.SymbolConfiguration(pointSize: 14, weight: .regular))
+					.withTintColor(.white, renderingMode: .alwaysOriginal)
+				return UIBarButtonItem(image: closeIcon, style: .plain, target: self, action: #selector(close))
 			default:
 				return UIBarButtonItem(
 					barButtonSystemItem: .close, target: self, action: #selector(close)
