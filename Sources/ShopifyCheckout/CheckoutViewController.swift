@@ -42,9 +42,18 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 
 	private let checkoutURL: URL
 
-	private lazy var closeBarButtonItem = UIBarButtonItem(
-		barButtonSystemItem: .stop, target: self, action: #selector(close)
-	)
+	private lazy var closeBarButtonItem: UIBarButtonItem = {
+		switch ShopifyCheckout.configuration.colorScheme {
+			case .web:
+				return UIBarButtonItem(
+					barButtonSystemItem: .stop, target: self, action: #selector(close)
+				)
+			default:
+				return UIBarButtonItem(
+					barButtonSystemItem: .close, target: self, action: #selector(close)
+				)
+		}
+	}()
 
 	// MARK: Initializers
 
