@@ -131,11 +131,17 @@ extension CheckoutView: WKNavigationDelegate {
 	}
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if let response = navigationResponse.response as? HTTPURLResponse {
-            decisionHandler(handleResponse(response))
-            return
-        }
-        decisionHandler(.allow)
+		guard let httpResponse = navigationResponse.response as? HTTPURLResponse else {
+			return decisionHandler(.allow)
+		}
+
+		if httpResponse.statusCode >= 400 {
+			DebugLogger.log("CheckoutView.decidePolicyForNavigationResponse", info: [
+				"url": httpResponse.url?.absoluteString, "status": String(httpResponse.statusCode)
+			])
+		}
+
+		decisionHandler(handleResponse(httpResponse))
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {

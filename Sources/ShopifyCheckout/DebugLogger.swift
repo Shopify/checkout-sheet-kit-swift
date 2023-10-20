@@ -5,7 +5,7 @@ public class DebugLogger {
 
 	public init() {}
 
-	public func log(_ name: String, info: [String: String] = [:]) {
+	public func log(_ name: String, info: [String: String?] = [:]) {
 		events.append(Event(name: name, info: info))
 	}
 
@@ -30,12 +30,12 @@ extension DebugLogger {
 
 		let name: String
 
-		let info: [String: String]
+		let info: [String: String?]
 	}
 }
 
 extension DebugLogger {
-	public static func log(_ name: String, info: [String: String] = [:]) {
+	public static func log(_ name: String, info: [String: String?] = [:]) {
 		configuration.debug.logger?.log(name, info: info)
 	}
 }
