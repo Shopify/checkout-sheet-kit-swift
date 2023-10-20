@@ -32,11 +32,7 @@ class SettingsViewController: UITableViewController {
 		case vaultedState = 1
 		case colorScheme = 2
 		case version = 3
-		case undefined = -1
-
-		static func from(_ rawValue: Int) -> Section {
-			return Section(rawValue: rawValue) ?? .undefined
-		}
+		case debug = 4
 	}
 
 	private lazy var preloadingSwitch: UISwitch = {
@@ -82,8 +78,8 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		switch Section.from(section) {
-		case Section.colorScheme:
+		switch Section(rawValue: section) {
+		case .colorScheme:
 			return "Color Scheme"
 		default:
 			return nil
@@ -91,8 +87,8 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		switch Section.from(section) {
-		case Section.colorScheme:
+		switch Section(rawValue: section) {
+		case .colorScheme:
 			return "NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again."
 		default:
 			return nil
@@ -100,14 +96,16 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		switch Section.from(section) {
-		case Section.preloading:
+		switch Section(rawValue: section) {
+		case .preloading:
 			return 1
-		case Section.vaultedState:
+		case .vaultedState:
 			return 1
-		case Section.colorScheme:
+		case .colorScheme:
 			return ShopifyCheckout.Configuration.ColorScheme.allCases.count
-		case Section.version:
+		case .version:
+			return 1
+		case .debug:
 			return 1
 		default:
 			return 0
@@ -119,21 +117,23 @@ class SettingsViewController: UITableViewController {
 
 		var content = cell.defaultContentConfiguration()
 
-		switch Section.from(indexPath.section) {
-		case Section.preloading:
+		switch Section(rawValue: indexPath.section) {
+		case .preloading:
 			content.text = "Preload checkout"
 			cell.accessoryView = preloadingSwitch
-		case Section.vaultedState:
+		case .vaultedState:
 			content.text = "Prefill buyer information"
 			cell.accessoryView = vaultedStateSwitch
-		case Section.colorScheme:
+		case .colorScheme:
 			let scheme = colorScheme(at: indexPath)
 			content.text = scheme.prettyTitle
 			content.secondaryText = ShopifyCheckout.configuration.colorScheme == scheme ? "Active" : ""
-		case Section.version:
+		case .version:
 			content = UIListContentConfiguration.valueCell()
 			content.text = "Version"
 			content.secondaryText = currentVersion()
+		case .debug:
+			content.text = "Share Debug Logs"
 		default:
 			()
 		}
@@ -144,14 +144,14 @@ class SettingsViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		switch Section.from(indexPath.section) {
-		case Section.preloading:
+		switch Section(rawValue: indexPath.section) {
+		case .preloading:
 			preloadingSwitch.isOn.toggle()
 			preloadingSwitchDidChange()
-		case Section.vaultedState:
+		case .vaultedState:
 			vaultedStateSwitch.isOn.toggle()
 			vaultedStateSwitchDidChange()
-		case Section.colorScheme:
+		case .colorScheme:
 			let newColorScheme = colorScheme(at: indexPath)
 			ShopifyCheckout.configuration.colorScheme = newColorScheme
 			let navigationBarAppearance = newColorScheme.navigationBarAppearance
@@ -161,6 +161,8 @@ class SettingsViewController: UITableViewController {
 			navigationController?.navigationBar.scrollEdgeAppearance = navigationBarAppearance
 			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
             tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
+		case .debug:
+			shareDebugLogs()
 		default:
 			()
 		}
@@ -187,6 +189,27 @@ class SettingsViewController: UITableViewController {
 	private func indexPath(for colorScheme: Configuration.ColorScheme) -> IndexPath? {
 		return ShopifyCheckout.Configuration.ColorScheme.allCases.firstIndex(of: colorScheme).map {
 			IndexPath(row: $0, section: 1)
+		}
+	}
+
+	private func shareDebugLogs() {
+		guard let logger = ShopifyCheckout.configuration.debug.logger else { return }
+
+		do {
+			let logURL = try logger.dump()
+			print(logURL)
+			present(UIActivityViewController(
+				activityItems: [logURL],
+				applicationActivities: nil
+			), animated: true)
+		} catch {
+			let alert = UIAlertController(
+				title: "Error",
+				message: error.localizedDescription,
+				preferredStyle: .alert
+			)
+			alert.addAction(UIAlertAction(title: "OK", style: .default))
+			present(alert, animated: true)
 		}
 	}
 

@@ -41,6 +41,7 @@ public struct Configuration {
 
 	public var spinnerColor: UIColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
+	public var debug = Configuration.Debug()
 }
 
 extension Configuration {
@@ -67,5 +68,11 @@ extension Configuration {
 extension Configuration {
 	public struct Preloading {
 		public var enabled: Bool = true
+	}
+}
+
+extension Configuration {
+	public struct Debug {
+		public var logger: DebugLogger? = nil
 	}
 }
