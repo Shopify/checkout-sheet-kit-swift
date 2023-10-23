@@ -24,7 +24,7 @@ dependencies: [
 #### Xcode
 
 1. Open your Xcode project
-2. Navigate to `File` > `Add Packages...`
+2. Navigate to `File` > `Add Package Dependencies...`
 3. Enter `https://github.com/Shopify/mobile-checkout-sdk-ios` into the search box
 4. Click `Add Package`
 
