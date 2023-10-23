@@ -111,8 +111,8 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 			checkoutView.load(checkout: checkoutURL)
 		} else if checkoutView.isLoading && initialNavigation {
 			checkoutView.alpha = 0
-			spinner.startAnimating()
 		}
+		spinner.startAnimating()
 	}
 
 	@IBAction internal func close() {
@@ -130,13 +130,6 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 }
 
 extension CheckoutViewController: CheckoutViewDelegate {
-
-	func checkoutViewDidStartNavigation() {
-		if initialNavigation {
-			spinner.startAnimating()
-		}
-	}
-
 	func checkoutViewDidFinishNavigation() {
 		spinner.stopAnimating()
 		initialNavigation = false

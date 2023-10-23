@@ -25,7 +25,6 @@ import UIKit
 import WebKit
 
 protocol CheckoutViewDelegate: AnyObject {
-	func checkoutViewDidStartNavigation()
 	func checkoutViewDidCompleteCheckout()
 	func checkoutViewDidFinishNavigation()
 	func checkoutViewDidClickLink(url: URL)
@@ -155,10 +154,6 @@ extension CheckoutView: WKNavigationDelegate {
 
 		return .allow
 	}
-
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        viewDelegate?.checkoutViewDidStartNavigation()
-    }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         viewDelegate?.checkoutViewDidFinishNavigation()
