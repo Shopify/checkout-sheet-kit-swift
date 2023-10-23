@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E8AE7642AE6A61A0002D25E /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8AE7632AE6A61A0002D25E /* DebugLogger.swift */; };
 		4EA7F9B62A9D2B9D003276A1 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7F9B42A9D2B9D003276A1 /* SettingsViewController.swift */; };
 		4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */; };
 		4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4E8AE7632AE6A61A0002D25E /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		4EA7F9B42A9D2B9D003276A1 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileBuyIntegration.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */,
 				4EF54F2F2A6F63C000F5E407 /* CartViewController.xib */,
 				4EA7F9B42A9D2B9D003276A1 /* SettingsViewController.swift */,
+				4E8AE7632AE6A61A0002D25E /* DebugLogger.swift */,
 			);
 			name = Application;
 			sourceTree = "<group>";
@@ -249,6 +252,7 @@
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,
 				86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */,
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,
+				4E8AE7642AE6A61A0002D25E /* DebugLogger.swift in Sources */,
 				4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */,
 				4EA7F9B62A9D2B9D003276A1 /* SettingsViewController.swift in Sources */,
 			);

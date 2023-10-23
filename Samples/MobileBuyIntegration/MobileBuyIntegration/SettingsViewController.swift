@@ -193,10 +193,8 @@ class SettingsViewController: UITableViewController {
 	}
 
 	private func shareDebugLogs() {
-		guard let logger = ShopifyCheckout.configuration.debug.logger else { return }
-
 		do {
-			let logURL = try logger.dump()
+			let logURL = try DebugLogger.shared.flushToDisk()
 			print(logURL)
 			present(UIActivityViewController(
 				activityItems: [logURL],

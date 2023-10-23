@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			$0.preloading.enabled = true
 
 			/// Enable debug logging
-			$0.debug.logger = DebugLogger()
+			$0.debug.logger = DebugLogger.shared
 		}
 
 		UIBarButtonItem.appearance().tintColor = .label

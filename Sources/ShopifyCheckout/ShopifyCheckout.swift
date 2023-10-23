@@ -41,13 +41,13 @@ public func configure(_ block: (inout Configuration) -> Void) {
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
 	guard configuration.preloading.enabled else { return }
-	DebugLogger.log("ShopifyCheckout.preloadCheckout", info: ["url": url.absoluteString])
+	log("preload checkout", ["url": url.absoluteString])
 	CheckoutView.for(checkout: url).load(checkout: url)
 }
 
 /// Presents the checkout from a given `UIViewController`.
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	DebugLogger.log("ShopifyCheckout.presentCheckout", info: ["url": url.absoluteString])
+	log("present checkout", ["url": url.absoluteString])
 	let rootViewController = CheckoutViewController(checkoutURL: url, delegate: delegate)
 	let viewController = UINavigationController(rootViewController: rootViewController)
 	viewController.presentationController?.delegate = rootViewController

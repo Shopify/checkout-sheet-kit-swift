@@ -50,10 +50,15 @@ class CheckoutView: WKWebView {
 			return view
 		}
 
+		log("[CheckoutView] returning cached view", [
+			"key": cacheKey
+		])
+
 		return cache.view
 	}
 
 	static func invalidate() {
+		log("[CheckoutView] invalidating checkout cache")
 		cache = nil
 	}
 
@@ -90,6 +95,7 @@ class CheckoutView: WKWebView {
 	}
 
 	func load(checkout url: URL) {
+		log("[CheckoutView] loading checkout url", ["url": url.absoluteString])
 		load(URLRequest(url: url))
 	}
 }
@@ -108,12 +114,19 @@ extension CheckoutView: WKScriptMessageHandler {
 				()
 			}
 		} catch {
+			log("[CheckoutView] invalid bridge event", [
+				"error": error.localizedDescription, "body": String(describing: message.body)
+			])
             viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 		}
 	}
 }
 
 extension CheckoutView: WKNavigationDelegate {
+	func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+		log("[CheckoutView] encountered server redirect", ["url": url?.absoluteString])
+	}
+
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
 		guard let url = action.request.url else {
@@ -122,6 +135,9 @@ extension CheckoutView: WKNavigationDelegate {
 		}
 
 		if isExternalLink(action) || isMailOrTelLink(url) {
+			log("[CheckoutView] encountered external navigation action", [
+				"url": url.absoluteString
+			])
 			viewDelegate?.checkoutViewDidClickLink(url: url)
 			decisionHandler(.cancel)
 			return
@@ -136,8 +152,10 @@ extension CheckoutView: WKNavigationDelegate {
 		}
 
 		if httpResponse.statusCode >= 400 {
-			DebugLogger.log("CheckoutView.decidePolicyForNavigationResponse", info: [
-				"url": httpResponse.url?.absoluteString, "status": String(httpResponse.statusCode)
+			log("[CheckoutView] received non-200 response", [
+				"url": httpResponse.url?.absoluteString,
+				"status": String(httpResponse.statusCode),
+				"x-request-id": httpResponse.value(forHTTPHeaderField: "x-request-id")
 			])
 		}
 

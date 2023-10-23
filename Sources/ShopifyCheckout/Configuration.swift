@@ -73,6 +73,6 @@ extension Configuration {
 
 extension Configuration {
 	public struct Debug {
-		public var logger: DebugLogger? = nil
+		public var logger: Logger?
 	}
 }
