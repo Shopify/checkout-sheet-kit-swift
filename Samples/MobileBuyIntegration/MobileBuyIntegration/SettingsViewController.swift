@@ -154,11 +154,7 @@ class SettingsViewController: UITableViewController {
 		case Section.colorScheme:
 			let newColorScheme = colorScheme(at: indexPath)
 			ShopifyCheckout.configuration.colorScheme = newColorScheme
-			let navigationBarAppearance = newColorScheme.navigationBarAppearance
-			UINavigationBar.appearance().standardAppearance = navigationBarAppearance
-			UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
-			navigationController?.navigationBar.standardAppearance = navigationBarAppearance
-			navigationController?.navigationBar.scrollEdgeAppearance = navigationBarAppearance
+			ShopifyCheckout.configuration.spinnerColor = newColorScheme.spinnerColor
 			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
             tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
 		default:
@@ -240,17 +236,12 @@ extension Configuration.ColorScheme {
 		}
 	}
 
-	var navigationBarAppearance: UINavigationBarAppearance {
-		switch self {
+	var spinnerColor: UIColor {
+		switch ShopifyCheckout.configuration.colorScheme {
 		case .web:
-			let navBarAppearance = UINavigationBarAppearance()
-			navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-			navBarAppearance.backgroundColor = UIColor(red: 0.19, green: 0.05, blue: 0.48, alpha: 1.00)
-			return navBarAppearance
+			return UIColor(red: 0.18, green: 0.16, blue: 0.22, alpha: 1.00)
 		default:
-			let navBarAppearance = UINavigationBarAppearance()
-			navBarAppearance.configureWithDefaultBackground()
-			return navBarAppearance
+			return UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 		}
 	}
 }
