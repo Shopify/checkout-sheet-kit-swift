@@ -98,7 +98,7 @@ ShopifyCheckout.configuration.colorScheme = .web
 ```
 
 #### `spinnerColor`
-If the checkout session is not ready and being initialized, a loading spinner is shown and can be customized via `spinnerColor` property:
+If the checkout session is not ready and being initialized, a loading spinner is shown and can be customized via the `spinnerColor` property:
 
 ```swift
 // Use a custom UI color
@@ -108,6 +108,17 @@ ShopifyCheckout.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blu
 ShopifyCheckout.configuration.spinnerColor = .systemBlue
 ```
 _Note: use preloading to optimize and deliver an instant buyer experience._
+
+#### `backgroundColor`
+While the checkout session is being initialized, the background color of the view can be customized via the `backgroundColor` property:
+
+```swift
+// Use a custom UI color
+ShopifyCheckout.configuration.backgroundColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+
+// Use a system color
+ShopifyCheckout.configuration.backgroundColor = .systemBackground
+```
 
 ### Preloading
 Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
