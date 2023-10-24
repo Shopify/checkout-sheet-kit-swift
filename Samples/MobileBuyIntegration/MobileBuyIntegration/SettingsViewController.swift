@@ -155,6 +155,7 @@ class SettingsViewController: UITableViewController {
 			let newColorScheme = colorScheme(at: indexPath)
 			ShopifyCheckout.configuration.colorScheme = newColorScheme
 			ShopifyCheckout.configuration.spinnerColor = newColorScheme.spinnerColor
+			ShopifyCheckout.configuration.backgroundColor = newColorScheme.backgroundColor
 			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
             tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
 		default:
@@ -237,11 +238,20 @@ extension Configuration.ColorScheme {
 	}
 
 	var spinnerColor: UIColor {
-		switch ShopifyCheckout.configuration.colorScheme {
+		switch self {
 		case .web:
 			return UIColor(red: 0.18, green: 0.16, blue: 0.22, alpha: 1.00)
 		default:
 			return UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+		}
+	}
+
+	var backgroundColor: UIColor {
+		switch self {
+		case .web:
+			return UIColor(red: 0.94, green: 0.94, blue: 0.91, alpha: 1.00)
+		default:
+			return .systemBackground
 		}
 	}
 }
