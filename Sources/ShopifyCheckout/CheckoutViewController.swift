@@ -76,7 +76,7 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 	override public func viewDidLoad() {
 		super.viewDidLoad()
 
-		view.backgroundColor = .systemBackground
+		view.backgroundColor = ShopifyCheckout.configuration.backgroundColor
 
 		view.addSubview(checkoutView)
 		NSLayoutConstraint.activate([

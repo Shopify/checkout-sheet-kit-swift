@@ -41,6 +41,8 @@ public struct Configuration {
 
 	public var spinnerColor: UIColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
+	public var backgroundColor: UIColor = .systemBackground
+
 }
 
 extension Configuration {
