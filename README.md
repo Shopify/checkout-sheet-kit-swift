@@ -9,6 +9,7 @@
 ### Requirements
 - Swift 5.7+
 - iOS SDK 13.0+
+- The SDK is not compatable with checkout.liquid. The Shopify Store must be migrated for extensibility 
 
 ### Getting Started
 The SDK is an open-source [Swift Package library](https://www.swift.org/package-manager/). As a quick start, see [sample projects](Samples/README.md) or use one of the following ways to integrate the SDK into your project:
@@ -163,6 +164,10 @@ extension MyViewController: ShopifyCheckoutDelegate {
 	/// Internal error: exception within the Checkout SDK code
 	/// You can inspect and log the Erorr and stacktrace to identify the problem.
 	case sdkError(underlying: Swift.Error)
+	
+	/// Issued when the provided checkout URL results in a 404.
+	/// The SDK only supports stores migrated for extensibility. This can be an indicator that the store is still using checkout.liquid and needs to be migrated to extensibility
+	case sdkError(underlying: CheckoutLiquidError.unmigratedCheckout)
 
 	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
         /// The provided message describes the error and may be logged and presented to the buyer.

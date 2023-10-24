@@ -145,8 +145,10 @@ extension CheckoutView: WKNavigationDelegate {
 		if isCheckout(url: response.url) && response.statusCode >= 400 {
 			CheckoutView.cache = nil
 			switch response.statusCode {
-			case 404, 410:
+			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
+			case 404:
+				viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: CheckoutLiquidError.unmigratedCheckoutError(message: "The checkout url provided has resulted in a 404. It may be possible that the provided checkout url is not valid. It is also possible the store is still using checkout.liquid. This checkout SDK only supports checkout with extensibility. Please ensure that the store is migrated to extensibility")))
 			case 500:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable due to error"))
 			default:
@@ -198,6 +200,7 @@ extension CheckoutView: WKNavigationDelegate {
 	private func isCheckout(url: URL?) -> Bool {
 		return self.url == url
 	}
+
 }
 
 extension CheckoutView {

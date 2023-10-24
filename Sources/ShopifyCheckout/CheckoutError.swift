@@ -37,3 +37,9 @@ public enum CheckoutError: Swift.Error {
 	/// In event of checkoutExpired, a new checkout url will need to be generated
 	case checkoutExpired(message: String)
 }
+
+public enum CheckoutLiquidError: Swift.Error {
+	/// Issued when the provided checkout URL results in a 404.
+	/// The SDK only supports stores migrated for extensibility. This can be an indicator that the store is still using checkout.liquid and needs to be migrated to extensibility
+	case unmigratedCheckoutError(message: String)
+}
