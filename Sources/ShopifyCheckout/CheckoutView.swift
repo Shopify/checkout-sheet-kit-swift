@@ -177,7 +177,7 @@ extension CheckoutView: WKNavigationDelegate {
 
 		guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?.value else { return false }
 
-		return openExternally == "true"
+		return openExternally.lowercased() == "true" || openExternally == "1"
 	}
 
 	private func removeExternalParam(_ url: URL) -> URL {
