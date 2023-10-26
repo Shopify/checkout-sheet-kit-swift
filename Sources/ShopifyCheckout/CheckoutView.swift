@@ -180,7 +180,7 @@ extension CheckoutView: WKNavigationDelegate {
 		return openExternally == "true"
 	}
 
-	private func removeExternalParam(url: URL) -> URL {
+	private func removeExternalParam(_ url: URL) -> URL {
 		guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
 			return url
 		}
