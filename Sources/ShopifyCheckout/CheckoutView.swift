@@ -122,7 +122,7 @@ extension CheckoutView: WKNavigationDelegate {
 		}
 
 		if isExternalLink(action) || isMailOrTelLink(url) {
-			viewDelegate?.checkoutViewDidClickLink(url: url)
+			viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
 			decisionHandler(.cancel)
 			return
 		}
@@ -173,12 +173,20 @@ extension CheckoutView: WKNavigationDelegate {
 		if action.navigationType == .linkActivated && action.targetFrame == nil { return true }
 
 		guard let url = action.request.url else { return false }
-		guard let url = URLComponents(string: url.absoluteString) else { return false }
+		guard let url = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
 
 		guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally"})?.value else { return false }
 
 		return openExternally == "true"
 	}
+
+	private func removeExternalParam(url: URL) -> URL {
+		guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+			return url
+		}
+		urlComponents.queryItems = urlComponents.queryItems?.filter { !($0.name == "open_externally")}
+		return urlComponents.url ?? url
+    }
 
 	private func isMailOrTelLink(_ url: URL) -> Bool {
 		return ["mailto", "tel"].contains(url.scheme)
