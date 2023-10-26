@@ -58,4 +58,3 @@ class MockExternalNavigationAction: WKNavigationAction {
 		super.init()
 	}
 }
-

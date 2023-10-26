@@ -175,7 +175,7 @@ extension CheckoutView: WKNavigationDelegate {
 		guard let url = action.request.url else { return false }
 		guard let url = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
 
-		guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally"})?.value else { return false }
+		guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?.value else { return false }
 
 		return openExternally == "true"
 	}
@@ -184,7 +184,7 @@ extension CheckoutView: WKNavigationDelegate {
 		guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
 			return url
 		}
-		urlComponents.queryItems = urlComponents.queryItems?.filter { !($0.name == "open_externally")}
+		urlComponents.queryItems = urlComponents.queryItems?.filter { !($0.name == "open_externally") }
 		return urlComponents.url ?? url
     }
 
