@@ -38,21 +38,23 @@ class MockNavigationAction: WKNavigationAction {
 
 class MockExternalNavigationAction: WKNavigationAction {
 	private let mockRequest: URLRequest
+	private let navType: WKNavigationType
 
 	override var request: URLRequest {
 		return mockRequest
 	}
 
 	override var navigationType: WKNavigationType {
-		return .linkActivated
+		return self.navType
 	}
 
 	override var targetFrame: WKFrameInfo? {
 		return nil
 	}
 
-	init(url: URL) {
+	init(url: URL, navigationType: WKNavigationType = .linkActivated) {
 		self.mockRequest = URLRequest(url: url)
+		self.navType = navigationType
 		super.init()
 	}
 }
