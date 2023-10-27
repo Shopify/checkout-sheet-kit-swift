@@ -97,4 +97,19 @@ class CheckoutBridgeTests: XCTestCase {
 			return XCTFail("expected CheckoutScriptMessage.checkoutExpired, got \(result)")
 		}
 	}
+
+	func testDecodeSupportsCheckoutBlockingEvent() throws {
+		let mock = WKScriptMessageMock(body: """
+		{
+			"name": "checkoutBlockingEvent",
+			"body": "true"
+		}
+		""")
+
+		let result = try CheckoutBridge.decode(mock)
+
+		guard case CheckoutBridge.WebEvent.checkoutModalToggled = result else {
+			return XCTFail("expected CheckoutScriptMessage.checkoutModalToggled, got \(result)")
+		}
+	}
 }

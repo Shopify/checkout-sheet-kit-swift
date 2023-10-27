@@ -37,6 +37,8 @@ class MockCheckoutViewDelegate: CheckoutViewDelegate {
 
 	var didFailWithErrorExpectation: XCTestExpectation?
 
+	var didToggleModalExpectation: XCTestExpectation?
+
 	func checkoutViewDidStartNavigation() {
 		didStartNavigationExpectation?.fulfill()
 	}
@@ -59,5 +61,9 @@ class MockCheckoutViewDelegate: CheckoutViewDelegate {
 
     func checkoutViewDidFailWithError(error: CheckoutError) {
 		didFailWithErrorExpectation?.fulfill()
+	}
+
+	func checkoutViewDidToggleModal() {
+		didToggleModalExpectation?.fulfill()
 	}
 }

@@ -151,4 +151,9 @@ extension CheckoutViewController: CheckoutViewDelegate {
 	func checkoutViewDidClickLink(url: URL) {
 		delegate?.checkoutDidClickLink(url: url)
 	}
+
+	func checkoutViewDidToggleModal(modalVisible: Bool) {
+		guard let navigationController = self.navigationController else { return }
+		navigationController.setNavigationBarHidden(modalVisible, animated: true)
+	}
 }
