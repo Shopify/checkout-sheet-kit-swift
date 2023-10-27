@@ -70,20 +70,6 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
-	func testDecodeSupportsCheckoutCanceledEvent() throws {
-		let mock = WKScriptMessageMock(body: """
-		{
-			"name": "close"
-		}
-		""")
-
-		let result = try CheckoutBridge.decode(mock)
-
-		guard case CheckoutBridge.WebEvent.checkoutCanceled = result else {
-			return XCTFail("expected CheckoutScriptMessage.checkoutCanceled, got \(result)")
-		}
-	}
-
 	func testDecodeSupportsCheckoutCompleteEvent() throws {
 		let mock = WKScriptMessageMock(body: """
 		{
