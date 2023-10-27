@@ -100,6 +100,7 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 		if checkoutView.url == nil {
 			checkoutView.alpha = 0
 			initialNavigation = true
+			print("Loading checkout")
 			checkoutView.load(checkout: checkoutURL)
 		} else if checkoutView.isLoading && initialNavigation {
 			checkoutView.alpha = 0
@@ -121,15 +122,24 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 	}
 }
 
-extension CheckoutViewController: CheckoutViewDelegate {
+private var startTime: Date?
 
+extension CheckoutViewController: CheckoutViewDelegate {
 	func checkoutViewDidStartNavigation() {
+		print("Started navigation")
+		startTime = Date()
 		if initialNavigation {
 			spinner.startAnimating()
 		}
 	}
 
 	func checkoutViewDidFinishNavigation() {
+		print("startTime:", startTime)
+		if let startTime = startTime {
+			let endTime = Date()
+			let timeTaken = endTime.timeIntervalSince(startTime)
+			print("Finished loading checkout: \(timeTaken) seconds")
+		}
 		spinner.stopAnimating()
 		initialNavigation = false
 		UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in

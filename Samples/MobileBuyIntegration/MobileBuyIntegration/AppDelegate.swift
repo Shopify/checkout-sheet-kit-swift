@@ -26,6 +26,9 @@ import ShopifyCheckout
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+
+	@IBOutlet private var banner: UILabel!
+
 	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
 		ShopifyCheckout.configure {

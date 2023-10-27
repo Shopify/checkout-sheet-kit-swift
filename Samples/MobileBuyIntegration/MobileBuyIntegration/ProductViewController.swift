@@ -29,6 +29,8 @@ class ProductViewController: UIViewController {
 
 	// MARK: Properties
 
+	@IBOutlet private var bannerLabel: UILabel!
+
 	@IBOutlet private var image: UIImageView!
 
 	@IBOutlet private var titleLabel: UILabel!
@@ -61,6 +63,8 @@ class ProductViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+
+		bannerLabel.isHidden = true
 
 		navigationItem.rightBarButtonItem = UIBarButtonItem(
 			barButtonSystemItem: .refresh,

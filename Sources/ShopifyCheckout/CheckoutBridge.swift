@@ -59,6 +59,11 @@ extension CheckoutBridge {
 		case checkoutExpired
 		case checkoutUnavailable
 		case checkoutModalToggled(modalVisible: Bool)
+		case checkoutReceivedSerializedData
+		case checkoutDOMContentLoaded
+		case checkoutDidLoadSkeleton
+		case checkoutDidLoad
+		case checkoutDidInit
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -71,11 +76,23 @@ extension CheckoutBridge {
 
 			let name = try container.decode(String.self, forKey: .name)
 
+			print("[Event]", name)
+
 			switch name {
+			case "init":
+				self = .checkoutDidInit
 			case "completed":
 				self = .checkoutComplete
 			case "close":
 				self = .checkoutCanceled
+			case "skeleton":
+				self = .checkoutDidLoadSkeleton
+			case "serialized":
+				self = .checkoutReceivedSerializedData
+			case "loaded":
+				self = .checkoutDOMContentLoaded
+			case "fullyLoaded":
+				self = .checkoutDidLoad
 			case "error":
 				// needs to support .checkoutUnavailable by parsing error payload on body
 				self = .checkoutExpired

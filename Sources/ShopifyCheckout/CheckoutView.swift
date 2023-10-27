@@ -70,6 +70,13 @@ class CheckoutView: WKWebView {
 		super.init(frame: frame, configuration: configuration)
 
 		navigationDelegate = self
+
+		if #available(iOS 16.4, *) {
+			self.isInspectable = true
+		}
+
+		configuration.userContentController
+			.add(self, name: CheckoutBridge.messageHandler)
 	}
 
 	required init?(coder: NSCoder) {
@@ -91,7 +98,14 @@ class CheckoutView: WKWebView {
 	}
 
 	func load(checkout url: URL) {
-		load(URLRequest(url: url))
+		let fastQuery = URLQueryItem(name: "render", value: "fast")
+
+
+		if #available(iOS 16.0, *) {
+			var request = URLRequest(url: url.appending(queryItems: [fastQuery]))
+			request.setValue("fast", forHTTPHeaderField: "X-Render")
+			load(request)
+		}
 	}
 }
 
@@ -107,6 +121,28 @@ extension CheckoutView: WKScriptMessageHandler {
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
+			case .checkoutReceivedSerializedData:
+				if let initialTime = startTime {
+					print("[Navigation] Received serialized data: \(Date().timeIntervalSince(initialTime))s")
+				}
+			case .checkoutDOMContentLoaded:
+				if let initialTime = startTime {
+					print("[Navigation] DOMContentLoaded: \(Date().timeIntervalSince(initialTime))s")
+				}
+			case .checkoutDidLoadSkeleton:
+				if let initialTime = startTime {
+					print("[Navigation] Loaded skeleton: \(Date().timeIntervalSince(initialTime))s")
+				}
+			case .checkoutDidLoad:
+				if let initialTime = startTime {
+					print("[Navigation] window.onload: \(Date().timeIntervalSince(initialTime))s")
+				}
+			case .checkoutDidInit:
+				initTime = Date()
+				if let initialTime = startTime, let t = initTime {
+					print("[Navigation] -- init: \(t.timeIntervalSince(initialTime))s")
+				}
+				viewDelegate?.checkoutViewDidFinishNavigation()
 			default:
 				()
 			}
@@ -115,6 +151,9 @@ extension CheckoutView: WKScriptMessageHandler {
 		}
 	}
 }
+
+private var startTime: Date?
+private var initTime: Date?
 
 extension CheckoutView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -160,15 +199,34 @@ extension CheckoutView: WKNavigationDelegate {
 	}
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+		print("[Navigation] didStartProvisionalNavigation")
+		startTime = Date()
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
+	func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+		print("[Navigation] didCommit")
+	}
+
+	func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+		print("[Navigation] didReceiveServerRedirectForProvisionalNavigation")
+	}
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        viewDelegate?.checkoutViewDidFinishNavigation()
+		if let initialTime = startTime, let t = initTime {
+			let endTime = Date()
+			print("[Navigation] -- didFinish: \(endTime.timeIntervalSince(initialTime))s (diff = \(endTime.timeIntervalSince(t))s)")
+		}
+//        viewDelegate?.checkoutViewDidFinishNavigation()
 	}
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         CheckoutView.cache = nil
+		if let startTime = startTime {
+			let endTime = Date()
+			let timeTaken = endTime.timeIntervalSince(startTime)
+			print("Failed to load checkout: \(timeTaken)s")
+		}
         viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
     }
 
