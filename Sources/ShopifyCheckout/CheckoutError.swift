@@ -39,7 +39,7 @@ public enum CheckoutError: Swift.Error {
 }
 
 public enum CheckoutLiquidError: Swift.Error {
-	/// Issued when the provided checkout URL results in a 404.
-	/// The SDK only supports stores migrated for extensibility. This can be an indicator that the store is still using checkout.liquid and needs to be migrated to extensibility
+	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
+	/// The SDK only supports stores migrated for extensibility. 
 	case unmigratedCheckoutError(message: String)
 }

@@ -165,8 +165,8 @@ extension MyViewController: ShopifyCheckoutDelegate {
 	/// You can inspect and log the Erorr and stacktrace to identify the problem.
 	case sdkError(underlying: Swift.Error)
 	
-	/// Issued when the provided checkout URL results in a 404.
-	/// The SDK only supports stores migrated for extensibility. This can be an indicator that the store is still using checkout.liquid and needs to be migrated to extensibility
+	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
+	/// The SDK only supports stores migrated for extensibility. 
 	case sdkError(underlying: CheckoutLiquidError.unmigratedCheckout)
 
 	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
