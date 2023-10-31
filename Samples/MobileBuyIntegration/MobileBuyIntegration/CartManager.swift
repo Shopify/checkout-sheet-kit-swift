@@ -162,7 +162,6 @@ class CartManager {
 		let deliveryAddressPreferences = [Storefront.DeliveryAddressInput.create(deliveryAddress: Input(orNull: deliveryAddress))]
 
 		return Storefront.CartInput.create(
-			attributes: Input(orNull: [Storefront.AttributeInput(key: "isBuyWithPrimeIntent", value: "true")]),
 			lines: Input(orNull: items.map({ Storefront.CartLineInput.create(merchandiseId: $0) })),
 			buyerIdentity: Input(orNull: Storefront.CartBuyerIdentityInput.create(
 				email: Input(orNull: email),
