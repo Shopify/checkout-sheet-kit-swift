@@ -148,7 +148,7 @@ extension CheckoutView: WKNavigationDelegate {
 			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
 			case 404:
-				viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: CheckoutLiquidError.unmigratedCheckoutError(message: "The checkout url provided has resulted in an error. The store is still using checkout.liquid, whereas the checkout SDK only supports checkout with extensibility.")))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "The checkout url provided has resulted in an error. The store is still using checkout.liquid, whereas the checkout SDK only supports checkout with extensibility."))
 			case 500:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable due to error"))
 			default:

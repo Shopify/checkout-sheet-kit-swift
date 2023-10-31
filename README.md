@@ -167,7 +167,7 @@ extension MyViewController: ShopifyCheckoutDelegate {
 	
 	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
 	/// The SDK only supports stores migrated for extensibility. 
-	case sdkError(underlying: CheckoutLiquidError.unmigratedCheckout)
+	case checkoutLiquidNotMigrated(message: String)
 
 	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
         /// The provided message describes the error and may be logged and presented to the buyer.

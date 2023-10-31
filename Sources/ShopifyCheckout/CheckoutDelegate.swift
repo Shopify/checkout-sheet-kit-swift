@@ -45,6 +45,10 @@ extension CheckoutDelegate {
 		handleUrl(url)
 	}
 
+	public func checkoutDidFail(error: CheckoutError) throws {
+		throw error
+	}
+
 	private func handleUrl(_ url: URL) {
 		if UIApplication.shared.canOpenURL(url) {
 			UIApplication.shared.open(url)
