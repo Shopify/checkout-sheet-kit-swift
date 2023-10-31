@@ -34,6 +34,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 			/// Enable preloading
 			$0.preloading.enabled = true
+
+			$0.spinnerColor = .systemMint
 		}
 
 		UIBarButtonItem.appearance().tintColor = .label

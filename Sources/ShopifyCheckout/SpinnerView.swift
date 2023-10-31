@@ -34,6 +34,8 @@ class SpinnerView: UIView {
 
 	private let animationKey = "SpinnerView.rotation"
 
+	private let fadeDuration: CGFloat = 0.2
+
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
@@ -58,6 +60,7 @@ class SpinnerView: UIView {
 	}
 
 	func startAnimating() {
+		imageView.alpha = 0.5
 		isHidden = false
 
 		let rotation = CABasicAnimation(
@@ -72,8 +75,11 @@ class SpinnerView: UIView {
 	}
 
 	func stopAnimating() {
-		isHidden = true
-
-		layer.removeAnimation(forKey: animationKey)
+		UIView.animate(withDuration: fadeDuration, animations: {
+			self.imageView.alpha = 0
+		}, completion: { _ in
+			self.isHidden = true
+			self.layer.removeAnimation(forKey: self.animationKey)
+		})
 	}
 }

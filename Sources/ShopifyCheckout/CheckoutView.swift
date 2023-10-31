@@ -69,6 +69,13 @@ class CheckoutView: WKWebView {
 		super.init(frame: frame, configuration: configuration)
 
 		navigationDelegate = self
+
+		configuration.userContentController
+			.add(self, name: CheckoutBridge.messageHandler)
+
+		if #available(iOS 16.4, *) {
+			self.isInspectable = true
+		}
 	}
 
 	required init?(coder: NSCoder) {
@@ -80,24 +87,53 @@ class CheckoutView: WKWebView {
 	override func didMoveToSuperview() {
 		super.didMoveToSuperview()
 
-		configuration.userContentController
-			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
-
-		if superview != nil {
-			configuration.userContentController
-				.add(self, name: CheckoutBridge.messageHandler)
-		}
+//		configuration.userContentController
+//			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
+//
+//		if superview != nil {
+//			configuration.userContentController
+//				.add(self, name: CheckoutBridge.messageHandler)
+//		}
 	}
 
 	func load(checkout url: URL) {
-		load(URLRequest(url: url))
+		var urlString = url
+
+
+//		if #available(iOS 16.0, *) {
+//			urlString = url.appending(queryItems: [URLQueryItem(name: "render", value: "fast")])
+//		}
+
+		load(URLRequest(url: urlString))
 	}
+}
+
+private var startTime: Date?
+private var initTime: Date?
+
+private func timeElapsed(_ end: Date = Date(), _ start: Date? = startTime) -> String {
+	if let t = start {
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+
+		let timeDifference = end.timeIntervalSince(t) * 1000
+		return String(format: "%.3f", timeDifference)
+	}
+
+	return ""
 }
 
 extension CheckoutView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
 			switch try CheckoutBridge.decode(message) {
+			case .checkoutInit:
+				print("[Navigation] `init` (\(timeElapsed())ms)")
+			case .checkoutDidRender:
+				print("[Navigation] `rendered` (LCP) (\(timeElapsed())ms)")
+				initTime = Date()
+				print("[Navigation] checkoutViewDidFinishNavigation")
+				viewDelegate?.checkoutViewDidFinishNavigation()
 			case .checkoutComplete:
 				CheckoutView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout()
@@ -157,11 +193,17 @@ extension CheckoutView: WKNavigationDelegate {
 	}
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+		startTime = Date()
+		print("[Navigation] didStartProvisionalNavigation (\(timeElapsed())ms)")
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        viewDelegate?.checkoutViewDidFinishNavigation()
+		print("[Navigation] didFinish (\(timeElapsed())ms)")
+		if let t = initTime {
+			print("[Navigation] Saved \(timeElapsed(Date(), t))ms by finishing on `init` event")
+		}
+//        viewDelegate?.checkoutViewDidFinishNavigation()
 	}
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

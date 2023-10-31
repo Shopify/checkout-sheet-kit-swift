@@ -54,9 +54,11 @@ extension CheckoutBridge {
 
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
+		case checkoutInit
 		case checkoutComplete
 		case checkoutExpired
 		case checkoutUnavailable
+		case checkoutDidRender
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -69,7 +71,13 @@ extension CheckoutBridge {
 
 			let name = try container.decode(String.self, forKey: .name)
 
+			print("[Navigation][event]", name)
+
 			switch name {
+			case "rendered":
+				self = .checkoutDidRender
+			case "init":
+				self = .checkoutInit
 			case "completed":
 				self = .checkoutComplete
 			case "error":

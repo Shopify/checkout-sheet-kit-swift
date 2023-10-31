@@ -98,11 +98,11 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 
 	private func loadCheckout() {
 		if checkoutView.url == nil {
-			checkoutView.alpha = 0
+			checkoutView.alpha = 0.5
 			initialNavigation = true
 			checkoutView.load(checkout: checkoutURL)
 		} else if checkoutView.isLoading && initialNavigation {
-			checkoutView.alpha = 0
+			checkoutView.alpha = 0.5
 			spinner.startAnimating()
 		}
 	}
