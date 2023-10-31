@@ -116,7 +116,6 @@ class CheckoutViewController: UIViewController, UIAdaptivePresentationController
 	}
 
 	private func didCancel() {
-		CheckoutView.invalidate()
 		delegate?.checkoutDidCancel()
 	}
 }
