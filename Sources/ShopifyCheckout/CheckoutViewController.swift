@@ -138,7 +138,7 @@ extension CheckoutViewController: CheckoutViewDelegate {
 	}
 
 	func checkoutViewDidCompleteCheckout() {
-		ConfettiCannon.fire(in: view)
+//		ConfettiCannon.fire(in: view)
 		CheckoutView.invalidate()
 		delegate?.checkoutDidComplete()
 	}

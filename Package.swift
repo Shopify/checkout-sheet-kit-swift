@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "ShopifyCheckout",
+    name: "ReactNativeShopifyCheckout",
     platforms: [
         .iOS(.v13)
     ],

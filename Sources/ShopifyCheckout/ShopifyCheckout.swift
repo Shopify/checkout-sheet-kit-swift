@@ -28,26 +28,26 @@ public let version = "0.1.0"
 
 /// The configuration options for the `ShopifyCheckout` library.
 public var configuration = Configuration() {
-	didSet {
-		CheckoutView.invalidate()
-	}
+    didSet {
+        CheckoutView.invalidate()
+    }
 }
 
-/// A convienence function for configuring the `ShopifyCheckout` library.
-public func configure(_ block: (inout Configuration) -> Void) {
-	block(&configuration)
+/// A convenience function for configuring the `ShopifyCheckout` library.
+public func configure(_ block: @escaping (inout Configuration) -> Void) {
+    block(&configuration)
 }
 
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
-	guard configuration.preloading.enabled else { return }
-	CheckoutView.for(checkout: url).load(checkout: url)
+    guard configuration.preloading.enabled else { return }
+    CheckoutView.for(checkout: url).load(checkout: url)
 }
 
 /// Presents the checkout from a given `UIViewController`.
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	let rootViewController = CheckoutViewController(checkoutURL: url, delegate: delegate)
-	let viewController = UINavigationController(rootViewController: rootViewController)
-	viewController.presentationController?.delegate = rootViewController
-	from.present(viewController, animated: true)
+    let rootViewController = CheckoutViewController(checkoutURL: url, delegate: delegate)
+    let viewController = UINavigationController(rootViewController: rootViewController)
+    viewController.presentationController?.delegate = rootViewController
+    from.present(viewController, animated: true)
 }

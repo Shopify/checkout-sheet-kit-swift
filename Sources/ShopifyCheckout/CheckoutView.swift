@@ -91,6 +91,7 @@ class CheckoutView: WKWebView {
 	}
 
 	func load(checkout url: URL) {
+		print("[ShopifyCheckoutSDK] Loading", URLRequest(url: url))
 		load(URLRequest(url: url))
 	}
 }
@@ -160,14 +161,28 @@ extension CheckoutView: WKNavigationDelegate {
 	}
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+		print("[ShopifyCheckoutSDK] didStartProvisionalNavigation")
         viewDelegate?.checkoutViewDidStartNavigation()
     }
+
+	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+		print("[ShopifyCheckoutSDK] didFailProvisionalNavigation", error)
+		// Ignore the "Frame load interrupted" error that is triggered when we cancel a request
+		// to open an external application and hand it over to UIApplication.openURL(). The result
+		// will be that we switch to the external app, for example the app store, while keeping the
+		// original web page in the tab instead of replacing it with an error page.
+		let error = error as NSError
+		if error.domain == "WebKitErrorDomain" && error.code == 102 {
+			return
+		}
+	}
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         viewDelegate?.checkoutViewDidFinishNavigation()
 	}
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+		print(error)
         CheckoutView.cache = nil
         viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
     }
