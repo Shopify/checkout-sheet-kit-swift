@@ -41,4 +41,3 @@ public enum CheckoutError: Swift.Error {
 	/// In event of checkoutExpired, a new checkout url will need to be generated
 	case checkoutExpired(message: String)
 }
-
