@@ -116,6 +116,8 @@ extension CheckoutView: WKScriptMessageHandler {
 	}
 }
 
+private var timer: Date?
+
 extension CheckoutView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
@@ -161,18 +163,32 @@ extension CheckoutView: WKNavigationDelegate {
 		return .allow
 	}
 
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        viewDelegate?.checkoutViewDidStartNavigation()
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        viewDelegate?.checkoutViewDidFinishNavigation()
+	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+		timer = Date()
+		viewDelegate?.checkoutViewDidStartNavigation()
 	}
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        CheckoutView.cache = nil
-        viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
-    }
+	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+		timer = nil
+	}
+
+	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+		viewDelegate?.checkoutViewDidFinishNavigation()
+
+		if let startTime = timer {
+			let endTime = Date()
+			let diff = endTime.timeIntervalSince(startTime)
+			ShopifyCheckout.events.triggerEvent(.load, message: "Preloaded checkout in \(String(format: "%.2f", diff))s")
+		}
+
+		timer = nil
+	}
+
+	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+		timer = nil
+		CheckoutView.cache = nil
+		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+	}
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
 		if action.navigationType == .linkActivated && action.targetFrame == nil { return true }

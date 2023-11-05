@@ -25,8 +25,7 @@ import Buy
 import UIKit
 import ShopifyCheckout
 
-class ProductViewController: UIViewController {
-
+class ProductViewController: UIViewController, CheckoutEventListener {
 	// MARK: Properties
 
 	@IBOutlet private var image: UIImageView!
@@ -55,6 +54,12 @@ class ProductViewController: UIViewController {
 		title = "Browse"
 
 		tabBarItem.image = UIImage(systemName: "books.vertical")
+
+		ShopifyCheckout.events.addEventListener(self, for: .load)
+	}
+
+	deinit {
+		ShopifyCheckout.events.removeEventListener(self, for: .load)
 	}
 
 	// MARK: UIViewController Lifecycle
@@ -72,6 +77,15 @@ class ProductViewController: UIViewController {
 		}
 
 		reloadProduct()
+	}
+
+	func handleCheckoutEvent(_ event: CheckoutEvent, message: String? = nil) {
+		switch event {
+		case .load:
+			if ShopifyCheckout.configuration.preloading.enabled {
+				PreloadBanner.shared.showBanner(withText: "\(message ?? "")")
+			}
+		}
 	}
 
 	// MARK: Actions
