@@ -30,7 +30,7 @@ enum CheckoutBridge {
 
 	static var applicationName: String {
 		let theme = ShopifyCheckout.configuration.colorScheme.rawValue
-		return "ShopifyCheckoutSDK/\(ShopifyCheckout.version) (\(schemaVersion);\(theme))"
+		return "ShopifyCheckoutSDK/\(ShopifyCheckout.version) (\(schemaVersion);\(theme);standard)"
 	}
 
 	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
