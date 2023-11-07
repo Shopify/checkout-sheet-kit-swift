@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import WebKit
 
 enum CheckoutBridge {
-	static let schemaVersion = "5.1"
+	static let schemaVersion = "5.3"
 
 	static let messageHandler = "mobileCheckoutSdk"
 
