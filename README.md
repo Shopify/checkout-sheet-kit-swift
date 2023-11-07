@@ -9,7 +9,7 @@
 ### Requirements
 - Swift 5.7+
 - iOS SDK 13.0+
-- The SDK is not compatable with checkout.liquid. The Shopify Store must be migrated for extensibility 
+- The SDK is not compatible with checkout.liquid. The Shopify Store must be migrated for extensibility 
 
 ### Getting Started
 The SDK is an open-source [Swift Package library](https://www.swift.org/package-manager/). As a quick start, see [sample projects](Samples/README.md) or use one of the following ways to integrate the SDK into your project:
