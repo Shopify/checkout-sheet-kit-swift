@@ -34,6 +34,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 			/// Enable preloading
 			$0.preloading.enabled = true
+
+			/// Custom background color
+			$0.backgroundColor = .systemBlue
 		}
 
 		UIBarButtonItem.appearance().tintColor = .label
