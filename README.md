@@ -18,7 +18,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/mobile-checkout-sdk-ios", from: "0.1.0")
+  .package(url: "https://github.com/Shopify/mobile-checkout-sdk-ios", from: "0.2.0")
 ]
 ```
 
