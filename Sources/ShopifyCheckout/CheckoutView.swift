@@ -178,7 +178,9 @@ extension CheckoutView: WKNavigationDelegate {
 		if let startTime = timer {
 			let endTime = Date()
 			let diff = endTime.timeIntervalSince(startTime)
-			ShopifyCheckout.events.triggerEvent(.load, message: "Preloaded checkout in \(String(format: "%.2f", diff))s")
+			let message = "Preloaded checkout in \(String(format: "%.2f", diff))s"
+			Logger.shared.log(message)
+			ShopifyCheckout.events.triggerEvent(.load, message: message)
 		}
 
 		timer = nil

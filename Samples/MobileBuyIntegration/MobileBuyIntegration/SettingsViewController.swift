@@ -32,6 +32,7 @@ class SettingsViewController: UITableViewController {
 		case vaultedState = 1
 		case colorScheme = 2
 		case version = 3
+		case logs = 4
 		case undefined = -1
 
 		static func from(_ rawValue: Int) -> Section {
@@ -69,6 +70,12 @@ class SettingsViewController: UITableViewController {
 
 	// MARK: UIViewController
 
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+
+		tableView.reloadData()
+	}
+
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
@@ -83,6 +90,8 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		switch Section.from(section) {
+		case Section.logs:
+			return "Logs"
 		case Section.colorScheme:
 			return "Color Scheme"
 		default:
@@ -109,6 +118,9 @@ class SettingsViewController: UITableViewController {
 			return ShopifyCheckout.Configuration.ColorScheme.allCases.count
 		case Section.version:
 			return 1
+		case Section.logs:
+			let logsCount = LogReader.shared.readLogs()?.count ?? 0
+			return logsCount > 10 ? 10 : logsCount
 		default:
 			return 0
 		}
@@ -134,6 +146,14 @@ class SettingsViewController: UITableViewController {
 			content = UIListContentConfiguration.valueCell()
 			content.text = "Version"
 			content.secondaryText = currentVersion()
+		case Section.logs:
+			content = UIListContentConfiguration.valueCell()
+			if let logs = LogReader.shared.readLogs(), indexPath.row < logs.count {
+				content.text = logs[indexPath.row]
+			} else {
+				content.text = "No log available"
+			}
+			content.textProperties.font = UIFont.systemFont(ofSize: 12)
 		default:
 			()
 		}
