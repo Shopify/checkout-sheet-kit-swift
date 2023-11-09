@@ -1,225 +1,77 @@
-# Mobile Checkout SDK - iOS
+# Checkout Kit - React Native
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/mobile-buy-sdk-ios/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/mobile-checkout-sdk-ios/actions/workflows/test-sdk.yml/badge.svg?branch=main)
+>**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
 
-![image](https://github.com/Shopify/mobile-checkout-sdk-ios/assets/15106863/4920367a-901f-4a42-a2b5-d8776af6169f)
+## Step 1: Start the Metro Server
 
-**Mobile Checkout SDK for iOS** is a Swift Package library, part of [Shopify's Mobile Kit](https://shopify.dev/docs/custom-storefronts/mobile-kit), that enables iOS apps to provide the world’s highest converting, customizable, one-page checkout within the mobile app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Mobile Checkout SDKs](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
+First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
 
-### Requirements
-- Swift 5.7+
-- iOS SDK 13.0+
+To start Metro, run the following command from the _root_ of your React Native project:
 
-### Getting Started
-The SDK is an open-source [Swift Package library](https://www.swift.org/package-manager/). As a quick start, see [sample projects](Samples/README.md) or use one of the following ways to integrate the SDK into your project:
+```bash
+# using npm
+npm start
 
-#### Package.swift
-
-```swift
-dependencies: [
-  .package(url: "https://github.com/Shopify/mobile-checkout-sdk-ios", from: "0.1.0")
-]
+# OR using Yarn
+yarn start
 ```
 
-#### Xcode
+## Step 2: Start your Application
 
-1. Open your Xcode project
-2. Navigate to `File` > `Add Package Dependencies...`
-3. Enter `https://github.com/Shopify/mobile-checkout-sdk-ios` into the search box
-4. Click `Add Package`
+Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
 
-For more details on managing Swift Package dependencies in Xcode, please see [Apple's documentation](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+### For Android
 
-### Basic Usage
+```bash
+# using npm
+npm run android
 
-Once the SDK has been added as a dependency, you can import the library:
-
-```swift
-import ShopifyCheckout
+# OR using Yarn
+yarn android
 ```
 
-To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GraphQL client to accomplish this and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
+### For iOS
 
-```swift
-import Buy
+```bash
+# using npm
+npm run ios
 
-let client = Graph.Client(
-  shopDomain: "yourshop.myshopify.com",
-  apiKey: "<storefront access token>"
-)
-
-let query = Storefront.buildQuery { $0
-  .cart(id: "myCartId") { $0
-    .checkoutUrl()
-  }
-}
-
-let task = client.queryGraphWith(query) { response, error in
-  let checkoutURL = response?.cart.checkoutUrl
-}
-task.resume()
+# OR using Yarn
+yarn ios
 ```
 
-The `checkoutURL` object is a standard web checkout URL that can be opened in any browser. To present a native checkout sheet in your iOS application, provide the `checkoutURL` alongside optional runtime configuration settings to the `present(checkout:)` function provided by the SDK:
+If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
 
-```swift
-import UIKit
-import ShopifyCheckout
+This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
 
-class MyViewController: UIViewController {
-  func presentCheckout() {
-    let checkoutURL: URL = // from cart object
-    ShopifyCheckout.present(checkout: checkoutURL, from: self, delegate: self)
-  }
-}
-```
+## Step 3: Modifying your App
 
-To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session in the background and ahead of time.
+Now that you have successfully run the app, let's modify it.
 
-### Configuration
+1. Open `App.tsx` in your text editor of choice and edit some lines.
+2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
 
-The SDK provides a way to customize the presented checkout experience via the `ShopifyCheckout.configuration` object.
+   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
 
-#### `colorScheme`
-By default, the SDK will match the user's device color appearance. This behavior can be customized via the `colorScheme` property:
+## Congratulations! :tada:
 
-```swift
-// [Default] Automatically toggle idiomatic light and dark themes based on device preference (`UITraitCollection`)
-ShopifyCheckout.configuration.colorScheme = .automatic
+You've successfully run and modified your React Native App. :partying_face:
 
-// Force idiomatic light color scheme
-ShopifyCheckout.configuration.colorScheme = .light
+### Now what?
 
-// Force idiomatic dark color scheme
-ShopifyCheckout.configuration.colorScheme = .dark
+- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
+- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
 
-// Force web theme, as rendered by a mobile browser
-ShopifyCheckout.configuration.colorScheme = .web
-```
+# Troubleshooting
 
-#### `spinnerColor`
-If the checkout session is not ready and being initialized, a loading spinner is shown and can be customized via the `spinnerColor` property:
+If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
 
-```swift
-// Use a custom UI color
-ShopifyCheckout.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+# Learn More
 
-// Use a system color
-ShopifyCheckout.configuration.spinnerColor = .systemBlue
-```
-_Note: use preloading to optimize and deliver an instant buyer experience._
+To learn more about React Native, take a look at the following resources:
 
-#### `backgroundColor`
-While the checkout session is being initialized, the background color of the view can be customized via the `backgroundColor` property:
-
-```swift
-// Use a custom UI color
-ShopifyCheckout.configuration.backgroundColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
-
-// Use a system color
-ShopifyCheckout.configuration.backgroundColor = .systemBackground
-```
-
-### Preloading
-Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
-
-Preloading is an advanced feature that can be disabled via a runtime flag:
-```swift
-ShopifyCheckout.configure {
-  $0.preloading.enabled = false // defaults to true
-}
-```
-
-Once enabled, preloading a checkout is as simple as:
-```swift
-ShopifyCheckout.preload(checkout: checkoutURL)
-```
-
-**Important considerations:**
-1. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout—e.g. when the buyer navigates to the cart overview or a similar app-specific experience.
-2. A preloaded checkout session reflects the cart contents at the time when `preload` is called. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
-3. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
-
-
-### Monitoring the lifecycle of a checkout session
-You can use the `ShopifyCheckoutDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
-
-```swift
-extension MyViewController: ShopifyCheckoutDelegate {
-  func checkoutDidComplete() {
-    // Called when the checkout was completed successfully by the buyer.
-    // Use this to update UI, reset cart state, etc.
-  }
-
-  func checkoutDidCancel() {
-    // Called when the checkout was canceled by the buyer.
-    // Use this to call `dismiss(animated:)`, etc.
-  }
-
-  func checkoutDidFail(error: CheckoutError) {
-    // Called when the checkout encountered an error and has been aborted. The callback
-    // provides a `CheckoutError` enum, with one of the following values:
-
-	/// Internal error: exception within the Checkout SDK code
-	/// You can inspect and log the Erorr and stacktrace to identify the problem.
-	case sdkError(underlying: Swift.Error)
-
-	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
-        /// The provided message describes the error and may be logged and presented to the buyer.
-	case checkoutUnavailable(message: String)
-
-	/// Expired error: checkout session associated with provided checkoutURL is no longer available.
-        /// The provided message describes the error and may be logged and presented to the buyer.
-	case checkoutExpired(message: String)
-  }
-
-  func checkoutDidClickLink(url: URL) {
-    // Called when the buyer clicks a link within the checkout experience:
-    //  - email address (`mailto:`),
-    //  - telephone number (`tel:`),
-    //  - web (`http:`)
-    // and is being directed outside the application.
-  }
-}
-```
-
-#### Integrating with Web Pixels, monitoring behavioral data
-App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. Web Pixel events are currently not executed within rendered checkout. Support for customer events and behavioral analytics is under development and will be available prior to the general availability of SDK.
-
-### Integrating identity & customer accounts
-Buyer-aware checkout experience reduces friction and increases conversion. Depending on the context of the buyer (guest or signed-in), knowledge of buyer preferences, or account/identity system, the application can use one of the following methods to initialize a personalized and contextualized buyer experience.
-
-#### Cart: buyer bag, identity, and preferences
-In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc.), and delivery and payment preferences: see [guide]([url](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage)). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
-
-#### Multipass
-[Shopify Plus](https://help.shopify.com/en/manual/intro-to-shopify/pricing-plans/plans-features/shopify-plus-plan) merchants using [Classic Customer Accounts](https://help.shopify.com/en/manual/customers/customer-accounts/classic-customer-accounts) can use [Multipass](https://shopify.dev/docs/api/multipass) ([API documentation](https://shopify.dev/docs/api/multipass)) to integrate an external identity system and initialize a buyer-aware checkout session.
-
-```json
-{
-  "email": "<Customer's email address>",
-  "created_at": "<Current timestamp in ISO8601 encoding>",
-  "remote_ip": "<Client IP address>",
-  "return_to": "<Checkout URL obtained from Storefront API>",
-  ...
-}
-```
-
-1. Follow the [Multipass documentation](https://shopify.dev/docs/api/multipass) to create a Multipass URL and set `return_to` to be the obtained `checkoutUrl`
-2. Provide the Multipass URL to `present(checkout:)`
-
-_Note: the above JSON omits useful customer attributes that should be provided where possible and encryption and signing should be done server-side to ensure Multipass keys are kept secret._
-
-#### Shop Pay
-To initialize accelerated Shop Pay checkout, the cart can set a [walletPreference](https://shopify.dev/docs/api/storefront/latest/mutations/cartBuyerIdentityUpdate#field-cartbuyeridentityinput-walletpreferences) to 'shop_pay'. The sign-in state of the buyer is app-local. The buyer will be prompted to sign in to their Shop account on their first checkout, and their sign-in state will be remembered for future checkout sessions.
-
-#### Customer Account API
-We are working on a library to provide buyer sign-in and authentication powered by the [new Customer Account API](https://www.shopify.com/partners/blog/introducing-customer-account-api-for-headless-stores)—stay tuned.
-
----
-
-### Contributing
-We welcome code contributions, feature requests, and reporting of issues. Please see [guidelines and instructions](.github/CONTRIBUTING.md).
-
-### License
-The Mobile Checkout SDK is provided under an [MIT License](LICENSE).
+- [React Native Website](https://reactnative.dev) - learn more about React Native.
+- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
+- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
+- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
