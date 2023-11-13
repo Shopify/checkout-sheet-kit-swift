@@ -38,7 +38,7 @@ class CheckoutView: WKWebView {
 	private static var cache: CacheEntry?
 
 	static func `for`(checkout url: URL) -> CheckoutView {
-		guard ShopifyCheckout.configuration.preloading.enabled else {
+		guard ShopifyCheckoutKit.configuration.preloading.enabled else {
 			CheckoutView.cache = nil
 			return CheckoutView()
 		}

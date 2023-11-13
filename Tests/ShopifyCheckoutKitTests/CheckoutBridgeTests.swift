@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import XCTest
 import WebKit
-@testable import ShopifyCheckout
+@testable import ShopifyCheckoutKit
 
 class CheckoutBridgeTests: XCTestCase {
 	class WKScriptMessageMock: WKScriptMessage {

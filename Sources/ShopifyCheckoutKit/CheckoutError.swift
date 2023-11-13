@@ -25,15 +25,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 public enum CheckoutError: Swift.Error {
 	/// Issued when an internal error within Shopify Checkout SDK
 	/// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
-	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
+	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-kit-swift
 	case sdkError(underlying: Swift.Error)
 
 	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
-	/// The SDK only supports stores migrated for extensibility. 
+	/// The SDK only supports stores migrated for extensibility.
 	case checkoutLiquidNotMigrated(message: String)
 
 	/// Issued when checkout has encountered a unrecoverable error (for example server side error)
-	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/mobile-checkout-sdk-ios
+	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-kit-swift
 	case checkoutUnavailable(message: String)
 
 	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.

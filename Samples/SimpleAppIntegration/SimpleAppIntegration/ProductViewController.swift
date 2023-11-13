@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
-import ShopifyCheckout
+import ShopifyCheckoutKit
 
 class ProductViewController: UIViewController, CheckoutDelegate {
 	@IBOutlet private var image: UIImageView!
@@ -64,7 +64,7 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 	}
 
 	private func presentCheckout(url: URL) {
-		ShopifyCheckout.present(checkout: url, from: self, delegate: self)
+		ShopifyCheckoutKit.present(checkout: url, from: self, delegate: self)
 	}
 
 	@IBAction private func reloadProduct() {
@@ -90,7 +90,7 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		}
 	}
 
-	// MARK: ShopifyCheckoutDelegate
+	// MARK: ShopifyCheckoutKitDelegate
 
 	func checkoutDidComplete() {
 		// use this callback to clean up any cart state

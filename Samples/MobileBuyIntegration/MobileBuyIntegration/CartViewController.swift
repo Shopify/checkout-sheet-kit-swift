@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import Buy
 import UIKit
 import Combine
-import ShopifyCheckout
+import ShopifyCheckoutKit
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -133,7 +133,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBAction private func presentCheckout() {
 		guard let url = CartManager.shared.cart?.checkoutUrl else { return }
-		ShopifyCheckout.present(checkout: url, from: self, delegate: self)
+		ShopifyCheckoutKit.present(checkout: url, from: self, delegate: self)
 	}
 
 	@IBAction private func resetCart() {
@@ -160,7 +160,7 @@ extension CartViewController: CheckoutDelegate {
 		dismiss(animated: true)
 	}
 
-	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
+	func checkoutDidFail(errors: [ShopifyCheckoutKit.CheckoutError]) {
 		print(#function, errors)
 	}
 
@@ -170,7 +170,7 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-	func checkoutDidFail(error: ShopifyCheckout.CheckoutError) {
+	func checkoutDidFail(error: ShopifyCheckoutKit.CheckoutError) {
 		switch error {
 		case .sdkError(let underlying):
 			print(#function, underlying)

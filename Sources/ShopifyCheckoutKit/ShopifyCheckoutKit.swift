@@ -22,26 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
-import ShopifyCheckoutKit
 
-@main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+/// The version of the `ShopifyCheckoutKit` library.
+public let version = "0.5.0"
 
-		ShopifyCheckoutKit.configure {
-			/// Checkout color scheme setting
-			$0.colorScheme = .automatic
-
-			/// Enable preloading
-			$0.preloading.enabled = true
-		}
-
-		UIBarButtonItem.appearance().tintColor = .label
-
-		return true
+/// The configuration options for the `ShopifyCheckoutKit` library.
+public var configuration = Configuration() {
+	didSet {
+		CheckoutView.invalidate()
 	}
+}
 
-	func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-		return UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
-	}
+/// A convienence function for configuring the `ShopifyCheckoutKit` library.
+public func configure(_ block: (inout Configuration) -> Void) {
+	block(&configuration)
+}
+
+/// Preloads the checkout for faster presentation.
+public func preload(checkout url: URL) {
+	guard configuration.preloading.enabled else { return }
+	CheckoutView.for(checkout: url).load(checkout: url)
+}
+
+/// Presents the checkout from a given `UIViewController`.
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
+	let rootViewController = CheckoutViewController(checkoutURL: url, delegate: delegate)
+	let viewController = UINavigationController(rootViewController: rootViewController)
+	viewController.presentationController?.delegate = rootViewController
+	from.present(viewController, animated: true)
 }
