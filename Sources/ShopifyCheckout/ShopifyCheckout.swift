@@ -51,37 +51,3 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 	viewController.presentationController?.delegate = rootViewController
 	from.present(viewController, animated: true)
 }
-
-public enum CheckoutEvent: Hashable {
-	case load
-}
-
-public protocol CheckoutEventListener: AnyObject {
-	func handleCheckoutEvent(_ event: CheckoutEvent, message: String?)
-}
-
-public var events = Events()
-
-public struct Events {
-	private var eventListeners = [CheckoutEvent: [CheckoutEventListener]]()
-
-	public mutating func addEventListener(_ listener: CheckoutEventListener, for event: CheckoutEvent) {
-		if eventListeners[event] == nil {
-			eventListeners[event] = [CheckoutEventListener]()
-		}
-		eventListeners[event]?.append(listener)
-	}
-
-	public mutating func removeEventListener(_ listener: CheckoutEventListener, for event: CheckoutEvent) {
-		eventListeners[event]?.removeAll { $0 === listener }
-	}
-
-	func triggerEvent(_ event: CheckoutEvent, message: String?) {
-		guard let listeners = eventListeners[event] else {
-			return
-		}
-		for listener in listeners {
-			listener.handleCheckoutEvent(event, message: message)
-		}
-	}
-}
