@@ -9,4 +9,4 @@ else
     dest="platform=iOS Simulator,name=iPhone 14"
 fi
 
-xcodebuild test -scheme ShopifyCheckoutKit -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
+xcodebuild clean test -scheme ShopifyCheckoutKit -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation
