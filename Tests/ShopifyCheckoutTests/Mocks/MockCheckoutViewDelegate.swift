@@ -63,7 +63,7 @@ class MockCheckoutViewDelegate: CheckoutViewDelegate {
 		didFailWithErrorExpectation?.fulfill()
 	}
 
-	func checkoutViewDidToggleModal() {
+	func checkoutViewDidToggleModal(modalVisible: Bool) {
 		didToggleModalExpectation?.fulfill()
 	}
 }

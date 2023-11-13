@@ -24,4 +24,4 @@ jobs:
           echo "CURRENT_SIMULATOR_UUID=$CURRENT_SIMULATOR_UUID" >> $GITHUB_ENV
 
       - name: Run Tests
-        run: ${{ inputs.config-path }}
+        run: ${{ inputs.test-path }}
