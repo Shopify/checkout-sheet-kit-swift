@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
-import ShopifyCheckout
+import ShopifyCheckoutKit
 
 class SettingsViewController: UITableViewController {
 
@@ -41,7 +41,7 @@ class SettingsViewController: UITableViewController {
 
 	private lazy var preloadingSwitch: UISwitch = {
 		let view = UISwitch()
-		view.isOn = ShopifyCheckout.configuration.preloading.enabled
+		view.isOn = ShopifyCheckoutKit.configuration.preloading.enabled
 		view.addTarget(self, action: #selector(preloadingSwitchDidChange), for: .valueChanged)
 		return view
 	}()
@@ -106,7 +106,7 @@ class SettingsViewController: UITableViewController {
 		case Section.vaultedState:
 			return 1
 		case Section.colorScheme:
-			return ShopifyCheckout.Configuration.ColorScheme.allCases.count
+			return ShopifyCheckoutKit.Configuration.ColorScheme.allCases.count
 		case Section.version:
 			return 1
 		default:
@@ -129,7 +129,7 @@ class SettingsViewController: UITableViewController {
 		case Section.colorScheme:
 			let scheme = colorScheme(at: indexPath)
 			content.text = scheme.prettyTitle
-			content.secondaryText = ShopifyCheckout.configuration.colorScheme == scheme ? "Active" : ""
+			content.secondaryText = ShopifyCheckoutKit.configuration.colorScheme == scheme ? "Active" : ""
 		case Section.version:
 			content = UIListContentConfiguration.valueCell()
 			content.text = "Version"
@@ -153,9 +153,9 @@ class SettingsViewController: UITableViewController {
 			vaultedStateSwitchDidChange()
 		case Section.colorScheme:
 			let newColorScheme = colorScheme(at: indexPath)
-			ShopifyCheckout.configuration.colorScheme = newColorScheme
-			ShopifyCheckout.configuration.spinnerColor = newColorScheme.spinnerColor
-			ShopifyCheckout.configuration.backgroundColor = newColorScheme.backgroundColor
+			ShopifyCheckoutKit.configuration.colorScheme = newColorScheme
+			ShopifyCheckoutKit.configuration.spinnerColor = newColorScheme.spinnerColor
+			ShopifyCheckoutKit.configuration.backgroundColor = newColorScheme.backgroundColor
 			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
             tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
 		default:
@@ -166,7 +166,7 @@ class SettingsViewController: UITableViewController {
 	// MARK: Private
 
 	@objc private func preloadingSwitchDidChange() {
-		ShopifyCheckout.configuration.preloading.enabled = preloadingSwitch.isOn
+		ShopifyCheckoutKit.configuration.preloading.enabled = preloadingSwitch.isOn
 	}
 
 	@objc private func vaultedStateSwitchDidChange() {
@@ -174,15 +174,15 @@ class SettingsViewController: UITableViewController {
 	}
 
 	private func currentColorScheme() -> Configuration.ColorScheme {
-		return ShopifyCheckout.configuration.colorScheme
+		return ShopifyCheckoutKit.configuration.colorScheme
 	}
 
 	private func colorScheme(at indexPath: IndexPath) -> Configuration.ColorScheme {
-		return ShopifyCheckout.Configuration.ColorScheme.allCases[indexPath.item]
+		return ShopifyCheckoutKit.Configuration.ColorScheme.allCases[indexPath.item]
 	}
 
 	private func indexPath(for colorScheme: Configuration.ColorScheme) -> IndexPath? {
-		return ShopifyCheckout.Configuration.ColorScheme.allCases.firstIndex(of: colorScheme).map {
+		return ShopifyCheckoutKit.Configuration.ColorScheme.allCases.firstIndex(of: colorScheme).map {
 			IndexPath(row: $0, section: 1)
 		}
 	}

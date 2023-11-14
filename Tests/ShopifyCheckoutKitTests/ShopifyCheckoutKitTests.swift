@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import XCTest
-@testable import ShopifyCheckout
+@testable import ShopifyCheckoutKit
 
-class ShopifyCheckoutTests: XCTestCase {
+class ShopifyCheckoutKitTests: XCTestCase {
 	func testVersionExists() {
-		XCTAssertFalse(ShopifyCheckout.version.isEmpty)
+		XCTAssertFalse(ShopifyCheckoutKit.version.isEmpty)
 	}
 }

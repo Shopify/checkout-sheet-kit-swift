@@ -18,7 +18,7 @@
 		4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */; };
 		4EBBA7AE2A5F1BBF00193E19 /* UIImageView+URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */; };
 		4EBBA7B02A5F222F00193E19 /* MoneyV2+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AF2A5F222F00193E19 /* MoneyV2+Format.swift */; };
-		4EBBA7B72A5F231500193E19 /* ShopifyCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = 4EBBA7B62A5F231500193E19 /* ShopifyCheckout */; };
+		4EBBA7B72A5F231500193E19 /* ShopifyCheckoutKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4EBBA7B62A5F231500193E19 /* ShopifyCheckoutKit */; };
 		4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF54F232A6F456B00F5E407 /* CartManager.swift */; };
 		4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */; };
 		4EF54F312A6F63C000F5E407 /* CartViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EF54F2F2A6F63C000F5E407 /* CartViewController.xib */; };
@@ -39,7 +39,7 @@
 		4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProductViewController.xib; sourceTree = "<group>"; };
 		4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+URL.swift"; sourceTree = "<group>"; };
 		4EBBA7AF2A5F222F00193E19 /* MoneyV2+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoneyV2+Format.swift"; sourceTree = "<group>"; };
-		4EBBA7B42A5F230900193E19 /* checkout-sdk-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-sdk-ios"; path = ../..; sourceTree = "<group>"; };
+		4EBBA7B42A5F230900193E19 /* checkout-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-kit-swift"; path = ../..; sourceTree = "<group>"; };
 		4EF54F232A6F456B00F5E407 /* CartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartManager.swift; sourceTree = "<group>"; };
 		4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		4EF54F2F2A6F63C000F5E407 /* CartViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CartViewController.xib; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */,
-				4EBBA7B72A5F231500193E19 /* ShopifyCheckout in Frameworks */,
+				4EBBA7B72A5F231500193E19 /* ShopifyCheckoutKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,7 +118,7 @@
 		4EBBA7B32A5F230900193E19 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				4EBBA7B42A5F230900193E19 /* checkout-sdk-ios */,
+				4EBBA7B42A5F230900193E19 /* checkout-kit-swift */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -158,7 +158,7 @@
 			name = MobileBuyIntegration;
 			packageProductDependencies = (
 				4EBBA7A22A5F0F5600193E19 /* Buy */,
-				4EBBA7B62A5F231500193E19 /* ShopifyCheckout */,
+				4EBBA7B62A5F231500193E19 /* ShopifyCheckoutKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */;
@@ -478,9 +478,9 @@
 			package = 4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
 			productName = Buy;
 		};
-		4EBBA7B62A5F231500193E19 /* ShopifyCheckout */ = {
+		4EBBA7B62A5F231500193E19 /* ShopifyCheckoutKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ShopifyCheckout;
+			productName = ShopifyCheckoutKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

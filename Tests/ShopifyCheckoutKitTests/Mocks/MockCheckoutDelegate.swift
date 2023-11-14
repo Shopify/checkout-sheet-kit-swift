@@ -21,33 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
+import XCTest
+@testable import ShopifyCheckoutKit
 
-/// The version of the `ShopifyCheckout` library.
-public let version = "0.5.0"
-
-/// The configuration options for the `ShopifyCheckout` library.
-public var configuration = Configuration() {
-	didSet {
-		CheckoutView.invalidate()
+class ExampleDelegate: CheckoutDelegate {
+	func checkoutDidComplete() {
 	}
-}
 
-/// A convienence function for configuring the `ShopifyCheckout` library.
-public func configure(_ block: (inout Configuration) -> Void) {
-	block(&configuration)
-}
+	func checkoutDidCancel() {
+	}
 
-/// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
-	guard configuration.preloading.enabled else { return }
-	CheckoutView.for(checkout: url).load(checkout: url)
-}
+	func checkoutDidFail(errors: [ShopifyCheckoutKit.CheckoutError]) {
+	}
 
-/// Presents the checkout from a given `UIViewController`.
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	let rootViewController = CheckoutViewController(checkoutURL: url, delegate: delegate)
-	let viewController = UINavigationController(rootViewController: rootViewController)
-	viewController.presentationController?.delegate = rootViewController
-	from.present(viewController, animated: true)
+	func checkoutDidFail(error: ShopifyCheckoutKit.CheckoutError) {
+	}
+
+	func checkoutDidClickContactLink(url: URL) {
+	}
 }

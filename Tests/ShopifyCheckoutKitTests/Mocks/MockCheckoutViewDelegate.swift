@@ -22,21 +22,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import XCTest
-@testable import ShopifyCheckout
+@testable import ShopifyCheckoutKit
 
-class ExampleDelegate: CheckoutDelegate {
-	func checkoutDidComplete() {
+class MockCheckoutViewDelegate: CheckoutViewDelegate {
+	var didStartNavigationExpectation: XCTestExpectation?
+
+	var didFinishNavigationExpectation: XCTestExpectation?
+
+	var didCompleteCheckoutExpectation: XCTestExpectation?
+
+	var didClickContactLinkExpectation: XCTestExpectation?
+
+	var didClickLinkExpectation: XCTestExpectation?
+
+	var didFailWithErrorExpectation: XCTestExpectation?
+
+	var didToggleModalExpectation: XCTestExpectation?
+
+	func checkoutViewDidStartNavigation() {
+		didStartNavigationExpectation?.fulfill()
 	}
 
-	func checkoutDidCancel() {
+	func checkoutViewDidCompleteCheckout() {
+		didCompleteCheckoutExpectation?.fulfill()
 	}
 
-	func checkoutDidFail(errors: [ShopifyCheckout.CheckoutError]) {
+	func checkoutViewDidFinishNavigation() {
+		didFinishNavigationExpectation?.fulfill()
 	}
 
-	func checkoutDidFail(error: ShopifyCheckout.CheckoutError) {
+	func checkoutViewDidClickContactLink(url: URL) {
+		didClickContactLinkExpectation?.fulfill()
 	}
 
-	func checkoutDidClickContactLink(url: URL) {
+	func checkoutViewDidClickLink(url: URL) {
+		didClickLinkExpectation?.fulfill()
+	}
+
+    func checkoutViewDidFailWithError(error: CheckoutError) {
+		didFailWithErrorExpectation?.fulfill()
+	}
+
+	func checkoutViewDidToggleModal(modalVisible: Bool) {
+		didToggleModalExpectation?.fulfill()
 	}
 }
