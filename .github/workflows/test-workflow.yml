@@ -17,6 +17,7 @@ jobs:
         run: |
           xcode-select -p
           xcrun xcodebuild -version
+          xcrun simctl list devices
           xcrun simctl list runtimes
           xcrun simctl list devicetypes
           xcrun simctl delete all
