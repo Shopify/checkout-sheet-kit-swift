@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+jobs:
+  cocoapods:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Deploy to Cocoapods
+        run: |
+          set -eo pipefail
+          bundle exec pod lib lint --allow-warnings --verbose
+          bundle exec pod trunk push --allow-warnings --verbose
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
