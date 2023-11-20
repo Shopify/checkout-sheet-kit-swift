@@ -33,7 +33,7 @@ dependencies: [
 
 For more details on managing Swift Package dependencies in Xcode, please see [Apple's documentation](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
-#### Cocoapods
+#### CocoaPods
 
 ```ruby
 pod "ShopifyCheckoutKit", "~> 0.7"
