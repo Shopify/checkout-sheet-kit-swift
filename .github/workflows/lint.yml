@@ -1,19 +1,32 @@
-name: Run Lint Checks
+name: Lint
 
 on:
   pull_request:
   workflow_dispatch:
 
 jobs:
-  lint:
+  swiftlint:
+    name: SwiftLint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Run SwiftLint
-        uses: norio-nomura/action-swiftlint@3.2.1
+      - uses: norio-nomura/action-swiftlint@3.2.1
         with:
           args: --strict
 
-      - name: Check License Headers
-        run: ./Scripts/copy_license && git diff --name-only --exit-code
+  check-license-headers:
+    name: License Headers
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./Scripts/copy_license && git diff --name-only --exit-code
+
+  lint-podspec:
+    name: CocoaPods
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle exec pod lib lint --allow-warnings
