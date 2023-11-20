@@ -36,7 +36,7 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 #### Cocoapods
 
 ```ruby
-pod "ShopifyCheckoutKit", "~> 0.6"
+pod "ShopifyCheckoutKit", "~> 0.7"
 ```
 
 ### Basic Usage
