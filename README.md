@@ -39,6 +39,8 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 pod "ShopifyCheckoutKit", "~> 0.7"
 ```
 
+For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
+
 ### Basic Usage
 
 Once the SDK has been added as a dependency, you can import the library:
