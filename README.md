@@ -33,6 +33,12 @@ dependencies: [
 
 For more details on managing Swift Package dependencies in Xcode, please see [Apple's documentation](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
+#### Cocoapods
+
+```ruby
+pod "ShopifyCheckoutKit", "~> 0.6"
+```
+
 ### Basic Usage
 
 Once the SDK has been added as a dependency, you can import the library:
