@@ -20,5 +20,7 @@ Pod::Spec.new do |s|
 
   s.source_files = "Sources/ShopifyCheckoutKit/**/*.swift"
 
-  s.resources = "Sources/ShopifyCheckoutKit/**/*.xcassets"
+  s.resource_bundles = {
+    "ShopifyCheckoutKit" => ["Sources/ShopifyCheckoutKit/Assets.xcassets"]
+  }
 end

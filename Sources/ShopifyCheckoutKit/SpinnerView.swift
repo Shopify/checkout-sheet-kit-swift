@@ -26,7 +26,7 @@ import UIKit
 class SpinnerView: UIView {
 	private lazy var imageView: UIImageView = {
 		let view = UIImageView(image: UIImage(
-			named: "spinner", in: .module, with: nil
+			named: "spinner", in: .shopifyCheckoutKit, with: nil
 		))
 		view.translatesAutoresizingMaskIntoConstraints = false
 		return view
