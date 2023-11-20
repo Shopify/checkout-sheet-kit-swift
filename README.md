@@ -20,7 +20,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-kit-swift", from: "0.6.0")
+  .package(url: "https://github.com/Shopify/checkout-kit-swift", from: "0.7.0")
 ]
 ```
 
