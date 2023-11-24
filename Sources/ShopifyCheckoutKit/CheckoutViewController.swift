@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 import WebKit
 
-class CheckoutViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
+public class CheckoutViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 
 	// MARK: Properties
 

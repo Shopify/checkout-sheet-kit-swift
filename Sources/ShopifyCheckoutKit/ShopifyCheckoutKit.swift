@@ -51,3 +51,8 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 	viewController.presentationController?.delegate = rootViewController
 	from.present(viewController, animated: true)
 }
+
+public func presentSwiftUI(checkout url: URL, delegate: CheckoutDelegate? = nil) -> CheckoutViewControllerRepresentable {
+	return CheckoutViewControllerRepresentable(url: url, delegate: delegate)
+}
+
