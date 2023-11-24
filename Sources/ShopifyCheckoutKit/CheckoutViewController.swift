@@ -112,7 +112,7 @@ public class CheckoutViewController: UIViewController, UIAdaptivePresentationCon
 		didCancel()
 	}
 
-	internal func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+	public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
 		didCancel()
 	}
 
