@@ -37,4 +37,3 @@ public struct CheckoutViewControllerRepresentable: UIViewControllerRepresentable
 	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Context) {
 	}
 }
-
