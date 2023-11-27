@@ -28,14 +28,14 @@ import WebKit
 class CheckoutViewDelegateTests: XCTestCase {
 
 	private let checkoutURL = URL(string: "https://checkout-sdk.myshopify.com")!
-	private var viewController: CheckoutViewController!
+	private var viewController: CheckoutWebViewController!
 	private var navigationController: UINavigationController!
 
 	override func setUp() {
 		ShopifyCheckoutKit.configure {
 			$0.preloading.enabled = true
 		}
-		viewController = CheckoutViewController(
+		viewController = CheckoutWebViewController(
 			checkoutURL: checkoutURL, delegate: ExampleDelegate())
 
 		navigationController = UINavigationController(rootViewController: viewController)
@@ -46,58 +46,58 @@ class CheckoutViewDelegateTests: XCTestCase {
 	}
 
 	func testCheckoutViewDidCompleteCheckoutInvalidatesViewCache() {
-		let one = CheckoutView.for(checkout: checkoutURL)
-		let two = CheckoutView.for(checkout: checkoutURL)
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
 		viewController.checkoutViewDidCompleteCheckout()
 
-		let three = CheckoutView.for(checkout: checkoutURL)
+		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
 	}
 
 	func testCheckoutViewDidFailWithErrorInvalidatesViewCache() {
-		let one = CheckoutView.for(checkout: checkoutURL)
-		let two = CheckoutView.for(checkout: checkoutURL)
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
 		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error"))
 
-		let three = CheckoutView.for(checkout: checkoutURL)
+		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
 	}
 
 	func testCloseInvalidatesViewCache() {
-		let one = CheckoutView.for(checkout: checkoutURL)
-		let two = CheckoutView.for(checkout: checkoutURL)
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
 		viewController.close()
 
-		let three = CheckoutView.for(checkout: checkoutURL)
+		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
 	}
 
 	func testPresentationControllerDidDismissInvalidatesViewCache() {
-		let one = CheckoutView.for(checkout: checkoutURL)
-		let two = CheckoutView.for(checkout: checkoutURL)
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
 		let presentationController = UIViewController().presentationController!
 		viewController.presentationControllerDidDismiss(presentationController)
 
-		let three = CheckoutView.for(checkout: checkoutURL)
+		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
 	}
 
 	func testCheckoutViewDidClickLinkDoesNotInvalidateViewCache() {
-		let one = CheckoutView.for(checkout: checkoutURL)
-		let two = CheckoutView.for(checkout: checkoutURL)
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
 		viewController.checkoutViewDidClickLink(url: URL(string: "https://shopify.com/anything")!)
 
-		let three = CheckoutView.for(checkout: checkoutURL)
+		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(two, three)
 	}
 

@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
-import SwiftUI
 
 /// The version of the `ShopifyCheckoutKit` library.
 public let version = "0.7.0"
@@ -30,7 +29,7 @@ public let version = "0.7.0"
 /// The configuration options for the `ShopifyCheckoutKit` library.
 public var configuration = Configuration() {
 	didSet {
-		CheckoutView.invalidate()
+		CheckoutWebView.invalidate()
 	}
 }
 
@@ -42,12 +41,10 @@ public func configure(_ block: (inout Configuration) -> Void) {
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
 	guard configuration.preloading.enabled else { return }
-	CheckoutView.for(checkout: url).load(checkout: url)
+	CheckoutWebView.for(checkout: url).load(checkout: url)
 }
 
 /// Presents the checkout from a given `UIViewController`.
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	let rootView = CheckoutViewControllerRepresentable(url: url, delegate: delegate)
-	let view = UIHostingController(rootView: rootView)
-	from.present(view, animated: true)
+	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
 }

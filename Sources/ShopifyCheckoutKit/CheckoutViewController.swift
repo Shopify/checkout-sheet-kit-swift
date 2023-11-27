@@ -22,139 +22,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
-import WebKit
+import SwiftUI
 
-public class CheckoutViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
-
-	// MARK: Properties
-
-	weak var delegate: CheckoutDelegate?
-
-	private let checkoutView: CheckoutView
-
-	private lazy var spinner: SpinnerView = {
-		let spinner = SpinnerView(frame: .zero)
-		spinner.translatesAutoresizingMaskIntoConstraints = false
-		return spinner
-	}()
-
-	private var initialNavigation: Bool = true
-
-	private let checkoutURL: URL
-
-	private lazy var closeBarButtonItem: UIBarButtonItem = {
-		return UIBarButtonItem(
-			barButtonSystemItem: .close, target: self, action: #selector(close)
+public class CheckoutViewController: UINavigationController {
+	public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
+		let rootViewController = CheckoutWebViewController(
+			checkoutURL: url, delegate: delegate
 		)
-	}()
-
-	// MARK: Initializers
-
-	public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
-		self.checkoutURL = url
-		self.delegate = delegate
-
-		let checkoutView = CheckoutView.for(checkout: url)
-		checkoutView.translatesAutoresizingMaskIntoConstraints = false
-		checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
-		self.checkoutView = checkoutView
-
-		super.init(nibName: nil, bundle: nil)
-
-		title = "Checkout"
-
-		navigationItem.rightBarButtonItem = closeBarButtonItem
-
-		checkoutView.viewDelegate = self
+		super.init(rootViewController: rootViewController)
+		presentationController?.delegate = rootViewController
 	}
-
-	required init?(coder: NSCoder) {
+	
+	@available(*, unavailable)
+	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
-	}
-
-	// MARK: UIViewController Lifecycle
-
-	override public func viewDidLoad() {
-		super.viewDidLoad()
-
-		view.backgroundColor = ShopifyCheckoutKit.configuration.backgroundColor
-
-		view.addSubview(checkoutView)
-		NSLayoutConstraint.activate([
-			checkoutView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-			checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-		])
-
-		view.addSubview(spinner)
-		NSLayoutConstraint.activate([
-			spinner.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-			spinner.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
-		])
-		view.bringSubviewToFront(spinner)
-
-		loadCheckout()
-	}
-
-	private func loadCheckout() {
-		if checkoutView.url == nil {
-			checkoutView.alpha = 0
-			initialNavigation = true
-			checkoutView.load(checkout: checkoutURL)
-		} else if checkoutView.isLoading && initialNavigation {
-			checkoutView.alpha = 0
-			spinner.startAnimating()
-		}
-	}
-
-	@IBAction internal func close() {
-		didCancel()
-	}
-
-	public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-		didCancel()
-	}
-
-	private func didCancel() {
-		CheckoutView.invalidate()
-		delegate?.checkoutDidCancel()
 	}
 }
 
-extension CheckoutViewController: CheckoutViewDelegate {
+extension CheckoutViewController {
+	public struct Representable: UIViewControllerRepresentable {
+		let checkoutURL: URL
 
-	func checkoutViewDidStartNavigation() {
-		if initialNavigation {
-			spinner.startAnimating()
+		let delegate: CheckoutDelegate?
+
+		public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
+			self.checkoutURL = url
+			self.delegate = delegate
 		}
-	}
 
-	func checkoutViewDidFinishNavigation() {
-		spinner.stopAnimating()
-		initialNavigation = false
-		UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in
-			checkoutView?.alpha = 1
+		public func makeUIViewController(context: Context) -> CheckoutViewController {
+			return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
 		}
-	}
 
-	func checkoutViewDidCompleteCheckout() {
-		ConfettiCannon.fire(in: view)
-		CheckoutView.invalidate()
-		delegate?.checkoutDidComplete()
-	}
-
-	func checkoutViewDidFailWithError(error: CheckoutError) {
-		CheckoutView.invalidate()
-		delegate?.checkoutDidFail(error: error)
-	}
-
-	func checkoutViewDidClickLink(url: URL) {
-		delegate?.checkoutDidClickLink(url: url)
-	}
-
-	func checkoutViewDidToggleModal(modalVisible: Bool) {
-		guard let navigationController = self.navigationController else { return }
-		navigationController.setNavigationBarHidden(modalVisible, animated: true)
+		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Context) {}
 	}
 }

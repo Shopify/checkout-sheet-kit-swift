@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 import WebKit
 
-protocol CheckoutViewDelegate: AnyObject {
+protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidStartNavigation()
 	func checkoutViewDidCompleteCheckout()
 	func checkoutViewDidFinishNavigation()
@@ -33,21 +33,21 @@ protocol CheckoutViewDelegate: AnyObject {
 	func checkoutViewDidToggleModal(modalVisible: Bool)
 }
 
-class CheckoutView: WKWebView {
+class CheckoutWebView: WKWebView {
 
 	private static var cache: CacheEntry?
 
-	static func `for`(checkout url: URL) -> CheckoutView {
+	static func `for`(checkout url: URL) -> CheckoutWebView {
 		guard ShopifyCheckoutKit.configuration.preloading.enabled else {
-			CheckoutView.cache = nil
-			return CheckoutView()
+			CheckoutWebView.cache = nil
+			return CheckoutWebView()
 		}
 
 		let cacheKey = url.absoluteString
 
 		guard let cache = cache, cacheKey == cache.key, !cache.isStale else {
-			let view = CheckoutView()
-			CheckoutView.cache = CacheEntry(key: cacheKey, view: view)
+			let view = CheckoutWebView()
+			CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
 			return view
 		}
 
@@ -60,7 +60,7 @@ class CheckoutView: WKWebView {
 
 	// MARK: Properties
 
-	weak var viewDelegate: CheckoutViewDelegate?
+	weak var viewDelegate: CheckoutWebViewDelegate?
 
 	// MARK: Initializers
 
@@ -101,15 +101,15 @@ class CheckoutView: WKWebView {
 	}
 }
 
-extension CheckoutView: WKScriptMessageHandler {
+extension CheckoutWebView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
 			switch try CheckoutBridge.decode(message) {
 			case .checkoutComplete:
-				CheckoutView.cache = nil
+				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout()
 			case .checkoutUnavailable:
-				CheckoutView.cache = nil
+				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
@@ -124,7 +124,7 @@ extension CheckoutView: WKScriptMessageHandler {
 
 private var timer: Date?
 
-extension CheckoutView: WKNavigationDelegate {
+extension CheckoutWebView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
 		guard let url = action.request.url else {
@@ -151,7 +151,7 @@ extension CheckoutView: WKNavigationDelegate {
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
 		if isCheckout(url: response.url) && response.statusCode >= 400 {
-			CheckoutView.cache = nil
+			CheckoutWebView.cache = nil
 			switch response.statusCode {
 			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
@@ -228,11 +228,11 @@ extension CheckoutView: WKNavigationDelegate {
 
 }
 
-extension CheckoutView {
+extension CheckoutWebView {
 	fileprivate struct CacheEntry {
 		let key: String
 
-		let view: CheckoutView
+		let view: CheckoutWebView
 
 		private let timestamp = Date()
 
