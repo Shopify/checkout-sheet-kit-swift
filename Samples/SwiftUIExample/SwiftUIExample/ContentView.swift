@@ -2,10 +2,35 @@ import SwiftUI
 import ShopifyCheckoutKit
 import Combine
 
+struct CheckoutView: View {
+	let checkoutURL: Binding<URL?>
+	let delegate: EventHandler
+
+	@Binding var isShowingCheckout: Bool
+
+	var body: some View {
+		CheckoutViewController.Representable(checkout: checkoutURL, delegate: delegate)
+			.onReceive(delegate.$didCancel, perform: { didCancel in
+				if didCancel {
+					delegate.checkoutDidCancel()
+					isShowingCheckout = false
+				}
+			})
+
+	}
+}
+
 struct ContentView: View {
 	@StateObject private var viewModel = ProductViewModel()
 	@State private var isShowingCheckout = false
 	@State private var checkoutURL: URL?
+	private var eventHandler = EventHandler()
+
+	init() {
+		eventHandler.dismissCheckout = { [self] in
+			self.isShowingCheckout = false
+		}
+	}
 
 	var body: some View {
 		NavigationView {
@@ -14,8 +39,9 @@ struct ContentView: View {
 					ScrollView {
 						VStack {
 							AsyncImage(url: product.featuredImage?.url)
-								.aspectRatio(contentMode: .fit)
-								.frame(maxWidth: 100)
+								.aspectRatio(contentMode: .fill)
+								.frame(maxWidth: 300, maxHeight: 300)
+								.clipped()
 							Text(product.title)
 								.font(.title)
 								.multilineTextAlignment(.center)
@@ -42,9 +68,7 @@ struct ContentView: View {
 								}
 								.padding()
 								.sheet(isPresented: $isShowingCheckout) {
-									if let url = checkoutURL {
-										CheckoutViewController.Representable(checkout: url)
-									}
+									CheckoutView(checkoutURL: $checkoutURL, delegate: eventHandler, isShowingCheckout: $isShowingCheckout)
 								}
 							}
 						}
@@ -63,6 +87,20 @@ struct ContentView: View {
 		.onAppear {
 			viewModel.reloadProduct()
 		}
+	}
+}
+
+class EventHandler: NSObject, CheckoutDelegate {
+	var dismissCheckout: (() -> Void)?
+	@Published var didCancel = false
+
+	func checkoutDidCancel() {
+		didCancel = !didCancel
+	}
+
+	func checkoutDidComplete() {
+	}
+	func checkoutDidFail(error: CheckoutError) {
 	}
 }
 

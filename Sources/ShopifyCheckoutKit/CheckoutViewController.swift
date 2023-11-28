@@ -41,19 +41,20 @@ public class CheckoutViewController: UINavigationController {
 
 extension CheckoutViewController {
 	public struct Representable: UIViewControllerRepresentable {
-		let checkoutURL: URL
+		@Binding var checkoutURL: URL?
 
 		let delegate: CheckoutDelegate?
 
-		public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-			self.checkoutURL = url
+		public init(checkout url: Binding<URL?>, delegate: CheckoutDelegate? = nil) {
+			self._checkoutURL = url
 			self.delegate = delegate
 		}
 
 		public func makeUIViewController(context: Context) -> CheckoutViewController {
-			return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+			return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
 		}
 
-		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Context) {}
+		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Context) {
+		}
 	}
 }
