@@ -48,3 +48,8 @@ public func preload(checkout url: URL) {
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
 	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
 }
+
+public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
+
+
+}
