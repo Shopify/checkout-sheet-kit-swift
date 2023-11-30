@@ -180,7 +180,7 @@ extension CheckoutView: WKNavigationDelegate {
 			let diff = endTime.timeIntervalSince(startTime)
 			let preloading = String(ShopifyCheckoutKit.Configuration().preloading.enabled)
 			let message = "Preloaded checkout in \(String(format: "%.2f", diff))s"
-			Logger.shared.log(message)
+			ShopifyCheckoutKit.configuration.logger.log(message)
 			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
 		}
 

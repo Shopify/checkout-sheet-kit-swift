@@ -1,11 +1,19 @@
 import Foundation
 
-class Logger {
-	static let shared = Logger()
+public protocol Logger {
+	func log(_ message: String)
+}
 
+public class NoOpLogger: Logger {
+	public func log(_ message: String) {
+
+	}
+}
+
+public class FileLogger: Logger {
 	private var fileHandle: FileHandle?
 
-	private init() {
+	public init() {
 		let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
 		let logFileUrl = paths[0].appendingPathComponent("log.txt")
 
@@ -20,7 +28,7 @@ class Logger {
 		}
 	}
 
-	func log(_ message: String) {
+	public func log(_ message: String) {
 		guard let fileHandle = fileHandle else {
 			print("File handle is nil")
 			return

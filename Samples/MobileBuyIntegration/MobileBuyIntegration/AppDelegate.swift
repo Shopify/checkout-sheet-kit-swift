@@ -34,6 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 			/// Enable preloading
 			$0.preloading.enabled = true
+			$0.logger = FileLogger()
 		}
 
 		UIBarButtonItem.appearance().tintColor = .label

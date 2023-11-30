@@ -41,7 +41,6 @@ enum CheckoutBridge {
 		if let payload = instrumentation.toBridgeEvent() {
 			// This is being wrapped in a timer as such due to a bug in loading of the event listeners on latest schema version. Will be removed once bug is fixed
 			let msg = "setTimeout(function() { window.MobileCheckoutSdk.dispatchMessage('instrumentation', \(payload));}, 1000 );"
-			print(msg)
 			webView.evaluateJavaScript(msg)
 		}
 	}
