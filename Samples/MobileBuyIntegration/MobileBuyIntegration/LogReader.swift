@@ -21,28 +21,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
-import ShopifyCheckoutKit
+import Foundation
 
-@main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+class LogReader {
+	static let shared = LogReader()
 
-		ShopifyCheckoutKit.configure {
-			/// Checkout color scheme setting
-			$0.colorScheme = .automatic
+	private let logFileUrl: URL
 
-			/// Enable preloading
-			$0.preloading.enabled = true
-			$0.logger = FileLogger()
-		}
-
-		UIBarButtonItem.appearance().tintColor = .label
-
-		return true
+	private init() {
+		let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+		logFileUrl = paths[0].appendingPathComponent("log.txt")
 	}
 
-	func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-		return UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
+	func readLogs() -> [String?]? {
+		do {
+			let logContent = try String(contentsOf: logFileUrl, encoding: .utf8)
+			var logLines = logContent.split(separator: "\n").map { String($0) }
+			logLines = Array(logLines.suffix(10)) // Keep only the last 10 lines
+			return logLines.reversed()
+		} catch {
+			print("Couldn't read the log file")
+			return []
+		}
 	}
 }

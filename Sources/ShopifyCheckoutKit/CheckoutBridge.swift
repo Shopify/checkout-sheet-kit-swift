@@ -23,9 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import WebKit
 
-enum CheckoutBridge {
-	static let schemaVersion = "5.3"
+enum BridgeError: Swift.Error {
+	case invalidBridgeEvent(Swift.Error? = nil)
+	case unencodableInstrumentation(Swift.Error? = nil)
+}
 
+enum CheckoutBridge {
+	static let schemaVersion = "6.0"
 	static let messageHandler = "mobileCheckoutSdk"
 
 	static var applicationName: String {
@@ -33,22 +37,24 @@ enum CheckoutBridge {
 		return "ShopifyCheckoutSDK/\(ShopifyCheckoutKit.version) (\(schemaVersion);\(theme);standard)"
 	}
 
+	static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {
+		if let payload = instrumentation.toBridgeEvent() {
+			// This is being wrapped in a timer as such due to a bug in loading of the event listeners on latest schema version. Will be removed once bug is fixed
+			let msg = "setTimeout(function() { window.MobileCheckoutSdk.dispatchMessage('instrumentation', \(payload));}, 1000 );"
+			webView.evaluateJavaScript(msg)
+		}
+	}
+
 	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
 		guard let body = message.body as? String, let data = body.data(using: .utf8) else {
-			throw Error.invalidBridgeEvent()
+			throw BridgeError.invalidBridgeEvent()
 		}
 
 		do {
 			return try JSONDecoder().decode(WebEvent.self, from: data)
 		} catch {
-			throw Error.invalidBridgeEvent(error)
+			throw BridgeError.invalidBridgeEvent(error)
 		}
-	}
-}
-
-extension CheckoutBridge {
-	enum Error: Swift.Error {
-		case invalidBridgeEvent(Swift.Error? = nil)
 	}
 }
 
@@ -84,4 +90,40 @@ extension CheckoutBridge {
 			}
 		}
 	}
+}
+
+struct InstrumentationPayload: Codable {
+	var name: String
+	var value: Int
+	var type: InstrumentationType
+	var tags: [String: String] = [:]
+}
+
+enum InstrumentationType: String, Codable {
+	case incrementCounter
+	case histogram
+}
+
+extension InstrumentationPayload {
+	func toBridgeEvent() -> String? {
+		SdkToWebEvent(detail: self).toJson()
+	}
+}
+
+struct SdkToWebEvent<T: Codable>: Codable {
+	var detail: T
+}
+
+extension SdkToWebEvent {
+	func toJson() -> String? {
+		do {
+			let jsonData = try JSONEncoder().encode(self)
+			return String(data: jsonData, encoding: .utf8)
+		} catch {
+			print(#function, BridgeError.unencodableInstrumentation(error))
+		}
+
+		return nil
+	}
+
 }

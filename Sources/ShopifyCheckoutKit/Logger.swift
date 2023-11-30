@@ -21,28 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
-import ShopifyCheckoutKit
+import Foundation
 
-@main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+public protocol Logger {
+	func log(_ message: String)
+}
 
-		ShopifyCheckoutKit.configure {
-			/// Checkout color scheme setting
-			$0.colorScheme = .automatic
+public class NoOpLogger: Logger {
+	public func log(_ message: String) {
 
-			/// Enable preloading
-			$0.preloading.enabled = true
-			$0.logger = FileLogger()
-		}
-
-		UIBarButtonItem.appearance().tintColor = .label
-
-		return true
-	}
-
-	func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-		return UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
 	}
 }

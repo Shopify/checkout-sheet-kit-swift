@@ -21,28 +21,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
+import Foundation
 import ShopifyCheckoutKit
 
-@main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+class FileLogger: Logger {
+	private var fileHandle: FileHandle?
 
-		ShopifyCheckoutKit.configure {
-			/// Checkout color scheme setting
-			$0.colorScheme = .automatic
+	public init() {
+		let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+		let logFileUrl = paths[0].appendingPathComponent("log.txt")
 
-			/// Enable preloading
-			$0.preloading.enabled = true
-			$0.logger = FileLogger()
+		if !FileManager.default.fileExists(atPath: logFileUrl.path) {
+			FileManager.default.createFile(atPath: logFileUrl.path, contents: nil, attributes: nil)
 		}
 
-		UIBarButtonItem.appearance().tintColor = .label
-
-		return true
+		do {
+			fileHandle = try FileHandle(forWritingTo: logFileUrl)
+		} catch let error as NSError {
+			print("Couldn't open the log file. Error: \(error)")
+		}
 	}
 
-	func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-		return UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
+	public func log(_ message: String) {
+		guard let fileHandle = fileHandle else {
+			print("File handle is nil")
+			return
+		}
+
+		let date = Date()
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateStyle = .none
+		dateFormatter.timeStyle = .medium
+		let timeString = dateFormatter.string(from: date)
+
+		let logMessage = "\(timeString): \(message)\n"
+		if let data = logMessage.data(using: .utf8) {
+			fileHandle.seekToEndOfFile()
+			fileHandle.write(data)
+		}
 	}
 }

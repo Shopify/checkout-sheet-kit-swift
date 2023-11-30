@@ -43,6 +43,8 @@ public struct Configuration {
 
 	public var backgroundColor: UIColor = .systemBackground
 
+	public var logger: Logger = NoOpLogger()
+
 }
 
 extension Configuration {
