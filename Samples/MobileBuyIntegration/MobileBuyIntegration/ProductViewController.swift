@@ -79,7 +79,11 @@ class ProductViewController: UIViewController {
 	@IBAction func addToCart() {
 		if let variant = product?.variants.nodes.first {
 			addToCartButton.isEnabled = false
+			let start = Date()
 			CartManager.shared.addItem(variant: variant.id) { [weak self] in
+				let diff = Date().timeIntervalSince(start)
+				let message = "Added item to cart in \(String(format: "%.0f", diff * 1000))ms"
+				Logger.shared.log(message)
 				self?.addToCartButton.isEnabled = true
 			}
 		}
