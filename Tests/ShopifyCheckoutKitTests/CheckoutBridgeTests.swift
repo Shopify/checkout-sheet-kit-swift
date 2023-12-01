@@ -42,7 +42,7 @@ class CheckoutBridgeTests: XCTestCase {
 		let mock = WKScriptMessageMock(body: 1234)
 
 		XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-			guard case CheckoutBridge.Error.invalidBridgeEvent = error else {
+			guard case BridgeError.invalidBridgeEvent = error else {
 				return XCTFail("unexpected error thrown: \(error)")
 			}
 		}
@@ -52,7 +52,7 @@ class CheckoutBridgeTests: XCTestCase {
 		let mock = WKScriptMessageMock(body: "")
 
 		XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-			guard case CheckoutBridge.Error.invalidBridgeEvent = error else {
+			guard case BridgeError.invalidBridgeEvent = error else {
 				return XCTFail("unexpected error thrown: \(error)")
 			}
 		}
@@ -60,8 +60,8 @@ class CheckoutBridgeTests: XCTestCase {
 
 	func testDecodeHandlesUnsupportedEventsGracefully() throws {
 		let mock = WKScriptMessageMock(body: """
-		{ "name": "unknown_event", "body": "" }
-		""")
+	{ "name": "unknown_event", "body": "" }
+	""")
 
 		let result = try CheckoutBridge.decode(mock)
 
@@ -72,10 +72,10 @@ class CheckoutBridgeTests: XCTestCase {
 
 	func testDecodeSupportsCheckoutCompleteEvent() throws {
 		let mock = WKScriptMessageMock(body: """
-		{
-			"name": "completed"
-		}
-		""")
+	{
+		"name": "completed"
+	}
+	""")
 
 		let result = try CheckoutBridge.decode(mock)
 
@@ -86,10 +86,10 @@ class CheckoutBridgeTests: XCTestCase {
 
 	func testDecodeSupportsCheckoutUnavailableEvent() throws {
 		let mock = WKScriptMessageMock(body: """
-		{
-			"name": "error"
-		}
-		""")
+	{
+		"name": "error"
+	}
+	""")
 
 		let result = try CheckoutBridge.decode(mock)
 
@@ -100,16 +100,45 @@ class CheckoutBridgeTests: XCTestCase {
 
 	func testDecodeSupportsCheckoutBlockingEvent() throws {
 		let mock = WKScriptMessageMock(body: """
-		{
-			"name": "checkoutBlockingEvent",
-			"body": "true"
-		}
-		""")
+	{
+		"name": "checkoutBlockingEvent",
+		"body": "true"
+	}
+	""")
 
 		let result = try CheckoutBridge.decode(mock)
 
 		guard case CheckoutBridge.WebEvent.checkoutModalToggled = result else {
 			return XCTFail("expected CheckoutScriptMessage.checkoutModalToggled, got \(result)")
+		}
+	}
+
+	func testInstrumentationPayloadToBridgeEvent() {
+		let payload = InstrumentationPayload(name: "test", value: 1, type: .histogram)
+		let jsonString = payload.toBridgeEvent()
+		XCTAssertNotNil(jsonString)
+
+		if let jsonData = jsonString?.data(using: .utf8) {
+			let decodedPayload = try? JSONDecoder().decode(SdkToWebEvent<InstrumentationPayload>.self, from: jsonData)
+			XCTAssertNotNil(decodedPayload)
+			XCTAssertEqual(decodedPayload?.detail.name, "test")
+			XCTAssertEqual(decodedPayload?.detail.value, 1)
+			XCTAssertEqual(decodedPayload?.detail.type, .histogram)
+		}
+	}
+
+	func testSdkToWebEventToJson() {
+		let payload = InstrumentationPayload(name: "test", value: 1, type: .incrementCounter)
+		let event = SdkToWebEvent(detail: payload)
+		let jsonString = event.toJson()
+		XCTAssertNotNil(jsonString)
+
+		if let jsonData = jsonString?.data(using: .utf8) {
+			let decodedEvent = try? JSONDecoder().decode(SdkToWebEvent<InstrumentationPayload>.self, from: jsonData)
+			XCTAssertNotNil(decodedEvent)
+			XCTAssertEqual(decodedEvent?.detail.name, "test")
+			XCTAssertEqual(decodedEvent?.detail.value, 1)
+			XCTAssertEqual(decodedEvent?.detail.type, .incrementCounter)
 		}
 	}
 }
