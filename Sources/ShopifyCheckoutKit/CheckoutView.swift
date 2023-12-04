@@ -69,6 +69,12 @@ class CheckoutView: WKWebView {
 
 		super.init(frame: frame, configuration: configuration)
 
+		#if DEBUG
+			if #available(iOS 16.4, *) {
+				isInspectable = true
+			}
+		#endif
+
 		navigationDelegate = self
 	}
 

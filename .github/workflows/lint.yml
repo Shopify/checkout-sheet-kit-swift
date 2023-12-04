@@ -16,14 +16,14 @@ jobs:
 
   check-license-headers:
     name: License Headers
-    runs-on: macOS-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
       - run: ./Scripts/copy_license && git diff --name-only --exit-code
 
   lint-podspec:
     name: CocoaPods
-    runs-on: macOS-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
