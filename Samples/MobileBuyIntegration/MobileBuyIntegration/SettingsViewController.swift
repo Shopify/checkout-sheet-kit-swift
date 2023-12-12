@@ -69,11 +69,9 @@ class SettingsViewController: UITableViewController {
 	}
 
 	// MARK: UIViewController
-
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-
-		tableView.reloadData()
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		tableView.reloadSections(IndexSet(integer: Section.logs.rawValue), with: .automatic)
 	}
 
 	override func viewDidLoad() {
@@ -165,12 +163,6 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		switch Section.from(indexPath.section) {
-		case Section.preloading:
-			preloadingSwitch.isOn.toggle()
-			preloadingSwitchDidChange()
-		case Section.vaultedState:
-			vaultedStateSwitch.isOn.toggle()
-			vaultedStateSwitchDidChange()
 		case Section.colorScheme:
 			let newColorScheme = colorScheme(at: indexPath)
 			ShopifyCheckoutKit.configuration.colorScheme = newColorScheme
@@ -185,12 +177,12 @@ class SettingsViewController: UITableViewController {
 
 	// MARK: Private
 
-	@objc private func preloadingSwitchDidChange() {
-		ShopifyCheckoutKit.configuration.preloading.enabled = preloadingSwitch.isOn
+	@objc private func preloadingSwitchDidChange(_ sender: UISwitch) {
+		ShopifyCheckoutKit.configuration.preloading.enabled = sender.isOn
 	}
 
-	@objc private func vaultedStateSwitchDidChange() {
-		appConfiguration.useVaultedState = vaultedStateSwitch.isOn
+	@objc private func vaultedStateSwitchDidChange(_ sender: UISwitch) {
+		appConfiguration.useVaultedState = sender.isOn
 	}
 
 	private func currentColorScheme() -> Configuration.ColorScheme {
