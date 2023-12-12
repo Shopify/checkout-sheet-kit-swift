@@ -195,7 +195,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
-		CheckoutView.cache = nil
+		CheckoutWebView.cache = nil
 		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 	}
 

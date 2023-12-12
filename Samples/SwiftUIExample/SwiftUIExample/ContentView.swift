@@ -1,6 +1,5 @@
 import SwiftUI
 import ShopifyCheckoutKit
-import Combine
 
 struct CheckoutView: View {
 	let checkoutURL: Binding<URL?>
@@ -19,7 +18,6 @@ struct CheckoutView: View {
 
 	}
 }
-
 struct ContentView: View {
 	@StateObject private var viewModel = ProductViewModel()
 	@State private var isShowingCheckout = false
@@ -38,10 +36,9 @@ struct ContentView: View {
 				if let product = viewModel.product {
 					ScrollView {
 						VStack {
-							AsyncImage(url: product.featuredImage?.url)
-								.aspectRatio(contentMode: .fill)
-								.frame(maxWidth: 300, maxHeight: 300)
-								.clipped()
+							AsyncImage(url: product.featuredImage?.url) { image in
+								image.image?.resizable().aspectRatio(contentMode: .fit)
+							}
 							Text(product.title)
 								.font(.title)
 								.multilineTextAlignment(.center)
