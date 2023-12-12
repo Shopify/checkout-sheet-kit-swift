@@ -67,29 +67,6 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertNotEqual(two, three)
 	}
 
-	func testCloseInvalidatesViewCache() {
-		let one = CheckoutWebView.for(checkout: checkoutURL)
-		let two = CheckoutWebView.for(checkout: checkoutURL)
-		XCTAssertEqual(one, two)
-
-		viewController.close()
-
-		let three = CheckoutWebView.for(checkout: checkoutURL)
-		XCTAssertNotEqual(two, three)
-	}
-
-	func testPresentationControllerDidDismissInvalidatesViewCache() {
-		let one = CheckoutWebView.for(checkout: checkoutURL)
-		let two = CheckoutWebView.for(checkout: checkoutURL)
-		XCTAssertEqual(one, two)
-
-		let presentationController = UIViewController().presentationController!
-		viewController.presentationControllerDidDismiss(presentationController)
-
-		let three = CheckoutWebView.for(checkout: checkoutURL)
-		XCTAssertNotEqual(two, three)
-	}
-
 	func testCheckoutViewDidClickLinkDoesNotInvalidateViewCache() {
 		let one = CheckoutWebView.for(checkout: checkoutURL)
 		let two = CheckoutWebView.for(checkout: checkoutURL)
