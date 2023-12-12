@@ -51,5 +51,4 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 
 public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
 
-
 }
