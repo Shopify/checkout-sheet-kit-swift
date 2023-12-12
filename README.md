@@ -160,25 +160,17 @@ ShopifyCheckoutKit.configuration.backgroundColor = .systemBackground
 
 Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
 
-Preloading is an advanced feature that can be disabled via a runtime flag:
-
-```swift
-ShopifyCheckoutKit.configure {
-  $0.preloading.enabled = false // defaults to true
-}
-```
-
-Once enabled, preloading a checkout is as simple as:
-
+Preloading is an advanced feature that will only be activated after calling:
 ```swift
 ShopifyCheckoutKit.preload(checkout: checkoutURL)
 ```
 
 **Important considerations:**
 
-1. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout—e.g. when the buyer navigates to the cart overview or a similar app-specific experience.
-2. A preloaded checkout session reflects the cart contents at the time when `preload` is called. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
-3. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
+1. Once you call preload, the checkout view is *cached*. _you must remember to call preload again on every cart update._ Otherwise you risk the user checking out with a stale cart
+2. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout—e.g. when the buyer navigates to the cart overview or a similar app-specific experience.
+3. A preloaded checkout session reflects the cart contents at the time when `preload` is called. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
+4. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
 
 ### Monitoring the lifecycle of a checkout session
 

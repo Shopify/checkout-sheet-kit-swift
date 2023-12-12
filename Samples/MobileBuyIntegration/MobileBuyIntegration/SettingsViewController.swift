@@ -28,11 +28,10 @@ class SettingsViewController: UITableViewController {
 
 	// MARK: Properties
 	enum Section: Int, CaseIterable {
-		case preloading = 0
-		case vaultedState = 1
-		case colorScheme = 2
-		case version = 3
-		case logs = 4
+		case vaultedState = 0
+		case colorScheme = 1
+		case version = 2
+		case logs = 3
 		case undefined = -1
 
 		static func from(_ rawValue: Int) -> Section {
@@ -115,8 +114,6 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		switch Section.from(section) {
-		case Section.preloading:
-			return 1
 		case Section.vaultedState:
 			return 1
 		case Section.colorScheme:
@@ -136,9 +133,6 @@ class SettingsViewController: UITableViewController {
 		var content = cell.defaultContentConfiguration()
 
 		switch Section.from(indexPath.section) {
-		case Section.preloading:
-			content.text = "Preload checkout"
-			cell.accessoryView = preloadingSwitch
 		case Section.vaultedState:
 			content.text = "Prefill buyer information"
 			cell.accessoryView = vaultedStateSwitch
@@ -169,9 +163,6 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		switch Section.from(indexPath.section) {
-		case Section.preloading:
-			preloadingSwitch.isOn.toggle()
-			preloadingSwitchDidChange()
 		case Section.vaultedState:
 			vaultedStateSwitch.isOn.toggle()
 			vaultedStateSwitchDidChange()
@@ -188,10 +179,6 @@ class SettingsViewController: UITableViewController {
 	}
 
 	// MARK: Private
-
-	@objc private func preloadingSwitchDidChange() {
-		ShopifyCheckoutKit.configuration.preloading.enabled = preloadingSwitch.isOn
-	}
 
 	@objc private func vaultedStateSwitchDidChange() {
 		appConfiguration.useVaultedState = vaultedStateSwitch.isOn
