@@ -77,7 +77,7 @@ struct ContentView: View {
 										checkoutURL = url
 										isShowingCheckout = true
 									}
-								}, () -> {
+								}, label: {
 									Text("Buy Now")
 										.font(.headline)
 										.padding()
@@ -96,7 +96,7 @@ struct ContentView: View {
 					.navigationTitle("Product Details")
 					.navigationBarItems(trailing: Button(action: {
 						viewModel.reloadProduct()
-					}, () -> {
+					}, label: {
 						SwiftUI.Image(systemName: "arrow.clockwise")
 					}))
 				} else {
