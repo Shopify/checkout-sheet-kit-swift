@@ -77,7 +77,7 @@ struct ContentView: View {
 										checkoutURL = url
 										isShowingCheckout = true
 									}
-								}) {
+								}, () -> {
 									Text("Buy Now")
 										.font(.headline)
 										.padding()
@@ -85,7 +85,7 @@ struct ContentView: View {
 										.background(Color.blue)
 										.foregroundColor(.white)
 										.cornerRadius(10)
-								}
+								})
 								.padding()
 								.sheet(isPresented: $isShowingCheckout) {
 									CheckoutView(checkoutURL: $checkoutURL, delegate: eventHandler, isShowingCheckout: $isShowingCheckout)
@@ -96,9 +96,9 @@ struct ContentView: View {
 					.navigationTitle("Product Details")
 					.navigationBarItems(trailing: Button(action: {
 						viewModel.reloadProduct()
-					}) {
+					}, () -> {
 						SwiftUI.Image(systemName: "arrow.clockwise")
-					})
+					}))
 				} else {
 					ProgressView()
 				}
