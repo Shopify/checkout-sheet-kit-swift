@@ -29,7 +29,7 @@ public let version = "0.7.0"
 /// The configuration options for the `ShopifyCheckoutKit` library.
 public var configuration = Configuration() {
 	didSet {
-		CheckoutView.invalidate()
+		CheckoutWebView.invalidate()
 	}
 }
 
@@ -41,13 +41,14 @@ public func configure(_ block: (inout Configuration) -> Void) {
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
 	guard configuration.preloading.enabled else { return }
-	CheckoutView.for(checkout: url).load(checkout: url)
+	CheckoutWebView.for(checkout: url).load(checkout: url)
 }
 
 /// Presents the checkout from a given `UIViewController`.
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	let rootViewController = CheckoutViewController(checkoutURL: url, delegate: delegate)
-	let viewController = UINavigationController(rootViewController: rootViewController)
-	viewController.presentationController?.delegate = rootViewController
-	from.present(viewController, animated: true)
+	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
+}
+
+public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
+
 }

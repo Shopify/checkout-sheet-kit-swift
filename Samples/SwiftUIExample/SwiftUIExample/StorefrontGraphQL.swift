@@ -21,40 +21,62 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
-import SwiftUI
+import Foundation
 
-public class CheckoutViewController: UINavigationController {
-	public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-		let rootViewController = CheckoutWebViewController(
-			checkoutURL: url, delegate: delegate
-		)
-		super.init(rootViewController: rootViewController)
-		presentationController?.delegate = rootViewController
-	}
+struct GraphQLResponse<Root: Decodable>: Decodable {
+	let data: Root
+}
 
-	@available(*, unavailable)
-	required init?(coder aDecoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
+struct QueryRoot: Decodable {
+	let products: Connection<Product>
+}
+
+struct MutationRoot: Decodable {
+	let cartCreate: CartCreatePayload
+}
+
+struct Connection<Node: Decodable>: Decodable {
+	let nodes: [Node]
+}
+
+struct Product: Decodable {
+	let title: String
+
+	let featuredImage: Image?
+
+	let variants: Connection<ProductVariant>
+}
+
+struct ProductVariant: Decodable {
+	let id: String
+
+	let title: String
+
+	let price: Money
+}
+
+struct Image: Decodable {
+	let url: URL
+}
+
+struct Money: Decodable {
+	let amount: String
+
+	let currencyCode: String
+
+	func formattedString() -> String? {
+		let decimal = Decimal(string: amount) ?? 0
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .currency
+		formatter.currencyCode = currencyCode
+		return formatter.string(from: NSDecimalNumber(decimal: decimal))
 	}
 }
 
-extension CheckoutViewController {
-	public struct Representable: UIViewControllerRepresentable {
-		@Binding var checkoutURL: URL?
+struct CartCreatePayload: Decodable {
+	let cart: Cart
+}
 
-		let delegate: CheckoutDelegate?
-
-		public init(checkout url: Binding<URL?>, delegate: CheckoutDelegate? = nil) {
-			self._checkoutURL = url
-			self.delegate = delegate
-		}
-
-		public func makeUIViewController(context: Context) -> CheckoutViewController {
-			return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
-		}
-
-		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Context) {
-		}
-	}
+struct Cart: Decodable {
+	let checkoutUrl: URL
 }

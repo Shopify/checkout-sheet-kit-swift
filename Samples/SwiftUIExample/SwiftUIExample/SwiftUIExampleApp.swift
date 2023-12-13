@@ -21,40 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
 import SwiftUI
 
-public class CheckoutViewController: UINavigationController {
-	public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-		let rootViewController = CheckoutWebViewController(
-			checkoutURL: url, delegate: delegate
-		)
-		super.init(rootViewController: rootViewController)
-		presentationController?.delegate = rootViewController
-	}
-
-	@available(*, unavailable)
-	required init?(coder aDecoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-}
-
-extension CheckoutViewController {
-	public struct Representable: UIViewControllerRepresentable {
-		@Binding var checkoutURL: URL?
-
-		let delegate: CheckoutDelegate?
-
-		public init(checkout url: Binding<URL?>, delegate: CheckoutDelegate? = nil) {
-			self._checkoutURL = url
-			self.delegate = delegate
-		}
-
-		public func makeUIViewController(context: Context) -> CheckoutViewController {
-			return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
-		}
-
-		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Context) {
-		}
-	}
+@main
+struct SwiftUIExampleApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
 }

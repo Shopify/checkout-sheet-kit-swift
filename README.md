@@ -86,6 +86,26 @@ class MyViewController: UIViewController {
 }
 ```
 
+we also support SwiftUI
+```
+import SwiftUI
+
+struct ContentView: View {
+    @State private var isPresented = false
+    let url: URL
+    let delegate: CheckoutDelegate?
+
+    var body: some View {
+        Button("Checkout") {
+            self.isPresented = true
+        }
+        .sheet(isPresented: $isPresented) {
+            CheckoutViewControllerRepresentable(url: url, delegate: delegate)
+        }
+    }
+}
+```
+
 To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session in the background and ahead of time.
 
 ### Configuration

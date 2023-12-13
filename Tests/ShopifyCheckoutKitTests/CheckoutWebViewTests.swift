@@ -25,20 +25,20 @@ import XCTest
 import WebKit
 @testable import ShopifyCheckoutKit
 
-class CheckoutViewTests: XCTestCase {
-	private var view: CheckoutView!
-	private var mockDelegate: MockCheckoutViewDelegate!
+class CheckoutWebViewTests: XCTestCase {
+	private var view: CheckoutWebView!
+	private var mockDelegate: MockCheckoutWebViewDelegate!
 
 	override func setUp() {
-		view = CheckoutView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
-        mockDelegate = MockCheckoutViewDelegate()
+		view = CheckoutWebView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+        mockDelegate = MockCheckoutWebViewDelegate()
         view.viewDelegate = mockDelegate
 	}
 
 	func testEmailContactLinkDelegation() {
 		let link = URL(string: "mailto:contact@shopify.com")!
 
-		let delegate = MockCheckoutViewDelegate()
+		let delegate = MockCheckoutWebViewDelegate()
 		let didClickLinkExpectation = expectation(
 			description: "checkoutViewDidClickLink was called"
 		)
@@ -55,7 +55,7 @@ class CheckoutViewTests: XCTestCase {
 	func testPhoneContactLinkDelegation() {
 		let link = URL(string: "tel:1234567890")!
 
-		let delegate = MockCheckoutViewDelegate()
+		let delegate = MockCheckoutWebViewDelegate()
 		let didClickLinkExpectation = expectation(
 			description: "checkoutViewDidClickLink was called"
 		)
@@ -72,7 +72,7 @@ class CheckoutViewTests: XCTestCase {
 	func testURLLinkDelegation() {
 		let link = URL(string: "https://www.shopify.com/legal/privacy/app-users")!
 
-		let delegate = MockCheckoutViewDelegate()
+		let delegate = MockCheckoutWebViewDelegate()
 		let didClickLinkExpectation = expectation(
 			description: "checkoutViewDidClickLink was called"
 		)
@@ -89,7 +89,7 @@ class CheckoutViewTests: XCTestCase {
 	func testURLLinkDelegationWithExternalParam() {
 		let link = URL(string: "https://www.shopify.com/legal/privacy/app-users?open_externally=true")!
 
-		let delegate = MockCheckoutViewDelegate()
+		let delegate = MockCheckoutWebViewDelegate()
 		let didClickLinkExpectation = expectation(
 			description: "checkoutViewDidClickLink was called"
 		)

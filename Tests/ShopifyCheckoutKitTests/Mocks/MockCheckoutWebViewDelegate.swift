@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import XCTest
 @testable import ShopifyCheckoutKit
 
-class MockCheckoutViewDelegate: CheckoutViewDelegate {
+class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 	var didStartNavigationExpectation: XCTestExpectation?
 
 	var didFinishNavigationExpectation: XCTestExpectation?
