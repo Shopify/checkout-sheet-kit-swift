@@ -43,7 +43,7 @@ public struct Configuration {
 
 	public var logger: Logger = NoOpLogger()
 
-	internal var preloading = Configuration.Preloading()
+	public var preloading = Configuration.Preloading()
 }
 
 extension Configuration {
@@ -68,7 +68,11 @@ extension Configuration {
 }
 
 extension Configuration {
-	internal struct Preloading {
+	public struct Preloading {
 		internal var enabled: Bool = false
+
+		public func invalidateAllCaches() {
+			CheckoutWebView.invalidate()
+		}
 	}
 }

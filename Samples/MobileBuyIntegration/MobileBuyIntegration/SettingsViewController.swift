@@ -30,8 +30,9 @@ class SettingsViewController: UITableViewController {
 	enum Section: Int, CaseIterable {
 		case vaultedState = 0
 		case colorScheme = 1
-		case version = 2
-		case logs = 3
+		case invalidateCache = 2
+		case version = 3
+		case logs = 4
 		case undefined = -1
 
 		static func from(_ rawValue: Int) -> Section {
@@ -94,6 +95,8 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		switch Section.from(section) {
+		case Section.invalidateCache:
+			return "Preloading"
 		case Section.logs:
 			return "Logs"
 		case Section.colorScheme:
@@ -103,23 +106,12 @@ class SettingsViewController: UITableViewController {
 		}
 	}
 
-	override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		switch Section.from(section) {
-		case Section.colorScheme:
-			return "NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again."
-		default:
-			return nil
-		}
-	}
-
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		switch Section.from(section) {
-		case Section.vaultedState:
+		case Section.vaultedState, Section.version, Section.invalidateCache:
 			return 1
 		case Section.colorScheme:
 			return ShopifyCheckoutKit.Configuration.ColorScheme.allCases.count
-		case Section.version:
-			return 1
 		case Section.logs:
 			return logs.count > 10 ? 10 : logs.count
 		default:
@@ -129,21 +121,31 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-
 		var content = cell.defaultContentConfiguration()
 
 		switch Section.from(indexPath.section) {
 		case Section.vaultedState:
 			content.text = "Prefill buyer information"
 			cell.accessoryView = vaultedStateSwitch
+			cell.contentConfiguration = content
 		case Section.colorScheme:
 			let scheme = colorScheme(at: indexPath)
 			content.text = scheme.prettyTitle
 			content.secondaryText = ShopifyCheckoutKit.configuration.colorScheme == scheme ? "Active" : ""
+			cell.contentConfiguration = content
 		case Section.version:
 			content = UIListContentConfiguration.valueCell()
 			content.text = "Version"
 			content.secondaryText = currentVersion()
+			cell.contentConfiguration = content
+		case Section.invalidateCache:
+			let clearCacheButton = UIButton(type: .system)
+			if cell.contentView.subviews.isEmpty {
+				clearCacheButton.setTitle("Clear Preloading Cache", for: .normal)
+				clearCacheButton.addTarget(self, action: #selector(clearPreloadingCache), for: .touchUpInside)
+				clearCacheButton.frame = CGRect(x: 0, y: 0, width: cell.contentView.frame.width, height: cell.contentView.frame.height)
+				cell.contentView.addSubview(clearCacheButton)
+			}
 		case Section.logs:
 			content = UIListContentConfiguration.valueCell()
 			if indexPath.row < logs.count {
@@ -152,13 +154,16 @@ class SettingsViewController: UITableViewController {
 				content.text = "No log available"
 			}
 			content.textProperties.font = UIFont.systemFont(ofSize: 12)
+			cell.contentConfiguration = content
 		default:
 			()
 		}
 
-		cell.contentConfiguration = content
-
 		return cell
+	}
+
+	@objc private func clearPreloadingCache() {
+		ShopifyCheckoutKit.configuration.preloading.invalidateAllCaches()
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -173,6 +178,9 @@ class SettingsViewController: UITableViewController {
 			ShopifyCheckoutKit.configuration.backgroundColor = newColorScheme.backgroundColor
 			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
             tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
+		case Section.invalidateCache:
+			clearPreloadingCache()
+			tableView.deselectRow(at: indexPath, animated: true)
 		default:
 			()
 		}
