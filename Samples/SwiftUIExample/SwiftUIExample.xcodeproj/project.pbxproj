@@ -13,9 +13,6 @@
 		86C569C52B15DA2B00F26028 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569C42B15DA2B00F26028 /* ContentView.swift */; };
 		86C569C72B15DA2D00F26028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86C569C62B15DA2D00F26028 /* Assets.xcassets */; };
 		86C569CA2B15DA2D00F26028 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86C569C92B15DA2D00F26028 /* Preview Assets.xcassets */; };
-		86C569D42B15DA2D00F26028 /* SwiftUIExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569D32B15DA2D00F26028 /* SwiftUIExampleTests.swift */; };
-		86C569DE2B15DA2D00F26028 /* SwiftUIExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569DD2B15DA2D00F26028 /* SwiftUIExampleUITests.swift */; };
-		86C569E02B15DA2D00F26028 /* SwiftUIExampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569DF2B15DA2D00F26028 /* SwiftUIExampleUITestsLaunchTests.swift */; };
 		86C569ED2B15DB0A00F26028 /* StorefrontClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569EC2B15DB0A00F26028 /* StorefrontClient.swift */; };
 		86C569F22B15DC6F00F26028 /* StorefrontGraphQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569F12B15DC6F00F26028 /* StorefrontGraphQL.swift */; };
 /* End PBXBuildFile section */
@@ -46,10 +43,7 @@
 		86C569C62B15DA2D00F26028 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		86C569C92B15DA2D00F26028 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		86C569CF2B15DA2D00F26028 /* SwiftUIExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUIExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		86C569D32B15DA2D00F26028 /* SwiftUIExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExampleTests.swift; sourceTree = "<group>"; };
 		86C569D92B15DA2D00F26028 /* SwiftUIExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUIExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		86C569DD2B15DA2D00F26028 /* SwiftUIExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExampleUITests.swift; sourceTree = "<group>"; };
-		86C569DF2B15DA2D00F26028 /* SwiftUIExampleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExampleUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		86C569EC2B15DB0A00F26028 /* StorefrontClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontClient.swift; sourceTree = "<group>"; };
 		86C569F12B15DC6F00F26028 /* StorefrontGraphQL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontGraphQL.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -86,8 +80,6 @@
 			children = (
 				8666476C2B1642730039400B /* Storefront.xcconfig */,
 				86C569C12B15DA2B00F26028 /* SwiftUIExample */,
-				86C569D22B15DA2D00F26028 /* SwiftUIExampleTests */,
-				86C569DC2B15DA2D00F26028 /* SwiftUIExampleUITests */,
 				86C569C02B15DA2B00F26028 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -122,23 +114,6 @@
 				86C569C92B15DA2D00F26028 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		86C569D22B15DA2D00F26028 /* SwiftUIExampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				86C569D32B15DA2D00F26028 /* SwiftUIExampleTests.swift */,
-			);
-			path = SwiftUIExampleTests;
-			sourceTree = "<group>";
-		};
-		86C569DC2B15DA2D00F26028 /* SwiftUIExampleUITests */ = {
-			isa = PBXGroup;
-			children = (
-				86C569DD2B15DA2D00F26028 /* SwiftUIExampleUITests.swift */,
-				86C569DF2B15DA2D00F26028 /* SwiftUIExampleUITestsLaunchTests.swift */,
-			);
-			path = SwiftUIExampleUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -289,7 +264,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86C569D42B15DA2D00F26028 /* SwiftUIExampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,8 +271,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86C569DE2B15DA2D00F26028 /* SwiftUIExampleUITests.swift in Sources */,
-				86C569E02B15DA2D00F26028 /* SwiftUIExampleUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
