@@ -28,6 +28,7 @@ import ShopifyCheckoutSheetKit
 struct SettingsView: View {
 	@State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	@State private var useVaultedState = appConfiguration.useVaultedState
+	@State private var useNativePayButton = ShopifyCheckoutSheetKit.configuration.payButton.enabled
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
 	@State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 	@State private var colorScheme: ColorScheme = .light
@@ -43,6 +44,11 @@ struct SettingsView: View {
 					Toggle("Prefill buyer information", isOn: $useVaultedState)
 						.onChange(of: useVaultedState) { newValue in
 							appConfiguration.useVaultedState = newValue
+						}
+					Toggle("Native pay button", isOn: $useNativePayButton)
+						.onChange(of: useNativePayButton) { newValue in
+							appConfiguration.useNativeButton = newValue
+							ShopifyCheckoutSheetKit.configuration.payButton.enabled = newValue
 						}
 				}
 
@@ -155,6 +161,28 @@ extension Configuration.ColorScheme {
 			return UIColor(red: 0.18, green: 0.16, blue: 0.22, alpha: 1.00)
 		default:
 			return UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+		}
+	}
+
+	var payButtonBackgroundColor: UIColor {
+		switch self {
+		case .web:
+			return UIColor(red: 0.94, green: 0.94, blue: 0.91, alpha: 1.00)
+		default:
+			return .systemBackground
+		}
+	}
+
+	var borderColor: UIColor {
+		switch self {
+		case .web:
+			return UIColor(red: 208/255, green: 208/255, blue: 205/255, alpha: 1.0)
+		case .light:
+			return UIColor(red: 222/255, green: 222/255, blue: 222/255, alpha: 1.0)
+		case .dark:
+			return UIColor(red: 68/255, green: 68/255, blue: 70/255, alpha: 1.0)
+		default:
+			return .systemGray5
 		}
 	}
 
