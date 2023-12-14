@@ -172,7 +172,7 @@ ShopifyCheckoutKit.configuration.preloading.invalidateAllCaches()
 
 **Important considerations:**
 
-1. Once you call preload, the checkout view is *cached*. _you must remember to call preload again on every cart update._ Otherwise you risk the user checking out with a stale cart
+1. Once you call `preload()`, the checkout view will be **cached**. **You must call `preload()` again on every cart update**. Otherwise you risk the user checking out with a stale cart.
 2. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout—e.g. when the buyer navigates to the cart overview or a similar app-specific experience.
 3. A preloaded checkout session reflects the cart contents at the time when `preload` is called. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
 4. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
