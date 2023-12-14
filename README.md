@@ -165,7 +165,7 @@ Preloading is an advanced feature that will only be activated after calling:
 ShopifyCheckoutKit.preload(checkout: checkoutURL)
 ```
 
-Once preload is called, the checkout view is cached. You are expected to re-call preload every time you need to refresh the checkout view. If for whatever reason you need to invalidate the cache without calling checkout again, you can call this function:
+Once preload is called, the checkout view is cached. You are expected to re-call preload every time you need to refresh the checkout view. If for whatever reason you need to invalidate the cache without preloading/loading the checkout view again (e.g we use this during testing of our sample app), you can call this function:
 ```swift
 ShopifyCheckoutKit.configuration.preloading.invalidateAllCaches()
 ```
