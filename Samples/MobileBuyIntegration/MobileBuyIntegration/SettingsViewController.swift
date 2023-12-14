@@ -42,13 +42,6 @@ class SettingsViewController: UITableViewController {
 
 	private var logs: [String?] = []
 
-	private lazy var preloadingSwitch: UISwitch = {
-		let view = UISwitch()
-		view.isOn = ShopifyCheckoutKit.configuration.preloading.enabled
-		view.addTarget(self, action: #selector(preloadingSwitchDidChange), for: .valueChanged)
-		return view
-	}()
-
 	private lazy var vaultedStateSwitch: UISwitch = {
 		let view = UISwitch()
 		view.isOn = appConfiguration.useVaultedState
@@ -163,7 +156,7 @@ class SettingsViewController: UITableViewController {
 	}
 
 	@objc private func clearPreloadingCache() {
-		ShopifyCheckoutKit.configuration.preloading.invalidateAllCaches()
+		ShopifyCheckoutKit.configuration.preloading.clearCache()
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
