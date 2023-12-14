@@ -40,7 +40,7 @@ class SettingsViewController: UITableViewController {
 		}
 	}
 
-	private var logs: [String?]? = []
+	private var logs: [String?] = []
 
 	private lazy var preloadingSwitch: UISwitch = {
 		let view = UISwitch()
@@ -77,10 +77,10 @@ class SettingsViewController: UITableViewController {
 		tableView.register(Cell.self, forCellReuseIdentifier: "cell")
 	}
 
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
 
-		logs = LogReader.shared.readLogs()
+		logs = LogReader.shared.readLogs() ?? []
 
 		DispatchQueue.main.async {
 			self.tableView.reloadSections(IndexSet(integer: Section.logs.rawValue), with: .automatic)
@@ -124,8 +124,7 @@ class SettingsViewController: UITableViewController {
 		case Section.version:
 			return 1
 		case Section.logs:
-			let logsCount = logs?.count ?? 0
-			return logsCount > 10 ? 10 : logsCount
+			return logs.count > 10 ? 10 : logs.count
 		default:
 			return 0
 		}
@@ -153,7 +152,7 @@ class SettingsViewController: UITableViewController {
 			content.secondaryText = currentVersion()
 		case Section.logs:
 			content = UIListContentConfiguration.valueCell()
-			if let logs = logs, indexPath.row < logs.count {
+			if indexPath.row < logs.count {
 				content.text = logs[indexPath.row]
 			} else {
 				content.text = "No log available"
