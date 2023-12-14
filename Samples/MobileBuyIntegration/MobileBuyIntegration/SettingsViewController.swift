@@ -40,6 +40,8 @@ class SettingsViewController: UITableViewController {
 		}
 	}
 
+	private var logs: [String?] = []
+
 	private lazy var preloadingSwitch: UISwitch = {
 		let view = UISwitch()
 		view.isOn = ShopifyCheckoutKit.configuration.preloading.enabled
@@ -69,17 +71,20 @@ class SettingsViewController: UITableViewController {
 	}
 
 	// MARK: UIViewController
-
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-
-		tableView.reloadData()
-	}
-
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
 		tableView.register(Cell.self, forCellReuseIdentifier: "cell")
+	}
+
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+
+		logs = LogReader.shared.readLogs() ?? []
+
+		DispatchQueue.main.async {
+			self.tableView.reloadSections(IndexSet(integer: Section.logs.rawValue), with: .automatic)
+		}
 	}
 
 	// MARK: UITableViewDataSource
@@ -119,8 +124,7 @@ class SettingsViewController: UITableViewController {
 		case Section.version:
 			return 1
 		case Section.logs:
-			let logsCount = LogReader.shared.readLogs()?.count ?? 0
-			return logsCount > 10 ? 10 : logsCount
+			return logs.count > 10 ? 10 : logs.count
 		default:
 			return 0
 		}
@@ -148,7 +152,7 @@ class SettingsViewController: UITableViewController {
 			content.secondaryText = currentVersion()
 		case Section.logs:
 			content = UIListContentConfiguration.valueCell()
-			if let logs = LogReader.shared.readLogs(), indexPath.row < logs.count {
+			if indexPath.row < logs.count {
 				content.text = logs[indexPath.row]
 			} else {
 				content.text = "No log available"
@@ -229,6 +233,12 @@ private class Cell: UITableViewCell {
 
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
+	}
+
+	override func prepareForReuse() {
+		super.prepareForReuse()
+
+		accessoryView = nil
 	}
 }
 
