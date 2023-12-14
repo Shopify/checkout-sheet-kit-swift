@@ -28,9 +28,9 @@ class SettingsViewController: UITableViewController {
 
 	// MARK: Properties
 	enum Section: Int, CaseIterable {
-		case preloading = 0
-		case vaultedState = 1
-		case colorScheme = 2
+		case vaultedState = 0
+		case colorScheme = 1
+		case invalidateCache = 2
 		case version = 3
 		case logs = 4
 		case undefined = -1
@@ -41,13 +41,6 @@ class SettingsViewController: UITableViewController {
 	}
 
 	private var logs: [String?] = []
-
-	private lazy var preloadingSwitch: UISwitch = {
-		let view = UISwitch()
-		view.isOn = ShopifyCheckoutKit.configuration.preloading.enabled
-		view.addTarget(self, action: #selector(preloadingSwitchDidChange), for: .valueChanged)
-		return view
-	}()
 
 	private lazy var vaultedStateSwitch: UISwitch = {
 		let view = UISwitch()
@@ -95,6 +88,8 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		switch Section.from(section) {
+		case Section.invalidateCache:
+			return "Preloading"
 		case Section.logs:
 			return "Logs"
 		case Section.colorScheme:
@@ -104,25 +99,12 @@ class SettingsViewController: UITableViewController {
 		}
 	}
 
-	override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		switch Section.from(section) {
-		case Section.colorScheme:
-			return "NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again."
-		default:
-			return nil
-		}
-	}
-
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		switch Section.from(section) {
-		case Section.preloading:
-			return 1
-		case Section.vaultedState:
+		case Section.vaultedState, Section.version, Section.invalidateCache:
 			return 1
 		case Section.colorScheme:
 			return ShopifyCheckoutKit.Configuration.ColorScheme.allCases.count
-		case Section.version:
-			return 1
 		case Section.logs:
 			return logs.count > 10 ? 10 : logs.count
 		default:
@@ -132,24 +114,31 @@ class SettingsViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-
 		var content = cell.defaultContentConfiguration()
 
 		switch Section.from(indexPath.section) {
-		case Section.preloading:
-			content.text = "Preload checkout"
-			cell.accessoryView = preloadingSwitch
 		case Section.vaultedState:
 			content.text = "Prefill buyer information"
 			cell.accessoryView = vaultedStateSwitch
+			cell.contentConfiguration = content
 		case Section.colorScheme:
 			let scheme = colorScheme(at: indexPath)
 			content.text = scheme.prettyTitle
 			content.secondaryText = ShopifyCheckoutKit.configuration.colorScheme == scheme ? "Active" : ""
+			cell.contentConfiguration = content
 		case Section.version:
 			content = UIListContentConfiguration.valueCell()
 			content.text = "Version"
 			content.secondaryText = currentVersion()
+			cell.contentConfiguration = content
+		case Section.invalidateCache:
+			let clearCacheButton = UIButton(type: .system)
+			if cell.contentView.subviews.isEmpty {
+				clearCacheButton.setTitle("Clear Preloading Cache", for: .normal)
+				clearCacheButton.addTarget(self, action: #selector(clearPreloadingCache), for: .touchUpInside)
+				clearCacheButton.frame = CGRect(x: 0, y: 0, width: cell.contentView.frame.width, height: cell.contentView.frame.height)
+				cell.contentView.addSubview(clearCacheButton)
+			}
 		case Section.logs:
 			content = UIListContentConfiguration.valueCell()
 			if indexPath.row < logs.count {
@@ -158,20 +147,20 @@ class SettingsViewController: UITableViewController {
 				content.text = "No log available"
 			}
 			content.textProperties.font = UIFont.systemFont(ofSize: 12)
+			cell.contentConfiguration = content
 		default:
 			()
 		}
 
-		cell.contentConfiguration = content
-
 		return cell
+	}
+
+	@objc private func clearPreloadingCache() {
+		ShopifyCheckoutKit.configuration.preloading.clearCache()
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		switch Section.from(indexPath.section) {
-		case Section.preloading:
-			preloadingSwitch.isOn.toggle()
-			preloadingSwitchDidChange()
 		case Section.vaultedState:
 			vaultedStateSwitch.isOn.toggle()
 			vaultedStateSwitchDidChange()
@@ -182,16 +171,15 @@ class SettingsViewController: UITableViewController {
 			ShopifyCheckoutKit.configuration.backgroundColor = newColorScheme.backgroundColor
 			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
             tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
+		case Section.invalidateCache:
+			clearPreloadingCache()
+			tableView.deselectRow(at: indexPath, animated: true)
 		default:
 			()
 		}
 	}
 
 	// MARK: Private
-
-	@objc private func preloadingSwitchDidChange() {
-		ShopifyCheckoutKit.configuration.preloading.enabled = preloadingSwitch.isOn
-	}
 
 	@objc private func vaultedStateSwitchDidChange() {
 		appConfiguration.useVaultedState = vaultedStateSwitch.isOn

@@ -31,9 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		ShopifyCheckoutKit.configure {
 			/// Checkout color scheme setting
 			$0.colorScheme = .automatic
-
-			/// Enable preloading
-			$0.preloading.enabled = true
 			$0.logger = FileLogger()
 		}
 

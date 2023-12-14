@@ -37,14 +37,13 @@ public struct Configuration {
 
 	public var confetti = Configuration.Confetti()
 
-	public var preloading = Configuration.Preloading()
-
 	public var spinnerColor: UIColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
 	public var backgroundColor: UIColor = .systemBackground
 
 	public var logger: Logger = NoOpLogger()
 
+	public var preloading = Configuration.Preloading()
 }
 
 extension Configuration {
@@ -70,6 +69,10 @@ extension Configuration {
 
 extension Configuration {
 	public struct Preloading {
-		public var enabled: Bool = true
+		internal var enabled: Bool = false
+
+		public func clearCache() {
+			CheckoutWebView.invalidate()
+		}
 	}
 }
