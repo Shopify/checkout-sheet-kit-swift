@@ -26,10 +26,10 @@ import Foundation
 internal class ShopifyBundleFinder {}
 
 extension Bundle {
-	static var shopifyCheckoutKit: Bundle {
+	static var ShopifyCheckoutSheetKit: Bundle {
 	#if COCOAPODS
 		guard let cocoapodsBundle = Bundle(for: ShopifyBundleFinder.self)
-			.url(forResource: "ShopifyCheckoutKit", withExtension: "bundle")
+			.url(forResource: "ShopifyCheckoutSheetKit", withExtension: "bundle")
 			.flatMap({ Bundle(url: $0) })
 		else {
 			fatalError("[cocoapods] unable to load resource bundle")

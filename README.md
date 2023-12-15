@@ -37,7 +37,7 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 #### CocoaPods
 
 ```ruby
-pod "ShopifyCheckoutKit", "~> 0.7"
+pod "ShopifyCheckoutSheetKit", "~> 0.7"
 ```
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
@@ -47,7 +47,7 @@ For more information on CocoaPods, please see their [getting started guide](http
 Once the SDK has been added as a dependency, you can import the library:
 
 ```swift
-import ShopifyCheckoutKit
+import ShopifyCheckoutSheetKit
 ```
 
 To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GraphQL client to accomplish this and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
@@ -76,12 +76,12 @@ The `checkoutURL` object is a standard web checkout URL that can be opened in an
 
 ```swift
 import UIKit
-import ShopifyCheckoutKit
+import ShopifyCheckoutSheetKit
 
 class MyViewController: UIViewController {
   func presentCheckout() {
     let checkoutURL: URL = // from cart object
-    ShopifyCheckoutKit.present(checkout: checkoutURL, from: self, delegate: self)
+    ShopifyCheckoutSheetKit.present(checkout: checkoutURL, from: self, delegate: self)
   }
 }
 ```
@@ -110,7 +110,7 @@ To help optimize and deliver the best experience the SDK also provides a [preloa
 
 ### Configuration
 
-The SDK provides a way to customize the presented checkout experience via the `ShopifyCheckoutKit.configuration` object.
+The SDK provides a way to customize the presented checkout experience via the `ShopifyCheckoutSheetKit.configuration` object.
 
 #### `colorScheme`
 
@@ -118,16 +118,16 @@ By default, the SDK will match the user's device color appearance. This behavior
 
 ```swift
 // [Default] Automatically toggle idiomatic light and dark themes based on device preference (`UITraitCollection`)
-ShopifyCheckoutKit.configuration.colorScheme = .automatic
+ShopifyCheckoutSheetKit.configuration.colorScheme = .automatic
 
 // Force idiomatic light color scheme
-ShopifyCheckoutKit.configuration.colorScheme = .light
+ShopifyCheckoutSheetKit.configuration.colorScheme = .light
 
 // Force idiomatic dark color scheme
-ShopifyCheckoutKit.configuration.colorScheme = .dark
+ShopifyCheckoutSheetKit.configuration.colorScheme = .dark
 
 // Force web theme, as rendered by a mobile browser
-ShopifyCheckoutKit.configuration.colorScheme = .web
+ShopifyCheckoutSheetKit.configuration.colorScheme = .web
 ```
 
 #### `spinnerColor`
@@ -136,10 +136,10 @@ If the checkout session is not ready and being initialized, a loading spinner is
 
 ```swift
 // Use a custom UI color
-ShopifyCheckoutKit.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+ShopifyCheckoutSheetKit.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
 // Use a system color
-ShopifyCheckoutKit.configuration.spinnerColor = .systemBlue
+ShopifyCheckoutSheetKit.configuration.spinnerColor = .systemBlue
 ```
 
 _Note: use preloading to optimize and deliver an instant buyer experience._
@@ -150,10 +150,10 @@ While the checkout session is being initialized, the background color of the vie
 
 ```swift
 // Use a custom UI color
-ShopifyCheckoutKit.configuration.backgroundColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+ShopifyCheckoutSheetKit.configuration.backgroundColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
 // Use a system color
-ShopifyCheckoutKit.configuration.backgroundColor = .systemBackground
+ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
 ```
 
 ### Preloading
@@ -162,12 +162,12 @@ Initializing a checkout session requires communicating with Shopify servers and,
 
 Preloading is an advanced feature that will only be activated after calling:
 ```swift
-ShopifyCheckoutKit.preload(checkout: checkoutURL)
+ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 ```
 
 Once preload is called, the checkout view is cached. You are expected to re-call preload every time you need to refresh the checkout view. If for whatever reason you need to invalidate the cache without preloading/loading the checkout view again (e.g we use this during testing of our sample app), you can call this function:
 ```swift
-ShopifyCheckoutKit.configuration.preloading.clearCache()
+ShopifyCheckoutSheetKit.configuration.preloading.clearCache()
 ```
 
 **Important considerations:**
@@ -179,10 +179,10 @@ ShopifyCheckoutKit.configuration.preloading.clearCache()
 
 ### Monitoring the lifecycle of a checkout session
 
-You can use the `ShopifyCheckoutKitDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
+You can use the `ShopifyCheckoutSheetKitDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
 
 ```swift
-extension MyViewController: ShopifyCheckoutKitDelegate {
+extension MyViewController: ShopifyCheckoutSheetKitDelegate {
   func checkoutDidComplete() {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.

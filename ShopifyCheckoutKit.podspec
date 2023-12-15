@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.version = "0.7.0"
 
-  s.name    = "ShopifyCheckoutKit"
+  s.name    = "ShopifyCheckoutSheetKit"
   s.summary = "Enables Swift apps to embed the Shopify's highest converting, customizable, one-page checkout."
   s.author  = "Shopify Inc."
 
@@ -18,9 +18,9 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = "13.0"
 
-  s.source_files = "Sources/ShopifyCheckoutKit/**/*.swift"
+  s.source_files = "Sources/ShopifyCheckoutSheetKit/**/*.swift"
 
   s.resource_bundles = {
-    "ShopifyCheckoutKit" => ["Sources/ShopifyCheckoutKit/Assets.xcassets"]
+    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"]
   }
 end

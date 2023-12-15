@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import XCTest
-@testable import ShopifyCheckoutKit
+@testable import ShopifyCheckoutSheetKit
 
 class ExampleDelegate: CheckoutDelegate {
 	func checkoutDidComplete() {
@@ -31,10 +31,10 @@ class ExampleDelegate: CheckoutDelegate {
 	func checkoutDidCancel() {
 	}
 
-	func checkoutDidFail(errors: [ShopifyCheckoutKit.CheckoutError]) {
+	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {
 	}
 
-	func checkoutDidFail(error: ShopifyCheckoutKit.CheckoutError) {
+	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
 	}
 
 	func checkoutDidClickContactLink(url: URL) {
