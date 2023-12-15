@@ -29,7 +29,7 @@ enum BridgeError: Swift.Error {
 }
 
 enum CheckoutBridge {
-	static let schemaVersion = "6.0"
+	static let schemaVersion = "7.0"
 	static let messageHandler = "mobileCheckoutSdk"
 
 	static var applicationName: String {
@@ -39,10 +39,14 @@ enum CheckoutBridge {
 
 	static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {
 		if let payload = instrumentation.toBridgeEvent() {
-			// This is being wrapped in a timer as such due to a bug in loading of the event listeners on latest schema version. Will be removed once bug is fixed
-			let msg = "setTimeout(function() { window.MobileCheckoutSdk.dispatchMessage('instrumentation', \(payload));}, 1000 );"
-			webView.evaluateJavaScript(msg)
+			sendMessage(webView, messageName: "instrumentation", messageBody: payload)
 		}
+	}
+
+	static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
+		let dispatchMessageBody = messageBody != nil ? "'\(messageName)', \(messageBody!)" : "'\(messageName)'"
+		let script = dispatchMessageTemplate(body: dispatchMessageBody)
+		webView.evaluateJavaScript(script)
 	}
 
 	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
@@ -55,6 +59,18 @@ enum CheckoutBridge {
 		} catch {
 			throw BridgeError.invalidBridgeEvent(error)
 		}
+	}
+
+	static func dispatchMessageTemplate(body: String) -> String {
+		return """
+		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
+			window.MobileCheckoutSdk.dispatchMessage(\(body));
+		} else {
+			window.addEventListener('mobileCheckoutBridgeReady', function () {
+				window.MobileCheckoutSdk.dispatchMessage(\(body));
+			}, {passive: true, once: true});
+		}
+		"""
 	}
 }
 
