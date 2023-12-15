@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>StorefrontDomain</key>
-	<string>$(STOREFRONT_DOMAIN)</string>
 	<key>StorefrontAccessToken</key>
 	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
+	<key>StorefrontDomain</key>
+	<string>$(STOREFRONT_DOMAIN)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -23,15 +23,5 @@
 			</array>
 		</dict>
 	</dict>
-</dict>
-</plist>
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict/>
-	</array>
 </dict>
 </plist>
