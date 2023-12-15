@@ -32,7 +32,7 @@ enum CheckoutBridge {
 	static let schemaVersion = "7.0"
 	static let messageHandler = "mobileCheckoutSdk"
 	static var hasInitialized = false
-	static var messageBuffer = Array<() -> Void>()
+	static var messageBuffer = [() -> Void]()
 
 	static var applicationName: String {
 		let theme = ShopifyCheckoutKit.configuration.colorScheme.rawValue
@@ -49,7 +49,7 @@ enum CheckoutBridge {
 
 	static func sendMessage(_ webView: WKWebView, message: String) {
 		let script = "window.MobileCheckoutSdk.dispatchMessage('\(message)');"
-		if (hasInitialized) {
+		if hasInitialized {
 			webView.evaluateJavaScript(script)
 		} else {
 			messageBuffer.append {
