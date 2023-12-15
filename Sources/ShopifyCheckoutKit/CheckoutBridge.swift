@@ -29,8 +29,10 @@ enum BridgeError: Swift.Error {
 }
 
 enum CheckoutBridge {
-	static let schemaVersion = "6.0"
+	static let schemaVersion = "7.0"
 	static let messageHandler = "mobileCheckoutSdk"
+	static var hasInitialized = false
+	static var messageBuffer = Array<() -> Void>()
 
 	static var applicationName: String {
 		let theme = ShopifyCheckoutKit.configuration.colorScheme.rawValue
@@ -45,6 +47,17 @@ enum CheckoutBridge {
 		}
 	}
 
+	static func sendMessage(_ webView: WKWebView, message: String) {
+		let script = "window.MobileCheckoutSdk.dispatchMessage('\(message)');"
+		if (hasInitialized) {
+			webView.evaluateJavaScript(script)
+		} else {
+			messageBuffer.append {
+				webView.evaluateJavaScript(script)
+			}
+		}
+	}
+
 	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
 		guard let body = message.body as? String, let data = body.data(using: .utf8) else {
 			throw BridgeError.invalidBridgeEvent()
@@ -56,6 +69,11 @@ enum CheckoutBridge {
 			throw BridgeError.invalidBridgeEvent(error)
 		}
 	}
+
+	static func reset() {
+		messageBuffer.removeAll()
+		hasInitialized = false
+	}
 }
 
 extension CheckoutBridge {
@@ -64,6 +82,7 @@ extension CheckoutBridge {
 		case checkoutExpired
 		case checkoutUnavailable
 		case checkoutModalToggled(modalVisible: Bool)
+		case `init`
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -85,6 +104,13 @@ extension CheckoutBridge {
 			case "checkoutBlockingEvent":
 				let modalVisible = try container.decode(String.self, forKey: .body)
 				self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)
+			case "init":
+				self = .`init`
+				CheckoutBridge.hasInitialized = true
+				CheckoutBridge.messageBuffer.forEach { delayedSend in
+					delayedSend()
+				}
+				CheckoutBridge.messageBuffer.removeAll()
 			default:
 				self = .unsupported(name)
 			}

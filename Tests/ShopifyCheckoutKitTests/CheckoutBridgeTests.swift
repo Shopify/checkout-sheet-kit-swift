@@ -38,6 +38,10 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
+	override func setUp() {
+		CheckoutBridge.reset()
+	}
+
 	func testDecodeThrowsInvalidBridgeEventWhenNonStringBody() throws {
 		let mock = WKScriptMessageMock(body: 1234)
 
@@ -81,6 +85,20 @@ class CheckoutBridgeTests: XCTestCase {
 
 		guard case CheckoutBridge.WebEvent.checkoutComplete = result else {
 			return XCTFail("expected CheckoutScriptMessage.checkoutComplete, got \(result)")
+		}
+	}
+
+	func testDecodeSupportsInitEvent() throws {
+		let mock = WKScriptMessageMock(body: """
+	{
+		"name": "init"
+	}
+	""")
+
+		let result = try CheckoutBridge.decode(mock)
+
+		guard case CheckoutBridge.WebEvent.`init` = result else {
+			return XCTFail("expected CheckoutScriptMessage.`init`, got \(result)")
 		}
 	}
 
@@ -140,5 +158,58 @@ class CheckoutBridgeTests: XCTestCase {
 			XCTAssertEqual(decodedEvent?.detail.value, 1)
 			XCTAssertEqual(decodedEvent?.detail.type, .incrementCounter)
 		}
+	}
+
+	func testSendMessageShouldCallEvaluateJavaScriptIfBridgeInitialized() {
+		let webView = MockWebView()
+		webView.expectedScript = expectedPresentedScript()
+		let evaluateJavaScriptExpectation = expectation(
+			description: "evaluateJavaScript was called"
+		)
+		webView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+
+		CheckoutBridge.hasInitialized = true
+		CheckoutBridge.sendMessage(webView, message: "presented")
+
+		wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+	}
+
+	func testSendMessageShouldBufferUntilIntialized() throws {
+		let webView = MockWebView()
+		webView.expectedScript = expectedPresentedScript()
+		let evaluateJavaScriptExpectation = expectation(
+			description: "evaluateJavaScript was called"
+		)
+		webView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+
+		CheckoutBridge.sendMessage(webView, message: "presented")
+		XCTAssertEqual(CheckoutBridge.messageBuffer.count, 1)
+
+		let mock = WKScriptMessageMock(body: """
+			{
+				"name": "init"
+			}
+		""")
+
+		_ = try CheckoutBridge.decode(mock)
+
+		wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+	}
+
+	func testResetsBridgeState() {
+		CheckoutBridge.messageBuffer = Array()
+		CheckoutBridge.messageBuffer.append {
+			print("script")
+		}
+		CheckoutBridge.hasInitialized = true
+
+		CheckoutBridge.reset()
+
+		XCTAssertEqual(0, CheckoutBridge.messageBuffer.count)
+		XCTAssertEqual(false, CheckoutBridge.hasInitialized)
+	}
+
+	private func expectedPresentedScript() -> String {
+		return "window.MobileCheckoutSdk.dispatchMessage('presented');"
 	}
 }

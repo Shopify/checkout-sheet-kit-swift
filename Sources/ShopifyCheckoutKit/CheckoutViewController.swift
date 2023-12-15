@@ -29,6 +29,7 @@ public class CheckoutViewController: UINavigationController {
 		let rootViewController = CheckoutWebViewController(
 			checkoutURL: url, delegate: delegate
 		)
+		rootViewController.notifyPresented()
 		super.init(rootViewController: rootViewController)
 		presentationController?.delegate = rootViewController
 	}

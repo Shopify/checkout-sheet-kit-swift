@@ -97,6 +97,10 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		loadCheckout()
 	}
 
+	func notifyPresented() {
+		CheckoutBridge.sendMessage(checkoutView, message: "presented")
+	}
+
 	private func loadCheckout() {
 		if checkoutView.url == nil {
 			checkoutView.alpha = 0
@@ -117,6 +121,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 	}
 
 	private func didCancel() {
+		CheckoutBridge.reset()
 		CheckoutWebView.invalidate()
 		delegate?.checkoutDidCancel()
 	}
