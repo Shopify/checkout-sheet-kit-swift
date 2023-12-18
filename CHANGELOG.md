@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 - December 18, 2023
+
+- Adds support for SwiftUI
+- `CheckoutViewController`` is now public for SwiftUI compatibility and to support UI modification requests
+- Telemetry improvements
+- Improved documentation
+
 ## 0.7.0 - November 20, 2023
 
 - Adds support for CocoaPods.
