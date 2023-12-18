@@ -45,13 +45,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
 		super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
-		title = "Cart"
-
 		navigationItem.rightBarButtonItem = UIBarButtonItem(
 			title: "Reset", style: .plain, target: self, action: #selector(resetCart)
 		)
-
-		tabBarItem.image = UIImage(systemName: "cart")
 
 		CartManager.shared.$cart
 			.receive(on: DispatchQueue.main)
