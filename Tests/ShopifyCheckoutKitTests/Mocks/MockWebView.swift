@@ -34,8 +34,6 @@ class MockWebView: WKWebView {
 	override func evaluateJavaScript(_ javaScriptString: String) async throws -> Any {
 		if javaScriptString == expectedScript {
 			evaluateJavaScriptExpectation?.fulfill()
-		} else {
-			print("Script did not match. Actual: \(javaScriptString), expected: \(expectedScript)")
 		}
 		return true
 	}

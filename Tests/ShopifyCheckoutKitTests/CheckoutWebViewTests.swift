@@ -134,4 +134,39 @@ class CheckoutWebViewTests: XCTestCase {
 
 		waitForExpectations(timeout: 0.5, handler: nil)
     }
+
+	func testEmitsPresentedMessageWhenPresentedAndFinishedLoading() {
+		let testCheckoutView = TestCheckoutWebView()
+		testCheckoutView.expectedScript = """
+		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
+			window.MobileCheckoutSdk.dispatchMessage('presented');
+		} else {
+			window.addEventListener('mobileCheckoutBridgeReady', function () {
+				window.MobileCheckoutSdk.dispatchMessage('presented');
+			}, {passive: true, once: true});
+		}
+		"""
+		let evaluateJavaScriptExpectation = expectation(
+			description: "evaluateJavaScript was called"
+		)
+		testCheckoutView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+
+		testCheckoutView.checkoutDidPresent = true
+		testCheckoutView.checkoutDidLoad = true
+
+		wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+	}
+}
+
+class TestCheckoutWebView: CheckoutWebView {
+	var expectedScript = ""
+
+	var evaluateJavaScriptExpectation: XCTestExpectation?
+
+	override func evaluateJavaScript(_ javaScriptString: String) async throws -> Any {
+		if javaScriptString == expectedScript {
+			evaluateJavaScriptExpectation?.fulfill()
+		}
+		return true
+	}
 }
