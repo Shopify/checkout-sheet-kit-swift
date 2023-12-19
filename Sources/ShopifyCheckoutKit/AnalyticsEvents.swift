@@ -221,6 +221,8 @@ struct PixelEventsCollectionViewedData {
     var collection: Collection
 }
 
+struct PixelEventsPageViewedData {}
+
 public struct PixelEventsCartViewed {
     var clientId: ClientId?
     var context: Context?
@@ -279,6 +281,15 @@ struct PixelEventsCollectionViewed {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsCollectionViewedData
+    var id: Id
+    var name: String
+    var timestamp: Timestamp
+}
+
+struct PixelEventsPageViewed {
+    var clientId: ClientId
+    var context: Context
+    var data: PixelEventsPageViewedData
     var id: Id
     var name: String
     var timestamp: Timestamp
