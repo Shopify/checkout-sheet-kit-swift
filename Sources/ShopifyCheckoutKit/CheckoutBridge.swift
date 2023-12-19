@@ -44,7 +44,7 @@ enum CheckoutBridge {
 	}
 
 	static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
-		var dispatchMessageBody: String
+		let dispatchMessageBody: String
 		if let body = messageBody {
 			dispatchMessageBody = "'\(messageName)', \(body)"
 		} else {
