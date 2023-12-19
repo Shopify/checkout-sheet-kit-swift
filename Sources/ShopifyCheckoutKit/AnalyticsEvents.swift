@@ -227,6 +227,10 @@ struct PixelEventsPaymentInfoSubmittedData {
     var checkout: Checkout
 }
 
+struct PixelEventsProductAddedToCartData {
+    var cartLine: CartLine?
+}
+
 public struct PixelEventsCartViewed {
     var clientId: ClientId?
     var context: Context?
@@ -254,7 +258,7 @@ public struct PixelEventsCheckoutCompleted {
     var timestamp: Timestamp
 }
 
-struct PixelEventsCheckoutContactInfoSubmitted {
+public struct PixelEventsCheckoutContactInfoSubmitted {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsCheckoutContactInfoSubmittedData
@@ -263,7 +267,7 @@ struct PixelEventsCheckoutContactInfoSubmitted {
     var timestamp: Timestamp
 }
 
-struct PixelEventsCheckoutShippingInfoSubmitted {
+public struct PixelEventsCheckoutShippingInfoSubmitted {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsCheckoutShippingInfoSubmittedData
@@ -272,7 +276,7 @@ struct PixelEventsCheckoutShippingInfoSubmitted {
     var timestamp: Timestamp
 }
 
-struct PixelEventsCheckoutStarted {
+public struct PixelEventsCheckoutStarted {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsCheckoutStartedData
@@ -281,7 +285,7 @@ struct PixelEventsCheckoutStarted {
     var timestamp: Timestamp
 }
 
-struct PixelEventsCollectionViewed {
+public struct PixelEventsCollectionViewed {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsCollectionViewedData
@@ -290,7 +294,7 @@ struct PixelEventsCollectionViewed {
     var timestamp: Timestamp
 }
 
-struct PixelEventsPageViewed {
+public struct PixelEventsPageViewed {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsPageViewedData
@@ -299,10 +303,19 @@ struct PixelEventsPageViewed {
     var timestamp: Timestamp
 }
 
-struct PixelEventsPaymentInfoSubmitted {
+public struct PixelEventsPaymentInfoSubmitted {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsPaymentInfoSubmittedData
+    var id: Id
+    var name: String
+    var timestamp: Timestamp
+}
+
+public struct PixelEventsProductAddedToCart {
+    var clientId: ClientId
+    var context: Context
+    var data: PixelEventsProductAddedToCartData
     var id: Id
     var name: String
     var timestamp: Timestamp
