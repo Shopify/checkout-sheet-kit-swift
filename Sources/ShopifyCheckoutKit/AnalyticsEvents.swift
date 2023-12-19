@@ -1,7 +1,5 @@
 typealias ClientId = String?
-
 typealias Id = String?
-
 typealias Timestamp = String?
 
 struct Location {
@@ -377,3 +375,22 @@ public struct PixelEventsSearchSubmitted {
     var name: String
     var timestamp: Timestamp
 }
+
+public struct PixelEvents {
+    var cart_viewed: PixelEventsCartViewed
+    var checkout_address_info_submitted: PixelEventsCheckoutAddressInfoSubmitted
+    var checkout_completed: PixelEventsCheckoutCompleted
+    var checkout_contact_info_submitted: PixelEventsCheckoutContactInfoSubmitted
+    var checkout_shipping_info_submitted: PixelEventsCheckoutShippingInfoSubmitted
+    var checkout_started: PixelEventsCheckoutStarted
+    var collection_viewed: PixelEventsCollectionViewed
+    var page_viewed: PixelEventsPageViewed
+    var payment_info_submitted: PixelEventsPaymentInfoSubmitted
+    var product_added_to_cart: PixelEventsProductAddedToCart
+    var product_removed_from_cart: PixelEventsProductRemovedFromCart
+    var product_variant_viewed: PixelEventsProductVariantViewed
+    var product_viewed: PixelEventsProductViewed
+    var search_submitted: PixelEventsSearchSubmitted
+}
+
+public typealias CustomEvents: [String: CustomEvent]
