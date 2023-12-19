@@ -235,6 +235,10 @@ struct PixelEventsProductRemovedFromCartData {
     var cartLine: CartLine?
 }
 
+struct PixelEventsProductVariantViewedData {
+    var productVariant: ProductVariant
+}
+
 public struct PixelEventsCartViewed {
     var clientId: ClientId?
     var context: Context?
@@ -329,6 +333,15 @@ public struct PixelEventsProductRemovedFromCart {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsProductRemovedFromCartData
+    var id: Id
+    var name: String
+    var timestamp: Timestamp
+}
+
+public struct PixelEventsProductVariantViewed {
+    var clientId: ClientId
+    var context: Context
+    var data: PixelEventsProductVariantViewedData
     var id: Id
     var name: String
     var timestamp: Timestamp
