@@ -376,20 +376,29 @@ public struct SearchSubmitted {
 }
 
 public struct PixelEvents {
-    var cartViewed: CartViewed
-    var checkoutAddressInfoSubmitted: CheckoutAddressInfoSubmitted
-    var checkoutCompleted: CheckoutCompleted
-    var checkoutContactInfoSubmitted: CheckoutContactInfoSubmitted
-    var checkoutShippingInfoSubmitted: CheckoutShippingInfoSubmitted
-    var checkoutStarted: CheckoutStarted
-    var collectionViewed: CollectionViewed
-    var pageViewed: PageViewed
-    var paymentInfoSubmitted: PaymentInfoSubmitted
-    var productAddedToCart: ProductAddedToCart
-    var productRemovedFromCart: ProductRemovedFromCart
-    var productVariantViewed: ProductVariantViewed
-    var productViewed: ProductViewed
-    var searchSubmitted: SearchSubmitted
+    var cartViewed: CartViewed?
+    var checkoutAddressInfoSubmitted: CheckoutAddressInfoSubmitted?
+    var checkoutCompleted: CheckoutCompleted?
+    var checkoutContactInfoSubmitted: CheckoutContactInfoSubmitted?
+    var checkoutShippingInfoSubmitted: CheckoutShippingInfoSubmitted?
+    var checkoutStarted: CheckoutStarted?
+    var collectionViewed: CollectionViewed?
+    var pageViewed: PageViewed?
+    var paymentInfoSubmitted: PaymentInfoSubmitted?
+    var productAddedToCart: ProductAddedToCart?
+    var productRemovedFromCart: ProductRemovedFromCart?
+    var productVariantViewed: ProductVariantViewed?
+    var productViewed: ProductViewed?
+    var searchSubmitted: SearchSubmitted?
 }
 
-public typealias CustomEvents: [String: CustomEvent]
+struct CustomEvent {
+    var clientId: ClientId?
+    var context: Context?
+    var customData: [String: Any]?
+    var id: Id?
+    var name: String?
+    var timestamp: Timestamp?
+}
+
+public typealias CustomEvents = [String: CustomEvent]
