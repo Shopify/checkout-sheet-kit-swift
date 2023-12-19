@@ -44,7 +44,12 @@ enum CheckoutBridge {
 	}
 
 	static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
-		let dispatchMessageBody = messageBody != nil ? "'\(messageName)', \(messageBody!)" : "'\(messageName)'"
+		var dispatchMessageBody: String
+		if let body = messageBody {
+			dispatchMessageBody = "'\(messageName)', \(body)"
+		} else {
+			dispatchMessageBody = "'\(messageName)'"
+		}
 		let script = dispatchMessageTemplate(body: dispatchMessageBody)
 		webView.evaluateJavaScript(script)
 	}
