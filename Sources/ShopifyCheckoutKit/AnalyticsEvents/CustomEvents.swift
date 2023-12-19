@@ -25,9 +25,9 @@ struct CustomEvent {
     var clientId: ClientId?
     var context: Context?
     var customData: [String: Any]?
-    var id: Id?
+    var id: Identifier?
     var name: String?
     var timestamp: Timestamp?
 }
 
-public typealias CustomEvents = [String: CustomEvent]
+typealias CustomEvents = [String: CustomEvent]
