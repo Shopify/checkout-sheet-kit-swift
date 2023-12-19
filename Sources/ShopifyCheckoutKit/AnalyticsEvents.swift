@@ -195,6 +195,10 @@ struct PixelEventsCheckoutAddressInfoSubmittedData {
     var checkout: Checkout
 }
 
+struct PixelEventsCheckoutCompletedData {
+    var checkout: Checkout
+}
+
 public struct PixelEventsCartViewed {
     var clientId: ClientId?
     var context: Context?
@@ -208,6 +212,15 @@ public struct PixelEventsCheckoutAddressInfoSubmitted {
     var clientId: ClientId
     var context: Context
     var data: PixelEventsCheckoutAddressInfoSubmittedData
+    var id: Id
+    var name: String
+    var timestamp: Timestamp
+}
+
+public struct PixelEventsCheckoutCompleted {
+    var clientId: ClientId
+    var context: Context
+    var data: PixelEventsCheckoutCompletedData
     var id: Id
     var name: String
     var timestamp: Timestamp
