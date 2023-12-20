@@ -30,6 +30,6 @@
 - [ ] I have bumped the version number in the [README](https://github.com/Shopify/checkout-kit-swift/blob/main/README.md#packageswift).
 - [ ] I have added a [Changelog](./CHANGELOG.md) entry.
 
-### After merging
+### After merging
 
 If your changes required a version bump, please add an entry under the [Releases](https://github.com/Shopify/checkout-kit-swift/releases) page - doing so will trigger a CI workflow to publish the latest Cocoapod.
