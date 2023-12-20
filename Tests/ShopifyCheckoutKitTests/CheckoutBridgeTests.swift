@@ -162,7 +162,6 @@ class CheckoutBridgeTests: XCTestCase {
 			description: "evaluateJavaScript was called"
 		)
 		webView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
-		let payload = InstrumentationPayload(name: "test", value: 1, type: .incrementCounter)
 
 		CheckoutBridge.sendMessage(webView, messageName: "payload", messageBody: "{\"one\": true}")
 
