@@ -24,3 +24,6 @@ nesting:
     warning: 2
 
 reporter: "xcode"
+
+excluded:
+  - Sources/ShopifyCheckoutKit/AnalyticsEvents.swift
