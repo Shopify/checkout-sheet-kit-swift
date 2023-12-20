@@ -141,4 +141,54 @@ class CheckoutBridgeTests: XCTestCase {
 			XCTAssertEqual(decodedEvent?.detail.type, .incrementCounter)
 		}
 	}
+
+	func testSendMessageShouldCallEvaluateJavaScriptPresented() {
+		let webView = MockWebView()
+		webView.expectedScript = expectedPresentedScript()
+		let evaluateJavaScriptExpectation = expectation(
+			description: "evaluateJavaScript was called"
+		)
+		webView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+
+		CheckoutBridge.sendMessage(webView, messageName: "presented", messageBody: nil)
+
+		wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+	}
+
+	func testSendMessageWithPayloadEvaulatesJavaScript() {
+		let webView = MockWebView()
+		webView.expectedScript = expectedPayloadScript()
+		let evaluateJavaScriptExpectation = expectation(
+			description: "evaluateJavaScript was called"
+		)
+		webView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+
+		CheckoutBridge.sendMessage(webView, messageName: "payload", messageBody: "{\"one\": true}")
+
+		wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+	}
+
+	private func expectedPresentedScript() -> String {
+		return """
+		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
+			window.MobileCheckoutSdk.dispatchMessage('presented');
+		} else {
+			window.addEventListener('mobileCheckoutBridgeReady', function () {
+				window.MobileCheckoutSdk.dispatchMessage('presented');
+			}, {passive: true, once: true});
+		}
+		"""
+	}
+
+	private func expectedPayloadScript() -> String {
+		return """
+		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
+			window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
+		} else {
+			window.addEventListener('mobileCheckoutBridgeReady', function () {
+				window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
+			}, {passive: true, once: true});
+		}
+		"""
+	}
 }

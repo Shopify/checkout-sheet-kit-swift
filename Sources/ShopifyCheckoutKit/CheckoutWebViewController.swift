@@ -97,6 +97,10 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		loadCheckout()
 	}
 
+	func notifyPresented() {
+		checkoutView.checkoutDidPresent = true
+	}
+
 	private func loadCheckout() {
 		if checkoutView.url == nil {
 			checkoutView.alpha = 0

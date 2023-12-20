@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1 - December 20, 2023
+
+Emit a presented message to checkout when the checkout sheet is raised as groundwork for supporting analytics / pixel events.
+
 ## 0.8.0 - December 18, 2023
 
 - Adds support for SwiftUI

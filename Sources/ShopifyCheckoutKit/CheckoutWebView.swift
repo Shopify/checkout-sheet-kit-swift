@@ -61,6 +61,17 @@ class CheckoutWebView: WKWebView {
 	// MARK: Properties
 
 	weak var viewDelegate: CheckoutWebViewDelegate?
+	var presentedEventDidDispatch = false
+	var checkoutDidPresent: Bool = false {
+		didSet {
+			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+		}
+	}
+	var checkoutDidLoad: Bool = false {
+		didSet {
+			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+		}
+	}
 
 	// MARK: Initializers
 
@@ -98,6 +109,13 @@ class CheckoutWebView: WKWebView {
 
 	func load(checkout url: URL) {
 		load(URLRequest(url: url))
+	}
+
+	private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {
+		if (checkoutDidLoad && checkoutDidPresent) && !presentedEventDidDispatch {
+			CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
+			presentedEventDidDispatch = true
+		}
 	}
 }
 
@@ -189,7 +207,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 			ShopifyCheckoutKit.configuration.logger.log(message)
 			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
 		}
-
+		checkoutDidLoad = true
 		timer = nil
 	}
 
