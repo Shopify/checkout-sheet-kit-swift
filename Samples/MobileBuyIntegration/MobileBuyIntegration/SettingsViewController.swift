@@ -156,7 +156,7 @@ class SettingsViewController: UITableViewController {
 	}
 
 	@objc private func clearPreloadingCache() {
-		ShopifyCheckoutKit.configuration.preloading.clearCache()
+		ShopifyCheckoutKit.configuration.preloading.invalidateCache()
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

@@ -71,7 +71,7 @@ extension Configuration {
 	public struct Preloading {
 		internal var enabled: Bool = false
 
-		public func clearCache() {
+		public func invalidateCache() {
 			CheckoutWebView.invalidate()
 		}
 	}
