@@ -67,10 +67,6 @@ enum CheckoutBridge {
 		}
 	}
 
-	//		  setInterval(() => {
-	//			window.MobileCheckoutSdk?.postMessage({handlerId: "debug"});
-	//		   }, 2_000);
-
 	static func dispatchMessageTemplate(body: String) -> String {
 		return """
 		if (window.MobileCheckoutSdk) {

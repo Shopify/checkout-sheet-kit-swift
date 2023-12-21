@@ -82,6 +82,24 @@ class CheckoutWebView: WKWebView {
 	override init(frame: CGRect, configuration: WKWebViewConfiguration) {
 		configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
 
+		let source = """
+		 const script = document.createElement('script');
+		 script.type = 'text/javascript';
+		 script.text = 'window.onload = () => window.MobileCheckoutSdk.postMessage({handlerId: "YES_I_HAVE_LOADED"})';
+		 document.body.appendChild(script);
+		"""
+
+		let script = WKUserScript(
+			source: source,
+			injectionTime: .atDocumentEnd,
+			forMainFrameOnly: true
+		)
+
+		let contentController = WKUserContentController()
+		contentController.addUserScript(script)
+
+		configuration.userContentController = contentController
+
 		super.init(frame: frame, configuration: configuration)
 
 		#if DEBUG
