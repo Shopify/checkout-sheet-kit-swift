@@ -51,6 +51,7 @@ enum CheckoutBridge {
 			dispatchMessageBody = "'\(messageName)'"
 		}
 		let script = dispatchMessageTemplate(body: dispatchMessageBody)
+		print("[debug] Sending message (\"\(messageName)\") from SDK -> Checkout")
 		webView.evaluateJavaScript(script)
 	}
 
@@ -66,13 +67,18 @@ enum CheckoutBridge {
 		}
 	}
 
+	//		  setInterval(() => {
+	//			window.MobileCheckoutSdk?.postMessage({handlerId: "debug"});
+	//		   }, 2_000);
+
 	static func dispatchMessageTemplate(body: String) -> String {
 		return """
-		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-			window.MobileCheckoutSdk.dispatchMessage(\(body));
+		if (window.MobileCheckoutSdk) {
+			window.MobileCheckoutSdk.postMessage({handlerId: \(body)});
 		} else {
+			console.log("MobileCheckoutSdk was not ready in time. Adding event listener...", window.MobileCheckoutSdk);
 			window.addEventListener('mobileCheckoutBridgeReady', function () {
-				window.MobileCheckoutSdk.dispatchMessage(\(body));
+				window.MobileCheckoutSdk.postMessage({handlerId: \(body)});
 			}, {passive: true, once: true});
 		}
 		"""
@@ -81,6 +87,7 @@ enum CheckoutBridge {
 
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
+		case checkoutAnalytics
 		case checkoutComplete
 		case checkoutExpired
 		case checkoutUnavailable
@@ -97,7 +104,12 @@ extension CheckoutBridge {
 
 			let name = try container.decode(String.self, forKey: .name)
 
+			var supported = true
+
 			switch name {
+			case "analytics":
+				print("[debug] -----> RECEIVED ANALYTICS EVENT")
+				self = .checkoutAnalytics
 			case "completed":
 				self = .checkoutComplete
 			case "error":
@@ -108,7 +120,10 @@ extension CheckoutBridge {
 				self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)
 			default:
 				self = .unsupported(name)
+				supported = false
 			}
+
+			print("[debug] RECEIVED EVENT: \(name) \(supported ? "" : "(unsupported)")")
 		}
 	}
 }

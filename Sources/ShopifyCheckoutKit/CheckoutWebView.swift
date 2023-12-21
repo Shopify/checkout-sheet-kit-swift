@@ -64,12 +64,16 @@ class CheckoutWebView: WKWebView {
 	var presentedEventDidDispatch = false
 	var checkoutDidPresent: Bool = false {
 		didSet {
-			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			if checkoutDidPresent {
+				dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			}
 		}
 	}
 	var checkoutDidLoad: Bool = false {
 		didSet {
-			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			if checkoutDidLoad {
+				dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			}
 		}
 	}
 
@@ -115,7 +119,27 @@ class CheckoutWebView: WKWebView {
 		if (checkoutDidLoad && checkoutDidPresent) && !presentedEventDidDispatch {
 			CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
 			presentedEventDidDispatch = true
+
+			if let view = CheckoutWebView.cache?.view {
+				print("[debug] Draining queue from dispatchPresentedMessage")
+				drainAnalyticsQueue(view)
+			}
 		}
+	}
+
+	func drainAnalyticsQueue(_ webView: WKWebView) {
+		let script = """
+		const checkExist = setInterval(function() {
+			console.log("Checking...")
+			if (window.MobileCheckoutSdk) {
+				clearInterval(checkExist);
+				window.MobileCheckoutSdk.postMessage({handlerId: "analytics"});
+			}
+		}, 100);
+		"""
+
+//		print("[debug] Draining analytics queue...")
+		webView.evaluateJavaScript(script)
 	}
 }
 
@@ -189,6 +213,11 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		timer = Date()
+		print("[debug] --------------------------------")
+		print("[debug] Navigating to \(webView.url!)...")
+		print("[debug] checkoutDidLoad: \(checkoutDidLoad)")
+		print("[debug] checkoutDidPresent: \(checkoutDidPresent)")
+		print("[debug] --------------------------------")
 		viewDelegate?.checkoutViewDidStartNavigation()
 	}
 
@@ -208,6 +237,11 @@ extension CheckoutWebView: WKNavigationDelegate {
 			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
 		}
 		checkoutDidLoad = true
+
+		if checkoutDidPresent {
+			print("[debug] Draining queue from didFinish")
+			drainAnalyticsQueue(webView)
+		}
 		timer = nil
 	}
 
