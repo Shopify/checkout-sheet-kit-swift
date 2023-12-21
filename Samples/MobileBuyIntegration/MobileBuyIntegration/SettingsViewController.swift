@@ -21,193 +21,87 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
+import SwiftUI
+import Combine
 import ShopifyCheckoutKit
 
-class SettingsViewController: UITableViewController {
+struct SettingsView: View {
+	@State private var preloadingEnabled = ShopifyCheckoutKit.configuration.preloading.enabled
+	@State private var useVaultedState = appConfiguration.useVaultedState
+	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
+	@State private var selectedColorScheme = ShopifyCheckoutKit.configuration.colorScheme
+	@State private var colorScheme: ColorScheme = .light
 
-	// MARK: Properties
-	enum Section: Int, CaseIterable {
-		case preloading = 0
-		case vaultedState = 1
-		case colorScheme = 2
-		case version = 3
-		case logs = 4
-		case undefined = -1
+	var body: some View {
+		NavigationView {
+			List {
+				Section(header: Text("Features")) {
+					Toggle("Preload checkout", isOn: $preloadingEnabled)
+						.onChange(of: preloadingEnabled) { newValue in
+							ShopifyCheckoutKit.configuration.preloading.enabled = newValue
+						}
+					Toggle("Prefill buyer information", isOn: $useVaultedState)
+						.onChange(of: useVaultedState) { newValue in
+							appConfiguration.useVaultedState = newValue
+						}
+				}
 
-		static func from(_ rawValue: Int) -> Section {
-			return Section(rawValue: rawValue) ?? .undefined
-		}
-	}
+				Section(header: Text("Color Scheme"), footer: Text("NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again.")) {
+					ForEach(Configuration.ColorScheme.allCases, id: \.self) { scheme in
+						ColorSchemeView(scheme: scheme, isSelected: scheme == selectedColorScheme)
+							.background(Color.clear)
+							.contentShape(Rectangle())
+							.onTapGesture {
+								selectedColorScheme = scheme
+								ShopifyCheckoutKit.configuration.colorScheme = scheme
+								ShopifyCheckoutKit.configuration.spinnerColor = scheme.spinnerColor
+								ShopifyCheckoutKit.configuration.backgroundColor = scheme.backgroundColor
+								NotificationCenter.default.post(name: .colorSchemeChanged, object: nil)
+							}
+					}
+				}
 
-	private var logs: [String?] = []
+				Section(header: Text("Version")) {
+					HStack {
+						Text("App version")
+						Spacer()
+						Text(currentVersion())
+							.font(.system(size: 14))
+							.foregroundStyle(.gray)
+					}
+					HStack {
+						Text("SDK version")
+						Spacer()
+						Text(ShopifyCheckoutKit.version)
+							.font(.system(size: 14))
+							.foregroundStyle(.gray)
+					}
+				}
 
-	private lazy var preloadingSwitch: UISwitch = {
-		let view = UISwitch()
-		view.isOn = ShopifyCheckoutKit.configuration.preloading.enabled
-		view.addTarget(self, action: #selector(preloadingSwitchDidChange), for: .valueChanged)
-		return view
-	}()
-
-	private lazy var vaultedStateSwitch: UISwitch = {
-		let view = UISwitch()
-		view.isOn = appConfiguration.useVaultedState
-		view.addTarget(self, action: #selector(vaultedStateSwitchDidChange), for: .valueChanged)
-		return view
-	}()
-
-	// MARK: Initializers
-
-	init() {
-		super.init(style: .grouped)
-
-		title = "Settings"
-
-		tabBarItem.image = UIImage(systemName: "gearshape.2")
-	}
-
-	required init?(coder: NSCoder) {
-		fatalError("not implemented")
-	}
-
-	// MARK: UIViewController
-	override func viewDidLoad() {
-		super.viewDidLoad()
-
-		tableView.register(Cell.self, forCellReuseIdentifier: "cell")
-	}
-
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-
-		logs = LogReader.shared.readLogs() ?? []
-
-		DispatchQueue.main.async {
-			self.tableView.reloadSections(IndexSet(integer: Section.logs.rawValue), with: .automatic)
-		}
-	}
-
-	// MARK: UITableViewDataSource
-
-	override func numberOfSections(in tableView: UITableView) -> Int {
-		return Section.allCases.count
-	}
-
-	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		switch Section.from(section) {
-		case Section.logs:
-			return "Logs"
-		case Section.colorScheme:
-			return "Color Scheme"
-		default:
-			return nil
-		}
-	}
-
-	override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		switch Section.from(section) {
-		case Section.colorScheme:
-			return "NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again."
-		default:
-			return nil
-		}
-	}
-
-	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		switch Section.from(section) {
-		case Section.preloading:
-			return 1
-		case Section.vaultedState:
-			return 1
-		case Section.colorScheme:
-			return ShopifyCheckoutKit.Configuration.ColorScheme.allCases.count
-		case Section.version:
-			return 1
-		case Section.logs:
-			return logs.count > 10 ? 10 : logs.count
-		default:
-			return 0
-		}
-	}
-
-	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-
-		var content = cell.defaultContentConfiguration()
-
-		switch Section.from(indexPath.section) {
-		case Section.preloading:
-			content.text = "Preload checkout"
-			cell.accessoryView = preloadingSwitch
-		case Section.vaultedState:
-			content.text = "Prefill buyer information"
-			cell.accessoryView = vaultedStateSwitch
-		case Section.colorScheme:
-			let scheme = colorScheme(at: indexPath)
-			content.text = scheme.prettyTitle
-			content.secondaryText = ShopifyCheckoutKit.configuration.colorScheme == scheme ? "Active" : ""
-		case Section.version:
-			content = UIListContentConfiguration.valueCell()
-			content.text = "Version"
-			content.secondaryText = currentVersion()
-		case Section.logs:
-			content = UIListContentConfiguration.valueCell()
-			if indexPath.row < logs.count {
-				content.text = logs[indexPath.row]
-			} else {
-				content.text = "No log available"
+				Section(header: Text("Logs")) {
+					ForEach(logs.prefix(10), id: \.self) { log in
+						Text(log ?? "No log available")
+							.font(.system(size: 12))
+					}
+				}
 			}
-			content.textProperties.font = UIFont.systemFont(ofSize: 12)
-		default:
-			()
+			.listStyle(GroupedListStyle())
+			.navigationTitle("Settings")
+			.onAppear {
+				logs = LogReader.shared.readLogs() ?? []
+			}
 		}
-
-		cell.contentConfiguration = content
-
-		return cell
-	}
-
-	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		switch Section.from(indexPath.section) {
-		case Section.preloading:
-			preloadingSwitch.isOn.toggle()
-			preloadingSwitchDidChange()
-		case Section.vaultedState:
-			vaultedStateSwitch.isOn.toggle()
-			vaultedStateSwitchDidChange()
-		case Section.colorScheme:
-			let newColorScheme = colorScheme(at: indexPath)
-			ShopifyCheckoutKit.configuration.colorScheme = newColorScheme
-			ShopifyCheckoutKit.configuration.spinnerColor = newColorScheme.spinnerColor
-			ShopifyCheckoutKit.configuration.backgroundColor = newColorScheme.backgroundColor
-			view?.window?.overrideUserInterfaceStyle = newColorScheme.userInterfaceStyle
-            tableView.reloadSections(IndexSet(integer: Section.colorScheme.rawValue), with: .automatic)
-		default:
-			()
-		}
-	}
-
-	// MARK: Private
-
-	@objc private func preloadingSwitchDidChange() {
-		ShopifyCheckoutKit.configuration.preloading.enabled = preloadingSwitch.isOn
-	}
-
-	@objc private func vaultedStateSwitchDidChange() {
-		appConfiguration.useVaultedState = vaultedStateSwitch.isOn
-	}
-
-	private func currentColorScheme() -> Configuration.ColorScheme {
-		return ShopifyCheckoutKit.configuration.colorScheme
-	}
-
-	private func colorScheme(at indexPath: IndexPath) -> Configuration.ColorScheme {
-		return ShopifyCheckoutKit.Configuration.ColorScheme.allCases[indexPath.item]
-	}
-
-	private func indexPath(for colorScheme: Configuration.ColorScheme) -> IndexPath? {
-		return ShopifyCheckoutKit.Configuration.ColorScheme.allCases.firstIndex(of: colorScheme).map {
-			IndexPath(row: $0, section: 1)
+		.navigationBarHidden(true)
+		.preferredColorScheme(.dark)
+		.onAppear {
+			switch ShopifyCheckoutKit.configuration.colorScheme {
+			case .light:
+				colorScheme = .light
+			case .dark:
+				colorScheme = .dark
+			default:
+				colorScheme = .light
+			}
 		}
 	}
 
@@ -224,21 +118,18 @@ class SettingsViewController: UITableViewController {
 	}
 }
 
-private class Cell: UITableViewCell {
-	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-		super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-		automaticallyUpdatesContentConfiguration = false
-		selectionStyle = .none
-	}
+struct ColorSchemeView: View {
+	let scheme: Configuration.ColorScheme
+	let isSelected: Bool
 
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-
-	override func prepareForReuse() {
-		super.prepareForReuse()
-
-		accessoryView = nil
+	var body: some View {
+		HStack {
+			Text(scheme.prettyTitle)
+			Spacer()
+			if isSelected {
+				Text("✓")
+			}
+		}
 	}
 }
 
@@ -253,17 +144,6 @@ extension Configuration.ColorScheme {
 			return "Automatic"
 		case .web:
 			return "Web Browser"
-		}
-	}
-
-	var userInterfaceStyle: UIUserInterfaceStyle {
-		switch self {
-		case .light:
-			return .light
-		case .dark:
-			return .dark
-		default:
-			return .unspecified
 		}
 	}
 

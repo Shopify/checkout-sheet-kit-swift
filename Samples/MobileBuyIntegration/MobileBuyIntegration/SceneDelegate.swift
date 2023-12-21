@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
+import SwiftUI
+import ShopifyCheckoutKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -31,15 +33,32 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		guard let windowScene = (scene as? UIWindowScene) else { return }
 
 		let tabBarController = UITabBarController()
+
+		/// Catalog
+		let catalogController = ProductViewController()
+		catalogController.tabBarItem.image = UIImage(systemName: "books.vertical")
+		catalogController.tabBarItem.title = "Browse"
+		catalogController.navigationItem.title = "Product details"
+
+		/// Cart
+		let cartController = CartViewController()
+		cartController.tabBarItem.image = UIImage(systemName: "cart")
+		cartController.tabBarItem.title = "Cart"
+
+		/// Settings
+		let settingsController = UIHostingController(rootView: SettingsView())
+		settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
+		settingsController.tabBarItem.title = "Settings"
+
 		tabBarController.viewControllers = [
 			UINavigationController(
-				rootViewController: ProductViewController()
+				rootViewController: catalogController
 			),
 			UINavigationController(
-				rootViewController: CartViewController()
+				rootViewController: cartController
 			),
 			UINavigationController(
-				rootViewController: SettingsViewController()
+				rootViewController: settingsController
 			)
 		]
 
@@ -47,6 +66,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		window.rootViewController = tabBarController
 		window.makeKeyAndVisible()
 
+		NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+
+		window.overrideUserInterfaceStyle = ShopifyCheckoutKit.configuration.colorScheme.userInterfaceStyle
+
 		self.window = window
+	}
+
+	@objc func colorSchemeChanged() {
+		window?.overrideUserInterfaceStyle = ShopifyCheckoutKit.configuration.colorScheme.userInterfaceStyle
+	}
+}
+
+extension Notification.Name {
+	static let colorSchemeChanged = Notification.Name("colorSchemeChanged")
+}
+
+extension Configuration.ColorScheme {
+	var userInterfaceStyle: UIUserInterfaceStyle {
+		switch self {
+		case .light:
+			return .light
+		case .dark:
+			return .dark
+		default:
+			return .unspecified
+		}
 	}
 }

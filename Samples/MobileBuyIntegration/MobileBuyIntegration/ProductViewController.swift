@@ -51,10 +51,6 @@ class ProductViewController: UIViewController {
 
 	convenience init() {
 		self.init(nibName: nil, bundle: nil)
-
-		title = "Browse"
-
-		tabBarItem.image = UIImage(systemName: "books.vertical")
 	}
 
 	// MARK: UIViewController Lifecycle
