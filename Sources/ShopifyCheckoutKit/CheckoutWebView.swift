@@ -55,6 +55,8 @@ class CheckoutWebView: WKWebView {
 	}
 
 	static func invalidate() {
+		cache?.view.configuration.userContentController
+			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
 		cache = nil
 	}
 
@@ -64,12 +66,16 @@ class CheckoutWebView: WKWebView {
 	var presentedEventDidDispatch = false
 	var checkoutDidPresent: Bool = false {
 		didSet {
-			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			if checkoutDidPresent {
+				dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			}
 		}
 	}
 	var checkoutDidLoad: Bool = false {
 		didSet {
-			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			if checkoutDidLoad {
+				dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
+			}
 		}
 	}
 
@@ -87,6 +93,14 @@ class CheckoutWebView: WKWebView {
 		#endif
 
 		navigationDelegate = self
+
+		configuration.userContentController
+			.add(self, name: CheckoutBridge.messageHandler)
+	}
+
+	deinit {
+		configuration.userContentController
+			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
 	}
 
 	required init?(coder: NSCoder) {
@@ -94,18 +108,6 @@ class CheckoutWebView: WKWebView {
 	}
 
 	// MARK: -
-
-	override func didMoveToSuperview() {
-		super.didMoveToSuperview()
-
-		configuration.userContentController
-			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
-
-		if superview != nil {
-			configuration.userContentController
-				.add(self, name: CheckoutBridge.messageHandler)
-		}
-	}
 
 	func load(checkout url: URL) {
 		load(URLRequest(url: url))
