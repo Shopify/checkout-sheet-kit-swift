@@ -64,7 +64,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 //   let cartLineCost = try CartLineCost(json)
 //   let checkout = try Checkout(json)
 //   let checkoutLineItem = try CheckoutLineItem(json)
-//   let clientID = try ClientID(json)
 //   let collection = try Collection(json)
 //   let context = try Context(json)
 //   let customData = try CustomData(json)
@@ -95,148 +94,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Foundation
 
-// MARK: - PixelEvents
-struct PixelEvents: Codable {
-    /// The `cart_viewed` event logs an instance where a customer visited the cart
-    /// page
-    let cartViewed: PixelEventsCartViewed?
-    /// The `checkout_address_info_submitted` event logs an instance of a customer
-    /// submitting their mailing address. This event is only available in checkouts
-    /// where checkout extensibility for customizations is enabled
-    let checkoutAddressInfoSubmitted: PixelEventsCheckoutAddressInfoSubmitted?
-    /// The `checkout_completed` event logs when a visitor completes a purchase.
-    /// This event is available on the order status and checkout pages
-    let checkoutCompleted: PixelEventsCheckoutCompleted?
-    /// The `checkout_contact_info_submitted` event logs an instance where a
-    /// customer submits a checkout form. This event is only available in checkouts
-    /// where checkout extensibility for customizations is enabled
-    let checkoutContactInfoSubmitted: PixelEventsCheckoutContactInfoSubmitted?
-    /// The `checkout_shipping_info_submitted` event logs an instance where the
-    /// customer chooses a shipping rate. This event is only available in checkouts
-    /// where checkout extensibility for customizations is enabled
-    let checkoutShippingInfoSubmitted: PixelEventsCheckoutShippingInfoSubmitted?
-    /// The `checkout_started` event logs an instance of a customer starting
-    /// the checkout process. This event is available on the checkout page. For
-    /// checkout extensibility, this event is triggered every time a customer
-    /// enters checkout. For non-checkout extensible shops, this event is only
-    /// triggered the first time a customer enters checkout.
-    let checkoutStarted: PixelEventsCheckoutStarted?
-    /// The `collection_viewed` event logs an instance where a customer visited a
-    /// product collection index page. This event is available on the online store
-    /// page
-    let collectionViewed: PixelEventsCollectionViewed?
-    /// The `page_viewed` event logs an instance where a customer visited a page.
-    /// This event is available on the online store, checkout, and order status
-    /// pages
-    let pageViewed: PixelEventsPageViewed?
-    /// The `payment_info_submitted` event logs an instance of a customer
-    /// submitting their payment information. This event is available on the
-    /// checkout page
-    let paymentInfoSubmitted: PixelEventsPaymentInfoSubmitted?
-    /// The `product_added_to_cart` event logs an instance where a customer adds a
-    /// product to their cart. This event is available on the online store page
-    let productAddedToCart: PixelEventsProductAddedToCart?
-    /// The `product_removed_from_cart` event logs an instance where a customer
-    /// removes a product from their cart. This event is available on the online
-    /// store page
-    let productRemovedFromCart: PixelEventsProductRemovedFromCart?
-    /// The `product_variant_viewed` event logs an instance where a customer
-    /// interacts with the product page and views a different variant than the
-    /// initial `product_viewed` impression. This event is available on the Product
-    /// page
-    let productVariantViewed: PixelEventsProductVariantViewed?
-    /// The `product_viewed` event logs an instance where a customer visited a
-    /// product details page. This event is available on the product page
-    let productViewed: PixelEventsProductViewed?
-    /// The `search_submitted` event logs an instance where a customer performed a
-    /// search on the storefront. This event is available on the online store page
-    let searchSubmitted: PixelEventsSearchSubmitted?
-
-    enum CodingKeys: String, CodingKey {
-        case cartViewed = "cart_viewed"
-        case checkoutAddressInfoSubmitted = "checkout_address_info_submitted"
-        case checkoutCompleted = "checkout_completed"
-        case checkoutContactInfoSubmitted = "checkout_contact_info_submitted"
-        case checkoutShippingInfoSubmitted = "checkout_shipping_info_submitted"
-        case checkoutStarted = "checkout_started"
-        case collectionViewed = "collection_viewed"
-        case pageViewed = "page_viewed"
-        case paymentInfoSubmitted = "payment_info_submitted"
-        case productAddedToCart = "product_added_to_cart"
-        case productRemovedFromCart = "product_removed_from_cart"
-        case productVariantViewed = "product_variant_viewed"
-        case productViewed = "product_viewed"
-        case searchSubmitted = "search_submitted"
-    }
-}
-
-// MARK: PixelEvents convenience initializers and mutators
-
-extension PixelEvents {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(PixelEvents.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        cartViewed: PixelEventsCartViewed?? = nil,
-        checkoutAddressInfoSubmitted: PixelEventsCheckoutAddressInfoSubmitted?? = nil,
-        checkoutCompleted: PixelEventsCheckoutCompleted?? = nil,
-        checkoutContactInfoSubmitted: PixelEventsCheckoutContactInfoSubmitted?? = nil,
-        checkoutShippingInfoSubmitted: PixelEventsCheckoutShippingInfoSubmitted?? = nil,
-        checkoutStarted: PixelEventsCheckoutStarted?? = nil,
-        collectionViewed: PixelEventsCollectionViewed?? = nil,
-        pageViewed: PixelEventsPageViewed?? = nil,
-        paymentInfoSubmitted: PixelEventsPaymentInfoSubmitted?? = nil,
-        productAddedToCart: PixelEventsProductAddedToCart?? = nil,
-        productRemovedFromCart: PixelEventsProductRemovedFromCart?? = nil,
-        productVariantViewed: PixelEventsProductVariantViewed?? = nil,
-        productViewed: PixelEventsProductViewed?? = nil,
-        searchSubmitted: PixelEventsSearchSubmitted?? = nil
-    ) -> PixelEvents {
-        return PixelEvents(
-            cartViewed: cartViewed ?? self.cartViewed,
-            checkoutAddressInfoSubmitted: checkoutAddressInfoSubmitted ?? self.checkoutAddressInfoSubmitted,
-            checkoutCompleted: checkoutCompleted ?? self.checkoutCompleted,
-            checkoutContactInfoSubmitted: checkoutContactInfoSubmitted ?? self.checkoutContactInfoSubmitted,
-            checkoutShippingInfoSubmitted: checkoutShippingInfoSubmitted ?? self.checkoutShippingInfoSubmitted,
-            checkoutStarted: checkoutStarted ?? self.checkoutStarted,
-            collectionViewed: collectionViewed ?? self.collectionViewed,
-            pageViewed: pageViewed ?? self.pageViewed,
-            paymentInfoSubmitted: paymentInfoSubmitted ?? self.paymentInfoSubmitted,
-            productAddedToCart: productAddedToCart ?? self.productAddedToCart,
-            productRemovedFromCart: productRemovedFromCart ?? self.productRemovedFromCart,
-            productVariantViewed: productVariantViewed ?? self.productVariantViewed,
-            productViewed: productViewed ?? self.productViewed,
-            searchSubmitted: searchSubmitted ?? self.searchSubmitted
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
 /// The `cart_viewed` event logs an instance where a customer visited the cart
 /// page
 // MARK: - PixelEventsCartViewed
 struct PixelEventsCartViewed: Codable {
-    /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsCartViewedData?
     /// The ID of the customer event
@@ -248,7 +109,6 @@ struct PixelEventsCartViewed: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -272,7 +132,6 @@ extension PixelEventsCartViewed {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsCartViewedData?? = nil,
         id: String?? = nil,
@@ -280,7 +139,6 @@ extension PixelEventsCartViewed {
         timestamp: String?? = nil
     ) -> PixelEventsCartViewed {
         return PixelEventsCartViewed(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -1237,7 +1095,6 @@ enum PixelEventsCartViewedName: String, Codable {
 // MARK: - PixelEventsCheckoutAddressInfoSubmitted
 struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsCheckoutAddressInfoSubmittedData?
     /// The ID of the customer event
@@ -1249,7 +1106,6 @@ struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -1273,7 +1129,6 @@ extension PixelEventsCheckoutAddressInfoSubmitted {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsCheckoutAddressInfoSubmittedData?? = nil,
         id: String?? = nil,
@@ -1281,7 +1136,6 @@ extension PixelEventsCheckoutAddressInfoSubmitted {
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutAddressInfoSubmitted {
         return PixelEventsCheckoutAddressInfoSubmitted(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -1993,7 +1847,6 @@ enum PixelEventsCheckoutAddressInfoSubmittedName: String, Codable {
 // MARK: - PixelEventsCheckoutCompleted
 struct PixelEventsCheckoutCompleted: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsCheckoutCompletedData?
     /// The ID of the customer event
@@ -2005,7 +1858,6 @@ struct PixelEventsCheckoutCompleted: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2029,7 +1881,6 @@ extension PixelEventsCheckoutCompleted {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsCheckoutCompletedData?? = nil,
         id: String?? = nil,
@@ -2037,7 +1888,6 @@ extension PixelEventsCheckoutCompleted {
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutCompleted {
         return PixelEventsCheckoutCompleted(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2110,7 +1960,6 @@ enum PixelEventsCheckoutCompletedName: String, Codable {
 // MARK: - PixelEventsCheckoutContactInfoSubmitted
 struct PixelEventsCheckoutContactInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsCheckoutContactInfoSubmittedData?
     /// The ID of the customer event
@@ -2122,7 +1971,6 @@ struct PixelEventsCheckoutContactInfoSubmitted: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2146,7 +1994,6 @@ extension PixelEventsCheckoutContactInfoSubmitted {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsCheckoutContactInfoSubmittedData?? = nil,
         id: String?? = nil,
@@ -2154,7 +2001,6 @@ extension PixelEventsCheckoutContactInfoSubmitted {
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutContactInfoSubmitted {
         return PixelEventsCheckoutContactInfoSubmitted(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2223,7 +2069,6 @@ enum PixelEventsCheckoutContactInfoSubmittedName: String, Codable {
 // MARK: - PixelEventsCheckoutShippingInfoSubmitted
 struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsCheckoutShippingInfoSubmittedData?
     /// The ID of the customer event
@@ -2235,7 +2080,6 @@ struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2259,7 +2103,6 @@ extension PixelEventsCheckoutShippingInfoSubmitted {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsCheckoutShippingInfoSubmittedData?? = nil,
         id: String?? = nil,
@@ -2267,7 +2110,6 @@ extension PixelEventsCheckoutShippingInfoSubmitted {
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutShippingInfoSubmitted {
         return PixelEventsCheckoutShippingInfoSubmitted(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2344,7 +2186,6 @@ enum PixelEventsCheckoutShippingInfoSubmittedName: String, Codable {
 // MARK: - PixelEventsCheckoutStarted
 struct PixelEventsCheckoutStarted: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsCheckoutStartedData?
     /// The ID of the customer event
@@ -2356,7 +2197,6 @@ struct PixelEventsCheckoutStarted: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2380,7 +2220,6 @@ extension PixelEventsCheckoutStarted {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsCheckoutStartedData?? = nil,
         id: String?? = nil,
@@ -2388,7 +2227,6 @@ extension PixelEventsCheckoutStarted {
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutStarted {
         return PixelEventsCheckoutStarted(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2457,7 +2295,6 @@ enum PixelEventsCheckoutStartedName: String, Codable {
 // MARK: - PixelEventsCollectionViewed
 struct PixelEventsCollectionViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsCollectionViewedData?
     /// The ID of the customer event
@@ -2469,7 +2306,6 @@ struct PixelEventsCollectionViewed: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2493,7 +2329,6 @@ extension PixelEventsCollectionViewed {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsCollectionViewedData?? = nil,
         id: String?? = nil,
@@ -2501,7 +2336,6 @@ extension PixelEventsCollectionViewed {
         timestamp: String?? = nil
     ) -> PixelEventsCollectionViewed {
         return PixelEventsCollectionViewed(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2623,7 +2457,6 @@ enum PixelEventsCollectionViewedName: String, Codable {
 // MARK: - PixelEventsPageViewed
 struct PixelEventsPageViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsPageViewedData?
     /// The ID of the customer event
@@ -2635,7 +2468,6 @@ struct PixelEventsPageViewed: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2659,7 +2491,6 @@ extension PixelEventsPageViewed {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsPageViewedData?? = nil,
         id: String?? = nil,
@@ -2667,7 +2498,6 @@ extension PixelEventsPageViewed {
         timestamp: String?? = nil
     ) -> PixelEventsPageViewed {
         return PixelEventsPageViewed(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2736,7 +2566,6 @@ enum PixelEventsPageViewedName: String, Codable {
 // MARK: - PixelEventsPaymentInfoSubmitted
 struct PixelEventsPaymentInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsPaymentInfoSubmittedData?
     /// The ID of the customer event
@@ -2748,7 +2577,6 @@ struct PixelEventsPaymentInfoSubmitted: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2772,7 +2600,6 @@ extension PixelEventsPaymentInfoSubmitted {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsPaymentInfoSubmittedData?? = nil,
         id: String?? = nil,
@@ -2780,7 +2607,6 @@ extension PixelEventsPaymentInfoSubmitted {
         timestamp: String?? = nil
     ) -> PixelEventsPaymentInfoSubmitted {
         return PixelEventsPaymentInfoSubmitted(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2848,7 +2674,6 @@ enum PixelEventsPaymentInfoSubmittedName: String, Codable {
 // MARK: - PixelEventsProductAddedToCart
 struct PixelEventsProductAddedToCart: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsProductAddedToCartData?
     /// The ID of the customer event
@@ -2860,7 +2685,6 @@ struct PixelEventsProductAddedToCart: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2884,7 +2708,6 @@ extension PixelEventsProductAddedToCart {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsProductAddedToCartData?? = nil,
         id: String?? = nil,
@@ -2892,7 +2715,6 @@ extension PixelEventsProductAddedToCart {
         timestamp: String?? = nil
     ) -> PixelEventsProductAddedToCart {
         return PixelEventsProductAddedToCart(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -2961,7 +2783,6 @@ enum PixelEventsProductAddedToCartName: String, Codable {
 // MARK: - PixelEventsProductRemovedFromCart
 struct PixelEventsProductRemovedFromCart: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsProductRemovedFromCartData?
     /// The ID of the customer event
@@ -2973,7 +2794,6 @@ struct PixelEventsProductRemovedFromCart: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -2997,7 +2817,6 @@ extension PixelEventsProductRemovedFromCart {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsProductRemovedFromCartData?? = nil,
         id: String?? = nil,
@@ -3005,7 +2824,6 @@ extension PixelEventsProductRemovedFromCart {
         timestamp: String?? = nil
     ) -> PixelEventsProductRemovedFromCart {
         return PixelEventsProductRemovedFromCart(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -3075,7 +2893,6 @@ enum PixelEventsProductRemovedFromCartName: String, Codable {
 // MARK: - PixelEventsProductVariantViewed
 struct PixelEventsProductVariantViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsProductVariantViewedData?
     /// The ID of the customer event
@@ -3087,7 +2904,6 @@ struct PixelEventsProductVariantViewed: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -3111,7 +2927,6 @@ extension PixelEventsProductVariantViewed {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsProductVariantViewedData?? = nil,
         id: String?? = nil,
@@ -3119,7 +2934,6 @@ extension PixelEventsProductVariantViewed {
         timestamp: String?? = nil
     ) -> PixelEventsProductVariantViewed {
         return PixelEventsProductVariantViewed(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -3187,7 +3001,6 @@ enum PixelEventsProductVariantViewedName: String, Codable {
 // MARK: - PixelEventsProductViewed
 struct PixelEventsProductViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsProductViewedData?
     /// The ID of the customer event
@@ -3199,7 +3012,6 @@ struct PixelEventsProductViewed: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -3223,7 +3035,6 @@ extension PixelEventsProductViewed {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsProductViewedData?? = nil,
         id: String?? = nil,
@@ -3231,7 +3042,6 @@ extension PixelEventsProductViewed {
         timestamp: String?? = nil
     ) -> PixelEventsProductViewed {
         return PixelEventsProductViewed(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -3299,7 +3109,6 @@ enum PixelEventsProductViewedName: String, Codable {
 // MARK: - PixelEventsSearchSubmitted
 struct PixelEventsSearchSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let data: PixelEventsSearchSubmittedData?
     /// The ID of the customer event
@@ -3311,7 +3120,6 @@ struct PixelEventsSearchSubmitted: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, data, id, name, timestamp
     }
 }
@@ -3335,7 +3143,6 @@ extension PixelEventsSearchSubmitted {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         data: PixelEventsSearchSubmittedData?? = nil,
         id: String?? = nil,
@@ -3343,7 +3150,6 @@ extension PixelEventsSearchSubmitted {
         timestamp: String?? = nil
     ) -> PixelEventsSearchSubmitted {
         return PixelEventsSearchSubmitted(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             data: data ?? self.data,
             id: id ?? self.id,
@@ -3451,828 +3257,11 @@ enum PixelEventsSearchSubmittedName: String, Codable {
     case searchSubmitted = "search_submitted"
 }
 
-// MARK: - Browser
-struct Browser: Codable {
-    /// This object replaces the native document.cookie API and provides a
-    /// setter/getter to set cookies on the top frame.
-    let cookie: BrowserCookie?
-    let localStorage: BrowserLocalStorage?
-    let sendBeacon: SendBeacon?
-    let sessionStorage: BrowserSessionStorage?
-}
-
-// MARK: Browser convenience initializers and mutators
-
-extension Browser {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(Browser.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        cookie: BrowserCookie?? = nil,
-        localStorage: BrowserLocalStorage?? = nil,
-        sendBeacon: SendBeacon?? = nil,
-        sessionStorage: BrowserSessionStorage?? = nil
-    ) -> Browser {
-        return Browser(
-            cookie: cookie ?? self.cookie,
-            localStorage: localStorage ?? self.localStorage,
-            sendBeacon: sendBeacon ?? self.sendBeacon,
-            sessionStorage: sessionStorage ?? self.sessionStorage
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// This object replaces the native document.cookie API and provides a
-/// setter/getter to set cookies on the top frame.
-// MARK: - BrowserCookie
-struct BrowserCookie: Codable {
-    /// An asynchronous method to get a specific cookie by name. Takes a cookie
-    /// name of type `string` and returns the cookie value as a `string`
-    let browserCookieGet: Get?
-    /// An asynchronous method to set a cookie by name. It
-    /// takes two arguments, a string of form `key=value` as
-    /// [described here](https://developer.mozilla.org/en-
-    /// US/docs/Web/API/Document/cookie#write_a_new_cookie) or the name of the
-    /// cookie as the first argument and the value as the second argument.
-    let browserCookieSet: Set?
-
-    enum CodingKeys: String, CodingKey {
-        case browserCookieGet = "get"
-        case browserCookieSet = "set"
-    }
-}
-
-// MARK: BrowserCookie convenience initializers and mutators
-
-extension BrowserCookie {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserCookie.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        browserCookieGet: Get?? = nil,
-        browserCookieSet: Set?? = nil
-    ) -> BrowserCookie {
-        return BrowserCookie(
-            browserCookieGet: browserCookieGet ?? self.browserCookieGet,
-            browserCookieSet: browserCookieSet ?? self.browserCookieSet
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// An asynchronous method to get a specific cookie by name. Takes a cookie
-/// name of type `string` and returns the cookie value as a `string`
-// MARK: - Get
-struct Get: Codable {
-}
-
-// MARK: Get convenience initializers and mutators
-
-extension Get {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(Get.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> Get {
-        return Get(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// An asynchronous method to set a cookie by name. It
-/// takes two arguments, a string of form `key=value` as
-/// [described here](https://developer.mozilla.org/en-
-/// US/docs/Web/API/Document/cookie#write_a_new_cookie) or the name of the
-/// cookie as the first argument and the value as the second argument.
-// MARK: - Set
-struct Set: Codable {
-}
-
-// MARK: Set convenience initializers and mutators
-
-extension Set {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(Set.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> Set {
-        return Set(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-// MARK: - BrowserLocalStorage
-struct BrowserLocalStorage: Codable {
-    /// When invoked, will empty all keys out of the storage.
-    let clear: BrowserLocalStorageClear?
-    /// When passed a key name, will return that key's value.
-    let getItem: BrowserLocalStorageGetItem?
-    /// When passed a number n, this method will return the name of the nth key in
-    /// the storage.
-    let key: BrowserLocalStorageKey?
-    /// Returns an integer representing the number of data items stored in the
-    /// Storage object.
-    let length: BrowserLocalStorageLength?
-    /// When passed a key name, will remove that key from the storage.
-    let removeItem: BrowserLocalStorageRemoveItem?
-    /// When passed a key name and value, will add that key to the storage, or
-    /// update that key's value if it already exists.
-    let setItem: BrowserLocalStorageSetItem?
-}
-
-// MARK: BrowserLocalStorage convenience initializers and mutators
-
-extension BrowserLocalStorage {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserLocalStorage.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        clear: BrowserLocalStorageClear?? = nil,
-        getItem: BrowserLocalStorageGetItem?? = nil,
-        key: BrowserLocalStorageKey?? = nil,
-        length: BrowserLocalStorageLength?? = nil,
-        removeItem: BrowserLocalStorageRemoveItem?? = nil,
-        setItem: BrowserLocalStorageSetItem?? = nil
-    ) -> BrowserLocalStorage {
-        return BrowserLocalStorage(
-            clear: clear ?? self.clear,
-            getItem: getItem ?? self.getItem,
-            key: key ?? self.key,
-            length: length ?? self.length,
-            removeItem: removeItem ?? self.removeItem,
-            setItem: setItem ?? self.setItem
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When invoked, will empty all keys out of the storage.
-// MARK: - BrowserLocalStorageClear
-struct BrowserLocalStorageClear: Codable {
-}
-
-// MARK: BrowserLocalStorageClear convenience initializers and mutators
-
-extension BrowserLocalStorageClear {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserLocalStorageClear.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserLocalStorageClear {
-        return BrowserLocalStorageClear(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a key name, will return that key's value.
-// MARK: - BrowserLocalStorageGetItem
-struct BrowserLocalStorageGetItem: Codable {
-}
-
-// MARK: BrowserLocalStorageGetItem convenience initializers and mutators
-
-extension BrowserLocalStorageGetItem {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserLocalStorageGetItem.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserLocalStorageGetItem {
-        return BrowserLocalStorageGetItem(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a number n, this method will return the name of the nth key in
-/// the storage.
-// MARK: - BrowserLocalStorageKey
-struct BrowserLocalStorageKey: Codable {
-}
-
-// MARK: BrowserLocalStorageKey convenience initializers and mutators
-
-extension BrowserLocalStorageKey {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserLocalStorageKey.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserLocalStorageKey {
-        return BrowserLocalStorageKey(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// Returns an integer representing the number of data items stored in the
-/// Storage object.
-// MARK: - BrowserLocalStorageLength
-struct BrowserLocalStorageLength: Codable {
-}
-
-// MARK: BrowserLocalStorageLength convenience initializers and mutators
-
-extension BrowserLocalStorageLength {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserLocalStorageLength.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserLocalStorageLength {
-        return BrowserLocalStorageLength(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a key name, will remove that key from the storage.
-// MARK: - BrowserLocalStorageRemoveItem
-struct BrowserLocalStorageRemoveItem: Codable {
-}
-
-// MARK: BrowserLocalStorageRemoveItem convenience initializers and mutators
-
-extension BrowserLocalStorageRemoveItem {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserLocalStorageRemoveItem.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserLocalStorageRemoveItem {
-        return BrowserLocalStorageRemoveItem(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a key name and value, will add that key to the storage, or
-/// update that key's value if it already exists.
-// MARK: - BrowserLocalStorageSetItem
-struct BrowserLocalStorageSetItem: Codable {
-}
-
-// MARK: BrowserLocalStorageSetItem convenience initializers and mutators
-
-extension BrowserLocalStorageSetItem {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserLocalStorageSetItem.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserLocalStorageSetItem {
-        return BrowserLocalStorageSetItem(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-// MARK: - SendBeacon
-struct SendBeacon: Codable {
-}
-
-// MARK: SendBeacon convenience initializers and mutators
-
-extension SendBeacon {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(SendBeacon.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> SendBeacon {
-        return SendBeacon(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-// MARK: - BrowserSessionStorage
-struct BrowserSessionStorage: Codable {
-    /// When invoked, will empty all keys out of the storage.
-    let clear: BrowserSessionStorageClear?
-    /// When passed a key name, will return that key's value.
-    let getItem: BrowserSessionStorageGetItem?
-    /// When passed a number n, this method will return the name of the nth key in
-    /// the storage.
-    let key: BrowserSessionStorageKey?
-    /// Returns an integer representing the number of data items stored in the
-    /// Storage object.
-    let length: BrowserSessionStorageLength?
-    /// When passed a key name, will remove that key from the storage.
-    let removeItem: BrowserSessionStorageRemoveItem?
-    /// When passed a key name and value, will add that key to the storage, or
-    /// update that key's value if it already exists.
-    let setItem: BrowserSessionStorageSetItem?
-}
-
-// MARK: BrowserSessionStorage convenience initializers and mutators
-
-extension BrowserSessionStorage {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserSessionStorage.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        clear: BrowserSessionStorageClear?? = nil,
-        getItem: BrowserSessionStorageGetItem?? = nil,
-        key: BrowserSessionStorageKey?? = nil,
-        length: BrowserSessionStorageLength?? = nil,
-        removeItem: BrowserSessionStorageRemoveItem?? = nil,
-        setItem: BrowserSessionStorageSetItem?? = nil
-    ) -> BrowserSessionStorage {
-        return BrowserSessionStorage(
-            clear: clear ?? self.clear,
-            getItem: getItem ?? self.getItem,
-            key: key ?? self.key,
-            length: length ?? self.length,
-            removeItem: removeItem ?? self.removeItem,
-            setItem: setItem ?? self.setItem
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When invoked, will empty all keys out of the storage.
-// MARK: - BrowserSessionStorageClear
-struct BrowserSessionStorageClear: Codable {
-}
-
-// MARK: BrowserSessionStorageClear convenience initializers and mutators
-
-extension BrowserSessionStorageClear {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserSessionStorageClear.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserSessionStorageClear {
-        return BrowserSessionStorageClear(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a key name, will return that key's value.
-// MARK: - BrowserSessionStorageGetItem
-struct BrowserSessionStorageGetItem: Codable {
-}
-
-// MARK: BrowserSessionStorageGetItem convenience initializers and mutators
-
-extension BrowserSessionStorageGetItem {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserSessionStorageGetItem.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserSessionStorageGetItem {
-        return BrowserSessionStorageGetItem(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a number n, this method will return the name of the nth key in
-/// the storage.
-// MARK: - BrowserSessionStorageKey
-struct BrowserSessionStorageKey: Codable {
-}
-
-// MARK: BrowserSessionStorageKey convenience initializers and mutators
-
-extension BrowserSessionStorageKey {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserSessionStorageKey.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserSessionStorageKey {
-        return BrowserSessionStorageKey(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// Returns an integer representing the number of data items stored in the
-/// Storage object.
-// MARK: - BrowserSessionStorageLength
-struct BrowserSessionStorageLength: Codable {
-}
-
-// MARK: BrowserSessionStorageLength convenience initializers and mutators
-
-extension BrowserSessionStorageLength {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserSessionStorageLength.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserSessionStorageLength {
-        return BrowserSessionStorageLength(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a key name, will remove that key from the storage.
-// MARK: - BrowserSessionStorageRemoveItem
-struct BrowserSessionStorageRemoveItem: Codable {
-}
-
-// MARK: BrowserSessionStorageRemoveItem convenience initializers and mutators
-
-extension BrowserSessionStorageRemoveItem {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserSessionStorageRemoveItem.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserSessionStorageRemoveItem {
-        return BrowserSessionStorageRemoveItem(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// When passed a key name and value, will add that key to the storage, or
-/// update that key's value if it already exists.
-// MARK: - BrowserSessionStorageSetItem
-struct BrowserSessionStorageSetItem: Codable {
-}
-
-// MARK: BrowserSessionStorageSetItem convenience initializers and mutators
-
-extension BrowserSessionStorageSetItem {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(BrowserSessionStorageSetItem.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> BrowserSessionStorageSetItem {
-        return BrowserSessionStorageSetItem(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
 /// This event represents any custom events emitted by partners or merchants via
 /// the `publish` method
 // MARK: - CustomEvent
 struct CustomEvent: Codable {
     /// The client-side ID of the customer, provided by Shopify
-    let clientID: String?
     let context: Context?
     let customData: CustomData?
     /// The ID of the customer event
@@ -4284,7 +3273,6 @@ struct CustomEvent: Codable {
     let timestamp: String?
 
     enum CodingKeys: String, CodingKey {
-        case clientID = "clientId"
         case context, customData, id, name, timestamp
     }
 }
@@ -4308,7 +3296,6 @@ extension CustomEvent {
     }
 
     func with(
-        clientID: String?? = nil,
         context: Context?? = nil,
         customData: CustomData?? = nil,
         id: String?? = nil,
@@ -4316,7 +3303,6 @@ extension CustomEvent {
         timestamp: String?? = nil
     ) -> CustomEvent {
         return CustomEvent(
-            clientID: clientID ?? self.clientID,
             context: context ?? self.context,
             customData: customData ?? self.customData,
             id: id ?? self.id,
@@ -4570,7 +3556,6 @@ extension PricingPercentageValue {
     }
 }
 
-typealias ClientID = String
 typealias ID = String
 typealias Name = String
 typealias Timestamp = String
