@@ -55,6 +55,8 @@ class CheckoutWebView: WKWebView {
 	}
 
 	static func invalidate() {
+		cache?.view.configuration.userContentController
+			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
 		cache = nil
 	}
 
@@ -82,18 +84,11 @@ class CheckoutWebView: WKWebView {
 	override init(frame: CGRect, configuration: WKWebViewConfiguration) {
 		configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
 
-		let source = """
-		 const script = document.createElement('script');
-		 script.type = 'text/javascript';
-		 script.text = 'window.onload = () => window.MobileCheckoutSdk.postMessage({handlerId: "YES_I_HAVE_LOADED"})';
-		 document.body.appendChild(script);
-		"""
-
-		let script = WKUserScript(
-			source: source,
-			injectionTime: .atDocumentEnd,
-			forMainFrameOnly: true
-		)
+		let script = CustomUserScript(
+			target: .head,
+			content: "window.addEventListener(\"mobileCheckoutBridgeReady\", () => window.MobileCheckoutSdk?.postMessage({handlerId: \"ready\"}))",
+			injectionTime: .atDocumentEnd
+		).createUserScript()
 
 		let contentController = WKUserContentController()
 		contentController.addUserScript(script)
@@ -101,6 +96,10 @@ class CheckoutWebView: WKWebView {
 		configuration.userContentController = contentController
 
 		super.init(frame: frame, configuration: configuration)
+
+		print("[debug] (init) Adding bridge handler")
+		configuration.userContentController
+			.add(self, name: CheckoutBridge.messageHandler)
 
 		#if DEBUG
 			if #available(iOS 16.4, *) {
@@ -111,23 +110,16 @@ class CheckoutWebView: WKWebView {
 		navigationDelegate = self
 	}
 
+	deinit {
+		configuration.userContentController
+			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
+	}
+
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
 	// MARK: -
-
-	override func didMoveToSuperview() {
-		super.didMoveToSuperview()
-
-		configuration.userContentController
-			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
-
-		if superview != nil {
-			configuration.userContentController
-				.add(self, name: CheckoutBridge.messageHandler)
-		}
-	}
 
 	func load(checkout url: URL) {
 		load(URLRequest(url: url))
@@ -155,8 +147,6 @@ class CheckoutWebView: WKWebView {
 			}
 		}, 100);
 		"""
-
-//		print("[debug] Draining analytics queue...")
 		webView.evaluateJavaScript(script)
 	}
 }
@@ -250,7 +240,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 			let endTime = Date()
 			let diff = endTime.timeIntervalSince(startTime)
 			let preloading = String(ShopifyCheckoutKit.Configuration().preloading.enabled)
-			let message = "Preloaded checkout in \(String(format: "%.2f", diff))s"
+			let message = "Loaded checkout in \(String(format: "%.2f", diff))s"
 			ShopifyCheckoutKit.configuration.logger.log(message)
 			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
 		}
@@ -311,5 +301,37 @@ extension CheckoutWebView {
 		var isStale: Bool {
 			abs(timestamp.timeIntervalSinceNow) >= timeout
 		}
+	}
+}
+
+struct CustomUserScript {
+	enum TargetElement: String {
+		case head
+		case body
+	}
+
+	let target: TargetElement
+	let content: String
+	let injectionTime: WKUserScriptInjectionTime
+
+	init(target: TargetElement = .body, content: String, injectionTime: WKUserScriptInjectionTime) {
+		self.target = target
+		self.content = content
+		self.injectionTime = injectionTime
+	}
+
+	func createUserScript() -> WKUserScript {
+		let source = """
+			const script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.text = '\(content)';
+			document.\(target.rawValue).appendChild(script);
+		"""
+
+		return WKUserScript(
+			source: source,
+			injectionTime: injectionTime,
+			forMainFrameOnly: true
+		)
 	}
 }

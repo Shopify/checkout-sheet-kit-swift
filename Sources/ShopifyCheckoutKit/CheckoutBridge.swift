@@ -72,7 +72,6 @@ enum CheckoutBridge {
 		if (window.MobileCheckoutSdk) {
 			window.MobileCheckoutSdk.postMessage({handlerId: \(body)});
 		} else {
-			console.log("MobileCheckoutSdk was not ready in time. Adding event listener...", window.MobileCheckoutSdk);
 			window.addEventListener('mobileCheckoutBridgeReady', function () {
 				window.MobileCheckoutSdk.postMessage({handlerId: \(body)});
 			}, {passive: true, once: true});
