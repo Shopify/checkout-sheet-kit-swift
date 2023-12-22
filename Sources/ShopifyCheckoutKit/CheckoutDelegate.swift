@@ -38,6 +38,8 @@ public protocol CheckoutDelegate: AnyObject {
     /// Tells te delegate that the buyer clicked a link
 	/// This includes email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
 	func checkoutDidClickLink(url: URL)
+    
+    func checkoutDidEventAnalyticsEvent(decodable: Decodable)
 }
 
 extension CheckoutDelegate {
