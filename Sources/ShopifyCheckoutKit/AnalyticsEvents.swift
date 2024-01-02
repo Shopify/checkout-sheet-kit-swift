@@ -21,77 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// This file was generated from JSON Schema using quicktype, do not modify it directly.
-// To parse the JSON, add this file to your project and do:
-//
-//   let pixelEventsCartViewedData = try PixelEventsCartViewedData(json)
-//   let pixelEventsCartViewed = try PixelEventsCartViewed(json)
-//   let pixelEventsCheckoutAddressInfoSubmittedData = try PixelEventsCheckoutAddressInfoSubmittedData(json)
-//   let pixelEventsCheckoutAddressInfoSubmitted = try PixelEventsCheckoutAddressInfoSubmitted(json)
-//   let pixelEventsCheckoutCompletedData = try PixelEventsCheckoutCompletedData(json)
-//   let pixelEventsCheckoutCompleted = try PixelEventsCheckoutCompleted(json)
-//   let pixelEventsCheckoutContactInfoSubmittedData = try PixelEventsCheckoutContactInfoSubmittedData(json)
-//   let pixelEventsCheckoutContactInfoSubmitted = try PixelEventsCheckoutContactInfoSubmitted(json)
-//   let pixelEventsCheckoutShippingInfoSubmittedData = try PixelEventsCheckoutShippingInfoSubmittedData(json)
-//   let pixelEventsCheckoutShippingInfoSubmitted = try PixelEventsCheckoutShippingInfoSubmitted(json)
-//   let pixelEventsCheckoutStartedData = try PixelEventsCheckoutStartedData(json)
-//   let pixelEventsCheckoutStarted = try PixelEventsCheckoutStarted(json)
-//   let pixelEventsCollectionViewedData = try PixelEventsCollectionViewedData(json)
-//   let pixelEventsCollectionViewed = try PixelEventsCollectionViewed(json)
-//   let pixelEventsPageViewedData = try PixelEventsPageViewedData(json)
-//   let pixelEventsPageViewed = try PixelEventsPageViewed(json)
-//   let pixelEventsPaymentInfoSubmittedData = try PixelEventsPaymentInfoSubmittedData(json)
-//   let pixelEventsPaymentInfoSubmitted = try PixelEventsPaymentInfoSubmitted(json)
-//   let pixelEventsProductAddedToCartData = try PixelEventsProductAddedToCartData(json)
-//   let pixelEventsProductAddedToCart = try PixelEventsProductAddedToCart(json)
-//   let pixelEventsProductRemovedFromCartData = try PixelEventsProductRemovedFromCartData(json)
-//   let pixelEventsProductRemovedFromCart = try PixelEventsProductRemovedFromCart(json)
-//   let pixelEventsProductVariantViewedData = try PixelEventsProductVariantViewedData(json)
-//   let pixelEventsProductVariantViewed = try PixelEventsProductVariantViewed(json)
-//   let pixelEventsProductViewedData = try PixelEventsProductViewedData(json)
-//   let pixelEventsProductViewed = try PixelEventsProductViewed(json)
-//   let pixelEventsSearchSubmittedData = try PixelEventsSearchSubmittedData(json)
-//   let pixelEventsSearchSubmitted = try PixelEventsSearchSubmitted(json)
-//   let pixelEvents = try PixelEvents(json)
-//   let attribute = try Attribute(json)
-//   let browserCookie = try BrowserCookie(json)
-//   let browserLocalStorage = try BrowserLocalStorage(json)
-//   let browserSessionStorage = try BrowserSessionStorage(json)
-//   let browser = try Browser(json)
-//   let cart = try Cart(json)
-//   let cartCost = try CartCost(json)
-//   let cartLine = try CartLine(json)
-//   let cartLineCost = try CartLineCost(json)
-//   let checkout = try Checkout(json)
-//   let checkoutLineItem = try CheckoutLineItem(json)
-//   let collection = try Collection(json)
-//   let context = try Context(json)
-//   let customData = try CustomData(json)
-//   let customEvent = try CustomEvent(json)
-//   let customer = try Customer(json)
-//   let purpleData = try PurpleData(json)
-//   let discountAllocation = try DiscountAllocation(json)
-//   let discountApplication = try DiscountApplication(json)
-//   let iD = try ID(json)
-//   let image = try Image(json)
-//   let initData = try InitData(json)
-//   let location = try Location(json)
-//   let mailingAddress = try MailingAddress(json)
-//   let moneyV2 = try MoneyV2(json)
-//   let name = try Name(json)
-//   let order = try Order(json)
-//   let pricingPercentageValue = try PricingPercentageValue(json)
-//   let product = try Product(json)
-//   let productVariant = try ProductVariant(json)
-//   let screen = try Screen(json)
-//   let searchResult = try SearchResult(json)
-//   let shippingRate = try ShippingRate(json)
-//   let timestamp = try Timestamp(json)
-//   let transaction = try Transaction(json)
-//   let webPixelsDocument = try WebPixelsDocument(json)
-//   let webPixelsNavigator = try WebPixelsNavigator(json)
-//   let webPixelsWindow = try WebPixelsWindow(json)
-
 import Foundation
 
 /// The `cart_viewed` event logs an instance where a customer visited the cart
@@ -3347,46 +3276,6 @@ extension CustomData {
     func with(
     ) -> CustomData {
         return CustomData(
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-/// A free-form object representing data specific to this event provided by
-/// Shopify. Refer to [standard events](#standard-events) for details on the
-/// payload available to each event
-// MARK: - PurpleData
-struct PurpleData: Codable {
-}
-
-// MARK: PurpleData convenience initializers and mutators
-
-extension PurpleData {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(PurpleData.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-    ) -> PurpleData {
-        return PurpleData(
         )
     }
 
