@@ -161,7 +161,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 		guard let navigationController = self.navigationController else { return }
 		navigationController.setNavigationBarHidden(modalVisible, animated: true)
 	}
-    
+
     func checkoutViewDidEmitAnalyticsEvent(event: Decodable) {
         delegate?.checkoutDidEventAnalyticsEvent(decodable: event)
     }

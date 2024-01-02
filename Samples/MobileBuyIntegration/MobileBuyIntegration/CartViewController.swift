@@ -147,7 +147,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 }
 
-extension CartViewController: CheckoutDelegate {    
+extension CartViewController: CheckoutDelegate {
 	func checkoutDidComplete() {
 		resetCart()
 	}
@@ -178,11 +178,11 @@ extension CartViewController: CheckoutDelegate {
 			forceCloseCheckout("Checkout Unavailable")
 		}
 	}
-    
+
     func checkoutDidEventAnalyticsEvent(decodable: Decodable) {
         print(#function, decodable)
     }
-    
+
 	private func forceCloseCheckout(_ message: String) {
 		print(#function, message)
 		dismiss(animated: true)

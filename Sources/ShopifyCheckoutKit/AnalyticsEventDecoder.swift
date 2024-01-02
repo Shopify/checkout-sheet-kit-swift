@@ -28,12 +28,12 @@ class AnalyticsEventDecoder {
         case name
         case event
     }
-    
+
     struct AnalyticsEvent: Decodable {
         let name: String
         let event: AnalyticsEventBody
     }
-    
+
     struct AnalyticsEventBody: Decodable {
         let id: String
         let name: String
@@ -42,7 +42,7 @@ class AnalyticsEventDecoder {
         let customData: [String: Any]?
         let data: [String: Any]?
         let context: [String: Any]?
-        
+
         enum CodingKeys: String, CodingKey {
             case id
             case name
@@ -52,16 +52,16 @@ class AnalyticsEventDecoder {
             case data
             case context
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
+
             id = try container.decode(String.self, forKey: .id)
             name = try container.decode(String.self, forKey: .name)
             timestamp = try container.decode(String.self, forKey: .timestamp)
             type = try container.decode(String.self, forKey: .type)
             context = try container.decode([String: Any].self, forKey: .context)
-            
+
             switch type {
             case "standard":
                 data = try container.decode([String: Any].self, forKey: .data)
@@ -79,14 +79,14 @@ class AnalyticsEventDecoder {
 
         }
     }
-    
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> Decodable?  {
+
+    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> Decodable? {
         let messageBody = try container.decode(String.self, forKey: .body)
-        
+
         if let data = messageBody.data(using: .utf8) {
             return try JSONDecoder().decode(AnalyticsEvent.self, from: data)
         }
-        
+
         return nil
     }
 }
