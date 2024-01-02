@@ -179,7 +179,7 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-    func checkoutDidEventAnalyticsEvent(decodable: Decodable) {
+    func checkoutDidEmitWebPixelEvent(decodable: Decodable) {
         print(#function, decodable)
     }
 

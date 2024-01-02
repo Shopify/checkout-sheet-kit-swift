@@ -127,7 +127,6 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 }
 
 extension CheckoutWebViewController: CheckoutWebViewDelegate {
-
 	func checkoutViewDidStartNavigation() {
 		if initialNavigation {
 			spinner.startAnimating()
@@ -162,7 +161,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 		navigationController.setNavigationBarHidden(modalVisible, animated: true)
 	}
 
-    func checkoutViewDidEmitAnalyticsEvent(event: Decodable) {
-        delegate?.checkoutDidEventAnalyticsEvent(decodable: event)
+    func checkoutViewDidEmitWebPixelEvent(event: Decodable) {
+        delegate?.checkoutDidEmitWebPixelEvent(decodable: event)
     }
 }

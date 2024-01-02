@@ -39,7 +39,7 @@ public protocol CheckoutDelegate: AnyObject {
 	/// This includes email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
 	func checkoutDidClickLink(url: URL)
 
-    func checkoutDidEventAnalyticsEvent(decodable: Decodable)
+    func checkoutDidEmitWebPixelEvent(decodable: Decodable)
 }
 
 extension CheckoutDelegate {

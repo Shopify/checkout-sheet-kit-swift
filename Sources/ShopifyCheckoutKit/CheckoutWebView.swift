@@ -31,7 +31,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidClickLink(url: URL)
 	func checkoutViewDidFailWithError(error: CheckoutError)
 	func checkoutViewDidToggleModal(modalVisible: Bool)
-    func checkoutViewDidEmitAnalyticsEvent(event: Decodable)
+    func checkoutViewDidEmitWebPixelEvent(event: Decodable)
 }
 
 class CheckoutWebView: WKWebView {
@@ -131,7 +131,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
             case let .analytics(event):
                 if let nonOptionalEvent = event {
-                    viewDelegate?.checkoutViewDidEmitAnalyticsEvent(event: nonOptionalEvent)
+                    viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
                 }
 			default:
 				()
