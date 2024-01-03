@@ -26,7 +26,7 @@
 
 #### Versioning
 
-- [ ] I have bumped the version number in the [`.podspec` file](https://github.com/Shopify/checkout-kit-swift/blob/main/ShopifyCheckoutKit.podspec#L2).
+- [ ] I have bumped the version number in the [`.podspec` file](https://github.com/Shopify/checkout-kit-swift/blob/main/ShopifyCheckoutSheetKit.podspec#L2).
 - [ ] I have bumped the version number in the [README](https://github.com/Shopify/checkout-kit-swift/blob/main/README.md#packageswift).
 - [ ] I have added a [Changelog](./CHANGELOG.md) entry.
 

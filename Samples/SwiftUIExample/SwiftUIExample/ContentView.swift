@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import SwiftUI
-import ShopifyCheckoutKit
+import ShopifyCheckoutSheetKit
 
 struct CheckoutView: View {
 	let checkoutURL: Binding<URL?>
