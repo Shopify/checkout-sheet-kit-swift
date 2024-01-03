@@ -85,7 +85,7 @@ extension CheckoutBridge {
 		case checkoutExpired
 		case checkoutUnavailable
 		case checkoutModalToggled(modalVisible: Bool)
-        case analytics(event: Decodable?)
+        case analytics(event: PixelEvent?)
         case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {

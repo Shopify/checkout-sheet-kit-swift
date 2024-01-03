@@ -161,7 +161,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 		navigationController.setNavigationBarHidden(modalVisible, animated: true)
 	}
 
-    func checkoutViewDidEmitWebPixelEvent(event: Decodable) {
+    func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
         delegate?.checkoutDidEmitWebPixelEvent(decodable: event)
     }
 }

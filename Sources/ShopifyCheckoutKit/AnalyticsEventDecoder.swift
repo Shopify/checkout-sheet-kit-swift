@@ -23,68 +23,69 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Foundation
 
+struct AnalyticsEvent: Decodable {
+    let name: String
+    let event: PixelEvent
+}
+
+public struct PixelEvent: Decodable {
+    let id: String
+    let name: String
+    let timestamp: String
+    let type: String
+    let customData: [String: Any]?
+    let data: [String: Any]?
+    let context: [String: Any]?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case timestamp
+        case type
+        case customData
+        case data
+        case context
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        timestamp = try container.decode(String.self, forKey: .timestamp)
+        type = try container.decode(String.self, forKey: .type)
+        context = try container.decode([String: Any].self, forKey: .context)
+
+        switch type {
+        case "standard":
+            data = try container.decode([String: Any].self, forKey: .data)
+            customData = nil
+            break
+        case "custom":
+            customData = try container.decode([String: Any].self, forKey: .customData)
+            data = nil
+            break
+        default:
+            customData = nil
+            data = nil
+            break
+        }
+
+    }
+}
+
 class AnalyticsEventDecoder {
     enum AnalyticsCodingKeys: String, CodingKey {
         case name
         case event
     }
 
-    struct AnalyticsEvent: Decodable {
-        let name: String
-        let event: AnalyticsEventBody
-    }
-
-    struct AnalyticsEventBody: Decodable {
-        let id: String
-        let name: String
-        let timestamp: String
-        let type: String
-        let customData: [String: Any]?
-        let data: [String: Any]?
-        let context: [String: Any]?
-
-        enum CodingKeys: String, CodingKey {
-            case id
-            case name
-            case timestamp
-            case type
-            case customData
-            case data
-            case context
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            id = try container.decode(String.self, forKey: .id)
-            name = try container.decode(String.self, forKey: .name)
-            timestamp = try container.decode(String.self, forKey: .timestamp)
-            type = try container.decode(String.self, forKey: .type)
-            context = try container.decode([String: Any].self, forKey: .context)
-
-            switch type {
-            case "standard":
-                data = try container.decode([String: Any].self, forKey: .data)
-                customData = nil
-                break
-            case "custom":
-                customData = try container.decode([String: Any].self, forKey: .customData)
-                data = nil
-                break
-            default:
-                customData = nil
-                data = nil
-                break
-            }
-
-        }
-    }
-
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> Decodable? {
+    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> PixelEvent? {
         let messageBody = try container.decode(String.self, forKey: .body)
 
         if let data = messageBody.data(using: .utf8) {
-            return try JSONDecoder().decode(AnalyticsEvent.self, from: data)
+            let analyticsEvent = try JSONDecoder().decode(AnalyticsEvent.self, from: data)
+            return analyticsEvent.event
         }
 
         return nil

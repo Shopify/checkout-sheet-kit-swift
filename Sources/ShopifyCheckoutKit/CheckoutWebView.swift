@@ -31,7 +31,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidClickLink(url: URL)
 	func checkoutViewDidFailWithError(error: CheckoutError)
 	func checkoutViewDidToggleModal(modalVisible: Bool)
-    func checkoutViewDidEmitWebPixelEvent(event: Decodable)
+    func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
 
 class CheckoutWebView: WKWebView {
