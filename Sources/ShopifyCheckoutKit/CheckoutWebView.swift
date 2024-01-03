@@ -38,19 +38,18 @@ class CheckoutWebView: WKWebView {
 	private static var cache: CacheEntry?
 
 	static func `for`(checkout url: URL) -> CheckoutWebView {
-		guard ShopifyCheckoutKit.configuration.preloading.enabled else {
-			CheckoutWebView.cache = nil
-			return CheckoutWebView()
-		}
-
 		let cacheKey = url.absoluteString
+
+		if !ShopifyCheckoutKit.configuration.preloading.enabled {
+			invalidate()
+		}
 
 		guard let cache = cache, cacheKey == cache.key, !cache.isStale else {
 			let view = CheckoutWebView()
 			CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
 			return view
 		}
-
+		
 		return cache.view
 	}
 
@@ -66,16 +65,12 @@ class CheckoutWebView: WKWebView {
 	var presentedEventDidDispatch = false
 	var checkoutDidPresent: Bool = false {
 		didSet {
-			if checkoutDidPresent {
-				dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
-			}
+			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
 		}
 	}
 	var checkoutDidLoad: Bool = false {
 		didSet {
-			if checkoutDidLoad {
-				dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
-			}
+			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
 		}
 	}
 
