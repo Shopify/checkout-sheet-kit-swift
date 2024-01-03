@@ -162,6 +162,6 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 	}
 
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
-        delegate?.checkoutDidEmitWebPixelEvent(decodable: event)
+        delegate?.checkoutDidEmitWebPixelEvent(event: event)
     }
 }

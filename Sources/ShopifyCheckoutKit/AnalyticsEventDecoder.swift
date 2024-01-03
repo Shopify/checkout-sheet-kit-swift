@@ -25,17 +25,17 @@ import Foundation
 
 struct AnalyticsEvent: Decodable {
     let name: String
-    let event: PixelEvent
+    let event: AnalyticsEventBody
 }
 
-public struct PixelEvent: Decodable {
+struct AnalyticsEventBody: Decodable {
     let id: String
     let name: String
     let timestamp: String
     let type: String
-    let customData: [String: Any]?
+    let customData: CustomData?
     let data: [String: Any]?
-    let context: [String: Any]?
+    let context: Context?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -47,14 +47,14 @@ public struct PixelEvent: Decodable {
         case context
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         timestamp = try container.decode(String.self, forKey: .timestamp)
         type = try container.decode(String.self, forKey: .type)
-        context = try container.decode([String: Any].self, forKey: .context)
+        context = try container.decode(Context.self, forKey: .context)
 
         switch type {
         case "standard":
@@ -62,7 +62,7 @@ public struct PixelEvent: Decodable {
             customData = nil
             break
         case "custom":
-            customData = try container.decode([String: Any].self, forKey: .customData)
+            customData = try? container.decode(CustomData.self, forKey: .customData)
             data = nil
             break
         default:
@@ -83,11 +83,67 @@ class AnalyticsEventDecoder {
     func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> PixelEvent? {
         let messageBody = try container.decode(String.self, forKey: .body)
 
-        if let data = messageBody.data(using: .utf8) {
-            let analyticsEvent = try JSONDecoder().decode(AnalyticsEvent.self, from: data)
-            return analyticsEvent.event
+        guard let data = messageBody.data(using: .utf8) else {
+            return nil
         }
 
-        return nil
+        let analyticsEvent = try JSONDecoder().decode(AnalyticsEvent.self, from: data)
+
+        switch analyticsEvent.event.type {
+        case "standard":
+            return createStandardEvent(from: analyticsEvent.event)
+        case "custom":
+            let customEvent = CustomEvent(from: analyticsEvent.event)
+            return .customEvent(customEvent)
+        default:
+            return nil
+        }
     }
+
+    func createStandardEvent(from analyticsEventBody: AnalyticsEventBody) -> PixelEvent? {
+        switch analyticsEventBody.name {
+        case "cart_viewed":
+            let event = PixelEventsCartViewed(from: analyticsEventBody)
+            return .pixelEventsCartViewed(event)
+        case "checkout_address_info_submitted":
+            let event = PixelEventsCheckoutAddressInfoSubmitted(from: analyticsEventBody)
+            return .pixelEventsCheckoutAddressInfoSubmitted(event)
+        case "checkout_completed":
+            let event = PixelEventsCheckoutCompleted(from: analyticsEventBody)
+            return .pixelEventsCheckoutCompleted(event)
+        case "checkout_contact_info_submitted":
+            let event = PixelEventsCheckoutContactInfoSubmitted(from: analyticsEventBody)
+            return .pixelEventsCheckoutContactInfoSubmitted(event)
+        case "checkout_shipping_info_submitted":
+            let event = PixelEventsCheckoutShippingInfoSubmitted(from: analyticsEventBody)
+            return .pixelEventsCheckoutShippingInfoSubmitted(event)
+        case "checkout_started":
+            let event = PixelEventsCheckoutStarted(from: analyticsEventBody)
+            return .pixelEventsCheckoutStarted(event)
+        case "collection_viewed":
+            let event = PixelEventsCollectionViewed(from: analyticsEventBody)
+            return .pixelEventsCollectionViewed(event)
+        case "page_viewed":
+            let event = PixelEventsPageViewed(from: analyticsEventBody)
+            return .pixelEventsPageViewed(event)
+        case "payment_info_submitted":
+            let event = PixelEventsPaymentInfoSubmitted(from: analyticsEventBody)
+            return .pixelEventsPaymentInfoSubmitted(event)
+        case "product_added_to_cart":
+            let event = PixelEventsProductAddedToCart(from: analyticsEventBody)
+            return .pixelEventsProductAddedToCart(event)
+        case "product_removed_from_cart":
+            let event = PixelEventsProductRemovedFromCart(from: analyticsEventBody)
+            return .pixelEventsProductRemovedFromCart(event)
+        case "product_viewed":
+            let event = PixelEventsProductViewed(from: analyticsEventBody)
+            return .pixelEventsProductViewed(event)
+        case "search_submitted":
+            let event = PixelEventsSearchSubmitted(from: analyticsEventBody)
+            return .pixelEventsSearchSubmitted(event)
+        default:
+            return nil
+        }
+    }
+
 }

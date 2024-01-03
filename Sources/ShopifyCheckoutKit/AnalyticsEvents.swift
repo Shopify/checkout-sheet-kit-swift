@@ -23,10 +23,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Foundation
 
+public enum PixelEvent {
+    case customEvent(CustomEvent)
+    case pixelEventsCartViewed(PixelEventsCartViewed)
+    case pixelEventsCheckoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted)
+    case pixelEventsCheckoutCompleted(PixelEventsCheckoutCompleted)
+    case pixelEventsCheckoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted)
+    case pixelEventsCheckoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted)
+    case pixelEventsCheckoutStarted(PixelEventsCheckoutStarted)
+    case pixelEventsCollectionViewed(PixelEventsCollectionViewed)
+    case pixelEventsPageViewed(PixelEventsPageViewed)
+    case pixelEventsPaymentInfoSubmitted(PixelEventsPaymentInfoSubmitted)
+    case pixelEventsProductAddedToCart(PixelEventsProductAddedToCart)
+    case pixelEventsProductRemovedFromCart(PixelEventsProductRemovedFromCart)
+    case pixelEventsProductViewed(PixelEventsProductViewed)
+    case pixelEventsSearchSubmitted(PixelEventsSearchSubmitted)
+}
+
+
 /// The `cart_viewed` event logs an instance where a customer visited the cart
 /// page
 // MARK: - PixelEventsCartViewed
-struct PixelEventsCartViewed: Codable {
+public struct PixelEventsCartViewed: Codable {
     let context: Context?
     let data: PixelEventsCartViewedData?
     /// The ID of the customer event
@@ -45,6 +63,19 @@ struct PixelEventsCartViewed: Codable {
 // MARK: PixelEventsCartViewed convenience initializers and mutators
 
 extension PixelEventsCartViewed {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsCartViewedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsCartViewedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCartViewed.self, from: data)
     }
@@ -538,6 +569,14 @@ struct PixelEventsCartViewedData: Codable {
 // MARK: PixelEventsCartViewedData convenience initializers and mutators
 
 extension PixelEventsCartViewedData {
+    init?(from dictionary: [String: Any]) {
+        guard let data = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+              let pixelEventsCartViewedData = try? JSONDecoder().decode(PixelEventsCartViewedData.self, from: data) else {
+            return nil
+        }
+        self = pixelEventsCartViewedData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCartViewedData.self, from: data)
     }
@@ -1022,7 +1061,7 @@ enum PixelEventsCartViewedName: String, Codable {
 /// submitting their mailing address. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
 // MARK: - PixelEventsCheckoutAddressInfoSubmitted
-struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
+public struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsCheckoutAddressInfoSubmittedData?
@@ -1042,6 +1081,19 @@ struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
 // MARK: PixelEventsCheckoutAddressInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsCheckoutAddressInfoSubmitted {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsCheckoutAddressInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsCheckoutAddressInfoSubmittedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutAddressInfoSubmitted.self, from: data)
     }
@@ -1090,6 +1142,14 @@ struct PixelEventsCheckoutAddressInfoSubmittedData: Codable {
 // MARK: PixelEventsCheckoutAddressInfoSubmittedData convenience initializers and mutators
 
 extension PixelEventsCheckoutAddressInfoSubmittedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+              let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutAddressInfoSubmittedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutAddressInfoSubmittedData.self, from: data)
     }
@@ -1774,7 +1834,7 @@ enum PixelEventsCheckoutAddressInfoSubmittedName: String, Codable {
 /// The `checkout_completed` event logs when a visitor completes a purchase.
 /// This event is available on the order status and checkout pages
 // MARK: - PixelEventsCheckoutCompleted
-struct PixelEventsCheckoutCompleted: Codable {
+public struct PixelEventsCheckoutCompleted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsCheckoutCompletedData?
@@ -1794,6 +1854,19 @@ struct PixelEventsCheckoutCompleted: Codable {
 // MARK: PixelEventsCheckoutCompleted convenience initializers and mutators
 
 extension PixelEventsCheckoutCompleted {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsCheckoutCompletedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsCheckoutCompletedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutCompleted.self, from: data)
     }
@@ -1842,6 +1915,14 @@ struct PixelEventsCheckoutCompletedData: Codable {
 // MARK: PixelEventsCheckoutCompletedData convenience initializers and mutators
 
 extension PixelEventsCheckoutCompletedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutCompletedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutCompletedData.self, from: data)
     }
@@ -1887,7 +1968,7 @@ enum PixelEventsCheckoutCompletedName: String, Codable {
 /// customer submits a checkout form. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
 // MARK: - PixelEventsCheckoutContactInfoSubmitted
-struct PixelEventsCheckoutContactInfoSubmitted: Codable {
+public struct PixelEventsCheckoutContactInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsCheckoutContactInfoSubmittedData?
@@ -1907,6 +1988,19 @@ struct PixelEventsCheckoutContactInfoSubmitted: Codable {
 // MARK: PixelEventsCheckoutContactInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsCheckoutContactInfoSubmitted {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsCheckoutContactInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsCheckoutContactInfoSubmittedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutContactInfoSubmitted.self, from: data)
     }
@@ -1955,6 +2049,14 @@ struct PixelEventsCheckoutContactInfoSubmittedData: Codable {
 // MARK: PixelEventsCheckoutContactInfoSubmittedData convenience initializers and mutators
 
 extension PixelEventsCheckoutContactInfoSubmittedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutContactInfoSubmittedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutContactInfoSubmittedData.self, from: data)
     }
@@ -1996,7 +2098,7 @@ enum PixelEventsCheckoutContactInfoSubmittedName: String, Codable {
 /// customer chooses a shipping rate. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
 // MARK: - PixelEventsCheckoutShippingInfoSubmitted
-struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
+public struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsCheckoutShippingInfoSubmittedData?
@@ -2016,6 +2118,19 @@ struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
 // MARK: PixelEventsCheckoutShippingInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsCheckoutShippingInfoSubmitted {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsCheckoutShippingInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsCheckoutShippingInfoSubmittedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutShippingInfoSubmitted.self, from: data)
     }
@@ -2064,6 +2179,14 @@ struct PixelEventsCheckoutShippingInfoSubmittedData: Codable {
 // MARK: PixelEventsCheckoutShippingInfoSubmittedData convenience initializers and mutators
 
 extension PixelEventsCheckoutShippingInfoSubmittedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutShippingInfoSubmittedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutShippingInfoSubmittedData.self, from: data)
     }
@@ -2113,7 +2236,7 @@ enum PixelEventsCheckoutShippingInfoSubmittedName: String, Codable {
 /// enters checkout. For non-checkout extensible shops, this event is only
 /// triggered the first time a customer enters checkout.
 // MARK: - PixelEventsCheckoutStarted
-struct PixelEventsCheckoutStarted: Codable {
+public struct PixelEventsCheckoutStarted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsCheckoutStartedData?
@@ -2133,6 +2256,19 @@ struct PixelEventsCheckoutStarted: Codable {
 // MARK: PixelEventsCheckoutStarted convenience initializers and mutators
 
 extension PixelEventsCheckoutStarted {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsCheckoutStartedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsCheckoutStartedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutStarted.self, from: data)
     }
@@ -2181,6 +2317,14 @@ struct PixelEventsCheckoutStartedData: Codable {
 // MARK: PixelEventsCheckoutStartedData convenience initializers and mutators
 
 extension PixelEventsCheckoutStartedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutStartedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCheckoutStartedData.self, from: data)
     }
@@ -2222,7 +2366,7 @@ enum PixelEventsCheckoutStartedName: String, Codable {
 /// product collection index page. This event is available on the online store
 /// page
 // MARK: - PixelEventsCollectionViewed
-struct PixelEventsCollectionViewed: Codable {
+public struct PixelEventsCollectionViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsCollectionViewedData?
@@ -2242,6 +2386,19 @@ struct PixelEventsCollectionViewed: Codable {
 // MARK: PixelEventsCollectionViewed convenience initializers and mutators
 
 extension PixelEventsCollectionViewed {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsCollectionViewedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsCollectionViewedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCollectionViewed.self, from: data)
     }
@@ -2290,6 +2447,14 @@ struct PixelEventsCollectionViewedData: Codable {
 // MARK: PixelEventsCollectionViewedData convenience initializers and mutators
 
 extension PixelEventsCollectionViewedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsCollectionViewedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsCollectionViewedData.self, from: data)
     }
@@ -2384,7 +2549,7 @@ enum PixelEventsCollectionViewedName: String, Codable {
 /// This event is available on the online store, checkout, and order status
 /// pages
 // MARK: - PixelEventsPageViewed
-struct PixelEventsPageViewed: Codable {
+public struct PixelEventsPageViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsPageViewedData?
@@ -2404,6 +2569,19 @@ struct PixelEventsPageViewed: Codable {
 // MARK: PixelEventsPageViewed convenience initializers and mutators
 
 extension PixelEventsPageViewed {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsPageViewedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsPageViewedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsPageViewed.self, from: data)
     }
@@ -2451,6 +2629,14 @@ struct PixelEventsPageViewedData: Codable {
 // MARK: PixelEventsPageViewedData convenience initializers and mutators
 
 extension PixelEventsPageViewedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsPageViewedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsPageViewedData.self, from: data)
     }
@@ -2493,7 +2679,7 @@ enum PixelEventsPageViewedName: String, Codable {
 /// submitting their payment information. This event is available on the
 /// checkout page
 // MARK: - PixelEventsPaymentInfoSubmitted
-struct PixelEventsPaymentInfoSubmitted: Codable {
+public struct PixelEventsPaymentInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsPaymentInfoSubmittedData?
@@ -2513,6 +2699,19 @@ struct PixelEventsPaymentInfoSubmitted: Codable {
 // MARK: PixelEventsPaymentInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsPaymentInfoSubmitted {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsPaymentInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsPaymentInfoSubmittedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsPaymentInfoSubmitted.self, from: data)
     }
@@ -2561,6 +2760,14 @@ struct PixelEventsPaymentInfoSubmittedData: Codable {
 // MARK: PixelEventsPaymentInfoSubmittedData convenience initializers and mutators
 
 extension PixelEventsPaymentInfoSubmittedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsPaymentInfoSubmittedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsPaymentInfoSubmittedData.self, from: data)
     }
@@ -2601,7 +2808,7 @@ enum PixelEventsPaymentInfoSubmittedName: String, Codable {
 /// The `product_added_to_cart` event logs an instance where a customer adds a
 /// product to their cart. This event is available on the online store page
 // MARK: - PixelEventsProductAddedToCart
-struct PixelEventsProductAddedToCart: Codable {
+public struct PixelEventsProductAddedToCart: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsProductAddedToCartData?
@@ -2621,6 +2828,19 @@ struct PixelEventsProductAddedToCart: Codable {
 // MARK: PixelEventsProductAddedToCart convenience initializers and mutators
 
 extension PixelEventsProductAddedToCart {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsProductAddedToCartName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsProductAddedToCartData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsProductAddedToCart.self, from: data)
     }
@@ -2669,6 +2889,14 @@ struct PixelEventsProductAddedToCartData: Codable {
 // MARK: PixelEventsProductAddedToCartData convenience initializers and mutators
 
 extension PixelEventsProductAddedToCartData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsProductAddedToCartData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsProductAddedToCartData.self, from: data)
     }
@@ -2710,7 +2938,7 @@ enum PixelEventsProductAddedToCartName: String, Codable {
 /// removes a product from their cart. This event is available on the online
 /// store page
 // MARK: - PixelEventsProductRemovedFromCart
-struct PixelEventsProductRemovedFromCart: Codable {
+public struct PixelEventsProductRemovedFromCart: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsProductRemovedFromCartData?
@@ -2730,6 +2958,19 @@ struct PixelEventsProductRemovedFromCart: Codable {
 // MARK: PixelEventsProductRemovedFromCart convenience initializers and mutators
 
 extension PixelEventsProductRemovedFromCart {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsProductRemovedFromCartName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsProductRemovedFromCartData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsProductRemovedFromCart.self, from: data)
     }
@@ -2778,6 +3019,14 @@ struct PixelEventsProductRemovedFromCartData: Codable {
 // MARK: PixelEventsProductRemovedFromCartData convenience initializers and mutators
 
 extension PixelEventsProductRemovedFromCartData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsProductRemovedFromCartData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsProductRemovedFromCartData.self, from: data)
     }
@@ -2928,7 +3177,7 @@ enum PixelEventsProductVariantViewedName: String, Codable {
 /// The `product_viewed` event logs an instance where a customer visited a
 /// product details page. This event is available on the product page
 // MARK: - PixelEventsProductViewed
-struct PixelEventsProductViewed: Codable {
+public struct PixelEventsProductViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsProductViewedData?
@@ -2948,6 +3197,19 @@ struct PixelEventsProductViewed: Codable {
 // MARK: PixelEventsProductViewed convenience initializers and mutators
 
 extension PixelEventsProductViewed {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsProductViewedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsProductViewedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsProductViewed.self, from: data)
     }
@@ -2996,6 +3258,14 @@ struct PixelEventsProductViewedData: Codable {
 // MARK: PixelEventsProductViewedData convenience initializers and mutators
 
 extension PixelEventsProductViewedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+                let pixelData = try? JSONDecoder().decode(PixelEventsProductViewedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsProductViewedData.self, from: data)
     }
@@ -3036,7 +3306,7 @@ enum PixelEventsProductViewedName: String, Codable {
 /// The `search_submitted` event logs an instance where a customer performed a
 /// search on the storefront. This event is available on the online store page
 // MARK: - PixelEventsSearchSubmitted
-struct PixelEventsSearchSubmitted: Codable {
+public struct PixelEventsSearchSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let data: PixelEventsSearchSubmittedData?
@@ -3056,6 +3326,19 @@ struct PixelEventsSearchSubmitted: Codable {
 // MARK: PixelEventsSearchSubmitted convenience initializers and mutators
 
 extension PixelEventsSearchSubmitted {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.id = analyticsEventBody.id
+        self.name = PixelEventsSearchSubmittedName(rawValue: analyticsEventBody.name)
+        self.timestamp = analyticsEventBody.timestamp
+
+        if let dataDict = analyticsEventBody.data {
+            self.data = PixelEventsSearchSubmittedData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsSearchSubmitted.self, from: data)
     }
@@ -3104,6 +3387,14 @@ struct PixelEventsSearchSubmittedData: Codable {
 // MARK: PixelEventsSearchSubmittedData convenience initializers and mutators
 
 extension PixelEventsSearchSubmittedData {
+    init?(from dictionary: [String: Any]) {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+              let pixelData = try? JSONDecoder().decode(PixelEventsSearchSubmittedData.self, from: jsonData) else {
+            return nil
+        }
+        self = pixelData
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(PixelEventsSearchSubmittedData.self, from: data)
     }
@@ -3189,7 +3480,7 @@ enum PixelEventsSearchSubmittedName: String, Codable {
 /// This event represents any custom events emitted by partners or merchants via
 /// the `publish` method
 // MARK: - CustomEvent
-struct CustomEvent: Codable {
+public struct CustomEvent: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
     let customData: CustomData?
@@ -3209,6 +3500,14 @@ struct CustomEvent: Codable {
 // MARK: CustomEvent convenience initializers and mutators
 
 extension CustomEvent {
+    init(from analyticsEventBody: AnalyticsEventBody) {
+        self.context = analyticsEventBody.context
+        self.customData = analyticsEventBody.customData
+        self.id = analyticsEventBody.id
+        self.name = analyticsEventBody.name
+        self.timestamp = analyticsEventBody.timestamp
+    }
+
     init(data: Data) throws {
         self = try newJSONDecoder().decode(CustomEvent.self, from: data)
     }
