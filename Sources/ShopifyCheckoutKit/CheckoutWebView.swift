@@ -38,12 +38,11 @@ class CheckoutWebView: WKWebView {
 	private static var cache: CacheEntry?
 
 	static func `for`(checkout url: URL) -> CheckoutWebView {
-		guard ShopifyCheckoutKit.configuration.preloading.enabled else {
-			CheckoutWebView.cache = nil
-			return CheckoutWebView()
-		}
-
 		let cacheKey = url.absoluteString
+
+		if !ShopifyCheckoutKit.configuration.preloading.enabled {
+			invalidate()
+		}
 
 		guard let cache = cache, cacheKey == cache.key, !cache.isStale else {
 			let view = CheckoutWebView()
@@ -55,6 +54,8 @@ class CheckoutWebView: WKWebView {
 	}
 
 	static func invalidate() {
+		cache?.view.configuration.userContentController
+			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
 		cache = nil
 	}
 
@@ -87,6 +88,14 @@ class CheckoutWebView: WKWebView {
 		#endif
 
 		navigationDelegate = self
+
+		configuration.userContentController
+			.add(self, name: CheckoutBridge.messageHandler)
+	}
+
+	deinit {
+		configuration.userContentController
+			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
 	}
 
 	required init?(coder: NSCoder) {
@@ -94,18 +103,6 @@ class CheckoutWebView: WKWebView {
 	}
 
 	// MARK: -
-
-	override func didMoveToSuperview() {
-		super.didMoveToSuperview()
-
-		configuration.userContentController
-			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
-
-		if superview != nil {
-			configuration.userContentController
-				.add(self, name: CheckoutBridge.messageHandler)
-		}
-	}
 
 	func load(checkout url: URL) {
 		load(URLRequest(url: url))
