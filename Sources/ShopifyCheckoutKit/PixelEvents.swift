@@ -1147,11 +1147,9 @@ extension CheckoutAddressInfoSubmitted {
 }
 
 // MARK: - CheckoutAddressInfoSubmittedData
-// swiftlint:disable type_name
 struct CheckoutAddressInfoSubmittedData: Codable {
     let checkout: Checkout?
 }
-// swiftlint:enable type_name
 
 // MARK: CheckoutAddressInfoSubmittedData convenience initializers and mutators
 
@@ -2059,11 +2057,9 @@ extension CheckoutContactInfoSubmitted {
 
 // MARK: - CheckoutContactInfoSubmittedData
 
-// swiftlint:disable type_name
 struct CheckoutContactInfoSubmittedData: Codable {
     let checkout: Checkout?
 }
-// swiftlint:enable type_name
 
 // MARK: CheckoutContactInfoSubmittedData convenience initializers and mutators
 
@@ -2187,11 +2183,9 @@ extension CheckoutShippingInfoSubmitted {
 }
 
 // MARK: - CheckoutShippingInfoSubmittedData
-// swiftlint:disable type_name
 struct CheckoutShippingInfoSubmittedData: Codable {
     let checkout: Checkout?
 }
-// swiftlint:enable type_name
 
 // MARK: CheckoutShippingInfoSubmittedData convenience initializers and mutators
 

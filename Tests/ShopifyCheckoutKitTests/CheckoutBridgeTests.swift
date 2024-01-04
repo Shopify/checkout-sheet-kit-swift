@@ -197,8 +197,8 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
 		guard case .analytics(let pixelEvent) = result,
-			case .pixelEventsSearchSubmitted(let searchSubmittedEvent) = pixelEvent else {
-				XCTFail("Expected .analytics(.pixelEventsSearchSubmitted), got \(result)")
+			case .searchSubmitted(let searchSubmittedEvent) = pixelEvent else {
+				XCTFail("Expected .analytics(.searchSubmitted), got \(result)")
 				return
 			}
 
