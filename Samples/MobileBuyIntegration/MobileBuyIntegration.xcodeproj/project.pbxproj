@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,13 +18,13 @@
 		4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */; };
 		4EBBA7AE2A5F1BBF00193E19 /* UIImageView+URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */; };
 		4EBBA7B02A5F222F00193E19 /* MoneyV2+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AF2A5F222F00193E19 /* MoneyV2+Format.swift */; };
-		4EBBA7B72A5F231500193E19 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4EBBA7B62A5F231500193E19 /* ShopifyCheckoutSheetKit */; };
 		4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF54F232A6F456B00F5E407 /* CartManager.swift */; };
 		4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */; };
 		4EF54F312A6F63C000F5E407 /* CartViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EF54F2F2A6F63C000F5E407 /* CartViewController.xib */; };
 		6A257A132AFBA78500610DA5 /* LogReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A257A122AFBA78500610DA5 /* LogReader.swift */; };
 		6A257A152AFBB06300610DA5 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A257A142AFBB06300610DA5 /* Logger.swift */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
+		86CA9B9D2B45C0AC009953F4 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 86CA9B9C2B45C0AC009953F4 /* ShopifyCheckoutSheetKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,7 +41,6 @@
 		4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProductViewController.xib; sourceTree = "<group>"; };
 		4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+URL.swift"; sourceTree = "<group>"; };
 		4EBBA7AF2A5F222F00193E19 /* MoneyV2+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoneyV2+Format.swift"; sourceTree = "<group>"; };
-		4EBBA7B42A5F230900193E19 /* checkout-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-kit-swift"; path = ../..; sourceTree = "<group>"; };
 		4EF54F232A6F456B00F5E407 /* CartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartManager.swift; sourceTree = "<group>"; };
 		4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		4EF54F2F2A6F63C000F5E407 /* CartViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CartViewController.xib; sourceTree = "<group>"; };
@@ -55,8 +54,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86CA9B9D2B45C0AC009953F4 /* ShopifyCheckoutSheetKit in Frameworks */,
 				4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */,
-				4EBBA7B72A5F231500193E19 /* ShopifyCheckoutSheetKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,7 +123,6 @@
 		4EBBA7B32A5F230900193E19 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				4EBBA7B42A5F230900193E19 /* checkout-kit-swift */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -164,7 +162,7 @@
 			name = MobileBuyIntegration;
 			packageProductDependencies = (
 				4EBBA7A22A5F0F5600193E19 /* Buy */,
-				4EBBA7B62A5F231500193E19 /* ShopifyCheckoutSheetKit */,
+				86CA9B9C2B45C0AC009953F4 /* ShopifyCheckoutSheetKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */;
@@ -178,7 +176,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1510;
 				TargetAttributes = {
 					4EBBA7662A5F0CE200193E19 = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -196,6 +194,7 @@
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
 				4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
+				86CA9B992B45C093009953F4 /* XCLocalSwiftPackageReference "../.." */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -314,6 +313,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -376,6 +376,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -469,6 +470,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		86CA9B992B45C093009953F4 /* XCLocalSwiftPackageReference "../.." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -486,7 +494,7 @@
 			package = 4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
 			productName = Buy;
 		};
-		4EBBA7B62A5F231500193E19 /* ShopifyCheckoutSheetKit */ = {
+		86CA9B9C2B45C0AC009953F4 /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShopifyCheckoutSheetKit;
 		};
