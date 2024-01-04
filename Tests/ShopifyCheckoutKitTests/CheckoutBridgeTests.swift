@@ -113,6 +113,7 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
+	// swiftlint:disable function_body_length
 	func testDecodeSupportsAnalyticsEvent() throws {
 		let body = """
         {
@@ -195,20 +196,18 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        switch result {
-        case .analytics(let pixelEvent):
-            switch pixelEvent {
-            case .pixelEventsSearchSubmitted(let searchSubmittedEvent):
-                XCTAssertEqual("search_submitted", searchSubmittedEvent.name)
-				XCTAssertEqual("123", searchSubmittedEvent.id)
-				XCTAssertEqual("2024-01-04T09:48:53.358Z", searchSubmittedEvent.timestamp)
-				XCTAssertEqual("snowboard", searchSubmittedEvent.data?.searchResult?.query)
-            default:
-                XCTFail("expected PixelEventsSearchSubmitted, got \(result)")
-            }
-        default: XCTFail("expected CheckoutScriptMessage.analytics, got \(result)")
+		guard case .analytics(let pixelEvent) = result,
+			  case .pixelEventsSearchSubmitted(let searchSubmittedEvent) = pixelEvent else {
+			XCTFail("Expected .analytics(.pixelEventsSearchSubmitted), got \(result)")
+			return
 		}
+
+		XCTAssertEqual("search_submitted", searchSubmittedEvent.name)
+		XCTAssertEqual("123", searchSubmittedEvent.id)
+		XCTAssertEqual("2024-01-04T09:48:53.358Z", searchSubmittedEvent.timestamp)
+		XCTAssertEqual("snowboard", searchSubmittedEvent.data?.searchResult?.query)
 	}
+	// swiftlint:enable function_body_length
 
 	func testInstrumentationPayloadToBridgeEvent() {
 		let payload = InstrumentationPayload(name: "test", value: 1, type: .histogram)
