@@ -125,7 +125,7 @@ class CheckoutBridgeTests: XCTestCase {
                 "data": {
                     "searchResult": {
                         "productVariants":[],
-                        "query": ""
+                        "query": "snowboard"
                     }
                 },
                 "customData": null,
@@ -200,7 +200,9 @@ class CheckoutBridgeTests: XCTestCase {
             switch pixelEvent {
             case .pixelEventsSearchSubmitted(let searchSubmittedEvent):
                 XCTAssertEqual("search_submitted", searchSubmittedEvent.name)
-
+				XCTAssertEqual("123", searchSubmittedEvent.id)
+				XCTAssertEqual("2024-01-04T09:48:53.358Z", searchSubmittedEvent.timestamp)
+				XCTAssertEqual("snowboard", searchSubmittedEvent.data?.searchResult?.query)
             default:
                 XCTFail("expected PixelEventsSearchSubmitted, got \(result)")
             }
