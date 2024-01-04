@@ -106,7 +106,7 @@ extension CheckoutBridge {
 			case "checkoutBlockingEvent":
 				let modalVisible = try container.decode(String.self, forKey: .body)
 				self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)
-            case "analytics":
+			case "analytics":
                 let analyticDecoder = AnalyticsEventDecoder()
                 let event = try analyticDecoder.decode(from: container, using: decoder)
                 self = .analytics(event: event)

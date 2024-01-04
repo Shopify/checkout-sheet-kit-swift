@@ -60,15 +60,12 @@ struct AnalyticsEventBody: Decodable {
         case "standard":
             data = try container.decode([String: Any].self, forKey: .data)
             customData = nil
-            break
         case "custom":
             customData = try? container.decode(CustomData.self, forKey: .customData)
             data = nil
-            break
         default:
             customData = nil
             data = nil
-            break
         }
 
     }
@@ -101,49 +98,26 @@ class AnalyticsEventDecoder {
     }
 
     func createStandardEvent(from analyticsEventBody: AnalyticsEventBody) -> PixelEvent? {
-        switch analyticsEventBody.name {
-        case "cart_viewed":
-            let event = PixelEventsCartViewed(from: analyticsEventBody)
-            return .pixelEventsCartViewed(event)
-        case "checkout_address_info_submitted":
-            let event = PixelEventsCheckoutAddressInfoSubmitted(from: analyticsEventBody)
-            return .pixelEventsCheckoutAddressInfoSubmitted(event)
-        case "checkout_completed":
-            let event = PixelEventsCheckoutCompleted(from: analyticsEventBody)
-            return .pixelEventsCheckoutCompleted(event)
-        case "checkout_contact_info_submitted":
-            let event = PixelEventsCheckoutContactInfoSubmitted(from: analyticsEventBody)
-            return .pixelEventsCheckoutContactInfoSubmitted(event)
-        case "checkout_shipping_info_submitted":
-            let event = PixelEventsCheckoutShippingInfoSubmitted(from: analyticsEventBody)
-            return .pixelEventsCheckoutShippingInfoSubmitted(event)
-        case "checkout_started":
-            let event = PixelEventsCheckoutStarted(from: analyticsEventBody)
-            return .pixelEventsCheckoutStarted(event)
-        case "collection_viewed":
-            let event = PixelEventsCollectionViewed(from: analyticsEventBody)
-            return .pixelEventsCollectionViewed(event)
-        case "page_viewed":
-            let event = PixelEventsPageViewed(from: analyticsEventBody)
-            return .pixelEventsPageViewed(event)
-        case "payment_info_submitted":
-            let event = PixelEventsPaymentInfoSubmitted(from: analyticsEventBody)
-            return .pixelEventsPaymentInfoSubmitted(event)
-        case "product_added_to_cart":
-            let event = PixelEventsProductAddedToCart(from: analyticsEventBody)
-            return .pixelEventsProductAddedToCart(event)
-        case "product_removed_from_cart":
-            let event = PixelEventsProductRemovedFromCart(from: analyticsEventBody)
-            return .pixelEventsProductRemovedFromCart(event)
-        case "product_viewed":
-            let event = PixelEventsProductViewed(from: analyticsEventBody)
-            return .pixelEventsProductViewed(event)
-        case "search_submitted":
-            let event = PixelEventsSearchSubmitted(from: analyticsEventBody)
-            return .pixelEventsSearchSubmitted(event)
-        default:
-            return nil
-        }
-    }
+        let eventCreationDictionary: [String: (AnalyticsEventBody) -> PixelEvent?] = [
+            "cart_viewed": { .pixelEventsCartViewed(PixelEventsCartViewed(from: $0)) },
+            "checkout_address_info_submitted": { .pixelEventsCheckoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted(from: $0)) },
+            "checkout_completed": { .pixelEventsCheckoutCompleted(PixelEventsCheckoutCompleted(from: $0)) },
+            "checkout_contact_info_submitted": { .pixelEventsCheckoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted(from: $0)) },
+            "checkout_shipping_info_submitted": { .pixelEventsCheckoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted(from: $0)) },
+            "checkout_started": { .pixelEventsCheckoutStarted(PixelEventsCheckoutStarted(from: $0)) },
+            "collection_viewed": { .pixelEventsCollectionViewed(PixelEventsCollectionViewed(from: $0)) },
+            "page_viewed": { .pixelEventsPageViewed(PixelEventsPageViewed(from: $0)) },
+            "payment_info_submitted": { .pixelEventsPaymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) },
+            "product_added_to_cart": { .pixelEventsProductAddedToCart(PixelEventsProductAddedToCart(from: $0)) },
+            "product_removed_from_cart": { .pixelEventsProductRemovedFromCart(PixelEventsProductRemovedFromCart(from: $0)) },
+            "product_viewed": { .pixelEventsProductViewed(PixelEventsProductViewed(from: $0)) },
+            "search_submitted": { .pixelEventsSearchSubmitted(PixelEventsSearchSubmitted(from: $0)) }
+        ]
 
+        if let createEvent = eventCreationDictionary[analyticsEventBody.name] {
+            return createEvent(analyticsEventBody)
+        }
+
+        return nil
+    }
 }

@@ -129,7 +129,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
-            case let .analytics(event):
+			case let .analytics(event):
                 if let nonOptionalEvent = event {
                     viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
                 }
