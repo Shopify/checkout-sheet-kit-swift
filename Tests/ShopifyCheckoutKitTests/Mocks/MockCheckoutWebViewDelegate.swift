@@ -69,7 +69,7 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 		didToggleModalExpectation?.fulfill()
 	}
 
-    func checkoutViewDidEmitAnalyticsEvent(event: Decodable) {
+    func checkoutViewDidEmitWebPixelEvent(event: ShopifyCheckoutKit.PixelEvent) {
         didEmitAnalyticsEventExpectation?.fulfill()
     }
 }

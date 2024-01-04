@@ -40,6 +40,6 @@ class ExampleDelegate: CheckoutDelegate {
 	func checkoutDidClickContactLink(url: URL) {
 	}
 
-    func checkoutDidEmitWebPixelEvent(decodable: PixelEvent) {
+    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
     }
 }

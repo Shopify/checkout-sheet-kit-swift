@@ -114,10 +114,81 @@ class CheckoutBridgeTests: XCTestCase {
 	}
 
     func testDecodeSupportsAnalyticsEvent() throws {
+        let body = """
+        {
+            "name": "search_submitted",
+            "event": {
+                "id": "123",
+                "name": "search_submitted",
+                "type":"standard",
+                "timestamp": "2024-01-04T09:48:53.358Z",
+                "data": {
+                    "searchResult": {
+                        "productVariants":[],
+                        "query": ""
+                    }
+                },
+                "customData": null,
+                "context": {
+                    "document": {
+                        "characterSet": "",
+                        "location": {
+                            "hash": "",
+                            "host":"",
+                            "hostname":"",
+                            "href":"",
+                            "origin":"",
+                            "pathname":"",
+                            "port":"",
+                            "protocol":"",
+                            "search": ""
+                        },
+                        "referrer": "",
+                        "title": ""
+                    },
+                    "navigator": {
+                        "cookieEnabled": false,
+                        "language": "",
+                        "languages": [],
+                        "userAgent": ""
+                    },
+                    "window": {
+                        "innerHeight": 0,
+                        "innerWidth": 0,
+                        "location": {
+                            "hash": "",
+                            "host": "",
+                            "hostname": "",
+                            "href": "",
+                            "origin": "",
+                            "pathname": "",
+                            "port": "",
+                            "protocol": "",
+                            "search": ""
+                        },
+                        "origin": "",
+                        "outerHeight": 0,
+                        "outerWidth": 0,
+                        "pageXOffset": 0,
+                        "pageYOffset": 0,
+                        "screen": {
+                            "height": 0,
+                            "width": 0
+                        },
+                        "screenX": 0,
+                        "screenY": 0,
+                        "scrollX": 0,
+                        "scrollY": 0
+                    }
+                }
+            }
+        }
+        """
+        
         let mock = WKScriptMessageMock(body: """
             {
                 "name": "analytics",
-                "body": "{\"name\":\"analytics\",\"body\":\"{\\\"name\\\":\\\"cart_viewed\\\",\\\"event\\\":{\\\"id\\\":\\\"123\\\",\\\"name\\\":\\\"cart_viewed\\\",\\\"type\\\":\\\"standard\\\",\\\"timestamp\\\":\\\"2024-01-02T14:14:59.699Z\\\",\\\"data\\\":{\\\"cart\\\":{\\\"id\\\":\\\"123\\\"}},\\\"customData\\\":null,\\\"context\\\":{\\\"document\\\":{\\\"characterSet\\\":\\\"\\\",\\\"location\\\":{\\\"hash\\\":\\\"\\\",\\\"host\\\":\\\"\\\",\\\"hostname\\\":\\\"\\\",\\\"href\\\":\\\"\\\",\\\"origin\\\":\\\"\\\",\\\"pathname\\\":\\\"\\\",\\\"port\\\":\\\"\\\",\\\"protocol\\\":\\\"\\\",\\\"search\\\":\\\"\\\"},\\\"referrer\\\":\\\"\\\",\\\"title\\\":\\\"\\\"},\\\"navigator\\\":{\\\"cookieEnabled\\\":false,\\\"language\\\":\\\"\\\",\\\"languages\\\":[],\\\"userAgent\\\":\\\"\\\"},\\\"window\\\":{\\\"innerHeight\\\":0,\\\"innerWidth\\\":0,\\\"location\\\":{\\\"hash\\\":\\\"\\\",\\\"host\\\":\\\"\\\",\\\"hostname\\\":\\\"\\\",\\\"href\\\":\\\"\\\",\\\"origin\\\":\\\"\\\",\\\"pathname\\\":\\\"\\\",\\\"port\\\":\\\"\\\",\\\"protocol\\\":\\\"\\\",\\\"search\\\":\\\"\\\"},\\\"origin\\\":\\\"\\\",\\\"outerHeight\\\":0,\\\"outerWidth\\\":0,\\\"pageXOffset\\\":0,\\\"pageYOffset\\\":0,\\\"screen\\\":{\\\"height\\\":0,\\\"width\\\":0},\\\"screenX\\\":0,\\\"screenY\\\":0,\\\"scrollX\\\":0,\\\"scrollY\\\":0}}}}\"}"
+                "body": "\(body)"
             }
             """)
 
