@@ -113,8 +113,8 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
-    func testDecodeSupportsAnalyticsEvent() throws {
-        let body = """
+	func testDecodeSupportsAnalyticsEvent() throws {
+		let body = """
         {
             "name": "search_submitted",
             "event": {
@@ -183,8 +183,9 @@ class CheckoutBridgeTests: XCTestCase {
                 }
             }
         }
-        """
-        
+        """.replacingOccurrences(of: "\"", with: "\\\"")
+            .replacingOccurrences(of: "\n", with: "")
+
         let mock = WKScriptMessageMock(body: """
             {
                 "name": "analytics",
@@ -194,10 +195,18 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard case CheckoutBridge.WebEvent.checkoutModalToggled = result else {
-            return XCTFail("expected CheckoutScriptMessage.checkoutModalToggled, got \(result)")
-        }
-    }
+        switch result {
+        case .analytics(let pixelEvent):
+            switch pixelEvent {
+            case .pixelEventsSearchSubmitted(let searchSubmittedEvent):
+                XCTAssertEqual("search_submitted", searchSubmittedEvent.name)
+
+            default:
+                XCTFail("expected PixelEventsSearchSubmitted, got \(result)")
+            }
+        default: XCTFail("expected CheckoutScriptMessage.analytics, got \(result)")
+		}
+	}
 
 	func testInstrumentationPayloadToBridgeEvent() {
 		let payload = InstrumentationPayload(name: "test", value: 1, type: .histogram)

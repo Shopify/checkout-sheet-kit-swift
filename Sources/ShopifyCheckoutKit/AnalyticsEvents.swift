@@ -3313,7 +3313,7 @@ public struct PixelEventsSearchSubmitted: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsSearchSubmittedName?
+	let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -3329,7 +3329,7 @@ extension PixelEventsSearchSubmitted {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsSearchSubmittedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {

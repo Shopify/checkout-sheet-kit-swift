@@ -130,9 +130,9 @@ extension CheckoutWebView: WKScriptMessageHandler {
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
 			case let .analytics(event):
-                if let nonOptionalEvent = event {
-                    viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
-                }
+				if let nonOptionalEvent = event {
+					viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
+				}
 			default:
 				()
 			}
