@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+// swiftlint:disable file_length
+
 import Foundation
 
 public enum PixelEvent {
@@ -40,10 +42,10 @@ public enum PixelEvent {
     case pixelEventsSearchSubmitted(PixelEventsSearchSubmitted)
 }
 
+// MARK: - PixelEventsCartViewed
 
 /// The `cart_viewed` event logs an instance where a customer visited the cart
 /// page
-// MARK: - PixelEventsCartViewed
 public struct PixelEventsCartViewed: Codable {
     let context: Context?
     let data: PixelEventsCartViewedData?
@@ -116,9 +118,10 @@ extension PixelEventsCartViewed {
     }
 }
 
+// MARK: - Context
+
 /// A snapshot of various read-only properties of the browser at the time of
 /// event
-// MARK: - Context
 struct Context: Codable {
     /// Snapshot of a subset of properties of the `document` object in the top
     /// frame of the browser
@@ -170,12 +173,13 @@ extension Context {
     }
 }
 
+// MARK: - WebPixelsDocument
+
 /// Snapshot of a subset of properties of the `document` object in the top
 /// frame of the browser
 ///
 /// A snapshot of a subset of properties of the `document` object in the top
 /// frame of the browser
-// MARK: - WebPixelsDocument
 struct WebPixelsDocument: Codable {
     /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document),
     /// returns the character set being used by the document
@@ -232,6 +236,8 @@ extension WebPixelsDocument {
     }
 }
 
+// MARK: - Location
+
 /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document),
 /// returns the URI of the current document
 ///
@@ -240,7 +246,6 @@ extension WebPixelsDocument {
 ///
 /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window), the
 /// location, or current URL, of the window object
-// MARK: - Location
 struct Location: Codable {
     /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Location), a
     /// string containing a `'#'` followed by the fragment identifier of the URL
@@ -331,12 +336,13 @@ extension Location {
     }
 }
 
+// MARK: - WebPixelsNavigator
+
 /// Snapshot of a subset of properties of the `navigator` object in the top
 /// frame of the browser
 ///
 /// A snapshot of a subset of properties of the `navigator` object in the top
 /// frame of the browser
-// MARK: - WebPixelsNavigator
 struct WebPixelsNavigator: Codable {
     /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Navigator),
     /// returns `false` if setting a cookie will be ignored and true otherwise
@@ -396,12 +402,13 @@ extension WebPixelsNavigator {
     }
 }
 
+// MARK: - WebPixelsWindow
+
 /// Snapshot of a subset of properties of the `window` object in the top frame
 /// of the browser
 ///
 /// A snapshot of a subset of properties of the `window` object in the top frame
 /// of the browser
-// MARK: - WebPixelsWindow
 struct WebPixelsWindow: Codable {
     /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window),
     /// gets the height of the content area of the browser window including, if
@@ -508,13 +515,14 @@ extension WebPixelsWindow {
     }
 }
 
+// MARK: - Screen
+
 /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Screen), the
 /// interface representing a screen, usually the one on which the current
 /// window is being rendered
 ///
 /// The interface representing a screen, usually the one on which the current
 /// window is being rendered
-// MARK: - Screen
 struct Screen: Codable {
     /// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Screen/height),
     /// the height of the screen
@@ -571,9 +579,9 @@ struct PixelEventsCartViewedData: Codable {
 extension PixelEventsCartViewedData {
     init?(from dictionary: [String: Any]) {
         guard let data = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-              let pixelEventsCartViewedData = try? JSONDecoder().decode(PixelEventsCartViewedData.self, from: data) else {
-            return nil
-        }
+			let pixelEventsCartViewedData = try? JSONDecoder().decode(PixelEventsCartViewedData.self, from: data) else {
+				return nil
+			}
         self = pixelEventsCartViewedData
     }
 
@@ -609,9 +617,10 @@ extension PixelEventsCartViewedData {
     }
 }
 
+// MARK: - Cart
+
 /// A cart represents the merchandise that a customer intends to purchase, and
 /// the estimated cost associated with the cart.
-// MARK: - Cart
 struct Cart: Codable {
     /// The estimated costs that the customer will pay at checkout.
     let cost: CartCost?
@@ -663,13 +672,14 @@ extension Cart {
     }
 }
 
+// MARK: - CartCost
+
 /// The estimated costs that the customer will pay at checkout.
 ///
 /// The costs that the customer will pay at checkout. It uses
 /// [`CartBuyerIdentity`](https://shopify.dev/api/storefront/reference/cart/cartb
 /// uyeridentity) to determine [international pricing](https://shopify.dev/custom-
 /// storefronts/internationalization/international-pricing#create-a-cart).
-// MARK: - CartCost
 struct CartCost: Codable {
     /// The total amount for the customer to pay.
     let totalAmount: MoneyV2?
@@ -710,6 +720,8 @@ extension CartCost {
     }
 }
 
+// MARK: - MoneyV2
+
 /// The total amount for the customer to pay.
 ///
 /// A monetary value with currency.
@@ -731,7 +743,6 @@ extension CartCost {
 /// the checkout.
 ///
 /// The monetary value with currency allocated to the transaction method.
-// MARK: - MoneyV2
 struct MoneyV2: Codable {
     /// The decimal money amount.
     let amount: Double?
@@ -778,8 +789,9 @@ extension MoneyV2 {
     }
 }
 
-/// Information about the merchandise in the cart.
 // MARK: - CartLine
+
+/// Information about the merchandise in the cart.
 struct CartLine: Codable {
     /// The cost of the merchandise that the customer will pay for at checkout. The
     /// costs are subject to change and changes will be reflected at checkout.
@@ -829,11 +841,12 @@ extension CartLine {
     }
 }
 
+// MARK: - CartLineCost
+
 /// The cost of the merchandise that the customer will pay for at checkout. The
 /// costs are subject to change and changes will be reflected at checkout.
 ///
 /// The cost of the merchandise line that the customer will pay at checkout.
-// MARK: - CartLineCost
 struct CartLineCost: Codable {
     /// The total cost of the merchandise line.
     let totalAmount: MoneyV2?
@@ -874,11 +887,12 @@ extension CartLineCost {
     }
 }
 
+// MARK: - ProductVariant
+
 /// The merchandise that the buyer intends to purchase.
 ///
 /// A product variant represents a different version of a product, such as
 /// differing sizes or differing colors.
-// MARK: - ProductVariant
 struct ProductVariant: Codable {
     /// A globally unique identifier.
     let id: String?
@@ -944,8 +958,9 @@ extension ProductVariant {
     }
 }
 
-/// An image resource.
 // MARK: - Image
+
+/// An image resource.
 struct Image: Codable {
     /// The location of the image as a URL.
     let src: String?
@@ -986,10 +1001,11 @@ extension Image {
     }
 }
 
+// MARK: - Product
+
 /// The product object that the product variant belongs to.
 ///
 /// A product is an individual item for sale in a Shopify store.
-// MARK: - Product
 struct Product: Codable {
     /// The ID of the product.
     let id: String?
@@ -1052,10 +1068,11 @@ extension Product {
     }
 }
 
+// MARK: - PixelEventsCheckoutAddressInfoSubmitted
+
 /// The `checkout_address_info_submitted` event logs an instance of a customer
 /// submitting their mailing address. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
-// MARK: - PixelEventsCheckoutAddressInfoSubmitted
 public struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -1130,18 +1147,20 @@ extension PixelEventsCheckoutAddressInfoSubmitted {
 }
 
 // MARK: - PixelEventsCheckoutAddressInfoSubmittedData
+// swiftlint:disable type_name
 struct PixelEventsCheckoutAddressInfoSubmittedData: Codable {
     let checkout: Checkout?
 }
+// swiftlint:enable type_name
 
 // MARK: PixelEventsCheckoutAddressInfoSubmittedData convenience initializers and mutators
 
 extension PixelEventsCheckoutAddressInfoSubmittedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-              let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutAddressInfoSubmittedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutAddressInfoSubmittedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -1177,9 +1196,10 @@ extension PixelEventsCheckoutAddressInfoSubmittedData {
     }
 }
 
+// MARK: - Checkout
+
 /// A container for all the information required to add items to checkout and
 /// pay.
-// MARK: - Checkout
 struct Checkout: Codable {
     /// A list of attributes accumulated throughout the checkout process.
     let attributes: [Attribute]?
@@ -1283,9 +1303,10 @@ extension Checkout {
     }
 }
 
+// MARK: - Attribute
+
 /// Custom attributes left by the customer to the merchant, either in their cart
 /// or during checkout.
-// MARK: - Attribute
 struct Attribute: Codable {
     /// The key for the attribute.
     let key: String?
@@ -1330,8 +1351,9 @@ extension Attribute {
     }
 }
 
-/// A mailing address for customers and shipping.
 // MARK: - MailingAddress
+
+/// A mailing address for customers and shipping.
 struct MailingAddress: Codable {
     /// The first line of the address. This is usually the street address or a P.O.
     /// Box number.
@@ -1416,8 +1438,9 @@ extension MailingAddress {
     }
 }
 
-/// The information about the intent of the discount.
 // MARK: - DiscountApplication
+
+/// The information about the intent of the discount.
 struct DiscountApplication: Codable {
     /// The method by which the discount's value is applied to its entitled items.
     ///
@@ -1502,6 +1525,8 @@ extension DiscountApplication {
     }
 }
 
+// MARK: - Value
+
 /// The value of the discount. Fixed discounts return a `Money` Object, while
 /// Percentage discounts return a `PricingPercentageValue` object.
 ///
@@ -1530,7 +1555,6 @@ extension DiscountApplication {
 /// A value given to a customer when a discount is applied to an order. The
 /// application of a discount with this value gives the customer the specified
 /// percentage off a specified item.
-// MARK: - Value
 struct Value: Codable {
     /// The decimal money amount.
     let amount: Double?
@@ -1581,8 +1605,9 @@ extension Value {
     }
 }
 
-/// A single line item in the checkout, grouped by variant and attributes.
 // MARK: - CheckoutLineItem
+
+/// A single line item in the checkout, grouped by variant and attributes.
 struct CheckoutLineItem: Codable {
     /// The discounts that have been applied to the checkout line item by a
     /// discount application.
@@ -1640,8 +1665,9 @@ extension CheckoutLineItem {
     }
 }
 
-/// The discount that has been applied to the checkout line item.
 // MARK: - DiscountAllocation
+
+/// The discount that has been applied to the checkout line item.
 struct DiscountAllocation: Codable {
     /// The monetary value with currency allocated to the discount.
     let amount: MoneyV2?
@@ -1686,10 +1712,11 @@ extension DiscountAllocation {
     }
 }
 
+// MARK: - Order
+
 /// An order is a customer’s completed request to purchase one or more products
 /// from a shop. An order is created when a customer completes the checkout
 /// process.
-// MARK: - Order
 struct Order: Codable {
     /// The ID of the order.
     let id: String?
@@ -1730,8 +1757,9 @@ extension Order {
     }
 }
 
-/// A shipping rate to be applied to a checkout.
 // MARK: - ShippingRate
+
+/// A shipping rate to be applied to a checkout.
 struct ShippingRate: Codable {
     /// Price of this shipping rate.
     let price: MoneyV2?
@@ -1772,8 +1800,9 @@ extension ShippingRate {
     }
 }
 
-/// A transaction associated with a checkout or order.
 // MARK: - Transaction
+
+/// A transaction associated with a checkout or order.
 struct Transaction: Codable {
     /// The monetary value with currency allocated to the transaction method.
     let amount: MoneyV2?
@@ -1818,12 +1847,13 @@ extension Transaction {
     }
 }
 
+// MARK: - PixelEventsCheckoutCompleted
+
 /// The `checkout_completed` event logs when a visitor completes a purchase. This
 /// event is available on the order status and checkout pages
 ///
 /// The `checkout_completed` event logs when a visitor completes a purchase.
 /// This event is available on the order status and checkout pages
-// MARK: - PixelEventsCheckoutCompleted
 public struct PixelEventsCheckoutCompleted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -1907,9 +1937,9 @@ struct PixelEventsCheckoutCompletedData: Codable {
 extension PixelEventsCheckoutCompletedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutCompletedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutCompletedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -1945,6 +1975,8 @@ extension PixelEventsCheckoutCompletedData {
     }
 }
 
+// MARK: - PixelEventsCheckoutContactInfoSubmitted
+
 /// The `checkout_contact_info_submitted` event logs an instance where a customer
 /// submits a checkout form. This event is only available in checkouts where
 /// checkout extensibility for customizations is enabled
@@ -1952,7 +1984,6 @@ extension PixelEventsCheckoutCompletedData {
 /// The `checkout_contact_info_submitted` event logs an instance where a
 /// customer submits a checkout form. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
-// MARK: - PixelEventsCheckoutContactInfoSubmitted
 public struct PixelEventsCheckoutContactInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2027,18 +2058,21 @@ extension PixelEventsCheckoutContactInfoSubmitted {
 }
 
 // MARK: - PixelEventsCheckoutContactInfoSubmittedData
+
+// swiftlint:disable type_name
 struct PixelEventsCheckoutContactInfoSubmittedData: Codable {
     let checkout: Checkout?
 }
+// swiftlint:enable type_name
 
 // MARK: PixelEventsCheckoutContactInfoSubmittedData convenience initializers and mutators
 
 extension PixelEventsCheckoutContactInfoSubmittedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutContactInfoSubmittedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutContactInfoSubmittedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -2074,10 +2108,11 @@ extension PixelEventsCheckoutContactInfoSubmittedData {
     }
 }
 
+// MARK: - PixelEventsCheckoutShippingInfoSubmitted
+
 /// The `checkout_shipping_info_submitted` event logs an instance where the
 /// customer chooses a shipping rate. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
-// MARK: - PixelEventsCheckoutShippingInfoSubmitted
 public struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2152,18 +2187,20 @@ extension PixelEventsCheckoutShippingInfoSubmitted {
 }
 
 // MARK: - PixelEventsCheckoutShippingInfoSubmittedData
+// swiftlint:disable type_name
 struct PixelEventsCheckoutShippingInfoSubmittedData: Codable {
     let checkout: Checkout?
 }
+// swiftlint:enable type_name
 
 // MARK: PixelEventsCheckoutShippingInfoSubmittedData convenience initializers and mutators
 
 extension PixelEventsCheckoutShippingInfoSubmittedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutShippingInfoSubmittedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutShippingInfoSubmittedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -2199,6 +2236,8 @@ extension PixelEventsCheckoutShippingInfoSubmittedData {
     }
 }
 
+// MARK: - PixelEventsCheckoutStarted
+
 /// The `checkout_started` event logs an instance of a customer starting the
 /// checkout process. This event is available on the checkout page. For checkout
 /// extensibility, this event is triggered every time a customer enters checkout.
@@ -2210,7 +2249,6 @@ extension PixelEventsCheckoutShippingInfoSubmittedData {
 /// checkout extensibility, this event is triggered every time a customer
 /// enters checkout. For non-checkout extensible shops, this event is only
 /// triggered the first time a customer enters checkout.
-// MARK: - PixelEventsCheckoutStarted
 public struct PixelEventsCheckoutStarted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2294,9 +2332,9 @@ struct PixelEventsCheckoutStartedData: Codable {
 extension PixelEventsCheckoutStartedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutStartedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutStartedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -2332,10 +2370,11 @@ extension PixelEventsCheckoutStartedData {
     }
 }
 
+// MARK: - PixelEventsCollectionViewed
+
 /// The `collection_viewed` event logs an instance where a customer visited a
 /// product collection index page. This event is available on the online store
 /// page
-// MARK: - PixelEventsCollectionViewed
 public struct PixelEventsCollectionViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2419,9 +2458,9 @@ struct PixelEventsCollectionViewedData: Codable {
 extension PixelEventsCollectionViewedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsCollectionViewedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsCollectionViewedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -2457,9 +2496,10 @@ extension PixelEventsCollectionViewedData {
     }
 }
 
+// MARK: - Collection
+
 /// A collection is a group of products that a shop owner can create to organize
 /// them or make their shops easier to browse.
-// MARK: - Collection
 struct Collection: Codable {
     /// A globally unique identifier.
     let id: String?
@@ -2507,13 +2547,14 @@ extension Collection {
     }
 }
 
+// MARK: - PixelEventsPageViewed
+
 /// The `page_viewed` event logs an instance where a customer visited a page.
 /// This event is available on the online store, checkout, and order status pages
 ///
 /// The `page_viewed` event logs an instance where a customer visited a page.
 /// This event is available on the online store, checkout, and order status
 /// pages
-// MARK: - PixelEventsPageViewed
 public struct PixelEventsPageViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2596,9 +2637,9 @@ struct PixelEventsPageViewedData: Codable {
 extension PixelEventsPageViewedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsPageViewedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsPageViewedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -2632,13 +2673,14 @@ extension PixelEventsPageViewedData {
     }
 }
 
+// MARK: - PixelEventsPaymentInfoSubmitted
+
 /// The `payment_info_submitted` event logs an instance of a customer submitting
 /// their payment information. This event is available on the checkout page
 ///
 /// The `payment_info_submitted` event logs an instance of a customer
 /// submitting their payment information. This event is available on the
 /// checkout page
-// MARK: - PixelEventsPaymentInfoSubmitted
 public struct PixelEventsPaymentInfoSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2722,9 +2764,9 @@ struct PixelEventsPaymentInfoSubmittedData: Codable {
 extension PixelEventsPaymentInfoSubmittedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsPaymentInfoSubmittedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsPaymentInfoSubmittedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -2760,9 +2802,10 @@ extension PixelEventsPaymentInfoSubmittedData {
     }
 }
 
+// MARK: - PixelEventsProductAddedToCart
+
 /// The `product_added_to_cart` event logs an instance where a customer adds a
 /// product to their cart. This event is available on the online store page
-// MARK: - PixelEventsProductAddedToCart
 public struct PixelEventsProductAddedToCart: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2846,9 +2889,9 @@ struct PixelEventsProductAddedToCartData: Codable {
 extension PixelEventsProductAddedToCartData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsProductAddedToCartData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsProductAddedToCartData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -2884,10 +2927,11 @@ extension PixelEventsProductAddedToCartData {
     }
 }
 
+// MARK: - PixelEventsProductRemovedFromCart
+
 /// The `product_removed_from_cart` event logs an instance where a customer
 /// removes a product from their cart. This event is available on the online
 /// store page
-// MARK: - PixelEventsProductRemovedFromCart
 public struct PixelEventsProductRemovedFromCart: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -2971,9 +3015,9 @@ struct PixelEventsProductRemovedFromCartData: Codable {
 extension PixelEventsProductRemovedFromCartData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsProductRemovedFromCartData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsProductRemovedFromCartData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -3009,11 +3053,12 @@ extension PixelEventsProductRemovedFromCartData {
     }
 }
 
+// MARK: - PixelEventsProductVariantViewed
+
 /// The `product_variant_viewed` event logs an instance where a customer
 /// interacts with the product page and views a different variant than the
 /// initial `product_viewed` impression. This event is available on the Product
 /// page
-// MARK: - PixelEventsProductVariantViewed
 struct PixelEventsProductVariantViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -3114,9 +3159,10 @@ extension PixelEventsProductVariantViewedData {
     }
 }
 
+// MARK: - PixelEventsProductViewed
+
 /// The `product_viewed` event logs an instance where a customer visited a
 /// product details page. This event is available on the product page
-// MARK: - PixelEventsProductViewed
 public struct PixelEventsProductViewed: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -3200,9 +3246,9 @@ struct PixelEventsProductViewedData: Codable {
 extension PixelEventsProductViewedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-                let pixelData = try? JSONDecoder().decode(PixelEventsProductViewedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsProductViewedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -3238,9 +3284,10 @@ extension PixelEventsProductViewedData {
     }
 }
 
+// MARK: - PixelEventsSearchSubmitted
+
 /// The `search_submitted` event logs an instance where a customer performed a
 /// search on the storefront. This event is available on the online store page
-// MARK: - PixelEventsSearchSubmitted
 public struct PixelEventsSearchSubmitted: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -3324,9 +3371,9 @@ struct PixelEventsSearchSubmittedData: Codable {
 extension PixelEventsSearchSubmittedData {
     init?(from dictionary: [String: Any]) {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-              let pixelData = try? JSONDecoder().decode(PixelEventsSearchSubmittedData.self, from: jsonData) else {
-            return nil
-        }
+			let pixelData = try? JSONDecoder().decode(PixelEventsSearchSubmittedData.self, from: jsonData) else {
+				return nil
+			}
         self = pixelData
     }
 
@@ -3362,8 +3409,9 @@ extension PixelEventsSearchSubmittedData {
     }
 }
 
-/// An object that contains the metadata of when a search has been performed.
 // MARK: - SearchResult
+
+/// An object that contains the metadata of when a search has been performed.
 struct SearchResult: Codable {
     let productVariants: [ProductVariant]?
     /// The search query that was executed
@@ -3407,9 +3455,10 @@ extension SearchResult {
     }
 }
 
+// MARK: - CustomEvent
+
 /// This event represents any custom events emitted by partners or merchants via
 /// the `publish` method
-// MARK: - CustomEvent
 public struct CustomEvent: Codable {
     /// The client-side ID of the customer, provided by Shopify
     let context: Context?
@@ -3478,9 +3527,10 @@ extension CustomEvent {
     }
 }
 
+// MARK: - CustomData
+
 /// A free-form object representing data specific to a custom event provided by
 /// the custom event publisher
-// MARK: - CustomData
 struct CustomData: Codable {
 }
 
@@ -3566,10 +3616,11 @@ extension InitData {
     }
 }
 
+// MARK: - Customer
+
 /// A customer represents a customer account with the shop. Customer accounts
 /// store contact information for the customer, saving logged-in customers the
 /// trouble of having to provide it at every checkout.
-// MARK: - Customer
 struct Customer: Codable {
     /// The customer’s email address.
     let email: String?
@@ -3630,10 +3681,11 @@ extension Customer {
     }
 }
 
+// MARK: - PricingPercentageValue
+
 /// A value given to a customer when a discount is applied to an order. The
 /// application of a discount with this value gives the customer the specified
 /// percentage off a specified item.
-// MARK: - PricingPercentageValue
 struct PricingPercentageValue: Codable {
     /// The percentage value of the object.
     let percentage: Double?
@@ -3674,7 +3726,10 @@ extension PricingPercentageValue {
     }
 }
 
+// swiftlint:disable type_name
 typealias ID = String
+// swiftlint:enable type_name
+
 typealias Name = String
 typealias Timestamp = String
 
@@ -3695,3 +3750,5 @@ func newJSONEncoder() -> JSONEncoder {
     }
     return encoder
 }
+
+// swiftlint:enable file_length
