@@ -50,7 +50,7 @@ public struct PixelEventsCartViewed: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsCartViewedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -66,7 +66,7 @@ extension PixelEventsCartViewed {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsCartViewedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -95,7 +95,7 @@ extension PixelEventsCartViewed {
         context: Context?? = nil,
         data: PixelEventsCartViewedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsCartViewedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsCartViewed {
         return PixelEventsCartViewed(
@@ -1052,11 +1052,6 @@ extension Product {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsCartViewedName: String, Codable {
-    case cartViewed = "cart_viewed"
-}
-
 /// The `checkout_address_info_submitted` event logs an instance of a customer
 /// submitting their mailing address. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
@@ -1068,7 +1063,7 @@ public struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsCheckoutAddressInfoSubmittedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -1084,7 +1079,7 @@ extension PixelEventsCheckoutAddressInfoSubmitted {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsCheckoutAddressInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -1113,7 +1108,7 @@ extension PixelEventsCheckoutAddressInfoSubmitted {
         context: Context?? = nil,
         data: PixelEventsCheckoutAddressInfoSubmittedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsCheckoutAddressInfoSubmittedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutAddressInfoSubmitted {
         return PixelEventsCheckoutAddressInfoSubmitted(
@@ -1823,11 +1818,6 @@ extension Transaction {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsCheckoutAddressInfoSubmittedName: String, Codable {
-    case checkoutAddressInfoSubmitted = "checkout_address_info_submitted"
-}
-
 /// The `checkout_completed` event logs when a visitor completes a purchase. This
 /// event is available on the order status and checkout pages
 ///
@@ -1841,7 +1831,7 @@ public struct PixelEventsCheckoutCompleted: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsCheckoutCompletedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -1857,7 +1847,7 @@ extension PixelEventsCheckoutCompleted {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsCheckoutCompletedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -1886,7 +1876,7 @@ extension PixelEventsCheckoutCompleted {
         context: Context?? = nil,
         data: PixelEventsCheckoutCompletedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsCheckoutCompletedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutCompleted {
         return PixelEventsCheckoutCompleted(
@@ -1955,11 +1945,6 @@ extension PixelEventsCheckoutCompletedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsCheckoutCompletedName: String, Codable {
-    case checkoutCompleted = "checkout_completed"
-}
-
 /// The `checkout_contact_info_submitted` event logs an instance where a customer
 /// submits a checkout form. This event is only available in checkouts where
 /// checkout extensibility for customizations is enabled
@@ -1975,7 +1960,7 @@ public struct PixelEventsCheckoutContactInfoSubmitted: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsCheckoutContactInfoSubmittedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -1991,7 +1976,7 @@ extension PixelEventsCheckoutContactInfoSubmitted {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsCheckoutContactInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2020,7 +2005,7 @@ extension PixelEventsCheckoutContactInfoSubmitted {
         context: Context?? = nil,
         data: PixelEventsCheckoutContactInfoSubmittedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsCheckoutContactInfoSubmittedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutContactInfoSubmitted {
         return PixelEventsCheckoutContactInfoSubmitted(
@@ -2089,11 +2074,6 @@ extension PixelEventsCheckoutContactInfoSubmittedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsCheckoutContactInfoSubmittedName: String, Codable {
-    case checkoutContactInfoSubmitted = "checkout_contact_info_submitted"
-}
-
 /// The `checkout_shipping_info_submitted` event logs an instance where the
 /// customer chooses a shipping rate. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
@@ -2105,7 +2085,7 @@ public struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsCheckoutShippingInfoSubmittedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -2121,7 +2101,7 @@ extension PixelEventsCheckoutShippingInfoSubmitted {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsCheckoutShippingInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2150,7 +2130,7 @@ extension PixelEventsCheckoutShippingInfoSubmitted {
         context: Context?? = nil,
         data: PixelEventsCheckoutShippingInfoSubmittedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsCheckoutShippingInfoSubmittedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutShippingInfoSubmitted {
         return PixelEventsCheckoutShippingInfoSubmitted(
@@ -2219,11 +2199,6 @@ extension PixelEventsCheckoutShippingInfoSubmittedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsCheckoutShippingInfoSubmittedName: String, Codable {
-    case checkoutShippingInfoSubmitted = "checkout_shipping_info_submitted"
-}
-
 /// The `checkout_started` event logs an instance of a customer starting the
 /// checkout process. This event is available on the checkout page. For checkout
 /// extensibility, this event is triggered every time a customer enters checkout.
@@ -2243,7 +2218,7 @@ public struct PixelEventsCheckoutStarted: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsCheckoutStartedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -2259,7 +2234,7 @@ extension PixelEventsCheckoutStarted {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsCheckoutStartedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2288,7 +2263,7 @@ extension PixelEventsCheckoutStarted {
         context: Context?? = nil,
         data: PixelEventsCheckoutStartedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsCheckoutStartedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsCheckoutStarted {
         return PixelEventsCheckoutStarted(
@@ -2357,11 +2332,6 @@ extension PixelEventsCheckoutStartedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsCheckoutStartedName: String, Codable {
-    case checkoutStarted = "checkout_started"
-}
-
 /// The `collection_viewed` event logs an instance where a customer visited a
 /// product collection index page. This event is available on the online store
 /// page
@@ -2373,7 +2343,7 @@ public struct PixelEventsCollectionViewed: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsCollectionViewedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -2389,7 +2359,7 @@ extension PixelEventsCollectionViewed {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsCollectionViewedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2418,7 +2388,7 @@ extension PixelEventsCollectionViewed {
         context: Context?? = nil,
         data: PixelEventsCollectionViewedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsCollectionViewedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsCollectionViewed {
         return PixelEventsCollectionViewed(
@@ -2537,11 +2507,6 @@ extension Collection {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsCollectionViewedName: String, Codable {
-    case collectionViewed = "collection_viewed"
-}
-
 /// The `page_viewed` event logs an instance where a customer visited a page.
 /// This event is available on the online store, checkout, and order status pages
 ///
@@ -2556,7 +2521,7 @@ public struct PixelEventsPageViewed: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsPageViewedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -2572,7 +2537,7 @@ extension PixelEventsPageViewed {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsPageViewedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2601,7 +2566,7 @@ extension PixelEventsPageViewed {
         context: Context?? = nil,
         data: PixelEventsPageViewedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsPageViewedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsPageViewed {
         return PixelEventsPageViewed(
@@ -2667,11 +2632,6 @@ extension PixelEventsPageViewedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsPageViewedName: String, Codable {
-    case pageViewed = "page_viewed"
-}
-
 /// The `payment_info_submitted` event logs an instance of a customer submitting
 /// their payment information. This event is available on the checkout page
 ///
@@ -2686,7 +2646,7 @@ public struct PixelEventsPaymentInfoSubmitted: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsPaymentInfoSubmittedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -2702,7 +2662,7 @@ extension PixelEventsPaymentInfoSubmitted {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsPaymentInfoSubmittedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2731,7 +2691,7 @@ extension PixelEventsPaymentInfoSubmitted {
         context: Context?? = nil,
         data: PixelEventsPaymentInfoSubmittedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsPaymentInfoSubmittedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsPaymentInfoSubmitted {
         return PixelEventsPaymentInfoSubmitted(
@@ -2800,11 +2760,6 @@ extension PixelEventsPaymentInfoSubmittedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsPaymentInfoSubmittedName: String, Codable {
-    case paymentInfoSubmitted = "payment_info_submitted"
-}
-
 /// The `product_added_to_cart` event logs an instance where a customer adds a
 /// product to their cart. This event is available on the online store page
 // MARK: - PixelEventsProductAddedToCart
@@ -2815,7 +2770,7 @@ public struct PixelEventsProductAddedToCart: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsProductAddedToCartName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -2831,7 +2786,7 @@ extension PixelEventsProductAddedToCart {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsProductAddedToCartName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2860,7 +2815,7 @@ extension PixelEventsProductAddedToCart {
         context: Context?? = nil,
         data: PixelEventsProductAddedToCartData?? = nil,
         id: String?? = nil,
-        name: PixelEventsProductAddedToCartName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsProductAddedToCart {
         return PixelEventsProductAddedToCart(
@@ -2929,11 +2884,6 @@ extension PixelEventsProductAddedToCartData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsProductAddedToCartName: String, Codable {
-    case productAddedToCart = "product_added_to_cart"
-}
-
 /// The `product_removed_from_cart` event logs an instance where a customer
 /// removes a product from their cart. This event is available on the online
 /// store page
@@ -2945,7 +2895,7 @@ public struct PixelEventsProductRemovedFromCart: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsProductRemovedFromCartName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -2961,7 +2911,7 @@ extension PixelEventsProductRemovedFromCart {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsProductRemovedFromCartName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -2990,7 +2940,7 @@ extension PixelEventsProductRemovedFromCart {
         context: Context?? = nil,
         data: PixelEventsProductRemovedFromCartData?? = nil,
         id: String?? = nil,
-        name: PixelEventsProductRemovedFromCartName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsProductRemovedFromCart {
         return PixelEventsProductRemovedFromCart(
@@ -3059,11 +3009,6 @@ extension PixelEventsProductRemovedFromCartData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsProductRemovedFromCartName: String, Codable {
-    case productRemovedFromCart = "product_removed_from_cart"
-}
-
 /// The `product_variant_viewed` event logs an instance where a customer
 /// interacts with the product page and views a different variant than the
 /// initial `product_viewed` impression. This event is available on the Product
@@ -3076,7 +3021,7 @@ struct PixelEventsProductVariantViewed: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsProductVariantViewedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -3108,7 +3053,7 @@ extension PixelEventsProductVariantViewed {
         context: Context?? = nil,
         data: PixelEventsProductVariantViewedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsProductVariantViewedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsProductVariantViewed {
         return PixelEventsProductVariantViewed(
@@ -3169,11 +3114,6 @@ extension PixelEventsProductVariantViewedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsProductVariantViewedName: String, Codable {
-    case productVariantViewed = "product_variant_viewed"
-}
-
 /// The `product_viewed` event logs an instance where a customer visited a
 /// product details page. This event is available on the product page
 // MARK: - PixelEventsProductViewed
@@ -3184,7 +3124,7 @@ public struct PixelEventsProductViewed: Codable {
     /// The ID of the customer event
     let id: String?
     /// The name of the customer event
-    let name: PixelEventsProductViewedName?
+    let name: String?
     /// The timestamp of when the customer event occurred, in [ISO
     /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
     let timestamp: String?
@@ -3200,7 +3140,7 @@ extension PixelEventsProductViewed {
     init(from analyticsEventBody: AnalyticsEventBody) {
         self.context = analyticsEventBody.context
         self.id = analyticsEventBody.id
-        self.name = PixelEventsProductViewedName(rawValue: analyticsEventBody.name)
+        self.name = analyticsEventBody.name
         self.timestamp = analyticsEventBody.timestamp
 
         if let dataDict = analyticsEventBody.data {
@@ -3229,7 +3169,7 @@ extension PixelEventsProductViewed {
         context: Context?? = nil,
         data: PixelEventsProductViewedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsProductViewedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsProductViewed {
         return PixelEventsProductViewed(
@@ -3298,11 +3238,6 @@ extension PixelEventsProductViewedData {
     }
 }
 
-/// The name of the customer event
-enum PixelEventsProductViewedName: String, Codable {
-    case productViewed = "product_viewed"
-}
-
 /// The `search_submitted` event logs an instance where a customer performed a
 /// search on the storefront. This event is available on the online store page
 // MARK: - PixelEventsSearchSubmitted
@@ -3358,7 +3293,7 @@ extension PixelEventsSearchSubmitted {
         context: Context?? = nil,
         data: PixelEventsSearchSubmittedData?? = nil,
         id: String?? = nil,
-        name: PixelEventsSearchSubmittedName?? = nil,
+        name: String?? = nil,
         timestamp: String?? = nil
     ) -> PixelEventsSearchSubmitted {
         return PixelEventsSearchSubmitted(
@@ -3470,11 +3405,6 @@ extension SearchResult {
     func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
         return String(data: try self.jsonData(), encoding: encoding)
     }
-}
-
-/// The name of the customer event
-enum PixelEventsSearchSubmittedName: String, Codable {
-    case searchSubmitted = "search_submitted"
 }
 
 /// This event represents any custom events emitted by partners or merchants via
