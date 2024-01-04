@@ -49,7 +49,7 @@ class CheckoutWebView: WKWebView {
 			CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
 			return view
 		}
-		
+
 		return cache.view
 	}
 
