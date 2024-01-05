@@ -99,19 +99,19 @@ class AnalyticsEventDecoder {
 
     func createStandardEvent(from analyticsEventBody: AnalyticsEventBody) -> PixelEvent? {
         let eventCreationDictionary: [String: (AnalyticsEventBody) -> PixelEvent?] = [
-            "cart_viewed": { .pixelEventsCartViewed(PixelEventsCartViewed(from: $0)) },
-            "checkout_address_info_submitted": { .pixelEventsCheckoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted(from: $0)) },
-            "checkout_completed": { .pixelEventsCheckoutCompleted(PixelEventsCheckoutCompleted(from: $0)) },
-            "checkout_contact_info_submitted": { .pixelEventsCheckoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted(from: $0)) },
-            "checkout_shipping_info_submitted": { .pixelEventsCheckoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted(from: $0)) },
-            "checkout_started": { .pixelEventsCheckoutStarted(PixelEventsCheckoutStarted(from: $0)) },
-            "collection_viewed": { .pixelEventsCollectionViewed(PixelEventsCollectionViewed(from: $0)) },
-            "page_viewed": { .pixelEventsPageViewed(PixelEventsPageViewed(from: $0)) },
-            "payment_info_submitted": { .pixelEventsPaymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) },
-            "product_added_to_cart": { .pixelEventsProductAddedToCart(PixelEventsProductAddedToCart(from: $0)) },
-            "product_removed_from_cart": { .pixelEventsProductRemovedFromCart(PixelEventsProductRemovedFromCart(from: $0)) },
-            "product_viewed": { .pixelEventsProductViewed(PixelEventsProductViewed(from: $0)) },
-            "search_submitted": { .pixelEventsSearchSubmitted(PixelEventsSearchSubmitted(from: $0)) }
+            "cart_viewed": { .cartViewed(PixelEventsCartViewed(from: $0)) },
+            "checkout_address_info_submitted": { .checkoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted(from: $0)) },
+            "checkout_completed": { .checkoutCompleted(PixelEventsCheckoutCompleted(from: $0)) },
+            "checkout_contact_info_submitted": { .checkoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted(from: $0)) },
+            "checkout_shipping_info_submitted": { .checkoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted(from: $0)) },
+            "checkout_started": { .checkoutStarted(PixelEventsCheckoutStarted(from: $0)) },
+            "collection_viewed": { .collectionViewed(PixelEventsCollectionViewed(from: $0)) },
+            "page_viewed": { .pageViewed(PixelEventsPageViewed(from: $0)) },
+            "payment_info_submitted": { .paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) },
+            "product_added_to_cart": { .productAddedToCart(PixelEventsProductAddedToCart(from: $0)) },
+            "product_removed_from_cart": { .productRemovedFromCart(PixelEventsProductRemovedFromCart(from: $0)) },
+            "product_viewed": { .productViewed(PixelEventsProductViewed(from: $0)) },
+            "search_submitted": { .searchSubmitted(PixelEventsSearchSubmitted(from: $0)) }
         ]
 
         if let createEvent = eventCreationDictionary[analyticsEventBody.name] {

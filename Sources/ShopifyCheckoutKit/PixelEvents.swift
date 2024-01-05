@@ -27,19 +27,19 @@ import Foundation
 
 public enum PixelEvent {
     case customEvent(CustomEvent)
-    case pixelEventsCartViewed(PixelEventsCartViewed)
-    case pixelEventsCheckoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted)
-    case pixelEventsCheckoutCompleted(PixelEventsCheckoutCompleted)
-    case pixelEventsCheckoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted)
-    case pixelEventsCheckoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted)
-    case pixelEventsCheckoutStarted(PixelEventsCheckoutStarted)
-    case pixelEventsCollectionViewed(PixelEventsCollectionViewed)
-    case pixelEventsPageViewed(PixelEventsPageViewed)
-    case pixelEventsPaymentInfoSubmitted(PixelEventsPaymentInfoSubmitted)
-    case pixelEventsProductAddedToCart(PixelEventsProductAddedToCart)
-    case pixelEventsProductRemovedFromCart(PixelEventsProductRemovedFromCart)
-    case pixelEventsProductViewed(PixelEventsProductViewed)
-    case pixelEventsSearchSubmitted(PixelEventsSearchSubmitted)
+    case cartViewed(PixelEventsCartViewed)
+    case checkoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted)
+    case checkoutCompleted(PixelEventsCheckoutCompleted)
+    case checkoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted)
+    case checkoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted)
+    case checkoutStarted(PixelEventsCheckoutStarted)
+    case collectionViewed(PixelEventsCollectionViewed)
+    case pageViewed(PixelEventsPageViewed)
+    case paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted)
+    case productAddedToCart(PixelEventsProductAddedToCart)
+    case productRemovedFromCart(PixelEventsProductRemovedFromCart)
+    case productViewed(PixelEventsProductViewed)
+    case searchSubmitted(PixelEventsSearchSubmitted)
 }
 
 // MARK: - PixelEventsCartViewed

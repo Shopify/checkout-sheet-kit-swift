@@ -196,11 +196,10 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-		guard case .analytics(let pixelEvent) = result,
-			case .pixelEventsSearchSubmitted(let searchSubmittedEvent) = pixelEvent else {
-				XCTFail("Expected .analytics(.pixelEventsSearchSubmitted), got \(result)")
-				return
-			}
+		guard case .analytics(let pixelEvent) = result, case .searchSubmitted(let searchSubmittedEvent) = pixelEvent else {
+			XCTFail("Expected .analytics(.pixelEventsSearchSubmitted), got \(result)")
+			return
+		}
 
 		XCTAssertEqual("search_submitted", searchSubmittedEvent.name)
 		XCTAssertEqual("123", searchSubmittedEvent.id)
