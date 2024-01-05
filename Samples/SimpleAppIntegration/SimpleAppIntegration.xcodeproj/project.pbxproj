@@ -16,7 +16,7 @@
 		4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */; };
 		4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */; };
 		4EBBA7AE2A5F1BBF00193E19 /* UIImageView+URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */; };
-		86CA9BA02B45C192009953F4 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 86CA9B9F2B45C192009953F4 /* ShopifyCheckoutSheetKit */; };
+		868573092B47FCC600A49710 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 868573082B47FCC600A49710 /* ShopifyCheckoutSheetKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,7 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86CA9BA02B45C192009953F4 /* ShopifyCheckoutSheetKit in Frameworks */,
+				868573092B47FCC600A49710 /* ShopifyCheckoutSheetKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,7 +138,7 @@
 			);
 			name = SimpleAppIntegration;
 			packageProductDependencies = (
-				86CA9B9F2B45C192009953F4 /* ShopifyCheckoutSheetKit */,
+				868573082B47FCC600A49710 /* ShopifyCheckoutSheetKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* SimpleAppIntegration.app */;
@@ -169,7 +169,7 @@
 			);
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
-				86CA9B9E2B45C192009953F4 /* XCLocalSwiftPackageReference "../.." */,
+				868573072B47FCC600A49710 /* XCLocalSwiftPackageReference "../.." */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -196,7 +196,6 @@
 /* Begin PBXShellScriptBuildPhase section */
 		4ECA613E2AC5D502005A59A7 /* Run SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -439,14 +438,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		86CA9B9E2B45C192009953F4 /* XCLocalSwiftPackageReference "../.." */ = {
+		868573072B47FCC600A49710 /* XCLocalSwiftPackageReference "../.." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../..;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		86CA9B9F2B45C192009953F4 /* ShopifyCheckoutSheetKit */ = {
+		868573082B47FCC600A49710 /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShopifyCheckoutSheetKit;
 		};
