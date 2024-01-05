@@ -26,10 +26,10 @@
 
 #### Versioning
 
-- [ ] I have bumped the version number in the [`.podspec` file](https://github.com/Shopify/checkout-kit-swift/blob/main/ShopifyCheckoutKit.podspec#L2).
-- [ ] I have bumped the version number in the [README](https://github.com/Shopify/checkout-kit-swift/blob/main/README.md#packageswift).
+- [ ] I have bumped the version number in the [`.podspec` file](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/ShopifyCheckoutSheetKit.podspec#L2).
+- [ ] I have bumped the version number in the [README](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/README.md#packageswift).
 - [ ] I have added a [Changelog](./CHANGELOG.md) entry.
 
 ### After merging
 
-If your changes required a version bump, please add an entry under the [Releases](https://github.com/Shopify/checkout-kit-swift/releases) page - doing so will trigger a CI workflow to publish the latest Cocoapod.
+If your changes required a version bump, please add an entry under the [Releases](https://github.com/Shopify/checkout-sheet-kit-swift/releases) page - doing so will trigger a CI workflow to publish the latest Cocoapod.

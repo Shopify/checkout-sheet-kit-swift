@@ -21,34 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
+import XCTest
+@testable import ShopifyCheckoutSheetKit
 
-/// The version of the `ShopifyCheckoutKit` library.
-public let version = "0.8.1"
-
-/// The configuration options for the `ShopifyCheckoutKit` library.
-public var configuration = Configuration() {
-	didSet {
-		CheckoutWebView.invalidate()
+class ShopifyCheckoutSheetKitTests: XCTestCase {
+	func testVersionExists() {
+		XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
 	}
-}
-
-/// A convienence function for configuring the `ShopifyCheckoutKit` library.
-public func configure(_ block: (inout Configuration) -> Void) {
-	block(&configuration)
-}
-
-/// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
-	guard configuration.preloading.enabled else { return }
-	CheckoutWebView.for(checkout: url).load(checkout: url)
-}
-
-/// Presents the checkout from a given `UIViewController`.
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
-}
-
-public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-
 }

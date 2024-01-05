@@ -23,13 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import SwiftUI
 import Combine
-import ShopifyCheckoutKit
+import ShopifyCheckoutSheetKit
 
 struct SettingsView: View {
-	@State private var preloadingEnabled = ShopifyCheckoutKit.configuration.preloading.enabled
+	@State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	@State private var useVaultedState = appConfiguration.useVaultedState
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
-	@State private var selectedColorScheme = ShopifyCheckoutKit.configuration.colorScheme
+	@State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 	@State private var colorScheme: ColorScheme = .light
 
 	var body: some View {
@@ -38,7 +38,7 @@ struct SettingsView: View {
 				Section(header: Text("Features")) {
 					Toggle("Preload checkout", isOn: $preloadingEnabled)
 						.onChange(of: preloadingEnabled) { newValue in
-							ShopifyCheckoutKit.configuration.preloading.enabled = newValue
+							ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
 						}
 					Toggle("Prefill buyer information", isOn: $useVaultedState)
 						.onChange(of: useVaultedState) { newValue in
@@ -53,9 +53,9 @@ struct SettingsView: View {
 							.contentShape(Rectangle())
 							.onTapGesture {
 								selectedColorScheme = scheme
-								ShopifyCheckoutKit.configuration.colorScheme = scheme
-								ShopifyCheckoutKit.configuration.spinnerColor = scheme.spinnerColor
-								ShopifyCheckoutKit.configuration.backgroundColor = scheme.backgroundColor
+								ShopifyCheckoutSheetKit.configuration.colorScheme = scheme
+								ShopifyCheckoutSheetKit.configuration.spinnerColor = scheme.spinnerColor
+								ShopifyCheckoutSheetKit.configuration.backgroundColor = scheme.backgroundColor
 								NotificationCenter.default.post(name: .colorSchemeChanged, object: nil)
 							}
 					}
@@ -72,7 +72,7 @@ struct SettingsView: View {
 					HStack {
 						Text("SDK version")
 						Spacer()
-						Text(ShopifyCheckoutKit.version)
+						Text(ShopifyCheckoutSheetKit.version)
 							.font(.system(size: 14))
 							.foregroundStyle(.gray)
 					}
@@ -94,7 +94,7 @@ struct SettingsView: View {
 		.navigationBarHidden(true)
 		.preferredColorScheme(.dark)
 		.onAppear {
-			switch ShopifyCheckoutKit.configuration.colorScheme {
+			switch ShopifyCheckoutSheetKit.configuration.colorScheme {
 			case .light:
 				colorScheme = .light
 			case .dark:

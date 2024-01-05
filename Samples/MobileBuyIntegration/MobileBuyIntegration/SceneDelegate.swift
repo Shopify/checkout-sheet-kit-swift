@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 import SwiftUI
-import ShopifyCheckoutKit
+import ShopifyCheckoutSheetKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -68,13 +68,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 		NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
 
-		window.overrideUserInterfaceStyle = ShopifyCheckoutKit.configuration.colorScheme.userInterfaceStyle
+		window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
 
 		self.window = window
 	}
 
 	@objc func colorSchemeChanged() {
-		window?.overrideUserInterfaceStyle = ShopifyCheckoutKit.configuration.colorScheme.userInterfaceStyle
+		window?.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
 	}
 }
 

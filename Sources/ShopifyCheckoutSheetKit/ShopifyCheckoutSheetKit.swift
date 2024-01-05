@@ -21,25 +21,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import XCTest
-@testable import ShopifyCheckoutKit
+import UIKit
 
-class ExampleDelegate: CheckoutDelegate {
-	func checkoutDidComplete() {
-	}
+/// The version of the `ShopifyCheckoutSheetKit` library.
+public let version = "0.8.1"
 
-	func checkoutDidCancel() {
+/// The configuration options for the `ShopifyCheckoutSheetKit` library.
+public var configuration = Configuration() {
+	didSet {
+		CheckoutWebView.invalidate()
 	}
+}
 
-	func checkoutDidFail(errors: [ShopifyCheckoutKit.CheckoutError]) {
-	}
+/// A convienence function for configuring the `ShopifyCheckoutSheetKit` library.
+public func configure(_ block: (inout Configuration) -> Void) {
+	block(&configuration)
+}
 
-	func checkoutDidFail(error: ShopifyCheckoutKit.CheckoutError) {
-	}
+/// Preloads the checkout for faster presentation.
+public func preload(checkout url: URL) {
+	guard configuration.preloading.enabled else { return }
+	CheckoutWebView.for(checkout: url).load(checkout: url)
+}
 
-	func checkoutDidClickContactLink(url: URL) {
-	}
+/// Presents the checkout from a given `UIViewController`.
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
+	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
+}
 
-	func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-	}
+public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
+
 }
