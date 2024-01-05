@@ -104,7 +104,7 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		print(error)
 	}
 
-	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutKit.PixelEvent) {
+	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
 		print(#function, event)
 	}
 }

@@ -31,9 +31,6 @@ public var configuration = Configuration() {
 	didSet {
 		CheckoutWebView.invalidate()
 	}
-
-	func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-	}
 }
 
 /// A convienence function for configuring the `ShopifyCheckoutSheetKit` library.
