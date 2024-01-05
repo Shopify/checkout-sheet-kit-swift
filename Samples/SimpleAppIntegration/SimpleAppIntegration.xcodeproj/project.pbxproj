@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,7 +16,8 @@
 		4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */; };
 		4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */; };
 		4EBBA7AE2A5F1BBF00193E19 /* UIImageView+URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */; };
-		868573092B47FCC600A49710 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 868573082B47FCC600A49710 /* ShopifyCheckoutSheetKit */; };
+		86616C1A2B4832F700CF88B1 /* checkout-sheet-kit-swift in Resources */ = {isa = PBXBuildFile; fileRef = 86616C192B4832F700CF88B1 /* checkout-sheet-kit-swift */; };
+		86616C1C2B4832FE00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 86616C1B2B4832FE00CF88B1 /* ShopifyCheckoutSheetKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontClient.swift; sourceTree = "<group>"; };
 		4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProductViewController.xib; sourceTree = "<group>"; };
 		4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+URL.swift"; sourceTree = "<group>"; };
+		86616C192B4832F700CF88B1 /* checkout-sheet-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-sheet-kit-swift"; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,7 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				868573092B47FCC600A49710 /* ShopifyCheckoutSheetKit in Frameworks */,
+				86616C1C2B4832FE00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -49,6 +51,7 @@
 		4EA6F9A82A66F8B7005482C5 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				86616C192B4832F700CF88B1 /* checkout-sheet-kit-swift */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -138,7 +141,7 @@
 			);
 			name = SimpleAppIntegration;
 			packageProductDependencies = (
-				868573082B47FCC600A49710 /* ShopifyCheckoutSheetKit */,
+				86616C1B2B4832FE00CF88B1 /* ShopifyCheckoutSheetKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* SimpleAppIntegration.app */;
@@ -169,7 +172,6 @@
 			);
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
-				868573072B47FCC600A49710 /* XCLocalSwiftPackageReference "../.." */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -188,6 +190,7 @@
 				4EBBA7772A5F0CE200193E19 /* LaunchScreen.storyboard in Resources */,
 				4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */,
 				4EBBA7742A5F0CE200193E19 /* Assets.xcassets in Resources */,
+				86616C1A2B4832F700CF88B1 /* checkout-sheet-kit-swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,15 +441,8 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		868573072B47FCC600A49710 /* XCLocalSwiftPackageReference "../.." */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../..;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		868573082B47FCC600A49710 /* ShopifyCheckoutSheetKit */ = {
+		86616C1B2B4832FE00CF88B1 /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShopifyCheckoutSheetKit;
 		};

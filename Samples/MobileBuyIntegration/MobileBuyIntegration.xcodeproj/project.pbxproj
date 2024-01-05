@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,7 +24,8 @@
 		6A257A132AFBA78500610DA5 /* LogReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A257A122AFBA78500610DA5 /* LogReader.swift */; };
 		6A257A152AFBB06300610DA5 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A257A142AFBB06300610DA5 /* Logger.swift */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
-		86616C132B48297E00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 86616C122B48297E00CF88B1 /* ShopifyCheckoutSheetKit */; };
+		86616C162B48328500CF88B1 /* checkout-sheet-kit-swift in Resources */ = {isa = PBXBuildFile; fileRef = 86616C152B48328500CF88B1 /* checkout-sheet-kit-swift */; };
+		86616C182B48329B00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 86616C172B48329B00CF88B1 /* ShopifyCheckoutSheetKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,7 @@
 		6A257A122AFBA78500610DA5 /* LogReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogReader.swift; sourceTree = "<group>"; };
 		6A257A142AFBB06300610DA5 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		86616C152B48328500CF88B1 /* checkout-sheet-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-sheet-kit-swift"; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86616C132B48297E00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */,
+				86616C182B48329B00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */,
 				4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,6 +125,7 @@
 		4EBBA7B32A5F230900193E19 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				86616C152B48328500CF88B1 /* checkout-sheet-kit-swift */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -162,7 +165,7 @@
 			name = MobileBuyIntegration;
 			packageProductDependencies = (
 				4EBBA7A22A5F0F5600193E19 /* Buy */,
-				86616C122B48297E00CF88B1 /* ShopifyCheckoutSheetKit */,
+				86616C172B48329B00CF88B1 /* ShopifyCheckoutSheetKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */;
@@ -194,7 +197,6 @@
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
 				4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
-				86CA9B992B45C093009953F4 /* XCLocalSwiftPackageReference "../.." */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -214,6 +216,7 @@
 				4EF54F312A6F63C000F5E407 /* CartViewController.xib in Resources */,
 				4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */,
 				4EBBA7742A5F0CE200193E19 /* Assets.xcassets in Resources */,
+				86616C162B48328500CF88B1 /* checkout-sheet-kit-swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,13 +473,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		86CA9B992B45C093009953F4 /* XCLocalSwiftPackageReference "../.." */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../..;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -494,7 +490,7 @@
 			package = 4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
 			productName = Buy;
 		};
-		86616C122B48297E00CF88B1 /* ShopifyCheckoutSheetKit */ = {
+		86616C172B48329B00CF88B1 /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShopifyCheckoutSheetKit;
 		};
