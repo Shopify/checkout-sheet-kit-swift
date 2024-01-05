@@ -25,6 +25,7 @@ import XCTest
 @testable import ShopifyCheckoutSheetKit
 
 class ExampleDelegate: CheckoutDelegate {
+
 	func checkoutDidComplete() {
 	}
 
@@ -38,5 +39,8 @@ class ExampleDelegate: CheckoutDelegate {
 	}
 
 	func checkoutDidClickContactLink(url: URL) {
+	}
+
+	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
 	}
 }

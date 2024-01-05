@@ -24,7 +24,7 @@
 		6A257A132AFBA78500610DA5 /* LogReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A257A122AFBA78500610DA5 /* LogReader.swift */; };
 		6A257A152AFBB06300610DA5 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A257A142AFBB06300610DA5 /* Logger.swift */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
-		86CA9B9D2B45C0AC009953F4 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 86CA9B9C2B45C0AC009953F4 /* ShopifyCheckoutSheetKit */; };
+		86616C132B48297E00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 86616C122B48297E00CF88B1 /* ShopifyCheckoutSheetKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86CA9B9D2B45C0AC009953F4 /* ShopifyCheckoutSheetKit in Frameworks */,
+				86616C132B48297E00CF88B1 /* ShopifyCheckoutSheetKit in Frameworks */,
 				4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -162,7 +162,7 @@
 			name = MobileBuyIntegration;
 			packageProductDependencies = (
 				4EBBA7A22A5F0F5600193E19 /* Buy */,
-				86CA9B9C2B45C0AC009953F4 /* ShopifyCheckoutSheetKit */,
+				86616C122B48297E00CF88B1 /* ShopifyCheckoutSheetKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */;
@@ -494,7 +494,7 @@
 			package = 4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
 			productName = Buy;
 		};
-		86CA9B9C2B45C0AC009953F4 /* ShopifyCheckoutSheetKit */ = {
+		86616C122B48297E00CF88B1 /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShopifyCheckoutSheetKit;
 		};
