@@ -120,8 +120,13 @@ class EventHandler: NSObject, CheckoutDelegate {
 
 	func checkoutDidComplete() {
 	}
+
 	func checkoutDidFail(error: CheckoutError) {
 	}
+
+	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
+	}
+
 }
 
 class ProductViewModel: ObservableObject {

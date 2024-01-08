@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -35,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		86054F852B48510300FF808D /* checkout-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-kit-swift"; path = ../../..; sourceTree = "<group>"; };
 		8652C4602B1659E600A770F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8666476C2B1642730039400B /* Storefront.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Storefront.xcconfig; sourceTree = "<group>"; };
 		86C569BF2B15DA2B00F26028 /* SwiftUIExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,12 +76,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		86054F802B48505A00FF808D /* packages */ = {
+			isa = PBXGroup;
+			children = (
+				86054F852B48510300FF808D /* checkout-kit-swift */,
+			);
+			path = packages;
+			sourceTree = "<group>";
+		};
+		86054F872B48513700FF808D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		86C569B62B15DA2B00F26028 = {
 			isa = PBXGroup;
 			children = (
 				8666476C2B1642730039400B /* Storefront.xcconfig */,
+				86054F802B48505A00FF808D /* packages */,
 				86C569C12B15DA2B00F26028 /* SwiftUIExample */,
 				86C569C02B15DA2B00F26028 /* Products */,
+				86054F872B48513700FF808D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -123,6 +141,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 86C569E32B15DA2D00F26028 /* Build configuration list for PBXNativeTarget "SwiftUIExample" */;
 			buildPhases = (
+				86054F7F2B48503500FF808D /* Run SwiftLint */,
 				86C569BB2B15DA2B00F26028 /* Sources */,
 				86C569BC2B15DA2B00F26028 /* Frameworks */,
 				86C569BD2B15DA2B00F26028 /* Resources */,
@@ -209,7 +228,6 @@
 			);
 			mainGroup = 86C569B62B15DA2B00F26028;
 			packageReferences = (
-				86C569EE2B15DB9300F26028 /* XCLocalSwiftPackageReference "../.." */,
 			);
 			productRefGroup = 86C569C02B15DA2B00F26028 /* Products */;
 			projectDirPath = "";
@@ -228,6 +246,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				86C569CA2B15DA2D00F26028 /* Preview Assets.xcassets in Resources */,
+				86054F862B48510300FF808D /* checkout-kit-swift in Resources */,
 				86C569C72B15DA2D00F26028 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -247,6 +266,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		86054F7F2B48503500FF808D /* Run SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint ../\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		86C569BB2B15DA2B00F26028 /* Sources */ = {
@@ -597,13 +638,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		86C569EE2B15DB9300F26028 /* XCLocalSwiftPackageReference "../.." */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../..;
-		};
-/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		866647662B161B770039400B /* ShopifyCheckoutKit */ = {

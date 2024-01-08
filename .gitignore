@@ -2,3 +2,5 @@
 .swiftpm
 .DS_Store
 xcuserdata
+**/Storefront.xcconfig
+
