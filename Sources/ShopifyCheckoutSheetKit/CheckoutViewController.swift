@@ -51,11 +51,11 @@ extension CheckoutViewController {
 			self.delegate = delegate
 		}
 
-		public func makeUIViewController(context: Self.Context) -> CheckoutViewController {
+		public func makeUIViewController(context: Context) -> CheckoutViewController {
 			return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
 		}
 
-		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {
+		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Context) {
 		}
 	}
 }

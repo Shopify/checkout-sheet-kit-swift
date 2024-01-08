@@ -179,10 +179,6 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-		print(#function, event)
-	}
-
 	private func forceCloseCheckout(_ message: String) {
 		print(#function, message)
 		dismiss(animated: true)
