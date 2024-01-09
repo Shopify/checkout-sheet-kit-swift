@@ -13,8 +13,6 @@ cd Samples/
 
 touch SimpleAppIntegration/Storefront.xcconfig
 touch MobileBuyIntegration/Storefront.xcconfig
-touch SwiftUiExample/Storefront.xcconfig
 
 xcodebuild clean build -scheme SimpleAppIntegration -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
 xcodebuild clean build -scheme MobileBuyIntegration -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
-xcodebuild clean build -scheme SwiftUIExample -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
