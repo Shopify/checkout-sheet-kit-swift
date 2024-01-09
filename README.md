@@ -1,6 +1,10 @@
 # Shopify Checkout Sheet Kit - Swift (Developer Preview)
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main)
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) 
+[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) 
+![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main)
+[![GitHub release](https://img.shields.io/github/release/shopify/checkout-kit-swift.svg)](https://github.com/Shopify/checkout-kit-swift/releases)
+
 
 ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/77912f52-4fca-45ee-92ec-5094ed50313d)
 
