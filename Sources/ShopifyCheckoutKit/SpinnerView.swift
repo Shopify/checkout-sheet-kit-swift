@@ -26,7 +26,7 @@ import UIKit
 class SpinnerView: UIView {
 	private lazy var imageView: UIImageView = {
 		let view = UIImageView(image: UIImage(
-			named: "spinner", in: .ShopifyCheckoutSheetKit, with: nil
+			named: "spinner", in: .shopifyCheckoutKit, with: nil
 		))
 		view.translatesAutoresizingMaskIntoConstraints = false
 		return view
@@ -48,7 +48,7 @@ class SpinnerView: UIView {
 			imageView.bottomAnchor.constraint(equalTo: bottomAnchor)
 		])
 
-		imageView.tintColor = ShopifyCheckoutSheetKit.configuration.spinnerColor
+		imageView.tintColor = ShopifyCheckoutKit.configuration.spinnerColor
 
 		isHidden = true
 	}

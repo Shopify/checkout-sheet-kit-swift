@@ -31,7 +31,7 @@ enum ConfettiCannon {
 			layer.name == layerName
 		})?.removeFromSuperlayer()
 
-		let config = ShopifyCheckoutSheetKit.configuration.confetti
+		let config = ShopifyCheckoutKit.configuration.confetti
 		guard config.enabled, !config.particles.isEmpty else {
 			return
 		}

@@ -21,22 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import Foundation
+import XCTest
+@testable import ShopifyCheckoutKit
 
-internal class ShopifyBundleFinder {}
-
-extension Bundle {
-	static var ShopifyCheckoutSheetKit: Bundle {
-	#if COCOAPODS
-		guard let cocoapodsBundle = Bundle(for: ShopifyBundleFinder.self)
-			.url(forResource: "ShopifyCheckoutSheetKit", withExtension: "bundle")
-			.flatMap({ Bundle(url: $0) })
-		else {
-			fatalError("[cocoapods] unable to load resource bundle")
-		}
-		return cocoapodsBundle
-	#else
-		return .module // use Swift Package Manager's synthesized helper
-	#endif
+class ShopifyCheckoutKitTests: XCTestCase {
+	func testVersionExists() {
+		XCTAssertFalse(ShopifyCheckoutKit.version.isEmpty)
 	}
 }

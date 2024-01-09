@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		866647672B161B770039400B /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 866647662B161B770039400B /* ShopifyCheckoutSheetKit */; };
-		866647692B161BBA0039400B /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 866647682B161BBA0039400B /* ShopifyCheckoutSheetKit */; };
+		866647672B161B770039400B /* ShopifyCheckoutKit in Frameworks */ = {isa = PBXBuildFile; productRef = 866647662B161B770039400B /* ShopifyCheckoutKit */; };
+		866647692B161BBA0039400B /* ShopifyCheckoutKit in Frameworks */ = {isa = PBXBuildFile; productRef = 866647682B161BBA0039400B /* ShopifyCheckoutKit */; };
 		86C569C32B15DA2B00F26028 /* SwiftUIExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569C22B15DA2B00F26028 /* SwiftUIExampleApp.swift */; };
 		86C569C52B15DA2B00F26028 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569C42B15DA2B00F26028 /* ContentView.swift */; };
 		86C569C72B15DA2D00F26028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86C569C62B15DA2D00F26028 /* Assets.xcassets */; };
@@ -53,8 +53,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				866647692B161BBA0039400B /* ShopifyCheckoutSheetKit in Frameworks */,
-				866647672B161B770039400B /* ShopifyCheckoutSheetKit in Frameworks */,
+				866647692B161BBA0039400B /* ShopifyCheckoutKit in Frameworks */,
+				866647672B161B770039400B /* ShopifyCheckoutKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,8 +133,8 @@
 			);
 			name = SwiftUIExample;
 			packageProductDependencies = (
-				866647662B161B770039400B /* ShopifyCheckoutSheetKit */,
-				866647682B161BBA0039400B /* ShopifyCheckoutSheetKit */,
+				866647662B161B770039400B /* ShopifyCheckoutKit */,
+				866647682B161BBA0039400B /* ShopifyCheckoutKit */,
 			);
 			productName = SwiftUIExample;
 			productReference = 86C569BF2B15DA2B00F26028 /* SwiftUIExample.app */;
@@ -606,13 +606,13 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		866647662B161B770039400B /* ShopifyCheckoutSheetKit */ = {
+		866647662B161B770039400B /* ShopifyCheckoutKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ShopifyCheckoutSheetKit;
+			productName = ShopifyCheckoutKit;
 		};
-		866647682B161BBA0039400B /* ShopifyCheckoutSheetKit */ = {
+		866647682B161BBA0039400B /* ShopifyCheckoutKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ShopifyCheckoutSheetKit;
+			productName = ShopifyCheckoutKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

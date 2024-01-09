@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import Buy
 import Combine
 import Foundation
-import ShopifyCheckoutSheetKit
+import ShopifyCheckoutKit
 
 class CartManager {
 
@@ -36,7 +36,7 @@ class CartManager {
 	var cart: Storefront.Cart? {
 		didSet {
 			if let url = cart?.checkoutUrl {
-				ShopifyCheckoutSheetKit.preload(checkout: url)
+				ShopifyCheckoutKit.preload(checkout: url)
 			}
 		}
 	}

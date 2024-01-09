@@ -41,7 +41,7 @@ class CheckoutWebView: WKWebView {
 	static func `for`(checkout url: URL) -> CheckoutWebView {
 		let cacheKey = url.absoluteString
 
-		if !ShopifyCheckoutSheetKit.configuration.preloading.enabled {
+		if !ShopifyCheckoutKit.configuration.preloading.enabled {
 			invalidate()
 		}
 
@@ -204,9 +204,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 		if let startTime = timer {
 			let endTime = Date()
 			let diff = endTime.timeIntervalSince(startTime)
-			let preloading = String(ShopifyCheckoutSheetKit.Configuration().preloading.enabled)
+			let preloading = String(ShopifyCheckoutKit.Configuration().preloading.enabled)
 			let message = "Preloaded checkout in \(String(format: "%.2f", diff))s"
-			ShopifyCheckoutSheetKit.configuration.logger.log(message)
+			ShopifyCheckoutKit.configuration.logger.log(message)
 			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
 		}
 		checkoutDidLoad = true

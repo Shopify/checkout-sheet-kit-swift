@@ -1,11 +1,11 @@
-# Shopify Checkout Sheet Kit - Swift (Developer Preview)
+# Shopify Checkout Kit - Swift (Developer Preview)
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main)
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main)
 
-![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/77912f52-4fca-45ee-92ec-5094ed50313d)
+![image](https://github.com/Shopify/checkout-kit-swift/assets/2034704/77912f52-4fca-45ee-92ec-5094ed50313d)
 
 
-**Shopify Checkout Sheet Kit** is a Swift Package library (currently in [Developer Preview](https://shopify.dev/docs/api/release-notes/developer-previews)), part of [Shopify's Native SDKs](https://shopify.dev/docs/custom-storefronts/mobile-apps), that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
+**Shopify Checkout Kit** is a Swift Package library (currently in [Developer Preview](https://shopify.dev/docs/api/release-notes/developer-previews)), part of [Shopify's Native SDKs](https://shopify.dev/docs/custom-storefronts/mobile-apps), that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built Checkout Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
 ### Requirements
 
@@ -21,7 +21,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "0.8.1")
+  .package(url: "https://github.com/Shopify/checkout-kit-swift", from: "0.8.1")
 ]
 ```
 
@@ -29,7 +29,7 @@ dependencies: [
 
 1. Open your Xcode project
 2. Navigate to `File` > `Add Package Dependencies...`
-3. Enter `https://github.com/Shopify/checkout-sheet-kit-swift` into the search box
+3. Enter `https://github.com/Shopify/checkout-kit-swift` into the search box
 4. Click `Add Package`
 
 For more details on managing Swift Package dependencies in Xcode, please see [Apple's documentation](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
@@ -37,7 +37,7 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 #### CocoaPods
 
 ```ruby
-pod "ShopifyCheckoutSheetKit", "~> 0.8"
+pod "ShopifyCheckoutKit", "~> 0.8"
 ```
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
@@ -47,7 +47,7 @@ For more information on CocoaPods, please see their [getting started guide](http
 Once the SDK has been added as a dependency, you can import the library:
 
 ```swift
-import ShopifyCheckoutSheetKit
+import ShopifyCheckoutKit
 ```
 
 To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). You can use any GraphQL client to accomplish this and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
@@ -76,12 +76,12 @@ The `checkoutURL` object is a standard web checkout URL that can be opened in an
 
 ```swift
 import UIKit
-import ShopifyCheckoutSheetKit
+import ShopifyCheckoutKit
 
 class MyViewController: UIViewController {
   func presentCheckout() {
     let checkoutURL: URL = // from cart object
-    ShopifyCheckoutSheetKit.present(checkout: checkoutURL, from: self, delegate: self)
+    ShopifyCheckoutKit.present(checkout: checkoutURL, from: self, delegate: self)
   }
 }
 ```
@@ -110,7 +110,7 @@ To help optimize and deliver the best experience the SDK also provides a [preloa
 
 ### Configuration
 
-The SDK provides a way to customize the presented checkout experience via the `ShopifyCheckoutSheetKit.configuration` object.
+The SDK provides a way to customize the presented checkout experience via the `ShopifyCheckoutKit.configuration` object.
 
 #### `colorScheme`
 
@@ -118,16 +118,16 @@ By default, the SDK will match the user's device color appearance. This behavior
 
 ```swift
 // [Default] Automatically toggle idiomatic light and dark themes based on device preference (`UITraitCollection`)
-ShopifyCheckoutSheetKit.configuration.colorScheme = .automatic
+ShopifyCheckoutKit.configuration.colorScheme = .automatic
 
 // Force idiomatic light color scheme
-ShopifyCheckoutSheetKit.configuration.colorScheme = .light
+ShopifyCheckoutKit.configuration.colorScheme = .light
 
 // Force idiomatic dark color scheme
-ShopifyCheckoutSheetKit.configuration.colorScheme = .dark
+ShopifyCheckoutKit.configuration.colorScheme = .dark
 
 // Force web theme, as rendered by a mobile browser
-ShopifyCheckoutSheetKit.configuration.colorScheme = .web
+ShopifyCheckoutKit.configuration.colorScheme = .web
 ```
 
 #### `spinnerColor`
@@ -136,10 +136,10 @@ If the checkout session is not ready and being initialized, a loading spinner is
 
 ```swift
 // Use a custom UI color
-ShopifyCheckoutSheetKit.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+ShopifyCheckoutKit.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
 // Use a system color
-ShopifyCheckoutSheetKit.configuration.spinnerColor = .systemBlue
+ShopifyCheckoutKit.configuration.spinnerColor = .systemBlue
 ```
 
 _Note: use preloading to optimize and deliver an instant buyer experience._
@@ -150,10 +150,10 @@ While the checkout session is being initialized, the background color of the vie
 
 ```swift
 // Use a custom UI color
-ShopifyCheckoutSheetKit.configuration.backgroundColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+ShopifyCheckoutKit.configuration.backgroundColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
 // Use a system color
-ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
+ShopifyCheckoutKit.configuration.backgroundColor = .systemBackground
 ```
 
 ### Preloading
@@ -163,7 +163,7 @@ Initializing a checkout session requires communicating with Shopify servers and,
 Preloading is an advanced feature that can be disabled via a runtime flag:
 
 ```swift
-ShopifyCheckoutSheetKit.configure {
+ShopifyCheckoutKit.configure {
   $0.preloading.enabled = false // defaults to true
 }
 ```
@@ -171,7 +171,7 @@ ShopifyCheckoutSheetKit.configure {
 Once enabled, preloading a checkout is as simple as:
 
 ```swift
-ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
+ShopifyCheckoutKit.preload(checkout: checkoutURL)
 ```
 
 **Important considerations:**
@@ -182,10 +182,10 @@ ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 
 ### Monitoring the lifecycle of a checkout session
 
-You can use the `ShopifyCheckoutSheetKitDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
+You can use the `ShopifyCheckoutKitDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
 
 ```swift
-extension MyViewController: ShopifyCheckoutSheetKitDelegate {
+extension MyViewController: ShopifyCheckoutKitDelegate {
   func checkoutDidComplete() {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.
@@ -274,4 +274,4 @@ We welcome code contributions, feature requests, and reporting of issues. Please
 
 ### License
 
-Checkout Sheet Kit is provided under an [MIT License](LICENSE).
+Checkout Kit is provided under an [MIT License](LICENSE).

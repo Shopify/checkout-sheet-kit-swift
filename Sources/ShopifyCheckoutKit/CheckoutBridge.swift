@@ -33,8 +33,8 @@ enum CheckoutBridge {
 	static let messageHandler = "mobileCheckoutSdk"
 
 	static var applicationName: String {
-		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-		return "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (\(schemaVersion);\(theme);standard)"
+		let theme = ShopifyCheckoutKit.configuration.colorScheme.rawValue
+		return "ShopifyCheckoutSDK/\(ShopifyCheckoutKit.version) (\(schemaVersion);\(theme);standard)"
 	}
 
 	static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {

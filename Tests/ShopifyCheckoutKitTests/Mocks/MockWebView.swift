@@ -21,26 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import WebKit
 import XCTest
-@testable import ShopifyCheckoutSheetKit
+@testable import ShopifyCheckoutKit
 
-class ExampleDelegate: CheckoutDelegate {
+class MockWebView: WKWebView {
 
-	func checkoutDidComplete() {
+	var expectedScript = ""
+
+	var evaluateJavaScriptExpectation: XCTestExpectation?
+
+	override func evaluateJavaScript(_ javaScriptString: String) async throws -> Any {
+		if javaScriptString == expectedScript {
+			evaluateJavaScriptExpectation?.fulfill()
+		}
+		return true
 	}
 
-	func checkoutDidCancel() {
-	}
-
-	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {
-	}
-
-	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
-	}
-
-	func checkoutDidClickContactLink(url: URL) {
-	}
-
-	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-	}
 }

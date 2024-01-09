@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import XCTest
 import WebKit
-@testable import ShopifyCheckoutSheetKit
+@testable import ShopifyCheckoutKit
 
 class CheckoutWebViewTests: XCTestCase {
 	private var view: CheckoutWebView!

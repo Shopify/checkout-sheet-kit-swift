@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Buy
 import UIKit
-import ShopifyCheckoutSheetKit
+import ShopifyCheckoutKit
 
 class ProductViewController: UIViewController {
 
@@ -79,7 +79,7 @@ class ProductViewController: UIViewController {
 			CartManager.shared.addItem(variant: variant.id) { [weak self] in
 				let diff = Date().timeIntervalSince(start)
 				let message = "Added item to cart in \(String(format: "%.0f", diff * 1000))ms"
-				ShopifyCheckoutSheetKit.configuration.logger.log(message)
+				ShopifyCheckoutKit.configuration.logger.log(message)
 				self?.addToCartButton.isEnabled = true
 			}
 		}

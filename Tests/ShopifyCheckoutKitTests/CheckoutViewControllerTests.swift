@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import XCTest
 import WebKit
-@testable import ShopifyCheckoutSheetKit
+@testable import ShopifyCheckoutKit
 
 class CheckoutViewDelegateTests: XCTestCase {
 
@@ -32,7 +32,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 	private var navigationController: UINavigationController!
 
 	override func setUp() {
-		ShopifyCheckoutSheetKit.configure {
+		ShopifyCheckoutKit.configure {
 			$0.preloading.enabled = true
 		}
 		viewController = CheckoutWebViewController(
