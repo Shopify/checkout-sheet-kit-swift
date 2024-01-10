@@ -2,7 +2,8 @@
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main)
 
-![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/77912f52-4fca-45ee-92ec-5094ed50313d)
+![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
+
 
 
 **Shopify Checkout Sheet Kit** is a Swift Package library (currently in [Developer Preview](https://shopify.dev/docs/api/release-notes/developer-previews)), part of [Shopify's Native SDKs](https://shopify.dev/docs/custom-storefronts/mobile-apps), that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
