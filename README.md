@@ -5,7 +5,7 @@
 ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/77912f52-4fca-45ee-92ec-5094ed50313d)
 
 
-**Shopify Checkout Sheet Kit** is a Swift Package library (currently in [Developer Preview](https://shopify.dev/docs/api/release-notes/developer-previews)), part of [Shopify's Native SDKs](https://shopify.dev/docs/custom-storefronts/mobile-apps), that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built Checkout Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
+**Shopify Checkout Sheet Kit** is a Swift Package library (currently in [Developer Preview](https://shopify.dev/docs/api/release-notes/developer-previews)), part of [Shopify's Native SDKs](https://shopify.dev/docs/custom-storefronts/mobile-apps), that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
 ### Requirements
 
@@ -87,7 +87,7 @@ class MyViewController: UIViewController {
 ```
 
 we also support SwiftUI
-```
+```swift
 import SwiftUI
 
 struct ContentView: View {
@@ -274,4 +274,4 @@ We welcome code contributions, feature requests, and reporting of issues. Please
 
 ### License
 
-Checkout Kit is provided under an [MIT License](LICENSE).
+Checkout Sheet Kit is provided under an [MIT License](LICENSE).
