@@ -16,7 +16,7 @@
 		4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */; };
 		4EBBA7AC2A5F18B900193E19 /* ProductViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AB2A5F18B900193E19 /* ProductViewController.xib */; };
 		4EBBA7AE2A5F1BBF00193E19 /* UIImageView+URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */; };
-		4EBBA7B72A5F231500193E19 /* ShopifyCheckoutKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4EBBA7B62A5F231500193E19 /* ShopifyCheckoutKit */; };
+		8665B2872B4E8AEE00DA19FA /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8665B2862B4E8AEE00DA19FA /* ShopifyCheckoutSheetKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4EBBA7B72A5F231500193E19 /* ShopifyCheckoutKit in Frameworks */,
+				8665B2872B4E8AEE00DA19FA /* ShopifyCheckoutSheetKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,7 +140,7 @@
 			);
 			name = SimpleAppIntegration;
 			packageProductDependencies = (
-				4EBBA7B62A5F231500193E19 /* ShopifyCheckoutKit */,
+				8665B2862B4E8AEE00DA19FA /* ShopifyCheckoutSheetKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* SimpleAppIntegration.app */;
@@ -154,7 +154,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					4EBBA7662A5F0CE200193E19 = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -440,9 +440,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4EBBA7B62A5F231500193E19 /* ShopifyCheckoutKit */ = {
+		8665B2862B4E8AEE00DA19FA /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ShopifyCheckoutKit;
+			productName = ShopifyCheckoutSheetKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
