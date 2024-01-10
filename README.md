@@ -175,8 +175,7 @@ Once enabled, preloading a checkout is as simple as:
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 ```
 
-
-On the other hand setting enabled to false will cause any calls to the `preload` function calls to be ignored by the sdk. This is intentional, so you can deactivate preloading on the fly when necessary (eg sudden cpu/memory concerns)
+Setting enabled to `false` will cause all calls to the `preload` function to be ignored. This is intentional in order to deactivate preloading on the fly where necessary (eg. sudden cpu/memory concerns, disabling/enabling for particular user groups etc)
 ```
 ShopifyCheckoutSheetKit.preloading.enabled = false
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // does nothing as preloading.enabled: false while preloading=false 
