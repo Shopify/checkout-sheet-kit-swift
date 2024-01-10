@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import XCTest
-@testable import ShopifyCheckoutKit
+@testable import ShopifyCheckoutSheetKit
 
 class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 	var didStartNavigationExpectation: XCTestExpectation?

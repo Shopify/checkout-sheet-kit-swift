@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		866647672B161B770039400B /* ShopifyCheckoutKit in Frameworks */ = {isa = PBXBuildFile; productRef = 866647662B161B770039400B /* ShopifyCheckoutKit */; };
-		866647692B161BBA0039400B /* ShopifyCheckoutKit in Frameworks */ = {isa = PBXBuildFile; productRef = 866647682B161BBA0039400B /* ShopifyCheckoutKit */; };
+		8665B2892B4E8B1C00DA19FA /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8665B2882B4E8B1C00DA19FA /* ShopifyCheckoutSheetKit */; };
 		86C569C32B15DA2B00F26028 /* SwiftUIExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569C22B15DA2B00F26028 /* SwiftUIExampleApp.swift */; };
 		86C569C52B15DA2B00F26028 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569C42B15DA2B00F26028 /* ContentView.swift */; };
 		86C569C72B15DA2D00F26028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86C569C62B15DA2D00F26028 /* Assets.xcassets */; };
@@ -35,7 +34,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		86054F852B48510300FF808D /* checkout-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-kit-swift"; path = ../../..; sourceTree = "<group>"; };
 		8652C4602B1659E600A770F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8666476C2B1642730039400B /* Storefront.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Storefront.xcconfig; sourceTree = "<group>"; };
 		86C569BF2B15DA2B00F26028 /* SwiftUIExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -54,8 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				866647692B161BBA0039400B /* ShopifyCheckoutKit in Frameworks */,
-				866647672B161B770039400B /* ShopifyCheckoutKit in Frameworks */,
+				8665B2892B4E8B1C00DA19FA /* ShopifyCheckoutSheetKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,7 +76,6 @@
 		86054F802B48505A00FF808D /* packages */ = {
 			isa = PBXGroup;
 			children = (
-				86054F852B48510300FF808D /* checkout-kit-swift */,
 			);
 			path = packages;
 			sourceTree = "<group>";
@@ -152,8 +148,7 @@
 			);
 			name = SwiftUIExample;
 			packageProductDependencies = (
-				866647662B161B770039400B /* ShopifyCheckoutKit */,
-				866647682B161BBA0039400B /* ShopifyCheckoutKit */,
+				8665B2882B4E8B1C00DA19FA /* ShopifyCheckoutSheetKit */,
 			);
 			productName = SwiftUIExample;
 			productReference = 86C569BF2B15DA2B00F26028 /* SwiftUIExample.app */;
@@ -246,7 +241,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				86C569CA2B15DA2D00F26028 /* Preview Assets.xcassets in Resources */,
-				86054F862B48510300FF808D /* checkout-kit-swift in Resources */,
 				86C569C72B15DA2D00F26028 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -640,13 +634,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		866647662B161B770039400B /* ShopifyCheckoutKit */ = {
+		8665B2882B4E8B1C00DA19FA /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ShopifyCheckoutKit;
-		};
-		866647682B161BBA0039400B /* ShopifyCheckoutKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ShopifyCheckoutKit;
+			productName = ShopifyCheckoutSheetKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -22,13 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
-import ShopifyCheckoutKit
+import ShopifyCheckoutSheetKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(_ app: UIApplication, willFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
-		ShopifyCheckoutKit.configure {
+		ShopifyCheckoutSheetKit.configure {
 			/// Checkout color scheme setting
 			$0.colorScheme = .automatic
 

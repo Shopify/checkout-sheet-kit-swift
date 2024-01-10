@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import Foundation
-import ShopifyCheckoutKit
+import ShopifyCheckoutSheetKit
 
 class FileLogger: Logger {
 	private var fileHandle: FileHandle?

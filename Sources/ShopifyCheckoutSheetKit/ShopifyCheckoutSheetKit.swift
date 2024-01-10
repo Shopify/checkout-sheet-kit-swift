@@ -23,17 +23,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 
-/// The version of the `ShopifyCheckoutKit` library.
-public let version = "0.8.1"
+/// The version of the `ShopifyCheckoutSheetKit` library.
+public let version = "0.9.0"
 
-/// The configuration options for the `ShopifyCheckoutKit` library.
+/// The configuration options for the `ShopifyCheckoutSheetKit` library.
 public var configuration = Configuration() {
 	didSet {
 		CheckoutWebView.invalidate()
 	}
 }
 
-/// A convienence function for configuring the `ShopifyCheckoutKit` library.
+/// A convienence function for configuring the `ShopifyCheckoutSheetKit` library.
 public func configure(_ block: (inout Configuration) -> Void) {
 	block(&configuration)
 }
