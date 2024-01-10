@@ -176,7 +176,11 @@ ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 ```
 
 
-On the other hand, calling ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) while preloading=false will cause any calls to the `preload` function to be ignored by the sdk. This is intentional, so you can deactivate preloading on the fly when necessary (eg sudden cpu/memory concerns)
+On the other hand setting enabled to false will cause any calls to the `preload` function calls to be ignored by the sdk. This is intentional, so you can deactivate preloading on the fly when necessary (eg sudden cpu/memory concerns)
+```
+ShopifyCheckoutSheetKit.preloading.enabled = false
+ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // does nothing as preloading.enabled: false while preloading=false 
+```
 
 **Important considerations:**
 
