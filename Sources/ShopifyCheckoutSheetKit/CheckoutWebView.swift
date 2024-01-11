@@ -110,7 +110,7 @@ class CheckoutWebView: WKWebView {
 	}
 
 	private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {
-		if (checkoutDidLoad && checkoutDidPresent) && !presentedEventDidDispatch {
+		if (checkoutDidLoad && checkoutDidPresent) {
 			CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
 			presentedEventDidDispatch = true
 		}

@@ -58,7 +58,7 @@ struct AnalyticsEventBody: Decodable {
 
         switch type {
         case "standard":
-            data = try container.decode([String: Any].self, forKey: .data)
+            data = try container.decodeIfPresent([String: Any].self, forKey: .data)
             customData = nil
         case "custom":
             customData = try? container.decode(CustomData.self, forKey: .customData)
