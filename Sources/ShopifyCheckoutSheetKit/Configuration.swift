@@ -44,7 +44,6 @@ public struct Configuration {
 	public var backgroundColor: UIColor = .systemBackground
 
 	public var logger: Logger = NoOpLogger()
-
 }
 
 extension Configuration {
@@ -70,6 +69,10 @@ extension Configuration {
 
 extension Configuration {
 	public struct Preloading {
-		public var enabled: Bool = true
+		public var enabled: Bool = true {
+			didSet {
+				CheckoutWebView.preloadingActivatedByClient = false
+			}
+		}
 	}
 }

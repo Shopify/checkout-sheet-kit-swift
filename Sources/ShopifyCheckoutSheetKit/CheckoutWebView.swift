@@ -36,6 +36,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 class CheckoutWebView: WKWebView {
 
 	private static var cache: CacheEntry?
+	static var preloadingActivatedByClient: Bool = false
 
 	static func `for`(checkout url: URL) -> CheckoutWebView {
 		let cacheKey = url.absoluteString
@@ -54,6 +55,7 @@ class CheckoutWebView: WKWebView {
 	}
 
 	static func invalidate() {
+		preloadingActivatedByClient = false
 		cache?.view.configuration.userContentController
 			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
 		cache = nil

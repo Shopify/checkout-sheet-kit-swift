@@ -41,6 +41,8 @@ public func configure(_ block: (inout Configuration) -> Void) {
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
 	guard configuration.preloading.enabled else { return }
+
+	CheckoutWebView.preloadingActivatedByClient = true
 	CheckoutWebView.for(checkout: url).load(checkout: url)
 }
 

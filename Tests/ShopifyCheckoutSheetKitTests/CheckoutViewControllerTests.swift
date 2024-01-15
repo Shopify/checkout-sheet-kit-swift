@@ -67,6 +67,16 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertNotEqual(two, three)
 	}
 
+	func testFailWithErrorDisablesPreloadingActivtedByClient() {
+		CheckoutWebView.preloadingActivatedByClient = true
+
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+
+		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error"))
+
+		XCTAssertEqual(false, CheckoutWebView.preloadingActivatedByClient)
+	}
+
 	func testCloseInvalidatesViewCache() {
 		let one = CheckoutWebView.for(checkout: checkoutURL)
 		let two = CheckoutWebView.for(checkout: checkoutURL)
@@ -76,6 +86,19 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
+	}
+
+	func testCloseDoesNotInvalidateViewCacheWhenPreloadingISCalledByClient() {
+		ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
+
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+		let two = CheckoutWebView.for(checkout: checkoutURL)
+		XCTAssertEqual(one, two)
+
+		viewController.close()
+
+		let three = CheckoutWebView.for(checkout: checkoutURL)
+		XCTAssertEqual(one, three)
 	}
 
 	func testPresentationControllerDidDismissInvalidatesViewCache() {
@@ -88,6 +111,19 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
+	}
+
+	func testPresentationControllerDidDismissSavesCacheWhenActivatedByClient() {
+		CheckoutWebView.preloadingActivatedByClient = true
+		let one = CheckoutWebView.for(checkout: checkoutURL)
+		let two = CheckoutWebView.for(checkout: checkoutURL)
+		XCTAssertEqual(one, two)
+
+		let presentationController = UIViewController().presentationController!
+		viewController.presentationControllerDidDismiss(presentationController)
+
+		let three = CheckoutWebView.for(checkout: checkoutURL)
+		XCTAssertEqual(one, three)
 	}
 
 	func testCheckoutViewDidClickLinkDoesNotInvalidateViewCache() {
