@@ -181,10 +181,34 @@ ShopifyCheckoutSheetKit.preloading.enabled = false
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // does nothing as preloading.enabled: false while preloading=false 
 ```
 
+### Preload Invalidation
+
+_N.B if you call `preload` anywhere in your app code, preload invalidation becomes very important to understand.`_
+
+Preloading is powered by a cache. To keep the cached view in sync with changes (eg to cart) we need to invalidate from time to time. This is a shared responsibility between the internal SDK and the merchant developer. The internal SDK will do it when it can but there are occasions that the merchant developer will need to invalidate. There are currently two ways to invalidate:
+
+* call `preload` (this will invalidate any existing cache and re-cache with current checkout state)
+* Set `ShopifyCheckoutSheetKit.preloading.enabled` to false (entirely disables preloading, including cache)
+
+The SDK invalidates preloading (with no refresh) when:
+* The server returns a non 2XX response code
+* There is a network error
+* A checkout is completed (indicated by server response)
+* The `ShopifyCheckoutSheetKit.Configuration` object is manipulated (e.g theming changes)
+* The checkout sheet is closed _and_ the merchant developer has _not_ called the `preload` function
+
+The Merchant developer needs to invalidate and refresh the cache _only after_ they have called `preload` at least once and:
+* The cart API is called indicating cart change (call `preload`)
+* There have been changes in app state that impact the checkout experience (call `preload`)
+
+The Merchant developer needs to invalidate and disable cache _only after_ they have called `preload` at least once and:
+* There are more important priorities such as app performance, cpu or memory conservation (disable preloading)
+* It becomes obvious that the end user will not navigate to checkout for whatever reason (disable preloading)
+
 **Important considerations:**
 
 1. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout—e.g. when the buyer navigates to the cart overview or a similar app-specific experience.
-2. A preloaded checkout session reflects the cart contents at the time when `preload` is called. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
+2. To re-iterate this important point: A preloaded checkout session reflects the cart contents _at the time when `preload` is called_. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
 3. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
 
 ### Monitoring the lifecycle of a checkout session
@@ -282,3 +306,4 @@ We welcome code contributions, feature requests, and reporting of issues. Please
 ### License
 
 Checkout Sheet Kit is provided under an [MIT License](LICENSE).
+
