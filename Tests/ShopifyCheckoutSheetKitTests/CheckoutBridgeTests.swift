@@ -113,6 +113,30 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
+	func testDecodeSupportsAnalyticsEvent() throws {
+		let body = "{\"name\": \"page_viewed\",\"event\": {\"id\": \"123\",\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": {}, \"context\": {}}}"
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+
+		let mock = WKScriptMessageMock(body: """
+			{
+				"name": "analytics",
+				"body": "\(body)"
+			}
+			""")
+
+		let result = try CheckoutBridge.decode(mock)
+
+		guard case .analytics(let pixelEvent) = result, case .pageViewed(let pageViewedEvent) = pixelEvent else {
+			XCTFail("Expected .analytics(.pageViewed), got \(result)")
+			return
+		}
+
+		XCTAssertEqual("page_viewed", pageViewedEvent.name)
+		XCTAssertEqual("123", pageViewedEvent.id)
+		XCTAssertEqual("2024-01-04T09:48:53.358Z", pageViewedEvent.timestamp)
+	}
+
 	func testInstrumentationPayloadToBridgeEvent() {
 		let payload = InstrumentationPayload(name: "test", value: 1, type: .histogram)
 		let jsonString = payload.toBridgeEvent()
