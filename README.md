@@ -183,11 +183,11 @@ ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // does nothing as preloa
 
 ### Preload Invalidation
 
-_N.B if you call `preload` anywhere in your app code, preload invalidation becomes very important to understand.`_
+_Note: if you call `preload` anywhere in your app code, preload invalidation becomes very important to understand.`_
 
 Preloading is powered by a cache. To keep the cached view in sync with changes (eg to cart) we need to invalidate from time to time. This is a shared responsibility between the internal SDK and the merchant developer. The internal SDK will do it when it can but there are occasions that the merchant developer will need to invalidate. There are currently two ways to invalidate:
 
-* call `preload` (this will invalidate any existing cache and re-cache with current checkout state)
+* Call `preload` (this will invalidate any existing cache and re-cache with current checkout state)
 * Set `ShopifyCheckoutSheetKit.preloading.enabled` to false (entirely disables preloading, including cache)
 
 The SDK invalidates preloading (with no refresh) when:
@@ -195,13 +195,13 @@ The SDK invalidates preloading (with no refresh) when:
 * There is a network error
 * A checkout is completed (indicated by server response)
 * The `ShopifyCheckoutSheetKit.Configuration` object is manipulated (e.g theming changes)
-* The checkout sheet is closed _and_ the merchant developer has _not_ called the `preload` function
+* The Checkout Sheet is closed _and_ the merchant developer has _not_ called the `preload` function
 
-The Merchant developer needs to invalidate and refresh the cache _only after_ they have called `preload` at least once and:
+You need to invalidate and refresh the cache _only after_ they have called `preload` at least once and:
 * The cart API is called indicating cart change (call `preload`)
 * There have been changes in app state that impact the checkout experience (call `preload`)
 
-The Merchant developer needs to invalidate and disable cache _only after_ they have called `preload` at least once and:
+You need to invalidate and disable cache _only after_ they have called `preload` at least once and:
 * There are more important priorities such as app performance, cpu or memory conservation (disable preloading)
 * It becomes obvious that the end user will not navigate to checkout for whatever reason (disable preloading)
 
