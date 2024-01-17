@@ -99,19 +99,13 @@ class WebPixelsEventDecoder {
 
 	func createStandardEvent(from webPixelsEventBody: WebPixelsEventBody) -> PixelEvent? {
 		let eventCreationDictionary: [String: (WebPixelsEventBody) -> PixelEvent?] = [
-			"cart_viewed": { .cartViewed(PixelEventsCartViewed(from: $0)) },
 			"checkout_address_info_submitted": { .checkoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted(from: $0)) },
 			"checkout_completed": { .checkoutCompleted(PixelEventsCheckoutCompleted(from: $0)) },
 			"checkout_contact_info_submitted": { .checkoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted(from: $0)) },
 			"checkout_shipping_info_submitted": { .checkoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted(from: $0)) },
 			"checkout_started": { .checkoutStarted(PixelEventsCheckoutStarted(from: $0)) },
-			"collection_viewed": { .collectionViewed(PixelEventsCollectionViewed(from: $0)) },
 			"page_viewed": { .pageViewed(PixelEventsPageViewed(from: $0)) },
-			"payment_info_submitted": { .paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) },
-			"product_added_to_cart": { .productAddedToCart(PixelEventsProductAddedToCart(from: $0)) },
-			"product_removed_from_cart": { .productRemovedFromCart(PixelEventsProductRemovedFromCart(from: $0)) },
-			"product_viewed": { .productViewed(PixelEventsProductViewed(from: $0)) },
-			"search_submitted": { .searchSubmitted(PixelEventsSearchSubmitted(from: $0)) }
+			"payment_info_submitted": { .paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) }
 		]
 
 		if let createEvent = eventCreationDictionary[webPixelsEventBody.name] {
