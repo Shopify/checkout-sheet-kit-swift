@@ -86,7 +86,7 @@ class ProductViewController: UIViewController {
 	}
 
 	@IBAction private func reloadProduct() {
-		let query = Storefront.buildQuery { $0
+		let query = Storefront.buildQuery(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
 			.products(first: 250) { $0
 				.nodes { $0
 					.id()
