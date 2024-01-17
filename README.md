@@ -1,12 +1,9 @@
 # Shopify Checkout Sheet Kit - Swift (Developer Preview)
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main)
-
-![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
 
 
-
-**Shopify Checkout Sheet Kit** is a Swift Package library (currently in [Developer Preview](https://shopify.dev/docs/api/release-notes/developer-previews)), part of [Shopify's Native SDKs](https://shopify.dev/docs/custom-storefronts/mobile-apps), that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
+**Shopify Checkout Sheet Kit** is a Swift Package library (currently in [Developer Preview](https://shopify.dev/docs/api/release-notes/developer-previews)) that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
 ### Requirements
 
@@ -87,7 +84,8 @@ class MyViewController: UIViewController {
 }
 ```
 
-we also support SwiftUI
+Alteranatively, with SwiftUI:
+
 ```swift
 import SwiftUI
 
@@ -107,7 +105,7 @@ struct ContentView: View {
 }
 ```
 
-To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session in the background and ahead of time.
+To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session ahead of time.
 
 ### Configuration
 
@@ -159,9 +157,9 @@ ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
 
 ### Preloading
 
-Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
+Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable wait time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
 
-Preloading is an advanced feature that can be disabled via a runtime flag:
+Preloading is an advanced feature that can be toggled via a runtime flag:
 
 ```swift
 ShopifyCheckoutSheetKit.configure {
@@ -169,47 +167,39 @@ ShopifyCheckoutSheetKit.configure {
 }
 ```
 
-Once enabled, preloading a checkout is as simple as:
+When enabled, preloading a checkout is as simple as:
 
 ```swift
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 ```
 
-Setting enabled to `false` will cause all calls to the `preload` function to be ignored. This is intentional in order to deactivate preloading on the fly where necessary (eg. sudden cpu/memory concerns, disabling/enabling for particular user groups etc)
+Setting enabled to `false` will cause all calls to the `preload` function to be ignored. This allows the appliaction to selectively toggle preloading behavior as a remote feature flag or dynamically in response to client conditions — e.g. when data saver functionality is enabled by the user.
+
 ```
 ShopifyCheckoutSheetKit.preloading.enabled = false
-ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // does nothing as preloading.enabled: false while preloading=false 
+ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // no-op 
 ```
 
-### Preload Invalidation
+#### Lifecycle management for preloaded checkout
 
-_Note: if you call `preload` anywhere in your app code, preload invalidation becomes very important to understand.`_
+Preloading renders a checkout in a background webview, which is brought to foreground when `ShopifyCheckoutSheetKit.present()` is called. The content of preloaded checkout reflects the state of cart when `preload()` was initially called. If the cart is mutated after `preload()` is called, the application is responsible for invalidating the preloaded checkout to ensure that up-to-date checkout content is displayed to the buyer:
 
-Preloading is powered by a cache. To keep the cached view in sync with changes (eg to cart) we need to invalidate from time to time. This is a shared responsibility between the internal SDK and the merchant developer. The internal SDK will do it when it can but there are occasions that the merchant developer will need to invalidate. There are currently two ways to invalidate:
+1. To update preloaded contents: call `preload()` once again
+2. To invalidate/disable preloaded content: toggle `ShopifyCheckoutSheetKit.preloading.enabled`
 
-* Call `preload` (this will invalidate any existing cache and re-cache with current checkout state)
-* Set `ShopifyCheckoutSheetKit.preloading.enabled` to false (entirely disables preloading, including cache)
+The library will automatically invalidate/abort preload under following conditions:
 
-The SDK invalidates preloading (with no refresh) when:
-* The server returns a non 2XX response code
-* There is a network error
-* A checkout is completed (indicated by server response)
-* The `ShopifyCheckoutSheetKit.Configuration` object is manipulated (e.g theming changes)
-* The Checkout Sheet is closed _and_ the merchant developer has _not_ called the `preload` function
+* Request results in network error or non 2XX server response code
+* Once the checkout is successfuly completed, as indicated by the server response
+* When `ShopifyCheckoutSheetKit.Configuration` object is updated by the application (e.g., theming changes)
 
-You need to invalidate and refresh the cache _only after_ they have called `preload` at least once and:
-* The cart API is called indicating cart change (call `preload`)
-* There have been changes in app state that impact the checkout experience (call `preload`)
+A preloaded checkout *is not* automatically invalidated when checkout sheet is closed. For example, if buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
 
-You need to invalidate and disable cache _only after_ they have called `preload` at least once and:
-* There are more important priorities such as app performance, cpu or memory conservation (disable preloading)
-* It becomes obvious that the end user will not navigate to checkout for whatever reason (disable preloading)
+#### Additional considerations for preloaded checkout
 
-**Important considerations:**
+1. Preloading is a hint, not a guarantee: the library may debounce or ignore calls depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
+1. Preloading results in background network requests and additional CPU/memory utilization for the client and should be used responsibly. For example, conditionally based on state of the client and when there is a high likelihood that the buyer will soon request to checkout.
 
-1. Initiating preload results in background network requests and additional CPU/memory utilization for the client, and should be used when there is a high likelihood that the buyer will soon request to checkout—e.g. when the buyer navigates to the cart overview or a similar app-specific experience.
-2. To re-iterate this important point: A preloaded checkout session reflects the cart contents _at the time when `preload` is called_. If the cart is updated after `preload` is called, the application needs to call `preload` again to reflect the updated checkout session.
-3. Calling `preload(checkout:)` is a hint, not a guarantee: the library may debounce or ignore calls to this API depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
 
 ### Monitoring the lifecycle of a checkout session
 
