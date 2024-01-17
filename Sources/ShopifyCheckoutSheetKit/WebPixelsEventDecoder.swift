@@ -105,7 +105,7 @@ class WebPixelsEventDecoder {
 			"checkout_shipping_info_submitted": { .checkoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted(from: $0)) },
 			"checkout_started": { .checkoutStarted(PixelEventsCheckoutStarted(from: $0)) },
 			"page_viewed": { .pageViewed(PixelEventsPageViewed(from: $0)) },
-			"payment_info_submitted": { .paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) },
+			"payment_info_submitted": { .paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) }
 		]
 
 		if let createEvent = eventCreationDictionary[webPixelsEventBody.name] {
