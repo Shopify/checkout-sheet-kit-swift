@@ -85,7 +85,7 @@ extension CheckoutBridge {
 		case checkoutExpired
 		case checkoutUnavailable
 		case checkoutModalToggled(modalVisible: Bool)
-		case analytics(event: PixelEvent?)
+		case webPixels(event: PixelEvent?)
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -107,10 +107,10 @@ extension CheckoutBridge {
 			case "checkoutBlockingEvent":
 				let modalVisible = try container.decode(String.self, forKey: .body)
 				self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)
-			case "analytics":
-				let analyticDecoder = AnalyticsEventDecoder()
-				let event = try analyticDecoder.decode(from: container, using: decoder)
-				self = .analytics(event: event)
+			case "webPixels":
+				let webPixelsDecoder = WebPixelsEventDecoder()
+				let event = try webPixelsDecoder.decode(from: container, using: decoder)
+				self = .webPixels(event: event)
 			default:
 				self = .unsupported(name)
 			}
