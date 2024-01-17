@@ -105,7 +105,7 @@ class CartManager {
 		if let cartID = cart?.id {
 			let lines = [Storefront.CartLineInput.create(merchandiseId: item)]
 
-			let mutation = Storefront.buildMutation { $0
+			let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
 				.cartLinesAdd(lines: lines, cartId: cartID) { $0
 					.cart { $0.cartManagerFragment() }
 				}
@@ -125,7 +125,7 @@ class CartManager {
 
 	private func performCartCreate(items: [GraphQL.ID] = [], handler: @escaping CartResultHandler) {
 		let input = (appConfiguration.useVaultedState) ? vaultedStateCart(items) : defaultCart(items)
-		let mutation = Storefront.buildMutation { $0
+		let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
 			.cartCreate(input: input) { $0
 				.cart { $0.cartManagerFragment() }
 			}
