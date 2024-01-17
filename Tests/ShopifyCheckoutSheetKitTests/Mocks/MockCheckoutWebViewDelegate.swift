@@ -39,7 +39,7 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 
 	var didToggleModalExpectation: XCTestExpectation?
 
-	var didEmitAnalyticsEventExpectation: XCTestExpectation?
+	var didEmitWebPixelsEventExpectation: XCTestExpectation?
 
 	func checkoutViewDidStartNavigation() {
 		didStartNavigationExpectation?.fulfill()
@@ -70,6 +70,6 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 	}
 
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
-		didEmitAnalyticsEventExpectation?.fulfill()
+		didEmitWebPixelsEventExpectation?.fulfill()
 	}
 }

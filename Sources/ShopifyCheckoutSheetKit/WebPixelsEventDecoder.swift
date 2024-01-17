@@ -23,12 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Foundation
 
-struct AnalyticsEvent: Decodable {
+struct WebPixelsEvent: Decodable {
 	let name: String
-	let event: AnalyticsEventBody
+	let event: WebPixelsEventBody
 }
 
-struct AnalyticsEventBody: Decodable {
+struct WebPixelsEventBody: Decodable {
 	let id: String
 	let name: String
 	let timestamp: String
@@ -71,8 +71,8 @@ struct AnalyticsEventBody: Decodable {
 	}
 }
 
-class AnalyticsEventDecoder {
-	enum AnalyticsCodingKeys: String, CodingKey {
+class WebPixelsEventDecoder {
+	enum WebPixelsCodingKeys: String, CodingKey {
 		case name
 		case event
 	}
@@ -84,21 +84,21 @@ class AnalyticsEventDecoder {
 			return nil
 		}
 
-		let analyticsEvent = try JSONDecoder().decode(AnalyticsEvent.self, from: data)
+		let webPixelsEvent = try JSONDecoder().decode(WebPixelsEvent.self, from: data)
 
-		switch analyticsEvent.event.type {
+		switch webPixelsEvent.event.type {
 		case "standard":
-			return createStandardEvent(from: analyticsEvent.event)
+			return createStandardEvent(from: webPixelsEvent.event)
 		case "custom":
-			let customEvent = CustomEvent(from: analyticsEvent.event)
+			let customEvent = CustomEvent(from: webPixelsEvent.event)
 			return .customEvent(customEvent)
 		default:
 			return nil
 		}
 	}
 
-	func createStandardEvent(from analyticsEventBody: AnalyticsEventBody) -> PixelEvent? {
-		let eventCreationDictionary: [String: (AnalyticsEventBody) -> PixelEvent?] = [
+	func createStandardEvent(from webPixelsEventBody: WebPixelsEventBody) -> PixelEvent? {
+		let eventCreationDictionary: [String: (WebPixelsEventBody) -> PixelEvent?] = [
 			"cart_viewed": { .cartViewed(PixelEventsCartViewed(from: $0)) },
 			"checkout_address_info_submitted": { .checkoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted(from: $0)) },
 			"checkout_completed": { .checkoutCompleted(PixelEventsCheckoutCompleted(from: $0)) },
@@ -114,8 +114,8 @@ class AnalyticsEventDecoder {
 			"search_submitted": { .searchSubmitted(PixelEventsSearchSubmitted(from: $0)) }
 		]
 
-		if let createEvent = eventCreationDictionary[analyticsEventBody.name] {
-			return createEvent(analyticsEventBody)
+		if let createEvent = eventCreationDictionary[webPixelsEventBody.name] {
+			return createEvent(webPixelsEventBody)
 		}
 
 		return nil

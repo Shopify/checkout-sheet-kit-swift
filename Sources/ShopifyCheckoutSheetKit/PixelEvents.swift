@@ -65,13 +65,13 @@ public struct PixelEventsCartViewed: Codable {
 // MARK: PixelEventsCartViewed convenience initializers and mutators
 
 extension PixelEventsCartViewed {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsCartViewedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -1093,13 +1093,13 @@ public struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
 // MARK: PixelEventsCheckoutAddressInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsCheckoutAddressInfoSubmitted {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsCheckoutAddressInfoSubmittedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -1874,13 +1874,13 @@ public struct PixelEventsCheckoutCompleted: Codable {
 // MARK: PixelEventsCheckoutCompleted convenience initializers and mutators
 
 extension PixelEventsCheckoutCompleted {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsCheckoutCompletedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2004,13 +2004,13 @@ public struct PixelEventsCheckoutContactInfoSubmitted: Codable {
 // MARK: PixelEventsCheckoutContactInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsCheckoutContactInfoSubmitted {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsCheckoutContactInfoSubmittedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2133,13 +2133,13 @@ public struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
 // MARK: PixelEventsCheckoutShippingInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsCheckoutShippingInfoSubmitted {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsCheckoutShippingInfoSubmittedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2269,13 +2269,13 @@ public struct PixelEventsCheckoutStarted: Codable {
 // MARK: PixelEventsCheckoutStarted convenience initializers and mutators
 
 extension PixelEventsCheckoutStarted {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsCheckoutStartedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2395,13 +2395,13 @@ public struct PixelEventsCollectionViewed: Codable {
 // MARK: PixelEventsCollectionViewed convenience initializers and mutators
 
 extension PixelEventsCollectionViewed {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsCollectionViewedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2575,13 +2575,13 @@ public struct PixelEventsPageViewed: Codable {
 // MARK: PixelEventsPageViewed convenience initializers and mutators
 
 extension PixelEventsPageViewed {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsPageViewedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2701,13 +2701,13 @@ public struct PixelEventsPaymentInfoSubmitted: Codable {
 // MARK: PixelEventsPaymentInfoSubmitted convenience initializers and mutators
 
 extension PixelEventsPaymentInfoSubmitted {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsPaymentInfoSubmittedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2826,13 +2826,13 @@ public struct PixelEventsProductAddedToCart: Codable {
 // MARK: PixelEventsProductAddedToCart convenience initializers and mutators
 
 extension PixelEventsProductAddedToCart {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsProductAddedToCartData(from: dataDict)
 		} else {
 			self.data = nil
@@ -2952,13 +2952,13 @@ public struct PixelEventsProductRemovedFromCart: Codable {
 // MARK: PixelEventsProductRemovedFromCart convenience initializers and mutators
 
 extension PixelEventsProductRemovedFromCart {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsProductRemovedFromCartData(from: dataDict)
 		} else {
 			self.data = nil
@@ -3183,13 +3183,13 @@ public struct PixelEventsProductViewed: Codable {
 // MARK: PixelEventsProductViewed convenience initializers and mutators
 
 extension PixelEventsProductViewed {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsProductViewedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -3308,13 +3308,13 @@ public struct PixelEventsSearchSubmitted: Codable {
 // MARK: PixelEventsSearchSubmitted convenience initializers and mutators
 
 extension PixelEventsSearchSubmitted {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 
-		if let dataDict = analyticsEventBody.data {
+		if let dataDict = webPixelsEventBody.data {
 			self.data = PixelEventsSearchSubmittedData(from: dataDict)
 		} else {
 			self.data = nil
@@ -3479,12 +3479,12 @@ public struct CustomEvent: Codable {
 // MARK: CustomEvent convenience initializers and mutators
 
 extension CustomEvent {
-	init(from analyticsEventBody: AnalyticsEventBody) {
-		self.context = analyticsEventBody.context
-		self.customData = analyticsEventBody.customData
-		self.id = analyticsEventBody.id
-		self.name = analyticsEventBody.name
-		self.timestamp = analyticsEventBody.timestamp
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.customData = webPixelsEventBody.customData
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
 	}
 
 	init(data: Data) throws {
