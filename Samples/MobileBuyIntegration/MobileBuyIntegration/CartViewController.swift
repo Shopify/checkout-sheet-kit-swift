@@ -180,7 +180,15 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-		print(#function, event)
+		switch event {
+		case .pageViewed(let eventDetails):
+			if let name = eventDetails.name {
+				print(#function, name)
+				ShopifyCheckoutSheetKit.configuration.logger.log(name)
+			}
+		default:
+			print("[ERROR] Unhandled event type", event)
+		}
 	}
 
 	private func forceCloseCheckout(_ message: String) {
