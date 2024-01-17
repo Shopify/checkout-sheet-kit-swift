@@ -36,6 +36,61 @@ public enum PixelEvent {
 	case paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted)
 }
 
+public struct BaseEvent<T>: Codable where T: Codable {
+    let context: Context?
+    let data: T?
+    /// The ID of the customer event
+    let id: String?
+    /// The name of the customer event
+    let name: String?
+    /// The timestamp of when the customer event occurred, in [ISO
+    /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
+    let timestamp: String?
+
+    enum CodingKeys: String, CodingKey {
+        case context, data, id, name, timestamp
+    }
+}
+
+/// The `checkout_address_info_submitted` event logs an instance of a customer
+/// submitting their mailing address. This event is only available in checkouts
+/// where checkout extensibility for customizations is enabled
+public typealias PixelEventsCheckoutAddressInfoSubmitted = BaseEvent<PixelEventsCheckoutAddressInfoSubmittedData>
+
+/// The `checkout_completed` event logs when a visitor completes a purchase. This
+/// event is available on the order status and checkout pages
+public typealias PixelEventsCheckoutCompleted = BaseEvent<PixelEventsCheckoutCompletedData>
+
+/// The `checkout_contact_info_submitted` event logs an instance where a customer
+/// submits a checkout form. This event is only available in checkouts where
+/// checkout extensibility for customizations is enabled
+public typealias PixelEventsCheckoutContactInfoSubmitted = BaseEvent<PixelEventsCheckoutContactInfoSubmittedData>
+
+/// The `checkout_shipping_info_submitted` event logs an instance where the
+/// customer chooses a shipping rate. This event is only available in checkouts
+/// where checkout extensibility for customizations is enabled
+public typealias PixelEventsCheckoutShippingInfoSubmitted = BaseEvent<PixelEventsCheckoutShippingInfoSubmittedData>
+
+/// The `checkout_started` event logs an instance of a customer starting
+/// the checkout process. This event is available on the checkout page. For
+/// checkout extensibility, this event is triggered every time a customer
+/// enters checkout. For non-checkout extensible shops, this event is only
+/// triggered the first time a customer enters checkout.
+public typealias PixelEventsCheckoutStarted = BaseEvent<PixelEventsCheckoutStartedData>
+
+/// The `page_viewed` event logs an instance where a customer visited a page.
+/// This event is available on the online store, checkout, and order status pages
+public typealias PixelEventsPageViewed = BaseEvent<PixelEventsPageViewedData>
+
+/// The `payment_info_submitted` event logs an instance of a customer
+/// submitting their payment information. This event is available on the
+/// checkout page
+public typealias PixelEventsPaymentInfoSubmitted = BaseEvent<PixelEventsPaymentInfoSubmittedData>
+
+/// This event represents any custom events emitted by partners or merchants via
+/// the `publish` method
+public typealias CustomEvent = BaseEvent<CustomData>
+
 // MARK: - Context
 
 /// A snapshot of various read-only properties of the browser at the time of
@@ -329,30 +384,6 @@ struct Product: Codable {
 	let vendor: String?
 }
 
-// MARK: - PixelEventsCheckoutAddressInfoSubmitted
-
-/// The `checkout_address_info_submitted` event logs an instance of a customer
-/// submitting their mailing address. This event is only available in checkouts
-/// where checkout extensibility for customizations is enabled
-public struct PixelEventsCheckoutAddressInfoSubmitted: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let data: PixelEventsCheckoutAddressInfoSubmittedData?
-	/// The ID of the customer event
-	let id: String?
-	/// The name of the customer event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
-	}
-}
-
-// MARK: PixelEventsCheckoutAddressInfoSubmitted convenience initializers and mutators
-
 extension PixelEventsCheckoutAddressInfoSubmitted {
 	init(from webPixelsEventBody: WebPixelsEventBody) {
 		self.context = webPixelsEventBody.context
@@ -370,7 +401,7 @@ extension PixelEventsCheckoutAddressInfoSubmitted {
 
 // MARK: - PixelEventsCheckoutAddressInfoSubmittedData
 // swiftlint:disable type_name
-struct PixelEventsCheckoutAddressInfoSubmittedData: Codable {
+public struct PixelEventsCheckoutAddressInfoSubmittedData: Codable {
 	let checkout: Checkout?
 }
 // swiftlint:enable type_name
@@ -612,30 +643,6 @@ struct Transaction: Codable {
 	let gateway: String?
 }
 
-// MARK: - PixelEventsCheckoutCompleted
-
-/// The `checkout_completed` event logs when a visitor completes a purchase. This
-/// event is available on the order status and checkout pages
-///
-/// The `checkout_completed` event logs when a visitor completes a purchase.
-/// This event is available on the order status and checkout pages
-public struct PixelEventsCheckoutCompleted: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let data: PixelEventsCheckoutCompletedData?
-	/// The ID of the customer event
-	let id: String?
-	/// The name of the customer event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
-	}
-}
-
 // MARK: PixelEventsCheckoutCompleted convenience initializers and mutators
 
 extension PixelEventsCheckoutCompleted {
@@ -654,7 +661,7 @@ extension PixelEventsCheckoutCompleted {
 }
 
 // MARK: - PixelEventsCheckoutCompletedData
-struct PixelEventsCheckoutCompletedData: Codable {
+public struct PixelEventsCheckoutCompletedData: Codable {
 	let checkout: Checkout?
 }
 
@@ -667,32 +674,6 @@ extension PixelEventsCheckoutCompletedData {
 				return nil
 			}
 		self = pixelData
-	}
-}
-
-// MARK: - PixelEventsCheckoutContactInfoSubmitted
-
-/// The `checkout_contact_info_submitted` event logs an instance where a customer
-/// submits a checkout form. This event is only available in checkouts where
-/// checkout extensibility for customizations is enabled
-///
-/// The `checkout_contact_info_submitted` event logs an instance where a
-/// customer submits a checkout form. This event is only available in checkouts
-/// where checkout extensibility for customizations is enabled
-public struct PixelEventsCheckoutContactInfoSubmitted: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let data: PixelEventsCheckoutContactInfoSubmittedData?
-	/// The ID of the customer event
-	let id: String?
-	/// The name of the customer event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
 	}
 }
 
@@ -716,7 +697,7 @@ extension PixelEventsCheckoutContactInfoSubmitted {
 // MARK: - PixelEventsCheckoutContactInfoSubmittedData
 
 // swiftlint:disable type_name
-struct PixelEventsCheckoutContactInfoSubmittedData: Codable {
+public struct PixelEventsCheckoutContactInfoSubmittedData: Codable {
 	let checkout: Checkout?
 }
 // swiftlint:enable type_name
@@ -730,28 +711,6 @@ extension PixelEventsCheckoutContactInfoSubmittedData {
 				return nil
 			}
 		self = pixelData
-	}
-}
-
-// MARK: - PixelEventsCheckoutShippingInfoSubmitted
-
-/// The `checkout_shipping_info_submitted` event logs an instance where the
-/// customer chooses a shipping rate. This event is only available in checkouts
-/// where checkout extensibility for customizations is enabled
-public struct PixelEventsCheckoutShippingInfoSubmitted: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let data: PixelEventsCheckoutShippingInfoSubmittedData?
-	/// The ID of the customer event
-	let id: String?
-	/// The name of the customer event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
 	}
 }
 
@@ -774,7 +733,7 @@ extension PixelEventsCheckoutShippingInfoSubmitted {
 
 // MARK: - PixelEventsCheckoutShippingInfoSubmittedData
 // swiftlint:disable type_name
-struct PixelEventsCheckoutShippingInfoSubmittedData: Codable {
+public struct PixelEventsCheckoutShippingInfoSubmittedData: Codable {
 	let checkout: Checkout?
 }
 // swiftlint:enable type_name
@@ -788,36 +747,6 @@ extension PixelEventsCheckoutShippingInfoSubmittedData {
 				return nil
 			}
 		self = pixelData
-	}
-}
-
-// MARK: - PixelEventsCheckoutStarted
-
-/// The `checkout_started` event logs an instance of a customer starting the
-/// checkout process. This event is available on the checkout page. For checkout
-/// extensibility, this event is triggered every time a customer enters checkout.
-/// For non-checkout extensible shops, this event is only triggered the first
-/// time a customer enters checkout.
-///
-/// The `checkout_started` event logs an instance of a customer starting
-/// the checkout process. This event is available on the checkout page. For
-/// checkout extensibility, this event is triggered every time a customer
-/// enters checkout. For non-checkout extensible shops, this event is only
-/// triggered the first time a customer enters checkout.
-public struct PixelEventsCheckoutStarted: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let data: PixelEventsCheckoutStartedData?
-	/// The ID of the customer event
-	let id: String?
-	/// The name of the customer event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
 	}
 }
 
@@ -839,7 +768,7 @@ extension PixelEventsCheckoutStarted {
 }
 
 // MARK: - PixelEventsCheckoutStartedData
-struct PixelEventsCheckoutStartedData: Codable {
+public struct PixelEventsCheckoutStartedData: Codable {
 	let checkout: Checkout?
 }
 
@@ -852,31 +781,6 @@ extension PixelEventsCheckoutStartedData {
 				return nil
 			}
 		self = pixelData
-	}
-}
-
-// MARK: - PixelEventsPageViewed
-
-/// The `page_viewed` event logs an instance where a customer visited a page.
-/// This event is available on the online store, checkout, and order status pages
-///
-/// The `page_viewed` event logs an instance where a customer visited a page.
-/// This event is available on the online store, checkout, and order status
-/// pages
-public struct PixelEventsPageViewed: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let data: PixelEventsPageViewedData?
-	/// The ID of the customer event
-	let id: String?
-	/// The name of the customer event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
 	}
 }
 
@@ -898,7 +802,7 @@ extension PixelEventsPageViewed {
 }
 
 // MARK: - PixelEventsPageViewedData
-struct PixelEventsPageViewedData: Codable {
+public struct PixelEventsPageViewedData: Codable {
 }
 
 // MARK: PixelEventsPageViewedData convenience initializers and mutators
@@ -910,31 +814,6 @@ extension PixelEventsPageViewedData {
 				return nil
 			}
 		self = pixelData
-	}
-}
-
-// MARK: - PixelEventsPaymentInfoSubmitted
-
-/// The `payment_info_submitted` event logs an instance of a customer submitting
-/// their payment information. This event is available on the checkout page
-///
-/// The `payment_info_submitted` event logs an instance of a customer
-/// submitting their payment information. This event is available on the
-/// checkout page
-public struct PixelEventsPaymentInfoSubmitted: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let data: PixelEventsPaymentInfoSubmittedData?
-	/// The ID of the customer event
-	let id: String?
-	/// The name of the customer event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
 	}
 }
 
@@ -956,7 +835,7 @@ extension PixelEventsPaymentInfoSubmitted {
 }
 
 // MARK: - PixelEventsPaymentInfoSubmittedData
-struct PixelEventsPaymentInfoSubmittedData: Codable {
+public struct PixelEventsPaymentInfoSubmittedData: Codable {
 	let checkout: Checkout?
 }
 
@@ -972,33 +851,12 @@ extension PixelEventsPaymentInfoSubmittedData {
 	}
 }
 
-// MARK: - CustomEvent
-
-/// This event represents any custom events emitted by partners or merchants via
-/// the `publish` method
-public struct CustomEvent: Codable {
-	/// The client-side ID of the customer, provided by Shopify
-	let context: Context?
-	let customData: CustomData?
-	/// The ID of the customer event
-	let id: String?
-	/// Arbitrary name of the custom event
-	let name: String?
-	/// The timestamp of when the customer event occurred, in [ISO
-	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-	let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, customData, id, name, timestamp
-	}
-}
-
 // MARK: CustomEvent convenience initializers and mutators
 
 extension CustomEvent {
 	init(from webPixelsEventBody: WebPixelsEventBody) {
 		self.context = webPixelsEventBody.context
-		self.customData = webPixelsEventBody.customData
+		self.data = webPixelsEventBody.customData
 		self.id = webPixelsEventBody.id
 		self.name = webPixelsEventBody.name
 		self.timestamp = webPixelsEventBody.timestamp
@@ -1009,7 +867,7 @@ extension CustomEvent {
 
 /// A free-form object representing data specific to a custom event provided by
 /// the custom event publisher
-struct CustomData: Codable {
+public struct CustomData: Codable {
 }
 
 // MARK: - PricingPercentageValue
