@@ -125,7 +125,12 @@ class CartManager {
 
 	private func performCartCreate(items: [GraphQL.ID] = [], handler: @escaping CartResultHandler) {
 		let input = (appConfiguration.useVaultedState) ? vaultedStateCart(items) : defaultCart(items)
-		let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
+
+		let countryCode: Storefront.CountryCode = appConfiguration.useVaultedState
+		? ((Storefront.CountryCode(rawValue: Bundle.main.infoDictionary?["Country"] as? String ?? "")) ?? .ca)
+		: Storefront.CountryCode.inferRegion()
+
+		let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: countryCode)) { $0
 			.cartCreate(input: input) { $0
 				.cart { $0.cartManagerFragment() }
 			}
