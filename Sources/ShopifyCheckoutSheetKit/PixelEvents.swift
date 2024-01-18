@@ -27,18 +27,49 @@ import Foundation
 
 public enum PixelEvent {
 	case customEvent(CustomEvent)
-	case checkoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted)
-	case checkoutCompleted(PixelEventsCheckoutCompleted)
-	case checkoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted)
-	case checkoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted)
-	case checkoutStarted(PixelEventsCheckoutStarted)
-	case pageViewed(PixelEventsPageViewed)
-	case paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted)
+	case standardEvent(StandardEvent)
 }
 
-public struct BaseEvent<T>: Codable where T: Codable {
+// guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+//let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutShippingInfoSubmittedData.self, from: jsonData) else {
+//	return nil
+//}
+//self = pixelData
+
+public struct CustomEvent {
+	public let context: Context?
+	public let data: CustomData?
+	public let checkout: Checkout?
+	/// The ID of the customer event
+	public let id: String?
+	/// The name of the customer event
+	public let name: String?
+	/// The timestamp of when the customer event occurred, in [ISO
+	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
+	public let timestamp: String?
+
+	enum CodingKeys: String, CodingKey {
+		case context, data, id, name, timestamp
+	}
+
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
+
+		if let dataDict = webPixelsEventBody.data {
+			self.data = CustomData(from: dataDict)
+		} else {
+			self.data = nil
+		}
+	}
+}
+
+public struct StandardEvent {
     public let context: Context?
-    public let data: T?
+    public let data: CustomData?
+	public let checkout: Checkout?
     /// The ID of the customer event
     public let id: String?
     /// The name of the customer event
@@ -50,46 +81,21 @@ public struct BaseEvent<T>: Codable where T: Codable {
     enum CodingKeys: String, CodingKey {
         case context, data, id, name, timestamp
     }
+
+	init(from webPixelsEventBody: WebPixelsEventBody) {
+		self.context = webPixelsEventBody.context
+		self.id = webPixelsEventBody.id
+		self.name = webPixelsEventBody.name
+		self.timestamp = webPixelsEventBody.timestamp
+//		self.checkout = webPixelsEventBody.checkout
+
+//		if let dataDict = webPixelsEventBody.data {
+//			self.data = CustomData(from: dataDict)
+//		} else {
+//			self.data = nil
+//		}
+	}
 }
-
-/// The `checkout_address_info_submitted` event logs an instance of a customer
-/// submitting their mailing address. This event is only available in checkouts
-/// where checkout extensibility for customizations is enabled
-public typealias PixelEventsCheckoutAddressInfoSubmitted = BaseEvent<PixelEventsCheckoutAddressInfoSubmittedData>
-
-/// The `checkout_completed` event logs when a visitor completes a purchase. This
-/// event is available on the order status and checkout pages
-public typealias PixelEventsCheckoutCompleted = BaseEvent<PixelEventsCheckoutCompletedData>
-
-/// The `checkout_contact_info_submitted` event logs an instance where a customer
-/// submits a checkout form. This event is only available in checkouts where
-/// checkout extensibility for customizations is enabled
-public typealias PixelEventsCheckoutContactInfoSubmitted = BaseEvent<PixelEventsCheckoutContactInfoSubmittedData>
-
-/// The `checkout_shipping_info_submitted` event logs an instance where the
-/// customer chooses a shipping rate. This event is only available in checkouts
-/// where checkout extensibility for customizations is enabled
-public typealias PixelEventsCheckoutShippingInfoSubmitted = BaseEvent<PixelEventsCheckoutShippingInfoSubmittedData>
-
-/// The `checkout_started` event logs an instance of a customer starting
-/// the checkout process. This event is available on the checkout page. For
-/// checkout extensibility, this event is triggered every time a customer
-/// enters checkout. For non-checkout extensible shops, this event is only
-/// triggered the first time a customer enters checkout.
-public typealias PixelEventsCheckoutStarted = BaseEvent<PixelEventsCheckoutStartedData>
-
-/// The `page_viewed` event logs an instance where a customer visited a page.
-/// This event is available on the online store, checkout, and order status pages
-public typealias PixelEventsPageViewed = BaseEvent<PixelEventsPageViewedData>
-
-/// The `payment_info_submitted` event logs an instance of a customer
-/// submitting their payment information. This event is available on the
-/// checkout page
-public typealias PixelEventsPaymentInfoSubmitted = BaseEvent<PixelEventsPaymentInfoSubmittedData>
-
-/// This event represents any custom events emitted by partners or merchants via
-/// the `publish` method
-public typealias CustomEvent = BaseEvent<CustomData>
 
 // MARK: - Context
 
@@ -384,42 +390,6 @@ public struct Product: Codable {
 	public let vendor: String?
 }
 
-// MARK: PixelEventsCheckoutAddressInfoSubmitted convenience initializers and mutators
-
-extension PixelEventsCheckoutAddressInfoSubmitted {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-
-		if let dataDict = webPixelsEventBody.data {
-			self.data = PixelEventsCheckoutAddressInfoSubmittedData(from: dataDict)
-		} else {
-			self.data = nil
-		}
-	}
-}
-
-// MARK: - PixelEventsCheckoutAddressInfoSubmittedData
-// swiftlint:disable type_name
-public struct PixelEventsCheckoutAddressInfoSubmittedData: Codable {
-	public let checkout: Checkout?
-}
-// swiftlint:enable type_name
-
-// MARK: PixelEventsCheckoutAddressInfoSubmittedData convenience initializers and mutators
-
-extension PixelEventsCheckoutAddressInfoSubmittedData {
-	init?(from dictionary: [String: Any]) {
-		guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutAddressInfoSubmittedData.self, from: jsonData) else {
-				return nil
-			}
-		self = pixelData
-	}
-}
-
 // MARK: - Checkout
 
 /// A container for all the information required to add items to checkout and
@@ -645,232 +615,6 @@ public struct Transaction: Codable {
 	public let gateway: String?
 }
 
-// MARK: PixelEventsCheckoutCompleted convenience initializers and mutators
-
-extension PixelEventsCheckoutCompleted {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-
-		if let dataDict = webPixelsEventBody.data {
-			self.data = PixelEventsCheckoutCompletedData(from: dataDict)
-		} else {
-			self.data = nil
-		}
-	}
-}
-
-// MARK: - PixelEventsCheckoutCompletedData
-public struct PixelEventsCheckoutCompletedData: Codable {
-	public let checkout: Checkout?
-}
-
-// MARK: PixelEventsCheckoutCompletedData convenience initializers and mutators
-
-extension PixelEventsCheckoutCompletedData {
-	init?(from dictionary: [String: Any]) {
-		guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutCompletedData.self, from: jsonData) else {
-				return nil
-			}
-		self = pixelData
-	}
-}
-
-// MARK: PixelEventsCheckoutContactInfoSubmitted convenience initializers and mutators
-
-extension PixelEventsCheckoutContactInfoSubmitted {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-
-		if let dataDict = webPixelsEventBody.data {
-			self.data = PixelEventsCheckoutContactInfoSubmittedData(from: dataDict)
-		} else {
-			self.data = nil
-		}
-	}
-}
-
-// MARK: - PixelEventsCheckoutContactInfoSubmittedData
-
-// swiftlint:disable type_name
-public struct PixelEventsCheckoutContactInfoSubmittedData: Codable {
-	public let checkout: Checkout?
-}
-// swiftlint:enable type_name
-
-// MARK: PixelEventsCheckoutContactInfoSubmittedData convenience initializers and mutators
-
-extension PixelEventsCheckoutContactInfoSubmittedData {
-	init?(from dictionary: [String: Any]) {
-		guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutContactInfoSubmittedData.self, from: jsonData) else {
-				return nil
-			}
-		self = pixelData
-	}
-}
-
-// MARK: PixelEventsCheckoutShippingInfoSubmitted convenience initializers and mutators
-
-extension PixelEventsCheckoutShippingInfoSubmitted {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-
-		if let dataDict = webPixelsEventBody.data {
-			self.data = PixelEventsCheckoutShippingInfoSubmittedData(from: dataDict)
-		} else {
-			self.data = nil
-		}
-	}
-}
-
-// MARK: - PixelEventsCheckoutShippingInfoSubmittedData
-// swiftlint:disable type_name
-public struct PixelEventsCheckoutShippingInfoSubmittedData: Codable {
-	public let checkout: Checkout?
-}
-// swiftlint:enable type_name
-
-// MARK: PixelEventsCheckoutShippingInfoSubmittedData convenience initializers and mutators
-
-extension PixelEventsCheckoutShippingInfoSubmittedData {
-	init?(from dictionary: [String: Any]) {
-		guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutShippingInfoSubmittedData.self, from: jsonData) else {
-				return nil
-			}
-		self = pixelData
-	}
-}
-
-// MARK: PixelEventsCheckoutStarted convenience initializers and mutators
-
-extension PixelEventsCheckoutStarted {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-
-		if let dataDict = webPixelsEventBody.data {
-			self.data = PixelEventsCheckoutStartedData(from: dataDict)
-		} else {
-			self.data = nil
-		}
-	}
-}
-
-// MARK: - PixelEventsCheckoutStartedData
-public struct PixelEventsCheckoutStartedData: Codable {
-	public let checkout: Checkout?
-}
-
-// MARK: PixelEventsCheckoutStartedData convenience initializers and mutators
-
-extension PixelEventsCheckoutStartedData {
-	init?(from dictionary: [String: Any]) {
-		guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-			let pixelData = try? JSONDecoder().decode(PixelEventsCheckoutStartedData.self, from: jsonData) else {
-				return nil
-			}
-		self = pixelData
-	}
-}
-
-// MARK: PixelEventsPageViewed convenience initializers and mutators
-
-extension PixelEventsPageViewed {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-
-		if let dataDict = webPixelsEventBody.data {
-			self.data = PixelEventsPageViewedData(from: dataDict)
-		} else {
-			self.data = nil
-		}
-	}
-}
-
-// MARK: - PixelEventsPageViewedData
-public struct PixelEventsPageViewedData: Codable {
-}
-
-// MARK: PixelEventsPageViewedData convenience initializers and mutators
-
-extension PixelEventsPageViewedData {
-	init?(from dictionary: [String: Any]) {
-		guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-			let pixelData = try? JSONDecoder().decode(PixelEventsPageViewedData.self, from: jsonData) else {
-				return nil
-			}
-		self = pixelData
-	}
-}
-
-// MARK: PixelEventsPaymentInfoSubmitted convenience initializers and mutators
-
-extension PixelEventsPaymentInfoSubmitted {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-
-		if let dataDict = webPixelsEventBody.data {
-			self.data = PixelEventsPaymentInfoSubmittedData(from: dataDict)
-		} else {
-			self.data = nil
-		}
-	}
-}
-
-// MARK: - PixelEventsPaymentInfoSubmittedData
-public struct PixelEventsPaymentInfoSubmittedData: Codable {
-	public let checkout: Checkout?
-}
-
-// MARK: PixelEventsPaymentInfoSubmittedData convenience initializers and mutators
-
-extension PixelEventsPaymentInfoSubmittedData {
-	init?(from dictionary: [String: Any]) {
-		guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-			let pixelData = try? JSONDecoder().decode(PixelEventsPaymentInfoSubmittedData.self, from: jsonData) else {
-				return nil
-			}
-		self = pixelData
-	}
-}
-
-// MARK: CustomEvent convenience initializers and mutators
-
-extension CustomEvent {
-	init(from webPixelsEventBody: WebPixelsEventBody) {
-		self.context = webPixelsEventBody.context
-		self.data = webPixelsEventBody.customData
-		self.id = webPixelsEventBody.id
-		self.name = webPixelsEventBody.name
-		self.timestamp = webPixelsEventBody.timestamp
-	}
-}
-
-// MARK: - CustomData
-
-/// A free-form object representing data specific to a custom event provided by
-/// the custom event publisher
-public struct CustomData: Codable {
-}
 
 // MARK: - PricingPercentageValue
 
@@ -908,3 +652,5 @@ func newJSONEncoder() -> JSONEncoder {
 }
 
 // swiftlint:enable file_length
+
+public struct CustomData: Codable {}
