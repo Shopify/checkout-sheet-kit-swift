@@ -107,8 +107,12 @@ class CheckoutWebView: WKWebView {
 
 	// MARK: -
 
-	func load(checkout url: URL) {
-		load(URLRequest(url: url))
+	func load(checkout url: URL, isPreload: Bool = false) {
+		var request = URLRequest(url: url)
+		if isPreload {
+			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
+		}
+		load(request)
 	}
 
 	private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {

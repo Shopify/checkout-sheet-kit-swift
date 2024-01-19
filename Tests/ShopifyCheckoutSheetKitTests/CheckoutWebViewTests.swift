@@ -134,4 +134,37 @@ class CheckoutWebViewTests: XCTestCase {
 
 		waitForExpectations(timeout: 0.5, handler: nil)
     }
+
+	func testPreloadSendsPrefetchHeader() {
+		let webView = LoadedRequestObservableWebView()
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: true
+		)
+
+		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
+		XCTAssertEqual(secPurposeHeader, "prefetch")
+	}
+
+	func testNoPreloadDoesNotSendPrefetchHeader() {
+		let webView = LoadedRequestObservableWebView()
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: false
+		)
+
+		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
+		XCTAssertEqual(secPurposeHeader, nil)
+	}
+}
+
+class LoadedRequestObservableWebView: CheckoutWebView {
+	var lastLoadedURLRequest: URLRequest?
+
+	override func load(_ request: URLRequest) -> WKNavigation? {
+		self.lastLoadedURLRequest = request
+		return nil
+	}
 }
