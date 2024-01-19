@@ -36,60 +36,85 @@ public enum PixelEvent {
 	case paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted)
 }
 
-public struct BaseEvent<T>: Codable where T: Codable {
-    public let context: Context?
-    public let data: T?
-    /// The ID of the customer event
-    public let id: String?
-    /// The name of the customer event
-    public let name: String?
-    /// The timestamp of when the customer event occurred, in [ISO
-    /// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
-    public let timestamp: String?
+public protocol BaseEvent: Codable {
+	var context: Context? {get}
+	/// The ID of the customer event
+	var id: String? {get}
+	/// The name of the customer event
+	var name: String? {get}
+	/// The timestamp of when the customer event occurred, in [ISO
+	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
+	var timestamp: String? {get}
+}
 
-    enum CodingKeys: String, CodingKey {
-        case context, data, id, name, timestamp
-    }
+public struct StandardEvent<T>: BaseEvent where T: Codable {
+	public let context: Context?
+	public let data: T?
+	/// The ID of the customer event
+	public let id: String?
+	/// The name of the customer event
+	public let name: String?
+	/// The timestamp of when the customer event occurred, in [ISO
+	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
+	public let timestamp: String?
+
+	enum CodingKeys: String, CodingKey {
+		case context, data, id, name, timestamp
+	}
+}
+
+/// This event represents any custom events emitted by partners or merchants via
+/// the `publish` method
+public struct CustomEvent: BaseEvent {
+	public let context: Context?
+	public let customData: CustomData?
+	/// The ID of the customer event
+	public let id: String?
+	/// The name of the customer event
+	public let name: String?
+	/// The timestamp of when the customer event occurred, in [ISO
+	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
+	public let timestamp: String?
+
+	enum CodingKeys: String, CodingKey {
+		case context, customData, id, name, timestamp
+	}
 }
 
 /// The `checkout_address_info_submitted` event logs an instance of a customer
 /// submitting their mailing address. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
-public typealias PixelEventsCheckoutAddressInfoSubmitted = BaseEvent<PixelEventsCheckoutAddressInfoSubmittedData>
+public typealias PixelEventsCheckoutAddressInfoSubmitted = StandardEvent<PixelEventsCheckoutAddressInfoSubmittedData>
 
 /// The `checkout_completed` event logs when a visitor completes a purchase. This
 /// event is available on the order status and checkout pages
-public typealias PixelEventsCheckoutCompleted = BaseEvent<PixelEventsCheckoutCompletedData>
+public typealias PixelEventsCheckoutCompleted = StandardEvent<PixelEventsCheckoutCompletedData>
 
 /// The `checkout_contact_info_submitted` event logs an instance where a customer
 /// submits a checkout form. This event is only available in checkouts where
 /// checkout extensibility for customizations is enabled
-public typealias PixelEventsCheckoutContactInfoSubmitted = BaseEvent<PixelEventsCheckoutContactInfoSubmittedData>
+public typealias PixelEventsCheckoutContactInfoSubmitted = StandardEvent<PixelEventsCheckoutContactInfoSubmittedData>
 
 /// The `checkout_shipping_info_submitted` event logs an instance where the
 /// customer chooses a shipping rate. This event is only available in checkouts
 /// where checkout extensibility for customizations is enabled
-public typealias PixelEventsCheckoutShippingInfoSubmitted = BaseEvent<PixelEventsCheckoutShippingInfoSubmittedData>
+public typealias PixelEventsCheckoutShippingInfoSubmitted = StandardEvent<PixelEventsCheckoutShippingInfoSubmittedData>
 
 /// The `checkout_started` event logs an instance of a customer starting
 /// the checkout process. This event is available on the checkout page. For
 /// checkout extensibility, this event is triggered every time a customer
 /// enters checkout. For non-checkout extensible shops, this event is only
 /// triggered the first time a customer enters checkout.
-public typealias PixelEventsCheckoutStarted = BaseEvent<PixelEventsCheckoutStartedData>
+public typealias PixelEventsCheckoutStarted = StandardEvent<PixelEventsCheckoutStartedData>
 
 /// The `page_viewed` event logs an instance where a customer visited a page.
 /// This event is available on the online store, checkout, and order status pages
-public typealias PixelEventsPageViewed = BaseEvent<PixelEventsPageViewedData>
+public typealias PixelEventsPageViewed = StandardEvent<PixelEventsPageViewedData>
 
 /// The `payment_info_submitted` event logs an instance of a customer
 /// submitting their payment information. This event is available on the
 /// checkout page
-public typealias PixelEventsPaymentInfoSubmitted = BaseEvent<PixelEventsPaymentInfoSubmittedData>
-
-/// This event represents any custom events emitted by partners or merchants via
-/// the `publish` method
-public typealias CustomEvent = BaseEvent<CustomData>
+public typealias PixelEventsPaymentInfoSubmitted = StandardEvent<PixelEventsPaymentInfoSubmittedData>
 
 // MARK: - Context
 
@@ -858,7 +883,7 @@ extension PixelEventsPaymentInfoSubmittedData {
 extension CustomEvent {
 	init(from webPixelsEventBody: WebPixelsEventBody) {
 		self.context = webPixelsEventBody.context
-		self.data = webPixelsEventBody.customData
+		self.customData = webPixelsEventBody.customData
 		self.id = webPixelsEventBody.id
 		self.name = webPixelsEventBody.name
 		self.timestamp = webPixelsEventBody.timestamp
