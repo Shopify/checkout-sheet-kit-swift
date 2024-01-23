@@ -21,15 +21,62 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import SwiftUI
 import ShopifyCheckoutSheetKit
 
-public struct AppConfiguration {
-	public var useVaultedState: Bool = false
-	internal let webPixelsLogger = FileLogger("analytics.txt")
-}
+struct LogsView: View {
+	@State private var logs: [String?] = LogReader.shared.readLogs(limit: 100) ?? []
 
-public var appConfiguration = AppConfiguration() {
-	didSet {
-		CartManager.shared.resetCart()
+	var body: some View {
+		VStack {
+			List {
+				if logs.isEmpty {
+					HStack {
+						Spacer()
+						Text("No logs available")
+							.font(.system(size: 12))
+							.padding()
+						Spacer()
+					}
+				} else {
+					ForEach(logs, id: \.self) { log in
+						Text(log ?? "No log available")
+							.font(.system(size: 12))
+					}
+
+					HStack {
+						Spacer()
+						Button(action: clearLogs) {
+							Text("Clear logs")
+								.foregroundColor(.red)
+								.background(.white)
+								.font(.system(size: 12))
+						}
+						Spacer()
+					}
+				}
+			}
+			.refreshable {
+				logs = readLogs()
+			}
+		}
+		.navigationTitle("Logs")
+		.navigationBarItems(
+			trailing: Button(action: clearLogs) {
+				Text("Clear")
+			}
+		)
+		.onAppear {
+			logs = readLogs()
+		}
+	}
+
+	private func clearLogs() {
+		ShopifyCheckoutSheetKit.configuration.logger.clearLogs()
+		logs = readLogs()
+	}
+
+	private func readLogs() -> [String?] {
+		return LogReader.shared.readLogs(limit: 100) ?? []
 	}
 }
