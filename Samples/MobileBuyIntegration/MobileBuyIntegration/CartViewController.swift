@@ -180,7 +180,13 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-		print(#function, event)
+		switch event {
+		case .customEvent(let customEvent):
+			guard let mappedEvent = mapCustomEvent(customEvent: customEvent) else { return }
+			recordAnalyticsEvent(mappedEvent)
+		case .standardEvent(let standardEvent):
+			recordAnalyticsEvent(mapStandardEvent(standardEvent: standardEvent))
+		}
 	}
 
 	private func forceCloseCheckout(_ message: String) {
@@ -198,4 +204,68 @@ extension CartViewController {
 
 		self.present(alert, animated: true, completion: nil)
     }
+}
+
+// analytics examples
+extension CartViewController {
+	private func mapStandardEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
+		return AnalyticsEvent(
+			name: standardEvent.name!,
+			userId: getUserId(),
+			timestamp: standardEvent.timestamp!,
+			checkoutTotal: standardEvent.data?.checkout?.totalPrice?.amount ?? 0.0
+		)
+	}
+
+	private func mapCustomEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
+		guard let eventName = customEvent.name else {
+			print("Invalid custom event: \(customEvent)")
+			return nil
+		}
+
+		do {
+			switch eventName {
+			case "custom_event":
+				return try decodeAndMap(event: customEvent)
+			default:
+				print("Unknown custom event \(customEvent)")
+				return nil
+			}
+		} catch {
+			print("Failed to map custom event: \(error)")
+			return nil
+		}
+	}
+
+	private func decodeAndMap(event: CustomEvent, decoder: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
+		guard let data = event.customData?.data(using: .utf8) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid data")) }
+		let decodedData = try decoder.decode(CustomPixelEventData.self, from: data)
+		return AnalyticsEvent(
+			name: event.name!,
+			userId: getUserId(),
+			timestamp: event.timestamp!,
+			checkoutTotal: decodedData.customAttribute
+		)
+	}
+
+	private func getUserId() -> String {
+		// return ID for user used in your existing analytics system
+		return "123"
+	}
+
+	func recordAnalyticsEvent(_ analyticsSystemEvent: AnalyticsEvent) {
+		// send the event to an analytics system, e.g. via an analytics sdk
+	}
+}
+
+// example type, e.g. that may be defined by an analytics sdk
+struct AnalyticsEvent: Codable {
+	var name = ""
+	var userId = ""
+	var timestamp = ""
+	var checkoutTotal = 0.0
+}
+
+struct CustomPixelEventData: Codable {
+	var customAttribute = 0.0
 }
