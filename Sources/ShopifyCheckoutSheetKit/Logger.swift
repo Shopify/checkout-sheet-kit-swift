@@ -25,10 +25,15 @@ import Foundation
 
 public protocol Logger {
 	func log(_ message: String)
+	func clearLogs()
 }
 
 public class NoOpLogger: Logger {
 	public func log(_ message: String) {
+
+	}
+
+	public func clearLogs() {
 
 	}
 }

@@ -187,7 +187,7 @@ extension CartViewController: CheckoutDelegate {
 		case .standardEvent(let standardEvent):
 			recordAnalyticsEvent(mapStandardEvent(standardEvent: standardEvent))
 		}
-		return nil
+		return
 	}
 
 	private func forceCloseCheckout(_ message: String) {
@@ -254,8 +254,9 @@ extension CartViewController {
 		return "123"
 	}
 
-	func recordAnalyticsEvent(_ analyticsSystemEvent: AnalyticsEvent) {
+	func recordAnalyticsEvent(_ event: AnalyticsEvent) {
 		// send the event to an analytics system, e.g. via an analytics sdk
+		appConfiguration.webPixelsLogger.log(event.name)
 	}
 }
 
