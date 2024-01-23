@@ -56,6 +56,9 @@ struct LogsView: View {
 					}
 				}
 			}
+			.refreshable {
+				logs = readLogs()
+			}
 		}
 		.navigationTitle("Logs")
 		.navigationBarItems(

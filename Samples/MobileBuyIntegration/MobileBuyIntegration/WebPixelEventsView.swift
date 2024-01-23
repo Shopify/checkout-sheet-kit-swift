@@ -55,6 +55,9 @@ struct WebPixelsEventsView: View {
 					}
 				}
 			}
+			.refreshable {
+				logs = readLogs()
+			}
 		}
 		.navigationTitle("Events")
 		.navigationBarItems(
