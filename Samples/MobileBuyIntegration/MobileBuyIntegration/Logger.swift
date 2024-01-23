@@ -66,8 +66,7 @@ class FileLogger: Logger {
 
 	public func clearLogs() {
 		do {
-			try FileManager.default.removeItem(at: logFileUrl)
-			FileManager.default.createFile(atPath: logFileUrl.path, contents: nil, attributes: nil)
+			try "".write(toFile: logFileUrl.path, atomically: false, encoding: .utf8)
 		} catch let error as NSError {
 			print("Couldn't clear the log file. Error: \(error)")
 		}
