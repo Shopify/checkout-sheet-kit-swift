@@ -113,7 +113,7 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
-	func testDecodeSupportsWebPixelsEvent() throws {
+	func testDecodeSupportsStandardWebPixelsEvent() throws {
 		let body = "{\"name\": \"page_viewed\",\"event\": {\"id\": \"123\",\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": {}, \"context\": {}}}"
 			.replacingOccurrences(of: "\"", with: "\\\"")
 			.replacingOccurrences(of: "\n", with: "")
@@ -135,6 +135,34 @@ class CheckoutBridgeTests: XCTestCase {
 		XCTAssertEqual("page_viewed", pageViewedEvent.name)
 		XCTAssertEqual("123", pageViewedEvent.id)
 		XCTAssertEqual("2024-01-04T09:48:53.358Z", pageViewedEvent.timestamp)
+	}
+
+	func testDecodeSupportsCustomWebPixelsEvent() throws {
+		let body = "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"wrapper\": {\"attr\": \"attrVal\", \"attr2\": [1,2,3]}}, \"context\": {}}}"
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+
+		let mock = WKScriptMessageMock(body: """
+			{
+				"name": "webPixels",
+				"body": "\(body)"
+			}
+			""")
+
+		let result = try CheckoutBridge.decode(mock)
+
+		guard case .webPixels(let pixelEvent) = result, case .customEvent(let customEvent) = pixelEvent else {
+			XCTFail("Expected .webPixels(.pageViewed), got \(result)")
+			return
+		}
+
+		XCTAssertEqual("my_custom_event", customEvent.name)
+
+		let decoder = JSONDecoder()
+		let customData = try decoder.decode(MyCustomData.self, from: customEvent.customData!.data(using: .utf8)!)
+
+		XCTAssertEqual("attrVal", customData.wrapper.attr)
+		XCTAssertEqual([1, 2, 3], customData.wrapper.attr2)
 	}
 
 	func testDecodeSupportsWebPixelsEventWithAdditionalDataAttributes() throws {
@@ -259,4 +287,13 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 		"""
 	}
+}
+
+struct MyCustomData: Codable {
+	let wrapper: MyCustomDataWrapper
+}
+
+struct MyCustomDataWrapper: Codable {
+	let attr: String
+	let attr2: [Int]
 }

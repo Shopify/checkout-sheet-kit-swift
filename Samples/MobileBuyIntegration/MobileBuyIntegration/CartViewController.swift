@@ -189,37 +189,6 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-	private func mapStandardEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
-		return AnalyticsEvent(
-			name: standardEvent.name!,
-			userId: getUserId(),
-			timestamp: standardEvent.timestamp!,
-			checkoutTotal: standardEvent.data?.checkout?.totalPrice?.amount ?? 0.0
-		)
-	}
-
-	private func mapCustomEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
-		if customEvent.name == "my_custom_event" {
-			// decode to custom data type
-			return AnalyticsEvent(
-				name: customEvent.name!,
-				userId: getUserId(),
-				timestamp: customEvent.timestamp!,
-				checkoutTotal: 0.0 // use custom data type
-			)
-		}
-		return nil
-	}
-
-	private func getUserId() -> String {
-		// return ID for user used in your existing analytics system
-		return "123"
-	}
-
-	func recordAnalyticsEvent(_ analyticsSystemEvent: AnalyticsEvent) {
-		// send the event to an analytics system, e.g. via an analytics sdk
-	}
-
 	private func forceCloseCheckout(_ message: String) {
 		print(#function, message)
 		dismiss(animated: true)
@@ -237,10 +206,83 @@ extension CartViewController {
     }
 }
 
+// analytics examples
+extension CartViewController {
+	private func mapStandardEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
+		return AnalyticsEvent(
+			name: standardEvent.name!,
+			userId: getUserId(),
+			timestamp: standardEvent.timestamp!,
+			checkoutTotal: standardEvent.data?.checkout?.totalPrice?.amount ?? 0.0
+		)
+	}
+
+	private func mapCustomEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
+		guard let eventName = customEvent.name else {
+			print("Invalid custom event: \(customEvent)")
+			return nil
+		}
+
+		do {
+			switch eventName {
+			case "custom_event":
+				return try mapFirstCustomEvent(event: customEvent)
+			case "second_custom_event":
+				return try mapSecondCustomEvent(event: customEvent)
+			default:
+				print("Unknown custom event \(customEvent)")
+				return nil
+			}
+		} catch {
+			print("Failed to map custom event: \(error)")
+			return nil
+		}
+	}
+
+	private func mapFirstCustomEvent(event: CustomEvent, decoder: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
+		guard let data = event.customData?.data(using: .utf8) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid data")) }
+		let decodedData = try decoder.decode(FirstCustomPixelEvent.self, from: data)
+		return AnalyticsEvent(
+			name: event.name!,
+			userId: getUserId(),
+			timestamp: event.timestamp!,
+			checkoutTotal: decodedData.customAttribute
+		)
+	}
+
+	private func mapSecondCustomEvent(event: CustomEvent, decoder: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
+		guard let data = event.customData?.data(using: .utf8) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid data")) }
+		let decodedData = try decoder.decode(SecondCustomPixelEvent.self, from: data)
+		return AnalyticsEvent(
+			name: event.name!,
+			userId: getUserId(),
+			timestamp: event.timestamp!,
+			checkoutTotal: decodedData.customAttribute2
+		)
+	}
+
+	private func getUserId() -> String {
+		// return ID for user used in your existing analytics system
+		return "123"
+	}
+
+	func recordAnalyticsEvent(_ analyticsSystemEvent: AnalyticsEvent) {
+		// send the event to an analytics system, e.g. via an analytics sdk
+	}
+}
+
 // example type, e.g. that may be defined by an analytics sdk
 struct AnalyticsEvent: Codable {
 	var name = ""
 	var userId = ""
 	var timestamp = ""
 	var checkoutTotal = 0.0
+}
+
+struct FirstCustomPixelEvent: Codable {
+	var customAttribute = 0.0
+}
+
+struct SecondCustomPixelEvent: Codable {
+	var customAttribute2 = 0.0
 }

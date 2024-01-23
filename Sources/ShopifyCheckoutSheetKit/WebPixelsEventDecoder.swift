@@ -33,7 +33,7 @@ struct WebPixelsEventBody: Decodable {
 	let name: String
 	let timestamp: String
 	let type: String
-	let customData: CustomData?
+	let customData: String?
 	let data: [String: Any]?
 	let context: Context?
 
@@ -61,7 +61,9 @@ struct WebPixelsEventBody: Decodable {
 			data = try container.decodeIfPresent([String: Any].self, forKey: .data)
 			customData = nil
 		case "custom":
-			customData = try? container.decode(CustomData.self, forKey: .customData)
+			let customDataValue = try container.decode([String: Any].self, forKey: .customData)
+			let jsonData = try JSONSerialization.data(withJSONObject: customDataValue)
+			customData = String(data: jsonData, encoding: .utf8)!
 			data = nil
 		default:
 			customData = nil

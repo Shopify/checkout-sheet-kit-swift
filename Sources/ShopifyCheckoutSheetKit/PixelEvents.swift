@@ -55,7 +55,7 @@ public struct StandardEventData: Codable {
 /// the `publish` method
 public struct CustomEvent {
 	public let context: Context?
-	public let customData: CustomData?
+	public let customData: String?
 	/// The ID of the customer event
 	public let id: String?
 	/// The name of the customer event
