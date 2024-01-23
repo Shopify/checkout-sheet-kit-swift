@@ -70,7 +70,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 	func testFailWithErrorDisablesPreloadingActivtedByClient() {
 		CheckoutWebView.preloadingActivatedByClient = true
 
-		let one = CheckoutWebView.for(checkout: checkoutURL)
+		_ = CheckoutWebView.for(checkout: checkoutURL)
 
 		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error"))
 
@@ -145,5 +145,20 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 		viewController.checkoutViewDidToggleModal(modalVisible: false)
 		XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
+	}
+
+	func testCheckoutViewDidStartNavigationShowsSpinner() {
+		XCTAssertTrue(viewController.spinner.isHidden)
+		XCTAssertTrue(viewController.initialNavigation)
+		XCTAssertFalse(viewController.checkoutView.checkoutDidLoad)
+
+		viewController.checkoutViewDidStartNavigation()
+		XCTAssertFalse(viewController.spinner.isHidden)
+
+		// Verify that spinner is not started if it is not the initial navigation
+		viewController.initialNavigation = true
+		viewController.checkoutView.checkoutDidLoad = true
+		viewController.checkoutViewDidStartNavigation()
+		XCTAssertFalse(viewController.spinner.isHidden)
 	}
 }

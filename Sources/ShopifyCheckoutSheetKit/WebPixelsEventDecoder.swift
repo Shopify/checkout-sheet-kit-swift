@@ -33,7 +33,7 @@ struct WebPixelsEventBody: Decodable {
 	let name: String
 	let timestamp: String
 	let type: String
-	let customData: CustomData?
+	let customData: String?
 	let data: [String: Any]?
 	let context: Context?
 
@@ -61,7 +61,9 @@ struct WebPixelsEventBody: Decodable {
 			data = try container.decodeIfPresent([String: Any].self, forKey: .data)
 			customData = nil
 		case "custom":
-			customData = try? container.decode(CustomData.self, forKey: .customData)
+			let customDataValue = try container.decode([String: Any].self, forKey: .customData)
+			let jsonData = try JSONSerialization.data(withJSONObject: customDataValue)
+			customData = String(data: jsonData, encoding: .utf8)!
 			data = nil
 		default:
 			customData = nil
@@ -88,30 +90,13 @@ class WebPixelsEventDecoder {
 
 		switch webPixelsEvent.event.type {
 		case "standard":
-			return createStandardEvent(from: webPixelsEvent.event)
+			let standardEvent = StandardEvent(from: webPixelsEvent.event)
+			return .standardEvent(standardEvent)
 		case "custom":
 			let customEvent = CustomEvent(from: webPixelsEvent.event)
 			return .customEvent(customEvent)
 		default:
 			return nil
 		}
-	}
-
-	func createStandardEvent(from webPixelsEventBody: WebPixelsEventBody) -> PixelEvent? {
-		let eventCreationDictionary: [String: (WebPixelsEventBody) -> PixelEvent?] = [
-			"checkout_address_info_submitted": { .checkoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted(from: $0)) },
-			"checkout_completed": { .checkoutCompleted(PixelEventsCheckoutCompleted(from: $0)) },
-			"checkout_contact_info_submitted": { .checkoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted(from: $0)) },
-			"checkout_shipping_info_submitted": { .checkoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted(from: $0)) },
-			"checkout_started": { .checkoutStarted(PixelEventsCheckoutStarted(from: $0)) },
-			"page_viewed": { .pageViewed(PixelEventsPageViewed(from: $0)) },
-			"payment_info_submitted": { .paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) }
-		]
-
-		if let createEvent = eventCreationDictionary[webPixelsEventBody.name] {
-			return createEvent(webPixelsEventBody)
-		}
-
-		return nil
 	}
 }

@@ -27,9 +27,12 @@ import ShopifyCheckoutSheetKit
 class FileLogger: Logger {
 	private var fileHandle: FileHandle?
 
-	public init() {
+	internal var logFileUrl: URL
+
+	public init(_ filename: String) {
 		let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-		let logFileUrl = paths[0].appendingPathComponent("log.txt")
+
+		logFileUrl = paths[0].appendingPathComponent(filename)
 
 		if !FileManager.default.fileExists(atPath: logFileUrl.path) {
 			FileManager.default.createFile(atPath: logFileUrl.path, contents: nil, attributes: nil)
@@ -58,6 +61,14 @@ class FileLogger: Logger {
 		if let data = logMessage.data(using: .utf8) {
 			fileHandle.seekToEndOfFile()
 			fileHandle.write(data)
+		}
+	}
+
+	public func clearLogs() {
+		do {
+			try "".write(toFile: logFileUrl.path, atomically: false, encoding: .utf8)
+		} catch let error as NSError {
+			print("Couldn't clear the log file. Error: \(error)")
 		}
 	}
 }

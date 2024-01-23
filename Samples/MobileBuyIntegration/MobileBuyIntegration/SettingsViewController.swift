@@ -46,7 +46,7 @@ struct SettingsView: View {
 						}
 				}
 
-				Section(header: Text("Color Scheme"), footer: Text("NOTE: If preloading is enabled, color scheme changes may not be applied unless the cart is preloaded again.")) {
+				Section(header: Text("Theme")) {
 					ForEach(Configuration.ColorScheme.allCases, id: \.self) { scheme in
 						ColorSchemeView(scheme: scheme, isSelected: scheme == selectedColorScheme)
 							.background(Color.clear)
@@ -58,6 +58,15 @@ struct SettingsView: View {
 								ShopifyCheckoutSheetKit.configuration.backgroundColor = scheme.backgroundColor
 								NotificationCenter.default.post(name: .colorSchemeChanged, object: nil)
 							}
+					}
+				}
+
+				Section(header: Text("Logs")) {
+					NavigationLink(destination: WebPixelsEventsView()) {
+						Text("Web pixel events")
+					}
+					NavigationLink(destination: LogsView()) {
+						Text("Logs")
 					}
 				}
 
@@ -75,13 +84,6 @@ struct SettingsView: View {
 						Text(ShopifyCheckoutSheetKit.version)
 							.font(.system(size: 14))
 							.foregroundStyle(.gray)
-					}
-				}
-
-				Section(header: Text("Logs")) {
-					ForEach(logs.prefix(10), id: \.self) { log in
-						Text(log ?? "No log available")
-							.font(.system(size: 12))
 					}
 				}
 			}
