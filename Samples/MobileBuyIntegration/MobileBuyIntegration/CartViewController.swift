@@ -187,6 +187,7 @@ extension CartViewController: CheckoutDelegate {
 		case .standardEvent(let standardEvent):
 			recordAnalyticsEvent(mapStandardEvent(standardEvent: standardEvent))
 		}
+		return nil
 	}
 
 	private func forceCloseCheckout(_ message: String) {
