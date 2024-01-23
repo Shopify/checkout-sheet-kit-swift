@@ -30,15 +30,15 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	weak var delegate: CheckoutDelegate?
 
-	private let checkoutView: CheckoutWebView
+	internal let checkoutView: CheckoutWebView
 
-	private lazy var spinner: SpinnerView = {
+	internal lazy var spinner: SpinnerView = {
 		let spinner = SpinnerView(frame: .zero)
 		spinner.translatesAutoresizingMaskIntoConstraints = false
 		return spinner
 	}()
 
-	private var initialNavigation: Bool = true
+	internal var initialNavigation: Bool = true
 
 	private let checkoutURL: URL
 
@@ -131,7 +131,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidStartNavigation() {
-		if initialNavigation {
+		if initialNavigation && !checkoutView.checkoutDidLoad {
 			spinner.startAnimating()
 		}
 	}
