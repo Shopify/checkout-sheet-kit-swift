@@ -131,7 +131,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidStartNavigation() {
-		if initialNavigation {
+		if initialNavigation && !checkoutView.checkoutDidLoad {
 			spinner.startAnimating()
 		}
 	}
