@@ -70,7 +70,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 	func testFailWithErrorDisablesPreloadingActivtedByClient() {
 		CheckoutWebView.preloadingActivatedByClient = true
 
-		let one = CheckoutWebView.for(checkout: checkoutURL)
+		_ = CheckoutWebView.for(checkout: checkoutURL)
 
 		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error"))
 

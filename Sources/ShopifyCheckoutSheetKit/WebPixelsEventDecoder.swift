@@ -88,30 +88,13 @@ class WebPixelsEventDecoder {
 
 		switch webPixelsEvent.event.type {
 		case "standard":
-			return createStandardEvent(from: webPixelsEvent.event)
+			let standardEvent = StandardEvent(from: webPixelsEvent.event)
+			return .standardEvent(standardEvent)
 		case "custom":
 			let customEvent = CustomEvent(from: webPixelsEvent.event)
 			return .customEvent(customEvent)
 		default:
 			return nil
 		}
-	}
-
-	func createStandardEvent(from webPixelsEventBody: WebPixelsEventBody) -> PixelEvent? {
-		let eventCreationDictionary: [String: (WebPixelsEventBody) -> PixelEvent?] = [
-			"checkout_address_info_submitted": { .checkoutAddressInfoSubmitted(PixelEventsCheckoutAddressInfoSubmitted(from: $0)) },
-			"checkout_completed": { .checkoutCompleted(PixelEventsCheckoutCompleted(from: $0)) },
-			"checkout_contact_info_submitted": { .checkoutContactInfoSubmitted(PixelEventsCheckoutContactInfoSubmitted(from: $0)) },
-			"checkout_shipping_info_submitted": { .checkoutShippingInfoSubmitted(PixelEventsCheckoutShippingInfoSubmitted(from: $0)) },
-			"checkout_started": { .checkoutStarted(PixelEventsCheckoutStarted(from: $0)) },
-			"page_viewed": { .pageViewed(PixelEventsPageViewed(from: $0)) },
-			"payment_info_submitted": { .paymentInfoSubmitted(PixelEventsPaymentInfoSubmitted(from: $0)) }
-		]
-
-		if let createEvent = eventCreationDictionary[webPixelsEventBody.name] {
-			return createEvent(webPixelsEventBody)
-		}
-
-		return nil
 	}
 }

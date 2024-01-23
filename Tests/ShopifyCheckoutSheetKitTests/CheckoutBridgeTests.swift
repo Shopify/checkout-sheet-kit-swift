@@ -127,7 +127,7 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case .webPixels(let pixelEvent) = result, case .pageViewed(let pageViewedEvent) = pixelEvent else {
+		guard case .webPixels(let pixelEvent) = result, case .standardEvent(let pageViewedEvent) = pixelEvent else {
 			XCTFail("Expected .webPixels(.pageViewed), got \(result)")
 			return
 		}
@@ -135,6 +135,50 @@ class CheckoutBridgeTests: XCTestCase {
 		XCTAssertEqual("page_viewed", pageViewedEvent.name)
 		XCTAssertEqual("123", pageViewedEvent.id)
 		XCTAssertEqual("2024-01-04T09:48:53.358Z", pageViewedEvent.timestamp)
+	}
+
+	func testDecodeSupportsWebPixelsEventWithAdditionalDataAttributes() throws {
+		let body = "{\"name\": \"page_viewed\",\"event\": {\"id\": \"123\",\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": { \"checkout\": {\"currencyCode\": \"USD\"}, \"cart\": {\"cartId\": \"123\"} }, \"context\": {}}}"
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+
+		let mock = WKScriptMessageMock(body: """
+			{
+				"name": "webPixels",
+				"body": "\(body)"
+			}
+			""")
+
+		let result = try CheckoutBridge.decode(mock)
+
+		guard case .webPixels(let pixelEvent) = result, case .standardEvent(let pageViewedEvent) = pixelEvent else {
+			XCTFail("Expected .webPixels(.pageViewed), got \(result)")
+			return
+		}
+
+		XCTAssertEqual("page_viewed", pageViewedEvent.name)
+		XCTAssertEqual("123", pageViewedEvent.id)
+		XCTAssertEqual("USD", pageViewedEvent.data?.checkout?.currencyCode)
+		XCTAssertEqual("2024-01-04T09:48:53.358Z", pageViewedEvent.timestamp)
+	}
+
+	func testDecoderThrowsBridgeErrorWhenMandatoryAttributesAreMissing() throws {
+		let body = "{\"name\": \"page_viewed\",\"event\": {\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\", \"context\": {}}}"
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+
+		let mock = WKScriptMessageMock(body: """
+			{
+				"name": "webPixels",
+				"body": "\(body)"
+			}
+			""")
+
+		XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
+			guard case BridgeError.invalidBridgeEvent = error else {
+				return XCTFail("unexpected error thrown: \(error)")
+			}
+		}
 	}
 
 	func testInstrumentationPayloadToBridgeEvent() {

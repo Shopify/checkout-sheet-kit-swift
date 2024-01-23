@@ -180,7 +180,44 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-		print(#function, event)
+
+	switch event {
+	case .customEvent(let customEvent):
+		guard let mappedEvent = mapCustomEvent(customEvent: customEvent) else { return }
+		recordAnalyticsEvent(mappedEvent)
+		case .standardEvent(let standardEvent):
+		recordAnalyticsEvent(mapStandardEvent(standardEvent: standardEvent))
+	}
+	}
+
+	private func mapStandardEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
+		return AnalyticsEvent(
+			name: standardEvent.name!,
+			userId: getUserId(),
+			timestamp: standardEvent.timestamp!,
+			checkoutTotal: standardEvent.data?.checkout?.totalPrice?.amount ?? 0.0
+		)
+	}
+
+	private func mapCustomEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
+		if customEvent.name == "my_custom_event" {
+			//TODO decode to custom data type
+			return AnalyticsEvent(
+				name: customEvent.name!,
+				userId: getUserId(),
+				timestamp: customEvent.timestamp!,
+				checkoutTotal: 0.0 // TODO use custom data type
+			)
+		}
+	}
+
+	private func getUserId() -> String {
+		// return ID for user used in your existing analytics system
+		return "123"
+	}
+
+	func recordAnalyticsEvent(_ analyticsSystemEvent: AnalyticsEvent) {
+		// send the event to an analytics system, e.g. via an analytics sdk
 	}
 
 	private func forceCloseCheckout(_ message: String) {
@@ -198,4 +235,12 @@ extension CartViewController {
 
 		self.present(alert, animated: true, completion: nil)
     }
+}
+
+// example type, e.g. that may be defined by an analytics sdk
+struct AnalyticsEvent: Codable {
+	var name = ""
+	var userId = ""
+	var timestamp = ""
+	var checkoutTotal = 0.0
 }
