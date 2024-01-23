@@ -226,9 +226,7 @@ extension CartViewController {
 		do {
 			switch eventName {
 			case "custom_event":
-				return try mapFirstCustomEvent(event: customEvent)
-			case "second_custom_event":
-				return try mapSecondCustomEvent(event: customEvent)
+				return try decodeAndMap(event: customEvent)
 			default:
 				print("Unknown custom event \(customEvent)")
 				return nil
@@ -239,25 +237,14 @@ extension CartViewController {
 		}
 	}
 
-	private func mapFirstCustomEvent(event: CustomEvent, decoder: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
+	private func decodeAndMap(event: CustomEvent, decoder: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
 		guard let data = event.customData?.data(using: .utf8) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid data")) }
-		let decodedData = try decoder.decode(FirstCustomPixelEvent.self, from: data)
+		let decodedData = try decoder.decode(CustomPixelEventData.self, from: data)
 		return AnalyticsEvent(
 			name: event.name!,
 			userId: getUserId(),
 			timestamp: event.timestamp!,
 			checkoutTotal: decodedData.customAttribute
-		)
-	}
-
-	private func mapSecondCustomEvent(event: CustomEvent, decoder: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
-		guard let data = event.customData?.data(using: .utf8) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid data")) }
-		let decodedData = try decoder.decode(SecondCustomPixelEvent.self, from: data)
-		return AnalyticsEvent(
-			name: event.name!,
-			userId: getUserId(),
-			timestamp: event.timestamp!,
-			checkoutTotal: decodedData.customAttribute2
 		)
 	}
 
@@ -279,10 +266,6 @@ struct AnalyticsEvent: Codable {
 	var checkoutTotal = 0.0
 }
 
-struct FirstCustomPixelEvent: Codable {
+struct CustomPixelEventData: Codable {
 	var customAttribute = 0.0
-}
-
-struct SecondCustomPixelEvent: Codable {
-	var customAttribute2 = 0.0
 }
