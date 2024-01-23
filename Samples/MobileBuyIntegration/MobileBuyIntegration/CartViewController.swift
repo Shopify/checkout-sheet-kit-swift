@@ -180,14 +180,13 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-
-	switch event {
-	case .customEvent(let customEvent):
-		guard let mappedEvent = mapCustomEvent(customEvent: customEvent) else { return }
-		recordAnalyticsEvent(mappedEvent)
+		switch event {
+		case .customEvent(let customEvent):
+			guard let mappedEvent = mapCustomEvent(customEvent: customEvent) else { return }
+			recordAnalyticsEvent(mappedEvent)
 		case .standardEvent(let standardEvent):
-		recordAnalyticsEvent(mapStandardEvent(standardEvent: standardEvent))
-	}
+			recordAnalyticsEvent(mapStandardEvent(standardEvent: standardEvent))
+		}
 	}
 
 	private func mapStandardEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
@@ -201,14 +200,15 @@ extension CartViewController: CheckoutDelegate {
 
 	private func mapCustomEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
 		if customEvent.name == "my_custom_event" {
-			//TODO decode to custom data type
+			// decode to custom data type
 			return AnalyticsEvent(
 				name: customEvent.name!,
 				userId: getUserId(),
 				timestamp: customEvent.timestamp!,
-				checkoutTotal: 0.0 // TODO use custom data type
+				checkoutTotal: 0.0 // use custom data type
 			)
 		}
+		return nil
 	}
 
 	private func getUserId() -> String {
