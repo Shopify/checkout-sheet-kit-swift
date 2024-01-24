@@ -38,12 +38,15 @@ class CheckoutWebView: WKWebView {
 
 	private static var cache: CacheEntry?
 	static var preloadingActivatedByClient: Bool = false
+	// a ref to the view is needed when preload is deactivated in order to detatch bridge
+	static weak var uncacheableViewRef: CheckoutWebView?
+	var isBridgeAttached = false
 
 	static func `for`(checkout url: URL) -> CheckoutWebView {
 		let cacheKey = url.absoluteString
 
-		if !ShopifyCheckoutSheetKit.configuration.preloading.enabled {
-			invalidate()
+		guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
+			return uncacheableView()
 		}
 
 		guard let cache = cache, cacheKey == cache.key, !cache.isStale else {
@@ -55,10 +58,16 @@ class CheckoutWebView: WKWebView {
 		return cache.view
 	}
 
+	static func uncacheableView() -> CheckoutWebView {
+		uncacheableViewRef?.detachBridge()
+		let view = CheckoutWebView()
+		uncacheableViewRef = view
+		return view
+	}
+
 	static func invalidate() {
 		preloadingActivatedByClient = false
-		cache?.view.configuration.userContentController
-			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
+		cache?.view.detachBridge()
 		cache = nil
 	}
 
@@ -94,11 +103,17 @@ class CheckoutWebView: WKWebView {
 
 		configuration.userContentController
 			.add(self, name: CheckoutBridge.messageHandler)
+		isBridgeAttached = true
 	}
 
 	deinit {
+		detachBridge()
+	}
+
+	public func detachBridge() {
 		configuration.userContentController
 			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
+		isBridgeAttached = false
 	}
 
 	required init?(coder: NSCoder) {

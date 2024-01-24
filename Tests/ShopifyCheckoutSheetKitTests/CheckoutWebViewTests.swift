@@ -158,6 +158,16 @@ class CheckoutWebViewTests: XCTestCase {
 		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
 		XCTAssertEqual(secPurposeHeader, nil)
 	}
+
+	func testDetachBridgeCalledOnInit() {
+		ShopifyCheckoutSheetKit.configuration.preloading.enabled = false
+		let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")
+		let view = CheckoutWebView.for(checkout: url!)
+		XCTAssertTrue(view.isBridgeAttached)
+		let secondView = CheckoutWebView.for(checkout: url!)
+		XCTAssertFalse(view.isBridgeAttached)
+		XCTAssertTrue(secondView.isBridgeAttached)
+	}
 }
 
 class LoadedRequestObservableWebView: CheckoutWebView {
