@@ -31,6 +31,7 @@ struct SettingsView: View {
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
 	@State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 	@State private var colorScheme: ColorScheme = .light
+	@State private var useProgressBar = ShopifyCheckoutSheetKit.configuration.progressBarEnabled
 
 	var body: some View {
 		NavigationView {
@@ -43,6 +44,10 @@ struct SettingsView: View {
 					Toggle("Prefill buyer information", isOn: $useVaultedState)
 						.onChange(of: useVaultedState) { newValue in
 							appConfiguration.useVaultedState = newValue
+						}
+					Toggle("Progress bar (experimental)", isOn: $useProgressBar)
+						.onChange(of: useProgressBar) { newValue in
+							ShopifyCheckoutSheetKit.configuration.progressBarEnabled = newValue
 						}
 				}
 
