@@ -104,6 +104,13 @@ class CheckoutWebView: WKWebView {
 		configuration.userContentController
 			.add(self, name: CheckoutBridge.messageHandler)
 		isBridgeAttached = true
+
+		isOpaque = false
+		backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+
+		if #available(iOS 15.0, *) {
+			underPageBackgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+		}
 	}
 
 	deinit {
