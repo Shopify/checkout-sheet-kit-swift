@@ -243,7 +243,8 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 			UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in
 				checkoutView?.alpha = 1
 				if ShopifyCheckoutSheetKit.configuration.payButton.enabled {
-				self.displayNativePayButton()
+					self.displayNativePayButton()
+				}
 			}
 		}
 	}
