@@ -43,7 +43,7 @@ public func preload(checkout url: URL) {
 	guard configuration.preloading.enabled else { return }
 
 	CheckoutWebView.preloadingActivatedByClient = true
-	CheckoutWebView.for(checkout: url).load(checkout: url)
+	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
 }
 
 /// Presents the checkout from a given `UIViewController`.
