@@ -48,6 +48,8 @@ public struct Configuration {
 	public var borderColor: UIColor = .systemGray5
 
 	public var logger: Logger = NoOpLogger()
+
+	public var progressBarEnabled: Bool = false
 }
 
 extension Configuration {
