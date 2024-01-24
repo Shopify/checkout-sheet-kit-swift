@@ -32,6 +32,7 @@ struct SettingsView: View {
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
 	@State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 	@State private var colorScheme: ColorScheme = .light
+	@State private var useProgressBar = ShopifyCheckoutSheetKit.configuration.progressBarEnabled
 
 	var body: some View {
 		NavigationView {
@@ -45,10 +46,14 @@ struct SettingsView: View {
 						.onChange(of: useVaultedState) { newValue in
 							appConfiguration.useVaultedState = newValue
 						}
-					Toggle("Native pay button", isOn: $useNativePayButton)
+					Toggle("Native pay button (experimental)", isOn: $useNativePayButton)
 						.onChange(of: useNativePayButton) { newValue in
 							appConfiguration.useNativeButton = newValue
 							ShopifyCheckoutSheetKit.configuration.payButton.enabled = newValue
+						}
+					Toggle("Progress bar (experimental)", isOn: $useProgressBar)
+						.onChange(of: useProgressBar) { newValue in
+							ShopifyCheckoutSheetKit.configuration.progressBarEnabled = newValue
 						}
 				}
 

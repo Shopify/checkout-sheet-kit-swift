@@ -38,6 +38,12 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		return spinner
 	}()
 
+	internal lazy var progress: IndeterminateProgressBarView = {
+		let progress = IndeterminateProgressBarView(frame: .zero)
+		progress.translatesAutoresizingMaskIntoConstraints = false
+		return progress
+	}()
+
 	internal var initialNavigation: Bool = true
 
 	private let checkoutURL: URL
@@ -72,6 +78,12 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		fatalError("init(coder:) has not been implemented")
 	}
 
+	deinit {
+		if progressBarEnabled() {
+			checkoutView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+		}
+	}
+
 	// MARK: UIViewController Lifecycle
 
 	override public func viewDidLoad() {
@@ -87,18 +99,42 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 			checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
 		])
 
-		view.addSubview(spinner)
-		NSLayoutConstraint.activate([
-			spinner.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-			spinner.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
-		])
-		view.bringSubviewToFront(spinner)
+		if progressBarEnabled() {
+			view.addSubview(progress)
+			NSLayoutConstraint.activate([
+				progress.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+				progress.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+				progress.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+				progress.heightAnchor.constraint(equalToConstant: 6)
+			])
+			view.bringSubviewToFront(progress)
+			checkoutView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+		} else {
+			view.addSubview(spinner)
+			NSLayoutConstraint.activate([
+				spinner.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+				spinner.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
+			])
+			view.bringSubviewToFront(spinner)
+		}
 
 		if checkoutView.isLoading == false {
 			self.displayNativePayButton()
 		}
 
 		loadCheckout()
+	}
+
+	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+		if keyPath == #keyPath(WKWebView.estimatedProgress) {
+			let estimatedProgress = Float(checkoutView.estimatedProgress)
+			progress.setProgress(estimatedProgress, animated: true)
+			if estimatedProgress < 1.0 {
+				progress.startAnimating()
+			} else {
+				progress.stopAnimating()
+			}
+		}
 	}
 
 	func notifyPresented() {
@@ -149,14 +185,28 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		}
 	}
 
+	private func progressBarEnabled() -> Bool {
+		return ShopifyCheckoutSheetKit.configuration.progressBarEnabled
+	}
+
 	private func loadCheckout() {
 		if checkoutView.url == nil {
-			checkoutView.alpha = 0
+			if !progressBarEnabled() {
+				checkoutView.alpha = 0
+			}
 			initialNavigation = true
 			checkoutView.load(checkout: checkoutURL)
+
+			if progressBarEnabled() {
+				progress.startAnimating()
+			}
 		} else if checkoutView.isLoading && initialNavigation {
-			checkoutView.alpha = 0
-			spinner.startAnimating()
+			if progressBarEnabled() {
+				progress.startAnimating()
+			} else {
+				checkoutView.alpha = 0
+				spinner.startAnimating()
+			}
 		}
 	}
 
@@ -179,17 +229,20 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 extension CheckoutWebViewController: CheckoutWebViewDelegate {
 	func checkoutViewDidStartNavigation() {
 		if initialNavigation && !checkoutView.checkoutDidLoad {
-			spinner.startAnimating()
+			if !progressBarEnabled() {
+				spinner.startAnimating()
+			}
 		}
 	}
 
 	func checkoutViewDidFinishNavigation() {
-		spinner.stopAnimating()
 		initialNavigation = false
 
-		UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in
-			checkoutView?.alpha = 1
-			if ShopifyCheckoutSheetKit.configuration.payButton.enabled {
+		if !progressBarEnabled() {
+			spinner.stopAnimating()
+			UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in
+				checkoutView?.alpha = 1
+				if ShopifyCheckoutSheetKit.configuration.payButton.enabled {
 				self.displayNativePayButton()
 			}
 		}

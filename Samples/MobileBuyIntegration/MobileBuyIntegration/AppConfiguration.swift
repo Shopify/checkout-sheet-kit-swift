@@ -24,8 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import ShopifyCheckoutSheetKit
 
 public struct AppConfiguration {
+	/// Prefill buyer information
 	public var useVaultedState: Bool = false
+
+	/// Native pay button experiment
 	public var useNativeButton: Bool = false
+
+	/// Logger to retain Web Pixel events
 	internal let webPixelsLogger = FileLogger("analytics.txt")
 }
 
