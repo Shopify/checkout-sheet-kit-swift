@@ -182,12 +182,12 @@ extension CartViewController: CheckoutDelegate {
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
 		switch event {
 		case .customEvent(let customEvent):
-			guard let mappedEvent = mapCustomEvent(customEvent: customEvent) else { return }
-			recordAnalyticsEvent(mappedEvent)
+			if let genericEvent = mapToGenericEvent(customEvent: customEvent) {
+				recordAnalyticsEvent(genericEvent)
+			}
 		case .standardEvent(let standardEvent):
-			recordAnalyticsEvent(mapStandardEvent(standardEvent: standardEvent))
+			recordAnalyticsEvent(mapToGenericEvent(standardEvent: standardEvent))
 		}
-		return
 	}
 
 	private func forceCloseCheckout(_ message: String) {
@@ -209,7 +209,7 @@ extension CartViewController {
 
 // analytics examples
 extension CartViewController {
-	private func mapStandardEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
+	private func mapToGenericEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
 		return AnalyticsEvent(
 			name: standardEvent.name!,
 			userId: getUserId(),
@@ -218,7 +218,7 @@ extension CartViewController {
 		)
 	}
 
-	private func mapCustomEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
+	private func mapToGenericEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
 		guard let eventName = customEvent.name else {
 			print("Invalid custom event: \(customEvent)")
 			return nil
