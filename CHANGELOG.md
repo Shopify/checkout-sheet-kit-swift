@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.0 - January 26, 2024
+
+- Expose Web Pixel events via new `checkoutDidEmitWebPixelEvent` hook - #101, #103, #105, #107, #112 (@josemiguel-alvarez, @kiftio , @markmur)
+- Send `Sec-Purpose: prefetch` header to identify preload requests - #109 (@kiftio)
+- Improve caching of preloaded checkout views - #97, #102, #110 (@cianBuckley)
+- Improve UX for loading spinner - #111 (@markmur)
+
 ## 0.9.0 - January 10, 2023
 
 - **Breaking:** The Shopify Checkout Kit has been rebranded to the Shopify Checkout Sheet Kit for Swift. To match this new name, the package has been renamed to `ShopifyCheckoutSheetKit`.
