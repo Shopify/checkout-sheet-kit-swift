@@ -53,7 +53,7 @@ public struct StandardEventData: Codable {
 
 /// This event represents any custom events emitted by partners or merchants via
 /// the `publish` method
-public struct CustomEvent {
+public struct CustomEvent: Codable {
 	public let context: Context?
 	public let customData: String?
 	/// The ID of the customer event
@@ -87,9 +87,6 @@ public struct Context: Codable {
 
 // MARK: - WebPixelsDocument
 
-/// Snapshot of a subset of properties of the `document` object in the top
-/// frame of the browser
-///
 /// A snapshot of a subset of properties of the `document` object in the top
 /// frame of the browser
 public struct WebPixelsDocument: Codable {
@@ -109,13 +106,7 @@ public struct WebPixelsDocument: Codable {
 
 // MARK: - Location
 
-/// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document),
-/// returns the URI of the current document
-///
-/// A snapshot of a subset of properties of the `location` object in the top
-/// frame of the browser
-///
-/// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window), the
+/// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Location), the
 /// location, or current URL, of the window object
 public struct Location: Codable {
 	/// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Location), a
@@ -158,9 +149,6 @@ public struct Location: Codable {
 
 // MARK: - WebPixelsNavigator
 
-/// Snapshot of a subset of properties of the `navigator` object in the top
-/// frame of the browser
-///
 /// A snapshot of a subset of properties of the `navigator` object in the top
 /// frame of the browser
 public struct WebPixelsNavigator: Codable {
@@ -183,9 +171,6 @@ public struct WebPixelsNavigator: Codable {
 
 // MARK: - WebPixelsWindow
 
-/// Snapshot of a subset of properties of the `window` object in the top frame
-/// of the browser
-///
 /// A snapshot of a subset of properties of the `window` object in the top frame
 /// of the browser
 public struct WebPixelsWindow: Codable {
@@ -237,10 +222,6 @@ public struct WebPixelsWindow: Codable {
 
 // MARK: - Screen
 
-/// Per [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Screen), the
-/// interface representing a screen, usually the one on which the current
-/// window is being rendered
-///
 /// The interface representing a screen, usually the one on which the current
 /// window is being rendered
 public struct Screen: Codable {
@@ -254,26 +235,6 @@ public struct Screen: Codable {
 
 // MARK: - MoneyV2
 
-/// The total amount for the customer to pay.
-///
-/// A monetary value with currency.
-///
-/// The total cost of the merchandise line.
-///
-/// The product variant’s price.
-///
-/// The monetary value with currency allocated to the discount.
-///
-/// Price of this shipping rate.
-///
-/// The price at checkout before duties, shipping, and taxes.
-///
-/// The sum of all the prices of all the items in the checkout, including
-/// duties, taxes, and discounts.
-///
-/// The sum of all the taxes applied to the line items and shipping lines in
-/// the checkout.
-///
 /// The monetary value with currency allocated to the transaction method.
 public struct MoneyV2: Codable {
 	/// The decimal money amount.
@@ -299,9 +260,6 @@ public struct CartLine: Codable {
 
 // MARK: - CartLineCost
 
-/// The cost of the merchandise that the customer will pay for at checkout. The
-/// costs are subject to change and changes will be reflected at checkout.
-///
 /// The cost of the merchandise line that the customer will pay at checkout.
 public struct CartLineCost: Codable {
 	/// The total cost of the merchandise line.
@@ -310,8 +268,6 @@ public struct CartLineCost: Codable {
 
 // MARK: - ProductVariant
 
-/// The merchandise that the buyer intends to purchase.
-///
 /// A product variant represents a different version of a product, such as
 /// differing sizes or differing colors.
 public struct ProductVariant: Codable {
@@ -342,8 +298,6 @@ public struct Image: Codable {
 
 // MARK: - Product
 
-/// The product object that the product variant belongs to.
-///
 /// A product is an individual item for sale in a Shopify store.
 public struct Product: Codable {
 	/// The ID of the product.
@@ -493,31 +447,6 @@ public struct DiscountApplication: Codable {
 
 // MARK: - Value
 
-/// The value of the discount. Fixed discounts return a `Money` Object, while
-/// Percentage discounts return a `PricingPercentageValue` object.
-///
-/// The total amount for the customer to pay.
-///
-/// A monetary value with currency.
-///
-/// The total cost of the merchandise line.
-///
-/// The product variant’s price.
-///
-/// The monetary value with currency allocated to the discount.
-///
-/// Price of this shipping rate.
-///
-/// The price at checkout before duties, shipping, and taxes.
-///
-/// The sum of all the prices of all the items in the checkout, including
-/// duties, taxes, and discounts.
-///
-/// The sum of all the taxes applied to the line items and shipping lines in
-/// the checkout.
-///
-/// The monetary value with currency allocated to the transaction method.
-///
 /// A value given to a customer when a discount is applied to an order. The
 /// application of a discount with this value gives the customer the specified
 /// percentage off a specified item.
@@ -642,13 +571,6 @@ public struct PricingPercentageValue: Codable {
 	/// The percentage value of the object.
 	let percentage: Double?
 }
-
-// swiftlint:disable type_name
-typealias ID = String
-// swiftlint:enable type_name
-
-typealias Name = String
-typealias Timestamp = String
 
 // MARK: - Helper functions for creating encoders and decoders
 
