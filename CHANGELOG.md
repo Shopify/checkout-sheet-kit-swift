@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.1 - January 26, 2024
+
+- Clean Web Pixel types - #120 (@markmur)
+
 ## 0.10.0 - January 26, 2024
 
 - Expose Web Pixel events via new `checkoutDidEmitWebPixelEvent` hook - #101, #103, #105, #107, #112 (@josemiguel-alvarez, @kiftio , @markmur)
