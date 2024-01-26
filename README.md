@@ -84,7 +84,7 @@ class MyViewController: UIViewController {
 }
 ```
 
-Alteranatively, with SwiftUI:
+Alternatively, with SwiftUI:
 
 ```swift
 import SwiftUI
