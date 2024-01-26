@@ -20,7 +20,7 @@ class IndeterminateProgressBarView: UIView {
 			progressBar.heightAnchor.constraint(equalToConstant: 4),
 		])
 
-		progressBar.tintColor = .systemGray5
+		progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.spinnerColor
 	}
 
 	override func didMoveToSuperview() {
@@ -43,21 +43,32 @@ class IndeterminateProgressBarView: UIView {
 	}
 
 	func startAnimating() {
-		print("start animating")
-		alpha = 1
-		isHidden = false
+		UIView.animate(withDuration: 0.2, animations: {
+			self.isHidden = false
+			self.alpha = 1
+		})
 	}
 
 	func stopAnimating() {
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-			UIView.animate(withDuration: 0.2, animations: {
-				self.alpha = 0
-			}) { _ in
-				self.isHidden = true
-				self.alpha = 1
-				self.progressBar.setProgress(0.0, animated: false)
-			}
-		})
+		animateToCompletion {
+			self.fadeOut()
+		}
+	}
 
+	private func animateToCompletion(_ completion: @escaping () -> Void) {
+		self.progressBar.setProgress(1.0, animated: true)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+			completion()
+		}
+	}
+
+	private func fadeOut() {
+		UIView.animate(withDuration: 0.2, animations: {
+			self.alpha = 0
+		}) { _ in
+			self.isHidden = true
+			self.alpha = 0
+			self.progressBar.setProgress(0.0, animated: false)
+		}
 	}
 }

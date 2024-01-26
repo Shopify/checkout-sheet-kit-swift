@@ -238,7 +238,11 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 	func checkoutViewDidFinishNavigation() {
 		initialNavigation = false
 
-		if !progressBarEnabled() {
+		if progressBarEnabled() {
+			if ShopifyCheckoutSheetKit.configuration.payButton.enabled {
+				self.displayNativePayButton()
+			}
+		} else {
 			spinner.stopAnimating()
 			UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in
 				checkoutView?.alpha = 1

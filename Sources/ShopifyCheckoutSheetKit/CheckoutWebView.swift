@@ -177,6 +177,8 @@ class CheckoutWebView: WKWebView {
 		if isPreload {
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
 		}
+		request.setValue("5e2770a732e8d89ce004c47da8f44f01d15d468e", forHTTPHeaderField: "X-Checkout-Web-Tophat")
+		request.setValue("proxy", forHTTPHeaderField: "X-Render")
 		load(request)
 	}
 
