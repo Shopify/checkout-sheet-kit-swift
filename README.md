@@ -177,7 +177,7 @@ Setting enabled to `false` will cause all calls to the `preload` function to be 
 
 ```
 ShopifyCheckoutSheetKit.preloading.enabled = false
-ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // no-op 
+ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // no-op
 ```
 
 #### Lifecycle management for preloaded checkout
@@ -245,12 +245,63 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
     //  - web (`http:`)
     // and is being directed outside the application.
   }
+
+  // Issued when the Checkout has emit a standard or custom Web Pixel event.
+  // Note that the event must be handled by the consuming app, and will not be sent from inside the checkout.
+  // See below for more information.
+  func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+    switch event {
+      case .standardEvent(let standardEvent):
+        recordAnalyticsEvent(standardEvent)
+      case .customEvent(let customEvent):
+        recordAnalyticsEvent(customEvent)
+    }
+  }
 }
 ```
 
 #### Integrating with Web Pixels, monitoring behavioral data
 
-App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. Web Pixel events are currently not executed within rendered checkout. Support for customer events and behavioral analytics is under development and will be available prior to the general availability of SDK.
+App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. Web Pixel events are currently not executed within rendered checkout.
+
+**To safeguard user privacy, Web Pixel events will not be dispatched from within the Checkout webview.** Instead, these events will be relayed back to your application through the checkoutDidEmitWebPixelEvent delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple privacy protocols before disseminating these events to third-party providers.
+
+Here's how you might intercept these events and relay them to a third party provider:
+
+```swift
+class MyViewController: UIViewController {
+  private func sendEventToAnalytics(event: StandardEvent) {
+    // Send standard event to third-party providers
+  }
+
+  private func sendEventToAnalytics(event: CustomEvent) {
+    // Send custom event to third-party providers
+  }
+
+  private func recordAnalyticsEvent(standardEvent: StandardEvent) {
+    if hasPermissionToCaptureEvents() {
+      sendEventToAnalytics(event: standardEvent)
+    }
+  }
+
+  private func recordAnalyticsEvent(customEvent: CustomEvent) {
+    if hasPermissionToCaptureEvents() {
+      sendEventToAnalytics(event: CustomEvent)
+    }
+  }
+}
+
+extension MyViewController: ShopifyCheckoutSheetKitDelegate {
+  func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+    switch event {
+      case .standardEvent(let standardEvent):
+        recordAnalyticsEvent(standardEvent: standardEvent)
+      case .customEvent(let customEvent):
+        recordAnalyticsEvent(customEvent: customEvent)
+    }
+  }
+}
+```
 
 ### Integrating identity & customer accounts
 
