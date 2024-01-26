@@ -303,6 +303,10 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 }
 ```
 
+**Note that you will likely need to augment these events with customer/session information derived from app state.**
+
+_Also note that the `customData` attribute of CustomPixelEvent can take on any shape. As such, this attribute will be returned as a String. Client applications should define a custom data type and deserialize the `customData` string into that type._
+
 ### Integrating identity & customer accounts
 
 Buyer-aware checkout experience reduces friction and increases conversion. Depending on the context of the buyer (guest or signed-in), knowledge of buyer preferences, or account/identity system, the application can use one of the following methods to initialize a personalized and contextualized buyer experience.
