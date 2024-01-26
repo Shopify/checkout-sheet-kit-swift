@@ -9,7 +9,7 @@ jobs:
     name: SwiftLint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: norio-nomura/action-swiftlint@3.2.1
         with:
           args: --strict
@@ -18,14 +18,14 @@ jobs:
     name: License Headers
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: ./Scripts/copy_license && git diff --name-only --exit-code
 
   lint-podspec:
     name: CocoaPods
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
