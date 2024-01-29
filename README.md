@@ -262,7 +262,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 
 #### Integrating with Web Pixels, monitoring behavioral data
 
-App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. Web Pixel events are currently not executed within rendered checkout.
+App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. 
 
 **To safeguard user privacy, Web Pixel events will not be dispatched from within the Checkout webview.** Instead, these events will be relayed back to your application through the checkoutDidEmitWebPixelEvent delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple privacy protocols before disseminating these events to third-party providers.
 
