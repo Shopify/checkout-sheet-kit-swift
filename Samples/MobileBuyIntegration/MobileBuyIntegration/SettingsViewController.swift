@@ -46,12 +46,15 @@ struct SettingsView: View {
 						.onChange(of: useVaultedState) { newValue in
 							appConfiguration.useVaultedState = newValue
 						}
+				}
+
+				Section(header: Text("Experiments")) {
 					Toggle("Native pay button", isOn: $useNativePayButton)
 						.onChange(of: useNativePayButton) { newValue in
 							appConfiguration.useNativeButton = newValue
 							ShopifyCheckoutSheetKit.configuration.payButton.enabled = newValue
 						}
-					Toggle("Progress bar (experimental)", isOn: $useProgressBar)
+					Toggle("Progress bar", isOn: $useProgressBar)
 						.onChange(of: useProgressBar) { newValue in
 							ShopifyCheckoutSheetKit.configuration.progressBarEnabled = newValue
 						}
