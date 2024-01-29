@@ -154,6 +154,13 @@ class CheckoutWebView: WKWebView {
 			injectionTime: WKUserScriptInjectionTime.atDocumentStart,
 			forMainFrameOnly: true
 		))
+
+		isOpaque = false
+		backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+
+		if #available(iOS 15.0, *) {
+			underPageBackgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+		}
 	}
 
 	deinit {

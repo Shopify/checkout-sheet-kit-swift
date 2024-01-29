@@ -17,10 +17,10 @@ class IndeterminateProgressBarView: UIView {
 
 		NSLayoutConstraint.activate([
 			progressBar.topAnchor.constraint(equalTo: topAnchor),
-			progressBar.heightAnchor.constraint(equalToConstant: 4),
+			progressBar.heightAnchor.constraint(equalToConstant: 1),
 		])
 
-		progressBar.tintColor = .systemGray5
+		progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.spinnerColor
 	}
 
 	override func didMoveToSuperview() {
@@ -43,7 +43,6 @@ class IndeterminateProgressBarView: UIView {
 	}
 
 	func startAnimating() {
-		print("start animating")
 		alpha = 1
 		isHidden = false
 	}

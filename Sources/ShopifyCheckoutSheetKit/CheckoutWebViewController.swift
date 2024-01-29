@@ -72,6 +72,8 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		navigationItem.rightBarButtonItem = closeBarButtonItem
 
 		checkoutView.viewDelegate = self
+
+		view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
 	}
 
 	required init?(coder: NSCoder) {
@@ -86,10 +88,12 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	// MARK: UIViewController Lifecycle
 
+	override public func viewWillAppear(_ animated: Bool) {
+		view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+	}
+
 	override public func viewDidLoad() {
 		super.viewDidLoad()
-
-		view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
 
 		view.addSubview(checkoutView)
 		NSLayoutConstraint.activate([
