@@ -262,11 +262,11 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 
 #### Integrating with Web Pixels, monitoring behavioral data
 
-App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session. 
+App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session.
 
-**To safeguard user privacy, Web Pixel events will not be dispatched from within the Checkout webview.** Instead, these events will be relayed back to your application through the checkoutDidEmitWebPixelEvent delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple privacy protocols before disseminating these events to third-party providers.
+**For behavioural monitoring, Checkout Web Pixel [standard](https://shopify.dev/docs/api/web-pixels-api/standard-events) and [custom](https://shopify.dev/docs/api/web-pixels-api/emitting-data) events will be relayed back to your application through the `checkoutDidEmitWebPixelEvent` delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple's privacy policy and local regulations like GDPR and ePrivacy directive before disseminating these events to first-party and third-party systems.
 
-Here's how you might intercept these events and relay them to a third party provider:
+Here's how you might intercept these events:
 
 ```swift
 class MyViewController: UIViewController {
@@ -303,7 +303,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 }
 ```
 
-**Note that you will likely need to augment these events with customer/session information derived from app state.**
+**Note that you may need to augment these events with customer/session information derived from app state.**
 
 _Also note that the `customData` attribute of CustomPixelEvent can take on any shape. As such, this attribute will be returned as a String. Client applications should define a custom data type and deserialize the `customData` string into that type._
 
