@@ -27,7 +27,7 @@ import UIKit
 /// A delegate protocol for managing checkout lifecycle events.
 public protocol CheckoutDelegate: AnyObject {
 	/// Tells the delegate that the checkout successfully completed.
-	func checkoutDidComplete()
+	func checkoutDidComplete(event: CheckoutCompletedEvent)
 
 	/// Tells the delegate that the checkout was cancelled by the buyer.
 	func checkoutDidCancel()

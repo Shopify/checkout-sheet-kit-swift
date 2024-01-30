@@ -92,7 +92,7 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 
 	// MARK: ShopifyCheckoutSheetKitDelegate
 
-	func checkoutDidComplete() {
+	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
 		// use this callback to clean up any cart state
 	}
 

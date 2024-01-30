@@ -70,18 +70,27 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
-	func testDecodeSupportsCheckoutCompleteEvent() throws {
+	func testDecodeSupportsCheckoutCompletedEvent() throws {
+		let orderId = "gid://shopify/OrderIdentity/8"
+		let body = "{\"orderId\": \"\(orderId)\"}"
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+
 		let mock = WKScriptMessageMock(body: """
-	{
-		"name": "completed"
-	}
-	""")
+			{
+				"name": "completed",
+				"body": "\(body)"
+			}
+			""")
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case CheckoutBridge.WebEvent.checkoutComplete = result else {
-			return XCTFail("expected CheckoutScriptMessage.checkoutComplete, got \(result)")
+		guard case .checkoutComplete(let event) = result else {
+			XCTFail("Expected .checkoutComplete, got \(result)")
+			return
 		}
+
+		XCTAssertEqual(orderId, event.orderId)
 	}
 
 	func testDecodeSupportsCheckoutUnavailableEvent() throws {
