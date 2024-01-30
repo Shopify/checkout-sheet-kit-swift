@@ -41,6 +41,8 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 
 	var didEmitWebPixelsEventExpectation: XCTestExpectation?
 
+	var didEmitCheckoutCompletedEventExpectation: XCTestExpectation?
+
 	func checkoutViewDidStartNavigation() {
 		didStartNavigationExpectation?.fulfill()
 	}
@@ -71,5 +73,9 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
 		didEmitWebPixelsEventExpectation?.fulfill()
+	}
+
+	func checkoutViewDidCompleteCheckout(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+		didEmitCheckoutCompletedEventExpectation?.fulfill()
 	}
 }
