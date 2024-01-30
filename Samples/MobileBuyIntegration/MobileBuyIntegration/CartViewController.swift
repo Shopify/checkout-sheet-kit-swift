@@ -219,33 +219,24 @@ extension CartViewController {
 	}
 
 	private func mapToGenericEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
-		guard let eventName = customEvent.name else {
-			print("Invalid custom event: \(customEvent)")
+		guard customEvent.name != nil else {
+			print("Failed to parse custom event", customEvent)
 			return nil
 		}
-
-		do {
-			switch eventName {
-			case "custom_event":
-				return try decodeAndMap(event: customEvent)
-			default:
-				print("Unknown custom event \(customEvent)")
-				return nil
-			}
-		} catch {
-			print("Failed to map custom event: \(error)")
-			return nil
-		}
+		return AnalyticsEvent(
+			name: customEvent.name!,
+			userId: getUserId(),
+			timestamp: customEvent.timestamp!,
+			checkoutTotal: nil
+		)
 	}
 
 	private func decodeAndMap(event: CustomEvent, decoder: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
-		guard let data = event.customData?.data(using: .utf8) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid data")) }
-		let decodedData = try decoder.decode(CustomPixelEventData.self, from: data)
 		return AnalyticsEvent(
 			name: event.name!,
 			userId: getUserId(),
 			timestamp: event.timestamp!,
-			checkoutTotal: decodedData.customAttribute
+			checkoutTotal: nil
 		)
 	}
 
@@ -265,7 +256,7 @@ struct AnalyticsEvent: Codable {
 	var name = ""
 	var userId = ""
 	var timestamp = ""
-	var checkoutTotal = 0.0
+	var checkoutTotal: Double? = 0.0
 }
 
 struct CustomPixelEventData: Codable {
