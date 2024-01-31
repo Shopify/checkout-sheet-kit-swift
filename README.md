@@ -19,7 +19,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "0.10")
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "1.0")
 ]
 ```
 
@@ -35,7 +35,7 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 #### CocoaPods
 
 ```ruby
-pod "ShopifyCheckoutSheetKit", "~> 0.10"
+pod "ShopifyCheckoutSheetKit", "~> 1.0"
 ```
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).

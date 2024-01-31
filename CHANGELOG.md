@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0 - January 31, 2024
+
+ShopifyCheckoutSheetKit is now generally available for
+[Swift](https://github.com/Shopify/checkout-sheet-kit-swift),
+[Android](https://github.com/Shopify/checkout-sheet-kit-android) and
+[React Native](https://github.com/Shopify/checkout-sheet-kit-react-native) -
+providing the world's highest converting, customizable, one-page checkout.
+
 ## 0.10.1 - January 26, 2024
 
 - Clean Web Pixel types - #120 (@markmur)
