@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 - January 31, 2024
+
+Bumps the package version.
+
 ## 1.0.0 - January 31, 2024
 
 ShopifyCheckoutSheetKit is now generally available for
