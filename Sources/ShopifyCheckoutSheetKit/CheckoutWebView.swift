@@ -103,7 +103,57 @@ class CheckoutWebView: WKWebView {
 
 		configuration.userContentController
 			.add(self, name: CheckoutBridge.messageHandler)
+
 		isBridgeAttached = true
+
+		let script = """
+		function hideElement(selector) {
+			const el = document.querySelector(selector)
+			if (el) el.style.display = "none";
+		}
+
+		function showElement(selector) {
+			const el = document.querySelector(selector)
+			if (el) el.style.display = "block";
+		}
+
+		function showStickyButtons() {
+			showElement("#sticky-pay-button-container");
+			showElement("#checkout-sdk-pay-button-container");
+			showElement(".XlHGh");
+		}
+
+		function hideStickyButtons() {
+			hideElement("#sticky-pay-button-container");
+			hideElement("#checkout-sdk-pay-button-container");
+			hideElement(".XlHGh");
+		}
+
+		document.addEventListener("DOMContentLoaded", () => {
+		   const fullHeight = window.visualViewport.height;
+		   showStickyButtons();
+
+		   window.visualViewport.addEventListener('resize', () => {
+				if (window.visualViewport.height < fullHeight) {
+					hideStickyButtons();
+				}
+
+				if (window.visualViewport.height === fullHeight) {
+					showStickyButtons();
+				}
+		   });
+
+		   document.addEventListener("focusout", () => {
+				showStickyButtons();
+		   });
+		  });
+		"""
+
+		configuration.userContentController.addUserScript(WKUserScript(
+			source: script,
+			injectionTime: WKUserScriptInjectionTime.atDocumentStart,
+			forMainFrameOnly: true
+		))
 	}
 
 	deinit {
@@ -158,7 +208,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				()
 			}
 		} catch {
-            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+			viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 		}
 	}
 }
@@ -182,15 +232,15 @@ extension CheckoutWebView: WKNavigationDelegate {
 		decisionHandler(.allow)
 	}
 
-    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if let response = navigationResponse.response as? HTTPURLResponse {
-            decisionHandler(handleResponse(response))
-            return
-        }
-        decisionHandler(.allow)
-    }
+	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+		if let response = navigationResponse.response as? HTTPURLResponse {
+			decisionHandler(handleResponse(response))
+			return
+		}
+		decisionHandler(.allow)
+	}
 
-    func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
+	func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
 		if isCheckout(url: response.url) && response.statusCode >= 400 {
 			CheckoutWebView.cache = nil
 			switch response.statusCode {
@@ -257,7 +307,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 		}
 		urlComponents.queryItems = urlComponents.queryItems?.filter { !($0.name == "open_externally") }
 		return urlComponents.url ?? url
-    }
+	}
 
 	private func isMailOrTelLink(_ url: URL) -> Bool {
 		return ["mailto", "tel"].contains(url.scheme)

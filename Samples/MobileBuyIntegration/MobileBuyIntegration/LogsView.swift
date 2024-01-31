@@ -49,7 +49,6 @@ struct LogsView: View {
 						Button(action: clearLogs) {
 							Text("Clear logs")
 								.foregroundColor(.red)
-								.background(.white)
 								.font(.system(size: 12))
 						}
 						Spacer()

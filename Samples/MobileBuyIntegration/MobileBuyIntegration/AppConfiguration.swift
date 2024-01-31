@@ -25,6 +25,7 @@ import ShopifyCheckoutSheetKit
 
 public struct AppConfiguration {
 	public var useVaultedState: Bool = false
+	public var useNativeButton: Bool = false
 	internal let webPixelsLogger = FileLogger("analytics.txt")
 }
 

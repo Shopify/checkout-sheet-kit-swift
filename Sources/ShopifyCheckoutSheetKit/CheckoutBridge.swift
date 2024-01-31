@@ -52,6 +52,15 @@ enum CheckoutBridge {
 		}
 		let script = dispatchMessageTemplate(body: dispatchMessageBody)
 		webView.evaluateJavaScript(script)
+		webView.evaluateJavaScript("""
+		   function showElement(selector) {
+				const el = document.querySelector(selector)
+				if (el) el.style.display = "block";
+		   }
+		   showElement("#sticky-pay-button-container");
+		   showElement("#checkout-sdk-pay-button-container");
+		   showElement(".XlHGh");
+		""")
 	}
 
 	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
