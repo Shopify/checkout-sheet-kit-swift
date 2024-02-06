@@ -39,11 +39,11 @@ public struct CheckoutCompletedEvent: Decodable {
 
 extension CheckoutCompletedEvent {
 	public struct OrderDetails: Decodable {
-		public let id: String
+		public let id: String?
 		public let email: String?
 		public let phone: String?
-		public let cart: CartInfo
-		public let paymentMethods: [OrderPaymentMethod]
+		public let cart: CartInfo?
+		public let paymentMethods: [OrderPaymentMethod]?
 		public let billingAddress: Address?
 		public let deliveries: [DeliveryInfo]?
 
@@ -59,8 +59,8 @@ extension CheckoutCompletedEvent {
 	}
 
 	public struct CartInfo: Decodable {
-		public let lines: [CartLine]
-		public let price: PriceSet
+		public let lines: [CartLine]?
+		public let price: PriceSet?
 
 		enum CodingKeys: String, CodingKey {
 			case lines
@@ -69,7 +69,7 @@ extension CheckoutCompletedEvent {
 	}
 
 	public struct OrderPaymentMethod: Decodable {
-		public let type: String
+		public let type: String?
 		public let details: [String: String?]
 
 		enum CodingKeys: String, CodingKey {
@@ -107,7 +107,7 @@ extension CheckoutCompletedEvent {
 	}
 
 	public struct DeliveryInfo: Decodable {
-		public let method: String
+		public let method: String?
 		public let details: DeliveryDetails?
 
 		enum CodingKeys: String, CodingKey {
@@ -145,9 +145,9 @@ extension CheckoutCompletedEvent {
 	}
 
 	public struct CartLineImage: Decodable {
-		public let sm: String
-		public let md: String
-		public let lg: String
+		public let sm: String?
+		public let md: String?
+		public let lg: String?
 		public let altText: String?
 
 		enum CodingKeys: String, CodingKey {
@@ -159,9 +159,9 @@ extension CheckoutCompletedEvent {
 	}
 
 	public struct CartLine: Decodable {
-		public let title: String
-		public let quantity: Int
-		public let price: Money
+		public let title: String?
+		public let quantity: Int?
+		public let price: Money?
 		public let image: CartLineImage?
 		public let merchandiseId: String?
 		public let productId: String?
@@ -177,8 +177,8 @@ extension CheckoutCompletedEvent {
 	}
 
 	public struct Money: Decodable {
-		public let amount: Double
-		public let currencyCode: String
+		public let amount: Double?
+		public let currencyCode: String?
 
 		enum CodingKeys: String, CodingKey {
 			case amount

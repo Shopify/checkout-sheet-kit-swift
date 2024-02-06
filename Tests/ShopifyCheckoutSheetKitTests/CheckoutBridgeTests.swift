@@ -90,10 +90,10 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 
 		XCTAssertEqual("gid://shopify/OrderIdentity/8", event.orderDetails?.id)
-		XCTAssertEqual(1, event.orderDetails?.cart.lines.count)
-		XCTAssertEqual("gid://shopify/Product/1", event.orderDetails?.cart.lines[0].productId)
-		XCTAssertEqual(1, event.orderDetails?.paymentMethods.count)
-		XCTAssertEqual("direct", event.orderDetails?.paymentMethods[0].type)
+		XCTAssertEqual(1, event.orderDetails?.cart?.lines?.count)
+		XCTAssertEqual("gid://shopify/Product/1", event.orderDetails?.cart?.lines?[0].productId)
+		XCTAssertEqual(1, event.orderDetails?.paymentMethods?.count)
+		XCTAssertEqual("direct", event.orderDetails?.paymentMethods?[0].type)
 	}
 
 	func testDecodeSupportsCheckoutUnavailableEvent() throws {
