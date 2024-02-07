@@ -44,6 +44,8 @@ public struct Configuration {
 	public var backgroundColor: UIColor = .systemBackground
 
 	public var logger: Logger = NoOpLogger()
+	
+	public var nativeApplePayButton = Configuration.NativeApplePayButton()
 }
 
 extension Configuration {
@@ -74,5 +76,11 @@ extension Configuration {
 				CheckoutWebView.preloadingActivatedByClient = false
 			}
 		}
+	}
+}
+
+extension Configuration {
+	public struct NativeApplePayButton {
+		public var enabled: Bool = false
 	}
 }
