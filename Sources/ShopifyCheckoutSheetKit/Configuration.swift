@@ -56,6 +56,8 @@ public struct Configuration {
 
 	/// Custom enum for identifying traffic from alternative platforms
 	public var platform: Platform?
+
+	public var nativeApplePayButton = Configuration.NativeApplePayButton()
 }
 
 extension Configuration {
@@ -86,5 +88,11 @@ extension Configuration {
 				CheckoutWebView.preloadingActivatedByClient = false
 			}
 		}
+	}
+}
+
+extension Configuration {
+	public struct NativeApplePayButton {
+		public var enabled: Bool = false
 	}
 }
