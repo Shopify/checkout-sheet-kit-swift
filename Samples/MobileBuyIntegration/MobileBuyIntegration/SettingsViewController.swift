@@ -33,6 +33,7 @@ struct SettingsView: View {
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
 	@State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 	@State private var colorScheme: ColorScheme = .light
+	@State private var nativeApplePayButtonEnabled = ShopifyCheckoutSheetKit.configuration.nativeApplePayButton.enabled
 
 	var body: some View {
 		NavigationView {
@@ -53,6 +54,10 @@ struct SettingsView: View {
 
 					Text("By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app.")
 						.font(.caption)
+					Toggle("Show native Apple Pay button", isOn: $nativeApplePayButtonEnabled)
+						.onChange(of: nativeApplePayButtonEnabled) { newValue in
+							ShopifyCheckoutSheetKit.configuration.nativeApplePayButton.enabled = newValue
+						}
 				}
 
 				Section(header: Text("Theme")) {

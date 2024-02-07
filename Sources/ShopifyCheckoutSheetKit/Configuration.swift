@@ -60,6 +60,9 @@ public struct Configuration {
 	/// Levels: all, debug, error, none
 	/// Default: .error - which will emit "error" and "fault" logs
 	public var logLevel: LogLevel = .error
+
+	public var nativeApplePayButton = Configuration.NativeApplePayButton()
+
 }
 
 extension Configuration {
@@ -90,5 +93,11 @@ extension Configuration {
 				CheckoutWebView.preloadingActivatedByClient = false
 			}
 		}
+	}
+}
+
+extension Configuration {
+	public struct NativeApplePayButton {
+		public var enabled: Bool = false
 	}
 }
