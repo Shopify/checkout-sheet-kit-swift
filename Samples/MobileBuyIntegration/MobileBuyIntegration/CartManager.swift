@@ -201,6 +201,12 @@ extension Storefront.CartQuery {
 							}
 						}
 					}
+					.cost { $0
+						.totalAmount({ $0
+							.amount()
+							.currencyCode()
+						})
+					}
 				}
 			}
 			.cost { $0
@@ -209,6 +215,10 @@ extension Storefront.CartQuery {
 					.currencyCode()
 				})
 				.subtotalAmount { $0
+					.amount()
+					.currencyCode()
+				}
+				.totalTaxAmount { $0
 					.amount()
 					.currencyCode()
 				}
