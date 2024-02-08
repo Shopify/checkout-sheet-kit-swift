@@ -48,6 +48,7 @@ struct SettingsView: View {
 					Toggle("Show native Apple Pay button", isOn: $nativeApplePayButtonEnabled)
 						.onChange(of: nativeApplePayButtonEnabled) { newValue in
 							ShopifyCheckoutSheetKit.configuration.nativeApplePayButton.enabled = newValue
+							CartManager.shared.resetCart()
 						}
 				}
 

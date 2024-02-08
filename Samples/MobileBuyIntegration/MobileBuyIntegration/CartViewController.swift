@@ -25,6 +25,7 @@ import Buy
 import UIKit
 import Combine
 import ShopifyCheckoutSheetKit
+import PassKit
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -39,6 +40,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	@IBOutlet private var footerView: UIView!
 
 	@IBOutlet private var checkoutButton: UIButton!
+
+	let paymentHandler = PaymentHandler()
 
 	// MARK: Initializers
 
@@ -74,10 +77,48 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		cartDidUpdate()
 	}
 
+	@objc func payPressed(sender: AnyObject) {
+		paymentHandler.startPayment { (success) in
+			if success {
+				self.performSegue(withIdentifier: "Confirmation", sender: self)
+			}
+		}
+	}
+
+	@objc func setupPressed(sender: AnyObject) {
+		let passLibrary = PKPassLibrary()
+		passLibrary.openPaymentSetup()
+	}
+
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 
 		tableView.reloadData()
+
+		if ShopifyCheckoutSheetKit.configuration.nativeApplePayButton.enabled {
+			let result = PaymentHandler.applePayStatus()
+			var button: UIButton?
+
+			if result.canMakePayments {
+				button = PKPaymentButton(paymentButtonType: .checkout, paymentButtonStyle: .automatic)
+				button?.addTarget(self, action: #selector(CartViewController.payPressed), for: .touchUpInside)
+			} else if result.canSetupCards {
+				button = PKPaymentButton(paymentButtonType: .setUp, paymentButtonStyle: .black)
+				button?.addTarget(self, action: #selector(CartViewController.setupPressed), for: .touchUpInside)
+			}
+
+			if let applePayButton = button {
+				let constraints = [
+					applePayButton.centerXAnchor.constraint(equalTo: footerView.centerXAnchor),
+					applePayButton.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
+					applePayButton.widthAnchor.constraint(equalToConstant: 200),
+					applePayButton.heightAnchor.constraint(equalToConstant: 50)
+				]
+				applePayButton.translatesAutoresizingMaskIntoConstraints = false
+				footerView.addSubview(applePayButton)
+				NSLayoutConstraint.activate(constraints)
+			}
+		}
 	}
 
 	override func viewDidLayoutSubviews() {
@@ -121,9 +162,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 			emptyView.isHidden = totalQuantity > 0
 			tableView.reloadData()
 			tableView.isHidden = totalQuantity <= 0
-			checkoutButton.isHidden = totalQuantity <= 0
+			checkoutButton.isHidden = totalQuantity <= 0 || ShopifyCheckoutSheetKit.configuration.nativeApplePayButton.enabled
 			checkoutButton.configuration?
 				.subtitle = cart?.cost.totalAmount.formattedString()
+			footerView.isHidden = totalQuantity <= 0
 		}
 	}
 
@@ -145,6 +187,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		}
 		return variant
 	}
+
 }
 
 extension CartViewController: CheckoutDelegate {
