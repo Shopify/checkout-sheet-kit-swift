@@ -27,7 +27,11 @@ import UIKit
 /// A delegate protocol for managing checkout lifecycle events.
 public protocol CheckoutDelegate: AnyObject {
 	/// Tells the delegate that the checkout successfully completed.
-	func checkoutDidComplete(event: CheckoutCompletedEvent)
+	@available(*, deprecated, renamed: "checkoutDidCompleteWithEvent", message: "Deprecated, please use checkoutDidCompleteWithEvent instead.")
+	func checkoutDidComplete()
+
+	/// Tells the delegate that the checkout successfully completed, returning a completed event with order details
+	func checkoutDidCompleteWithEvent(event: CheckoutCompletedEvent)
 
 	/// Tells the delegate that the checkout was cancelled by the buyer.
 	func checkoutDidCancel()
@@ -44,6 +48,13 @@ public protocol CheckoutDelegate: AnyObject {
 }
 
 extension CheckoutDelegate {
+	/// Deprecated and will be removed in the next major release
+	public func checkoutDidComplete() {}
+
+	public func checkoutDidCompleteWithEvent(event: CheckoutCompletedEvent) {
+		/// No-op by default
+	}
+
 	public func checkoutDidClickLink(url: URL) {
 		handleUrl(url)
 	}

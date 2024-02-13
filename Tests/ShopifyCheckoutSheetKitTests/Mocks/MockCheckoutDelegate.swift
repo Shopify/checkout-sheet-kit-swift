@@ -25,21 +25,17 @@ import XCTest
 @testable import ShopifyCheckoutSheetKit
 
 class ExampleDelegate: CheckoutDelegate {
-	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-	}
+	func checkoutDidComplete() {}
 
-	func checkoutDidCancel() {
-	}
+	func checkoutDidCompleteWithEvent(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}
 
-	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {
-	}
+	func checkoutDidCancel() {}
 
-	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
-	}
+	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {}
 
-	func checkoutDidClickContactLink(url: URL) {
-	}
+	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {}
 
-	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-	}
+	func checkoutDidClickContactLink(url: URL) {}
+
+	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {}
 }
