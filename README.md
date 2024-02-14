@@ -106,7 +106,8 @@ struct ContentView: View {
 }
 ```
 
-To help optimize and deliver the best experience the SDK also provides a [preloading API](#preloading) that can be used to initialize the checkout session ahead of time.
+> [!TIP]
+> To help optimize and deliver the best experience, the SDK also provides a [preloading API](#preloading) which can be used to initialize the checkout session ahead of time.
 
 ### Configuration
 
@@ -304,9 +305,11 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 }
 ```
 
-**Note that you may need to augment these events with customer/session information derived from app state.**
+> [!NOTE]
+> You may need to augment these events with customer/session information derived from app state.
 
-_Also note that the `customData` attribute of CustomPixelEvent can take on any shape. As such, this attribute will be returned as a String. Client applications should define a custom data type and deserialize the `customData` string into that type._
+> [!NOTE]
+> The `customData` attribute of CustomPixelEvent can take on any shape. As such, this attribute will be returned as a String. Client applications should define a custom data type and deserialize the `customData` string into that type.
 
 ### Integrating identity & customer accounts
 
@@ -325,15 +328,15 @@ In addition to specifying the line items, the Cart can include buyer identity (n
   "email": "<Customer's email address>",
   "created_at": "<Current timestamp in ISO8601 encoding>",
   "remote_ip": "<Client IP address>",
-  "return_to": "<Checkout URL obtained from Storefront API>",
-  ...
+  "return_to": "<Checkout URL obtained from Storefront API>"
 }
 ```
 
 1. Follow the [Multipass documentation](https://shopify.dev/docs/api/multipass) to create a Multipass URL and set `return_to` to be the obtained `checkoutUrl`
 2. Provide the Multipass URL to `present(checkout:)`
 
-_Note: the above JSON omits useful customer attributes that should be provided where possible and encryption and signing should be done server-side to ensure Multipass keys are kept secret._
+> [!IMPORTANT]
+> The above JSON omits useful customer attributes that should be provided where possible and encryption and signing should be done server-side to ensure Multipass keys are kept secret.
 
 #### Shop Pay
 
@@ -351,5 +354,5 @@ We welcome code contributions, feature requests, and reporting of issues. Please
 
 ### License
 
-Checkout Sheet Kit is provided under an [MIT License](LICENSE).
+Shopify's Checkout Sheet Kit is provided under an [MIT License](LICENSE).
 
