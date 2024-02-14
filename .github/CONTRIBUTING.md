@@ -35,3 +35,21 @@ When in doubt about whether we will be interested in including a new feature in 
 5. Commit your changes and push
 6. Ensure all checks (e.g. tests) are passing in GitHub
 7. Create a new pull request with a detailed description of what is changing and why
+
+## Releasing a new version
+
+Open a pull request with the following changes:
+1. Bump the [package version](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/Sources/ShopifyCheckoutSheetKit/ShopifyCheckoutSheetKit.swift#L27)
+2. Bump the [podspec version](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/ShopifyCheckoutSheetKit.podspec#L2)
+3. Add an entry to the top of the [CHANGELOG](../CHANGELOG.md)
+
+Once you have merged a pull request with these changes, you will be ready to publish a new version.
+
+To do so, navigate to
+https://github.com/Shopify/checkout-sheet-kit-swift/releases and click "Draft a new release" then complete the following steps:
+
+1. Create a tag for the new version
+2. Use the same tag as the name for the version
+3. Document a full list of changes since the previous release, tagging merged pull requests where applicable, in the description box.
+4. Check "Set as the latest release" to ensure Swift Package Manager identifies this as the latest release.
+5. When ready, click "Publish release". This will ensure SPM can identity the latest version and it will kickstart the [CI process](https://github.com/Shopify/checkout-sheet-kit-swift/actions/workflows/deploy.yml) to publish a new version of the CocoaPod.
