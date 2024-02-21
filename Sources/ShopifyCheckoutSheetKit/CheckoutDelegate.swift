@@ -44,9 +44,6 @@ public protocol CheckoutDelegate: AnyObject {
 }
 
 extension CheckoutDelegate {
-	/// Deprecated and will be removed in the next major release
-	public func checkoutDidComplete() {}
-
 	public func checkoutDidComplete(event: CheckoutCompletedEvent) {
 		/// No-op by default
 	}

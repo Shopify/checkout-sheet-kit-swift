@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import WebKit
+import os.log
 
 enum BridgeError: Swift.Error {
 	case invalidBridgeEvent(Swift.Error? = nil)
@@ -101,8 +102,13 @@ extension CheckoutBridge {
 			switch name {
 			case "completed":
 				let checkoutCompletedEventDecoder = CheckoutCompletedEventDecoder()
-				let checkoutCompletedEvent = try checkoutCompletedEventDecoder.decode(from: container, using: decoder)
-				self = .checkoutComplete(event: checkoutCompletedEvent)
+				do {
+					let checkoutCompletedEvent = try checkoutCompletedEventDecoder.decode(from: container, using: decoder)
+					self = .checkoutComplete(event: checkoutCompletedEvent)
+				} catch {
+					os_log(.error, "[ShopifyCheckoutSheetKit] Error decoding CheckoutCompletedEvent: %{public}@", error as CVarArg)
+					self = .checkoutComplete(event: CheckoutCompletedEvent())
+				}
 			case "error":
 				// needs to support .checkoutUnavailable by parsing error payload on body
 				self = .checkoutExpired
