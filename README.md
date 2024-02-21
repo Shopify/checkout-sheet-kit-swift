@@ -210,7 +210,7 @@ You can use the `ShopifyCheckoutSheetKitDelegate` protocol to register callbacks
 
 ```swift
 extension MyViewController: ShopifyCheckoutSheetKitDelegate {
-  func checkoutDidCompleteWithEvent(event: CheckoutCompletedEvent) {
+  func checkoutDidComplete(event: CheckoutCompletedEvent) {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.
   }
