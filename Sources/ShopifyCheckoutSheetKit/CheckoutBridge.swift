@@ -29,7 +29,7 @@ enum BridgeError: Swift.Error {
 }
 
 enum CheckoutBridge {
-	static let schemaVersion = "7.0"
+	static let schemaVersion = "8.0"
 	static let messageHandler = "mobileCheckoutSdk"
 
 	static var applicationName: String {
