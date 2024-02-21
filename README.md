@@ -1,6 +1,6 @@
 # Shopify Checkout Sheet Kit - Swift
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) [![GitHub Release](https://img.shields.io/github/release/shopify/checkout-sheet-kit-swift.svg?style=flat)]()  
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) [![GitHub Release](https://img.shields.io/github/release/shopify/checkout-sheet-kit-swift.svg?style=flat)]()
  ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
 
 
@@ -20,7 +20,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "1.0")
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "1.1")
 ]
 ```
 
@@ -36,7 +36,7 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 #### CocoaPods
 
 ```ruby
-pod "ShopifyCheckoutSheetKit", "~> 1.0"
+pod "ShopifyCheckoutSheetKit", "~> 1.1"
 ```
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
@@ -210,7 +210,7 @@ You can use the `ShopifyCheckoutSheetKitDelegate` protocol to register callbacks
 
 ```swift
 extension MyViewController: ShopifyCheckoutSheetKitDelegate {
-  func checkoutDidComplete() {
+  func checkoutDidComplete(event: CheckoutCompletedEvent) {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.
   }
@@ -223,22 +223,21 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
   func checkoutDidFail(error: CheckoutError) {
     // Called when the checkout encountered an error and has been aborted. The callback
     // provides a `CheckoutError` enum, with one of the following values:
+   	// Internal error: exception within the Checkout SDK code
+   	// You can inspect and log the Erorr and stacktrace to identify the problem.
+   	case sdkError(underlying: Swift.Error)
 
-	/// Internal error: exception within the Checkout SDK code
-	/// You can inspect and log the Erorr and stacktrace to identify the problem.
-	case sdkError(underlying: Swift.Error)
+   	// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
+   	// The SDK only supports stores migrated for extensibility.
+   	case checkoutLiquidNotMigrated(message: String)
 
-	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
-	/// The SDK only supports stores migrated for extensibility.
-	case checkoutLiquidNotMigrated(message: String)
+   	// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
+    // The provided message describes the error and may be logged and presented to the buyer.
+   	case checkoutUnavailable(message: String)
 
-	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
-        /// The provided message describes the error and may be logged and presented to the buyer.
-	case checkoutUnavailable(message: String)
-
-	/// Expired error: checkout session associated with provided checkoutURL is no longer available.
-        /// The provided message describes the error and may be logged and presented to the buyer.
-	case checkoutExpired(message: String)
+   	// Expired error: checkout session associated with provided checkoutURL is no longer available.
+    // The provided message describes the error and may be logged and presented to the buyer.
+   	case checkoutExpired(message: String)
   }
 
   func checkoutDidClickLink(url: URL) {
