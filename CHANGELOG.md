@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0 - February 13, 2024
+
+TODO
+
 ## 1.0.2 - March 5, 2024
 
 Fixes an issue with strongly held references to old Webview instances.
