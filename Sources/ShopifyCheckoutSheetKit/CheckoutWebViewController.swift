@@ -147,10 +147,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent) {
 		ConfettiCannon.fire(in: view)
 		CheckoutWebView.invalidate()
-		/// Remove this line in the next major release
-		delegate?.checkoutDidComplete()
-		/// Supersedes the above
-		delegate?.checkoutDidCompleteWithEvent(event: event)
+		delegate?.checkoutDidComplete(event: event)
 	}
 
 	func checkoutViewDidFailWithError(error: CheckoutError) {
