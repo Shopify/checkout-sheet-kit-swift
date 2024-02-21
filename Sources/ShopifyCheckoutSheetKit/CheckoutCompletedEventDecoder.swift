@@ -21,19 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import XCTest
-@testable import ShopifyCheckoutSheetKit
+import Foundation
 
-class ExampleDelegate: CheckoutDelegate {
-	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}
+class CheckoutCompletedEventDecoder {
+	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> CheckoutCompletedEvent {
+		let messageBody = try container.decode(String.self, forKey: .body)
 
-	func checkoutDidCancel() {}
+		guard let data = messageBody.data(using: .utf8) else {
+			return CheckoutCompletedEvent()
+		}
 
-	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {}
-
-	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {}
-
-	func checkoutDidClickContactLink(url: URL) {}
-
-	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {}
+		return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)
+	}
 }
