@@ -118,7 +118,7 @@ class EventHandler: NSObject, CheckoutDelegate {
 		didCancel.toggle()
 	}
 
-	func checkoutDidCompleteWithEvent(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}
+	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}
 
 	func checkoutDidFail(error: CheckoutError) {}
 
