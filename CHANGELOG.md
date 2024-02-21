@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 - February 13, 2024
+## 2.0.0 - February 13, 2024
 
 - Introduces a new `checkoutDidCompleteWithEvent(event)` method, which returns an event object containing order details from the completed checkout.
 - Deprecates the `checkoutDidComplete` lifecycle delegate method.
