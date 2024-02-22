@@ -89,6 +89,7 @@ Alternatively, with SwiftUI:
 
 ```swift
 import SwiftUI
+import ShopifyCheckoutSheetKit
 
 struct ContentView: View {
     @State private var isPresented = false
@@ -100,7 +101,7 @@ struct ContentView: View {
             self.isPresented = true
         }
         .sheet(isPresented: $isPresented) {
-            CheckoutViewControllerRepresentable(url: url, delegate: delegate)
+            CheckoutViewController.Representable(url: url, delegate: delegate)
         }
     }
 }
