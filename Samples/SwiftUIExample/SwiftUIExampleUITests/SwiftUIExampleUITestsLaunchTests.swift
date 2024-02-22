@@ -21,13 +21,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import SwiftUI
+import XCTest
 
-@main
-struct SwiftUIExampleApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+final class SwiftUIExampleUITestsLaunchTests: XCTestCase {
+
+    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+        true
+    }
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+    }
+
+    func testLaunch() throws {
+        let app = XCUIApplication()
+        app.launch()
     }
 }
