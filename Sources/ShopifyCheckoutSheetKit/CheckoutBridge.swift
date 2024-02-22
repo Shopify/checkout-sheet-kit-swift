@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import WebKit
-import os.log
 
 enum BridgeError: Swift.Error {
 	case invalidBridgeEvent(Swift.Error? = nil)
@@ -32,6 +31,7 @@ enum BridgeError: Swift.Error {
 enum CheckoutBridge {
 	static let schemaVersion = "8.0"
 	static let messageHandler = "mobileCheckoutSdk"
+	internal static var logger: ProductionLogger = InternalLogger()
 
 	static var applicationName: String {
 		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
@@ -106,7 +106,7 @@ extension CheckoutBridge {
 					let checkoutCompletedEvent = try checkoutCompletedEventDecoder.decode(from: container, using: decoder)
 					self = .checkoutComplete(event: checkoutCompletedEvent)
 				} catch {
-					os_log(.error, "[ShopifyCheckoutSheetKit] Error decoding CheckoutCompletedEvent: %{public}@", error as CVarArg)
+					logger.logError(error, "Error decoding CheckoutCompletedEvent")
 					self = .checkoutComplete(event: CheckoutCompletedEvent())
 				}
 			case "error":
