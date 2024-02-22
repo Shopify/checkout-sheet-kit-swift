@@ -41,6 +41,7 @@ public class CheckoutViewController: UINavigationController {
 }
 
 extension CheckoutViewController {
+	@available(*, deprecated, message: "Replace \"CheckoutViewController.Representable\" with \"CheckoutSheet\"")
 	public struct Representable: UIViewControllerRepresentable {
 		@Binding var checkoutURL: URL?
 
@@ -57,5 +58,43 @@ extension CheckoutViewController {
 
 		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {
 		}
+	}
+}
+
+public struct CheckoutSheet: UIViewControllerRepresentable {
+	@Binding var checkoutURL: URL?
+
+	let delegate: CheckoutDelegate?
+
+	public init(checkout url: Binding<URL?>, delegate: CheckoutDelegate? = nil) {
+		self._checkoutURL = url
+		self.delegate = delegate
+		self.delegate?.checkoutDidPresent()
+	}
+
+	public func makeUIViewController(context: CheckoutSheet.Context) -> CheckoutViewController {
+		return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
+	}
+
+	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: CheckoutSheet.Context) {}
+
+	public func backgroundColor(_ color: UIColor) -> CheckoutSheet {
+		ShopifyCheckoutSheetKit.configuration.backgroundColor = color
+		return self
+	}
+
+	public func colorScheme(_ colorScheme: ShopifyCheckoutSheetKit.Configuration.ColorScheme) -> CheckoutSheet {
+		ShopifyCheckoutSheetKit.configuration.colorScheme = colorScheme
+		return self
+	}
+
+	public func tintColor(_ color: UIColor) -> CheckoutSheet {
+		ShopifyCheckoutSheetKit.configuration.tintColor = color
+		return self
+	}
+
+	public func title(_ title: String) -> CheckoutSheet {
+		ShopifyCheckoutSheetKit.configuration.title = title
+		return self
 	}
 }

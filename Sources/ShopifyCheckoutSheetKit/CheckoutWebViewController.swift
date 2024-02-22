@@ -142,18 +142,18 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 	}
 
 	@IBAction internal func close() {
-		didCancel()
+		didCancel(dismissed: false)
 	}
 
 	public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-		didCancel()
+		didCancel(dismissed: true)
 	}
 
-	private func didCancel() {
+	private func didCancel(dismissed: Bool) {
 		if !CheckoutWebView.preloadingActivatedByClient {
 			CheckoutWebView.invalidate()
 		}
-		delegate?.checkoutDidCancel()
+		delegate?.checkoutDidCancel(dismissed: dismissed)
 	}
 }
 

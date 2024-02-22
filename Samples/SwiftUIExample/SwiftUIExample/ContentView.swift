@@ -24,34 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import SwiftUI
 import ShopifyCheckoutSheetKit
 
-struct CheckoutSheet: View {
-	let checkoutURL: Binding<URL?>
-	let delegate: EventHandler
-
-	@Binding var isShowingCheckout: Bool
-
-	var body: some View {
-		CheckoutViewController.Representable(checkout: checkoutURL, delegate: delegate)
-			.onReceive(delegate.$didCancel, perform: { didCancel in
-				if didCancel {
-					delegate.checkoutDidCancel()
-					isShowingCheckout = false
-				}
-			})
-
-	}
-}
 struct ContentView: View {
 	@StateObject private var viewModel = ProductViewModel()
 	@State private var isShowingCheckout = false
 	@State private var checkoutURL: URL?
 	private var eventHandler = EventHandler()
-
-	init() {
-		eventHandler.dismissCheckout = { [self] in
-			self.isShowingCheckout = false
-		}
-	}
 
 	var body: some View {
 		NavigationView {
@@ -98,7 +75,16 @@ struct ContentView: View {
 							})
 							.padding()
 							.sheet(isPresented: $isShowingCheckout) {
-								CheckoutSheet(checkoutURL: $checkoutURL, delegate: eventHandler, isShowingCheckout: $isShowingCheckout)
+								CheckoutSheet(checkout: $checkoutURL, delegate: eventHandler)
+									.title("Check out with SwiftUI")
+									.tintColor(.systemCyan)
+									.colorScheme(.automatic)
+									.onReceive(eventHandler.$didCancel, perform: { didCancel in
+										if didCancel {
+											print("[debug] didCancel", didCancel)
+											isShowingCheckout = false
+										}
+									})
 							}
 						}
 					}
@@ -116,14 +102,25 @@ struct ContentView: View {
 			viewModel.reloadProduct()
 		}
 	}
+
+	func didDismiss() {
+		print("[debug] didDismiss")
+		eventHandler.checkoutDidCancel(dismissed: true)
+	}
 }
 
 class EventHandler: NSObject, CheckoutDelegate {
-	var dismissCheckout: (() -> Void)?
 	@Published var didCancel = false
 
-	func checkoutDidCancel() {
-		didCancel.toggle()
+	func checkoutDidPresent() {
+		didCancel = false
+	}
+
+	func checkoutDidCancel(dismissed: Bool) {
+		print("[debug] checkoutDidCancel")
+		if !dismissed {
+			didCancel.toggle()
+		}
 	}
 
 	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}

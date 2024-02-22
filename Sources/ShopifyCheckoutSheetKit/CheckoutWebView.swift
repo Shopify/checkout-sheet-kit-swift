@@ -287,6 +287,7 @@ extension CheckoutWebView {
 		private let timeout = TimeInterval(60 * 5)
 
 		var isStale: Bool {
+
 			abs(timestamp.timeIntervalSinceNow) >= timeout
 		}
 	}
