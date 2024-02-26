@@ -75,7 +75,7 @@ class PaymentHandler: NSObject {
 
 		// Create a payment request.
 		let paymentRequest = PKPaymentRequest()
-		paymentRequest.paymentSummaryItems = paymentSummaryItems
+
 		paymentRequest.merchantIdentifier = "merchant.com.shopify.example.MobileBuyIntegration.ApplePay"
 		paymentRequest.merchantCapabilities = .capability3DS
 		paymentRequest.countryCode = "US"
@@ -84,6 +84,17 @@ class PaymentHandler: NSObject {
 		paymentRequest.shippingType = .delivery
 		paymentRequest.shippingMethods = shippingMethodCalculator()
 		paymentRequest.requiredShippingContactFields = [.name, .postalAddress]
+
+		let recurringPaymentSummaryItem = PKRecurringPaymentSummaryItem(label: paymentSummaryItems[0].label, amount: paymentSummaryItems[0].amount)
+		recurringPaymentSummaryItem.intervalUnit = .month
+		recurringPaymentSummaryItem.intervalCount = 1
+		paymentSummaryItems.append(recurringPaymentSummaryItem)
+
+		let recurringPaymentRequest = PKRecurringPaymentRequest(paymentDescription: "Monthly subscription", regularBilling: recurringPaymentSummaryItem, managementURL: URL(string: "https://shopify.com/")!)
+
+		paymentRequest.recurringPaymentRequest = recurringPaymentRequest
+
+		paymentRequest.paymentSummaryItems = paymentSummaryItems
 
 		// Display the payment request.
 		paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
@@ -96,7 +107,7 @@ class PaymentHandler: NSObject {
 				self.completionHandler(false)
 			}
 		})
-	}
+		}
 }
 
 // Set up PKPaymentAuthorizationControllerDelegate conformance.

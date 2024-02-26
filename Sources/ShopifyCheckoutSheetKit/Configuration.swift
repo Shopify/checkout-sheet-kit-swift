@@ -93,6 +93,6 @@ extension Configuration {
 
 extension Configuration {
 	public struct NativeApplePayButton {
-		public var enabled: Bool = false
+		public var enabled: Bool = true
 	}
 }
