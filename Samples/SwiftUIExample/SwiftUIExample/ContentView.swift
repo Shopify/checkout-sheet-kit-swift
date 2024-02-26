@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import SwiftUI
 import ShopifyCheckoutSheetKit
 
-struct CheckoutView: View {
+struct CheckoutSheet: View {
 	let checkoutURL: Binding<URL?>
 	let delegate: EventHandler
 
@@ -61,39 +61,47 @@ struct ContentView: View {
 						VStack {
 							AsyncImage(url: product.featuredImage?.url) { image in
 								image.image?.resizable().aspectRatio(contentMode: .fit)
-							}
-							Text(product.title)
-								.font(.title)
+							}.frame(height: 400)
+
+							Text(product.vendor)
+								.font(.subheadline)
+								.bold()
+								.foregroundColor(.blue)
 								.multilineTextAlignment(.center)
 								.padding()
-							if let variant = product.variants.nodes.first {
-								Text(variant.title)
-									.font(.title3)
-									.foregroundColor(.secondary)
-									.multilineTextAlignment(.center)
-									.padding()
-								Button(action: {
-									viewModel.beginCheckout { url in
-										checkoutURL = url
-										isShowingCheckout = true
-									}
-								}, label: {
-									Text("Buy Now")
-										.font(.headline)
-										.padding()
-										.frame(maxWidth: .infinity)
-										.background(Color.blue)
-										.foregroundColor(.white)
-										.cornerRadius(10)
-								})
-								.padding()
-								.sheet(isPresented: $isShowingCheckout) {
-									CheckoutView(checkoutURL: $checkoutURL, delegate: eventHandler, isShowingCheckout: $isShowingCheckout)
+
+							Text(product.title)
+								.font(.title)
+								.bold()
+								.multilineTextAlignment(.center)
+
+							if let price = product.variants.nodes.first?.price.formattedString() {
+								Text(price)
+									.padding(2)
+									.bold()
+									.foregroundColor(.gray)
+							}
+
+							Button(action: {
+								viewModel.beginCheckout { url in
+									checkoutURL = url
+									isShowingCheckout = true
 								}
+							}, label: {
+								Text("Buy Now")
+									.font(.headline)
+									.padding()
+									.frame(maxWidth: .infinity)
+									.background(Color.blue)
+									.foregroundColor(.white)
+									.cornerRadius(10)
+							})
+							.padding()
+							.sheet(isPresented: $isShowingCheckout) {
+								CheckoutSheet(checkoutURL: $checkoutURL, delegate: eventHandler, isShowingCheckout: $isShowingCheckout)
 							}
 						}
 					}
-					.navigationTitle("Product Details")
 					.navigationBarItems(trailing: Button(action: {
 						viewModel.reloadProduct()
 					}, label: {
