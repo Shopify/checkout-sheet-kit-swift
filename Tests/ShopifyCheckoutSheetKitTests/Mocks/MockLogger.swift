@@ -21,27 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import Foundation
 import os.log
+@testable import ShopifyCheckoutSheetKit
 
-public protocol Logger {
-	func log(_ message: String)
-	func clearLogs()
-}
+class MockLogger: ProductionLogger {
+	var loggedError: Error?
+	var loggedMessage: String?
 
-public class NoOpLogger: Logger {
-	public func log(_ message: String) {}
-
-	public func clearLogs() {}
-}
-
-internal protocol ProductionLogger {
-	func logError(_ error: Error, _ message: String)
-}
-
-internal struct InternalLogger: ProductionLogger {
-	public func logError(_ error: Error, _ message: String) {
-		let logMessage = "[ShopifyCheckoutSheetKit] \(message): \(error.localizedDescription) (Please report this to the Shopify team at https://github.com/Shopify/checkout-sheet-kit-swift)"
-		os_log(.error, "%{public}@", logMessage)
+	func logError(_ error: Error, _ message: String) {
+		loggedError = error
+		loggedMessage = message
 	}
 }
