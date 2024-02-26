@@ -117,6 +117,21 @@ class CheckoutBridgeTests: XCTestCase {
 		XCTAssertEqual("direct", event.orderDetails?.paymentMethods?[0].type)
 	}
 
+	func testDecodeGracefullyReturnsEmptyEvent() throws {
+		let mock = WKScriptMessageMock(body: "{\"name\":\"completed\",\"body\": \"INVALID JSON\"}")
+		let logger = MockLogger()
+		CheckoutBridge.logger = logger
+		let result = try CheckoutBridge.decode(mock)
+		XCTAssertEqual(logger.loggedMessage, "Error decoding CheckoutCompletedEvent")
+
+		guard case .checkoutComplete(let event) = result else {
+			XCTFail("Expected empty completed event, got \(result)")
+			return
+		}
+
+		XCTAssertNil(event.orderDetails)
+	}
+
 	func testDecodeSupportsCheckoutUnavailableEvent() throws {
 		let mock = WKScriptMessageMock(body: """
 	{
