@@ -25,6 +25,7 @@ import SwiftUI
 import Combine
 import ShopifyCheckoutSheetKit
 
+@available(iOS 15.0, *)
 struct SettingsView: View {
 	@State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	@State private var useVaultedState = appConfiguration.useVaultedState

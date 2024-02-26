@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import SwiftUI
 
+@available(iOS 15.0, *)
 struct WebPixelsEventsView: View {
 	@State private var logs: [String?] = WebPixelsLogReader.shared.readLogs() ?? []
 

@@ -71,6 +71,7 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		StorefrontClient.shared.product { [weak self] result in
 			if case .success(let product) = result {
 				self?.product = product
+				self?.title = product.title
 			}
 		}
 	}
@@ -84,9 +85,14 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 			image.load(url: featuredImageURL)
 		}
 
+		variantLabel.text = product.vendor
+
 		if let variant = product.variants.nodes.first {
-			variantLabel.text = variant.title
-			buyNowButton.configuration?.subtitle = variant.price.formattedString()
+			if #available(iOS 15.0, *) {
+				buyNowButton.configuration?.subtitle = variant.price.formattedString()
+			} else {
+				buyNowButton.setTitle(variant.price.formattedString(), for: .normal)
+			}
 		}
 	}
 

@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import SwiftUI
 import ShopifyCheckoutSheetKit
 
+@available(iOS 15.0, *)
 struct LogsView: View {
 	@State private var logs: [String?] = LogReader.shared.readLogs(limit: 100) ?? []
 

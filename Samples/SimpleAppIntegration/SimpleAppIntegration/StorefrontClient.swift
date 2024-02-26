@@ -55,6 +55,7 @@ class StorefrontClient {
 					featuredImage {
 						url
 					}
+					vendor
 					variants(first: 10) {
 						nodes {
 							id

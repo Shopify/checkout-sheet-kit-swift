@@ -63,8 +63,10 @@ class ProductViewController: UIViewController {
 			target: self, action: #selector(reloadProduct)
 		)
 
-		addToCartButton.configurationUpdateHandler = {
-			$0.configuration?.showsActivityIndicator = !$0.isEnabled
+		if #available(iOS 15.0, *) {
+			addToCartButton.configurationUpdateHandler = {
+				$0.configuration?.showsActivityIndicator = !$0.isEnabled
+			}
 		}
 
 		reloadProduct()
@@ -131,8 +133,10 @@ class ProductViewController: UIViewController {
 		}
 
 		if let variant = product.variants.nodes.first {
-			addToCartButton.configuration?
-				.subtitle = variant.price.formattedString()
+			if #available(iOS 15.0, *) {
+				addToCartButton.configuration?
+					.subtitle = variant.price.formattedString()
+			}
 		}
 	}
 }
