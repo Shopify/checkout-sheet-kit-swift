@@ -44,7 +44,7 @@ class ProgressBarView: UIView {
 		])
 
 		/// Use tintColor, but fallback to deprecated spinnerColor
-		progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.tintColor ?? ShopifyCheckoutSheetKit.configuration.spinnerColor
+		progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.tintColor
 	}
 
 	override func didMoveToSuperview() {
