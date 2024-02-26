@@ -132,7 +132,7 @@ extension CheckoutCompletedEvent {
 		public let subtotal: Money?
 		public let total: Money?
 		public let taxes: Money?
-		public let discounts: Money?
+		public let discounts: [Discount]?
 		public let shipping: Money?
 
 		enum CodingKeys: String, CodingKey {
@@ -142,6 +142,14 @@ extension CheckoutCompletedEvent {
 			case discounts
 			case shipping
 		}
+	}
+
+	public struct Discount: Decodable {
+		public let title: String?
+		public let amount: Money?
+		public let applicationType: String?
+		public let valueType: String?
+		public let value: Double?
 	}
 
 	public struct CartLineImage: Decodable {
@@ -165,6 +173,7 @@ extension CheckoutCompletedEvent {
 		public let image: CartLineImage?
 		public let merchandiseId: String?
 		public let productId: String?
+		public let discounts: [Discount]?
 
 		enum CodingKeys: String, CodingKey {
 			case title
@@ -173,6 +182,7 @@ extension CheckoutCompletedEvent {
 			case image
 			case merchandiseId
 			case productId
+			case discounts
 		}
 	}
 
