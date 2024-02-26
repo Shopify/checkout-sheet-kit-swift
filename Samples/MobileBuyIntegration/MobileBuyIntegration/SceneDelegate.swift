@@ -45,22 +45,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		cartController.tabBarItem.image = UIImage(systemName: "cart")
 		cartController.tabBarItem.title = "Cart"
 
-		/// Settings
-		let settingsController = UIHostingController(rootView: SettingsView())
-		settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
-		settingsController.tabBarItem.title = "Settings"
-
 		tabBarController.viewControllers = [
 			UINavigationController(
 				rootViewController: catalogController
 			),
 			UINavigationController(
 				rootViewController: cartController
-			),
-			UINavigationController(
-				rootViewController: settingsController
 			)
 		]
+
+		if #available(iOS 15.0, *) {
+			let settingsController = UIHostingController(rootView: SettingsView())
+			settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
+			settingsController.tabBarItem.title = "Settings"
+
+			tabBarController.viewControllers?.append(UINavigationController(
+				rootViewController: settingsController
+			))
+		}
 
 		let window = UIWindow(windowScene: windowScene)
 		window.rootViewController = tabBarController

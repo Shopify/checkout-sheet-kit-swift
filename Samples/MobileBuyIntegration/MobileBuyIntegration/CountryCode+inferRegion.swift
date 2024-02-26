@@ -26,8 +26,14 @@ import Foundation
 
 extension Storefront.CountryCode {
 	static func inferRegion() -> Storefront.CountryCode {
-		if let regionCode = Locale.current.region?.identifier {
-			return Storefront.CountryCode(rawValue: regionCode) ?? .ca
+		if #available(iOS 16, *) {
+			if let regionCode = Locale.current.region?.identifier {
+				return Storefront.CountryCode(rawValue: regionCode) ?? .ca
+			}
+		} else if #available(iOS 13, *) {
+			if let regionCode = Locale.current.regionCode {
+				return Storefront.CountryCode(rawValue: regionCode) ?? .ca
+			}
 		}
 
 		return .ca

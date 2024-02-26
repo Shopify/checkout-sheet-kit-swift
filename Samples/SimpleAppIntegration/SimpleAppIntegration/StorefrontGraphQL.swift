@@ -41,17 +41,14 @@ struct Connection<Node: Decodable>: Decodable {
 
 struct Product: Decodable {
 	let title: String
-
 	let featuredImage: Image?
-
 	let variants: Connection<ProductVariant>
+	let vendor: String
 }
 
 struct ProductVariant: Decodable {
 	let id: String
-
 	let title: String
-
 	let price: Money
 }
 

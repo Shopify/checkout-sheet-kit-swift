@@ -99,12 +99,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let variant = variant(at: indexPath)
 
-		let cell = tableView.dequeueReusableCell(withIdentifier: "row", for: indexPath)
+		var cell = tableView.dequeueReusableCell(withIdentifier: "row", for: indexPath)
+		if cell.reuseIdentifier == "row" {
+			cell = UITableViewCell(style: .subtitle, reuseIdentifier: "row")
+		}
 
-		var content = cell.defaultContentConfiguration()
-		content.text = variant.product.title
-		content.secondaryText = variant.product.vendor
-		cell.contentConfiguration = content
+		cell.textLabel?.text = variant.product.title
+		cell.detailTextLabel?.text = variant.product.vendor
 
 		return cell
 	}
@@ -122,8 +123,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 			tableView.reloadData()
 			tableView.isHidden = totalQuantity <= 0
 			checkoutButton.isHidden = totalQuantity <= 0
-			checkoutButton.configuration?
-				.subtitle = cart?.cost.totalAmount.formattedString()
+
+			if #available(iOS 15.0, *) {
+				checkoutButton.configuration?
+					.subtitle = cart?.cost.totalAmount.formattedString()
+			}
 		}
 	}
 
