@@ -196,7 +196,7 @@ The library will automatically invalidate/abort preload under following conditio
 * Once the checkout is successfully completed, as indicated by the server response
 * When `ShopifyCheckoutSheetKit.Configuration` object is updated by the application (e.g., theming changes)
 
-A preloaded checkout *is not* automatically invalidated when checkout sheet is closed. For example, if buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
+A preloaded checkout *is not* automatically invalidated when checkout sheet is closed. For example, if a buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
 
 #### Additional considerations for preloaded checkout
 
