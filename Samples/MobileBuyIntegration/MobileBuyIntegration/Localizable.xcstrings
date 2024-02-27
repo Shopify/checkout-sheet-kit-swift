@@ -1,0 +1,77 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "✓" : {
+
+    },
+    "App version" : {
+
+    },
+    "checkout_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checkout"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panier"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panier"
+          }
+        }
+      }
+    },
+    "Clear" : {
+
+    },
+    "Clear logs" : {
+
+    },
+    "Events" : {
+
+    },
+    "Features" : {
+
+    },
+    "Logs" : {
+
+    },
+    "No logs available" : {
+
+    },
+    "OK" : {
+      "comment" : "Default action"
+    },
+    "Prefill buyer information" : {
+
+    },
+    "Preload checkout" : {
+
+    },
+    "SDK version" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Theme" : {
+
+    },
+    "Version" : {
+
+    },
+    "Web pixel events" : {
+
+    }
+  },
+  "version" : "1.0"
+}

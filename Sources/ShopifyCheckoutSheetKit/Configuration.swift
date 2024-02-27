@@ -44,6 +44,8 @@ public struct Configuration {
 	public var backgroundColor: UIColor = .systemBackground
 
 	public var logger: Logger = NoOpLogger()
+
+	public var title: String = "Checkout"
 }
 
 extension Configuration {

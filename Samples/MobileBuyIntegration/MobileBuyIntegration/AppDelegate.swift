@@ -34,7 +34,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 			/// Enable preloading
 			$0.preloading.enabled = true
+
+			/// Logs
 			$0.logger = FileLogger("log.txt")
+
+			/// Title
+			$0.title = NSLocalizedString("checkout_title", comment: "")
 		}
 
 		UIBarButtonItem.appearance().tintColor = .label
