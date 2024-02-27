@@ -19,13 +19,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Panier"
+            "value" : "Caisse"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Panier"
+            "value" : "Caisse"
           }
         }
       }
