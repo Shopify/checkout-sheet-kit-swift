@@ -193,7 +193,7 @@ Preloading renders a checkout in a background webview, which is brought to foreg
 The library will automatically invalidate/abort preload under following conditions:
 
 * Request results in network error or non 2XX server response code
-* Once the checkout is successfully completed, as indicated by the server response
+* The checkout has successfully completed, as indicated by the server response
 * When `ShopifyCheckoutSheetKit.Configuration` object is updated by the application (e.g., theming changes)
 
 A preloaded checkout *is not* automatically invalidated when checkout sheet is closed. For example, if a buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
