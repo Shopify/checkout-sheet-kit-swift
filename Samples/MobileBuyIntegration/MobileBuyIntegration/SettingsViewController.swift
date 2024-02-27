@@ -55,7 +55,7 @@ struct SettingsView: View {
 							.onTapGesture {
 								selectedColorScheme = scheme
 								ShopifyCheckoutSheetKit.configuration.colorScheme = scheme
-								ShopifyCheckoutSheetKit.configuration.spinnerColor = scheme.spinnerColor
+								ShopifyCheckoutSheetKit.configuration.tintColor = scheme.tintColor
 								ShopifyCheckoutSheetKit.configuration.backgroundColor = scheme.backgroundColor
 								NotificationCenter.default.post(name: .colorSchemeChanged, object: nil)
 							}
@@ -150,7 +150,7 @@ extension Configuration.ColorScheme {
 		}
 	}
 
-	var spinnerColor: UIColor {
+	var tintColor: UIColor {
 		switch self {
 		case .web:
 			return UIColor(red: 0.18, green: 0.16, blue: 0.22, alpha: 1.00)

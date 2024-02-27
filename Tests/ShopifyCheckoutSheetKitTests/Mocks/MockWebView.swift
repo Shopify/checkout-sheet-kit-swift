@@ -25,7 +25,7 @@ import WebKit
 import XCTest
 @testable import ShopifyCheckoutSheetKit
 
-class MockWebView: WKWebView {
+class MockWebView: CheckoutWebView {
 
 	var expectedScript = ""
 
@@ -37,5 +37,4 @@ class MockWebView: WKWebView {
 		}
 		return true
 	}
-
 }
