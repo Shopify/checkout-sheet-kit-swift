@@ -158,6 +158,45 @@ ShopifyCheckoutSheetKit.configuration.backgroundColor = UIColor(red: 0.09, green
 ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
 ```
 
+### Localization
+
+#### `title`
+
+By default, the Checkout Sheet Kit will look for a `shopify_checkout_sheet_title` key in a `Localizable.xcstrings` file to set the sheet title, otherwise it will fallback to "Checkout" across all locales.
+
+The title of the sheet can be customized by either setting a value for the `shopify_checkout_sheet_title` key in the `Localizable.xcstrings` file for your application or by configuring the `title` property of the `ShopifyCheckoutSheetKit.configuration` object manually.
+
+```swift
+// Hardcoded title, applicable to all languages
+ShopifyCheckoutSheetKit.configuration.title = "Custom title"
+```
+
+Here is an example of a `Localizable.xcstrings` containing translations for 2 locales - `en` and `fr`.
+```json
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "shopify_checkout_sheet_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checkout"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caisse"
+          }
+        },
+      }
+    }
+  }
+}
+```
+
 ### Preloading
 
 Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable wait time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.

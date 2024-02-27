@@ -61,7 +61,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 		super.init(nibName: nil, bundle: nil)
 
-		title = "Checkout"
+		title = ShopifyCheckoutSheetKit.configuration.title
 
 		navigationItem.rightBarButtonItem = closeBarButtonItem
 
