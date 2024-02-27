@@ -27,6 +27,7 @@ import WebKit
 
 class CheckoutViewDelegateTests: XCTestCase {
 
+	private var customTitle: String?
 	private let checkoutURL = URL(string: "https://checkout-sdk.myshopify.com")!
 	private var viewController: CheckoutWebViewController!
 	private var navigationController: UINavigationController!
@@ -34,6 +35,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 	override func setUp() {
 		ShopifyCheckoutSheetKit.configure {
 			$0.preloading.enabled = true
+			$0.title = customTitle ?? "Checkout"
 		}
 		viewController = CheckoutWebViewController(
 			checkoutURL: checkoutURL, delegate: ExampleDelegate())
@@ -41,8 +43,19 @@ class CheckoutViewDelegateTests: XCTestCase {
 		navigationController = UINavigationController(rootViewController: viewController)
 	}
 
+	override func tearDown() {
+		customTitle = nil
+		super.tearDown()
+	}
+
 	func testTitleIsSetToCheckout() {
 		XCTAssertEqual(viewController.title, "Checkout")
+	}
+
+	func testTitleCanBeCustomized() {
+		customTitle = "Custom title"
+		setUp()
+		XCTAssertEqual(viewController.title, "Custom title")
 	}
 
 	func testCheckoutViewDidCompleteCheckoutInvalidatesViewCache() {
