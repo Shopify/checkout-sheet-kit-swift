@@ -176,7 +176,7 @@ When enabled, preloading a checkout is as simple as:
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 ```
 
-Setting enabled to `false` will cause all calls to the `preload` function to be ignored. This allows the appliaction to selectively toggle preloading behavior as a remote feature flag or dynamically in response to client conditions — e.g. when data saver functionality is enabled by the user.
+Setting enabled to `false` will cause all calls to the `preload` function to be ignored. This allows the application to selectively toggle preloading behavior as a remote feature flag or dynamically in response to client conditions — e.g. when data saver functionality is enabled by the user.
 
 ```
 ShopifyCheckoutSheetKit.preloading.enabled = false
