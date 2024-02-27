@@ -44,6 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		let cartController = CartViewController()
 		cartController.tabBarItem.image = UIImage(systemName: "cart")
 		cartController.tabBarItem.title = "Cart"
+		cartController.navigationItem.title = "Cart"
 
 		tabBarController.viewControllers = [
 			UINavigationController(
