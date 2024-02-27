@@ -32,7 +32,7 @@ public protocol CheckoutDelegate: AnyObject {
 	func checkoutDidPresent()
 
 	/// Tells the delegate that the checkout was cancelled by the buyer.
-	func checkoutDidCancel(dismissed: Bool)
+	func checkoutDidCancel()
 
 	/// Tells the delegate that the checkout encoutered one or more errors.
 	func checkoutDidFail(error: CheckoutError)

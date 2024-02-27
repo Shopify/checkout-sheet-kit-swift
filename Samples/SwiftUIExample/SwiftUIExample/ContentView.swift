@@ -25,10 +25,11 @@ import SwiftUI
 import ShopifyCheckoutSheetKit
 
 struct ContentView: View {
+//	private var eventHandler = EventHandler()
+	@StateObject private var presenter = CheckoutSheetPresenter()
 	@StateObject private var viewModel = ProductViewModel()
 	@State private var isShowingCheckout = false
 	@State private var checkoutURL: URL?
-	private var eventHandler = EventHandler()
 
 	var body: some View {
 		NavigationView {
@@ -45,7 +46,7 @@ struct ContentView: View {
 								.bold()
 								.foregroundColor(.blue)
 								.multilineTextAlignment(.center)
-								.padding()
+								.padding(3)
 
 							Text(product.title)
 								.font(.title)
@@ -63,6 +64,8 @@ struct ContentView: View {
 								viewModel.beginCheckout { url in
 									checkoutURL = url
 									isShowingCheckout = true
+
+									presenter.present(checkout: checkoutURL)
 								}
 							}, label: {
 								Text("Buy Now")
@@ -74,18 +77,6 @@ struct ContentView: View {
 									.cornerRadius(10)
 							})
 							.padding()
-							.sheet(isPresented: $isShowingCheckout) {
-								CheckoutSheet(checkout: $checkoutURL, delegate: eventHandler)
-									.title("Check out with SwiftUI")
-									.tintColor(.systemCyan)
-									.colorScheme(.automatic)
-									.onReceive(eventHandler.$didCancel, perform: { didCancel in
-										if didCancel {
-											print("[debug] didCancel", didCancel)
-											isShowingCheckout = false
-										}
-									})
-							}
 						}
 					}
 					.navigationBarItems(trailing: Button(action: {
@@ -101,34 +92,46 @@ struct ContentView: View {
 		.onAppear {
 			viewModel.reloadProduct()
 		}
+		.preferredColorScheme(.dark)
+
+		CheckoutSheetKit(presenter: presenter)
+			.title("Checkout with SwiftUI!")
+			.colorScheme(.dark)
+			.tintColor(UIColor(red: 0.33, green: 0.20, blue: 0.92, alpha: 1.00))
+			.onCheckoutCancel {
+				print("[EVENT] checkout closed")
+				presenter.dismiss()
+			}
+			.onCheckoutCompleted { event in
+				print("[EVENT] checkout completed", event)
+			}
+			.onCheckoutDidFail { error in
+				print("[EVENT] checkout failed", error)
+			}
+			.onCheckoutDidEmitWebPixelEvent { event in
+				print("[EVENT] checkout received event", event)
+			}
 	}
 
 	func didDismiss() {
-		print("[debug] didDismiss")
-		eventHandler.checkoutDidCancel(dismissed: true)
+		isShowingCheckout = false
 	}
 }
 
-class EventHandler: NSObject, CheckoutDelegate {
-	@Published var didCancel = false
-
-	func checkoutDidPresent() {
-		didCancel = false
-	}
-
-	func checkoutDidCancel(dismissed: Bool) {
-		print("[debug] checkoutDidCancel")
-		if !dismissed {
-			didCancel.toggle()
-		}
-	}
-
-	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}
-
-	func checkoutDidFail(error: CheckoutError) {}
-
-	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {}
-}
+// class EventHandler: CheckoutDelegate {
+//	var didCancel: (() -> Void)?
+//
+//	func checkoutDidCancel() {
+//		print("[debug] checkoutDidCancel")
+//		didCancel?()
+//	}
+//
+//	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}
+//
+//	func checkoutDidFail(error: CheckoutError) {}
+//
+//	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {}
+// }
 
 class ProductViewModel: ObservableObject {
 	@Published var product: Product?

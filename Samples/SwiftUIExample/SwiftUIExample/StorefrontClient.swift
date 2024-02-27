@@ -89,8 +89,9 @@ class StorefrontClient {
 	typealias CartResultHandler = (Result<Cart, Error>) -> Void
 
 	func createCart(variant: ProductVariant, _ handler: @escaping CartResultHandler) {
+		let regionCode = Locale.current.region?.identifier ?? "CA"
 		let query = """
-		mutation Foo {
+		mutation CreateCart @inContext(country: \(regionCode)) {
 			cartCreate(input: { lines: { merchandiseId: "\(variant.id)" } }) {
 				cart {
 					checkoutUrl
