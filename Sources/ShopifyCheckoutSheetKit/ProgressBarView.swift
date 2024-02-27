@@ -43,7 +43,6 @@ class ProgressBarView: UIView {
 			progressBar.heightAnchor.constraint(equalToConstant: 1)
 		])
 
-		/// Use tintColor, but fallback to deprecated spinnerColor
 		progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.tintColor
 	}
 
