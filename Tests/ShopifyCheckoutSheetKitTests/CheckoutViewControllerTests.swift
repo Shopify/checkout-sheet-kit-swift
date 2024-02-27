@@ -160,18 +160,13 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
 	}
 
-	func testCheckoutViewDidStartNavigationShowsSpinner() {
-		XCTAssertTrue(viewController.spinner.isHidden)
+	func testCheckoutViewDidStartNavigationShowsProgressBar() {
+		XCTAssertFalse(viewController.progressBar.isHidden)
 		XCTAssertTrue(viewController.initialNavigation)
 		XCTAssertFalse(viewController.checkoutView.checkoutDidLoad)
 
 		viewController.checkoutViewDidStartNavigation()
-		XCTAssertFalse(viewController.spinner.isHidden)
-
-		// Verify that spinner is not started if it is not the initial navigation
-		viewController.initialNavigation = true
-		viewController.checkoutView.checkoutDidLoad = true
-		viewController.checkoutViewDidStartNavigation()
-		XCTAssertFalse(viewController.spinner.isHidden)
+		viewController.checkoutViewDidFinishNavigation()
+		XCTAssertFalse(viewController.progressBar.isHidden)
 	}
 }

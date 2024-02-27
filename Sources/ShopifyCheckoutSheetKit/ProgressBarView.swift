@@ -23,57 +23,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 
-class SpinnerView: UIView {
-	private lazy var imageView: UIImageView = {
-		let view = UIImageView(image: UIImage(
-			named: "spinner", in: .ShopifyCheckoutSheetKit, with: nil
-		))
-		view.translatesAutoresizingMaskIntoConstraints = false
-		return view
+class ProgressBarView: UIView {
+	internal lazy var progressBar: UIProgressView = {
+		let progressBar = UIProgressView(progressViewStyle: .bar)
+		progressBar.setProgress(0.0, animated: false)
+		progressBar.translatesAutoresizingMaskIntoConstraints = false
+		return progressBar
 	}()
 
-	private let animationKey = "SpinnerView.rotation"
+	private var progressAnimation: UIViewPropertyAnimator?
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
-		addSubview(imageView)
+		addSubview(progressBar)
 
 		NSLayoutConstraint.activate([
-			widthAnchor.constraint(equalToConstant: 64),
-			heightAnchor.constraint(equalToConstant: 64),
-			imageView.topAnchor.constraint(equalTo: topAnchor),
-			imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-			imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-			imageView.bottomAnchor.constraint(equalTo: bottomAnchor)
+			progressBar.topAnchor.constraint(equalTo: topAnchor),
+			progressBar.heightAnchor.constraint(equalToConstant: 1)
 		])
 
-		imageView.tintColor = ShopifyCheckoutSheetKit.configuration.spinnerColor
+		progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.tintColor
+	}
 
-		isHidden = true
+	override func didMoveToSuperview() {
+		super.didMoveToSuperview()
+
+		if let superview = superview {
+			progressBar.leadingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.leadingAnchor).isActive = true
+			progressBar.trailingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.trailingAnchor).isActive = true
+		}
 	}
 
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
+	func setProgress(_ progress: Float, animated: Bool = false) {
+		if progress > progressBar.progress {
+			progressBar.setProgress(progress, animated: animated)
+		}
+	}
+
 	func startAnimating() {
+		alpha = 1
 		isHidden = false
-
-		let rotation = CABasicAnimation(
-			keyPath: "transform.rotation"
-		)
-		rotation.fromValue = 0
-		rotation.toValue = Double.pi * 2
-		rotation.duration = 0.5
-		rotation.repeatCount = .greatestFiniteMagnitude
-
-		layer.add(rotation, forKey: animationKey)
 	}
 
 	func stopAnimating() {
-		isHidden = true
-
-		layer.removeAnimation(forKey: animationKey)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+			UIView.animate(withDuration: 0.2, animations: {
+				self.alpha = 0
+			}, completion: { _ in
+				self.isHidden = true
+				self.alpha = 1
+				self.progressBar.setProgress(0.0, animated: false)
+			})
+		})
 	}
 }
