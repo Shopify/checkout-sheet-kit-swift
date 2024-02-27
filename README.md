@@ -267,7 +267,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 
 App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session.
 
-**For behavioural monitoring, Checkout Web Pixel [standard](https://shopify.dev/docs/api/web-pixels-api/standard-events) and [custom](https://shopify.dev/docs/api/web-pixels-api/emitting-data) events will be relayed back to your application through the `checkoutDidEmitWebPixelEvent` delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple's privacy policy and local regulations like GDPR and ePrivacy directive before disseminating these events to first-party and third-party systems.
+For behavioural monitoring, Checkout Web Pixel [standard](https://shopify.dev/docs/api/web-pixels-api/standard-events) and [custom](https://shopify.dev/docs/api/web-pixels-api/emitting-data) events will be relayed back to your application through the `checkoutDidEmitWebPixelEvent` delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple's privacy policy and local regulations like GDPR and ePrivacy directive before disseminating these events to first-party and third-party systems.
 
 Here's how you might intercept these events:
 
