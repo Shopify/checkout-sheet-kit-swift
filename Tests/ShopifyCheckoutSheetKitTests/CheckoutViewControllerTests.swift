@@ -159,4 +159,14 @@ class CheckoutViewDelegateTests: XCTestCase {
 		viewController.checkoutViewDidToggleModal(modalVisible: false)
 		XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
 	}
+
+	func testCheckoutViewDidStartNavigationShowsProgressBar() {
+		XCTAssertFalse(viewController.progressBar.isHidden)
+		XCTAssertTrue(viewController.initialNavigation)
+		XCTAssertFalse(viewController.checkoutView.checkoutDidLoad)
+
+		viewController.checkoutViewDidStartNavigation()
+		viewController.checkoutViewDidFinishNavigation()
+		XCTAssertFalse(viewController.progressBar.isHidden)
+	}
 }

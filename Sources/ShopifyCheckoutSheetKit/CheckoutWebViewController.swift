@@ -163,6 +163,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidFinishNavigation() {
 		initialNavigation = false
+		self.progressBar.stopAnimating()
 		UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in
 			checkoutView?.alpha = 1
 		}
