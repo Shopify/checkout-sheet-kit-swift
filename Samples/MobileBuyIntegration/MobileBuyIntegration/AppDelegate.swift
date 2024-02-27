@@ -37,9 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 			/// Logs
 			$0.logger = FileLogger("log.txt")
-
-			/// Title
-			$0.title = NSLocalizedString("checkout_title", comment: "")
 		}
 
 		UIBarButtonItem.appearance().tintColor = .label

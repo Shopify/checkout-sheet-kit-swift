@@ -160,22 +160,23 @@ ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
 
 ### Localization
 
-The title of the sheet can be customized by setting the `title` property of the configuration object. This title will default to "Checkout" across all locales.
+#### `title`
+
+By default, the Checkout Sheet Kit will look for a `shopify_checkout_sheet_title` key in a `Localizable.xcstrings` file to set the sheet title, otherwise it will fallback to "Checkout" across all locales.
+
+The title of the sheet can be customized by either setting a value for the `shopify_checkout_sheet_title` key in the `Localizable.xcstrings` file for your application or by configuring the `title` property of the `ShopifyCheckoutSheetKit.configuration` object manually.
 
 ```swift
 // Hardcoded title, applicable to all languages
 ShopifyCheckoutSheetKit.configuration.title = "Custom title"
 ```
 
-To implement localization for this value, create a `Localizable.xcstrings` file in your application, and add an entry for a "checkout_title" key (or similar).
-
-
 Here is an example of a `Localizable.xcstrings` containing translations for 2 locales - `en` and `fr`.
 ```json
 {
   "sourceLanguage": "en",
   "strings": {
-    "checkout_title": {
+    "shopify_checkout_sheet_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -193,14 +194,6 @@ Here is an example of a `Localizable.xcstrings` containing translations for 2 lo
       }
     }
   }
-}
-```
-
-One you have defined your locale values, you can extract a locale-specific value using `NSLocalizedString` in your application:
-
-```swift
-ShopifyCheckoutSheetKit.configure {
-  $0.title = NSLocalizedString("checkout_title", comment: "The title of the checkout sheet")
 }
 ```
 

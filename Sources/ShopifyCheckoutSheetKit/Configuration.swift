@@ -45,7 +45,7 @@ public struct Configuration {
 
 	public var logger: Logger = NoOpLogger()
 
-	public var title: String = "Checkout"
+	public var title: String = NSLocalizedString("shopify_checkout_sheet_title", value: "Checkout", comment: "The title of the checkout sheet.")
 }
 
 extension Configuration {
