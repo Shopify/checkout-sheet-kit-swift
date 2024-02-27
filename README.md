@@ -132,16 +132,16 @@ ShopifyCheckoutSheetKit.configuration.colorScheme = .dark
 ShopifyCheckoutSheetKit.configuration.colorScheme = .web
 ```
 
-#### `spinnerColor`
+#### `tintColor`
 
-If the checkout session is not ready and being initialized, a loading spinner is shown and can be customized via the `spinnerColor` property:
+If the checkout session is not ready and being initialized, a progress bar is shown and can be customized via the `tintColor` property:
 
 ```swift
 // Use a custom UI color
-ShopifyCheckoutSheetKit.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+ShopifyCheckoutSheetKit.configuration.tintColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
 // Use a system color
-ShopifyCheckoutSheetKit.configuration.spinnerColor = .systemBlue
+ShopifyCheckoutSheetKit.configuration.tintColor = .systemBlue
 ```
 
 _Note: use preloading to optimize and deliver an instant buyer experience._
@@ -239,7 +239,7 @@ A preloaded checkout *is not* automatically invalidated when checkout sheet is c
 
 #### Additional considerations for preloaded checkout
 
-1. Preloading is a hint, not a guarantee: the library may debounce or ignore calls depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
+1. Preloading is a hint, not a guarantee: the library may debounce or ignore calls depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a progress bar while the checkout session is finalized.
 1. Preloading results in background network requests and additional CPU/memory utilization for the client and should be used responsibly. For example, conditionally based on state of the client and when there is a high likelihood that the buyer will soon request to checkout.
 
 
