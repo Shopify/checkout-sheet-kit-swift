@@ -176,7 +176,7 @@ When enabled, preloading a checkout is as simple as:
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 ```
 
-Setting enabled to `false` will cause all calls to the `preload` function to be ignored. This allows the appliaction to selectively toggle preloading behavior as a remote feature flag or dynamically in response to client conditions — e.g. when data saver functionality is enabled by the user.
+Setting enabled to `false` will cause all calls to the `preload` function to be ignored. This allows the application to selectively toggle preloading behavior as a remote feature flag or dynamically in response to client conditions — e.g. when data saver functionality is enabled by the user.
 
 ```
 ShopifyCheckoutSheetKit.preloading.enabled = false
@@ -185,7 +185,7 @@ ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // no-op
 
 #### Lifecycle management for preloaded checkout
 
-Preloading renders a checkout in a background webview, which is brought to foreground when `ShopifyCheckoutSheetKit.present()` is called. The content of preloaded checkout reflects the state of cart when `preload()` was initially called. If the cart is mutated after `preload()` is called, the application is responsible for invalidating the preloaded checkout to ensure that up-to-date checkout content is displayed to the buyer:
+Preloading renders a checkout in a background webview, which is brought to foreground when `ShopifyCheckoutSheetKit.present()` is called. The content of preloaded checkout reflects the state of the cart when `preload()` was initially called. If the cart is mutated after `preload()` is called, the application is responsible for invalidating the preloaded checkout to ensure that up-to-date checkout content is displayed to the buyer:
 
 1. To update preloaded contents: call `preload()` once again
 2. To invalidate/disable preloaded content: toggle `ShopifyCheckoutSheetKit.preloading.enabled`
@@ -193,10 +193,10 @@ Preloading renders a checkout in a background webview, which is brought to foreg
 The library will automatically invalidate/abort preload under following conditions:
 
 * Request results in network error or non 2XX server response code
-* Once the checkout is successfuly completed, as indicated by the server response
+* The checkout has successfully completed, as indicated by the server response
 * When `ShopifyCheckoutSheetKit.Configuration` object is updated by the application (e.g., theming changes)
 
-A preloaded checkout *is not* automatically invalidated when checkout sheet is closed. For example, if buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
+A preloaded checkout *is not* automatically invalidated when checkout sheet is closed. For example, if a buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
 
 #### Additional considerations for preloaded checkout
 
@@ -267,7 +267,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 
 App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session.
 
-**For behavioural monitoring, Checkout Web Pixel [standard](https://shopify.dev/docs/api/web-pixels-api/standard-events) and [custom](https://shopify.dev/docs/api/web-pixels-api/emitting-data) events will be relayed back to your application through the `checkoutDidEmitWebPixelEvent` delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple's privacy policy and local regulations like GDPR and ePrivacy directive before disseminating these events to first-party and third-party systems.
+For behavioural monitoring, Checkout Web Pixel [standard](https://shopify.dev/docs/api/web-pixels-api/standard-events) and [custom](https://shopify.dev/docs/api/web-pixels-api/emitting-data) events will be relayed back to your application through the `checkoutDidEmitWebPixelEvent` delegate hook. The responsibility then falls on the application developer to ensure adherence to Apple's privacy policy and local regulations like GDPR and ePrivacy directive before disseminating these events to first-party and third-party systems.
 
 Here's how you might intercept these events:
 
@@ -318,7 +318,7 @@ Buyer-aware checkout experience reduces friction and increases conversion. Depen
 
 #### Cart: buyer bag, identity, and preferences
 
-In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc.), and delivery and payment preferences: see [guide](<[url](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage)>). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
+In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc.), and delivery and payment preferences: see [guide](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
 
 #### Multipass
 

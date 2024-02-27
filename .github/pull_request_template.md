@@ -15,7 +15,6 @@
 > - [ ] I have read and agree with the [Contribution Guidelines](https://github.com/shopify/checkout-sheet-kit-swift/blob/main/.github/CONTRIBUTING.md).
 > - [ ] I have read and agree with the [Code of Conduct](https://github.com/shopify/checkout-sheet-kit-swift/blob/main/.github/CODE_OF_CONDUCT.md).
 > - [ ] I've updated the [README](https://github.com/shopify/checkout-sheet-kit-swift).
-> - [ ] I've updated any documentation related to these changes.
 
 ---
 
