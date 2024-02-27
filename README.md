@@ -318,7 +318,7 @@ Buyer-aware checkout experience reduces friction and increases conversion. Depen
 
 #### Cart: buyer bag, identity, and preferences
 
-In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc.), and delivery and payment preferences: see [guide](<[url](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage)>). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
+In addition to specifying the line items, the Cart can include buyer identity (name, email, address, etc.), and delivery and payment preferences: see [guide](https://shopify.dev/docs/custom-storefronts/building-with-the-storefront-api/cart/manage). Included information will be used to present pre-filled and pre-selected choices to the buyer within checkout.
 
 #### Multipass
 
