@@ -1,37 +1,36 @@
 /*
-MIT License
+ MIT License
 
-Copyright 2023 - Present, Shopify Inc.
+ Copyright 2023 - Present, Shopify Inc.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
+import Buy
 import Foundation
 
-class StorefrontClient {
+public class StorefrontClient {
 
 	static let shared = StorefrontClient()
 
-	private let requestURL: URL
+	private let client: Graph.Client
 
-	private let accessToken: String
-
-	private init() {
+	public init() {
 		guard
 			let infoPlist = Bundle.main.infoDictionary,
 			let domain = infoPlist["StorefrontDomain"] as? String,
@@ -40,98 +39,31 @@ class StorefrontClient {
 			fatalError("unable to load storefront configuration")
 		}
 
-		requestURL = URL(string: "https://\(domain)/api/2023-07/graphql")!
-		accessToken = token
+		client = Graph.Client(shopDomain: domain, apiKey: token)
 	}
 
-	typealias ProductResultHandler = (Result<Product, Error>) -> Void
+	typealias QueryResultHandler = (Result<Storefront.QueryRoot, Error>) -> Void
 
-	func product(_ handler: @escaping ProductResultHandler) {
-		let query = """
-		query FetchVariants {
-			products(first: 10) {
-				nodes {
-					title
-					featuredImage {
-						url
-					}
-					vendor
-					variants(first: 10) {
-						nodes {
-							id
-							title
-							price {
-								amount
-								currencyCode
-							}
-						}
-					}
-				}
-			}
-		}
-		"""
-
-		perform(query: query) {
-			let result = $0.flatMap { data in
-				Result {
-					try JSONDecoder().decode(GraphQLResponse<QueryRoot>.self, from: data)
-				}
-			}
-
-			if case .success(let response) = result, let product = response.data.products.nodes.randomElement() {
-				handler(.success(product))
+	func execute(query: Storefront.QueryRootQuery, handler: @escaping QueryResultHandler) {
+		let task = client.queryGraphWith(query) { query, error in
+			if let root = query {
+				handler(.success(root))
 			} else {
-				handler(.failure(URLError(.unknown)))
+				handler(.failure(error ?? URLError(.unknown)))
 			}
 		}
+
+		task.resume()
 	}
 
-	typealias CartResultHandler = (Result<Cart, Error>) -> Void
+	typealias MutationResultHandler = (Result<Storefront.Mutation, Error>) -> Void
 
-	func createCart(variant: ProductVariant, _ handler: @escaping CartResultHandler) {
-		let regionCode = Locale.current.region?.identifier ?? "CA"
-		let query = """
-		mutation CreateCart @inContext(country: \(regionCode)) {
-			cartCreate(input: { lines: { merchandiseId: "\(variant.id)" } }) {
-				cart {
-					checkoutUrl
-				}
-			}
-		}
-		"""
-
-		perform(query: query) {
-			let result = $0.flatMap { data in
-				Result {
-					try JSONDecoder().decode(GraphQLResponse<MutationRoot>.self, from: data)
-				}
-			}
-
-			if case .success(let response) = result {
-				handler(.success(response.data.cartCreate.cart))
+	func execute(mutation: Storefront.MutationQuery, handler: @escaping MutationResultHandler) {
+		let task = client.mutateGraphWith(mutation) { mutation, error in
+			if let root = mutation {
+				handler(.success(root))
 			} else {
-				handler(.failure(URLError(.unknown)))
-			}
-		}
-	}
-
-	private func perform(query: String, handler: @escaping (Result<Data, Error>) -> Void) {
-		var request = URLRequest(url: requestURL)
-
-		request.setValue("application/json", forHTTPHeaderField: "Accept")
-		request.setValue("application/graphql", forHTTPHeaderField: "Content-Type")
-		request.setValue(accessToken, forHTTPHeaderField: "X-Shopify-Storefront-Access-Token")
-
-		request.httpMethod = "POST"
-		request.httpBody = query.data(using: .utf8)
-
-		let task = URLSession.shared.dataTask(with: request) { data, _, error in
-			DispatchQueue.main.async {
-				if let responseData = data {
-					handler(.success(responseData))
-				} else {
-					handler(.failure(error ?? URLError(.unknown)))
-				}
+				handler(.failure(error ?? URLError(.unknown)))
 			}
 		}
 

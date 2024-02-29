@@ -50,14 +50,11 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	internal var progressObserver: NSKeyValueObservation?
 
-	internal var isSwiftUI: Bool = false
-
 	// MARK: Initializers
 
-	public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, isSwiftUI: Bool = false) {
+	public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
 		self.checkoutURL = url
 		self.delegate = delegate
-		self.isSwiftUI = isSwiftUI
 
 		let checkoutView = CheckoutWebView.for(checkout: url)
 		checkoutView.translatesAutoresizingMaskIntoConstraints = false
@@ -157,11 +154,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 			CheckoutWebView.invalidate()
 		}
 
-		if isSwiftUI {
-			dismiss(animated: true)
-		} else {
-			delegate?.checkoutDidCancel()
-		}
+		delegate?.checkoutDidCancel()
 	}
 }
 

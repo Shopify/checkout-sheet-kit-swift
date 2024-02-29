@@ -22,12 +22,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import SwiftUI
+import ShopifyCheckoutSheetKit
 
 @main
 struct SwiftUIExampleApp: App {
+	init() {
+		ShopifyCheckoutSheetKit.configure {
+			$0.preloading.enabled = true
+		}
+	}
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+			RootTabView()
         }
     }
+}
+
+struct RootTabView: View {
+	@State var isShowingCheckout = false
+	@State var checkoutURL: URL?
+	@StateObject private var cartManager = CartManager.shared
+
+	var body: some View {
+		TabView {
+			CatalogView(cartManager: cartManager, checkoutURL: $checkoutURL, cart: $cartManager.cart)
+				.tabItem {
+					SwiftUI.Image(systemName: "storefront")
+					Text("Catalog")
+				}
+
+			NavigationView {
+				CartView(checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout, cart: $cartManager.cart)
+					.navigationTitle("Cart")
+					.navigationBarTitleDisplayMode(.inline)
+					.padding(20)
+					.toolbar {
+						if cartManager.cart?.lines != nil {
+							ToolbarItem(placement: .navigationBarTrailing) {
+								Text("Clear")
+									.font(.body)
+									.foregroundStyle(Color.accentColor)
+									.onTapGesture {
+										cartManager.resetCart()
+									}
+							}
+						}
+					}
+			}.tabItem {
+				SwiftUI.Image(systemName: "cart")
+				Text("Cart")
+			}
+		}
+	}
 }

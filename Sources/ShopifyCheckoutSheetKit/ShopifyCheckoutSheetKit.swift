@@ -26,10 +26,14 @@ import UIKit
 /// The version of the `ShopifyCheckoutSheetKit` library.
 public let version = "2.0.0"
 
+internal var invalidateOnConfigurationChange = true
+
 /// The configuration options for the `ShopifyCheckoutSheetKit` library.
 public var configuration = Configuration() {
 	didSet {
-		CheckoutWebView.invalidate()
+		if invalidateOnConfigurationChange {
+			CheckoutWebView.invalidate()
+		}
 	}
 }
 
@@ -40,7 +44,9 @@ public func configure(_ block: (inout Configuration) -> Void) {
 
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
-	guard configuration.preloading.enabled else { return }
+	guard configuration.preloading.enabled else {
+		return
+	}
 
 	CheckoutWebView.preloadingActivatedByClient = true
 	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
@@ -51,6 +57,7 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
 }
 
-public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-
-}
+/// This is not used anywhere?
+// public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
+//
+// }

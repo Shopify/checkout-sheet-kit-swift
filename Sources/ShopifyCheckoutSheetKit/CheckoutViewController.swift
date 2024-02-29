@@ -26,9 +26,7 @@ import SwiftUI
 
 public class CheckoutViewController: UINavigationController {
 	public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-		let rootViewController = CheckoutWebViewController(
-			checkoutURL: url, delegate: delegate, isSwiftUI: true
-		)
+		let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
 		rootViewController.notifyPresented()
 		super.init(rootViewController: rootViewController)
 		presentationController?.delegate = rootViewController
@@ -40,8 +38,9 @@ public class CheckoutViewController: UINavigationController {
 	}
 }
 
+/// Deprecated
 extension CheckoutViewController {
-	@available(*, deprecated, message: "Replace \"CheckoutViewController.Representable\" with \"CheckoutSheet\"")
+	@available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
 	public struct Representable: UIViewControllerRepresentable {
 		@Binding var checkoutURL: URL?
 
@@ -61,21 +60,51 @@ extension CheckoutViewController {
 	}
 }
 
-public class CheckoutSheetPresenter: ObservableObject {
-	@Published var isPresented: Bool = false
-	var checkoutURL: URL?
+// MARK: - Checkout sheet controller representable
+public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable {
+	public typealias UIViewControllerType = CheckoutViewController
 
-	public init() {}
+	var checkoutURL: URL
+	var delegate = CheckoutDelegateWrapper()
 
-	public func present(checkout url: URL?) {
+	public init(checkout url: URL) {
 		self.checkoutURL = url
-		self.isPresented = true
+
+		/// Programatic usage of the library will invalidate the cache each time the configuration changes.
+		/// This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
+		ShopifyCheckoutSheetKit.invalidateOnConfigurationChange = false
 	}
 
-	public func dismiss() {
-		self.isPresented = false
+	public func makeUIViewController(context: Self.Context) -> CheckoutViewController {
+		return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+	}
+
+	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {}
+
+	/// Lifecycle methods
+
+	public func onCheckoutDidCancel(_ action: @escaping () -> Void) -> Self {
+		delegate.onCheckoutDidCancel = action
+		return self
+	}
+
+	public func onCheckoutCompleted(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> Self {
+		delegate.onCheckoutDidComplete = action
+		return self
+	}
+
+	public func onCheckoutDidFail(_ action: @escaping (CheckoutError) -> Void) -> Self {
+		delegate.onCheckoutDidFail = action
+		return self
+	}
+
+	public func onCheckoutDidEmitWebPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> Self {
+		delegate.onCheckoutDidEmitWebPixelEvent = action
+		return self
 	}
 }
+
+// MARK: - Checkout Delegate protocol
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
 	var onCheckoutDidComplete: ((CheckoutCompletedEvent) -> Void)?
@@ -100,74 +129,16 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 	}
 }
 
-public struct CheckoutSheetKit: View, CheckoutModifiers {
-	@ObservedObject var presenter: CheckoutSheetPresenter
-	var delegate = CheckoutDelegateWrapper()
+// MARK: - Checkout configuration modifiers
 
-	public init(presenter: CheckoutSheetPresenter) {
-		self.presenter = presenter
-	}
-
-	private func dismiss() {
-		presenter.dismiss()
-		delegate.checkoutDidCancel()
-	}
-
-	public var body: some View {
-		VStack {
-			EmptyView()
-		}
-			.sheet(isPresented: $presenter.isPresented, onDismiss: dismiss) {
-				CheckoutSheet(checkout: $presenter.checkoutURL, delegate: delegate)
-					.edgesIgnoringSafeArea(.all)
-			}
-	}
-
-	public func onCheckoutCancel(_ action: @escaping () -> Void) -> CheckoutSheetKit {
-		delegate.onCheckoutDidCancel = action
-		return self
-	}
-
-	public func onCheckoutCompleted(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> CheckoutSheetKit {
-		delegate.onCheckoutDidComplete = action
-		return self
-	}
-
-	public func onCheckoutDidFail(_ action: @escaping (CheckoutError) -> Void) -> CheckoutSheetKit {
-		delegate.onCheckoutDidFail = action
-		return self
-	}
-
-	public func onCheckoutDidEmitWebPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> CheckoutSheetKit {
-		delegate.onCheckoutDidEmitWebPixelEvent = action
-		return self
-	}
-}
-
-public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutModifiers {
-	@Binding var checkoutURL: URL?
-	let delegate: CheckoutDelegate?
-
-	public init(checkout url: Binding<URL?>, delegate: CheckoutDelegate? = nil) {
-		self._checkoutURL = url
-		self.delegate = delegate
-	}
-
-	public func makeUIViewController(context: CheckoutSheet.Context) -> CheckoutViewController {
-		return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
-	}
-
-	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: CheckoutSheet.Context) {}
-}
-
-public protocol CheckoutModifiers {
+public protocol CheckoutConfigurable {
 	func backgroundColor(_ color: UIColor) -> Self
 	func colorScheme(_ colorScheme: ShopifyCheckoutSheetKit.Configuration.ColorScheme) -> Self
 	func tintColor(_ color: UIColor) -> Self
 	func title(_ title: String) -> Self
 }
 
-extension CheckoutModifiers {
+extension CheckoutConfigurable {
 	public func backgroundColor(_ color: UIColor) -> Self {
 		ShopifyCheckoutSheetKit.configuration.backgroundColor = color
 		return self
