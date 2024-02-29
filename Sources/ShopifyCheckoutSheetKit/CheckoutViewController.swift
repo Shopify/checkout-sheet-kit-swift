@@ -83,23 +83,23 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 
 	/// Lifecycle methods
 
-	public func onCheckoutDidCancel(_ action: @escaping () -> Void) -> Self {
-		delegate.onCheckoutDidCancel = action
+	public func onCancel(_ action: @escaping () -> Void) -> Self {
+		delegate.onCancel = action
 		return self
 	}
 
-	public func onCheckoutCompleted(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> Self {
-		delegate.onCheckoutDidComplete = action
+	public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> Self {
+		delegate.onComplete = action
 		return self
 	}
 
-	public func onCheckoutDidFail(_ action: @escaping (CheckoutError) -> Void) -> Self {
-		delegate.onCheckoutDidFail = action
+	public func onFail(_ action: @escaping (CheckoutError) -> Void) -> Self {
+		delegate.onFail = action
 		return self
 	}
 
-	public func onCheckoutDidEmitWebPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> Self {
-		delegate.onCheckoutDidEmitWebPixelEvent = action
+	public func onPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> Self {
+		delegate.onPixelEvent = action
 		return self
 	}
 }
@@ -107,25 +107,25 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 // MARK: - Checkout Delegate protocol
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
-	var onCheckoutDidComplete: ((CheckoutCompletedEvent) -> Void)?
-	var onCheckoutDidCancel: (() -> Void)?
-	var onCheckoutDidFail: ((CheckoutError) -> Void)?
-	var onCheckoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)?
+	var onComplete: ((CheckoutCompletedEvent) -> Void)?
+	var onCancel: (() -> Void)?
+	var onFail: ((CheckoutError) -> Void)?
+	var onPixelEvent: ((PixelEvent) -> Void)?
 
 	public func checkoutDidFail(error: CheckoutError) {
-		onCheckoutDidFail?(error)
+		onFail?(error)
 	}
 
 	public func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-		onCheckoutDidEmitWebPixelEvent?(event)
+		onPixelEvent?(event)
 	}
 
 	public func checkoutDidComplete(event: CheckoutCompletedEvent) {
-		onCheckoutDidComplete?(event)
+		onComplete?(event)
 	}
 
 	public func checkoutDidCancel() {
-		onCheckoutDidCancel?()
+		onCancel?()
 	}
 }
 

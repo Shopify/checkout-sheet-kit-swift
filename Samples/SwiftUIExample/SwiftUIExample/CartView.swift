@@ -57,16 +57,22 @@ struct CartView: View {
 								.title("SwiftUI")
 								.colorScheme(.automatic)
 								.tintColor(UIColor(red: 0.33, green: 0.20, blue: 0.92, alpha: 1.00))
-								.onCheckoutDidCancel {
+								.onCancel {
 									isShowingCheckout = false
 								}
-								.onCheckoutDidEmitWebPixelEvent { event in
+								.onPixelEvent { event in
 									switch event {
 									case .standardEvent(let event):
-										print("WebPixel - (standard)", event.name!)
+										print("WebPixel - (standard)", event.name)
 									case .customEvent(let event):
-										print("WebPixel - (custom)", event.name!)
+										print("WebPixel - (custom)", event.name)
 									}
+								}
+								.onComplete { checkout in
+									print("Checkout completed - Order id: \(checkout.orderDetails?.id)")
+								}
+								.onFail { error in
+									print(error)
 								}
 								.edgesIgnoringSafeArea(.all)
 						}
