@@ -21,38 +21,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
+import XCTest
 
-/// The version of the `ShopifyCheckoutSheetKit` library.
-public let version = "2.0.0"
+class AppTests: XCTestCase {
 
-internal var invalidateOnConfigurationChange = true
+	var app: XCUIApplication!
 
-/// The configuration options for the `ShopifyCheckoutSheetKit` library.
-public var configuration = Configuration() {
-	didSet {
-		if invalidateOnConfigurationChange {
-			CheckoutWebView.invalidate()
-		}
-	}
-}
-
-/// A convienence function for configuring the `ShopifyCheckoutSheetKit` library.
-public func configure(_ block: (inout Configuration) -> Void) {
-	block(&configuration)
-}
-
-/// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
-	guard configuration.preloading.enabled else {
-		return
+	override func setUp() {
+		super.setUp()
+		continueAfterFailure = false
+		app = XCUIApplication()
+		app.launch()
 	}
 
-	CheckoutWebView.preloadingActivatedByClient = true
-	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
-}
+	func testCheckoutSheetTitle() {
+		// Wait for the "Add to Cart" button to become available
+		let addToCartButton = app.buttons["addToCartButton"]
+		let exists = NSPredicate(format: "exists == true")
+		expectation(for: exists, evaluatedWith: addToCartButton, handler: nil)
+		waitForExpectations(timeout: 5, handler: nil)
 
-/// Presents the checkout from a given `UIViewController`.
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
+		// Tap the "Add to Cart" button
+		addToCartButton.tap()
+
+		// Find the "Checkout" title
+		let checkoutTitle = app.navigationBars["CheckoutSheet"]
+
+		// Check if the title exists
+		XCTAssertTrue(checkoutTitle.exists)
+	}
 }

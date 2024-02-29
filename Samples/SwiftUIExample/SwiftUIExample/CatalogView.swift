@@ -93,6 +93,7 @@ struct CatalogView: View {
 										.font(.headline)
 								}
 							})
+							.accessibilityIdentifier("addToCartButton")
 							.padding()
 							.frame(maxWidth: 400)
 							.background(Color.blue)
@@ -131,6 +132,7 @@ struct CatalogView: View {
 							BadgeButton(badgeCount: Int(cartManager.cart?.totalQuantity ?? 0), action: {
 								isShowingCart = true
 							})
+							.accessibilityIdentifier("cartIcon")
 
 							Button(action: {
 								onAppear()

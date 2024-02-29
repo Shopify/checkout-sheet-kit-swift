@@ -280,11 +280,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 extension CheckoutWebView {
 	fileprivate struct CacheEntry {
-		var key: String {
-			didSet {
-				print("Set cache key:", key)
-			}
-		}
+		var key: String
 
 		let view: CheckoutWebView
 

@@ -21,38 +21,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import UIKit
+import XCTest
 
-/// The version of the `ShopifyCheckoutSheetKit` library.
-public let version = "2.0.0"
+final class SwiftUIExampleUITestsLaunchTests: XCTestCase {
 
-internal var invalidateOnConfigurationChange = true
+    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+        true
+    }
 
-/// The configuration options for the `ShopifyCheckoutSheetKit` library.
-public var configuration = Configuration() {
-	didSet {
-		if invalidateOnConfigurationChange {
-			CheckoutWebView.invalidate()
-		}
-	}
-}
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+    }
 
-/// A convienence function for configuring the `ShopifyCheckoutSheetKit` library.
-public func configure(_ block: (inout Configuration) -> Void) {
-	block(&configuration)
-}
-
-/// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
-	guard configuration.preloading.enabled else {
-		return
-	}
-
-	CheckoutWebView.preloadingActivatedByClient = true
-	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
-}
-
-/// Presents the checkout from a given `UIViewController`.
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
+    func testLaunch() throws {
+        let app = XCUIApplication()
+        app.launch()
+    }
 }
