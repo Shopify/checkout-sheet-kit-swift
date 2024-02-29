@@ -5,8 +5,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Shopify/mobile-buy-sdk-ios",
       "state" : {
-        "revision" : "3a6ecdce6b9e8f356078fbdc2b738ac32cd18153",
+        "revision" : "e6e85dcf8f9eb95baaa8336ad3d7967ea8c36ade",
         "version" : "11.3.0"
+      }
+    },
+    {
+      "identity" : "swiftlintplugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lukepistrol/SwiftLintPlugin",
+      "state" : {
+        "revision" : "ea6d3ca895b49910f790e98e4b4ca658e0fe490e",
+        "version" : "0.54.0"
       }
     }
   ],

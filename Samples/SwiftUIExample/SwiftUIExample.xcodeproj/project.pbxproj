@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6A8A1E582B909C0B00427FC8 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = 6A8A1E572B909C0B00427FC8 /* Buy */; };
+		6A71777C2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6A71777B2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit */; };
+		6A71777E2B90DECF00ED3B99 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = 6A71777D2B90DECF00ED3B99 /* Buy */; };
 		6AC6C3902B9089B60007EA2E /* ProductViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC6C38F2B9089B60007EA2E /* ProductViewModel.swift */; };
 		6ACED4192B909C5C00AC6947 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6ACED4182B909C5C00AC6947 /* ShopifyCheckoutSheetKit */; };
 		6ACED41B2B90A7FE00AC6947 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ACED41A2B90A7FE00AC6947 /* CartView.swift */; };
@@ -55,8 +56,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A71777E2B90DECF00ED3B99 /* Buy in Frameworks */,
+				6A71777C2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit in Frameworks */,
 				6ACED4192B909C5C00AC6947 /* ShopifyCheckoutSheetKit in Frameworks */,
-				6A8A1E582B909C0B00427FC8 /* Buy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,8 +147,9 @@
 			);
 			name = SwiftUIExample;
 			packageProductDependencies = (
-				6A8A1E572B909C0B00427FC8 /* Buy */,
 				6ACED4182B909C5C00AC6947 /* ShopifyCheckoutSheetKit */,
+				6A71777B2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit */,
+				6A71777D2B90DECF00ED3B99 /* Buy */,
 			);
 			productName = SwiftUIExample;
 			productReference = 86C569BF2B15DA2B00F26028 /* SwiftUIExample.app */;
@@ -463,7 +466,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SwiftUIExample/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = A7XGC83MZE;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -494,7 +497,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SwiftUIExample/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = A7XGC83MZE;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -653,7 +656,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6A8A1E572B909C0B00427FC8 /* Buy */ = {
+		6A71777B2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShopifyCheckoutSheetKit;
+		};
+		6A71777D2B90DECF00ED3B99 /* Buy */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6A4C495D2B9090C4003C7D89 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
 			productName = Buy;
