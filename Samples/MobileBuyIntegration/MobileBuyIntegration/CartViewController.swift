@@ -80,7 +80,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	@objc func payPressed(sender: AnyObject) {
 		paymentHandler.startPayment { (success) in
 			if success {
-				self.performSegue(withIdentifier: "Confirmation", sender: self)
+				//self.performSegue(withIdentifier: "Confirmation", sender: self)
+				self.presentCheckout()
 			}
 		}
 	}
@@ -170,7 +171,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 
 	@IBAction private func presentCheckout() {
-		guard let url = CartManager.shared.cart?.checkoutUrl else { return }
+		guard let url = Client.shared.checkoutUrl else { return }
 		ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
 	}
 

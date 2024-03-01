@@ -187,6 +187,7 @@ extension Storefront.CartQuery {
 				.nodes { $0
 					.merchandise { $0
 						.onProductVariant { $0
+							.id()
 							.title()
 							.price({ $0
 								.amount()
@@ -207,6 +208,7 @@ extension Storefront.CartQuery {
 							.currencyCode()
 						})
 					}
+					.quantity()
 				}
 			}
 			.cost { $0
