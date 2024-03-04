@@ -97,3 +97,40 @@ class CheckoutSheetTests: XCTestCase {
 		XCTAssertTrue(pixelEventActionCalled)
 	}
 }
+
+class CheckoutConfigurableTests: XCTestCase {
+	var checkoutURL: URL!
+	var checkoutSheet: CheckoutSheet!
+
+	/// Configuration modifiers
+
+	override func setUp() {
+		super.setUp()
+		checkoutURL = URL(string: "https://www.example.com")
+		checkoutSheet = CheckoutSheet(checkout: checkoutURL)
+	}
+
+	func testBackgroundColor() {
+		let color = UIColor.red
+		_ = checkoutSheet.backgroundColor(color)
+		XCTAssertEqual(ShopifyCheckoutSheetKit.configuration.backgroundColor, color)
+	}
+
+	func testColorScheme() {
+		let colorScheme = ShopifyCheckoutSheetKit.Configuration.ColorScheme.light
+		_ = checkoutSheet.colorScheme(colorScheme)
+		XCTAssertEqual(ShopifyCheckoutSheetKit.configuration.colorScheme, colorScheme)
+	}
+
+	func testTintColor() {
+		let color = UIColor.blue
+		_ = checkoutSheet.tintColor(color)
+		XCTAssertEqual(ShopifyCheckoutSheetKit.configuration.tintColor, color)
+	}
+
+	func testTitle() {
+		let title = "Test Title"
+		_ = checkoutSheet.title(title)
+		XCTAssertEqual(ShopifyCheckoutSheetKit.configuration.title, title)
+	}
+}
