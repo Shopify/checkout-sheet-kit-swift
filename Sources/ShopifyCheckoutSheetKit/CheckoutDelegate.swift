@@ -29,8 +29,6 @@ public protocol CheckoutDelegate: AnyObject {
 	/// Tells the delegate that the checkout successfully completed, returning a completed event with order details
 	func checkoutDidComplete(event: CheckoutCompletedEvent)
 
-	func checkoutDidPresent()
-
 	/// Tells the delegate that the checkout was cancelled by the buyer.
 	func checkoutDidCancel()
 
@@ -49,8 +47,6 @@ extension CheckoutDelegate {
 	public func checkoutDidComplete(event: CheckoutCompletedEvent) {
 		/// No-op by default
 	}
-
-	public func checkoutDidPresent() {}
 
 	public func checkoutDidClickLink(url: URL) {
 		handleUrl(url)

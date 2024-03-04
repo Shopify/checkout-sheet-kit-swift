@@ -44,14 +44,14 @@ struct CartView: View {
 						isShowingCheckout = true
 					}, label: {
 						Text("Checkout")
+							.padding()
+							.frame(maxWidth: .infinity)
+							.background(Color.blue)
+							.foregroundColor(.white)
+							.cornerRadius(10)
+							.bold()
 					})
 					.accessibilityIdentifier("checkoutButton")
-					.padding()
-					.frame(maxWidth: .infinity)
-					.background(Color.blue)
-					.foregroundColor(.white)
-					.cornerRadius(10)
-					.bold()
 					.sheet(isPresented: $isShowingCheckout) {
 						if let url = checkoutURL {
 							CheckoutSheet(checkout: url)
@@ -81,12 +81,12 @@ struct CartView: View {
 								.accessibility(identifier: "CheckoutSheet")
 						}
 					}
-					.padding(.top, 20)
+					.padding(.top, 15)
 					.padding(.horizontal, 5)
 				}
 
 				Spacer()
-			}.padding()
+			}.padding(10)
 		} else {
 			EmptyState()
 		}

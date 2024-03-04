@@ -88,17 +88,22 @@ struct CatalogView: View {
 								if isAddingToCart {
 									ProgressView()
 										.progressViewStyle(CircularProgressViewStyle(tint: .white))
+										.padding()
+										.frame(maxWidth: 400)
+										.background(Color.blue)
+										.foregroundColor(.white)
+										.cornerRadius(10)
 								} else {
 									Text("Add to cart")
 										.font(.headline)
+										.padding()
+										.frame(maxWidth: 400)
+										.background(Color.blue)
+										.foregroundColor(.white)
+										.cornerRadius(10)
 								}
 							})
 							.accessibilityIdentifier("addToCartButton")
-							.padding()
-							.frame(maxWidth: 400)
-							.background(Color.blue)
-							.foregroundColor(.white)
-							.cornerRadius(10)
 							.sheet(isPresented: $isShowingCart) {
 								NavigationView {
 									CartView(
