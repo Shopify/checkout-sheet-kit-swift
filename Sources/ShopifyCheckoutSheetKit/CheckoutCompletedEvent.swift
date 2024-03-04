@@ -26,163 +26,161 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import Foundation
 
 public struct CheckoutCompletedEvent: Decodable {
-	public let orderDetails: OrderDetails?
+	public let orderDetails: OrderDetails
 
 	enum CodingKeys: String, CodingKey {
 		case orderDetails
 	}
-
-	init() {
-		orderDetails = nil
-	}
 }
 
 extension CheckoutCompletedEvent {
-	public struct OrderDetails: Decodable {
-		public let id: String?
-		public let email: String?
-		public let phone: String?
-		public let cart: CartInfo?
-		public let paymentMethods: [OrderPaymentMethod]?
-		public let billingAddress: Address?
-		public let deliveries: [DeliveryInfo]?
-
-		enum CodingKeys: String, CodingKey {
-			case id
-			case email
-			case phone
-			case cart
-			case paymentMethods
-			case billingAddress
-			case deliveries
-		}
-	}
-
-	public struct CartInfo: Decodable {
-		public let lines: [CartLine]?
-		public let price: PriceSet?
-
-		enum CodingKeys: String, CodingKey {
-			case lines
-			case price
-		}
-	}
-
-	public struct OrderPaymentMethod: Decodable {
-		public let type: String?
-		public let details: [String: String?]
-
-		enum CodingKeys: String, CodingKey {
-			case type
-			case details
-		}
-	}
-
 	public struct Address: Decodable {
-		public let referenceId: String?
-		public let name: String?
-		public let firstName: String?
-		public let lastName: String?
 		public let address1: String?
 		public let address2: String?
 		public let city: String?
 		public let countryCode: String?
-		public let zoneCode: String?
-		public let postalCode: String?
+		public let firstName: String?
+		public let lastName: String?
+		public let name: String?
 		public let phone: String?
+		public let postalCode: String?
+		public let referenceId: String?
+		public let zoneCode: String?
 
 		enum CodingKeys: String, CodingKey {
-			case referenceId
-			case name
-			case firstName
-			case lastName
 			case address1
 			case address2
 			case city
 			case countryCode
-			case zoneCode
-			case postalCode
-			case phone
-		}
-	}
-
-	public struct DeliveryInfo: Decodable {
-		public let method: String?
-		public let details: DeliveryDetails?
-
-		enum CodingKeys: String, CodingKey {
-			case method
-			case details
-		}
-	}
-
-	public struct DeliveryDetails: Decodable {
-		public let name: String?
-		public let location: Address?
-		public let additionalInfo: String?
-
-		enum CodingKeys: String, CodingKey {
+			case firstName
+			case lastName
 			case name
-			case location
-			case additionalInfo
+			case phone
+			case postalCode
+			case referenceId
+			case zoneCode
 		}
 	}
 
-	public struct PriceSet: Decodable {
-		public let subtotal: Money?
-		public let total: Money?
-		public let taxes: Money?
-		public let discounts: [Discount]?
-		public let shipping: Money?
+	public struct CartInfo: Decodable {
+		public let lines: [CartLine]
+		public let price: Price
+		public let token: String
 
 		enum CodingKeys: String, CodingKey {
-			case subtotal
-			case total
-			case taxes
-			case discounts
-			case shipping
+			case lines
+			case price
+			case token
 		}
-	}
-
-	public struct Discount: Decodable {
-		public let title: String?
-		public let amount: Money?
-		public let applicationType: String?
-		public let valueType: String?
-		public let value: Double?
 	}
 
 	public struct CartLineImage: Decodable {
-		public let sm: String?
-		public let md: String?
-		public let lg: String?
 		public let altText: String?
+		public let lg: String
+		public let md: String
+		public let sm: String
 
 		enum CodingKeys: String, CodingKey {
-			case sm
-			case md
-			case lg
 			case altText
+			case lg
+			case md
+			case sm
 		}
 	}
 
 	public struct CartLine: Decodable {
-		public let title: String?
-		public let quantity: Int?
-		public let price: Money?
+		public let discounts: [Discount]?
 		public let image: CartLineImage?
 		public let merchandiseId: String?
+		public let price: Money
 		public let productId: String?
-		public let discounts: [Discount]?
+		public let quantity: Int
+		public let title: String
 
 		enum CodingKeys: String, CodingKey {
-			case title
-			case quantity
-			case price
+			case discounts
 			case image
 			case merchandiseId
+			case price
 			case productId
+			case quantity
+			case title
+		}
+	}
+
+	public struct DeliveryDetails: Decodable {
+		public let additionalInfo: String?
+		public let location: Address?
+		public let name: String?
+
+		enum CodingKeys: String, CodingKey {
+			case additionalInfo
+			case location
+			case name
+		}
+	}
+
+	public struct DeliveryInfo: Decodable {
+		public let details: DeliveryDetails
+		public let method: String
+
+		enum CodingKeys: String, CodingKey {
+			case details
+			case method
+		}
+	}
+
+	public struct Discount: Decodable {
+		public let amount: Money?
+		public let applicationType: String?
+		public let title: String?
+		public let value: Double?
+		public let valueType: String?
+	}
+
+	public struct OrderDetails: Decodable {
+		public let billingAddress: Address?
+		public let cart: CartInfo
+		public let deliveries: [DeliveryInfo]?
+		public let email: String?
+		public let id: String
+		public let paymentMethods: [PaymentMethod]?
+		public let phone: String?
+
+		enum CodingKeys: String, CodingKey {
+			case billingAddress
+			case cart
+			case deliveries
+			case email
+			case id
+			case paymentMethods
+			case phone
+		}
+	}
+
+	public struct PaymentMethod: Decodable {
+		public let details: [String: String?]
+		public let type: String
+
+		enum CodingKeys: String, CodingKey {
+			case details
+			case type
+		}
+	}
+
+	public struct Price: Decodable {
+		public let discounts: [Discount]?
+		public let shipping: Money?
+		public let subtotal: Money?
+		public let taxes: Money?
+		public let total: Money?
+
+		enum CodingKeys: String, CodingKey {
 			case discounts
+			case shipping
+			case subtotal
+			case taxes
+			case total
 		}
 	}
 
@@ -198,3 +196,37 @@ extension CheckoutCompletedEvent {
 }
 
 // swiftlint:enable identifier_name
+
+internal let emptyCheckoutCompletedEvent = CheckoutCompletedEvent(
+	orderDetails: CheckoutCompletedEvent.OrderDetails(
+		billingAddress: CheckoutCompletedEvent.Address(
+			address1: nil,
+			address2: nil,
+			city: nil,
+			countryCode: nil,
+			firstName: nil,
+			lastName: nil,
+			name: nil,
+			phone: nil,
+			postalCode: nil,
+			referenceId: nil,
+			zoneCode: nil
+		),
+		cart: CheckoutCompletedEvent.CartInfo(
+			lines: [],
+			price: CheckoutCompletedEvent.Price(
+				discounts: nil,
+				shipping: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
+				subtotal: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
+				taxes: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
+				total: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil)
+			),
+			token: ""
+		),
+		deliveries: nil,
+		email: nil,
+		id: "",
+		paymentMethods: nil,
+		phone: nil
+	)
+)

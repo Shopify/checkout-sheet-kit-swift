@@ -63,7 +63,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
-		viewController.checkoutViewDidCompleteCheckout(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent())
+		viewController.checkoutViewDidCompleteCheckout(event: emptyCheckoutCompletedEvent)
 
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
