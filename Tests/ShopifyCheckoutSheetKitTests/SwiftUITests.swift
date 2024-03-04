@@ -31,7 +31,7 @@ class CheckoutViewControllerTests: XCTestCase {
 
 	override func setUp() {
 		super.setUp()
-		checkoutURL = URL(string: "https://www.example.com")
+		checkoutURL = URL(string: "https://www.shopify.com")
 		delegate = CheckoutDelegateWrapper()
 		checkoutViewController = CheckoutViewController(checkout: checkoutURL, delegate: delegate)
 	}
@@ -47,7 +47,7 @@ class CheckoutSheetTests: XCTestCase {
 
 	override func setUp() {
 		super.setUp()
-		checkoutURL = URL(string: "https://www.example.com")
+		checkoutURL = URL(string: "https://www.shopify.com")
 		checkoutSheet = CheckoutSheet(checkout: checkoutURL)
 	}
 
@@ -64,37 +64,47 @@ class CheckoutSheetTests: XCTestCase {
 	}
 
 	func testOnComplete() {
-		var completeActionCalled = false
+		var actionCalled = false
+		var actionData: CheckoutCompletedEvent?
 		let event = CheckoutCompletedEvent()
 
-		_ = checkoutSheet.onComplete { _ in
-			completeActionCalled = true
+		_ = checkoutSheet.onComplete { event in
+			actionCalled = true
+			actionData = event
 		}
 		checkoutSheet.delegate.checkoutDidComplete(event: event)
-		XCTAssertTrue(completeActionCalled)
+		XCTAssertTrue(actionCalled)
+		XCTAssertNotNil(actionData)
 	}
 
 	func testOnFail() {
-		var failActionCalled = false
+		var actionCalled = false
+		var actionData: CheckoutError?
 		let error: CheckoutError = .checkoutUnavailable(message: "error")
 
-		_ = checkoutSheet.onFail { _ in
-			failActionCalled = true
+		_ = checkoutSheet.onFail { failure in
+			actionCalled = true
+			actionData = failure
+
 		}
 		checkoutSheet.delegate.checkoutDidFail(error: error)
-		XCTAssertTrue(failActionCalled)
+		XCTAssertTrue(actionCalled)
+		XCTAssertNotNil(actionData)
 	}
 
 	func testOnPixelEvent() {
-		var pixelEventActionCalled = false
+		var actionCalled = false
+		var actionData: PixelEvent?
 		let standardEvent = StandardEvent(context: nil, id: "testId", name: "checkout_started", timestamp: "2022-01-01T00:00:00Z", data: nil)
 		let pixelEvent = PixelEvent.standardEvent(standardEvent)
 
-		_ = checkoutSheet.onPixelEvent { _ in
-			pixelEventActionCalled = true
+		_ = checkoutSheet.onPixelEvent { event in
+			actionCalled = true
+			actionData = event
 		}
 		checkoutSheet.delegate.checkoutDidEmitWebPixelEvent(event: pixelEvent)
-		XCTAssertTrue(pixelEventActionCalled)
+		XCTAssertTrue(actionCalled)
+		XCTAssertNotNil(actionData)
 	}
 }
 
@@ -106,7 +116,7 @@ class CheckoutConfigurableTests: XCTestCase {
 
 	override func setUp() {
 		super.setUp()
-		checkoutURL = URL(string: "https://www.example.com")
+		checkoutURL = URL(string: "https://www.shopify.com")
 		checkoutSheet = CheckoutSheet(checkout: checkoutURL)
 	}
 
