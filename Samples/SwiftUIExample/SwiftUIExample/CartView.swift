@@ -93,7 +93,7 @@ struct CartView: View {
 
 struct EmptyState: View {
 	var body: some View {
-		VStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/) {
+		VStack(alignment: .center) {
 			SwiftUI.Image(systemName: "cart")
 				.resizable()
 				.frame(width: 30, height: 30)
