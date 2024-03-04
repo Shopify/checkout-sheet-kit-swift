@@ -55,9 +55,11 @@ struct CartView: View {
 					.sheet(isPresented: $isShowingCheckout) {
 						if let url = checkoutURL {
 							CheckoutSheet(checkout: url)
+								/// Configuration
 								.title("SwiftUI")
 								.colorScheme(.automatic)
 								.tintColor(UIColor(red: 0.33, green: 0.20, blue: 0.92, alpha: 1.00))
+								/// Lifecycle events
 								.onCancel {
 									isShowingCheckout = false
 								}

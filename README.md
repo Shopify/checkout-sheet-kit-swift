@@ -41,7 +41,7 @@ pod "ShopifyCheckoutSheetKit", "~> 2"
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
 
-### Basic Usage
+### Programmatic Usage
 
 Once the SDK has been added as a dependency, you can import the library:
 
@@ -85,25 +85,46 @@ class MyViewController: UIViewController {
 }
 ```
 
-Alternatively, with SwiftUI:
+### SwiftUI Usage
 
 ```swift
 import SwiftUI
 import ShopifyCheckoutSheetKit
 
 struct ContentView: View {
-    @State private var isPresented = false
-    let url: URL
-    let delegate: CheckoutDelegate?
+  @State var isPresented = false
+  @State var checkoutURL: URL?
 
-    var body: some View {
-        Button("Checkout") {
-            self.isPresented = true
-        }
-        .sheet(isPresented: $isPresented) {
-            CheckoutViewController.Representable(url: url, delegate: delegate)
-        }
+  var body: some View {
+    Button("Checkout") {
+      isPresented = true
     }
+    .sheet(isPresented: $isPresented) {
+      if let url = checkoutURL {
+        CheckoutSheet(url: url)
+           /// Configuration
+           .title("Checkout")
+           .colorScheme(.automatic)
+           .tintColor(.blue)
+           .backgroundColor(.white)
+
+           /// Lifecycle events
+           .onCancel {
+             isPresented = false
+           }
+           .onComplete { event in
+             handleCompletedEvent(event)
+           }
+           .onFail { error in
+             handleError(error)
+           }
+           .onPixelEvent { event in
+             handlePixelEvent(event)
+           }
+           .edgesIgnoringSafeArea(.all)
+      }
+    }
+  }
 }
 ```
 
@@ -158,8 +179,6 @@ ShopifyCheckoutSheetKit.configuration.backgroundColor = UIColor(red: 0.09, green
 ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
 ```
 
-### Localization
-
 #### `title`
 
 By default, the Checkout Sheet Kit will look for a `shopify_checkout_sheet_title` key in a `Localizable.xcstrings` file to set the sheet title, otherwise it will fallback to "Checkout" across all locales.
@@ -196,6 +215,23 @@ Here is an example of a `Localizable.xcstrings` containing translations for 2 lo
   }
 }
 ```
+
+#### SwiftUI Configuration
+
+Similarly, configuration modifiers are available to set the configuration of your checkout when using SwiftUI:
+
+```swift
+CheckoutSheet(checkout: checkoutURL)
+  .title("Checkout")
+  .colorScheme(.automatic)
+  .tintColor(.blue)
+  .backgroundColor(.black)
+```
+
+> [!NOTE]
+> Note that if the values of your SwiftUI configuration are **variable** and you are using `preload()`,
+> you will need to  call `preload()` each time your variables change to ensure that the checkout cache
+> has been invalidated, for checkout to be loaded with the new configuration.
 
 ### Preloading
 
