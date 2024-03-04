@@ -23,10 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import WebKit
 
-/*
- * Prevent retaining the WKScriptMessageHandler by wrapping it with this
- * class and using a weak ref to the real script handler
- */
 class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
 	weak var delegate: WKScriptMessageHandler?
 
@@ -36,9 +32,6 @@ class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
 	}
 
 	func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-		self.delegate?.userContentController(
-			userContentController,
-			didReceive: message
-		)
+		self.delegate?.userContentController(userContentController, didReceive: message)
 	}
 }
