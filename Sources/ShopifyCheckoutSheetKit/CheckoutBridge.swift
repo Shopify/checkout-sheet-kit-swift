@@ -95,9 +95,12 @@ extension CheckoutBridge {
 		}
 
 		init(from decoder: Decoder) throws {
-			let container = try decoder.container(keyedBy: CodingKeys.self)
 
+			throw NSError(domain: "com.shopify", code: 1, userInfo: [NSLocalizedDescriptionKey: "Fake Error"])
+
+			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let name = try container.decode(String.self, forKey: .name)
+
 
 			switch name {
 			case "completed":

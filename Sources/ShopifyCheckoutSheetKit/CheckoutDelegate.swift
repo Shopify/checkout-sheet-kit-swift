@@ -52,9 +52,7 @@ extension CheckoutDelegate {
 		handleUrl(url)
 	}
 
-	public func checkoutDidFail(error: CheckoutError) throws {
-		throw error
-	}
+	public func checkoutDidFail(error: CheckoutError) throws {}
 
 	private func handleUrl(_ url: URL) {
 		if UIApplication.shared.canOpenURL(url) {
