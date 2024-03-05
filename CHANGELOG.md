@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 - March 5, 2024
+
+Fixes an issue with strongly held references to old Webview instances.
+
 ## 1.0.1 - January 31, 2024
 
 Bumps the package version.
