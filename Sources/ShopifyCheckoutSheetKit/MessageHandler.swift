@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import WebKit
 
-class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
+class MessageHandler: NSObject, WKScriptMessageHandler {
 	weak var delegate: WKScriptMessageHandler?
 
 	init(delegate: WKScriptMessageHandler) {

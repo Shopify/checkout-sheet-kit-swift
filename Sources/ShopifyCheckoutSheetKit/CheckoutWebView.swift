@@ -102,7 +102,7 @@ class CheckoutWebView: WKWebView {
 		navigationDelegate = self
 
 		configuration.userContentController
-			.add(WeakScriptMessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
+			.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
 		isBridgeAttached = true
 
 		isOpaque = false
