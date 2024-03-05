@@ -102,7 +102,7 @@ class CheckoutWebView: WKWebView {
 		navigationDelegate = self
 
 		configuration.userContentController
-			.add(self, name: CheckoutBridge.messageHandler)
+			.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
 		isBridgeAttached = true
 	}
 
