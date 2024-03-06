@@ -27,9 +27,7 @@ import ShopifyCheckoutSheetKit
 @main
 struct SwiftUIExampleApp: App {
 	init() {
-		ShopifyCheckoutSheetKit.configure {
-			$0.preloading.enabled = false
-		}
+		ShopifyCheckoutSheetKit.configuration.preloading.enabled = true
 	}
 
     var body: some Scene {

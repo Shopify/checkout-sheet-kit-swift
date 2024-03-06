@@ -31,15 +31,6 @@ public struct CheckoutSheet: View {
 
 	let delegate: EventHandler = EventHandler()
 
-	public init(checkoutURL: Binding<URL?>, isShowingCheckout: Binding<Bool>) {
-		self._checkoutURL = checkoutURL
-		self._isShowingCheckout = isShowingCheckout
-
-		delegate.dismissCheckout = { [self] in
-			self.isShowingCheckout = false
-		}
-	}
-
 	public var body: some View {
 		CheckoutViewController.Representable(checkout: $checkoutURL, delegate: delegate)
 			.onReceive(delegate.$didCancel, perform: { didCancel in
@@ -48,7 +39,11 @@ public struct CheckoutSheet: View {
 					isShowingCheckout = false
 				}
 			})
-
+			.onAppear {
+				delegate.dismissCheckout = { [self] in
+					self.isShowingCheckout = false
+				}
+			}
 	}
 }
 
@@ -69,6 +64,8 @@ public struct CartView: View {
 	@Binding var checkoutURL: URL?
 	@Binding var isShowingCheckout: Bool
 	@Binding var cart: Storefront.Cart?
+
+	let delegate: EventHandler = EventHandler()
 
 	public var body: some View {
 		if let lines = cart?.lines.nodes {
@@ -93,9 +90,7 @@ public struct CartView: View {
 					})
 					.accessibilityIdentifier("checkoutButton")
 					.sheet(isPresented: $isShowingCheckout) {
-						if checkoutURL != nil {
-							CheckoutSheet(checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout)
-						}
+						CheckoutSheet(checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout)
 					}
 					.padding(.top, 15)
 					.padding(.horizontal, 5)

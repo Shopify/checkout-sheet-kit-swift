@@ -72,8 +72,7 @@ class SpinnerView: UIView {
 	}
 
 	func stopAnimating() {
-		isHidden = true
-
 		layer.removeAnimation(forKey: animationKey)
+		isHidden = true
 	}
 }
