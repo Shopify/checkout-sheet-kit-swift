@@ -41,6 +41,9 @@ public struct Configuration {
 
 	public var tintColor: UIColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
+	@available(*, renamed: "tintColor", message: "spinnerColor has been superseded by tintColor")
+	public var spinnerColor: UIColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+
 	public var backgroundColor: UIColor = .systemBackground
 
 	public var logger: Logger = NoOpLogger()

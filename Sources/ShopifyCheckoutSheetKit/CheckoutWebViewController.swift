@@ -153,6 +153,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		if !CheckoutWebView.preloadingActivatedByClient {
 			CheckoutWebView.invalidate()
 		}
+
 		delegate?.checkoutDidCancel()
 	}
 }
