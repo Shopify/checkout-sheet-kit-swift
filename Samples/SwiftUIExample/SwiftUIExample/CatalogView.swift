@@ -25,6 +25,42 @@ import Buy
 import SwiftUI
 import ShopifyCheckoutSheetKit
 
+public struct CheckoutSheet: View {
+	@Binding var checkoutURL: URL?
+	@Binding var isShowingCheckout: Bool
+
+	let delegate: EventHandler = EventHandler()
+
+	public var body: some View {
+		CheckoutViewController.Representable(checkout: $checkoutURL, delegate: delegate)
+			.onReceive(delegate.$didCancel, perform: { didCancel in
+				if didCancel {
+					delegate.checkoutDidCancel()
+					isShowingCheckout = false
+				}
+			})
+			.onAppear {
+				delegate.dismissCheckout = { [self] in
+					self.isShowingCheckout = false
+				}
+			}
+			.edgesIgnoringSafeArea(.all)
+	}
+}
+
+class EventHandler: NSObject, CheckoutDelegate {
+	var dismissCheckout: (() -> Void)?
+	@Published var didCancel = false
+
+	func checkoutDidCancel() {
+		didCancel.toggle()
+	}
+
+	func checkoutDidComplete() {}
+	func checkoutDidFail(error: CheckoutError) {}
+	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {}
+}
+
 struct CatalogView: View {
 	var cartManager: CartManager
 
@@ -82,6 +118,7 @@ struct CatalogView: View {
 									cartManager.addItem(variant: variantId) { cart in
 										isAddingToCart = false
 										checkoutURL = cart?.checkoutUrl
+										isShowingCheckout = true
 									}
 								}
 							}, label: {
@@ -94,7 +131,7 @@ struct CatalogView: View {
 										.foregroundColor(.white)
 										.cornerRadius(10)
 								} else {
-									Text("Add to cart")
+									Text("Buy now")
 										.font(.headline)
 										.padding()
 										.frame(maxWidth: 400)
@@ -104,28 +141,10 @@ struct CatalogView: View {
 								}
 							})
 							.accessibilityIdentifier("addToCartButton")
-							.sheet(isPresented: $isShowingCart) {
-								NavigationView {
-									CartView(
-										checkoutURL: $checkoutURL,
-										isShowingCheckout: $isShowingCheckout,
-										cart: $cart
-									)
-									.toolbar {
-										ToolbarItem(placement: .navigationBarTrailing) {
-											SwiftUI.Image(systemName: "multiply.circle.fill")
-												.resizable()
-												.frame(width: 25, height: 25)
-												.foregroundColor(Color(UIColor.lightGray))
-												.onTapGesture {
-													isShowingCart = false
-												}
-										}
-									}
-									.navigationBarTitleDisplayMode(.inline)
-									.navigationTitle("Cart")
-								}
-							}.padding()
+							.sheet(isPresented: $isShowingCheckout) {
+								CheckoutSheet(checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout)
+							}
+							.padding()
 						}
 					}
 					.toolbar {
@@ -134,11 +153,6 @@ struct CatalogView: View {
 								.font(.headline)
 						}
 						ToolbarItemGroup {
-							BadgeButton(badgeCount: Int(cartManager.cart?.totalQuantity ?? 0), action: {
-								isShowingCart = true
-							})
-							.accessibilityIdentifier("cartIcon")
-
 							Button(action: {
 								onAppear()
 							}, label: {

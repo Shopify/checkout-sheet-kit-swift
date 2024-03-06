@@ -27,7 +27,9 @@ import ShopifyCheckoutSheetKit
 @main
 struct SwiftUIExampleApp: App {
 	init() {
-		ShopifyCheckoutSheetKit.configuration.preloading.enabled = true
+		ShopifyCheckoutSheetKit.configure {
+			$0.preloading.enabled = true
+		}
 	}
 
     var body: some Scene {
@@ -50,30 +52,6 @@ struct RootTabView: View {
 						.accessibilityIdentifier("catalogTabIcon")
 					Text("Catalog")
 				}
-
-			NavigationView {
-				CartView(checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout, cart: $cartManager.cart)
-					.navigationTitle("Cart")
-					.navigationBarTitleDisplayMode(.inline)
-					.padding(20)
-					.toolbar {
-						if cartManager.cart?.lines != nil {
-							ToolbarItem(placement: .navigationBarTrailing) {
-								Text("Clear")
-									.font(.body)
-									.foregroundStyle(Color.accentColor)
-									.onTapGesture {
-										cartManager.resetCart()
-									}
-							}
-						}
-					}
-			}
-			.tabItem {
-				SwiftUI.Image(systemName: "cart")
-					.accessibilityIdentifier("cartTabIcon")
-				Text("Cart")
-			}
 		}
 	}
 }

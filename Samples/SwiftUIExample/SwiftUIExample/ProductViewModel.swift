@@ -34,15 +34,7 @@ public class CartManager: ObservableObject {
 	// MARK: Properties
 
 	@Published
-	var cart: Storefront.Cart? {
-		didSet {
-			if let url = cart?.checkoutUrl {
-				DispatchQueue.main.async {
-					ShopifyCheckoutSheetKit.preload(checkout: url)
-				}
-			}
-		}
-	}
+	var cart: Storefront.Cart?
 
 	// MARK: Cart Actions
 
