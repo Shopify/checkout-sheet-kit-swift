@@ -52,6 +52,30 @@ struct RootTabView: View {
 						.accessibilityIdentifier("catalogTabIcon")
 					Text("Catalog")
 				}
+
+			NavigationView {
+				CartView(checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout, cart: $cartManager.cart)
+					.navigationTitle("Cart")
+					.navigationBarTitleDisplayMode(.inline)
+					.padding(20)
+					.toolbar {
+						if cartManager.cart?.lines != nil {
+							ToolbarItem(placement: .navigationBarTrailing) {
+								Text("Clear")
+									.font(.body)
+									.foregroundStyle(Color.accentColor)
+									.onTapGesture {
+										cartManager.resetCart()
+									}
+							}
+						}
+					}
+			}
+			.tabItem {
+				SwiftUI.Image(systemName: "cart")
+					.accessibilityIdentifier("cartTabIcon")
+				Text("Cart")
+			}
 		}
 	}
 }
