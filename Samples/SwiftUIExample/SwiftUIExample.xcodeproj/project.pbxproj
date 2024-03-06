@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6A2DBC202B90ECBA00761222 /* SwiftUIExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2DBC1F2B90ECBA00761222 /* SwiftUIExampleUITests.swift */; };
 		6A2DBC222B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2DBC212B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift */; };
 		6A71777C2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6A71777B2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit */; };
 		6A71777E2B90DECF00ED3B99 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = 6A71777D2B90DECF00ED3B99 /* Buy */; };
 		6AC6C3902B9089B60007EA2E /* ProductViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC6C38F2B9089B60007EA2E /* ProductViewModel.swift */; };
 		6ACED4192B909C5C00AC6947 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6ACED4182B909C5C00AC6947 /* ShopifyCheckoutSheetKit */; };
+		6ACED41B2B90A7FE00AC6947 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ACED41A2B90A7FE00AC6947 /* CartView.swift */; };
 		86C569C32B15DA2B00F26028 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569C22B15DA2B00F26028 /* App.swift */; };
 		86C569C52B15DA2B00F26028 /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C569C42B15DA2B00F26028 /* CatalogView.swift */; };
 		86C569C72B15DA2D00F26028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86C569C62B15DA2D00F26028 /* Assets.xcassets */; };
@@ -31,8 +33,10 @@
 
 /* Begin PBXFileReference section */
 		6A2DBC1D2B90ECBA00761222 /* SwiftUIExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUIExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A2DBC1F2B90ECBA00761222 /* SwiftUIExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExampleUITests.swift; sourceTree = "<group>"; };
 		6A2DBC212B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExampleUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		6AC6C38F2B9089B60007EA2E /* ProductViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewModel.swift; sourceTree = "<group>"; };
+		6ACED41A2B90A7FE00AC6947 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		8652C4602B1659E600A770F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8666476C2B1642730039400B /* Storefront.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Storefront.xcconfig; sourceTree = "<group>"; };
 		86C569BF2B15DA2B00F26028 /* SwiftUIExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,6 +71,7 @@
 		6A2DBC1E2B90ECBA00761222 /* SwiftUIExampleUITests */ = {
 			isa = PBXGroup;
 			children = (
+				6A2DBC1F2B90ECBA00761222 /* SwiftUIExampleUITests.swift */,
 				6A2DBC212B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift */,
 			);
 			path = SwiftUIExampleUITests;
@@ -117,6 +122,7 @@
 				86C569C42B15DA2B00F26028 /* CatalogView.swift */,
 				86C569C62B15DA2D00F26028 /* Assets.xcassets */,
 				6AC6C38F2B9089B60007EA2E /* ProductViewModel.swift */,
+				6ACED41A2B90A7FE00AC6947 /* CartView.swift */,
 			);
 			path = SwiftUIExample;
 			sourceTree = "<group>";
@@ -252,6 +258,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A2DBC202B90ECBA00761222 /* SwiftUIExampleUITests.swift in Sources */,
 				6A2DBC222B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -260,6 +267,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6ACED41B2B90A7FE00AC6947 /* CartView.swift in Sources */,
 				86C569C52B15DA2B00F26028 /* CatalogView.swift in Sources */,
 				86C569ED2B15DB0A00F26028 /* StorefrontClient.swift in Sources */,
 				86C569C32B15DA2B00F26028 /* App.swift in Sources */,
@@ -551,7 +559,7 @@
 			repositoryURL = "https://github.com/Shopify/mobile-buy-sdk-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 11.1.0;
+				minimumVersion = 11.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

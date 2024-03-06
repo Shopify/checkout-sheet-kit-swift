@@ -35,11 +35,13 @@ protocol CheckoutWebViewDelegate: AnyObject {
 }
 
 class CheckoutWebView: WKWebView {
-
 	private static var cache: CacheEntry?
+
 	static var preloadingActivatedByClient: Bool = false
-	// a ref to the view is needed when preload is deactivated in order to detatch bridge
+
+	/// A reference to the view is needed when preload is deactivated in order to detatch the bridge
 	static weak var uncacheableViewRef: CheckoutWebView?
+
 	var isBridgeAttached = false
 
 	static func `for`(checkout url: URL) -> CheckoutWebView {
