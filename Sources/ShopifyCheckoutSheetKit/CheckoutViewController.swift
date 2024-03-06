@@ -26,9 +26,7 @@ import SwiftUI
 
 public class CheckoutViewController: UINavigationController {
 	public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-		let rootViewController = CheckoutWebViewController(
-			checkoutURL: url, delegate: delegate
-		)
+		let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
 		rootViewController.notifyPresented()
 		super.init(rootViewController: rootViewController)
 		presentationController?.delegate = rootViewController
@@ -40,7 +38,9 @@ public class CheckoutViewController: UINavigationController {
 	}
 }
 
+/// Deprecated
 extension CheckoutViewController {
+	@available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
 	public struct Representable: UIViewControllerRepresentable {
 		@Binding var checkoutURL: URL?
 
@@ -57,5 +57,100 @@ extension CheckoutViewController {
 
 		public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {
 		}
+	}
+}
+
+public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable {
+	public typealias UIViewControllerType = CheckoutViewController
+
+	var checkoutURL: URL
+	var delegate = CheckoutDelegateWrapper()
+
+	public init(checkout url: URL) {
+		self.checkoutURL = url
+
+		/// Programatic usage of the library will invalidate the cache each time the configuration changes.
+		/// This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
+		ShopifyCheckoutSheetKit.invalidateOnConfigurationChange = false
+	}
+
+	public func makeUIViewController(context: Self.Context) -> CheckoutViewController {
+		return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+	}
+
+	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {}
+
+	/// Lifecycle methods
+
+	@discardableResult public func onCancel(_ action: @escaping () -> Void) -> Self {
+		delegate.onCancel = action
+		return self
+	}
+
+	@discardableResult public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> Self {
+		delegate.onComplete = action
+		return self
+	}
+
+	@discardableResult public func onFail(_ action: @escaping (CheckoutError) -> Void) -> Self {
+		delegate.onFail = action
+		return self
+	}
+
+	@discardableResult public func onPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> Self {
+		delegate.onPixelEvent = action
+		return self
+	}
+}
+
+public class CheckoutDelegateWrapper: CheckoutDelegate {
+	var onComplete: ((CheckoutCompletedEvent) -> Void)?
+	var onCancel: (() -> Void)?
+	var onFail: ((CheckoutError) -> Void)?
+	var onPixelEvent: ((PixelEvent) -> Void)?
+
+	public func checkoutDidFail(error: CheckoutError) {
+		onFail?(error)
+	}
+
+	public func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+		onPixelEvent?(event)
+	}
+
+	public func checkoutDidComplete(event: CheckoutCompletedEvent) {
+		onComplete?(event)
+	}
+
+	public func checkoutDidCancel() {
+		onCancel?()
+	}
+}
+
+public protocol CheckoutConfigurable {
+	func backgroundColor(_ color: UIColor) -> Self
+	func colorScheme(_ colorScheme: ShopifyCheckoutSheetKit.Configuration.ColorScheme) -> Self
+	func tintColor(_ color: UIColor) -> Self
+	func title(_ title: String) -> Self
+}
+
+extension CheckoutConfigurable {
+	@discardableResult public func backgroundColor(_ color: UIColor) -> Self {
+		ShopifyCheckoutSheetKit.configuration.backgroundColor = color
+		return self
+	}
+
+	@discardableResult public func colorScheme(_ colorScheme: ShopifyCheckoutSheetKit.Configuration.ColorScheme) -> Self {
+		ShopifyCheckoutSheetKit.configuration.colorScheme = colorScheme
+		return self
+	}
+
+	@discardableResult public func tintColor(_ color: UIColor) -> Self {
+		ShopifyCheckoutSheetKit.configuration.tintColor = color
+		return self
+	}
+
+	@discardableResult public func title(_ title: String) -> Self {
+		ShopifyCheckoutSheetKit.configuration.title = title
+		return self
 	}
 }
