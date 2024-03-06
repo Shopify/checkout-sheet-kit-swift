@@ -46,20 +46,29 @@ struct CatalogView: View {
 		NavigationView {
 			VStack {
 				if let product = product {
-					ScrollView {
-						VStack {
+					VStack{
+						VStack(alignment: .leading) {
 							AsyncImage(url: product.featuredImage?.url) { image in
-								image.image?.resizable().aspectRatio(contentMode: .fit)
+								image.image?
+									.resizable()
+									.aspectRatio(contentMode: .fill)
+									.background(Color(UIColor.systemGray5))
+									.frame(maxHeight: 400)
+									.clipped()
 							}
-							.frame(height: 400)
+							.frame(height: 400, alignment: .topLeading)
+							.background(Color.gray)
+							.padding(.bottom, 10)
+						}
 
+						VStack {
 							Text(product.vendor)
-								.font(.subheadline)
+								.font(.caption2)
 								.bold()
 								.foregroundColor(.blue)
 								.multilineTextAlignment(.center)
 								.padding(.top, 10)
-								.padding()
+								.padding(.bottom, 5)
 
 							Text(product.title)
 								.font(.title3)
@@ -67,6 +76,7 @@ struct CatalogView: View {
 								.multilineTextAlignment(.center)
 								.lineLimit(2)
 								.truncationMode(.tail)
+								.padding(.top, 0)
 
 							if let price = product.variants.nodes.first?.price.formattedString() {
 								Text(price)
@@ -74,6 +84,7 @@ struct CatalogView: View {
 									.bold()
 									.foregroundColor(.gray)
 							}
+						}.padding(.horizontal, 15)
 
 							Button(action: {
 								isAddingToCart = true
@@ -125,41 +136,40 @@ struct CatalogView: View {
 									.navigationBarTitleDisplayMode(.inline)
 									.navigationTitle("Cart")
 								}
-							}.padding()
+							}
+							.padding(40)
 						}
-					}
-					.toolbar {
-						ToolbarItem(placement: .topBarLeading) {
-							Text("SwiftUI")
-								.font(.headline)
-						}
-						ToolbarItemGroup {
-							BadgeButton(badgeCount: Int(cartManager.cart?.totalQuantity ?? 0), action: {
-								isShowingCart = true
-							})
-							.accessibilityIdentifier("cartIcon")
-
-							Button(action: {
-								onAppear()
-							}, label: {
-								SwiftUI.Image(systemName: "arrow.clockwise")
-							})
-						}
-					}
 				} else {
 					ProgressView()
 				}
+			}.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Text("Catalog")
+						.font(.headline)
+				}
+				ToolbarItemGroup {
+					BadgeButton(badgeCount: Int(cartManager.cart?.totalQuantity ?? 0), action: {
+						isShowingCart = true
+					})
+					.accessibilityIdentifier("cartIcon")
+
+					Button(action: {
+						onAppear()
+					}, label: {
+						SwiftUI.Image(systemName: "arrow.clockwise")
+					})
+				}
 			}
 		}
-		.padding()
+		.preferredColorScheme(.light)
+		.edgesIgnoringSafeArea(.bottom)
+		.padding(0)
 		.onAppear {
 			if product != nil {
 				return
 			}
 			onAppear()
 		}
-		.preferredColorScheme(.light)
-		.edgesIgnoringSafeArea(.all)
 	}
 }
 
@@ -183,5 +193,22 @@ struct BadgeButton: View {
 				}
 			}
 		}
+	}
+}
+
+
+struct CatalogViewPreview: PreviewProvider {
+	static var previews: some View {
+		CatalogViewPreviewContent()
+	}
+}
+
+struct CatalogViewPreviewContent: View {
+	@State var isShowingCheckout = false
+	@State var checkoutURL: URL?
+	@StateObject var cartManager = CartManager.shared
+
+	var body: some View {
+		CatalogView(cartManager: CartManager.shared, checkoutURL: $checkoutURL, cart: $cartManager.cart)
 	}
 }

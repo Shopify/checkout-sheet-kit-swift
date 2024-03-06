@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6A2DBC202B90ECBA00761222 /* SwiftUIExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2DBC1F2B90ECBA00761222 /* SwiftUIExampleUITests.swift */; };
 		6A2DBC222B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2DBC212B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift */; };
+		6A3BB2912B977A8A0013BC79 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A3BB2902B977A8A0013BC79 /* Settings.swift */; };
 		6A71777C2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6A71777B2B90DEB000ED3B99 /* ShopifyCheckoutSheetKit */; };
 		6A71777E2B90DECF00ED3B99 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = 6A71777D2B90DECF00ED3B99 /* Buy */; };
 		6AC6C3902B9089B60007EA2E /* ProductViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC6C38F2B9089B60007EA2E /* ProductViewModel.swift */; };
@@ -35,6 +36,7 @@
 		6A2DBC1D2B90ECBA00761222 /* SwiftUIExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUIExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A2DBC1F2B90ECBA00761222 /* SwiftUIExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExampleUITests.swift; sourceTree = "<group>"; };
 		6A2DBC212B90ECBA00761222 /* SwiftUIExampleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExampleUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		6A3BB2902B977A8A0013BC79 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		6AC6C38F2B9089B60007EA2E /* ProductViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewModel.swift; sourceTree = "<group>"; };
 		6ACED41A2B90A7FE00AC6947 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		8652C4602B1659E600A770F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				86C569C62B15DA2D00F26028 /* Assets.xcassets */,
 				6AC6C38F2B9089B60007EA2E /* ProductViewModel.swift */,
 				6ACED41A2B90A7FE00AC6947 /* CartView.swift */,
+				6A3BB2902B977A8A0013BC79 /* Settings.swift */,
 			);
 			path = SwiftUIExample;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 				86C569C52B15DA2B00F26028 /* CatalogView.swift in Sources */,
 				86C569ED2B15DB0A00F26028 /* StorefrontClient.swift in Sources */,
 				86C569C32B15DA2B00F26028 /* App.swift in Sources */,
+				6A3BB2912B977A8A0013BC79 /* Settings.swift in Sources */,
 				86C569F22B15DC6F00F26028 /* StorefrontGraphQL.swift in Sources */,
 				6AC6C3902B9089B60007EA2E /* ProductViewModel.swift in Sources */,
 			);
