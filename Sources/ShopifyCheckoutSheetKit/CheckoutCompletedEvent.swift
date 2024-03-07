@@ -27,14 +27,9 @@ import Foundation
 
 public struct CheckoutCompletedEvent: Decodable {
 	public let orderDetails: OrderDetails
-
-	enum CodingKeys: String, CodingKey {
-		case orderDetails
-	}
 }
 
 extension CheckoutCompletedEvent {
-	
 	public struct Address: Decodable {
 		public let address1: String?
 		public let address2: String?
@@ -47,32 +42,12 @@ extension CheckoutCompletedEvent {
 		public let postalCode: String?
 		public let referenceId: String?
 		public let zoneCode: String?
-
-		enum CodingKeys: String, CodingKey {
-			case address1
-			case address2
-			case city
-			case countryCode
-			case firstName
-			case lastName
-			case name
-			case phone
-			case postalCode
-			case referenceId
-			case zoneCode
-		}
 	}
 
 	public struct CartInfo: Decodable {
 		public let lines: [CartLine]
 		public let price: Price
 		public let token: String
-
-		enum CodingKeys: String, CodingKey {
-			case lines
-			case price
-			case token
-		}
 	}
 
 	public struct CartLineImage: Decodable {
@@ -80,13 +55,6 @@ extension CheckoutCompletedEvent {
 		public let lg: String
 		public let md: String
 		public let sm: String
-
-		enum CodingKeys: String, CodingKey {
-			case altText
-			case lg
-			case md
-			case sm
-		}
 	}
 
 	public struct CartLine: Decodable {
@@ -97,38 +65,17 @@ extension CheckoutCompletedEvent {
 		public let productId: String?
 		public let quantity: Int
 		public let title: String
-
-		enum CodingKeys: String, CodingKey {
-			case discounts
-			case image
-			case merchandiseId
-			case price
-			case productId
-			case quantity
-			case title
-		}
 	}
 
 	public struct DeliveryDetails: Decodable {
 		public let additionalInfo: String?
 		public let location: Address?
 		public let name: String?
-
-		enum CodingKeys: String, CodingKey {
-			case additionalInfo
-			case location
-			case name
-		}
 	}
 
 	public struct DeliveryInfo: Decodable {
 		public let details: DeliveryDetails
 		public let method: String
-
-		enum CodingKeys: String, CodingKey {
-			case details
-			case method
-		}
 	}
 
 	public struct Discount: Decodable {
@@ -147,26 +94,11 @@ extension CheckoutCompletedEvent {
 		public let id: String
 		public let paymentMethods: [PaymentMethod]?
 		public let phone: String?
-
-		enum CodingKeys: String, CodingKey {
-			case billingAddress
-			case cart
-			case deliveries
-			case email
-			case id
-			case paymentMethods
-			case phone
-		}
 	}
 
 	public struct PaymentMethod: Decodable {
 		public let details: [String: String?]
 		public let type: String
-
-		enum CodingKeys: String, CodingKey {
-			case details
-			case type
-		}
 	}
 
 	public struct Price: Decodable {
@@ -175,24 +107,11 @@ extension CheckoutCompletedEvent {
 		public let subtotal: Money?
 		public let taxes: Money?
 		public let total: Money?
-
-		enum CodingKeys: String, CodingKey {
-			case discounts
-			case shipping
-			case subtotal
-			case taxes
-			case total
-		}
 	}
 
 	public struct Money: Decodable {
 		public let amount: Double?
 		public let currencyCode: String?
-
-		enum CodingKeys: String, CodingKey {
-			case amount
-			case currencyCode
-		}
 	}
 }
 
