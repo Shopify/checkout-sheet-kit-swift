@@ -109,23 +109,17 @@ class PaymentHandler: NSObject {
 extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 	
 	public func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didSelectShippingMethod shippingMethod: PKShippingMethod, completion: @escaping (PKPaymentAuthorizationStatus, [PKPaymentSummaryItem]) -> Void) {
-		print("Selecting delivery method...")
+		print("Selecting shipping rate...")
 		
-		/*guard let shippingRate = self.shippingRates.shippingRateFor(shippingMethod) else {
-		 completion(.failure, self.checkout.summaryItems(for: self.shopName))
-		 return
-		 }*/
+		let shippingRate = self.shippingRates.filter {
+			$0.handle == shippingMethod.identifier!
+		}.first
 		
-		/*self.delegate?.paySession(self, didSelectShippingRate: shippingRate, checkout: self.checkout, provide: { updatedCheckout in
-		 if let updatedCheckout = updatedCheckout {
-		 self.checkout = updatedCheckout
-		 
-		 Log("Selected delivery method.")
-		 completion(.success, updatedCheckout.summaryItems(for: self.shopName))
-		 } else {
-		 completion(.failure, [])
-		 }
-		 })*/
+		Client.shared.updateCheckout(checkout.id, updatingShippingRate: shippingRate!) { updatedCheckout in
+			print("Selected shipping rate.")
+			self.checkout = updatedCheckout
+			completion(PKPaymentAuthorizationStatus.success, self.paymentSummaryItems)
+		}
 	}
 	
 	func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didSelectShippingContact contact: PKContact, handler completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void) {
@@ -212,6 +206,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 					Client.shared.completeCheckout(self.checkout, billingAddress: shippingAddress, applePayToken: token, idempotencyToken: UUID().uuidString) { payment in
 						if let payment = payment, self.checkout.paymentDue.amount == payment.amount.amount {
 							print("Checkout completed successfully.")
+							print(self.checkout.webUrl)
 						} else {
 							print("Checkout failed to complete.")
 							status = PKPaymentAuthorizationStatus.failure

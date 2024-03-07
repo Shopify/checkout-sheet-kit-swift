@@ -214,10 +214,10 @@ final class ClientQuery {
 		}
 	}
 	
-	static func mutationForUpdateCheckout(_ id: String, updatingShippingRate shippingRate: PayShippingRate) -> Storefront.MutationQuery {
+	static func mutationForUpdateCheckout(_ id: GraphQL.ID, updatingShippingRate shippingRate: Storefront.ShippingRate) -> Storefront.MutationQuery {
 		
 		return Storefront.buildMutation { $0
-			.checkoutShippingLineUpdate(checkoutId: GraphQL.ID(rawValue: id), shippingRateHandle: shippingRate.handle) { $0
+			.checkoutShippingLineUpdate(checkoutId: id, shippingRateHandle: shippingRate.handle) { $0
 				.checkoutUserErrors { $0
 					.field()
 					.message()
@@ -279,7 +279,8 @@ final class ClientQuery {
 			idempotencyKey: idempotencyToken,
 			billingAddress: mailingAddress,
 			paymentData:    token,
-			type:           Storefront.PaymentTokenType.applePay
+			type:           Storefront.PaymentTokenType.applePay,
+			test: .value(true)
 		)
 		
 		return Storefront.buildMutation { $0

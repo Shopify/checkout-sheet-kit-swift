@@ -32,8 +32,8 @@ import Pay
 
 final class Client {
 	
-	static let shopDomain = "checkout-sdk.myshopify.com"
-	static let apiKey     = "ec242e8c0bfd38b44702d2d1b76c505b"
+	static let shopDomain = "shop1.shopify.shopify-wallets-g1yd.jose-alvarez.eu.spin.dev"
+	static let apiKey     = "389f14488519bd3a56c855d7ec8f489b"
 	static let merchantID = "merchant.com.your.id"
 	static let locale   = Locale(identifier: "en-US")
 	
@@ -230,6 +230,24 @@ final class Client {
 		return task
 	}
 	
+	@discardableResult
+	func updateCheckout(_ id: GraphQL.ID, updatingShippingRate shippingRate: Storefront.ShippingRate, completion: @escaping (Storefront.Checkout?) -> Void) -> Task {
+		let mutation = ClientQuery.mutationForUpdateCheckout(id, updatingShippingRate: shippingRate)
+		let task     = self.client.mutateGraphWith(mutation) { response, error in
+			print(error?.localizedDescription ?? "")
+			
+			if let checkout = response?.checkoutShippingLineUpdate?.checkout,
+				let _ = checkout.shippingLine {
+				completion(checkout)
+			} else {
+				completion(nil)
+			}
+		}
+		
+		task.resume()
+		return task
+	}
+	
 	// ----------------------------------
 	//  MARK: - Collections -
 	//
@@ -329,26 +347,6 @@ final class Client {
 			
 			if let checkout = response?.checkoutShippingAddressUpdateV2?.checkout,
 				let _ = checkout.shippingAddress {
-				completion(checkout.viewModel)
-			} else {
-				completion(nil)
-			}
-		}
-		
-		task.resume()
-		return task
-	}
-	
-	
-	
-	@discardableResult
-	func updateCheckout(_ id: String, updatingShippingRate shippingRate: PayShippingRate, completion: @escaping (CheckoutViewModel?) -> Void) -> Task {
-		let mutation = ClientQuery.mutationForUpdateCheckout(id, updatingShippingRate: shippingRate)
-		let task     = self.client.mutateGraphWith(mutation) { response, error in
-			error.debugPrint()
-			
-			if let checkout = response?.checkoutShippingLineUpdate?.checkout,
-				let _ = checkout.shippingLine {
 				completion(checkout.viewModel)
 			} else {
 				completion(nil)
