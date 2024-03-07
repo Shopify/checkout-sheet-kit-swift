@@ -34,6 +34,7 @@ public struct CheckoutCompletedEvent: Decodable {
 }
 
 extension CheckoutCompletedEvent {
+	
 	public struct Address: Decodable {
 		public let address1: String?
 		public let address2: String?
