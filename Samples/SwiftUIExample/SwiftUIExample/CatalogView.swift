@@ -148,9 +148,9 @@ struct CatalogView: View {
 				}
 				ToolbarItemGroup {
 					BadgeButton(badgeCount: Int(cartManager.cart?.totalQuantity ?? 0), action: {
-								isShowingCart = true
-							})
-							.accessibilityIdentifier("cartIcon")
+						isShowingCart = true
+					})
+					.accessibilityIdentifier("cartIcon")
 
 					Button(action: {
 						onAppear()
