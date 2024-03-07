@@ -1,6 +1,45 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "✓" : {
+
+    },
+    "App version" : {
+
+    },
+    "Clear" : {
+
+    },
+    "Clear logs" : {
+
+    },
+    "Events" : {
+
+    },
+    "Features" : {
+
+    },
+    "Logs" : {
+
+    },
+    "No logs available" : {
+
+    },
+    "OK" : {
+      "comment" : "Default action"
+    },
+    "Prefill buyer information" : {
+
+    },
+    "Preload checkout" : {
+
+    },
+    "SDK version" : {
+
+    },
+    "Settings" : {
+
+    },
     "shopify_checkout_sheet_title" : {
       "comment" : "The title of the checkout sheet.",
       "extractionState" : "manual",
@@ -24,6 +63,15 @@
           }
         }
       }
+    },
+    "Theme" : {
+
+    },
+    "Version" : {
+
+    },
+    "Web pixel events" : {
+
     }
   },
   "version" : "1.0"

@@ -72,7 +72,7 @@ struct CartView: View {
 									}
 								}
 								.onComplete { checkout in
-									print("Checkout completed - Order id: \(String(describing: checkout.orderDetails?.id))")
+									print("Checkout completed - Order id: \(String(describing: checkout.orderDetails.id))")
 								}
 								.onFail { error in
 									print(error)
