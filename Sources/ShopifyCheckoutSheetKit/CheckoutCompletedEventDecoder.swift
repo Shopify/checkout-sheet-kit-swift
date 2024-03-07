@@ -28,7 +28,7 @@ class CheckoutCompletedEventDecoder {
 		let messageBody = try container.decode(String.self, forKey: .body)
 
 		guard let data = messageBody.data(using: .utf8) else {
-			return CheckoutCompletedEvent()
+			return emptyCheckoutCompletedEvent
 		}
 
 		return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)

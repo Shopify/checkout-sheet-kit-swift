@@ -155,9 +155,7 @@ extension CartViewController: CheckoutDelegate {
 	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
 		resetCart()
 
-		if let orderId = event.orderDetails?.id {
-			ShopifyCheckoutSheetKit.configuration.logger.log("Order created: \(orderId)")
-		}
+		ShopifyCheckoutSheetKit.configuration.logger.log("Order created: \(event.orderDetails.id)")
 	}
 
 	func checkoutDidCancel() {

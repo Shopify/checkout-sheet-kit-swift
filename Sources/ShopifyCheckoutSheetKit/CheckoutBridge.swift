@@ -107,7 +107,7 @@ extension CheckoutBridge {
 					self = .checkoutComplete(event: checkoutCompletedEvent)
 				} catch {
 					logger.logError(error, "Error decoding CheckoutCompletedEvent")
-					self = .checkoutComplete(event: CheckoutCompletedEvent())
+					self = .checkoutComplete(event: emptyCheckoutCompletedEvent)
 				}
 			case "error":
 				// needs to support .checkoutUnavailable by parsing error payload on body
