@@ -35,7 +35,7 @@ struct SwiftUIExampleApp: App {
     var body: some Scene {
         WindowGroup {
 			RootTabView()
-        }
+		}
     }
 }
 
@@ -54,4 +54,8 @@ struct RootTabView: View {
 				}
 		}
 	}
+}
+
+#Preview {
+	RootTabView()
 }
