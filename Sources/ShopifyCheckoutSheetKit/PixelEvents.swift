@@ -41,10 +41,6 @@ public struct StandardEvent: Codable {
 	public let timestamp: String?
 
 	public let data: StandardEventData?
-
-	enum CodingKeys: String, CodingKey {
-		case context, data, id, name, timestamp
-	}
 }
 
 public struct StandardEventData: Codable {
@@ -63,10 +59,6 @@ public struct CustomEvent: Codable {
 	/// The timestamp of when the customer event occurred, in [ISO
 	/// 8601](https://en.wikipedia.org/wiki/ISO_8601) format
 	public let timestamp: String?
-
-	enum CodingKeys: String, CodingKey {
-		case context, customData, id, name, timestamp
-	}
 }
 
 // MARK: - Context
