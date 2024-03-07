@@ -184,6 +184,23 @@ final class Client {
 	}
 	
 	@discardableResult
+	func updateCartBuyerIdentity(_ id: GraphQL.ID, updatingCartBuyerIdentity address: PayAddress, _ cartId: GraphQL.ID, _ countryCode: Storefront.CountryCode, completion: @escaping (GraphQL.ID?) -> Void) -> Task {
+		let mutation = ClientQuery.mutationForUpdateCheckout(id, updatingCartBuyerIdentity: address, cartId, countryCode)
+		let task     = self.client.mutateGraphWith(mutation) { response, error in
+			print(error?.localizedDescription ?? "")
+			
+			if let cartId = response?.cartBuyerIdentityUpdate?.cart?.id {
+				completion(cartId)
+			} else {
+				completion(nil)
+			}
+		}
+		
+		task.resume()
+		return task
+	}
+	
+	@discardableResult
 	func updateCheckout(_ id: GraphQL.ID, updatingEmail email: String, completion: @escaping (Storefront.Checkout?) -> Void) -> Task {
 		let mutation = ClientQuery.mutationForUpdateCheckout(id, updatingEmail: email)
 		let task     = self.client.mutateGraphWith(mutation) { response, error in

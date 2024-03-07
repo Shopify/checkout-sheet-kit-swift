@@ -29,7 +29,7 @@ import Buy
 import Pay
 
 final class ClientQuery {
-
+	
 	static let maxImageDimension = Int32(UIScreen.main.bounds.width)
 	
 	// ----------------------------------
@@ -209,6 +209,44 @@ final class ClientQuery {
 				}
 				.checkout { $0
 					.fragmentForCheckout()
+				}
+			}
+		}
+	}
+	
+	static func mutationForUpdateCheckout(_ id: GraphQL.ID, updatingCartBuyerIdentity address: PayAddress, _ cartId: GraphQL.ID, _ countryCode: Storefront.CountryCode) -> Storefront.MutationQuery {
+		let deliveryAddress = Storefront.MailingAddressInput.create(
+			address1:  address.addressLine1.orNull,
+			address2:  address.addressLine2.orNull,
+			city:      address.city.orNull,
+			country:   address.country.orNull,
+			firstName: address.firstName.orNull,
+			lastName:  address.lastName.orNull,
+			phone:     address.phone.orNull,
+			province:  address.province.orNull,
+			zip:       address.zip.orNull
+		)
+		
+		let addressInput = Storefront.DeliveryAddressInput.create(
+			deliveryAddress: Input.init(orNull: deliveryAddress)
+			//customerAddressId: Input<GraphQL.ID> = .undefined
+		)
+		
+		let buyerIdentity = Storefront.CartBuyerIdentityInput.create(
+			email: address.email.orNull,
+			phone: address.phone.orNull,
+			countryCode: Input.init(orNull: countryCode),
+			deliveryAddressPreferences: Input.init(orNull: [addressInput])
+		)
+		
+		return Storefront.buildMutation { $0
+			.cartBuyerIdentityUpdate(cartId: cartId, buyerIdentity: buyerIdentity) { $0
+				.userErrors { $0
+					.field()
+					.message()
+				}
+				.cart { $0
+					.id()
 				}
 			}
 		}

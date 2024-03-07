@@ -180,7 +180,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 		let email = "jose.alvarez@shopify.com"
 		let token = String(data: paymentData, encoding: .utf8)!
 		
-		print("Updating checkout shipping address...")
+		/*print("Updating checkout shipping address...")
 		Client.shared.updateCheckout(self.checkout.id, updatingCompleteShippingAddress: shippingAddress) { updatedCheckout in
 			guard let _ = updatedCheckout else {
 				self.paymentStatus = PKPaymentAuthorizationStatus.failure
@@ -217,9 +217,20 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 					}
 				}
 			}
+		 
 			
 			
 			
+		}*/
+		
+		Client.shared.updateCartBuyerIdentity(self.checkout.id, updatingCartBuyerIdentity: shippingAddress, CartManager.shared.cart!.id, Storefront.CountryCode.us) { updatedCart in
+			guard let _ = updatedCart else {
+				self.paymentStatus = PKPaymentAuthorizationStatus.failure
+				completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: nil))
+				return
+			}
+			
+			completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: nil))
 		}
 	}
 	
