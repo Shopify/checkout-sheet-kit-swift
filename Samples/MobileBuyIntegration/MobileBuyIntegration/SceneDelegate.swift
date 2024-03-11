@@ -38,7 +38,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		let catalogController = ProductViewController()
 		catalogController.tabBarItem.image = UIImage(systemName: "books.vertical")
 		catalogController.tabBarItem.title = "Browse"
-		catalogController.navigationItem.title = "Product details"
+		catalogController.navigationItem.title = "Catalog"
 
 		/// Cart
 		let cartController = CartViewController()

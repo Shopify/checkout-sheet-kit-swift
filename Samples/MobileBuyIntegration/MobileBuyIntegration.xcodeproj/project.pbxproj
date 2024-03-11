@@ -165,7 +165,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4EBBA77B2A5F0CE200193E19 /* Build configuration list for PBXNativeTarget "MobileBuyIntegration" */;
 			buildPhases = (
-				4ECA613D2AC5D304005A59A7 /* Run SwiftLint */,
 				4EBBA7632A5F0CE200193E19 /* Sources */,
 				4EBBA7642A5F0CE200193E19 /* Frameworks */,
 				4EBBA7652A5F0CE200193E19 /* Resources */,
@@ -236,28 +235,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		4ECA613D2AC5D304005A59A7 /* Run SwiftLint */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run SwiftLint";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4EBBA7632A5F0CE200193E19 /* Sources */ = {
@@ -448,6 +425,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A7XGC83MZE;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MobileBuyIntegration/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

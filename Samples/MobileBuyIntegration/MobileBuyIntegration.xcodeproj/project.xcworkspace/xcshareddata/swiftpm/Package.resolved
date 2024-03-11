@@ -1,4 +1,5 @@
 {
+  "originHash" : "62051b57561cee5cc38179e28137b92b494503b064558f41caf8569b17f6740e",
   "pins" : [
     {
       "identity" : "mobile-buy-sdk-ios",
@@ -8,16 +9,7 @@
         "revision" : "3a6ecdce6b9e8f356078fbdc2b738ac32cd18153",
         "version" : "11.3.0"
       }
-    },
-    {
-      "identity" : "swiftlintplugin",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/lukepistrol/SwiftLintPlugin",
-      "state" : {
-        "revision" : "ea6d3ca895b49910f790e98e4b4ca658e0fe490e",
-        "version" : "0.54.0"
-      }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
