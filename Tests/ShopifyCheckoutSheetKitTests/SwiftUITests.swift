@@ -115,7 +115,7 @@ class CheckoutSheetTests: XCTestCase {
 			actionCalled = true
 			actionData = url
 		}
-		checkoutSheet.delegate.checkoutDidClickLink(url: URL(from: "https://shopify.com"))
+		checkoutSheet.delegate.checkoutDidClickLink(url: URL(string: "https://shopify.com")!)
 		XCTAssertTrue(actionCalled)
 		XCTAssertNotNil(actionData)
 	}
