@@ -177,8 +177,9 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 			phone: shippingContact?.phoneNumber?.stringValue,
 			email: "jose.alvarez@shopify.com"
 		)
-		let email = "jose.alvarez@shopify.com"
 		let token = String(data: paymentData, encoding: .utf8)!
+		let email = "jose.alvarez@shopify.com"
+		
 		
 		/*print("Updating checkout shipping address...")
 		Client.shared.updateCheckout(self.checkout.id, updatingCompleteShippingAddress: shippingAddress) { updatedCheckout in
@@ -223,12 +224,58 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 			
 		}*/
 		
-		Client.shared.updateCartBuyerIdentity(self.checkout.id, updatingCartBuyerIdentity: shippingAddress, CartManager.shared.cart!.id, Storefront.CountryCode.us) { updatedCart in
-			guard let _ = updatedCart else {
+		// First mutation: update buyer identity with email and full address
+		let deliveryAddress = Storefront.MailingAddressInput.create(
+			address1:  shippingAddress.addressLine1.orNull,
+			address2:  shippingAddress.addressLine2.orNull,
+			city:      shippingAddress.city.orNull,
+			country:   shippingAddress.country.orNull,
+			firstName: shippingAddress.firstName.orNull,
+			lastName:  shippingAddress.lastName.orNull,
+			phone:     shippingAddress.phone.orNull,
+			province:  shippingAddress.province.orNull,
+			zip:       shippingAddress.zip.orNull
+		)
+		
+		let addressInput = Storefront.DeliveryAddressInput.create(
+			deliveryAddress: Input.init(orNull: deliveryAddress)
+		)
+		
+		let buyerIdentity = Storefront.CartBuyerIdentityInput.create(
+			email: shippingAddress.email.orNull,
+			phone: shippingAddress.phone.orNull,
+			countryCode: Input.init(orNull: Storefront.CountryCode.us),
+			deliveryAddressPreferences: Input.init(orNull: [addressInput])
+		)
+		
+		Client.shared.updateCartBuyerIdentity(CartManager.shared.cart!.id, buyerIdentity) { cart in
+			guard let cart = cart else {
 				self.paymentStatus = PKPaymentAuthorizationStatus.failure
 				completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: nil))
 				return
 			}
+			
+			/*do {
+				let decoder = JSONDecoder()
+				let decodedData = try decoder.decode(PaymentData.self, from: payment.token.paymentData)
+				print("Key: \(decodedData.header)")
+			} catch {
+				self.paymentStatus = PKPaymentAuthorizationStatus.failure
+				completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: nil))
+				return
+			}*/
+			
+			
+			// Second mutation: update cart with payment information
+			/*let totalAmount = Storefront.MoneyInput.create(amount: cart.cost.totalAmount.amount, currencyCode: cart.cost.totalAmount.currencyCode)
+			let walletHeader = Storefront.ApplePayWalletHeaderInput.create(ephemeralPublicKey: payment.token.paymentData., publicKeyHash: payment.token.paymentData.hashValue, transactionId: <#T##String#>)
+			let applePayWalletContent = Storefront.ApplePayWalletContentInput.create(billingAddress: deliveryAddress, data: token, signature: <#T##String#>, version: <#T##String#>)
+			let walletInput = Storefront.CartWalletPaymentMethodInput.create()
+			let payment: Storefront.CartPaymentInput = Storefront.CartPaymentInput.create(amount: totalAmount)
+			
+			Client.shared.updatePayment(cart.id, payment) { cart in
+				
+			}*/
 			
 			completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: nil))
 		}
@@ -303,4 +350,16 @@ extension PayAddress {
 	}
 }
 
+struct PaymentData: Codable {
+	let version: String
+	let data: String
+	let signature: String
+	let header: Header
+}
 
+struct Header: Codable {
+	let applicationData: String
+	let transactionId: String
+	let ephemeralPublicKey: String
+	let publicKeyHash: String
+}

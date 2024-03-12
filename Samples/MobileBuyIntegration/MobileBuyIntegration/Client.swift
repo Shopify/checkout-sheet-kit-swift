@@ -184,13 +184,30 @@ final class Client {
 	}
 	
 	@discardableResult
-	func updateCartBuyerIdentity(_ id: GraphQL.ID, updatingCartBuyerIdentity address: PayAddress, _ cartId: GraphQL.ID, _ countryCode: Storefront.CountryCode, completion: @escaping (GraphQL.ID?) -> Void) -> Task {
-		let mutation = ClientQuery.mutationForUpdateCheckout(id, updatingCartBuyerIdentity: address, cartId, countryCode)
+	func updateCartBuyerIdentity( _ cartId: GraphQL.ID, _ buyerIdentity: Storefront.CartBuyerIdentityInput, completion: @escaping (Storefront.Cart?) -> Void) -> Task {
+		let mutation = ClientQuery.mutationForUpdateBuyerIdentity(cartId, buyerIdentity)
 		let task     = self.client.mutateGraphWith(mutation) { response, error in
 			print(error?.localizedDescription ?? "")
 			
-			if let cartId = response?.cartBuyerIdentityUpdate?.cart?.id {
-				completion(cartId)
+			if let cart = response?.cartBuyerIdentityUpdate?.cart {
+				completion(cart)
+			} else {
+				completion(nil)
+			}
+		}
+		
+		task.resume()
+		return task
+	}
+	
+	@discardableResult
+	func updatePayment(_ cartId: GraphQL.ID, _ payment: Storefront.CartPaymentInput, completion: @escaping (Storefront.Cart?) -> Void) -> Task {
+		let mutation = ClientQuery.mutationForPaymentUpdate(cartId, payment)
+		let task     = self.client.mutateGraphWith(mutation) { response, error in
+			print(error?.localizedDescription ?? "")
+			
+			if let cart = response?.cartPaymentUpdate?.cart {
+				completion(cart)
 			} else {
 				completion(nil)
 			}
