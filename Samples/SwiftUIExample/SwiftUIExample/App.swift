@@ -42,7 +42,7 @@ struct SwiftUIExampleApp: App {
 struct RootTabView: View {
 	@State var isShowingCheckout = false
 	@State var checkoutURL: URL?
-	@StateObject private var cartManager = CartManager.shared
+	@ObservedObject private var cartManager = CartManager.shared
 
 	var body: some View {
 		TabView {
@@ -54,7 +54,7 @@ struct RootTabView: View {
 				}
 
 			NavigationView {
-				CartView(checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout, cart: $cartManager.cart)
+				CartView(cartManager: cartManager, checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout)
 					.navigationTitle("Cart")
 					.navigationBarTitleDisplayMode(.inline)
 					.padding(20)

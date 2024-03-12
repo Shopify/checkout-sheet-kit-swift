@@ -106,6 +106,19 @@ class CheckoutSheetTests: XCTestCase {
 		XCTAssertTrue(actionCalled)
 		XCTAssertNotNil(actionData)
 	}
+
+	func testOnLinkClick() {
+		var actionCalled = false
+		var actionData: URL?
+
+		checkoutSheet.onLinkClick { url in
+			actionCalled = true
+			actionData = url
+		}
+		checkoutSheet.delegate.checkoutDidClickLink(url: URL(string: "https://shopify.com")!)
+		XCTAssertTrue(actionCalled)
+		XCTAssertNotNil(actionData)
+	}
 }
 
 class CheckoutConfigurableTests: XCTestCase {

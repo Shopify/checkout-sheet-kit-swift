@@ -26,12 +26,12 @@ import SwiftUI
 import ShopifyCheckoutSheetKit
 
 struct CartView: View {
+	@ObservedObject var cartManager: CartManager
 	@Binding var checkoutURL: URL?
 	@Binding var isShowingCheckout: Bool
-	@Binding var cart: Storefront.Cart?
 
 	var body: some View {
-		if let lines = cart?.lines.nodes {
+		if let lines = cartManager.cart?.lines.nodes {
 			ScrollView {
 				VStack {
 					CartLines(lines: lines)
@@ -71,8 +71,14 @@ struct CartView: View {
 										print("WebPixel - (custom)", event.name!)
 									}
 								}
+								.onLinkClick { url in
+									if UIApplication.shared.canOpenURL(url) {
+										UIApplication.shared.open(url)
+									}
+								}
 								.onComplete { checkout in
 									print("Checkout completed - Order id: \(String(describing: checkout.orderDetails.id))")
+									cartManager.resetCart()
 								}
 								.onFail { error in
 									print(error)

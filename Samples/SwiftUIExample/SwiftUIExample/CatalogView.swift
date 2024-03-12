@@ -26,7 +26,7 @@ import SwiftUI
 import ShopifyCheckoutSheetKit
 
 struct CatalogView: View {
-	var cartManager: CartManager
+	@ObservedObject var cartManager: CartManager
 
 	@Binding var checkoutURL: URL?
 	@Binding var cart: Storefront.Cart?
@@ -118,9 +118,9 @@ struct CatalogView: View {
 							.sheet(isPresented: $isShowingCart) {
 								NavigationView {
 									CartView(
+										cartManager: cartManager,
 										checkoutURL: $checkoutURL,
-										isShowingCheckout: $isShowingCheckout,
-										cart: $cart
+										isShowingCheckout: $isShowingCheckout
 									)
 									.toolbar {
 										ToolbarItem(placement: .navigationBarTrailing) {

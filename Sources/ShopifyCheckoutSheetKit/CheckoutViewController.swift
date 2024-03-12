@@ -101,6 +101,11 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 		delegate.onPixelEvent = action
 		return self
 	}
+
+	@discardableResult public func onLinkClick(_ action: @escaping (URL) -> Void) -> Self {
+		delegate.onLinkClick = action
+		return self
+	}
 }
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
@@ -108,6 +113,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 	var onCancel: (() -> Void)?
 	var onFail: ((CheckoutError) -> Void)?
 	var onPixelEvent: ((PixelEvent) -> Void)?
+	var onLinkClick: ((URL) -> Void)?
 
 	public func checkoutDidFail(error: CheckoutError) {
 		onFail?(error)
@@ -123,6 +129,10 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 
 	public func checkoutDidCancel() {
 		onCancel?()
+	}
+
+	public func checkoutDidClickLink(url: URL) {
+		onLinkClick?(url)
 	}
 }
 
