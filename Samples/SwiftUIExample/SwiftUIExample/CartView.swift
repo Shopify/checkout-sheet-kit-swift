@@ -71,6 +71,11 @@ struct CartView: View {
 										print("WebPixel - (custom)", event.name!)
 									}
 								}
+								.onLinkClick { url in
+									if UIApplication.shared.canOpenURL(url) {
+										UIApplication.shared.open(url)
+									}
+								}
 								.onComplete { checkout in
 									print("Checkout completed - Order id: \(String(describing: checkout.orderDetails.id))")
 								}

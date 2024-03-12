@@ -121,6 +121,11 @@ struct ContentView: View {
            .onPixelEvent { event in
              handlePixelEvent(event)
            }
+           .onLinkClick { url in
+              if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+              }
+           }
            .edgesIgnoringSafeArea(.all)
       }
     }
