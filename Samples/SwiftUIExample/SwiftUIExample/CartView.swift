@@ -26,8 +26,14 @@ import SwiftUI
 import ShopifyCheckoutSheetKit
 
 struct CartView: View {
+	@State var cartCompleted: Bool = false
+
 	@ObservedObject var cartManager: CartManager
-	@Binding var checkoutURL: URL?
+	@Binding var checkoutURL: URL? {
+		didSet {
+			cartCompleted = false
+		}
+	}
 	@Binding var isShowingCheckout: Bool
 
 	var body: some View {
@@ -61,6 +67,11 @@ struct CartView: View {
 								.tintColor(UIColor(red: 0.33, green: 0.20, blue: 0.92, alpha: 1.00))
 								/// Lifecycle events
 								.onCancel {
+									if cartCompleted {
+										cartManager.resetCart()
+										cartCompleted = false
+									}
+
 									isShowingCheckout = false
 								}
 								.onPixelEvent { event in
@@ -78,7 +89,7 @@ struct CartView: View {
 								}
 								.onComplete { checkout in
 									print("Checkout completed - Order id: \(String(describing: checkout.orderDetails.id))")
-									cartManager.resetCart()
+									cartCompleted = true
 								}
 								.onFail { error in
 									print(error)
