@@ -132,7 +132,15 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 	}
 
 	public func checkoutDidClickLink(url: URL) {
-		onLinkClick?(url)
+		if let onLinkClick = onLinkClick {
+			onLinkClick(url)
+			return
+		}
+
+		/// Use fallback behavior if callback is not provided
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
 	}
 }
 
