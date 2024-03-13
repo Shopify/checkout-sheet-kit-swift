@@ -4,7 +4,7 @@
 
 ### New Features
 
-1. The loading spinner has been replaced by a progress bar on the webview. This should result in a faster perceived load time for checkout.
+1. The loading spinner has been replaced by a progress bar on the webview. This will result in a faster perceived load time for checkout because the SDK will no longer wait for full page load to show the DOM content.
 2. Localization has been added for the sheet title. Customize this value by modifying a `shopify_checkout_sheet_title` string in your `Localizable.xcstrings` file.
 
 ```json
@@ -47,7 +47,7 @@ checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
 
 ### Deprecations
 
-1. `CheckoutViewController.Representable()` for SwiftUI has been deprecated. Please use `CheckoutSheet` now instead.
+1. `CheckoutViewController.Representable()` for SwiftUI has been deprecated. Please use `CheckoutSheet(checkout:)` now instead.
 
 ```diff
 .sheet(isPresented: $isShowingCheckout, onDismiss: didDismiss) {
@@ -65,9 +65,10 @@ checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
 +    .onCancel {
 +       isShowingCheckout = false
 +    }
-+    .onComplete { event in }
-+    .onPixelEvent { event in }
-+    .onFail { error in }
++    .onComplete { }
++    .onPixelEvent { }
++    .onFail { }
++    .onLinkClick { }
 }
 ```
 
