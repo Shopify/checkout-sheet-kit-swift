@@ -28,6 +28,8 @@
 		6A34672F2B5FFEFB007314A8 /* WebPixelEventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A34672E2B5FFEFB007314A8 /* WebPixelEventsView.swift */; };
 		6A3467332B600E64007314A8 /* LogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A3467322B600E64007314A8 /* LogsView.swift */; };
 		6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */; };
+		6A8B76C52B6050AD004A6C32 /* WebPixelsStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8B76C42B6050AD004A6C32 /* WebPixelsStorageManager.swift */; };
+		6A8B76C82B611630004A6C32 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 6A8B76C72B611630004A6C32 /* SQLite */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +56,7 @@
 		6A34672E2B5FFEFB007314A8 /* WebPixelEventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPixelEventsView.swift; sourceTree = "<group>"; };
 		6A3467322B600E64007314A8 /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
 		6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CountryCode+inferRegion.swift"; sourceTree = "<group>"; };
+		6A8B76C42B6050AD004A6C32 /* WebPixelsStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPixelsStorageManager.swift; sourceTree = "<group>"; };
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -62,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A8B76C82B611630004A6C32 /* SQLite in Frameworks */,
 				2147F3E42B502AA9005546F3 /* ShopifyCheckoutSheetKit in Frameworks */,
 				4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */,
 			);
@@ -126,6 +130,7 @@
 				6A257A142AFBB06300610DA5 /* Logger.swift */,
 				6A34672E2B5FFEFB007314A8 /* WebPixelEventsView.swift */,
 				6A3467322B600E64007314A8 /* LogsView.swift */,
+				6A8B76C42B6050AD004A6C32 /* WebPixelsStorageManager.swift */,
 			);
 			name = Application;
 			sourceTree = "<group>";
@@ -175,6 +180,7 @@
 			packageProductDependencies = (
 				4EBBA7A22A5F0F5600193E19 /* Buy */,
 				2147F3E32B502AA9005546F3 /* ShopifyCheckoutSheetKit */,
+				6A8B76C72B611630004A6C32 /* SQLite */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */;
@@ -206,6 +212,7 @@
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
 				4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
+				6A8B76C62B611630004A6C32 /* XCRemoteSwiftPackageReference "SQLite" */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -269,6 +276,7 @@
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,
 				6A257A152AFBB06300610DA5 /* Logger.swift in Sources */,
 				4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */,
+				6A8B76C52B6050AD004A6C32 /* WebPixelsStorageManager.swift in Sources */,
 				6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */,
 				4EA7F9B62A9D2B9D003276A1 /* SettingsViewController.swift in Sources */,
 				6A3467332B600E64007314A8 /* LogsView.swift in Sources */,
@@ -494,6 +502,14 @@
 				version = 11.1.0;
 			};
 		};
+		6A8B76C62B611630004A6C32 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.14.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -505,6 +521,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
 			productName = Buy;
+		};
+		6A8B76C72B611630004A6C32 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A8B76C62B611630004A6C32 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -184,6 +184,8 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
+		appConfiguration.webPixelsManager.addEvent(event)
+
 		switch event {
 		case .customEvent(let customEvent):
 			if let genericEvent = mapToGenericEvent(customEvent: customEvent) {
@@ -251,7 +253,6 @@ extension CartViewController {
 
 	func recordAnalyticsEvent(_ event: AnalyticsEvent) {
 		// send the event to an analytics system, e.g. via an analytics sdk
-		appConfiguration.webPixelsLogger.log(event.name)
 	}
 }
 
