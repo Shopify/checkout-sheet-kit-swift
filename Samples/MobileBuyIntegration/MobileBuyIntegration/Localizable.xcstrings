@@ -1,0 +1,81 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "✓" : {
+
+    },
+    "App version" : {
+
+    },
+    "Clear" : {
+
+    },
+    "Clear logs" : {
+
+    },
+    "Events" : {
+
+    },
+    "Features" : {
+
+    },
+    "Logs" : {
+
+    },
+    "No logs available" : {
+
+    },
+    "Not supported in < iOS 15" : {
+
+    },
+    "OK" : {
+      "comment" : "Default action"
+    },
+    "Prefill buyer information" : {
+
+    },
+    "Preload checkout" : {
+
+    },
+    "SDK version" : {
+
+    },
+    "Settings" : {
+
+    },
+    "shopify_checkout_sheet_title" : {
+      "comment" : "The title of the checkout sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checkout"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caisse"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caisse"
+          }
+        }
+      }
+    },
+    "Theme" : {
+
+    },
+    "Version" : {
+
+    },
+    "Web pixel events" : {
+
+    }
+  },
+  "version" : "1.0"
+}

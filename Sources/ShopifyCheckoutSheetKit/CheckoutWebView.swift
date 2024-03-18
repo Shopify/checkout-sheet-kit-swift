@@ -26,7 +26,7 @@ import WebKit
 
 protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidStartNavigation()
-	func checkoutViewDidCompleteCheckout()
+	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent)
 	func checkoutViewDidFinishNavigation()
 	func checkoutViewDidClickLink(url: URL)
 	func checkoutViewDidFailWithError(error: CheckoutError)
@@ -35,11 +35,13 @@ protocol CheckoutWebViewDelegate: AnyObject {
 }
 
 class CheckoutWebView: WKWebView {
-
 	private static var cache: CacheEntry?
+
 	static var preloadingActivatedByClient: Bool = false
-	// a ref to the view is needed when preload is deactivated in order to detatch bridge
+
+	/// A reference to the view is needed when preload is deactivated in order to detatch the bridge
 	static weak var uncacheableViewRef: CheckoutWebView?
+
 	var isBridgeAttached = false
 
 	static func `for`(checkout url: URL) -> CheckoutWebView {
@@ -104,6 +106,13 @@ class CheckoutWebView: WKWebView {
 		configuration.userContentController
 			.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
 		isBridgeAttached = true
+
+		isOpaque = false
+		backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+
+		if #available(iOS 15.0, *) {
+			underPageBackgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+		}
 	}
 
 	deinit {
@@ -142,9 +151,9 @@ extension CheckoutWebView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
 			switch try CheckoutBridge.decode(message) {
-			case .checkoutComplete:
+			case let .checkoutComplete(checkoutCompletedEvent):
 				CheckoutWebView.cache = nil
-				viewDelegate?.checkoutViewDidCompleteCheckout()
+				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
 			case .checkoutUnavailable:
 				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))

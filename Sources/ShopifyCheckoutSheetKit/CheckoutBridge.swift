@@ -29,8 +29,9 @@ enum BridgeError: Swift.Error {
 }
 
 enum CheckoutBridge {
-	static let schemaVersion = "7.0"
+	static let schemaVersion = "8.0"
 	static let messageHandler = "mobileCheckoutSdk"
+	internal static var logger: ProductionLogger = InternalLogger()
 
 	static var applicationName: String {
 		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
@@ -81,7 +82,7 @@ enum CheckoutBridge {
 
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
-		case checkoutComplete
+		case checkoutComplete(event: CheckoutCompletedEvent)
 		case checkoutExpired
 		case checkoutUnavailable
 		case checkoutModalToggled(modalVisible: Bool)
@@ -100,7 +101,14 @@ extension CheckoutBridge {
 
 			switch name {
 			case "completed":
-				self = .checkoutComplete
+				let checkoutCompletedEventDecoder = CheckoutCompletedEventDecoder()
+				do {
+					let checkoutCompletedEvent = try checkoutCompletedEventDecoder.decode(from: container, using: decoder)
+					self = .checkoutComplete(event: checkoutCompletedEvent)
+				} catch {
+					logger.logError(error, "Error decoding CheckoutCompletedEvent")
+					self = .checkoutComplete(event: emptyCheckoutCompletedEvent)
+				}
 			case "error":
 				// needs to support .checkoutUnavailable by parsing error payload on body
 				self = .checkoutExpired

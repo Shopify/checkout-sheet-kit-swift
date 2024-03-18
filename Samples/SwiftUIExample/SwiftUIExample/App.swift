@@ -42,7 +42,7 @@ struct SwiftUIExampleApp: App {
 struct RootTabView: View {
 	@State var isShowingCheckout = false
 	@State var checkoutURL: URL?
-	@StateObject private var cartManager = CartManager.shared
+	@ObservedObject private var cartManager = CartManager.shared
 
 	var body: some View {
 		TabView {
@@ -52,6 +52,30 @@ struct RootTabView: View {
 						.accessibilityIdentifier("catalogTabIcon")
 					Text("Catalog")
 				}
+
+			NavigationView {
+				CartView(cartManager: cartManager, checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout)
+					.navigationTitle("Cart")
+					.navigationBarTitleDisplayMode(.inline)
+					.padding(20)
+					.toolbar {
+						if cartManager.cart?.lines != nil {
+							ToolbarItem(placement: .navigationBarTrailing) {
+								Text("Clear")
+									.font(.body)
+									.foregroundStyle(Color.accentColor)
+									.onTapGesture {
+										cartManager.resetCart()
+									}
+							}
+						}
+					}
+			}
+			.tabItem {
+				SwiftUI.Image(systemName: "cart")
+					.accessibilityIdentifier("cartTabIcon")
+				Text("Cart")
+			}
 		}
 	}
 }

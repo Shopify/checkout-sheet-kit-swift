@@ -32,10 +32,10 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	internal let checkoutView: CheckoutWebView
 
-	internal lazy var spinner: SpinnerView = {
-		let spinner = SpinnerView(frame: .zero)
-		spinner.translatesAutoresizingMaskIntoConstraints = false
-		return spinner
+	internal lazy var progressBar: ProgressBarView = {
+		let progressBar = ProgressBarView(frame: .zero)
+		progressBar.translatesAutoresizingMaskIntoConstraints = false
+		return progressBar
 	}()
 
 	internal var initialNavigation: Bool = true
@@ -47,6 +47,8 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 			barButtonSystemItem: .close, target: self, action: #selector(close)
 		)
 	}()
+
+	internal var progressObserver: NSKeyValueObservation?
 
 	// MARK: Initializers
 
@@ -61,23 +63,33 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 		super.init(nibName: nil, bundle: nil)
 
-		title = "Checkout"
+		title = ShopifyCheckoutSheetKit.configuration.title
 
 		navigationItem.rightBarButtonItem = closeBarButtonItem
 
 		checkoutView.viewDelegate = self
+
+		view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
 	}
 
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
+	deinit {
+		progressObserver?.invalidate()
+	}
+
 	// MARK: UIViewController Lifecycle
+
+	override public func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+
+		view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+	}
 
 	override public func viewDidLoad() {
 		super.viewDidLoad()
-
-		view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
 
 		view.addSubview(checkoutView)
 		NSLayoutConstraint.activate([
@@ -87,14 +99,32 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 			checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
 		])
 
-		view.addSubview(spinner)
+		view.addSubview(progressBar)
 		NSLayoutConstraint.activate([
-			spinner.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-			spinner.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
+			progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+			progressBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+			progressBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+			progressBar.heightAnchor.constraint(equalToConstant: 1)
 		])
-		view.bringSubviewToFront(spinner)
+		view.bringSubviewToFront(progressBar)
 
+		observeProgressChanges()
 		loadCheckout()
+	}
+
+	internal func observeProgressChanges() {
+		progressObserver = checkoutView.observe(\.estimatedProgress, options: [.new]) { [weak self] (_, change) in
+			guard let self = self else { return }
+			if let newProgress = change.newValue {
+				let estimatedProgress = Float(newProgress)
+				self.progressBar.setProgress(estimatedProgress, animated: true)
+				if estimatedProgress < 1.0 {
+					self.progressBar.startAnimating()
+				} else {
+					self.progressBar.stopAnimating()
+				}
+			}
+		}
 	}
 
 	func notifyPresented() {
@@ -103,12 +133,11 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	private func loadCheckout() {
 		if checkoutView.url == nil {
-			checkoutView.alpha = 0
 			initialNavigation = true
 			checkoutView.load(checkout: checkoutURL)
+			progressBar.startAnimating()
 		} else if checkoutView.isLoading && initialNavigation {
-			checkoutView.alpha = 0
-			spinner.startAnimating()
+			progressBar.startAnimating()
 		}
 	}
 
@@ -124,30 +153,27 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		if !CheckoutWebView.preloadingActivatedByClient {
 			CheckoutWebView.invalidate()
 		}
+
 		delegate?.checkoutDidCancel()
 	}
 }
 
 extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
-	func checkoutViewDidStartNavigation() {
-		if initialNavigation && !checkoutView.checkoutDidLoad {
-			spinner.startAnimating()
-		}
-	}
+	func checkoutViewDidStartNavigation() {}
 
 	func checkoutViewDidFinishNavigation() {
-		spinner.stopAnimating()
 		initialNavigation = false
+		self.progressBar.stopAnimating()
 		UIView.animate(withDuration: UINavigationController.hideShowBarDuration) { [weak checkoutView] in
 			checkoutView?.alpha = 1
 		}
 	}
 
-	func checkoutViewDidCompleteCheckout() {
+	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent) {
 		ConfettiCannon.fire(in: view)
 		CheckoutWebView.invalidate()
-		delegate?.checkoutDidComplete()
+		delegate?.checkoutDidComplete(event: event)
 	}
 
 	func checkoutViewDidFailWithError(error: CheckoutError) {

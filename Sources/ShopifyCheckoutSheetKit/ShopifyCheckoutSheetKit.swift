@@ -24,12 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 
 /// The version of the `ShopifyCheckoutSheetKit` library.
-public let version = "1.0.1"
+public let version = "2.0.0"
+
+internal var invalidateOnConfigurationChange = true
 
 /// The configuration options for the `ShopifyCheckoutSheetKit` library.
 public var configuration = Configuration() {
 	didSet {
-		CheckoutWebView.invalidate()
+		if invalidateOnConfigurationChange {
+			CheckoutWebView.invalidate()
+		}
 	}
 }
 
@@ -40,17 +44,18 @@ public func configure(_ block: (inout Configuration) -> Void) {
 
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
-	guard configuration.preloading.enabled else { return }
+	guard configuration.preloading.enabled else {
+		return
+	}
 
 	CheckoutWebView.preloadingActivatedByClient = true
 	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
 }
 
 /// Presents the checkout from a given `UIViewController`.
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) {
-	from.present(CheckoutViewController(checkout: url, delegate: delegate), animated: true)
-}
-
-public func presentRepresentable(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-
+@discardableResult
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
+	let viewController = CheckoutViewController(checkout: url, delegate: delegate)
+	from.present(viewController, animated: true)
+	return viewController
 }

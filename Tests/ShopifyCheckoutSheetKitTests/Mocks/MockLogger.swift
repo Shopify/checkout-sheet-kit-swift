@@ -21,13 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import SwiftUI
+import os.log
+@testable import ShopifyCheckoutSheetKit
 
-@main
-struct SwiftUIExampleApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+class MockLogger: ProductionLogger {
+	var loggedError: Error?
+	var loggedMessage: String?
+
+	func logError(_ error: Error, _ message: String) {
+		loggedError = error
+		loggedMessage = message
+	}
 }

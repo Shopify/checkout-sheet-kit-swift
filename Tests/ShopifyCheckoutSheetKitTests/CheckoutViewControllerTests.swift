@@ -27,6 +27,7 @@ import WebKit
 
 class CheckoutViewDelegateTests: XCTestCase {
 
+	private var customTitle: String?
 	private let checkoutURL = URL(string: "https://checkout-sdk.myshopify.com")!
 	private var viewController: CheckoutWebViewController!
 	private var navigationController: UINavigationController!
@@ -34,6 +35,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 	override func setUp() {
 		ShopifyCheckoutSheetKit.configure {
 			$0.preloading.enabled = true
+			$0.title = customTitle ?? "Checkout"
 		}
 		viewController = CheckoutWebViewController(
 			checkoutURL: checkoutURL, delegate: ExampleDelegate())
@@ -41,8 +43,19 @@ class CheckoutViewDelegateTests: XCTestCase {
 		navigationController = UINavigationController(rootViewController: viewController)
 	}
 
+	override func tearDown() {
+		customTitle = nil
+		super.tearDown()
+	}
+
 	func testTitleIsSetToCheckout() {
 		XCTAssertEqual(viewController.title, "Checkout")
+	}
+
+	func testTitleCanBeCustomized() {
+		customTitle = "Custom title"
+		setUp()
+		XCTAssertEqual(viewController.title, "Custom title")
 	}
 
 	func testCheckoutViewDidCompleteCheckoutInvalidatesViewCache() {
@@ -50,7 +63,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
-		viewController.checkoutViewDidCompleteCheckout()
+		viewController.checkoutViewDidCompleteCheckout(event: emptyCheckoutCompletedEvent)
 
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
@@ -147,18 +160,13 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
 	}
 
-	func testCheckoutViewDidStartNavigationShowsSpinner() {
-		XCTAssertTrue(viewController.spinner.isHidden)
+	func testCheckoutViewDidStartNavigationShowsProgressBar() {
+		XCTAssertFalse(viewController.progressBar.isHidden)
 		XCTAssertTrue(viewController.initialNavigation)
 		XCTAssertFalse(viewController.checkoutView.checkoutDidLoad)
 
 		viewController.checkoutViewDidStartNavigation()
-		XCTAssertFalse(viewController.spinner.isHidden)
-
-		// Verify that spinner is not started if it is not the initial navigation
-		viewController.initialNavigation = true
-		viewController.checkoutView.checkoutDidLoad = true
-		viewController.checkoutViewDidStartNavigation()
-		XCTAssertFalse(viewController.spinner.isHidden)
+		viewController.checkoutViewDidFinishNavigation()
+		XCTAssertFalse(viewController.progressBar.isHidden)
 	}
 }

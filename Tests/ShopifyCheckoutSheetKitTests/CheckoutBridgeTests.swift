@@ -70,18 +70,48 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
-	func testDecodeSupportsCheckoutCompleteEvent() throws {
+	func testDecodeSupportsCheckoutCompletedEvent() throws {
+		let body = "{\"orderDetails\":{\"id\":\"gid://shopify/OrderIdentity/8\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\": \"fake-token\"},\"billingAddress\":{\"city\":\"Cagalry\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Cagalry\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\"}"
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+
 		let mock = WKScriptMessageMock(body: """
-	{
-		"name": "completed"
-	}
-	""")
+			{
+				"name": "completed",
+				"body": "\(body)"
+			}
+			""")
 
 		let result = try CheckoutBridge.decode(mock)
 
-		guard case CheckoutBridge.WebEvent.checkoutComplete = result else {
-			return XCTFail("expected CheckoutScriptMessage.checkoutComplete, got \(result)")
+		guard case .checkoutComplete(let event) = result else {
+			XCTFail("Expected .checkoutComplete, got \(result)")
+			return
 		}
+
+		XCTAssertEqual("gid://shopify/OrderIdentity/8", event.orderDetails.id)
+		XCTAssertEqual(1, event.orderDetails.cart.lines.count)
+		XCTAssertEqual("gid://shopify/Product/1", event.orderDetails.cart.lines[0].productId)
+		XCTAssertEqual(1, event.orderDetails.paymentMethods?.count)
+		XCTAssertEqual("direct", event.orderDetails.paymentMethods?[0].type)
+	}
+
+	func testFailedDecodeReturnsEmptyEvent() throws {
+		/// Missing orderId, taxes, billingAddress
+		let body = "{\"orderDetails\":{\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\":\"fake-token\"},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Cagalry\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}}}}"
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+
+		let mock = WKScriptMessageMock(body: "{\"name\":\"completed\",\"body\": \"\(body)\"}")
+
+		let result = try CheckoutBridge.decode(mock)
+
+		guard case .checkoutComplete(let event) = result else {
+			XCTFail("Expected .checkoutComplete, got \(result)")
+			return
+		}
+
+		XCTAssertEqual(event.orderDetails.id, "")
 	}
 
 	func testDecodeSupportsCheckoutUnavailableEvent() throws {

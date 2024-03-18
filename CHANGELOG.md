@@ -1,5 +1,77 @@
 # Changelog
 
+## 2.0.0 - March 15, 2024
+
+### New Features
+
+1. The loading spinner has been replaced by a progress bar on the webview. This will result in a faster perceived load time for checkout because the SDK will no longer wait for full page load to show the DOM content.
+2. Localization has been added for the sheet title. Customize this value by modifying a `shopify_checkout_sheet_title` string in your `Localizable.xcstrings` file.
+
+```json
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "shopify_checkout_sheet_title" : {
+      "comment" : "The title of the checkout sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checkout"
+          }
+        },
+      }
+    }
+  }
+}
+
+```
+
+### Breaking Changes
+
+1. The `checkoutDidComplete` delegate method now returns a completed event object, containing details about the order:
+
+```swift
+checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+  print(event.orderDetails.id)
+}
+```
+
+2. `spinnerColor` has been replaced by `tintColor`:
+
+```diff
+- ShopifyCheckoutSheetKit.configuration.spinnerColor = .systemBlue
++ ShopifyCheckoutSheetKit.configuration.tintColor = .systemBlue
+```
+
+### Deprecations
+
+1. `CheckoutViewController.Representable()` for SwiftUI has been deprecated. Please use `CheckoutSheet(checkout:)` now instead.
+
+```diff
+.sheet(isPresented: $isShowingCheckout, onDismiss: didDismiss) {
+-  CheckoutViewController.Representable(checkout: $checkoutURL, delegate: eventHandler)
+-    .onReceive(eventHandler.$didCancel, perform: { didCancel in
+-      if didCancel {
+-        isShowingCheckout = false
+-      }
+-    })
++  CheckoutSheet(checkout: $checkoutURL)
++    .title("Custom title")
++    .colorScheme(.automatic)
++    .backgroundColor(.black)
++    .tintColor(.systemBlue)
++    .onCancel {
++       isShowingCheckout = false
++    }
++    .onComplete { }
++    .onPixelEvent { }
++    .onFail { }
++    .onLinkClick { }
+}
+```
+
 ## 1.0.2 - March 5, 2024
 
 Fixes an issue with strongly held references to old Webview instances.

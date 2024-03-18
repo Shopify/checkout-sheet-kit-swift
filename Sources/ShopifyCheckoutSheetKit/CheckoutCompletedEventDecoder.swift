@@ -22,26 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import Foundation
-import os.log
 
-public protocol Logger {
-	func log(_ message: String)
-	func clearLogs()
-}
+class CheckoutCompletedEventDecoder {
+	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> CheckoutCompletedEvent {
+		let messageBody = try container.decode(String.self, forKey: .body)
 
-public class NoOpLogger: Logger {
-	public func log(_ message: String) {}
+		guard let data = messageBody.data(using: .utf8) else {
+			return emptyCheckoutCompletedEvent
+		}
 
-	public func clearLogs() {}
-}
-
-internal protocol ProductionLogger {
-	func logError(_ error: Error, _ message: String)
-}
-
-internal struct InternalLogger: ProductionLogger {
-	public func logError(_ error: Error, _ message: String) {
-		let logMessage = "[ShopifyCheckoutSheetKit] \(message): \(error.localizedDescription) (Please report this to the Shopify team at https://github.com/Shopify/checkout-sheet-kit-swift)"
-		os_log(.error, "%{public}@", logMessage)
+		return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)
 	}
 }

@@ -34,6 +34,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 			/// Enable preloading
 			$0.preloading.enabled = true
+
+			/// Optional logger used for internal purposes
 			$0.logger = FileLogger("log.txt")
 		}
 

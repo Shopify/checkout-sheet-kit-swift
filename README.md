@@ -1,6 +1,6 @@
 # Shopify Checkout Sheet Kit - Swift
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) [![GitHub Release](https://img.shields.io/github/release/shopify/checkout-sheet-kit-swift.svg?style=flat)]()  
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) [![GitHub Release](https://img.shields.io/github/release/shopify/checkout-sheet-kit-swift.svg?style=flat)]()
  ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
 
 
@@ -20,7 +20,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "1.0")
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "2")
 ]
 ```
 
@@ -36,12 +36,12 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 #### CocoaPods
 
 ```ruby
-pod "ShopifyCheckoutSheetKit", "~> 1.0"
+pod "ShopifyCheckoutSheetKit", "~> 2"
 ```
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
 
-### Basic Usage
+### Programmatic Usage
 
 Once the SDK has been added as a dependency, you can import the library:
 
@@ -85,25 +85,51 @@ class MyViewController: UIViewController {
 }
 ```
 
-Alternatively, with SwiftUI:
+### SwiftUI Usage
 
 ```swift
 import SwiftUI
 import ShopifyCheckoutSheetKit
 
 struct ContentView: View {
-    @State private var isPresented = false
-    let url: URL
-    let delegate: CheckoutDelegate?
+  @State var isPresented = false
+  @State var checkoutURL: URL?
 
-    var body: some View {
-        Button("Checkout") {
-            self.isPresented = true
-        }
-        .sheet(isPresented: $isPresented) {
-            CheckoutViewController.Representable(url: url, delegate: delegate)
-        }
+  var body: some View {
+    Button("Checkout") {
+      isPresented = true
     }
+    .sheet(isPresented: $isPresented) {
+      if let url = checkoutURL {
+        CheckoutSheet(url: url)
+           /// Configuration
+           .title("Checkout")
+           .colorScheme(.automatic)
+           .tintColor(.blue)
+           .backgroundColor(.white)
+
+           /// Lifecycle events
+           .onCancel {
+             isPresented = false
+           }
+           .onComplete { event in
+             handleCompletedEvent(event)
+           }
+           .onFail { error in
+             handleError(error)
+           }
+           .onPixelEvent { event in
+             handlePixelEvent(event)
+           }
+           .onLinkClick { url in
+              if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+              }
+           }
+           .edgesIgnoringSafeArea(.all)
+      }
+    }
+  }
 }
 ```
 
@@ -132,16 +158,16 @@ ShopifyCheckoutSheetKit.configuration.colorScheme = .dark
 ShopifyCheckoutSheetKit.configuration.colorScheme = .web
 ```
 
-#### `spinnerColor`
+#### `tintColor`
 
-If the checkout session is not ready and being initialized, a loading spinner is shown and can be customized via the `spinnerColor` property:
+If the checkout session is not ready and being initialized, a progress bar is shown and can be customized via the `tintColor` property:
 
 ```swift
 // Use a custom UI color
-ShopifyCheckoutSheetKit.configuration.spinnerColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+ShopifyCheckoutSheetKit.configuration.tintColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
 // Use a system color
-ShopifyCheckoutSheetKit.configuration.spinnerColor = .systemBlue
+ShopifyCheckoutSheetKit.configuration.tintColor = .systemBlue
 ```
 
 _Note: use preloading to optimize and deliver an instant buyer experience._
@@ -157,6 +183,60 @@ ShopifyCheckoutSheetKit.configuration.backgroundColor = UIColor(red: 0.09, green
 // Use a system color
 ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
 ```
+
+#### `title`
+
+By default, the Checkout Sheet Kit will look for a `shopify_checkout_sheet_title` key in a `Localizable.xcstrings` file to set the sheet title, otherwise it will fallback to "Checkout" across all locales.
+
+The title of the sheet can be customized by either setting a value for the `shopify_checkout_sheet_title` key in the `Localizable.xcstrings` file for your application or by configuring the `title` property of the `ShopifyCheckoutSheetKit.configuration` object manually.
+
+```swift
+// Hardcoded title, applicable to all languages
+ShopifyCheckoutSheetKit.configuration.title = "Custom title"
+```
+
+Here is an example of a `Localizable.xcstrings` containing translations for 2 locales - `en` and `fr`.
+```json
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "shopify_checkout_sheet_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checkout"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caisse"
+          }
+        },
+      }
+    }
+  }
+}
+```
+
+#### SwiftUI Configuration
+
+Similarly, configuration modifiers are available to set the configuration of your checkout when using SwiftUI:
+
+```swift
+CheckoutSheet(checkout: checkoutURL)
+  .title("Checkout")
+  .colorScheme(.automatic)
+  .tintColor(.blue)
+  .backgroundColor(.black)
+```
+
+> [!NOTE]
+> Note that if the values of your SwiftUI configuration are **variable** and you are using `preload()`,
+> you will need to  call `preload()` each time your variables change to ensure that the checkout cache
+> has been invalidated, for checkout to be loaded with the new configuration.
 
 ### Preloading
 
@@ -200,7 +280,7 @@ A preloaded checkout *is not* automatically invalidated when checkout sheet is c
 
 #### Additional considerations for preloaded checkout
 
-1. Preloading is a hint, not a guarantee: the library may debounce or ignore calls depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a spinner while the checkout session is finalized.
+1. Preloading is a hint, not a guarantee: the library may debounce or ignore calls depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a progress bar while the checkout session is finalized.
 1. Preloading results in background network requests and additional CPU/memory utilization for the client and should be used responsibly. For example, conditionally based on state of the client and when there is a high likelihood that the buyer will soon request to checkout.
 
 
@@ -210,7 +290,7 @@ You can use the `ShopifyCheckoutSheetKitDelegate` protocol to register callbacks
 
 ```swift
 extension MyViewController: ShopifyCheckoutSheetKitDelegate {
-  func checkoutDidComplete() {
+  func checkoutDidComplete(event: CheckoutCompletedEvent) {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.
   }
@@ -223,22 +303,21 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
   func checkoutDidFail(error: CheckoutError) {
     // Called when the checkout encountered an error and has been aborted. The callback
     // provides a `CheckoutError` enum, with one of the following values:
+   	// Internal error: exception within the Checkout SDK code
+   	// You can inspect and log the Erorr and stacktrace to identify the problem.
+   	case sdkError(underlying: Swift.Error)
 
-	/// Internal error: exception within the Checkout SDK code
-	/// You can inspect and log the Erorr and stacktrace to identify the problem.
-	case sdkError(underlying: Swift.Error)
+   	// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
+   	// The SDK only supports stores migrated for extensibility.
+   	case checkoutLiquidNotMigrated(message: String)
 
-	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
-	/// The SDK only supports stores migrated for extensibility.
-	case checkoutLiquidNotMigrated(message: String)
+   	// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
+    // The provided message describes the error and may be logged and presented to the buyer.
+   	case checkoutUnavailable(message: String)
 
-	/// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
-        /// The provided message describes the error and may be logged and presented to the buyer.
-	case checkoutUnavailable(message: String)
-
-	/// Expired error: checkout session associated with provided checkoutURL is no longer available.
-        /// The provided message describes the error and may be logged and presented to the buyer.
-	case checkoutExpired(message: String)
+   	// Expired error: checkout session associated with provided checkoutURL is no longer available.
+    // The provided message describes the error and may be logged and presented to the buyer.
+   	case checkoutExpired(message: String)
   }
 
   func checkoutDidClickLink(url: URL) {
