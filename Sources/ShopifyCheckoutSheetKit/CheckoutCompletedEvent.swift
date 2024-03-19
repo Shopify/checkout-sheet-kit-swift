@@ -25,12 +25,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Foundation
 
-public struct CheckoutCompletedEvent: Decodable {
+public struct CheckoutCompletedEvent: Codable {
 	public let orderDetails: OrderDetails
 }
 
 extension CheckoutCompletedEvent {
-	public struct Address: Decodable {
+	public struct Address: Codable {
 		public let address1: String?
 		public let address2: String?
 		public let city: String?
@@ -44,20 +44,20 @@ extension CheckoutCompletedEvent {
 		public let zoneCode: String?
 	}
 
-	public struct CartInfo: Decodable {
+	public struct CartInfo: Codable {
 		public let lines: [CartLine]
 		public let price: Price
 		public let token: String
 	}
 
-	public struct CartLineImage: Decodable {
+	public struct CartLineImage: Codable {
 		public let altText: String?
 		public let lg: String
 		public let md: String
 		public let sm: String
 	}
 
-	public struct CartLine: Decodable {
+	public struct CartLine: Codable {
 		public let discounts: [Discount]?
 		public let image: CartLineImage?
 		public let merchandiseId: String?
@@ -67,18 +67,18 @@ extension CheckoutCompletedEvent {
 		public let title: String
 	}
 
-	public struct DeliveryDetails: Decodable {
+	public struct DeliveryDetails: Codable {
 		public let additionalInfo: String?
 		public let location: Address?
 		public let name: String?
 	}
 
-	public struct DeliveryInfo: Decodable {
+	public struct DeliveryInfo: Codable {
 		public let details: DeliveryDetails
 		public let method: String
 	}
 
-	public struct Discount: Decodable {
+	public struct Discount: Codable {
 		public let amount: Money?
 		public let applicationType: String?
 		public let title: String?
@@ -86,7 +86,7 @@ extension CheckoutCompletedEvent {
 		public let valueType: String?
 	}
 
-	public struct OrderDetails: Decodable {
+	public struct OrderDetails: Codable {
 		public let billingAddress: Address?
 		public let cart: CartInfo
 		public let deliveries: [DeliveryInfo]?
@@ -96,12 +96,12 @@ extension CheckoutCompletedEvent {
 		public let phone: String?
 	}
 
-	public struct PaymentMethod: Decodable {
+	public struct PaymentMethod: Codable {
 		public let details: [String: String?]
 		public let type: String
 	}
 
-	public struct Price: Decodable {
+	public struct Price: Codable {
 		public let discounts: [Discount]?
 		public let shipping: Money?
 		public let subtotal: Money?
@@ -109,7 +109,7 @@ extension CheckoutCompletedEvent {
 		public let total: Money?
 	}
 
-	public struct Money: Decodable {
+	public struct Money: Codable {
 		public let amount: Double?
 		public let currencyCode: String?
 	}
