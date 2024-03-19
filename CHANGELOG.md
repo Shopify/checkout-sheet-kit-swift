@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 - March 19, 2024
+
+- Makes `CheckoutCompletedEvent` encodable/decodable.
+
 ## 2.0.0 - March 15, 2024
 
 ### New Features

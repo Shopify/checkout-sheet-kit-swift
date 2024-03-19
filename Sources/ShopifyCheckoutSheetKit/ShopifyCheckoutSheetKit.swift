@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 
 /// The version of the `ShopifyCheckoutSheetKit` library.
-public let version = "2.0.0"
+public let version = "2.0.1"
 
 internal var invalidateOnConfigurationChange = true
 
