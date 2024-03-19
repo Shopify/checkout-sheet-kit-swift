@@ -151,7 +151,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	private func didCancel() {
 		if !CheckoutWebView.preloadingActivatedByClient {
-			CheckoutWebView.invalidate()
+			CheckoutWebView.invalidate(self.checkoutURL)
 		}
 
 		delegate?.checkoutDidCancel()
@@ -172,12 +172,12 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent) {
 		ConfettiCannon.fire(in: view)
-		CheckoutWebView.invalidate()
+        CheckoutWebView.invalidate(self.checkoutURL)
 		delegate?.checkoutDidComplete(event: event)
 	}
 
 	func checkoutViewDidFailWithError(error: CheckoutError) {
-		CheckoutWebView.invalidate()
+		CheckoutWebView.invalidate(self.checkoutURL)
 		delegate?.checkoutDidFail(error: error)
 	}
 

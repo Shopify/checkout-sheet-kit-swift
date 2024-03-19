@@ -35,9 +35,11 @@ protocol CheckoutWebViewDelegate: AnyObject {
 }
 
 class CheckoutWebView: WKWebView {
-	private static var cache: CacheEntry?
+    private static var cacheEntries: [String: CacheEntry] = [:]
 
 	static var preloadingActivatedByClient: Bool = false
+    
+    var checkoutURL: URL? = nil
 
 	/// A reference to the view is needed when preload is deactivated in order to detatch the bridge
 	static weak var uncacheableViewRef: CheckoutWebView?
@@ -50,10 +52,10 @@ class CheckoutWebView: WKWebView {
 		guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
 			return uncacheableView()
 		}
-
-		guard let cache = cache, cacheKey == cache.key, !cache.isStale else {
+        
+		guard let cache = cacheEntries[cacheKey], !cache.isStale else {
 			let view = CheckoutWebView()
-			CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
+			CheckoutWebView.cacheEntries[cacheKey] = CacheEntry(key: cacheKey, view: view)
 			return view
 		}
 
@@ -67,10 +69,20 @@ class CheckoutWebView: WKWebView {
 		return view
 	}
 
-	static func invalidate() {
-		preloadingActivatedByClient = false
+    static func invalidate(_ key:URL? = nil) {
+        guard let key = key?.absoluteString else {
+            for (key, cache) in cacheEntries {
+                cache.view.detachBridge()
+            }
+            cacheEntries = [:]
+            preloadingActivatedByClient = false
+            return
+        }
+        let cache = cacheEntries[key]
 		cache?.view.detachBridge()
-		cache = nil
+        cacheEntries[key] = nil
+		
+        preloadingActivatedByClient = false
 	}
 
 	// MARK: Properties
@@ -132,7 +144,10 @@ class CheckoutWebView: WKWebView {
 	// MARK: -
 
 	func load(checkout url: URL, isPreload: Bool = false) {
-		var request = URLRequest(url: url)
+        checkoutURL = url
+        
+        var request = URLRequest(url: url)
+        
 		if isPreload {
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
 		}
@@ -152,10 +167,10 @@ extension CheckoutWebView: WKScriptMessageHandler {
 		do {
 			switch try CheckoutBridge.decode(message) {
 			case let .checkoutComplete(checkoutCompletedEvent):
-				CheckoutWebView.cache = nil
+				CheckoutWebView.invalidate(checkoutURL)
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
 			case .checkoutUnavailable:
-				CheckoutWebView.cache = nil
+                CheckoutWebView.invalidate(checkoutURL)
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
@@ -201,7 +216,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
 		if isCheckout(url: response.url) && response.statusCode >= 400 {
-			CheckoutWebView.cache = nil
+            CheckoutWebView.invalidate(checkoutURL)
 			switch response.statusCode {
 			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
@@ -245,7 +260,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
-		CheckoutWebView.cache = nil
+        CheckoutWebView.invalidate(checkoutURL)
 		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 	}
 
