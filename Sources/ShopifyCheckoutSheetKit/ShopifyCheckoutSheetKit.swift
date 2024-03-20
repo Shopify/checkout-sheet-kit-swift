@@ -43,13 +43,13 @@ public func configure(_ block: (inout Configuration) -> Void) {
 }
 
 /// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
+public func preload(checkout url: URL, onComplete:(() -> ())? = nil) {
 	guard configuration.preloading.enabled else {
 		return
 	}
 
 	CheckoutWebView.preloadingActivatedByClient = true
-	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
+    CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true, onComplete:onComplete)
 }
 
 /// Presents the checkout from a given `UIViewController`.

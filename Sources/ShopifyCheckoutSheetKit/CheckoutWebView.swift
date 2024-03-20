@@ -40,6 +40,8 @@ class CheckoutWebView: WKWebView {
 	static var preloadingActivatedByClient: Bool = false
     
     var checkoutURL: URL? = nil
+    
+    var initialLoadComplete:(() -> ())? = nil
 
 	/// A reference to the view is needed when preload is deactivated in order to detatch the bridge
 	static weak var uncacheableViewRef: CheckoutWebView?
@@ -125,7 +127,20 @@ class CheckoutWebView: WKWebView {
 		if #available(iOS 15.0, *) {
 			underPageBackgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
 		}
+        
+        setupColorScripts()
 	}
+    
+    func setupColorScripts() {
+        let cssScript = """
+  var style = document.createElement('style');
+  style.innerHTML = 'section { background-color: #121212 !important; }';
+  document.head.appendChild(style);
+"""
+        
+        let userScript = WKUserScript(source: cssScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        configuration.userContentController.addUserScript(userScript)
+    }
 
 	deinit {
 		detachBridge()
@@ -143,13 +158,14 @@ class CheckoutWebView: WKWebView {
 
 	// MARK: -
 
-	func load(checkout url: URL, isPreload: Bool = false) {
+    func load(checkout url: URL, isPreload: Bool = false, onComplete:(() -> ())? = nil) {
         checkoutURL = url
         
         var request = URLRequest(url: url)
         
 		if isPreload {
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
+            initialLoadComplete = onComplete
 		}
 		load(request)
 	}
@@ -253,6 +269,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 			let message = "Preloaded checkout in \(String(format: "%.2f", diff))s"
 			ShopifyCheckoutSheetKit.configuration.logger.log(message)
 			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
+            
+            initialLoadComplete?()
+            initialLoadComplete = nil
 		}
 		checkoutDidLoad = true
 		timer = nil
