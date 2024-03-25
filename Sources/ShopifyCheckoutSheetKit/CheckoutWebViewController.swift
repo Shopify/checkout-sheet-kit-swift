@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 import WebKit
+import SafariServices
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 
@@ -176,11 +177,6 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 		delegate?.checkoutDidComplete(event: event)
 	}
 
-	func checkoutViewDidFailWithError(error: CheckoutError) {
-		CheckoutWebView.invalidate()
-		delegate?.checkoutDidFail(error: error)
-	}
-
 	func checkoutViewDidClickLink(url: URL) {
 		delegate?.checkoutDidClickLink(url: url)
 	}
@@ -192,5 +188,38 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
 		delegate?.checkoutDidEmitWebPixelEvent(event: event)
+	}
+
+	func checkoutViewDidFailWithError(error: CheckoutError) {
+		CheckoutWebView.invalidate()
+		delegate?.checkoutDidFail(error: error)
+
+		guard ShopifyCheckoutSheetKit.configuration.handleFallbackOnError else {
+			return
+		}
+
+		switch error {
+		case .sdkError: fallthrough
+		case .checkoutUnavailable: fallthrough
+		case .checkoutLiquidNotMigrated:
+			self.fallbackToSafariViewController()
+		default:
+				break
+		}
+	}
+
+	/// Private
+
+	private func getRootViewController() -> UIViewController? {
+		return UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController
+	}
+
+	private func fallbackToSafariViewController() {
+		dismiss(animated: true) {
+			let safariViewController = SFSafariViewController(url: self.checkoutURL)
+			if let rootViewController = self.getRootViewController() {
+				rootViewController.present(safariViewController, animated: true)
+			}
+		}
 	}
 }

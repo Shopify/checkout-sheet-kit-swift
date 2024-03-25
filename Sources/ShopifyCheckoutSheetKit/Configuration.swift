@@ -49,6 +49,10 @@ public struct Configuration {
 	public var logger: Logger = NoOpLogger()
 
 	public var title: String = NSLocalizedString("shopify_checkout_sheet_title", value: "Checkout", comment: "The title of the checkout sheet.")
+
+	/// Trigger a SafariViewController in the event of a checkout error.
+	/// Set to "false" to disable this feature.
+	public var handleFallbackOnError = true
 }
 
 extension Configuration {
