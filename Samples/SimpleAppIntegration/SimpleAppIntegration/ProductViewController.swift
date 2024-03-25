@@ -102,6 +102,10 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		// use this callback to clean up any cart state
 	}
 
+	func checkoutDidTouchPayButton() {
+		// noop
+	}
+
 	func checkoutDidCancel() {
 		dismiss(animated: true)
 	}
