@@ -185,6 +185,10 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 		delegate?.checkoutDidClickLink(url: url)
 	}
 
+	func checkoutViewDidTouchPayButton() {
+		delegate?.checkoutDidTouchPayButton()
+	}
+
 	func checkoutViewDidToggleModal(modalVisible: Bool) {
 		guard let navigationController = self.navigationController else { return }
 		navigationController.setNavigationBarHidden(modalVisible, animated: true)

@@ -196,6 +196,9 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
+	// noop func
+	func checkoutDidTouchPayButton() {}
+
 	private func forceCloseCheckout(_ message: String) {
 		print(#function, message)
 		dismiss(animated: true)

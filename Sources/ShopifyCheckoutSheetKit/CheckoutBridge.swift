@@ -29,7 +29,7 @@ enum BridgeError: Swift.Error {
 }
 
 enum CheckoutBridge {
-	static let schemaVersion = "8.0"
+	static let schemaVersion = "8.1"
 	static let messageHandler = "mobileCheckoutSdk"
 	internal static var logger: ProductionLogger = InternalLogger()
 
@@ -86,6 +86,7 @@ extension CheckoutBridge {
 		case checkoutExpired
 		case checkoutUnavailable
 		case checkoutModalToggled(modalVisible: Bool)
+		case payButtonTouch
 		case webPixels(event: PixelEvent?)
 		case unsupported(String)
 
@@ -119,6 +120,12 @@ extension CheckoutBridge {
 				let webPixelsDecoder = WebPixelsEventDecoder()
 				let event = try webPixelsDecoder.decode(from: container, using: decoder)
 				self = .webPixels(event: event)
+			case "payButtonTouch":
+				if #available(iOS 10,*) {
+					let impactMed = UIImpactFeedbackGenerator(style: .medium)
+					impactMed.impactOccurred()
+				}
+				self = .payButtonTouch
 			default:
 				self = .unsupported(name)
 			}
