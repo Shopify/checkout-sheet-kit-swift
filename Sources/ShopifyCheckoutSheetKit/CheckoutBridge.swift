@@ -121,7 +121,7 @@ extension CheckoutBridge {
 				let event = try webPixelsDecoder.decode(from: container, using: decoder)
 				self = .webPixels(event: event)
 			case "payButtonTouch":
-				if #available(iOS 10,*) {
+				if #available(iOS 10, *) {
 					let impactMed = UIImpactFeedbackGenerator(style: .medium)
 					impactMed.impactOccurred()
 				}
