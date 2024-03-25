@@ -121,6 +121,9 @@ struct ContentView: View {
            .onPixelEvent { event in
              handlePixelEvent(event)
            }
+           .onTouchPayButton {
+             handleTouchPayButton()
+           }
            .onLinkClick { url in
               if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
@@ -318,6 +321,10 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
    	// Expired error: checkout session associated with provided checkoutURL is no longer available.
     // The provided message describes the error and may be logged and presented to the buyer.
    	case checkoutExpired(message: String)
+  }
+
+  func checkoutDidTouchPayButton(url: URL) {
+    // Called when the buyer touches the pay now button.
   }
 
   func checkoutDidClickLink(url: URL) {

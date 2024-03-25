@@ -39,6 +39,9 @@ public protocol CheckoutDelegate: AnyObject {
 	/// This includes email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
 	func checkoutDidClickLink(url: URL)
 
+	/// Tells the delegate that the checkout pay button was touched
+	func checkoutDidTouchPayButton()
+
 	/// Tells te delegate that a Web Pixel event was emitted
 	func checkoutDidEmitWebPixelEvent(event: PixelEvent)
 }

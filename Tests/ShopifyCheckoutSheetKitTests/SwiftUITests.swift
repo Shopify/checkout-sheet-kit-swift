@@ -119,6 +119,16 @@ class CheckoutSheetTests: XCTestCase {
 		XCTAssertTrue(actionCalled)
 		XCTAssertNotNil(actionData)
 	}
+
+	func testOnTouchPayButton() {
+		var touchPayButtonActionCalled = false
+
+		checkoutSheet.onTouchPayButton {
+			touchPayButtonActionCalled = true
+		}
+		checkoutSheet.delegate.checkoutDidTouchPayButton()
+		XCTAssertTrue(touchPayButtonActionCalled)
+	}
 }
 
 class CheckoutConfigurableTests: XCTestCase {

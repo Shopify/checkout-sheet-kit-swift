@@ -106,6 +106,11 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 		delegate.onLinkClick = action
 		return self
 	}
+
+	@discardableResult public func onTouchPayButton(_ action: @escaping () -> Void) -> Self {
+		delegate.onTouchPayButton = action
+		return self
+	}
 }
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
@@ -114,6 +119,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 	var onFail: ((CheckoutError) -> Void)?
 	var onPixelEvent: ((PixelEvent) -> Void)?
 	var onLinkClick: ((URL) -> Void)?
+	var onTouchPayButton: (() -> Void)?
 
 	public func checkoutDidFail(error: CheckoutError) {
 		onFail?(error)
@@ -129,6 +135,10 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 
 	public func checkoutDidCancel() {
 		onCancel?()
+	}
+
+	public func checkoutDidTouchPayButton() {
+		onTouchPayButton?()
 	}
 
 	public func checkoutDidClickLink(url: URL) {

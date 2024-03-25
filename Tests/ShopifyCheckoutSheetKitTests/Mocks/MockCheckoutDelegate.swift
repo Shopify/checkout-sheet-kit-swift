@@ -35,5 +35,7 @@ class ExampleDelegate: CheckoutDelegate {
 
 	func checkoutDidClickContactLink(url: URL) {}
 
+	func checkoutDidTouchPayButton() {}
+
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {}
 }
