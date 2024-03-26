@@ -83,8 +83,8 @@ enum CheckoutBridge {
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
 		case checkoutComplete(event: CheckoutCompletedEvent)
-		case checkoutExpired
-		case checkoutUnavailable
+		case checkoutExpired(message: String?)
+		case checkoutUnavailable(message: String?)
 		case checkoutModalToggled(modalVisible: Bool)
 		case webPixels(event: PixelEvent?)
 		case unsupported(String)
@@ -110,8 +110,21 @@ extension CheckoutBridge {
 					self = .checkoutComplete(event: emptyCheckoutCompletedEvent)
 				}
 			case "error":
-				// needs to support .checkoutUnavailable by parsing error payload on body
-				self = .checkoutExpired
+				let errorDecoder = CheckoutErrorEventDecoder()
+				do {
+					let error = try errorDecoder.decode(from: container, using: decoder)
+					switch error.group {
+					case .unrecoverable:
+						self = .checkoutUnavailable(message: error.reason)
+					default:
+						self = .unsupported(name)
+					}
+				} catch {
+					logger.logError(error, "Error decoding checkout error event")
+
+					/// TODO (@markmur) Is this really the right fallback event to fire?
+					self = .checkoutExpired(message: nil)
+				}
 			case "checkoutBlockingEvent":
 				let modalVisible = try container.decode(String.self, forKey: .body)
 				self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)

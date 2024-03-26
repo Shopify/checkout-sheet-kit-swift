@@ -173,16 +173,19 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
+		let errorMessage: String
+
 		switch error {
 		case .sdkError(let underlying):
-			print(#function, underlying)
-			forceCloseCheckout("Checkout Unavailable")
-		case .checkoutExpired(let message): forceCloseCheckout(message)
-		case .checkoutUnavailable(let message): forceCloseCheckout(message)
-		case .checkoutLiquidNotMigrated(let message):
-			print(#function, message)
-			forceCloseCheckout("Checkout Unavailable")
+			errorMessage = "\(underlying)"
+		case .checkoutExpired(let message),
+			.checkoutUnavailable(let message),
+			.checkoutLiquidNotMigrated(let message):
+			errorMessage = message
 		}
+
+		print(#function, errorMessage)
+		forceCloseCheckout(errorMessage)
 	}
 
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
@@ -196,7 +199,7 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-	private func forceCloseCheckout(_ message: String) {
+	private func forceCloseCheckout(_ message: String = "Checkout unavailable") {
 		print(#function, message)
 		dismiss(animated: true)
 		resetCart()

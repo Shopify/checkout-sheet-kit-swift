@@ -151,14 +151,22 @@ extension CheckoutWebView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
 			switch try CheckoutBridge.decode(message) {
+			/// Completed event
 			case let .checkoutComplete(checkoutCompletedEvent):
 				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
-			case .checkoutUnavailable:
+			/// Errror: Checkout unavailable
+			case .checkoutUnavailable(let message):
 				CheckoutWebView.cache = nil
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message ?? "Checkout unavailable."))
+			/// Error: Checkout expired
+			case .checkoutExpired(let message):
+				CheckoutWebView.cache = nil
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired."))
+			/// Checkout modal toggled
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
+			/// Checkout web pixel event
 			case let .webPixels(event):
 				if let nonOptionalEvent = event {
 					viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)

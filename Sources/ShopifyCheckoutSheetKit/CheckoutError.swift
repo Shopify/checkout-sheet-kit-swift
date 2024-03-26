@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Foundation
+
 /// A type representing Shopify Checkout specific errors.
 public enum CheckoutError: Swift.Error {
 	/// Issued when an internal error within Shopify Checkout SDK
@@ -40,4 +42,40 @@ public enum CheckoutError: Swift.Error {
 	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
 	/// In event of checkoutExpired, a new checkout url will need to be generated
 	case checkoutExpired(message: String)
+}
+
+internal enum CheckoutErrorGroup: String, Codable {
+	/// An authentication error
+	case authentication
+	/// A terminal checkout error which cannot be handled
+	case unrecoverable
+	/// A checkout-related error, such as failure to receive a receipt or progress through checkout
+	case checkout
+}
+
+internal struct CheckoutErrorEvent: Codable {
+	public let code: String?
+	public let flowType: String?
+	public let group: CheckoutErrorGroup
+	public let reason: String?
+	public let type: String?
+}
+
+internal class CheckoutErrorEventDecoder {
+	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> CheckoutErrorEvent {
+		let messageBody = try container.decode(String.self, forKey: .body)
+		let unrecoverableError = CheckoutErrorEvent(code: nil, flowType: nil, group: .unrecoverable, reason: nil, type: nil)
+
+		guard let data = messageBody.data(using: .utf8) else {
+			return unrecoverableError
+		}
+
+		let events = try JSONDecoder().decode([CheckoutErrorEvent].self, from: data)
+
+		guard let error = events.first else {
+			return unrecoverableError
+		}
+
+		return error
+	}
 }
