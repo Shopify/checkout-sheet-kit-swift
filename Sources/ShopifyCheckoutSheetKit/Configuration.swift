@@ -49,6 +49,12 @@ public struct Configuration {
 	public var logger: Logger = NoOpLogger()
 
 	public var title: String = NSLocalizedString("shopify_checkout_sheet_title", value: "Checkout", comment: "The title of the checkout sheet.")
+
+	public var presentFallbackViewControllerOnError = true
+
+	public func shouldRecoverFromError(error: CheckoutError) -> Bool {
+		return true
+	}
 }
 
 extension Configuration {

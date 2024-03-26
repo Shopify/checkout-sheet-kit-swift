@@ -60,8 +60,8 @@ public enum CheckoutError: Swift.Error {
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
 	case sdkError(underlying: Swift.Error, recoverable: Bool = true)
 
-	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
-	/// The SDK only supports stores migrated for extensibility.
+	/// Issued when the storefront configuration has caused an error.
+	/// Note that the Checkout Sheet Kit only supports stores migrated for extensibility.
 	case configurationError(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
 
 	/// Issued when checkout has encountered a unrecoverable error (for example server side error)

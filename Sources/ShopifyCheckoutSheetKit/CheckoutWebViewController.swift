@@ -23,12 +23,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 import WebKit
+import SafariServices
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 
+	var fallback: FallbackViewController? = nil
+
+	private func presentFallbackViewController(url: URL) {
+        if fallback == nil {
+            fallback = FallbackViewController(checkout: url, delegate: self.delegate)
+        }
+
+        guard let view = fallback?.createSafariViewController() else {
+            print("Failed to create SFSafariViewController")
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.present(view, animated: false)
+        }
+    }
+
 	// MARK: Properties
 
-	weak var delegate: CheckoutDelegate?
+	var delegate: CheckoutDelegate
 
 	internal let checkoutView: CheckoutWebView
 
@@ -52,9 +70,10 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	// MARK: Initializers
 
-	public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
+	public init(checkoutURL url: URL, delegate: CheckoutDelegate) {
 		self.checkoutURL = url
 		self.delegate = delegate
+		self.fallback = FallbackViewController(checkout: url, delegate: self.delegate)
 
 		let checkoutView = CheckoutWebView.for(checkout: url)
 		checkoutView.translatesAutoresizingMaskIntoConstraints = false
@@ -154,7 +173,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 			CheckoutWebView.invalidate()
 		}
 
-		delegate?.checkoutDidCancel()
+		delegate.checkoutDidCancel()
 	}
 }
 
@@ -173,24 +192,46 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent) {
 		ConfettiCannon.fire(in: view)
 		CheckoutWebView.invalidate()
-		delegate?.checkoutDidComplete(event: event)
+		delegate.checkoutDidComplete(event: event)
 	}
 
 	func checkoutViewDidFailWithError(error: CheckoutError) {
 		CheckoutWebView.invalidate()
-		delegate?.checkoutDidFail(error: error)
+
+		let shouldAttemptRecovery = delegate.shouldRecoverFromError(error: error)
+		let url = URL(string: "https://shopify.com")!
+
+		if shouldAttemptRecovery {
+			self.presentFallbackViewController(url: url)
+		} else {
+			delegate.checkoutDidFail(error: error)
+		}
 	}
 
 	func checkoutViewDidClickLink(url: URL) {
-		delegate?.checkoutDidClickLink(url: url)
+		delegate.checkoutDidClickLink(url: url)
 	}
 
 	func checkoutViewDidToggleModal(modalVisible: Bool) {
-		guard let navigationController = self.navigationController else { return }
+		guard let navigationController = self.navigationController else {
+			return
+		}
+
 		navigationController.setNavigationBarHidden(modalVisible, animated: true)
 	}
 
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
-		delegate?.checkoutDidEmitWebPixelEvent(event: event)
+		delegate.checkoutDidEmitWebPixelEvent(event: event)
+	}
+
+	private func isErrorRecoverable(error: CheckoutError) -> Bool {
+		switch error {
+		case .authenticationError(_, _, let recoverable),
+			.checkoutExpired(_, _, let recoverable),
+			.checkoutUnavailable(_, _, let recoverable),
+			.configurationError(_, _, let recoverable),
+			.sdkError(_, let recoverable):
+			return recoverable
+		}
 	}
 }

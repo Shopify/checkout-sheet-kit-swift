@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 
 /// The version of the `ShopifyCheckoutSheetKit` library.
-public let version = "2.0.1"
+public let version = "2.1.0"
 
 internal var invalidateOnConfigurationChange = true
 
@@ -54,8 +54,10 @@ public func preload(checkout url: URL) {
 
 /// Presents the checkout from a given `UIViewController`.
 @discardableResult
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate) -> CheckoutViewController {
 	let viewController = CheckoutViewController(checkout: url, delegate: delegate)
+
 	from.present(viewController, animated: true)
+	
 	return viewController
 }

@@ -305,7 +305,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
-		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+		viewDelegate?.checkoutViewDidFailWithError(
+			error: .sdkError(underlying: error)
+		)
 	}
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
