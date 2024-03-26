@@ -31,11 +31,17 @@ enum BridgeError: Swift.Error {
 enum CheckoutBridge {
 	static let schemaVersion = "8.1"
 	static let messageHandler = "mobileCheckoutSdk"
+	internal static let userAgent = "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version)"
 	internal static var logger: ProductionLogger = InternalLogger()
 
 	static var applicationName: String {
 		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-		return "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (\(schemaVersion);\(theme);standard)"
+		return "\(userAgent) (\(schemaVersion);\(theme);standard)"
+	}
+
+	static var recoveryAgent: String {
+		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
+		return "\(userAgent) (noconnect;\(theme);standard_recovery)"
 	}
 
 	static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {
@@ -119,7 +125,7 @@ extension CheckoutBridge {
 					self = .checkoutComplete(event: checkoutCompletedEvent)
 				} catch {
 					logger.logError(error, "Error decoding CheckoutCompletedEvent")
-					self = .checkoutComplete(event: emptyCheckoutCompletedEvent)
+					self = .checkoutComplete(event: createEmptyCheckoutCompletedEvent())
 				}
 			case "error":
 				let errorDecoder = CheckoutErrorEventDecoder()

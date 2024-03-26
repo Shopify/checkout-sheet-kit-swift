@@ -25,6 +25,8 @@ import XCTest
 @testable import ShopifyCheckoutSheetKit
 
 class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
+	var completedEventReceived: CheckoutCompletedEvent?
+
 	var errorReceived: CheckoutError?
 
 	var didStartNavigationExpectation: XCTestExpectation?
@@ -79,6 +81,7 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 	}
 
 	func checkoutViewDidCompleteCheckout(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+		completedEventReceived = event
 		didEmitCheckoutCompletedEventExpectation?.fulfill()
 	}
 }

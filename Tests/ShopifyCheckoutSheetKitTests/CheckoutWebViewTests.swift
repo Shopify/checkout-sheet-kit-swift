@@ -27,12 +27,36 @@ import WebKit
 
 class CheckoutWebViewTests: XCTestCase {
 	private var view: CheckoutWebView!
+	private var recovery: CheckoutWebView!
 	private var mockDelegate: MockCheckoutWebViewDelegate!
+	private var url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
 
 	override func setUp() {
-		view = CheckoutWebView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		view = CheckoutWebView.for(checkout: url)
         mockDelegate = MockCheckoutWebViewDelegate()
         view.viewDelegate = mockDelegate
+	}
+
+	private func createRecoveryAgent() -> CheckoutWebView {
+		recovery = CheckoutWebView.for(checkout: url, recovery: true)
+        mockDelegate = MockCheckoutWebViewDelegate()
+        recovery.viewDelegate = mockDelegate
+        return recovery
+	}
+
+	func testUsesRecoveryAgent() {
+		let backgroundColor: UIColor = .systemRed
+		ShopifyCheckoutSheetKit.configuration.backgroundColor = backgroundColor
+		ShopifyCheckoutSheetKit.configuration.colorScheme = .automatic
+		recovery = createRecoveryAgent()
+
+		XCTAssertTrue(recovery.isRecovery)
+		XCTAssertFalse(recovery.isBridgeAttached)
+		XCTAssertFalse(recovery.isPreloadingAvailable)
+		XCTAssertFalse(recovery.isBridgeAvailable)
+		XCTAssertEqual(recovery.configuration.applicationNameForUserAgent, "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (noconnect;automatic;standard_recovery)")
+		XCTAssertEqual(recovery.backgroundColor, backgroundColor)
+		XCTAssertFalse(recovery.isOpaque)
 	}
 
 	func testEmailContactLinkDelegation() {
@@ -123,6 +147,32 @@ class CheckoutWebViewTests: XCTestCase {
 				XCTAssertFalse(recoverable)
 			default:
 				XCTFail("Unhandled error case received")
+			}
+		}
+	}
+
+	func testObtainsOrderIDFromQuery() {
+		let urls = [
+			"http://shopify1.shopify.com/checkouts/c/12345/thank-you?order_id=1234",
+			"http://shopify1.shopify.com/checkouts/c/12345/thank_you?order_id=1234",
+			"http://shopify1.shopify.com/checkouts/c/12345/thank_you/completed?order_id=1234"
+		]
+
+		for url in urls {
+			recovery = createRecoveryAgent()
+			recovery.load(checkout: URL(string: url)!)
+			let didCompleteCheckoutExpectation = expectation(description: "checkoutViewDidCompleteCheckout was called")
+
+			mockDelegate.didEmitCheckoutCompletedEventExpectation = didCompleteCheckoutExpectation
+			recovery.viewDelegate = mockDelegate
+
+			let urlResponse = HTTPURLResponse(url: URL(string: url)!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+			let policy = recovery.handleResponse(urlResponse)
+			XCTAssertEqual(policy, .allow)
+
+			waitForExpectations(timeout: 5) { _ in
+				XCTAssertEqual(self.mockDelegate.completedEventReceived?.orderDetails.id, "1234")
 			}
 		}
 	}

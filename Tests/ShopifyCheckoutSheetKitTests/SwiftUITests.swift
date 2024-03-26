@@ -66,7 +66,7 @@ class CheckoutSheetTests: XCTestCase {
 	func testOnComplete() {
 		var actionCalled = false
 		var actionData: CheckoutCompletedEvent?
-		let event = emptyCheckoutCompletedEvent
+		let event = createEmptyCheckoutCompletedEvent()
 
 		checkoutSheet.onComplete { event in
 			actionCalled = true

@@ -47,7 +47,25 @@ class CheckoutWebView: WKWebView {
 
 	var isBridgeAttached = false
 
-	static func `for`(checkout url: URL) -> CheckoutWebView {
+	var isRecovery = false {
+		didSet {
+			isBridgeAttached = false
+		}
+	}
+
+	var isBridgeAvailable: Bool {
+		return !isRecovery
+	}
+	var isPreloadingAvailable: Bool {
+		return !isRecovery
+	}
+
+	static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
+		if recovery {
+			CheckoutWebView.invalidate()
+			return CheckoutWebView(recovery: true)
+		}
+
 		let cacheKey = url.absoluteString
 
 		guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
@@ -92,10 +110,17 @@ class CheckoutWebView: WKWebView {
 	}
 
 	// MARK: Initializers
+	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
+		if recovery {
+			/// Uses a non-persistent, private cookie store to avoid cross-instance pollution
+			configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+			configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent
+		} else {
+			/// Set the User-Agent in non-recovery view
+			configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
+		}
 
-	override init(frame: CGRect, configuration: WKWebViewConfiguration) {
-		configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
-
+		self.isRecovery = recovery
 		super.init(frame: frame, configuration: configuration)
 
 		#if DEBUG
@@ -105,11 +130,23 @@ class CheckoutWebView: WKWebView {
 		#endif
 
 		navigationDelegate = self
+		translatesAutoresizingMaskIntoConstraints = false
+		scrollView.contentInsetAdjustmentBehavior = .never
 
-		configuration.userContentController
-			.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
-		isBridgeAttached = true
+		connectBridge()
+		setBackgroundColor()
+	}
 
+	private func connectBridge() {
+		if isBridgeAvailable {
+			configuration.userContentController
+				.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
+
+			isBridgeAttached = true
+		}
+	}
+
+	private func setBackgroundColor() {
 		isOpaque = false
 		backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
 
@@ -136,14 +173,16 @@ class CheckoutWebView: WKWebView {
 
 	func load(checkout url: URL, isPreload: Bool = false) {
 		var request = URLRequest(url: url)
-		if isPreload {
+
+		if isPreload && isPreloadingAvailable {
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
 		}
+
 		load(request)
 	}
 
 	private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {
-		if checkoutDidLoad && checkoutDidPresent {
+		if checkoutDidLoad && checkoutDidPresent && isBridgeAttached {
 			CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
 			presentedEventDidDispatch = true
 		}
@@ -230,11 +269,21 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
+		let allowRecoverable = !isRecovery
 		let headers = response.allHeaderFields
 		let statusCode = response.statusCode
 		let errorMessageForStatusCode = HTTPURLResponse.localizedString(
 			forStatusCode: statusCode
 		)
+
+		if let url = response.url {
+			let isRecoveryConfirmationPage = isRecovery && statusCode == 200 && isConfirmation(url: url)
+
+			if isRecoveryConfirmationPage {
+				let event = createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url))
+				viewDelegate?.checkoutViewDidCompleteCheckout(event: event)
+			}
+		}
 
 		guard isCheckout(url: response.url) else {
 			return .allow
@@ -261,7 +310,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 					message: errorMessageForStatusCode,
 					code: CheckoutUnavailable.httpError(statusCode: statusCode),
-					recoverable: true
+					recoverable: allowRecoverable
 				))
 			default:
 				viewDelegate?.checkoutViewDidFailWithError(
@@ -295,9 +344,18 @@ extension CheckoutWebView: WKNavigationDelegate {
 			let endTime = Date()
 			let diff = endTime.timeIntervalSince(startTime)
 			let preloading = String(ShopifyCheckoutSheetKit.Configuration().preloading.enabled)
-			let message = "Preloaded checkout in \(String(format: "%.2f", diff))s"
+			let message = "Loaded checkout in \(String(format: "%.2f", diff))s"
+
 			ShopifyCheckoutSheetKit.configuration.logger.log(message)
-			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
+
+			if isBridgeAttached {
+				CheckoutBridge.instrument(self,
+					InstrumentationPayload(
+					name: "checkout_finished_loading",
+					value: Int(diff * 1000),
+					type: .histogram,
+					tags: ["preloading": preloading]))
+			}
 		}
 		checkoutDidLoad = true
 		timer = nil
@@ -305,7 +363,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
-		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+		viewDelegate?.checkoutViewDidFailWithError(
+			error: .sdkError(underlying: error, recoverable: !isRecovery)
+		)
 	}
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
@@ -335,6 +395,34 @@ extension CheckoutWebView: WKNavigationDelegate {
 		return self.url == url
 	}
 
+	private func isConfirmation(url: URL) -> Bool {
+		let pathComponents = url.pathComponents
+		let pattern = "^(thank[_-]you)$"
+		let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+
+		for component in pathComponents {
+			let range = NSRange(location: 0, length: component.utf16.count)
+			if regex?.firstMatch(in: component, options: [], range: range) != nil {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	private func getOrderIdFromQuery(url: URL) -> String? {
+		guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+			return nil
+		}
+
+		let queryItems = urlComponents.queryItems ?? []
+
+		for item in queryItems where item.name == "order_id" {
+			return item.value
+		}
+
+		return nil
+	}
 }
 
 extension CheckoutWebView {

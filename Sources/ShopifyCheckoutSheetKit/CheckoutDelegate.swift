@@ -35,6 +35,9 @@ public protocol CheckoutDelegate: AnyObject {
 	/// Tells the delegate that the checkout encoutered one or more errors.
 	func checkoutDidFail(error: CheckoutError)
 
+	/// Tells the delegate that checkout has encountered an error and the return value will determine if it is handled with a fallback
+	func shouldRecoverFromError(error: CheckoutError) -> Bool
+
     /// Tells te delegate that the buyer clicked a link
 	/// This includes email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
 	func checkoutDidClickLink(url: URL)
@@ -54,6 +57,10 @@ extension CheckoutDelegate {
 
 	public func checkoutDidFail(error: CheckoutError) throws {
 		throw error
+	}
+
+	public func shouldRecoverFromError(error: CheckoutError) -> Bool {
+		return error.isRecoverable
 	}
 
 	private func handleUrl(_ url: URL) {

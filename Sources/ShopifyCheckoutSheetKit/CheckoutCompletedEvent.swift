@@ -21,8 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// swiftlint:disable identifier_name
-
 import Foundation
 
 public struct CheckoutCompletedEvent: Codable {
@@ -52,9 +50,11 @@ extension CheckoutCompletedEvent {
 
 	public struct CartLineImage: Codable {
 		public let altText: String?
+		// swiftlint:disable identifier_name
 		public let lg: String
 		public let md: String
 		public let sm: String
+		// swiftlint:enable identifier_name
 	}
 
 	public struct CartLine: Codable {
@@ -115,38 +115,38 @@ extension CheckoutCompletedEvent {
 	}
 }
 
-// swiftlint:enable identifier_name
-
-internal let emptyCheckoutCompletedEvent = CheckoutCompletedEvent(
-	orderDetails: CheckoutCompletedEvent.OrderDetails(
-		billingAddress: CheckoutCompletedEvent.Address(
-			address1: nil,
-			address2: nil,
-			city: nil,
-			countryCode: nil,
-			firstName: nil,
-			lastName: nil,
-			name: nil,
-			phone: nil,
-			postalCode: nil,
-			referenceId: nil,
-			zoneCode: nil
-		),
-		cart: CheckoutCompletedEvent.CartInfo(
-			lines: [],
-			price: CheckoutCompletedEvent.Price(
-				discounts: nil,
-				shipping: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
-				subtotal: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
-				taxes: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
-				total: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil)
+internal func createEmptyCheckoutCompletedEvent(id: String? = "") -> CheckoutCompletedEvent {
+	return CheckoutCompletedEvent(
+		orderDetails: CheckoutCompletedEvent.OrderDetails(
+			billingAddress: CheckoutCompletedEvent.Address(
+				address1: nil,
+				address2: nil,
+				city: nil,
+				countryCode: nil,
+				firstName: nil,
+				lastName: nil,
+				name: nil,
+				phone: nil,
+				postalCode: nil,
+				referenceId: nil,
+				zoneCode: nil
 			),
-			token: ""
-		),
-		deliveries: nil,
-		email: nil,
-		id: "",
-		paymentMethods: nil,
-		phone: nil
+			cart: CheckoutCompletedEvent.CartInfo(
+				lines: [],
+				price: CheckoutCompletedEvent.Price(
+					discounts: nil,
+					shipping: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
+					subtotal: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
+					taxes: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil),
+					total: CheckoutCompletedEvent.Money(amount: nil, currencyCode: nil)
+				),
+				token: ""
+			),
+			deliveries: nil,
+			email: nil,
+			id: id ?? "",
+			paymentMethods: nil,
+			phone: nil
+		)
 	)
-)
+}
