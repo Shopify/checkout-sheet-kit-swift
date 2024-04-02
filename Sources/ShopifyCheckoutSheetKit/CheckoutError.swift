@@ -51,6 +51,10 @@ internal enum CheckoutErrorGroup: String, Codable {
 	case unrecoverable
 	/// A checkout-related error, such as failure to receive a receipt or progress through checkout
 	case checkout
+	/// The checkout session has expired and is no longer available
+	case checkoutExpired
+	/// The error sent by checkout is not supported
+	case unsupported
 }
 
 internal struct CheckoutErrorEvent: Codable {
@@ -62,20 +66,26 @@ internal struct CheckoutErrorEvent: Codable {
 }
 
 internal class CheckoutErrorEventDecoder {
-	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> CheckoutErrorEvent {
-		let messageBody = try container.decode(String.self, forKey: .body)
-		let unrecoverableError = CheckoutErrorEvent(code: nil, flowType: nil, group: .unrecoverable, reason: nil, type: nil)
+	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) -> CheckoutErrorEvent {
+		let unsupportedError = CheckoutErrorEvent(code: nil, flowType: nil, group: .unsupported, reason: nil, type: nil)
 
-		guard let data = messageBody.data(using: .utf8) else {
-			return unrecoverableError
+		do {
+			let messageBody = try container.decode(String.self, forKey: .body)
+
+			guard let data = messageBody.data(using: .utf8) else {
+				return unsupportedError
+			}
+
+			let events = try JSONDecoder().decode([CheckoutErrorEvent].self, from: data)
+
+			guard let error = events.first else {
+				return unsupportedError
+			}
+
+			return error
+		} catch {
+			CheckoutBridge.logger.logError(error, "Error decoding checkout error event")
+			return unsupportedError
 		}
-
-		let events = try JSONDecoder().decode([CheckoutErrorEvent].self, from: data)
-
-		guard let error = events.first else {
-			return unrecoverableError
-		}
-
-		return error
 	}
 }

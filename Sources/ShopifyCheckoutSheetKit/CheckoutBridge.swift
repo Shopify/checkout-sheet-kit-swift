@@ -111,19 +111,15 @@ extension CheckoutBridge {
 				}
 			case "error":
 				let errorDecoder = CheckoutErrorEventDecoder()
-				do {
-					let error = try errorDecoder.decode(from: container, using: decoder)
-					switch error.group {
-					case .unrecoverable:
-						self = .checkoutUnavailable(message: error.reason)
-					default:
-						self = .unsupported(name)
-					}
-				} catch {
-					logger.logError(error, "Error decoding checkout error event")
+				let error = errorDecoder.decode(from: container, using: decoder)
 
-					/// TODO (@markmur) Is this really the right fallback event to fire?
-					self = .checkoutExpired(message: nil)
+				switch error.group {
+				case .unrecoverable:
+					self = .checkoutUnavailable(message: error.reason)
+				case .checkoutExpired:
+					self = .checkoutExpired(message: error.reason)
+				default:
+					self = .unsupported(name)
 				}
 			case "checkoutBlockingEvent":
 				let modalVisible = try container.decode(String.self, forKey: .body)
