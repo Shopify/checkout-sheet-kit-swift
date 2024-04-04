@@ -52,40 +52,43 @@ internal enum CheckoutErrorGroup: String, Codable {
 	/// A checkout-related error, such as failure to receive a receipt or progress through checkout
 	case checkout
 	/// The checkout session has expired and is no longer available
-	case checkoutExpired
+	case expired
 	/// The error sent by checkout is not supported
 	case unsupported
 }
 
 internal struct CheckoutErrorEvent: Codable {
+	public let group: CheckoutErrorGroup
 	public let code: String?
 	public let flowType: String?
-	public let group: CheckoutErrorGroup
 	public let reason: String?
 	public let type: String?
+
+	public init(group: CheckoutErrorGroup, code: String? = nil, flowType: String? = nil, reason: String? = nil, type: String? = nil) {
+		self.group = group
+		self.code = code
+		self.flowType = flowType
+		self.reason = reason
+		self.type = type
+	}
 }
 
 internal class CheckoutErrorEventDecoder {
 	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) -> CheckoutErrorEvent {
-		let unsupportedError = CheckoutErrorEvent(code: nil, flowType: nil, group: .unsupported, reason: nil, type: nil)
 
 		do {
 			let messageBody = try container.decode(String.self, forKey: .body)
 
-			guard let data = messageBody.data(using: .utf8) else {
-				return unsupportedError
-			}
+			/// Failure to decode will trigger the catch block
+			let data = messageBody.data(using: .utf8)
 
-			let events = try JSONDecoder().decode([CheckoutErrorEvent].self, from: data)
+			let events = try JSONDecoder().decode([CheckoutErrorEvent].self, from: data!)
 
-			guard let error = events.first else {
-				return unsupportedError
-			}
-
-			return error
+			/// Failure to find an event in the payload array will trigger the catch block
+			return events.first!
 		} catch {
 			CheckoutBridge.logger.logError(error, "Error decoding checkout error event")
-			return unsupportedError
+			return CheckoutErrorEvent(group: .unsupported, reason: "Decoded error could not be parsed.")
 		}
 	}
 }

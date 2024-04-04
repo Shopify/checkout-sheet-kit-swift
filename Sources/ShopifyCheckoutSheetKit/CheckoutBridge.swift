@@ -116,7 +116,7 @@ extension CheckoutBridge {
 				switch error.group {
 				case .unrecoverable:
 					self = .checkoutUnavailable(message: error.reason)
-				case .checkoutExpired:
+				case .expired:
 					self = .checkoutExpired(message: error.reason)
 				default:
 					self = .unsupported(name)
