@@ -85,6 +85,7 @@ extension CheckoutBridge {
 		case checkoutComplete(event: CheckoutCompletedEvent)
 		case checkoutExpired
 		case checkoutUnavailable
+		case __internalValidateSubmit
 		case checkoutModalToggled(modalVisible: Bool)
 		case webPixels(event: PixelEvent?)
 		case unsupported(String)
@@ -98,7 +99,6 @@ extension CheckoutBridge {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
 			let name = try container.decode(String.self, forKey: .name)
-
 			switch name {
 			case "completed":
 				let checkoutCompletedEventDecoder = CheckoutCompletedEventDecoder()
@@ -109,6 +109,8 @@ extension CheckoutBridge {
 					logger.logError(error, "Error decoding CheckoutCompletedEvent")
 					self = .checkoutComplete(event: emptyCheckoutCompletedEvent)
 				}
+			case "__internalValidateSubmit":
+				self = .__internalValidateSubmit
 			case "error":
 				// needs to support .checkoutUnavailable by parsing error payload on body
 				self = .checkoutExpired

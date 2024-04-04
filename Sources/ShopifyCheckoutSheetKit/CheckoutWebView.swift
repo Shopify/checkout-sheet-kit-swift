@@ -163,6 +163,11 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				if let nonOptionalEvent = event {
 					viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
 				}
+			case .__internalValidateSubmit:
+				if #available(iOS 10, *) {
+					let impactMed = UIImpactFeedbackGenerator(style: .medium)
+					impactMed.impactOccurred()
+				}
 			default:
 				()
 			}
