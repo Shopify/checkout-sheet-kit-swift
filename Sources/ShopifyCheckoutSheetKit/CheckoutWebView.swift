@@ -152,10 +152,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
 		do {
 			switch try CheckoutBridge.decode(message) {
 			case let .checkoutComplete(checkoutCompletedEvent):
-				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
 			case .checkoutUnavailable:
-				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable."))
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
