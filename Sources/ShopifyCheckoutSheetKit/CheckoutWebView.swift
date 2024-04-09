@@ -211,10 +211,12 @@ extension CheckoutWebView: WKNavigationDelegate {
 		if isCheckout(url: response.url) && response.statusCode >= 400 {
 			CheckoutWebView.cache = nil
 			switch response.statusCode {
-			case 410:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
+			case 403:
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Forbidden."))
 			case 404:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "The checkout url provided has resulted in an error. The store is still using checkout.liquid, whereas the checkout SDK only supports checkout with extensibility."))
+			case 410:
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
 			case 500:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable due to error"))
 			default:
