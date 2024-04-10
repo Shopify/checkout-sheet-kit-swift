@@ -347,13 +347,14 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 
 #### Error handling guidance
 
-| Error                                                                    | Description                                | Recommendation                                                                                    |
-| ------------------------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `.checkoutUnavailable(message: "Forbidden")`                             | Access to checkout is forbidden.           | This error is unrecoverable.                                                                      |
-| `.storefrontConfigurationError(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores. |
-| `.checkoutUnavailable(message: "Customer account required")`             | A Customer account is required to proceed  | Request login before proceeding to checkout.                                                      |
-| `.checkoutExpired(message: "Checkout already completed")`                | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                              |
-| `.checkoutExpired(message: "Cart is empty")`                             | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                    |
+| `CheckoutError`                                                          | Description                                | Recommendation                                                                                                                                                                    |
+| ------------------------------------------------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.checkoutLiquidNotMigrated`                                             | `checkout.liquid` is not supported.        | Please upgrade to Extensibility.                                                                                                                                                  |
+| `.checkoutUnavailable(message: "Forbidden")`                             | Access to checkout is forbidden.           | This error is unrecoverable.                                                                                                                                                      |
+| `.storefrontConfigurationError(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores.                                                                                 |
+| `.checkoutUnavailable(message: "Customer account required")`             | A Customer account is required to proceed  | Request customer login before proceeding to checkout. See [Customer Accounts API](https://github.com/Shopify/checkout-sheet-kit-swift#customer-account-api) for more information. |
+| `.checkoutExpired(message: "Checkout already completed")`                | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                                                                                                              |
+| `.checkoutExpired(message: "Cart is empty")`                             | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                                                                                                    |
 
 #### Integrating with Web Pixels, monitoring behavioral data
 
