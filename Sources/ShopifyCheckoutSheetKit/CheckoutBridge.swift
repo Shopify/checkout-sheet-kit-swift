@@ -85,6 +85,7 @@ extension CheckoutBridge {
 		case checkoutComplete(event: CheckoutCompletedEvent)
 		case checkoutExpired(message: String?)
 		case checkoutUnavailable(message: String?)
+		case storefrontConfigurationError(message: String?)
 		case checkoutModalToggled(modalVisible: Bool)
 		case webPixels(event: PixelEvent?)
 		case unsupported(String)
@@ -114,6 +115,8 @@ extension CheckoutBridge {
 				let error = errorDecoder.decode(from: container, using: decoder)
 
 				switch error.group {
+				case .configuration:
+					self = .storefrontConfigurationError(message: error.reason)
 				case .unrecoverable:
 					self = .checkoutUnavailable(message: error.reason)
 				case .expired:

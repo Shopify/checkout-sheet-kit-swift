@@ -153,12 +153,13 @@ extension CheckoutWebView: WKScriptMessageHandler {
 			switch try CheckoutBridge.decode(message) {
 			/// Completed event
 			case let .checkoutComplete(checkoutCompletedEvent):
-				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
 			/// Errror: Checkout unavailable
 			case .checkoutUnavailable(let message):
-				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message ?? "Checkout unavailable."))
+			/// Error: Storefront not configured properly
+			case .storefrontConfigurationError(let message):
+				viewDelegate?.checkoutViewDidFailWithError(error: .storefrontConfigurationError(message: message ?? "Storefront was not configured properly."))
 			/// Error: Checkout expired
 			case .checkoutExpired(let message):
 				CheckoutWebView.cache = nil
@@ -214,7 +215,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 			case 403:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Forbidden."))
 			case 404:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "The checkout url provided has resulted in an error. The store is still using checkout.liquid, whereas the checkout SDK only supports checkout with extensibility."))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."))
 			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
 			case 500:
@@ -236,6 +237,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 		timer = nil
+		viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: error.localizedDescription))
 	}
 
 	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
