@@ -129,6 +129,16 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 	}
 
+	func testDecodeSupportsConfigurationErrorEvent() throws {
+		let event = createErrorEventPayload("[{\"group\":\"configuration\",\"reason\": \"Storefront password required\"}]")
+
+		let result = try CheckoutBridge.decode(event)
+
+		guard case CheckoutBridge.WebEvent.storefrontConfigurationError = result else {
+			return XCTFail("expected .storefrontConfigurationError error, got \(result)")
+		}
+	}
+
 	func testDecodeFailsSilentlyWhenErrorIsUnsupported() throws {
 		let event = createErrorEventPayload("[{\"group\":\"checkout\",\"reason\": \"violation\"}]")
 		let result = try CheckoutBridge.decode(event)
