@@ -180,8 +180,7 @@ extension CartViewController: CheckoutDelegate {
 			errorMessage = "\(underlying)"
 		case .checkoutExpired(let message),
 			.checkoutUnavailable(let message),
-			.checkoutLiquidNotMigrated(let message),
-			.storefrontConfigurationError(let message):
+			.checkoutLiquidNotMigrated(let message):
 			errorMessage = message
 		}
 

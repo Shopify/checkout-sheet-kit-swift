@@ -30,9 +30,6 @@ public enum CheckoutError: Swift.Error {
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
 	case sdkError(underlying: Swift.Error)
 
-	/// Issued when the storefront used has a configuration setup that is incompatible with the Checkout Sheet Kit.
-	case storefrontConfigurationError(message: String)
-
 	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
 	/// The SDK only supports stores migrated for extensibility.
 	case checkoutLiquidNotMigrated(message: String)

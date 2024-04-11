@@ -159,7 +159,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message ?? "Checkout unavailable."))
 			/// Error: Storefront not configured properly
 			case .storefrontConfigurationError(let message):
-				viewDelegate?.checkoutViewDidFailWithError(error: .storefrontConfigurationError(message: message ?? "Storefront was not configured properly."))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message ?? "Storefront was not configured properly."))
 			/// Error: Checkout expired
 			case .checkoutExpired(let message):
 				CheckoutWebView.cache = nil
