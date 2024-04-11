@@ -154,7 +154,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 			/// Completed event
 			case let .checkoutComplete(checkoutCompletedEvent):
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
-			/// Errror: Checkout unavailable
+			/// Error: Checkout unavailable
 			case .checkoutUnavailable(let message):
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message ?? "Checkout unavailable."))
 			/// Error: Storefront not configured properly
