@@ -156,10 +156,18 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
 			/// Error: Checkout unavailable
 			case .checkoutUnavailable(let message):
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message ?? "Checkout unavailable."))
+					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
+						message: message ?? "Checkout unavailable.",
+						code: CheckoutUnavailableCode.serverError,
+						httpStatusCode: nil
+					))
 			/// Error: Storefront not configured properly
 			case .storefrontConfigurationError(let message):
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: message ?? "Storefront was not configured properly."))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
+					message: message ?? "Storefront was not configured properly.",
+					code: CheckoutUnavailableCode.storefrontConfigurationError,
+					httpStatusCode: nil
+				))
 			/// Error: Checkout expired
 			case .checkoutExpired(let message):
 				CheckoutWebView.cache = nil
@@ -209,8 +217,9 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
+		let statusCode = response.statusCode
 		let errorMessageForStatusCode = HTTPURLResponse.localizedString(
-			forStatusCode: response.statusCode
+			forStatusCode: statusCode
 		)
 
 		guard isCheckout(url: response.url) else {
@@ -218,21 +227,30 @@ extension CheckoutWebView: WKNavigationDelegate {
 		}
 
 		/// Invalidate cache for any sort of error
-		if response.statusCode >= 400 {
+		if statusCode >= 400 {
 			CheckoutWebView.invalidate()
 		}
 
-		if response.statusCode >= 400 && response.statusCode < 500 {
-			switch response.statusCode {
+		if statusCode >= 400 && statusCode < 500 {
+			switch statusCode {
 			case 403:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Forbidden."))
+					viewDelegate?.checkoutViewDidFailWithError(
+						error: .checkoutUnavailable(
+							message: errorMessageForStatusCode,
+							code: CheckoutUnavailableCode.forbidden,
+							httpStatusCode: statusCode
+						))
 			case 404:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."))
 			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
 			default:
 				viewDelegate?.checkoutViewDidFailWithError(
-					error: .checkoutUnavailable(message: errorMessageForStatusCode))
+					error: .checkoutUnavailable(
+						message: errorMessageForStatusCode,
+						code: CheckoutUnavailableCode.clientError,
+						httpStatusCode: statusCode
+					))
 			}
 
 			return .cancel
@@ -240,7 +258,11 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 		if response.statusCode >= 500 {
 			viewDelegate?.checkoutViewDidFailWithError(
-				error: .checkoutUnavailable(message: errorMessageForStatusCode))
+				error: .checkoutUnavailable(
+					message: errorMessageForStatusCode,
+					code: CheckoutUnavailableCode.serverError,
+					httpStatusCode: response.statusCode
+				))
 
 			return .cancel
 		}
@@ -253,9 +275,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 		viewDelegate?.checkoutViewDidStartNavigation()
 	}
 
+	/// No need to emit checkoutDidFail error here as it has been handled in handleResponse already
 	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 		timer = nil
-		viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: error.localizedDescription))
 	}
 
 	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

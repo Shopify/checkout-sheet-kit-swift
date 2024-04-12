@@ -178,8 +178,9 @@ extension CartViewController: CheckoutDelegate {
 		switch error {
 		case .sdkError(let underlying):
 			errorMessage = "\(underlying)"
+		case .checkoutUnavailable(let message, let code, let httpStatusCode):
+			errorMessage = message
 		case .checkoutExpired(let message),
-			.checkoutUnavailable(let message),
 			.checkoutLiquidNotMigrated(let message):
 			errorMessage = message
 		}
