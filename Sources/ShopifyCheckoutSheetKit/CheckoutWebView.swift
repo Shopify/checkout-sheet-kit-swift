@@ -217,6 +217,7 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
+		let headers = response.allHeaderFields
 		let statusCode = response.statusCode
 		let errorMessageForStatusCode = HTTPURLResponse.localizedString(
 			forStatusCode: statusCode
@@ -241,7 +242,15 @@ extension CheckoutWebView: WKNavigationDelegate {
 							httpStatusCode: statusCode
 						))
 			case 404:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."))
+				if let reason = response.allHeaderFields["X-Reason"] as? String, reason.lowercased() == "checkout_liquid_not_supported" {
+					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."))
+				} else {
+					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
+						message: errorMessageForStatusCode,
+						code: CheckoutUnavailableCode.clientError,
+						httpStatusCode: statusCode
+					))
+				}
 			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
 			default:
