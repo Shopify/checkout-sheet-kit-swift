@@ -162,31 +162,47 @@ extension CartViewController: CheckoutDelegate {
 		dismiss(animated: true)
 	}
 
-	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {
-		print(#function, errors)
-	}
-
 	func checkoutDidClickContactLink(url: URL) {
 		if UIApplication.shared.canOpenURL(url) {
 			UIApplication.shared.open(url)
 		}
 	}
 
-	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
-		let errorMessage: String
+	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError, recoverable: Bool) {
+		var errorMessage: String = ""
 
-		switch error {
-		case .sdkError(let underlying):
-			errorMessage = "\(underlying)"
-		case .checkoutUnavailable(let message, let code, let httpStatusCode):
+		/// Internal Checkout SDK error
+		if case .sdkError(let underlying) = error {
+			errorMessage = "\(underlying.localizedDescription)"
+		}
+
+		/// Checkout unavailable error
+		if case .checkoutUnavailable(let message, let code) = error {
 			errorMessage = message
-		case .checkoutExpired(let message),
-			.checkoutLiquidNotMigrated(let message):
+			handleCheckoutUnavailable(message, code)
+		}
+
+		/// Storefront deprecation error
+		if case .checkoutLiquidNotMigrated(let message) = error {
 			errorMessage = message
 		}
 
-		print(#function, error)
+		/// Checkout has expired, re-create cart to fetch a new checkout URL
+		if case .checkoutExpired(let message) = error {
+			errorMessage = message
+		}
+
+		print(#function, error, "Recoverable: \(recoverable)")
 		forceCloseCheckout(errorMessage)
+	}
+
+	private func handleCheckoutUnavailable(_ message: String, _ code: CheckoutUnavailable) {
+		switch code {
+		case .clientError:
+			print("[CheckoutUnavailable] (checkoutError)", message)
+		case .httpError(let statusCode):
+			print("[CheckoutUnavailable] (httpError)", statusCode)
+		}
 	}
 
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
@@ -201,7 +217,6 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	private func forceCloseCheckout(_ message: String = "Checkout unavailable") {
-		print(#function, message)
 		dismiss(animated: true)
 		resetCart()
 		self.showAlert(message: message)

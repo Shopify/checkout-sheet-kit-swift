@@ -23,11 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Foundation
 
-public enum CheckoutUnavailableCode {
-	case forbidden
+public enum CheckoutUnavailable {
 	case clientError
-	case serverError
-	case storefrontConfigurationError
+	case httpError(statusCode: Int)
 }
 
 /// A type representing Shopify Checkout specific errors.
@@ -45,8 +43,7 @@ public enum CheckoutError: Swift.Error {
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
 	case checkoutUnavailable(
 		message: String,
-		code: CheckoutUnavailableCode,
-		httpStatusCode: Int?
+		code: CheckoutUnavailable
 	)
 
 	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.

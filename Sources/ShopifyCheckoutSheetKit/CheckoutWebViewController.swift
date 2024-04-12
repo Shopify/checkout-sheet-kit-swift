@@ -176,9 +176,9 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 		delegate?.checkoutDidComplete(event: event)
 	}
 
-	func checkoutViewDidFailWithError(error: CheckoutError) {
+	func checkoutViewDidFailWithError(error: CheckoutError, recoverable: Bool) {
 		CheckoutWebView.invalidate()
-		delegate?.checkoutDidFail(error: error)
+		delegate?.checkoutDidFail(error: error, recoverable: recoverable)
 	}
 
 	func checkoutViewDidClickLink(url: URL) {
