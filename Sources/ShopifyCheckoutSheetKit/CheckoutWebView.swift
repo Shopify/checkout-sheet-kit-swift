@@ -209,8 +209,20 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
-		if isCheckout(url: response.url) && response.statusCode >= 400 {
-			CheckoutWebView.cache = nil
+		let errorMessageForStatusCode = HTTPURLResponse.localizedString(
+			forStatusCode: response.statusCode
+		)
+
+		guard isCheckout(url: response.url) else {
+			return .allow
+		}
+
+		/// Invalidate cache for any sort of error
+		if response.statusCode >= 400 {
+			CheckoutWebView.invalidate()
+		}
+
+		if response.statusCode >= 400 && response.statusCode < 500 {
 			switch response.statusCode {
 			case 403:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Forbidden."))
@@ -218,11 +230,17 @@ extension CheckoutWebView: WKNavigationDelegate {
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."))
 			case 410:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
-			case 500:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "Checkout unavailable due to error"))
 			default:
-				()
+				viewDelegate?.checkoutViewDidFailWithError(
+					error: .checkoutUnavailable(message: errorMessageForStatusCode))
 			}
+
+			return .cancel
+		}
+
+		if response.statusCode >= 500 {
+			viewDelegate?.checkoutViewDidFailWithError(
+				error: .checkoutUnavailable(message: errorMessageForStatusCode))
 
 			return .cancel
 		}

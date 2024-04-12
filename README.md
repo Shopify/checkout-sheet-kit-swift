@@ -317,10 +317,6 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
     // Expired error: checkout session associated with provided checkoutURL is no longer available.
     // The provided message describes the error and may be logged and presented to the buyer.
     case checkoutExpired(message: String)
-
-    // Storefront configuration error: the storefront is configured in a way which is incompatible with the Checkout
-    // Sheet Kit.
-    case storefrontConfigurationError(message: String)
   }
 
   func checkoutDidClickLink(url: URL) {
@@ -352,7 +348,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 | `.checkoutLiquidNotMigrated`                                             | `checkout.liquid` is not supported.        | Please upgrade to Extensibility.                                                                                                                                                  |
 | `.checkoutUnavailable(message: "Forbidden")`                             | Access to checkout is forbidden.           | This error is unrecoverable.                                                                                                                                                      |
 | `.checkoutUnavailable(message: "Internal Server Error")`                 | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                                                                                                  |
-| `.storefrontConfigurationError(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores.                                                                                 |
+| `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores.                                                                                 |
 | `.checkoutUnavailable(message: "Customer account required")`             | A Customer account is required to proceed  | Request customer login before proceeding to checkout. See [Customer Accounts API](https://github.com/Shopify/checkout-sheet-kit-swift#customer-account-api) for more information. |
 | `.checkoutExpired(message: "Checkout already completed")`                | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                                                                                                              |
 | `.checkoutExpired(message: "Cart is empty")`                             | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                                                                                                    |
