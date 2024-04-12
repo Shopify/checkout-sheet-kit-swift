@@ -242,7 +242,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 							httpStatusCode: statusCode
 						))
 			case 404:
-				if let reason = response.allHeaderFields["X-Reason"] as? String, reason.lowercased() == "checkout_liquid_not_supported" {
+				if let reason = response.allHeaderFields["X-Shopify-API-Deprecated-Reason"] as? String, reason.lowercased() == "checkout_liquid_not_supported" {
 					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."))
 				} else {
 					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
