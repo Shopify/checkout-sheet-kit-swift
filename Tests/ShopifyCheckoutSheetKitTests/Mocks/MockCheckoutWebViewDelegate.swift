@@ -63,7 +63,7 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 		didClickLinkExpectation?.fulfill()
 	}
 
-	func checkoutViewDidFailWithError(error: CheckoutError, recoverable: Bool) {
+	func checkoutViewDidFailWithError(error: CheckoutError) {
 		didFailWithErrorExpectation?.fulfill()
 	}
 

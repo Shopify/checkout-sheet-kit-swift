@@ -92,7 +92,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 		return self
 	}
 
-	@discardableResult public func onFail(_ action: @escaping (CheckoutError, Bool) -> Void) -> Self {
+	@discardableResult public func onFail(_ action: @escaping (CheckoutError) -> Void) -> Self {
 		delegate.onFail = action
 		return self
 	}
@@ -111,12 +111,12 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 public class CheckoutDelegateWrapper: CheckoutDelegate {
 	var onComplete: ((CheckoutCompletedEvent) -> Void)?
 	var onCancel: (() -> Void)?
-	var onFail: ((CheckoutError, Bool) -> Void)?
+	var onFail: ((CheckoutError) -> Void)?
 	var onPixelEvent: ((PixelEvent) -> Void)?
 	var onLinkClick: ((URL) -> Void)?
 
-	public func checkoutDidFail(error: CheckoutError, recoverable: Bool) {
-		onFail?(error, recoverable)
+	public func checkoutDidFail(error: CheckoutError) {
+		onFail?(error)
 	}
 
 	public func checkoutDidEmitWebPixelEvent(event: PixelEvent) {

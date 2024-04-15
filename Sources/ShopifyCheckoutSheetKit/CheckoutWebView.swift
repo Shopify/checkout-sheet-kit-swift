@@ -29,7 +29,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent)
 	func checkoutViewDidFinishNavigation()
 	func checkoutViewDidClickLink(url: URL)
-	func checkoutViewDidFailWithError(error: CheckoutError, recoverable: Bool)
+	func checkoutViewDidFailWithError(error: CheckoutError)
 	func checkoutViewDidToggleModal(modalVisible: Bool)
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
@@ -159,20 +159,21 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				viewDelegate?.checkoutViewDidFailWithError(
 					error: .checkoutUnavailable(
 						message: message ?? "Checkout unavailable.",
-						code: CheckoutUnavailable.clientError
-					),
-					recoverable: true
+						code: CheckoutUnavailable.clientError,
+						recoverable: true
+					)
 				)
 			/// Error: Storefront not configured properly
 			case .storefrontConfigurationError(let message):
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 					message: message ?? "Storefront configuration error.",
-					code: CheckoutUnavailable.clientError
-				), recoverable: false)
+					code: CheckoutUnavailable.clientError,
+					recoverable: false
+				))
 			/// Error: Checkout expired
 			case .checkoutExpired(let message):
 				CheckoutWebView.cache = nil
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired."), recoverable: false)
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired."))
 			/// Checkout modal toggled
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
@@ -185,7 +186,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				()
 			}
 		} catch {
-            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error), recoverable: true)
+            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 		}
 	}
 }
@@ -228,11 +229,6 @@ extension CheckoutWebView: WKNavigationDelegate {
 			return .allow
 		}
 
-		let checkoutUnavailableError: CheckoutError = .checkoutUnavailable(
-			message: errorMessageForStatusCode,
-			code: CheckoutUnavailable.httpError(statusCode: statusCode)
-		)
-
 		if statusCode >= 400 {
 			/// Invalidate cache for any sort of error
 			CheckoutWebView.invalidate()
@@ -240,21 +236,30 @@ extension CheckoutWebView: WKNavigationDelegate {
 			switch statusCode {
 			case 404:
 				if let reason = headers["X-Shopify-API-Deprecated-Reason"] as? String, reason.lowercased() == "checkout_liquid_not_supported" {
-					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."), recoverable: false)
+					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutLiquidNotMigrated(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility."))
 				} else {
 					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 						message: errorMessageForStatusCode,
-						code: CheckoutUnavailable.httpError(statusCode: statusCode)
-					), recoverable: false)
+						code: CheckoutUnavailable.httpError(statusCode: statusCode),
+						recoverable: false
+					))
 				}
 			case 410:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"), recoverable: false)
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired"))
 			case 500...599:
 				viewDelegate?.checkoutViewDidFailWithError(
-					error: checkoutUnavailableError, recoverable: true)
+					error: .checkoutUnavailable(
+						message: errorMessageForStatusCode,
+						code: CheckoutUnavailable.httpError(statusCode: statusCode),
+						recoverable: true
+					))
 			default:
 				viewDelegate?.checkoutViewDidFailWithError(
-					error: checkoutUnavailableError, recoverable: false)
+					error: .checkoutUnavailable(
+						message: errorMessageForStatusCode,
+						code: CheckoutUnavailable.httpError(statusCode: statusCode),
+						recoverable: false
+					))
 			}
 
 			return .cancel
@@ -291,7 +296,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
 		CheckoutWebView.cache = nil
-		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error), recoverable: true)
+		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 	}
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {

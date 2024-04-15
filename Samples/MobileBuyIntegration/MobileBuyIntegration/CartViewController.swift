@@ -168,31 +168,31 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError, recoverable: Bool) {
+	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
 		var errorMessage: String = ""
 
 		/// Internal Checkout SDK error
-		if case .sdkError(let underlying) = error {
+		if case .sdkError(let underlying, let recoverable) = error {
 			errorMessage = "\(underlying.localizedDescription)"
 		}
 
 		/// Checkout unavailable error
-		if case .checkoutUnavailable(let message, let code) = error {
+		if case .checkoutUnavailable(let message, let code, let recoverable) = error {
 			errorMessage = message
 			handleCheckoutUnavailable(message, code)
 		}
 
 		/// Storefront deprecation error
-		if case .checkoutLiquidNotMigrated(let message) = error {
+		if case .checkoutLiquidNotMigrated(let message, let recoverable) = error {
 			errorMessage = message
 		}
 
 		/// Checkout has expired, re-create cart to fetch a new checkout URL
-		if case .checkoutExpired(let message) = error {
+		if case .checkoutExpired(let message, let recoverable) = error {
 			errorMessage = message
 		}
 
-		print(#function, error, "Recoverable: \(recoverable)")
+		print(#function, error)
 		forceCloseCheckout(errorMessage)
 	}
 
