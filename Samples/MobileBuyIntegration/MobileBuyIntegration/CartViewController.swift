@@ -182,7 +182,7 @@ extension CartViewController: CheckoutDelegate {
 			handleCheckoutUnavailable(message, code)
 		}
 
-		/// Storefront deprecation error
+		/// Storefront configuration error
 		if case .configurationError(let message, _, _) = error {
 			errorMessage = message
 		}

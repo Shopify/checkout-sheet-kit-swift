@@ -96,6 +96,7 @@ extension CheckoutBridge {
 			case body
 		}
 
+		// swiftlint:disable cyclomatic_complexity
 		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -140,6 +141,7 @@ extension CheckoutBridge {
 				self = .unsupported(name)
 			}
 		}
+		// swiftlint:enable cyclomatic_complexity
 	}
 }
 

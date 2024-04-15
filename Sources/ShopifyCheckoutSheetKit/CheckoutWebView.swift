@@ -181,7 +181,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				))
 			/// Error: Checkout expired
 			case .checkoutExpired(let message):
-					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: CheckoutErrorCode.cartExpired))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: CheckoutErrorCode.cartExpired))
 			/// Checkout modal toggled
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
@@ -244,12 +244,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 			switch statusCode {
 			case 404:
 				if let reason = headers["X-Shopify-API-Deprecated-Reason"] as? String, reason.lowercased() == "checkout_liquid_not_supported" {
-					viewDelegate?.checkoutViewDidFailWithError(error: 
-							.configurationError(
-								message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
-								code: CheckoutErrorCode.checkoutLiquidNotMigrated,
-								recoverable: false
-							))
+					viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
 				} else {
 					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 						message: errorMessageForStatusCode,
@@ -258,14 +253,13 @@ extension CheckoutWebView: WKNavigationDelegate {
 					))
 				}
 			case 410:
-					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired", code: CheckoutErrorCode.cartExpired))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired", code: CheckoutErrorCode.cartExpired))
 			case 500...599:
-				viewDelegate?.checkoutViewDidFailWithError(
-					error: .checkoutUnavailable(
-						message: errorMessageForStatusCode,
-						code: CheckoutUnavailable.httpError(statusCode: statusCode),
-						recoverable: true
-					))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
+					message: errorMessageForStatusCode,
+					code: CheckoutUnavailable.httpError(statusCode: statusCode),
+					recoverable: true
+				))
 			default:
 				viewDelegate?.checkoutViewDidFailWithError(
 					error: .checkoutUnavailable(
