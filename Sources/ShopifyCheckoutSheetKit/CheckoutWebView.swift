@@ -172,7 +172,6 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				))
 			/// Error: Checkout expired
 			case .checkoutExpired(let message):
-				CheckoutWebView.cache = nil
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired."))
 			/// Checkout modal toggled
 			case let .checkoutModalToggled(modalVisible):
@@ -295,7 +294,6 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
-		CheckoutWebView.cache = nil
 		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 	}
 
