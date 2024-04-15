@@ -23,6 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import Foundation
 
+public enum CheckoutErrorCode: String, Codable {
+	case customerAccountRequired = "customer_account_required"
+	case storefrontPasswordRequired = "storefront_password_required"
+	case cartExpired = "cart_expired"
+	case cartCompleted = "cart_completed"
+	case invalidCart = "invalid_cart"
+	case checkoutLiquidNotMigrated = "checkout_liquid_not_migrated"
+}
+
 public enum CheckoutUnavailable {
 	case clientError
 	case httpError(statusCode: Int)
@@ -31,6 +40,10 @@ public enum CheckoutUnavailable {
 /// A type representing Shopify Checkout specific errors.
 /// "recoverable" indicates that though the request has failed, it should be retried in a fallback browser experience.
 public enum CheckoutError: Swift.Error {
+	/// Issued when checkout has encountered an authentication error.
+	/// For example; the stonrefront is configured to enforce customer account login.
+	case authenticationError(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
+
 	/// Issued when an internal error within Shopify Checkout SDK
 	/// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
@@ -38,20 +51,16 @@ public enum CheckoutError: Swift.Error {
 
 	/// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
 	/// The SDK only supports stores migrated for extensibility.
-	case checkoutLiquidNotMigrated(message: String, recoverable: Bool = false)
+	case configurationError(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
 
 	/// Issued when checkout has encountered a unrecoverable error (for example server side error)
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
-	case checkoutUnavailable(
-		message: String,
-		code: CheckoutUnavailable,
-		recoverable: Bool
-	)
+	case checkoutUnavailable(message: String, code: CheckoutUnavailable, recoverable: Bool)
 
 	/// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
 	/// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
 	/// In event of checkoutExpired, a new checkout url will need to be generated
-	case checkoutExpired(message: String, recoverable: Bool = false)
+	case checkoutExpired(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
 }
 
 internal enum CheckoutErrorGroup: String, Codable {

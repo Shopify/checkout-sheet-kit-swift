@@ -82,6 +82,7 @@ enum CheckoutBridge {
 
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
+		case authenticationError(message: String?)
 		case checkoutComplete(event: CheckoutCompletedEvent)
 		case checkoutExpired(message: String?)
 		case checkoutUnavailable(message: String?)
@@ -116,7 +117,11 @@ extension CheckoutBridge {
 
 				switch error.group {
 				case .configuration:
-					self = .storefrontConfigurationError(message: error.reason)
+					if let code = error.code, CheckoutErrorCode(rawValue: code) == .customerAccountRequired {
+						self = .authenticationError(message: error.reason)
+					} else {
+						self = .storefrontConfigurationError(message: error.reason)
+					}
 				case .unrecoverable:
 					self = .checkoutUnavailable(message: error.reason)
 				case .expired:

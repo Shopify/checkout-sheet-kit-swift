@@ -25,7 +25,18 @@ import Buy
 import UIKit
 import ShopifyCheckoutSheetKit
 
-class ProductViewController: UIViewController {
+class ProductViewController: UIViewController, CheckoutDelegate {
+	func checkoutDidCancel() {
+		// no-op
+	}
+
+	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
+		// no-op
+	}
+
+	func checkoutDidFail(error: CheckoutError) {
+		print(#function, error)
+	}
 
 	// MARK: Properties
 

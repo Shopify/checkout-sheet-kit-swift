@@ -172,23 +172,28 @@ extension CartViewController: CheckoutDelegate {
 		var errorMessage: String = ""
 
 		/// Internal Checkout SDK error
-		if case .sdkError(let underlying, let recoverable) = error {
+		if case .sdkError(let underlying, _) = error {
 			errorMessage = "\(underlying.localizedDescription)"
 		}
 
 		/// Checkout unavailable error
-		if case .checkoutUnavailable(let message, let code, let recoverable) = error {
+		if case .checkoutUnavailable(let message, let code, _) = error {
 			errorMessage = message
 			handleCheckoutUnavailable(message, code)
 		}
 
 		/// Storefront deprecation error
-		if case .checkoutLiquidNotMigrated(let message, let recoverable) = error {
+		if case .configurationError(let message, _, _) = error {
 			errorMessage = message
 		}
 
 		/// Checkout has expired, re-create cart to fetch a new checkout URL
-		if case .checkoutExpired(let message, let recoverable) = error {
+		if case .checkoutExpired(let message, _, _) = error {
+			errorMessage = message
+		}
+
+		/// Unauthorized checkout
+		if case .authenticationError(let message, _, _) = error {
 			errorMessage = message
 		}
 
