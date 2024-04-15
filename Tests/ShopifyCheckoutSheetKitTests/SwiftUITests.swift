@@ -80,14 +80,14 @@ class CheckoutSheetTests: XCTestCase {
 	func testOnFail() {
 		var actionCalled = false
 		var actionData: CheckoutError?
-		let error: CheckoutError = .checkoutUnavailable(message: "error")
+		let error: CheckoutError = .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500))
 
-		checkoutSheet.onFail { failure in
+		checkoutSheet.onFail { (failure, _) in
 			actionCalled = true
 			actionData = failure
 
 		}
-		checkoutSheet.delegate.checkoutDidFail(error: error)
+		checkoutSheet.delegate.checkoutDidFail(error: error, recoverable: false)
 		XCTAssertTrue(actionCalled)
 		XCTAssertNotNil(actionData)
 	}

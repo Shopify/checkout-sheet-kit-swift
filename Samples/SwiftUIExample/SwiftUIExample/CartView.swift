@@ -91,8 +91,8 @@ struct CartView: View {
 									print("Checkout completed - Order id: \(String(describing: checkout.orderDetails.id))")
 									cartCompleted = true
 								}
-								.onFail { error in
-									print(error)
+								.onFail { (error, recoverable) in
+									print(error, recoverable)
 								}
 								.edgesIgnoringSafeArea(.all)
 								.accessibility(identifier: "CheckoutSheet")
