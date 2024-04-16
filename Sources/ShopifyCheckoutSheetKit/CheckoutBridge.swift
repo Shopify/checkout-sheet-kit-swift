@@ -82,13 +82,22 @@ enum CheckoutBridge {
 
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
-		case authenticationError(message: String?)
+		/// Error types
+		case authenticationError(message: String?, code: CheckoutErrorCode)
+		case checkoutExpired(message: String?, code: CheckoutErrorCode)
+		case checkoutUnavailable(message: String?, code: CheckoutErrorCode)
+		case configurationError(message: String?, code: CheckoutErrorCode)
+
+		/// Success
 		case checkoutComplete(event: CheckoutCompletedEvent)
-		case checkoutExpired(message: String?)
-		case checkoutUnavailable(message: String?)
-		case storefrontConfigurationError(message: String?)
+
+		/// Presentational
 		case checkoutModalToggled(modalVisible: Bool)
+
+		/// Eventing
 		case webPixels(event: PixelEvent?)
+
+		/// Generic
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -115,18 +124,19 @@ extension CheckoutBridge {
 			case "error":
 				let errorDecoder = CheckoutErrorEventDecoder()
 				let error = errorDecoder.decode(from: container, using: decoder)
+				let code = CheckoutErrorCode.from(error.code)
 
 				switch error.group {
 				case .configuration:
-					if let code = error.code, CheckoutErrorCode(rawValue: code) == .customerAccountRequired {
-						self = .authenticationError(message: error.reason)
+					if code == .customerAccountRequired {
+						self = .authenticationError(message: error.reason, code: .customerAccountRequired)
 					} else {
-						self = .storefrontConfigurationError(message: error.reason)
+						self = .configurationError(message: error.reason, code: code)
 					}
 				case .unrecoverable:
-					self = .checkoutUnavailable(message: error.reason)
+					self = .checkoutUnavailable(message: error.reason, code: code)
 				case .expired:
-					self = .checkoutExpired(message: error.reason)
+					self = .checkoutExpired(message: error.reason, code: CheckoutErrorCode.from(error.code))
 				default:
 					self = .unsupported(name)
 				}

@@ -26,14 +26,25 @@ import Foundation
 public enum CheckoutErrorCode: String, Codable {
 	case customerAccountRequired = "customer_account_required"
 	case storefrontPasswordRequired = "storefront_password_required"
+	case checkoutLiquidNotMigrated = "checkout_liquid_not_migrated"
 	case cartExpired = "cart_expired"
 	case cartCompleted = "cart_completed"
 	case invalidCart = "invalid_cart"
-	case checkoutLiquidNotMigrated = "checkout_liquid_not_migrated"
+	case unknown = "unknown"
+
+	public static func from(_ code: String?) -> CheckoutErrorCode {
+		let fallback = CheckoutErrorCode.unknown
+
+		guard let errorCode = code else {
+			return fallback
+		}
+
+		return CheckoutErrorCode(rawValue: errorCode) ?? fallback
+	}
 }
 
 public enum CheckoutUnavailable {
-	case clientError
+	case clientError(code: CheckoutErrorCode)
 	case httpError(statusCode: Int)
 }
 

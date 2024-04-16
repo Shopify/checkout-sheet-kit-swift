@@ -155,11 +155,11 @@ extension CheckoutWebView: WKScriptMessageHandler {
 		do {
 			switch try CheckoutBridge.decode(message) {
 			/// Error: authentication error
-			case .authenticationError(let message):
+			case .authenticationError(let message, let code):
 				viewDelegate?.checkoutViewDidFailWithError(
 					error: .authenticationError(
 						message: message ?? "Unauthorized",
-						code: CheckoutErrorCode.customerAccountRequired,
+						code: code,
 						recoverable: false
 					)
 				)
@@ -167,24 +167,24 @@ extension CheckoutWebView: WKScriptMessageHandler {
 			case let .checkoutComplete(checkoutCompletedEvent):
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
 			/// Error: Checkout unavailable
-			case .checkoutUnavailable(let message):
+			case .checkoutUnavailable(let message, let code):
 				viewDelegate?.checkoutViewDidFailWithError(
 					error: .checkoutUnavailable(
 						message: message ?? "Checkout unavailable.",
-						code: CheckoutUnavailable.clientError,
+						code: CheckoutUnavailable.clientError(code: code),
 						recoverable: true
 					)
 				)
 			/// Error: Storefront not configured properly
-			case .storefrontConfigurationError(let message):
+			case .configurationError(let message, let code):
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 					message: message ?? "Storefront configuration error.",
-					code: CheckoutUnavailable.clientError,
+					code: CheckoutUnavailable.clientError(code: code),
 					recoverable: false
 				))
 			/// Error: Checkout expired
-			case .checkoutExpired(let message):
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: CheckoutErrorCode.cartExpired))
+			case .checkoutExpired(let message, let code):
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: code))
 			/// Checkout modal toggled
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)

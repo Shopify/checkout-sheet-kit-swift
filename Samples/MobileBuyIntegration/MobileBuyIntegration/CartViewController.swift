@@ -203,8 +203,8 @@ extension CartViewController: CheckoutDelegate {
 
 	private func handleCheckoutUnavailable(_ message: String, _ code: CheckoutUnavailable) {
 		switch code {
-		case .clientError:
-			print("[CheckoutUnavailable] (checkoutError)", message)
+		case .clientError(let clientErrorCode):
+			print("[CheckoutUnavailable] (checkoutError)", message, clientErrorCode)
 		case .httpError(let statusCode):
 			print("[CheckoutUnavailable] (httpError)", statusCode)
 		}

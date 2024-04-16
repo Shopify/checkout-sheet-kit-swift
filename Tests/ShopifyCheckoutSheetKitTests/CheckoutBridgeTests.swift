@@ -135,8 +135,8 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(event)
 
-		guard case CheckoutBridge.WebEvent.storefrontConfigurationError = result else {
-			return XCTFail("expected .storefrontConfigurationError error, got \(result)")
+		guard case CheckoutBridge.WebEvent.configurationError = result else {
+			return XCTFail("expected .configurationError error, got \(result)")
 		}
 	}
 
@@ -155,8 +155,8 @@ class CheckoutBridgeTests: XCTestCase {
 
 		let result = try CheckoutBridge.decode(event)
 
-		guard case CheckoutBridge.WebEvent.storefrontConfigurationError = result else {
-			return XCTFail("expected .storefrontConfigurationError error, got \(result)")
+		guard case CheckoutBridge.WebEvent.configurationError = result else {
+			return XCTFail("expected .configurationError error, got \(result)")
 		}
 	}
 
