@@ -34,8 +34,8 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
 
-private let DEPRECATED_REASON_HEADER = "X-Shopify-API-Deprecated-Reason"
-private let CHECKOUT_LIQUID_UNSUPPORTED = "checkout_liquid_not_supported"
+private let deprecatedReasonHeader = "X-Shopify-API-Deprecated-Reason"
+private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
 class CheckoutWebView: WKWebView {
 	private static var cache: CacheEntry?
@@ -246,7 +246,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 			switch statusCode {
 			case 404:
-				if let reason = headers[DEPRECATED_REASON_HEADER] as? String, reason.lowercased() == CHECKOUT_LIQUID_UNSUPPORTED {
+				if let reason = headers[deprecatedReasonHeader] as? String, reason.lowercased() == checkoutLiquidNotSupportedReason {
 					viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
 				} else {
 					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(

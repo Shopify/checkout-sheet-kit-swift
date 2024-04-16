@@ -116,7 +116,15 @@ class CheckoutWebViewTests: XCTestCase {
 		let policy = view.handleResponse(urlResponse)
 		XCTAssertEqual(policy, .cancel)
 
-		waitForExpectations(timeout: 5, handler: nil)
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.checkoutUnavailable(let message, _, let recoverable)):
+				XCTAssertEqual(message, "forbidden")
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
+			}
+		}
 	}
 
 	func test404responseOnCheckoutURLCodeDelegation() {
@@ -132,7 +140,39 @@ class CheckoutWebViewTests: XCTestCase {
 		let policy = view.handleResponse(urlResponse)
 		XCTAssertEqual(policy, .cancel)
 
-		waitForExpectations(timeout: 5, handler: nil)
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.checkoutUnavailable(let message, _, let recoverable)):
+				XCTAssertEqual(message, "not found")
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
+			}
+		}
+	}
+
+	func testTreat404WithDeprecationHeader() {
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
+		let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+		view.viewDelegate = mockDelegate
+
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: ["X-Shopify-API-Deprecated-Reason": "checkout_liquid_not_supported"])!
+
+		let policy = view.handleResponse(urlResponse)
+		XCTAssertEqual(policy, .cancel)
+
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.configurationError(let message, _, let recoverable)):
+				XCTAssertEqual(message, "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.")
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
+			}
+		}
 	}
 
     func test410responseOnCheckoutURLCodeDelegation() {
@@ -148,8 +188,54 @@ class CheckoutWebViewTests: XCTestCase {
         let policy = view.handleResponse(urlResponse)
         XCTAssertEqual(policy, .cancel)
 
-        waitForExpectations(timeout: 5, handler: nil)
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.checkoutExpired(let message, _, let recoverable)):
+				XCTAssertEqual(message, "Checkout has expired.")
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
+			}
+		}
     }
+
+	func testTreat5XXReponsesAsRecoverable() {
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
+		view.viewDelegate = mockDelegate
+
+		for statusCode in 500...510 {
+			let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called for status code \(statusCode)")
+			mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+
+			let urlResponse = HTTPURLResponse(url: link, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+
+			let policy = view.handleResponse(urlResponse)
+			XCTAssertEqual(policy, .cancel, "Policy should be .cancel for status code \(statusCode)")
+
+			waitForExpectations(timeout: 3) { error in
+				if error != nil {
+					XCTFail("Test timed out for status code \(statusCode)")
+				}
+
+				guard let receivedError = self.mockDelegate.errorReceived else {
+					XCTFail("Expected to receive a `CheckoutError` for status code \(statusCode)")
+					return
+				}
+
+				switch receivedError {
+				case .checkoutUnavailable(_, _, let recoverable):
+					XCTAssertTrue(recoverable, "Error should be recoverable for status code \(statusCode)")
+				default:
+					XCTFail("Received incorrect `CheckoutError` case for status code \(statusCode)")
+				}
+			}
+
+			// Reset the delegate's expectations and error received state before the next iteration
+			mockDelegate.didFailWithErrorExpectation = nil
+			mockDelegate.errorReceived = nil
+		}
+	}
 
 	func testNormalresponseOnNonCheckoutURLCodeDelegation() {
 		let link = URL(string: "http://shopify.com/resource_url")!

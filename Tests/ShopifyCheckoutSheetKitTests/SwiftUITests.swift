@@ -85,8 +85,8 @@ class CheckoutSheetTests: XCTestCase {
 		checkoutSheet.onFail { (failure) in
 			actionCalled = true
 			actionData = failure
-
 		}
+
 		checkoutSheet.delegate.checkoutDidFail(error: error)
 		XCTAssertTrue(actionCalled)
 		XCTAssertNotNil(actionData)
