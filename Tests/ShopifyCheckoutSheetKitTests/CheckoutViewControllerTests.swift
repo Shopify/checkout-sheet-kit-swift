@@ -74,7 +74,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
-		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error"))
+		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: false))
 
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
@@ -85,7 +85,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 		_ = CheckoutWebView.for(checkout: checkoutURL)
 
-		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error"))
+		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: false))
 
 		XCTAssertEqual(false, CheckoutWebView.preloadingActivatedByClient)
 	}

@@ -29,7 +29,7 @@ enum BridgeError: Swift.Error {
 }
 
 enum CheckoutBridge {
-	static let schemaVersion = "8.0"
+	static let schemaVersion = "8.1"
 	static let messageHandler = "mobileCheckoutSdk"
 	internal static var logger: ProductionLogger = InternalLogger()
 
@@ -82,11 +82,22 @@ enum CheckoutBridge {
 
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
+		/// Error types
+		case authenticationError(message: String?, code: CheckoutErrorCode)
+		case checkoutExpired(message: String?, code: CheckoutErrorCode)
+		case checkoutUnavailable(message: String?, code: CheckoutErrorCode)
+		case configurationError(message: String?, code: CheckoutErrorCode)
+
+		/// Success
 		case checkoutComplete(event: CheckoutCompletedEvent)
-		case checkoutExpired
-		case checkoutUnavailable
+
+		/// Presentational
 		case checkoutModalToggled(modalVisible: Bool)
+
+		/// Eventing
 		case webPixels(event: PixelEvent?)
+
+		/// Generic
 		case unsupported(String)
 
 		enum CodingKeys: String, CodingKey {
@@ -94,6 +105,7 @@ extension CheckoutBridge {
 			case body
 		}
 
+		// swiftlint:disable cyclomatic_complexity
 		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -110,8 +122,24 @@ extension CheckoutBridge {
 					self = .checkoutComplete(event: emptyCheckoutCompletedEvent)
 				}
 			case "error":
-				// needs to support .checkoutUnavailable by parsing error payload on body
-				self = .checkoutExpired
+				let errorDecoder = CheckoutErrorEventDecoder()
+				let error = errorDecoder.decode(from: container, using: decoder)
+				let code = CheckoutErrorCode.from(error.code)
+
+				switch error.group {
+				case .configuration:
+					if code == .customerAccountRequired {
+						self = .authenticationError(message: error.reason, code: .customerAccountRequired)
+					} else {
+						self = .configurationError(message: error.reason, code: code)
+					}
+				case .unrecoverable:
+					self = .checkoutUnavailable(message: error.reason, code: code)
+				case .expired:
+					self = .checkoutExpired(message: error.reason, code: CheckoutErrorCode.from(error.code))
+				default:
+					self = .unsupported(name)
+				}
 			case "checkoutBlockingEvent":
 				let modalVisible = try container.decode(String.self, forKey: .body)
 				self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)
@@ -123,6 +151,7 @@ extension CheckoutBridge {
 				self = .unsupported(name)
 			}
 		}
+		// swiftlint:enable cyclomatic_complexity
 	}
 }
 

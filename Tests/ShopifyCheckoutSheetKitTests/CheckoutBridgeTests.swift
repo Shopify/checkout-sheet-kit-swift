@@ -25,6 +25,7 @@ import XCTest
 import WebKit
 @testable import ShopifyCheckoutSheetKit
 
+// swiftlint:disable type_body_length
 class CheckoutBridgeTests: XCTestCase {
 	class WKScriptMessageMock: WKScriptMessage {
 		private let _mockBody: Any
@@ -59,9 +60,7 @@ class CheckoutBridgeTests: XCTestCase {
 	}
 
 	func testDecodeHandlesUnsupportedEventsGracefully() throws {
-		let mock = WKScriptMessageMock(body: """
-	{ "name": "unknown_event", "body": "" }
-	""")
+		let mock = createEventPayload(name: "unknown", "{}")
 
 		let result = try CheckoutBridge.decode(mock)
 
@@ -71,18 +70,10 @@ class CheckoutBridgeTests: XCTestCase {
 	}
 
 	func testDecodeSupportsCheckoutCompletedEvent() throws {
-		let body = "{\"orderDetails\":{\"id\":\"gid://shopify/OrderIdentity/8\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\": \"fake-token\"},\"billingAddress\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\"}"
-			.replacingOccurrences(of: "\"", with: "\\\"")
-			.replacingOccurrences(of: "\n", with: "")
+		let payload = "{\"orderDetails\":{\"id\":\"gid://shopify/OrderIdentity/8\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\": \"fake-token\"},\"billingAddress\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\"}"
 
-		let mock = WKScriptMessageMock(body: """
-			{
-				"name": "completed",
-				"body": "\(body)"
-			}
-			""")
-
-		let result = try CheckoutBridge.decode(mock)
+		let event = createEventPayload(name: "completed", payload)
+		let result = try CheckoutBridge.decode(event)
 
 		guard case .checkoutComplete(let event) = result else {
 			XCTFail("Expected .checkoutComplete, got \(result)")
@@ -98,13 +89,10 @@ class CheckoutBridgeTests: XCTestCase {
 
 	func testFailedDecodeReturnsEmptyEvent() throws {
 		/// Missing orderId, taxes, billingAddress
-		let body = "{\"orderDetails\":{\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\":\"fake-token\"},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}}}}"
-			.replacingOccurrences(of: "\"", with: "\\\"")
-			.replacingOccurrences(of: "\n", with: "")
+		let payload = "{\"orderDetails\":{\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\":\"fake-token\"},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}}}}"
 
-		let mock = WKScriptMessageMock(body: "{\"name\":\"completed\",\"body\": \"\(body)\"}")
-
-		let result = try CheckoutBridge.decode(mock)
+		let event = createEventPayload(name: "completed", payload)
+		let result = try CheckoutBridge.decode(event)
 
 		guard case .checkoutComplete(let event) = result else {
 			XCTFail("Expected .checkoutComplete, got \(result)")
@@ -114,29 +102,77 @@ class CheckoutBridgeTests: XCTestCase {
 		XCTAssertEqual(event.orderDetails.id, "")
 	}
 
-	func testDecodeSupportsCheckoutUnavailableEvent() throws {
-		let mock = WKScriptMessageMock(body: """
-	{
-		"name": "error"
-	}
-	""")
-
-		let result = try CheckoutBridge.decode(mock)
+	func testDecodeSupportsCheckoutExpiredEvent() throws {
+		let event = createErrorEventPayload("[{\"group\":\"expired\",\"type\": \"invalidCart\",\"reason\": \"Cart is invalid\", \"flowType\": \"regular\", \"code\": \"null\"}]")
+		let result = try CheckoutBridge.decode(event)
 
 		guard case CheckoutBridge.WebEvent.checkoutExpired = result else {
-			return XCTFail("expected CheckoutScriptMessage.checkoutExpired, got \(result)")
+			return XCTFail("expected .checkoutExpired error, got \(result)")
+		}
+	}
+
+	func testDecodesBarebonesErrorEvent() throws {
+		let event = createErrorEventPayload("[{\"group\":\"expired\"}]")
+		let result = try CheckoutBridge.decode(event)
+
+		guard case CheckoutBridge.WebEvent.checkoutExpired = result else {
+			return XCTFail("expected .checkoutExpired error, got \(result)")
+		}
+	}
+
+	func testDecodeSupportsUnrecoverableErrorEvent() throws {
+		let event = createErrorEventPayload("[{\"group\":\"unrecoverable\",\"reason\": \"Checkout crashed\", \"code\": \"sdk_not_enabled\"}]")
+
+		let result = try CheckoutBridge.decode(event)
+
+		guard case CheckoutBridge.WebEvent.checkoutUnavailable = result else {
+			return XCTFail("expected .checkoutUnavailable error, got \(result)")
+		}
+	}
+
+	func testDecodeSupportsConfigurationErrorEvent() throws {
+		let event = createErrorEventPayload("[{\"group\":\"configuration\",\"code\":\"storefront_password_required\",\"reason\": \"Storefront password required\"}]")
+
+		let result = try CheckoutBridge.decode(event)
+
+		guard case CheckoutBridge.WebEvent.configurationError = result else {
+			return XCTFail("expected .configurationError error, got \(result)")
+		}
+	}
+
+	func testDecodeSupportsAuthConfigurationErrorEvent() throws {
+		let event = createErrorEventPayload("[{\"group\":\"configuration\",\"code\":\"customer_account_required\",\"reason\": \"Customer Account required\"}]")
+
+		let result = try CheckoutBridge.decode(event)
+
+		guard case CheckoutBridge.WebEvent.authenticationError = result else {
+			return XCTFail("expected .authenticationError error, got \(result)")
+		}
+	}
+
+	func testDecodeSupportsUnsupportedConfigurationErrorEvent() throws {
+		let event = createErrorEventPayload("[{\"group\":\"configuration\",\"code\":\"unsupported\",\"reason\": \"Unsupported\"}]")
+
+		let result = try CheckoutBridge.decode(event)
+
+		guard case CheckoutBridge.WebEvent.configurationError = result else {
+			return XCTFail("expected .configurationError error, got \(result)")
+		}
+	}
+
+	func testDecodeFailsSilentlyWhenErrorIsUnsupported() throws {
+		let event = createErrorEventPayload("[{\"group\":\"checkout\",\"reason\": \"violation\"}]")
+		let result = try CheckoutBridge.decode(event)
+
+		guard case CheckoutBridge.WebEvent.unsupported = result else {
+			return XCTFail("expected .unsupported event, got \(result)")
 		}
 	}
 
 	func testDecodeSupportsCheckoutBlockingEvent() throws {
-		let mock = WKScriptMessageMock(body: """
-	{
-		"name": "checkoutBlockingEvent",
-		"body": "true"
-	}
-	""")
+		let event = createEventPayload(name: "checkoutBlockingEvent", "true")
 
-		let result = try CheckoutBridge.decode(mock)
+		let result = try CheckoutBridge.decode(event)
 
 		guard case CheckoutBridge.WebEvent.checkoutModalToggled = result else {
 			return XCTFail("expected CheckoutScriptMessage.checkoutModalToggled, got \(result)")
@@ -144,18 +180,9 @@ class CheckoutBridgeTests: XCTestCase {
 	}
 
 	func testDecodeSupportsStandardWebPixelsEvent() throws {
-		let body = "{\"name\": \"page_viewed\",\"event\": {\"id\": \"123\",\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": {}, \"context\": {}}}"
-			.replacingOccurrences(of: "\"", with: "\\\"")
-			.replacingOccurrences(of: "\n", with: "")
+		let event = createEventPayload(name: "webPixels", "{\"name\": \"page_viewed\",\"event\": {\"id\": \"123\",\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": {}, \"context\": {}}}")
 
-		let mock = WKScriptMessageMock(body: """
-			{
-				"name": "webPixels",
-				"body": "\(body)"
-			}
-			""")
-
-		let result = try CheckoutBridge.decode(mock)
+		let result = try CheckoutBridge.decode(event)
 
 		guard case .webPixels(let pixelEvent) = result, case .standardEvent(let pageViewedEvent) = pixelEvent else {
 			XCTFail("Expected .webPixels(.pageViewed), got \(result)")
@@ -317,6 +344,20 @@ class CheckoutBridgeTests: XCTestCase {
 		}
 		"""
 	}
+
+	private func createPayload(_ jsonString: String) -> String {
+		return jsonString
+			.replacingOccurrences(of: "\"", with: "\\\"")
+			.replacingOccurrences(of: "\n", with: "")
+	}
+
+	private func createErrorEventPayload(_ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
+		return WKScriptMessageMock(body: "{\"name\": \"error\",\"body\": \"\(createPayload(jsonString))\"}")
+	}
+
+	private func createEventPayload(name: String, _ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
+		return WKScriptMessageMock(body: "{\"name\": \"\(name)\",\"body\": \"\(createPayload(jsonString))\"}")
+	}
 }
 
 struct MyCustomData: Codable {
@@ -327,3 +368,5 @@ struct MyCustomDataWrapper: Codable {
 	let attr: String
 	let attr2: [Int]
 }
+
+// swiftlint:enable type_body_length

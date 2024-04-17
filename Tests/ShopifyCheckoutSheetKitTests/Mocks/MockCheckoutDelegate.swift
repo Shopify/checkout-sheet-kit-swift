@@ -29,8 +29,6 @@ class ExampleDelegate: CheckoutDelegate {
 
 	func checkoutDidCancel() {}
 
-	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {}
-
 	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {}
 
 	func checkoutDidClickContactLink(url: URL) {}

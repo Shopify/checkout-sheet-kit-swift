@@ -162,10 +162,6 @@ extension CartViewController: CheckoutDelegate {
 		dismiss(animated: true)
 	}
 
-	func checkoutDidFail(errors: [ShopifyCheckoutSheetKit.CheckoutError]) {
-		print(#function, errors)
-	}
-
 	func checkoutDidClickContactLink(url: URL) {
 		if UIApplication.shared.canOpenURL(url) {
 			UIApplication.shared.open(url)
@@ -173,15 +169,44 @@ extension CartViewController: CheckoutDelegate {
 	}
 
 	func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
-		switch error {
-		case .sdkError(let underlying):
-			print(#function, underlying)
-			forceCloseCheckout("Checkout Unavailable")
-		case .checkoutExpired(let message): forceCloseCheckout(message)
-		case .checkoutUnavailable(let message): forceCloseCheckout(message)
-		case .checkoutLiquidNotMigrated(let message):
-			print(#function, message)
-			forceCloseCheckout("Checkout Unavailable")
+		var errorMessage: String = ""
+
+		/// Internal Checkout SDK error
+		if case .sdkError(let underlying, _) = error {
+			errorMessage = "\(underlying.localizedDescription)"
+		}
+
+		/// Checkout unavailable error
+		if case .checkoutUnavailable(let message, let code, _) = error {
+			errorMessage = message
+			handleCheckoutUnavailable(message, code)
+		}
+
+		/// Storefront configuration error
+		if case .configurationError(let message, _, _) = error {
+			errorMessage = message
+		}
+
+		/// Checkout has expired, re-create cart to fetch a new checkout URL
+		if case .checkoutExpired(let message, _, _) = error {
+			errorMessage = message
+		}
+
+		/// Unauthorized checkout
+		if case .authenticationError(let message, _, _) = error {
+			errorMessage = message
+		}
+
+		print(#function, error)
+		forceCloseCheckout(errorMessage)
+	}
+
+	private func handleCheckoutUnavailable(_ message: String, _ code: CheckoutUnavailable) {
+		switch code {
+		case .clientError(let clientErrorCode):
+			print("[CheckoutUnavailable] (checkoutError)", message, clientErrorCode)
+		case .httpError(let statusCode):
+			print("[CheckoutUnavailable] (httpError)", statusCode)
 		}
 	}
 
@@ -196,8 +221,7 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-	private func forceCloseCheckout(_ message: String) {
-		print(#function, message)
+	private func forceCloseCheckout(_ message: String = "Checkout unavailable") {
 		dismiss(animated: true)
 		resetCart()
 		self.showAlert(message: message)
