@@ -306,9 +306,9 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
     // You can inspect and log the Erorr and stacktrace to identify the problem.
     case sdkError(underlying: Swift.Error)
 
-    // Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
-    // The SDK only supports stores migrated for extensibility.
-    case checkoutLiquidNotMigrated(message: String)
+    // Issued when the provided checkout URL results in an error related to shop configuration.
+    // Note: The SDK only supports stores migrated for extensibility.
+    case configurationError(message: String)
 
     // Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
     // The provided message describes the error and may be logged and presented to the buyer.
@@ -341,18 +341,39 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 }
 ```
 
-#### Error handling guidance
+### Error handling
 
-| `CheckoutError`                                                          | Description                                | Recommendation                                                                                                                                                                    |
-| ------------------------------------------------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.checkoutLiquidNotMigrated`                                             | `checkout.liquid` is not supported.        | Please upgrade to Extensibility.                                                                                                                                                  |
-| `.checkoutUnavailable(message: "Forbidden")`                             | Access to checkout is forbidden.           | This error is unrecoverable.                                                                                                                                                      |
-| `.checkoutUnavailable(message: "Internal Server Error")`                 | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                                                                                                  |
+In the event of a checkout error ocurring, the Checkout Sheet Kit _may_ attempt a retry to recover from the error. Recovery will happen in the background by discarding the failed webview and creating a new "recovery" instance. Recovery will be attempted in the following scenarios:
+
+- The webview receives a response with a 5XX status code
+- An internal SDK error is emitted
+
+There are some caveats to note when this scenario occurs:
+
+1. The checkout experience may look different to buyers. Though the sheet kit will attempt to load any checkout customizations for the storefront, there is no guarantee they will show in recovery mode.
+2. The `checkoutDidComplete(event:)` will be emitted with partial data. Invocations will only receive the order ID via `event.orderDetails.id`.
+3. `checkoutDidEmitWebPixelEvent` lifecycle methods will **not** be emitted.
+
+Should you wish to opt-out of this fallback experience entirely, you can do so by adding a `shouldRecoverFromError(error:)` method to your delegate controller. Errors given to the `checkoutDidFail(error:)` lifecycle method, will contain an `isRecoverable` property by default indicating whether the request should be retried or not.
+
+```swift
+func shouldRecoverFromError(error: CheckoutError) {
+  return error.isRecoverable // default
+}
+```
+
+#### `CheckoutError`
+
+| Type                                                            | Description                                | Recommendation                                                                                                                                                                    |
+| --------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                                                                                                         |
+| `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                                                                                                      |
+| `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                                                                                                  |
 | `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores.                                                                                 |
-| `.checkoutUnavailable(message: "Customer account required")`             | A Customer account is required to proceed  | Request customer login before proceeding to checkout. See [Customer Accounts API](https://github.com/Shopify/checkout-sheet-kit-swift#customer-account-api) for more information. |
-| `.checkoutExpired(message: "Checkout already completed")`                | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                                                                                                              |
-| `.checkoutExpired(message: "Cart is empty")`                             | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                                                                                                    |
-| `.sdkError`                                                              | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                                                                                                           |
+| `.checkoutUnavailable(message: "Customer account required")`    | A Customer account is required to proceed  | Request customer login before proceeding to checkout. See [Customer Accounts API](https://github.com/Shopify/checkout-sheet-kit-swift#customer-account-api) for more information. |
+| `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                                                                                                              |
+| `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                                                                                                    |
+| `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                                                                                                           |
 
 #### Integrating with Web Pixels, monitoring behavioral data
 
