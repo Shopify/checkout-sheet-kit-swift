@@ -1,56 +1,71 @@
----
-name: Bug report
-about: Create a bug report
-title: ''
-labels: 'Bug'
-assignees: ''
+name: 🐛 Bug Report
+description: Something is wrong with the Checkout Sheet Kit.
+labels:
+  - 'Bug'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Hi there!
 
----
+        If your issue is **not** related to the Checkout Sheet Kit itself, but rather an internal checkout or storefront problem, please reach out to Shopify support directly where the issue will be triaged correctly.
 
-**Describe the bug**
+  - type: dropdown
+    attributes:
+      label: What area is the issue related to?
+      options:
+        - Checkout Sheet Kit
+        - Storefront API
+        - Multipass
+        - Lifecycle methods
+        - Web Pixels
+        - Other / I don't know
+    validations:
+      required: true
 
-<!--
-A clear and concise description of what the bug is.
--->
+  - type: input
+    attributes:
+      label: Do you have a minimum reproducible example?
+    validations:
+      required: false
 
-**To Reproduce**
+  - type: input
+    attributes:
+      label: What version of Checkout Sheet Kit are you using?
+      description: Please list the package version and device you are testing with.
+    validations:
+      required: true
 
-<!--
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
--->
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: A list of steps to reproduce the behavior.
+    validations:
+      required: true
 
-**Expected behavior**
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+    validations:
+      required: true
 
-<!--
-A clear and concise description of what you expected to happen.
--->
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: A concise description of what you're experiencing.
+    validations:
+      required: true
 
-**Screenshots/Videos/Log output**
+  - type: textarea
+    attributes:
+      label: Screenshots/Videos/Log output
+    validations:
+      required: false
 
-<!--
-If applicable, add screenshots, videos or log output to help explain your problem.
--->
-
-**Versions (please complete the following information):**
-
-<!--
- - Checkout Sheet Kit Version [e.g. 1.0.0]
- - Device: [e.g. iPhone 15 Pro]
- - OS: [e.g. iOS 16.0]
--->
-
-**Shop domain**
-
-<!--
-This is optional, but will help us search logs for any errors that occurred server-side.
--->
-
-**Additional context**
-
-<!--
-Add any other context about the problem here.
--->
+  - type: textarea
+    attributes:
+      label: Storefront domain
+      description: (Optional) This will expedite our search for any errors that occurred.
+    validations:
+      required: false
