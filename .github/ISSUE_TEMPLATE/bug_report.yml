@@ -25,16 +25,17 @@ body:
 
   - type: input
     attributes:
-      label: Do you have a minimum reproducible example?
-    validations:
-      required: false
-
-  - type: input
-    attributes:
       label: What version of Checkout Sheet Kit are you using?
       description: Please list the package version and device you are testing with.
     validations:
       required: true
+
+  - type: input
+    attributes:
+      label: Do you have a minimum reproducible example?
+      description: (Optional) This will help is debug the issue more quickly.
+    validations:
+      required: false
 
   - type: textarea
     attributes:
