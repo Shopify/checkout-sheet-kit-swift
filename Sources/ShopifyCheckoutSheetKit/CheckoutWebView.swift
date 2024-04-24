@@ -133,9 +133,11 @@ class CheckoutWebView: WKWebView {
     
     func setupColorScripts() {
         let cssScript = """
-  var style = document.createElement('style');
-  style.innerHTML = 'section { background-color: #121212 !important; }';
-  document.head.appendChild(style);
+var style = document.createElement('style');
+style.innerHTML = 'section { background-color: #121212 !important; }';
+document.head.appendChild(style);
+var footers = document.getElementsByTagName('footer');
+footers[0].style = 'display: none;';
 """
         
         let userScript = WKUserScript(source: cssScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
@@ -207,7 +209,6 @@ private var timer: Date?
 
 extension CheckoutWebView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
 		guard let url = action.request.url else {
 			decisionHandler(.allow)
 			return
