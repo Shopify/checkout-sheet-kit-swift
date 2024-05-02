@@ -34,7 +34,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
 
-private let deprecatedReasonHeader = "X-Shopify-API-Deprecated-Reason"
+private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
 private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
 class CheckoutWebView: WKWebView {
