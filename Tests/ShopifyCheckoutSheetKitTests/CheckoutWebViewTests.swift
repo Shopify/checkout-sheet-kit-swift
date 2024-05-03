@@ -160,16 +160,15 @@ class CheckoutWebViewTests: XCTestCase {
 
 		for url in urls {
 			recovery = createRecoveryAgent()
-			recovery.load(checkout: URL(string: url)!)
 			let didCompleteCheckoutExpectation = expectation(description: "checkoutViewDidCompleteCheckout was called")
 
 			mockDelegate.didEmitCheckoutCompletedEventExpectation = didCompleteCheckoutExpectation
 			recovery.viewDelegate = mockDelegate
 
+			recovery.load(checkout: URL(string: url)!)
 			let urlResponse = HTTPURLResponse(url: URL(string: url)!, statusCode: 200, httpVersion: nil, headerFields: nil)!
 
-			let policy = recovery.handleResponse(urlResponse)
-			XCTAssertEqual(policy, .allow)
+			XCTAssertEqual(recovery.handleResponse(urlResponse), .allow)
 
 			waitForExpectations(timeout: 5) { _ in
 				XCTAssertEqual(self.mockDelegate.completedEventReceived?.orderDetails.id, "1234")
@@ -209,7 +208,7 @@ class CheckoutWebViewTests: XCTestCase {
 		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
 		view.viewDelegate = mockDelegate
 
-		let urlResponse = HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: ["X-Shopify-API-Deprecated-Reason": "checkout_liquid_not_supported"])!
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: ["x-shopify-api-deprecated-reason": "checkout_liquid_not_supported"])!
 
 		let policy = view.handleResponse(urlResponse)
 		XCTAssertEqual(policy, .cancel)

@@ -45,6 +45,8 @@ class CheckoutWebView: WKWebView {
 	/// A reference to the view is needed when preload is deactivated in order to detatch the bridge
 	static weak var uncacheableViewRef: CheckoutWebView?
 
+	private var navigationObserver: NSKeyValueObservation?
+
 	var isBridgeAttached = false
 
 	var isRecovery = false {
@@ -135,6 +137,10 @@ class CheckoutWebView: WKWebView {
 
 		connectBridge()
 		setBackgroundColor()
+
+		if recovery {
+			observeNavigationChanges()
+		}
 	}
 
 	private func connectBridge() {
@@ -155,8 +161,22 @@ class CheckoutWebView: WKWebView {
 		}
 	}
 
+	private func observeNavigationChanges() {
+		navigationObserver = observe(\.url, options: [.new]) { [weak self] (_, change) in
+			guard let self = self else { return }
+
+			if let url = change.newValue as? URL {
+				if isConfirmation(url: url) {
+					self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
+					navigationObserver?.invalidate()
+				}
+			}
+		}
+	}
+
 	deinit {
 		detachBridge()
+		navigationObserver?.invalidate()
 	}
 
 	public func detachBridge() {
@@ -275,15 +295,6 @@ extension CheckoutWebView: WKNavigationDelegate {
 		let errorMessageForStatusCode = HTTPURLResponse.localizedString(
 			forStatusCode: statusCode
 		)
-
-		if let url = response.url {
-			let isRecoveryConfirmationPage = isRecovery && statusCode == 200 && isConfirmation(url: url)
-
-			if isRecoveryConfirmationPage {
-				let event = createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url))
-				viewDelegate?.checkoutViewDidCompleteCheckout(event: event)
-			}
-		}
 
 		guard isCheckout(url: response.url) else {
 			return .allow
