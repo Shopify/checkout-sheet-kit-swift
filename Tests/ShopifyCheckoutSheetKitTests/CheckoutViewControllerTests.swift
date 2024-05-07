@@ -90,7 +90,6 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertNotEqual(view, viewController.checkoutView)
 		XCTAssertTrue(viewController.checkoutView.isRecovery)
 		XCTAssertFalse(viewController.checkoutView.isBridgeAttached)
-		XCTAssertFalse(viewController.checkoutView.isBridgeAvailable)
 		XCTAssertFalse(viewController.checkoutView.isPreloadingAvailable)
 
 		XCTAssertFalse(viewController.checkoutView.translatesAutoresizingMaskIntoConstraints)

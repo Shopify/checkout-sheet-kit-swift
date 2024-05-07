@@ -53,7 +53,6 @@ class CheckoutWebViewTests: XCTestCase {
 		XCTAssertTrue(recovery.isRecovery)
 		XCTAssertFalse(recovery.isBridgeAttached)
 		XCTAssertFalse(recovery.isPreloadingAvailable)
-		XCTAssertFalse(recovery.isBridgeAvailable)
 		XCTAssertEqual(recovery.configuration.applicationNameForUserAgent, "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (noconnect;automatic;standard_recovery)")
 		XCTAssertEqual(recovery.backgroundColor, backgroundColor)
 		XCTAssertFalse(recovery.isOpaque)

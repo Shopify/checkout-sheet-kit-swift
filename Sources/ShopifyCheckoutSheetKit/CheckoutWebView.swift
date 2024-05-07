@@ -55,9 +55,6 @@ class CheckoutWebView: WKWebView {
 		}
 	}
 
-	var isBridgeAvailable: Bool {
-		return !isRecovery
-	}
 	var isPreloadingAvailable: Bool {
 		return !isRecovery
 	}
@@ -135,21 +132,38 @@ class CheckoutWebView: WKWebView {
 		translatesAutoresizingMaskIntoConstraints = false
 		scrollView.contentInsetAdjustmentBehavior = .never
 
-		connectBridge()
 		setBackgroundColor()
 
 		if recovery {
 			observeNavigationChanges()
+		} else {
+			connectBridge()
 		}
 	}
 
-	private func connectBridge() {
-		if isBridgeAvailable {
-			configuration.userContentController
-				.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
-
-			isBridgeAttached = true
+	deinit {
+		if isRecovery {
+			navigationObserver?.invalidate()
+		} else {
+			detachBridge()
 		}
+	}
+
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
+	private func connectBridge() {
+		configuration.userContentController
+			.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
+
+		isBridgeAttached = true
+	}
+
+	public func detachBridge() {
+		configuration.userContentController
+			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
+		isBridgeAttached = false
 	}
 
 	private func setBackgroundColor() {
@@ -172,21 +186,6 @@ class CheckoutWebView: WKWebView {
 				}
 			}
 		}
-	}
-
-	deinit {
-		detachBridge()
-		navigationObserver?.invalidate()
-	}
-
-	public func detachBridge() {
-		configuration.userContentController
-			.removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)
-		isBridgeAttached = false
-	}
-
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
 	}
 
 	// MARK: -
@@ -407,11 +406,10 @@ extension CheckoutWebView: WKNavigationDelegate {
 	}
 
 	private func isConfirmation(url: URL) -> Bool {
-		let pathComponents = url.pathComponents
 		let pattern = "^(thank[_-]you)$"
 		let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
 
-		for component in pathComponents {
+		for component in url.pathComponents {
 			let range = NSRange(location: 0, length: component.utf16.count)
 			if regex?.firstMatch(in: component, options: [], range: range) != nil {
 				return true
