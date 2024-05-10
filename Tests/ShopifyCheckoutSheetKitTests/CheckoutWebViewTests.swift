@@ -25,6 +25,7 @@ import XCTest
 import WebKit
 @testable import ShopifyCheckoutSheetKit
 
+// swiftlint:disable type_body_length
 class CheckoutWebViewTests: XCTestCase {
 	private var view: CheckoutWebView!
 	private var recovery: CheckoutWebView!
@@ -171,6 +172,57 @@ class CheckoutWebViewTests: XCTestCase {
 
 			waitForExpectations(timeout: 5) { _ in
 				XCTAssertEqual(self.mockDelegate.completedEventReceived?.orderDetails.id, "1234")
+			}
+		}
+	}
+
+	func test401responseOnCheckoutURLCodeDelegation() {
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
+		let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+		view.viewDelegate = mockDelegate
+
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 401, httpVersion: nil, headerFields: nil)!
+
+		let policy = view.handleResponse(urlResponse)
+		XCTAssertEqual(policy, .cancel)
+
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.checkoutUnavailable(let message, let code, let recoverable)):
+				XCTAssertEqual(message, "unauthorized")
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
+			}
+		}
+	}
+
+	func testReturnsAuthenticationErrorFor401WithHeader() {
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
+		let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+		view.viewDelegate = mockDelegate
+
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 401, httpVersion: nil, headerFields: [
+			"x-shopify-checkout-sheet-kit-error": "customer_account_required"
+		])!
+
+		let policy = view.handleResponse(urlResponse)
+		XCTAssertEqual(policy, .cancel)
+
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.authenticationError(let message, let code, let recoverable)):
+				XCTAssertEqual(message, "Customer Account Required")
+				XCTAssertEqual(code, CheckoutErrorCode.customerAccountRequired)
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
 			}
 		}
 	}
@@ -344,3 +396,4 @@ class LoadedRequestObservableWebView: CheckoutWebView {
 		return nil
 	}
 }
+// swiftlint:enable type_body_length

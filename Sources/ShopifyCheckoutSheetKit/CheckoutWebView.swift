@@ -34,8 +34,10 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
 
+private let errorReasonHeader = "x-shopify-checkout-sheet-kit-error"
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
 private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
+private let customerAccountRequiredReason = "customer_account_required"
 
 class CheckoutWebView: WKWebView {
 	private static var cache: CacheEntry?
@@ -304,6 +306,12 @@ extension CheckoutWebView: WKNavigationDelegate {
 			CheckoutWebView.invalidate()
 
 			switch statusCode {
+			case 401:
+				if let reason = headers[errorReasonHeader] as? String, reason.lowercased() == customerAccountRequiredReason {
+					viewDelegate?.checkoutViewDidFailWithError(error: .authenticationError(message: "Customer Account Required", code: CheckoutErrorCode.customerAccountRequired, recoverable: false))
+				} else {
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: errorMessageForStatusCode, code: CheckoutUnavailable.httpError(statusCode: statusCode), recoverable: false))
+				}
 			case 404:
 				if let reason = headers[deprecatedReasonHeader] as? String, reason.lowercased() == checkoutLiquidNotSupportedReason {
 					viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
