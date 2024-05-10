@@ -63,6 +63,11 @@ class ProductViewController: UIViewController {
 			target: self, action: #selector(reloadProduct)
 		)
 
+		navigationItem.leftBarButtonItem = UIBarButtonItem(
+			image: UIImage(systemName: "cart"),
+			style: .plain,
+			target: self, action: #selector(openCart))
+
 		if #available(iOS 15.0, *) {
 			addToCartButton.configurationUpdateHandler = {
 				$0.configuration?.showsActivityIndicator = !$0.isEnabled
@@ -119,6 +124,17 @@ class ProductViewController: UIViewController {
 		}
 	}
 
+	@IBAction private func openCart() {
+		let cartViewController = CartViewController()
+
+		if #available(iOS 13.0, *) {
+			cartViewController.modalPresentationStyle = .automatic
+		} else {
+			cartViewController.modalPresentationStyle = .overFullScreen
+		}
+		present(cartViewController, animated: true, completion: nil)
+	}
+
 	// MARK: Private
 
 	private func updateProductDetails() {
@@ -127,6 +143,8 @@ class ProductViewController: UIViewController {
 		titleLabel.text = product.title
 		variantLabel.text = product.vendor
 		descriptionLabel.text = product.description
+
+		self.navigationItem.title = product.title
 
 		if let featuredImageURL = product.featuredImage?.url {
 			image.load(url: featuredImageURL)
