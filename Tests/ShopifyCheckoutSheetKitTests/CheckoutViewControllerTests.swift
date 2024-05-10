@@ -31,6 +31,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 	private let checkoutURL = URL(string: "https://checkout-sdk.myshopify.com")!
 	private var viewController: CheckoutWebViewController!
 	private var navigationController: UINavigationController!
+	private var delegate = ExampleDelegate()
 
 	override func setUp() {
 		ShopifyCheckoutSheetKit.configure {
@@ -38,7 +39,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 			$0.title = customTitle ?? "Checkout"
 		}
 		viewController = CheckoutWebViewController(
-			checkoutURL: checkoutURL, delegate: ExampleDelegate())
+			checkoutURL: checkoutURL, delegate: delegate)
 
 		navigationController = UINavigationController(rootViewController: viewController)
 	}
@@ -63,7 +64,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		let two = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertEqual(one, two)
 
-		viewController.checkoutViewDidCompleteCheckout(event: emptyCheckoutCompletedEvent)
+		viewController.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent())
 
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
@@ -78,6 +79,29 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
+		XCTAssertFalse(viewController.checkoutView.isRecovery)
+	}
+
+	func testInstantiatesRecoveryWebviewOnRecoverableError() {
+		let view = CheckoutWebView.for(checkout: checkoutURL)
+
+		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: true))
+
+		XCTAssertNotEqual(view, viewController.checkoutView)
+		XCTAssertTrue(viewController.checkoutView.isRecovery)
+		XCTAssertFalse(viewController.checkoutView.isBridgeAttached)
+		XCTAssertFalse(viewController.checkoutView.isPreloadingAvailable)
+
+		XCTAssertFalse(viewController.checkoutView.translatesAutoresizingMaskIntoConstraints)
+		XCTAssertEqual(viewController.checkoutView.scrollView.contentInsetAdjustmentBehavior, .never)
+	}
+
+	func testDoesNotInstantiateRecoveryWebviewOnNonRecoverableError() {
+		_ = CheckoutWebView.for(checkout: checkoutURL)
+
+		viewController.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: false))
+
+		XCTAssertFalse(viewController.checkoutView.isRecovery)
 	}
 
 	func testFailWithErrorDisablesPreloadingActivtedByClient() {
@@ -101,7 +125,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertNotEqual(two, three)
 	}
 
-	func testCloseDoesNotInvalidateViewCacheWhenPreloadingISCalledByClient() {
+	func testCloseDoesNotInvalidateViewCacheWhenPreloadingIsCalledByClient() {
 		ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
 
 		let one = CheckoutWebView.for(checkout: checkoutURL)

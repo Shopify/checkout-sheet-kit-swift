@@ -25,14 +25,38 @@ import XCTest
 import WebKit
 @testable import ShopifyCheckoutSheetKit
 
+// swiftlint:disable type_body_length
 class CheckoutWebViewTests: XCTestCase {
 	private var view: CheckoutWebView!
+	private var recovery: CheckoutWebView!
 	private var mockDelegate: MockCheckoutWebViewDelegate!
+	private var url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
 
 	override func setUp() {
-		view = CheckoutWebView.for(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		view = CheckoutWebView.for(checkout: url)
         mockDelegate = MockCheckoutWebViewDelegate()
         view.viewDelegate = mockDelegate
+	}
+
+	private func createRecoveryAgent() -> CheckoutWebView {
+		recovery = CheckoutWebView.for(checkout: url, recovery: true)
+        mockDelegate = MockCheckoutWebViewDelegate()
+        recovery.viewDelegate = mockDelegate
+        return recovery
+	}
+
+	func testUsesRecoveryAgent() {
+		let backgroundColor: UIColor = .systemRed
+		ShopifyCheckoutSheetKit.configuration.backgroundColor = backgroundColor
+		ShopifyCheckoutSheetKit.configuration.colorScheme = .automatic
+		recovery = createRecoveryAgent()
+
+		XCTAssertTrue(recovery.isRecovery)
+		XCTAssertFalse(recovery.isBridgeAttached)
+		XCTAssertFalse(recovery.isPreloadingAvailable)
+		XCTAssertEqual(recovery.configuration.applicationNameForUserAgent, "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (noconnect;automatic;standard_recovery)")
+		XCTAssertEqual(recovery.backgroundColor, backgroundColor)
+		XCTAssertFalse(recovery.isOpaque)
 	}
 
 	func testEmailContactLinkDelegation() {
@@ -127,6 +151,82 @@ class CheckoutWebViewTests: XCTestCase {
 		}
 	}
 
+	func testObtainsOrderIDFromQuery() {
+		let urls = [
+			"http://shopify1.shopify.com/checkouts/c/12345/thank-you?order_id=1234",
+			"http://shopify1.shopify.com/checkouts/c/12345/thank_you?order_id=1234",
+			"http://shopify1.shopify.com/checkouts/c/12345/thank_you/completed?order_id=1234"
+		]
+
+		for url in urls {
+			recovery = createRecoveryAgent()
+			let didCompleteCheckoutExpectation = expectation(description: "checkoutViewDidCompleteCheckout was called")
+
+			mockDelegate.didEmitCheckoutCompletedEventExpectation = didCompleteCheckoutExpectation
+			recovery.viewDelegate = mockDelegate
+
+			recovery.load(checkout: URL(string: url)!)
+			let urlResponse = HTTPURLResponse(url: URL(string: url)!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+			XCTAssertEqual(recovery.handleResponse(urlResponse), .allow)
+
+			waitForExpectations(timeout: 5) { _ in
+				XCTAssertEqual(self.mockDelegate.completedEventReceived?.orderDetails.id, "1234")
+			}
+		}
+	}
+
+	func test401responseOnCheckoutURLCodeDelegation() {
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
+		let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+		view.viewDelegate = mockDelegate
+
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 401, httpVersion: nil, headerFields: nil)!
+
+		let policy = view.handleResponse(urlResponse)
+		XCTAssertEqual(policy, .cancel)
+
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.checkoutUnavailable(let message, let code, let recoverable)):
+				XCTAssertEqual(message, "unauthorized")
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
+			}
+		}
+	}
+
+	func testReturnsAuthenticationErrorFor401WithHeader() {
+		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
+		let link = view.url!
+		let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+		view.viewDelegate = mockDelegate
+
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 401, httpVersion: nil, headerFields: [
+			"x-shopify-checkout-sheet-kit-error": "customer_account_required"
+		])!
+
+		let policy = view.handleResponse(urlResponse)
+		XCTAssertEqual(policy, .cancel)
+
+		waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.authenticationError(let message, let code, let recoverable)):
+				XCTAssertEqual(message, "Customer Account Required")
+				XCTAssertEqual(code, CheckoutErrorCode.customerAccountRequired)
+				XCTAssertFalse(recoverable)
+			default:
+				XCTFail("Unhandled error case received")
+			}
+		}
+	}
+
 	func test404responseOnCheckoutURLCodeDelegation() {
 		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
 		let link = view.url!
@@ -159,7 +259,7 @@ class CheckoutWebViewTests: XCTestCase {
 		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
 		view.viewDelegate = mockDelegate
 
-		let urlResponse = HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: ["X-Shopify-API-Deprecated-Reason": "checkout_liquid_not_supported"])!
+		let urlResponse = HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: ["x-shopify-api-deprecated-reason": "checkout_liquid_not_supported"])!
 
 		let policy = view.handleResponse(urlResponse)
 		XCTAssertEqual(policy, .cancel)
@@ -296,3 +396,4 @@ class LoadedRequestObservableWebView: CheckoutWebView {
 		return nil
 	}
 }
+// swiftlint:enable type_body_length

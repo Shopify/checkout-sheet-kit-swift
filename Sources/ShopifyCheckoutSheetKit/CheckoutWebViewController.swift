@@ -25,12 +25,9 @@ import UIKit
 import WebKit
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
-
-	// MARK: Properties
-
 	weak var delegate: CheckoutDelegate?
 
-	internal let checkoutView: CheckoutWebView
+	internal var checkoutView: CheckoutWebView
 
 	internal lazy var progressBar: ProgressBarView = {
 		let progressBar = ProgressBarView(frame: .zero)
@@ -108,12 +105,12 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		])
 		view.bringSubviewToFront(progressBar)
 
-		observeProgressChanges()
+		observeProgressChanges(checkoutView)
 		loadCheckout()
 	}
 
-	internal func observeProgressChanges() {
-		progressObserver = checkoutView.observe(\.estimatedProgress, options: [.new]) { [weak self] (_, change) in
+	internal func observeProgressChanges(_ view: WKWebView) {
+		progressObserver = view.observe(\.estimatedProgress, options: [.new]) { [weak self] (_, change) in
 			guard let self = self else { return }
 			if let newProgress = change.newValue {
 				let estimatedProgress = Float(newProgress)
@@ -156,6 +153,40 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 		delegate?.checkoutDidCancel()
 	}
+
+	private func presentFallbackViewController(url: URL) {
+		progressObserver?.invalidate()
+		checkoutView.removeFromSuperview()
+
+		self.checkoutView = CheckoutWebView.for(checkout: url, recovery: true)
+		checkoutView.translatesAutoresizingMaskIntoConstraints = false
+		checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
+		checkoutView.viewDelegate = self
+		checkoutView.alpha = 1
+
+		view.addSubview(checkoutView)
+		NSLayoutConstraint.activate([
+			checkoutView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+			checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+		])
+
+		view.addSubview(progressBar)
+		progressBar.translatesAutoresizingMaskIntoConstraints = false
+		NSLayoutConstraint.activate([
+			progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+			progressBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+			progressBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+			progressBar.heightAnchor.constraint(equalToConstant: 1)
+		])
+		view.bringSubviewToFront(checkoutView)
+		view.bringSubviewToFront(progressBar)
+
+		observeProgressChanges(checkoutView)
+		checkoutView.load(checkout: url)
+		progressBar.startAnimating()
+	}
 }
 
 extension CheckoutWebViewController: CheckoutWebViewDelegate {
@@ -179,6 +210,12 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 	func checkoutViewDidFailWithError(error: CheckoutError) {
 		CheckoutWebView.invalidate()
 		delegate?.checkoutDidFail(error: error)
+
+		let shouldAttemptRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
+
+		if shouldAttemptRecovery {
+			self.presentFallbackViewController(url: self.checkoutURL)
+		}
 	}
 
 	func checkoutViewDidClickLink(url: URL) {
@@ -187,6 +224,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidToggleModal(modalVisible: Bool) {
 		guard let navigationController = self.navigationController else { return }
+
 		navigationController.setNavigationBarHidden(modalVisible, animated: true)
 	}
 

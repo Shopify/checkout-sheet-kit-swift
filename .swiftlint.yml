@@ -1,5 +1,6 @@
 disabled_rules:
   - line_length
+  - file_length
 
 opt_in_rules:
   - array_init
@@ -18,6 +19,9 @@ opt_in_rules:
   - modifier_order
   - overridden_super_call
   - toggle_bool
+  - switch_case_alignment:
+    indented_cases: false
+  - fallthrough
 
 nesting:
   type_level:

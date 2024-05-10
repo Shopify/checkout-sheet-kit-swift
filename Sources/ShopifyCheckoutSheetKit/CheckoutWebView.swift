@@ -34,8 +34,10 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
 
-private let deprecatedReasonHeader = "X-Shopify-API-Deprecated-Reason"
+private let errorReasonHeader = "x-shopify-checkout-sheet-kit-error"
+private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
 private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
+private let customerAccountRequiredReason = "customer_account_required"
 
 class CheckoutWebView: WKWebView {
 	private static var cache: CacheEntry?
@@ -45,9 +47,26 @@ class CheckoutWebView: WKWebView {
 	/// A reference to the view is needed when preload is deactivated in order to detatch the bridge
 	static weak var uncacheableViewRef: CheckoutWebView?
 
+	private var navigationObserver: NSKeyValueObservation?
+
 	var isBridgeAttached = false
 
-	static func `for`(checkout url: URL) -> CheckoutWebView {
+	var isRecovery = false {
+		didSet {
+			isBridgeAttached = false
+		}
+	}
+
+	var isPreloadingAvailable: Bool {
+		return !isRecovery
+	}
+
+	static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
+		if recovery {
+			CheckoutWebView.invalidate()
+			return CheckoutWebView(recovery: true)
+		}
+
 		let cacheKey = url.absoluteString
 
 		guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
@@ -92,10 +111,17 @@ class CheckoutWebView: WKWebView {
 	}
 
 	// MARK: Initializers
+	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
+		if recovery {
+			/// Uses a non-persistent, private cookie store to avoid cross-instance pollution
+			configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+			configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent
+		} else {
+			/// Set the User-Agent in non-recovery view
+			configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
+		}
 
-	override init(frame: CGRect, configuration: WKWebViewConfiguration) {
-		configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
-
+		self.isRecovery = recovery
 		super.init(frame: frame, configuration: configuration)
 
 		#if DEBUG
@@ -105,21 +131,35 @@ class CheckoutWebView: WKWebView {
 		#endif
 
 		navigationDelegate = self
+		translatesAutoresizingMaskIntoConstraints = false
+		scrollView.contentInsetAdjustmentBehavior = .never
 
-		configuration.userContentController
-			.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
-		isBridgeAttached = true
+		setBackgroundColor()
 
-		isOpaque = false
-		backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
-
-		if #available(iOS 15.0, *) {
-			underPageBackgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+		if recovery {
+			observeNavigationChanges()
+		} else {
+			connectBridge()
 		}
 	}
 
 	deinit {
-		detachBridge()
+		if isRecovery {
+			navigationObserver?.invalidate()
+		} else {
+			detachBridge()
+		}
+	}
+
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
+	private func connectBridge() {
+		configuration.userContentController
+			.add(MessageHandler(delegate: self), name: CheckoutBridge.messageHandler)
+
+		isBridgeAttached = true
 	}
 
 	public func detachBridge() {
@@ -128,22 +168,42 @@ class CheckoutWebView: WKWebView {
 		isBridgeAttached = false
 	}
 
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
+	private func setBackgroundColor() {
+		isOpaque = false
+		backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+
+		if #available(iOS 15.0, *) {
+			underPageBackgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+		}
+	}
+
+	private func observeNavigationChanges() {
+		navigationObserver = observe(\.url, options: [.new]) { [weak self] (_, change) in
+			guard let self = self else { return }
+
+			if let url = change.newValue as? URL {
+				if isConfirmation(url: url) {
+					self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
+					navigationObserver?.invalidate()
+				}
+			}
+		}
 	}
 
 	// MARK: -
 
 	func load(checkout url: URL, isPreload: Bool = false) {
 		var request = URLRequest(url: url)
-		if isPreload {
+
+		if isPreload && isPreloadingAvailable {
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
 		}
+
 		load(request)
 	}
 
 	private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {
-		if checkoutDidLoad && checkoutDidPresent {
+		if checkoutDidLoad && checkoutDidPresent && isBridgeAttached {
 			CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
 			presentedEventDidDispatch = true
 		}
@@ -230,6 +290,7 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
+		let allowRecoverable = !isRecovery
 		let headers = response.allHeaderFields
 		let statusCode = response.statusCode
 		let errorMessageForStatusCode = HTTPURLResponse.localizedString(
@@ -245,6 +306,12 @@ extension CheckoutWebView: WKNavigationDelegate {
 			CheckoutWebView.invalidate()
 
 			switch statusCode {
+			case 401:
+				if let reason = headers[errorReasonHeader] as? String, reason.lowercased() == customerAccountRequiredReason {
+					viewDelegate?.checkoutViewDidFailWithError(error: .authenticationError(message: "Customer Account Required", code: CheckoutErrorCode.customerAccountRequired, recoverable: false))
+				} else {
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: errorMessageForStatusCode, code: CheckoutUnavailable.httpError(statusCode: statusCode), recoverable: false))
+				}
 			case 404:
 				if let reason = headers[deprecatedReasonHeader] as? String, reason.lowercased() == checkoutLiquidNotSupportedReason {
 					viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
@@ -261,7 +328,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 					message: errorMessageForStatusCode,
 					code: CheckoutUnavailable.httpError(statusCode: statusCode),
-					recoverable: true
+					recoverable: allowRecoverable
 				))
 			default:
 				viewDelegate?.checkoutViewDidFailWithError(
@@ -295,9 +362,18 @@ extension CheckoutWebView: WKNavigationDelegate {
 			let endTime = Date()
 			let diff = endTime.timeIntervalSince(startTime)
 			let preloading = String(ShopifyCheckoutSheetKit.Configuration().preloading.enabled)
-			let message = "Preloaded checkout in \(String(format: "%.2f", diff))s"
+			let message = "Loaded checkout in \(String(format: "%.2f", diff))s"
+
 			ShopifyCheckoutSheetKit.configuration.logger.log(message)
-			CheckoutBridge.instrument(self, InstrumentationPayload(name: "checkout_finished_loading", value: Int(diff * 1000), type: .histogram, tags: ["preloading": preloading]))
+
+			if isBridgeAttached {
+				CheckoutBridge.instrument(self,
+					InstrumentationPayload(
+					name: "checkout_finished_loading",
+					value: Int(diff * 1000),
+					type: .histogram,
+					tags: ["preloading": preloading]))
+			}
 		}
 		checkoutDidLoad = true
 		timer = nil
@@ -305,7 +381,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
-		viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+		viewDelegate?.checkoutViewDidFailWithError(
+			error: .sdkError(underlying: error, recoverable: !isRecovery)
+		)
 	}
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
@@ -335,6 +413,33 @@ extension CheckoutWebView: WKNavigationDelegate {
 		return self.url == url
 	}
 
+	private func isConfirmation(url: URL) -> Bool {
+		let pattern = "^(thank[_-]you)$"
+		let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+
+		for component in url.pathComponents {
+			let range = NSRange(location: 0, length: component.utf16.count)
+			if regex?.firstMatch(in: component, options: [], range: range) != nil {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	private func getOrderIdFromQuery(url: URL) -> String? {
+		guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+			return nil
+		}
+
+		let queryItems = urlComponents.queryItems ?? []
+
+		for item in queryItems where item.name == "order_id" {
+			return item.value
+		}
+
+		return nil
+	}
 }
 
 extension CheckoutWebView {
