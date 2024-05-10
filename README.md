@@ -343,7 +343,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 
 ### Error handling
 
-In the event of a checkout error ocurring, the Checkout Sheet Kit _may_ attempt a retry to recover from the error. Recovery will happen in the background by discarding the failed webview and creating a new "recovery" instance. Recovery will be attempted in the following scenarios:
+In the event of a checkout error occurring, the Checkout Sheet Kit _may_ attempt a retry to recover from the error. Recovery will happen in the background by discarding the failed webview and creating a new "recovery" instance. Recovery will be attempted in the following scenarios:
 
 - The webview receives a response with a 5XX status code
 - An internal SDK error is emitted
