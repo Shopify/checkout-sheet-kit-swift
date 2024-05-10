@@ -1,8 +1,7 @@
 # Shopify Checkout Sheet Kit - Swift
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) [![GitHub Release](https://img.shields.io/github/release/shopify/checkout-sheet-kit-swift.svg?style=flat)]()
- ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
-
+![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
 
 **Shopify Checkout Sheet Kit** is a Swift Package library that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
@@ -196,6 +195,7 @@ ShopifyCheckoutSheetKit.configuration.title = "Custom title"
 ```
 
 Here is an example of a `Localizable.xcstrings` containing translations for 2 locales - `en` and `fr`.
+
 ```json
 {
   "sourceLanguage": "en",
@@ -214,7 +214,7 @@ Here is an example of a `Localizable.xcstrings` containing translations for 2 lo
             "state": "translated",
             "value": "Caisse"
           }
-        },
+        }
       }
     }
   }
@@ -235,7 +235,7 @@ CheckoutSheet(checkout: checkoutURL)
 
 > [!NOTE]
 > Note that if the values of your SwiftUI configuration are **variable** and you are using `preload()`,
-> you will need to  call `preload()` each time your variables change to ensure that the checkout cache
+> you will need to call `preload()` each time your variables change to ensure that the checkout cache
 > has been invalidated, for checkout to be loaded with the new configuration.
 
 ### Preloading
@@ -272,17 +272,16 @@ Preloading renders a checkout in a background webview, which is brought to foreg
 
 The library will automatically invalidate/abort preload under following conditions:
 
-* Request results in network error or non 2XX server response code
-* The checkout has successfully completed, as indicated by the server response
-* When `ShopifyCheckoutSheetKit.Configuration` object is updated by the application (e.g., theming changes)
+- Request results in network error or non 2XX server response code
+- The checkout has successfully completed, as indicated by the server response
+- When `ShopifyCheckoutSheetKit.Configuration` object is updated by the application (e.g., theming changes)
 
-A preloaded checkout *is not* automatically invalidated when checkout sheet is closed. For example, if a buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
+A preloaded checkout _is not_ automatically invalidated when checkout sheet is closed. For example, if a buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
 
 #### Additional considerations for preloaded checkout
 
 1. Preloading is a hint, not a guarantee: the library may debounce or ignore calls depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a progress bar while the checkout session is finalized.
 1. Preloading results in background network requests and additional CPU/memory utilization for the client and should be used responsibly. For example, conditionally based on state of the client and when there is a high likelihood that the buyer will soon request to checkout.
-
 
 ### Monitoring the lifecycle of a checkout session
 
@@ -303,21 +302,21 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
   func checkoutDidFail(error: CheckoutError) {
     // Called when the checkout encountered an error and has been aborted. The callback
     // provides a `CheckoutError` enum, with one of the following values:
-   	// Internal error: exception within the Checkout SDK code
-   	// You can inspect and log the Erorr and stacktrace to identify the problem.
-   	case sdkError(underlying: Swift.Error)
+    // Internal error: exception within the Checkout SDK code
+    // You can inspect and log the Erorr and stacktrace to identify the problem.
+    case sdkError(underlying: Swift.Error)
 
-   	// Issued when the provided checkout URL results in an error related to shop being on checkout.liquid.
-   	// The SDK only supports stores migrated for extensibility.
-   	case checkoutLiquidNotMigrated(message: String)
+    // Issued when the provided checkout URL results in an error related to shop configuration.
+    // Note: The SDK only supports stores migrated for extensibility.
+    case configurationError(message: String)
 
-   	// Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
+    // Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
     // The provided message describes the error and may be logged and presented to the buyer.
-   	case checkoutUnavailable(message: String)
+    case checkoutUnavailable(message: String)
 
-   	// Expired error: checkout session associated with provided checkoutURL is no longer available.
+    // Expired error: checkout session associated with provided checkoutURL is no longer available.
     // The provided message describes the error and may be logged and presented to the buyer.
-   	case checkoutExpired(message: String)
+    case checkoutExpired(message: String)
   }
 
   func checkoutDidClickLink(url: URL) {
@@ -341,6 +340,40 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
   }
 }
 ```
+
+### Error handling
+
+In the event of a checkout error occurring, the Checkout Sheet Kit _may_ attempt a retry to recover from the error. Recovery will happen in the background by discarding the failed webview and creating a new "recovery" instance. Recovery will be attempted in the following scenarios:
+
+- The webview receives a response with a 5XX status code
+- An internal SDK error is emitted
+
+There are some caveats to note when this scenario occurs:
+
+1. The checkout experience may look different to buyers. Though the sheet kit will attempt to load any checkout customizations for the storefront, there is no guarantee they will show in recovery mode.
+2. The `checkoutDidComplete(event:)` will be emitted with partial data. Invocations will only receive the order ID via `event.orderDetails.id`.
+3. `checkoutDidEmitWebPixelEvent` lifecycle methods will **not** be emitted.
+
+Should you wish to opt-out of this fallback experience entirely, you can do so by adding a `shouldRecoverFromError(error:)` method to your delegate controller. Errors given to the `checkoutDidFail(error:)` lifecycle method, will contain an `isRecoverable` property by default indicating whether the request should be retried or not.
+
+```swift
+func shouldRecoverFromError(error: CheckoutError) {
+  return error.isRecoverable // default
+}
+```
+
+#### `CheckoutError`
+
+| Type                                                            | Description                                | Recommendation                                                                                                                                                                    |
+| --------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                                                                                                         |
+| `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                                                                                                      |
+| `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                                                                                                  |
+| `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores.                                                                                 |
+| `.checkoutUnavailable(message: "Customer account required")`    | A Customer account is required to proceed  | Request customer login before proceeding to checkout. See [Customer Accounts API](https://github.com/Shopify/checkout-sheet-kit-swift#customer-account-api) for more information. |
+| `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                                                                                                              |
+| `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                                                                                                    |
+| `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                                                                                                           |
 
 #### Integrating with Web Pixels, monitoring behavioral data
 
@@ -435,4 +468,3 @@ We welcome code contributions, feature requests, and reporting of issues. Please
 ### License
 
 Shopify's Checkout Sheet Kit is provided under an [MIT License](LICENSE).
-
