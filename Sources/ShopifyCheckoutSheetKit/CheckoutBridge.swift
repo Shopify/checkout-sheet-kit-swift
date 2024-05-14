@@ -36,12 +36,24 @@ enum CheckoutBridge {
 
 	static var applicationName: String {
 		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-		return "\(userAgent) (\(schemaVersion);\(theme);standard)"
+		let userAgentString = "\(userAgent) (\(schemaVersion);\(theme);standard)"
+
+		return userAgentWithOptionalSuffix(userAgentString)
 	}
 
 	static var recoveryAgent: String {
 		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-		return "\(userAgent) (noconnect;\(theme);standard_recovery)"
+		let userAgentString = "\(userAgent) (noconnect;\(theme);standard_recovery)"
+
+		return userAgentWithOptionalSuffix(userAgentString)
+	}
+
+	static func userAgentWithOptionalSuffix(_ userAgentString: String) -> String {
+		if let platform = ShopifyCheckoutSheetKit.configuration.platform?.rawValue {
+			return "\(userAgentString) \(platform)"
+		} else {
+			return userAgentString
+		}
 	}
 
 	static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {
