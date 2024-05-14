@@ -23,6 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 
+public enum Platform: String {
+	case reactNative = "ReactNative"
+}
+
 public struct Configuration {
 	/// Determines the color scheme used when checkout is presented.
 	///
@@ -49,6 +53,9 @@ public struct Configuration {
 	public var logger: Logger = NoOpLogger()
 
 	public var title: String = NSLocalizedString("shopify_checkout_sheet_title", value: "Checkout", comment: "The title of the checkout sheet.")
+
+	/// Custom enum for identifying traffic from alternative platforms
+	public var platform: Platform?
 }
 
 extension Configuration {
