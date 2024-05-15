@@ -215,6 +215,8 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 		if shouldAttemptRecovery {
 			self.presentFallbackViewController(url: self.checkoutURL)
+		} else {
+			dismiss(animated: true)
 		}
 	}
 
