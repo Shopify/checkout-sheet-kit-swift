@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import Foundation
 
 public enum CheckoutErrorCode: String, Codable {
-	case customerAccountRequired = "customer_account_required"
 	case storefrontPasswordRequired = "storefront_password_required"
 	case checkoutLiquidNotMigrated = "checkout_liquid_not_migrated"
 	case cartExpired = "cart_expired"
