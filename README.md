@@ -364,16 +364,15 @@ func shouldRecoverFromError(error: CheckoutError) {
 
 #### `CheckoutError`
 
-| Type                                                            | Description                                | Recommendation                                                                                                                                                                    |
-| --------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                                                                                                         |
-| `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                                                                                                      |
-| `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                                                                                                  |
-| `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores.                                                                                 |
-| `.checkoutUnavailable(message: "Customer account required")`    | A Customer account is required to proceed  | Request customer login before proceeding to checkout. See [Customer Accounts API](https://github.com/Shopify/checkout-sheet-kit-swift#customer-account-api) for more information. |
-| `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                                                                                                              |
-| `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                                                                                                    |
-| `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                                                                                                           |
+| Type                                                            | Description                                | Recommendation                                                                                    |
+| --------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                         |
+| `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                      |
+| `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                  |
+| `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores. |
+| `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                              |
+| `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                    |
+| `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                           |
 
 #### Integrating with Web Pixels, monitoring behavioral data
 

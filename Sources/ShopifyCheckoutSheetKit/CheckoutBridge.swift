@@ -123,7 +123,6 @@ extension CheckoutBridge {
 			case body
 		}
 
-		// swiftlint:disable cyclomatic_complexity
 		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -146,11 +145,7 @@ extension CheckoutBridge {
 
 				switch error.group {
 				case .configuration:
-					if code == .customerAccountRequired {
-						self = .authenticationError(message: error.reason, code: .customerAccountRequired)
-					} else {
-						self = .configurationError(message: error.reason, code: code)
-					}
+					self = .configurationError(message: error.reason, code: code)
 				case .unrecoverable:
 					self = .checkoutUnavailable(message: error.reason, code: code)
 				case .expired:
@@ -169,7 +164,6 @@ extension CheckoutBridge {
 				self = .unsupported(name)
 			}
 		}
-		// swiftlint:enable cyclomatic_complexity
 	}
 }
 

@@ -200,33 +200,6 @@ class CheckoutWebViewTests: XCTestCase {
 		}
 	}
 
-	func testReturnsAuthenticationErrorFor401WithHeader() {
-		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
-		let link = view.url!
-		let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
-
-		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
-		view.viewDelegate = mockDelegate
-
-		let urlResponse = HTTPURLResponse(url: link, statusCode: 401, httpVersion: nil, headerFields: [
-			"x-shopify-checkout-sheet-kit-error": "customer_account_required"
-		])!
-
-		let policy = view.handleResponse(urlResponse)
-		XCTAssertEqual(policy, .cancel)
-
-		waitForExpectations(timeout: 5) { _ in
-			switch self.mockDelegate.errorReceived {
-			case .some(.authenticationError(let message, let code, let recoverable)):
-				XCTAssertEqual(message, "Customer Account Required")
-				XCTAssertEqual(code, CheckoutErrorCode.customerAccountRequired)
-				XCTAssertFalse(recoverable)
-			default:
-				XCTFail("Unhandled error case received")
-			}
-		}
-	}
-
 	func test404responseOnCheckoutURLCodeDelegation() {
 		view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
 		let link = view.url!
