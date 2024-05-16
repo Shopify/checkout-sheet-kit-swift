@@ -101,7 +101,6 @@ enum CheckoutBridge {
 extension CheckoutBridge {
 	enum WebEvent: Decodable {
 		/// Error types
-		case authenticationError(message: String?, code: CheckoutErrorCode)
 		case checkoutExpired(message: String?, code: CheckoutErrorCode)
 		case checkoutUnavailable(message: String?, code: CheckoutErrorCode)
 		case configurationError(message: String?, code: CheckoutErrorCode)

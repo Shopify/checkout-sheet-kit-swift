@@ -50,10 +50,6 @@ public enum CheckoutUnavailable {
 /// A type representing Shopify Checkout specific errors.
 /// "recoverable" indicates that though the request has failed, it should be retried in a fallback browser experience.
 public enum CheckoutError: Swift.Error {
-	/// Issued when checkout has encountered an authentication error.
-	/// For example; the stonrefront is configured to enforce customer account login.
-	case authenticationError(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
-
 	/// Issued when an internal error within Shopify Checkout SDK
 	/// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
 	/// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
@@ -74,8 +70,7 @@ public enum CheckoutError: Swift.Error {
 
 	public var isRecoverable: Bool {
         switch self {
-		case .authenticationError(_, _, let recoverable),
-			.checkoutExpired(_, _, let recoverable),
+		case .checkoutExpired(_, _, let recoverable),
 			.checkoutUnavailable(_, _, let recoverable),
 			.configurationError(_, _, let recoverable),
 			.sdkError(_, let recoverable):

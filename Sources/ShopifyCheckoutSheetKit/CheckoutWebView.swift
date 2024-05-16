@@ -212,15 +212,6 @@ extension CheckoutWebView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
 			switch try CheckoutBridge.decode(message) {
-			/// Error: authentication error
-			case .authenticationError(let message, let code):
-				viewDelegate?.checkoutViewDidFailWithError(
-					error: .authenticationError(
-						message: message ?? "Unauthorized",
-						code: code,
-						recoverable: false
-					)
-				)
 			/// Completed event
 			case let .checkoutComplete(checkoutCompletedEvent):
 				viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
