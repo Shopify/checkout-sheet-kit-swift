@@ -201,7 +201,7 @@ extension CartViewController: CheckoutDelegate {
 		print(errorMessage, "Recoverable: \(error.isRecoverable)")
 
 		if !error.isRecoverable {
-			forceCloseCheckout(errorMessage)
+			handleUnrecoverableError(errorMessage)
 		}
 	}
 
@@ -225,10 +225,11 @@ extension CartViewController: CheckoutDelegate {
 		}
 	}
 
-	private func forceCloseCheckout(_ message: String = "Checkout unavailable") {
-		dismiss(animated: true)
-		resetCart()
-		self.showAlert(message: message)
+	private func handleUnrecoverableError(_ message: String = "Checkout unavailable") {
+		DispatchQueue.main.async {
+			self.resetCart()
+			self.showAlert(message: message)
+		}
 	}
 }
 

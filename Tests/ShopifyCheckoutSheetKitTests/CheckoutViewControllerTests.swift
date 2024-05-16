@@ -29,7 +29,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 
 	private var customTitle: String?
 	private let checkoutURL = URL(string: "https://checkout-sdk.myshopify.com")!
-	private var viewController: CheckoutWebViewController!
+	private var viewController: MockCheckoutWebViewController!
 	private var navigationController: UINavigationController!
 	private var delegate = ExampleDelegate()
 
@@ -38,7 +38,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 			$0.preloading.enabled = true
 			$0.title = customTitle ?? "Checkout"
 		}
-		viewController = CheckoutWebViewController(
+		viewController = MockCheckoutWebViewController(
 			checkoutURL: checkoutURL, delegate: delegate)
 
 		navigationController = UINavigationController(rootViewController: viewController)
@@ -80,6 +80,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		let three = CheckoutWebView.for(checkout: checkoutURL)
 		XCTAssertNotEqual(two, three)
 		XCTAssertFalse(viewController.checkoutView.isRecovery)
+		XCTAssertTrue(viewController.dismissCalled)
 	}
 
 	func testInstantiatesRecoveryWebviewOnRecoverableError() {
@@ -91,6 +92,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertTrue(viewController.checkoutView.isRecovery)
 		XCTAssertFalse(viewController.checkoutView.isBridgeAttached)
 		XCTAssertFalse(viewController.checkoutView.isPreloadingAvailable)
+		XCTAssertFalse(viewController.dismissCalled)
 
 		XCTAssertFalse(viewController.checkoutView.translatesAutoresizingMaskIntoConstraints)
 		XCTAssertEqual(viewController.checkoutView.scrollView.contentInsetAdjustmentBehavior, .never)
@@ -193,4 +195,19 @@ class CheckoutViewDelegateTests: XCTestCase {
 		viewController.checkoutViewDidFinishNavigation()
 		XCTAssertFalse(viewController.progressBar.isHidden)
 	}
+}
+
+protocol Dismissible: AnyObject {
+    func dismiss(animated flag: Bool, completion: (() -> Void)?)
+}
+
+extension CheckoutWebViewController: Dismissible {}
+
+class MockCheckoutWebViewController: CheckoutWebViewController {
+    private(set) var dismissCalled = false
+
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        dismissCalled = true
+        super.dismiss(animated: flag, completion: completion)
+    }
 }
