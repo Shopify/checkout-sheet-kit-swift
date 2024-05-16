@@ -193,11 +193,6 @@ extension CartViewController: CheckoutDelegate {
 			errorMessage = message
 		}
 
-		/// Unauthorized checkout
-		if case .authenticationError(let message, _, _) = error {
-			errorMessage = message
-		}
-
 		print(errorMessage, "Recoverable: \(error.isRecoverable)")
 
 		if !error.isRecoverable {
