@@ -32,8 +32,8 @@ body:
 
   - type: input
     attributes:
-      label: Do you have a minimum reproducible example?
-      description: (Optional) This will help us debug the issue more quickly.
+      label: Reproducible sample code
+      description: Please provide examples of code relating to your issue. This might include GraphQL queries to the Storefront API to create a cart, or native code to present the checkout URL. Providing this will help us debug your issue more quickly.
     validations:
       required: false
 
@@ -67,6 +67,7 @@ body:
   - type: textarea
     attributes:
       label: Storefront domain
-      description: (Optional) This will expedite our search for any errors that occurred.
+      placeholder: your-storefront-name.myshopify.com
+      description: This will expedite our search for any errors that occurred.
     validations:
-      required: false
+      required: true
