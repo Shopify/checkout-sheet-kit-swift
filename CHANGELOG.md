@@ -1,5 +1,70 @@
 # Changelog
 
+## 3.0.0 - May 20, 2024
+
+Version `3.0.0` of the Checkout Sheet Kit ships with numerous improvements to error handling, including graceful degradation. In the event that your app receives an HTTP error on load or crashes mid-experience, the kit will implement a retry in an effort to attempt to recover.
+
+```swift
+func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
+		var errorMessage: String = ""
+
+		/// Internal Checkout SDK error
+		if case .sdkError(let underlying, let recoverable) = error {
+			errorMessage = "\(underlying.localizedDescription)"
+		}
+
+		/// Checkout unavailable error
+		if case .checkoutUnavailable(let message, let code, let recoverable) = error {
+			errorMessage = message
+			switch code {
+        case .clientError(let clientErrorCode):
+          errorMessage = "Client Error: \(clientErrorCode)"
+        case .httpError(let statusCode):
+          errorMessage = "HTTP Error: \(statusCode)"
+      }
+		}
+
+		/// Storefront configuration error
+		if case .configurationError(let message, let code, let recoverable) = error {
+			errorMessage = message
+		}
+
+		/// Checkout has expired, re-create cart to fetch a new checkout URL
+		if case .checkoutExpired(let message, let code, let recoverable) = error {
+			errorMessage = message
+		}
+
+		if !error.isRecoverable {
+			handleUnrecoverableError(errorMessage)
+		}
+	}
+```
+
+### Opting out
+
+To opt out of the recovery feature, or to opt-out of the revovery of a specific error, extend the `shouldRecoverFromError` delegate method:
+
+```swift
+class Controller: CheckoutDelegate {
+  shouldRecoverFromError(error: CheckoutError) {
+    // default:
+    return error.isRecoverable
+  }
+
+  checkoutDidFail(error: CheckoutError) {
+    // Error handling...
+  }
+}
+```
+
+### Caveats
+
+In the event that the Checkout Sheet Kit has triggered the recovery experience, certain features _may_ not be available.
+
+1. Theming may not work as intended.
+2. **Web pixel lifecycle events will not fire.**
+3. `checkoutDidComplete` lifecycle events will contain only an `orderId`.
+
 ## 2.0.1 - March 19, 2024
 
 - Makes `CheckoutCompletedEvent` encodable/decodable.
@@ -13,23 +78,22 @@
 
 ```json
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "shopify_checkout_sheet_title" : {
-      "comment" : "The title of the checkout sheet.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Checkout"
+  "sourceLanguage": "en",
+  "strings": {
+    "shopify_checkout_sheet_title": {
+      "comment": "The title of the checkout sheet.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checkout"
           }
-        },
+        }
       }
     }
   }
 }
-
 ```
 
 ### Breaking Changes
