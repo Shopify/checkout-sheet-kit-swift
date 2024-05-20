@@ -4,6 +4,8 @@
 
 Version `3.0.0` of the Checkout Sheet Kit ships with numerous improvements to error handling, including graceful degradation. In the event that your app receives an HTTP error on load or crashes mid-experience, the kit will implement a retry in an effort to attempt to recover.
 
+### Error handling
+
 ```swift
 func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
 		var errorMessage: String = ""
@@ -42,7 +44,7 @@ func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
 
 ### Opting out
 
-To opt out of the recovery feature, or to opt-out of the revovery of a specific error, extend the `shouldRecoverFromError` delegate method:
+To opt out of the recovery feature, or to opt-out of the recovery of a specific error, extend the `shouldRecoverFromError` delegate method:
 
 ```swift
 class Controller: CheckoutDelegate {
