@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 - June 18, 2024
+
+- Fixes an issue where web pixels events do not fire after checkout completion.
+
 ## 3.0.0 - May 20, 2024
 
 Version `3.0.0` of the Checkout Sheet Kit ships with numerous improvements to error handling, including graceful degradation. In the event that your app receives an HTTP error on load or crashes mid-experience, the kit will implement a retry in an effort to attempt to recover.
