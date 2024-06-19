@@ -203,7 +203,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent) {
 		ConfettiCannon.fire(in: view)
-		CheckoutWebView.invalidate()
+		CheckoutWebView.invalidate(disconnect: false)
 		delegate?.checkoutDidComplete(event: event)
 	}
 

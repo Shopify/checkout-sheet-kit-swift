@@ -87,9 +87,13 @@ class CheckoutWebView: WKWebView {
 		return view
 	}
 
-	static func invalidate() {
+	static func invalidate(disconnect: Bool = true) {
 		preloadingActivatedByClient = false
-		cache?.view.detachBridge()
+
+		if disconnect {
+			cache?.view.detachBridge()
+		}
+
 		cache = nil
 	}
 
