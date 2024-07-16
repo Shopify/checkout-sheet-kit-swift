@@ -24,6 +24,8 @@
 	<string>$(ZIP)</string>
 	<key>Email</key>
 	<string>$(EMAIL)</string>
+	<key>Phone</key>
+	<string>$(PHONE)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

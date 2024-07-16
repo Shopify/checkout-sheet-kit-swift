@@ -51,6 +51,7 @@ class CartManager {
 	private let province: String
 	private let zip: String
 	private let email: String
+	private let phone: String
 
 	// MARK: Initializers
 	init(client: StorefrontClient) {
@@ -65,7 +66,8 @@ class CartManager {
 			let lastName = infoPlist["LastName"] as? String,
 			let province = infoPlist["Province"] as? String,
 			let zip = infoPlist["Zip"] as? String,
-			let email = infoPlist["Email"] as? String
+			let email = infoPlist["Email"] as? String,
+			let phone = infoPlist["Phone"] as? String
 		else {
 			fatalError("unable to load storefront configuration")
 		}
@@ -79,6 +81,7 @@ class CartManager {
 		self.province = province
 		self.zip = zip
 		self.email = email
+		self.phone = phone
 	}
 
 	// MARK: Cart Actions
@@ -160,7 +163,7 @@ class CartManager {
 			country: Input(orNull: country),
 			firstName: Input(orNull: firstName),
 			lastName: Input(orNull: lastName),
-			phone: Input(orNull: ""),
+			phone: Input(orNull: phone),
 			province: Input(orNull: province),
 			zip: Input(orNull: zip))
 
