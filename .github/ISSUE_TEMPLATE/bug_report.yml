@@ -1,7 +1,6 @@
 name: 🐛 Bug Report
 description: Something is wrong with the Checkout Sheet Kit.
-labels:
-  - 'Bug'
+labels: ["Bug", "untriaged"]
 body:
   - type: markdown
     attributes:
