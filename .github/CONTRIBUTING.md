@@ -26,6 +26,8 @@ behavior to [opensource@shopify.com](mailto:opensource@shopify.com).
 
 When in doubt about whether we will be interested in including a new feature in this project, please open an issue to propose the feature so we can confirm the feature should be in scope for the project before it is implemented.
 
+**NOTE**: Issues that have not been active for 30 days will be marked as stale, and subsequently closed after a further 7 days of inactivity.
+
 ## How To Contribute
 
 1. Fork the repo and branch off of main
