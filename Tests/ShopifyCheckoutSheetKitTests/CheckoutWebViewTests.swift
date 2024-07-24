@@ -45,6 +45,11 @@ class CheckoutWebViewTests: XCTestCase {
         return recovery
 	}
 
+	func testCorrectlyConfiguresWebview() {
+		XCTAssertEqual(view.configuration.applicationNameForUserAgent, CheckoutBridge.applicationName)
+		XCTAssertTrue(view.configuration.allowsInlineMediaPlayback)
+	}
+
 	func testUsesRecoveryAgent() {
 		let backgroundColor: UIColor = .systemRed
 		ShopifyCheckoutSheetKit.configuration.backgroundColor = backgroundColor
@@ -55,6 +60,7 @@ class CheckoutWebViewTests: XCTestCase {
 		XCTAssertFalse(recovery.isBridgeAttached)
 		XCTAssertFalse(recovery.isPreloadingAvailable)
 		XCTAssertEqual(recovery.configuration.applicationNameForUserAgent, "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (noconnect;automatic;standard_recovery)")
+		XCTAssertTrue(recovery.configuration.allowsInlineMediaPlayback)
 		XCTAssertEqual(recovery.backgroundColor, backgroundColor)
 		XCTAssertFalse(recovery.isOpaque)
 	}
