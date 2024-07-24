@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2 - July 24, 2024
+
+- Sets `allowsInlineMediaPlayback` to true on the Webview to prevent the iOS camera opening as a live broadcast.
+
 ## 3.0.1 - June 18, 2024
 
 - Fixes an issue where web pixels events do not fire after checkout completion.

@@ -114,6 +114,10 @@ class CheckoutWebView: WKWebView {
 
 	// MARK: Initializers
 	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
+		/// Some external payment providers require ID verification which trigger the camera
+		/// This configuration option prevents the camera from opening as a "Live Broadcast".
+		configuration.allowsInlineMediaPlayback = true
+
 		if recovery {
 			/// Uses a non-persistent, private cookie store to avoid cross-instance pollution
 			configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
