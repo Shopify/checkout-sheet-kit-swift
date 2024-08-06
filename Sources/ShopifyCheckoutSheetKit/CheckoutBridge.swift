@@ -28,7 +28,12 @@ enum BridgeError: Swift.Error {
 	case unencodableInstrumentation(Swift.Error? = nil)
 }
 
-enum CheckoutBridge {
+protocol CheckoutBridgeProtocol {
+    static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload)
+    static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?)
+}
+
+enum CheckoutBridge: CheckoutBridgeProtocol {
 	static let schemaVersion = "8.1"
 	static let messageHandler = "mobileCheckoutSdk"
 	internal static let userAgent = "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version)"
@@ -85,7 +90,7 @@ enum CheckoutBridge {
 		}
 	}
 
-	static func dispatchMessageTemplate(body: String) -> String {
+	static internal func dispatchMessageTemplate(body: String) -> String {
 		return """
 		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
 			window.MobileCheckoutSdk.dispatchMessage(\(body));

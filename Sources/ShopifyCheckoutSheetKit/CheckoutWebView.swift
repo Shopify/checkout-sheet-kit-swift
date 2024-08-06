@@ -39,8 +39,11 @@ private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
 class CheckoutWebView: WKWebView {
 	private static var cache: CacheEntry?
+	internal var timer: Date?
 
 	static var preloadingActivatedByClient: Bool = false
+
+	var checkoutBridge: CheckoutBridgeProtocol.Type = CheckoutBridge.self
 
 	/// A reference to the view is needed when preload is deactivated in order to detatch the bridge
 	static weak var uncacheableViewRef: CheckoutWebView?
@@ -56,7 +59,7 @@ class CheckoutWebView: WKWebView {
 	}
 
 	var isPreloadingAvailable: Bool {
-		return !isRecovery
+		return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	}
 
 	static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
@@ -111,6 +114,7 @@ class CheckoutWebView: WKWebView {
 			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
 		}
 	}
+	var isPreloadRequest: Bool = false
 
 	// MARK: Initializers
 	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
@@ -196,12 +200,17 @@ class CheckoutWebView: WKWebView {
 		}
 	}
 
+	internal func instrument(_ payload: InstrumentationPayload) {
+		checkoutBridge.instrument(self, payload)
+	}
+
 	// MARK: -
 
 	func load(checkout url: URL, isPreload: Bool = false) {
 		var request = URLRequest(url: url)
 
 		if isPreload && isPreloadingAvailable {
+			isPreloadRequest = true
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
 		}
 
@@ -258,8 +267,6 @@ extension CheckoutWebView: WKScriptMessageHandler {
 		}
 	}
 }
-
-private var timer: Date?
 
 extension CheckoutWebView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -354,18 +361,18 @@ extension CheckoutWebView: WKNavigationDelegate {
 		if let startTime = timer {
 			let endTime = Date()
 			let diff = endTime.timeIntervalSince(startTime)
-			let preloading = String(ShopifyCheckoutSheetKit.Configuration().preloading.enabled)
 			let message = "Loaded checkout in \(String(format: "%.2f", diff))s"
+			let preload = String(isPreloadRequest)
 
 			ShopifyCheckoutSheetKit.configuration.logger.log(message)
 
 			if isBridgeAttached {
-				CheckoutBridge.instrument(self,
+				self.instrument(
 					InstrumentationPayload(
 					name: "checkout_finished_loading",
 					value: Int(diff * 1000),
 					type: .histogram,
-					tags: ["preloading": preloading]))
+					tags: ["preloading": preload]))
 			}
 		}
 		checkoutDidLoad = true

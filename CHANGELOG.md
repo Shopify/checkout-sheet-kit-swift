@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.3 - August 6, 2024
+
+- Fixes internal instrumentation
+
 ## 3.0.2 - July 24, 2024
 
 - Sets `allowsInlineMediaPlayback` to true on the Webview to prevent the iOS camera opening as a live broadcast.
