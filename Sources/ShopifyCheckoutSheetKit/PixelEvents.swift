@@ -325,17 +325,27 @@ public struct Checkout: Codable {
 	public let attributes: [Attribute]?
 	/// The billing address to where the order will be charged.
 	public let billingAddress: MailingAddress?
+	/// Indicates whether the customer has consented to be sent marketing material via email.
+	public let buyerAcceptsEmailMarketing: Bool?
+	/// Indicates whether the customer has consented to be sent marketing material via SMS.
+	public let buyerAcceptsSmsMarketing: Bool?
 	/// The three-letter code that represents the currency, for example, USD.
 	/// Supported codes include standard ISO 4217 codes, legacy codes, and non-
 	/// standard codes.
 	public let currencyCode: String?
+	/// Represents the selected delivery options for a checkout.
+	public let delivery: Delivery?
 	/// A list of discount applications.
 	public let discountApplications: [DiscountApplication]?
+	/// The total amount of the discounts applied to the price of the checkout.
+	public let discountsAmount: MoneyV2?
 	/// The email attached to this checkout.
 	public let email: String?
 	/// A list of line item objects, each one containing information about an item
 	/// in the checkout.
 	public let lineItems: [CheckoutLineItem]?
+	/// The total amount of the discounts applied to the price of the checkout.
+	public let localization: Localization?
 	/// The resulting order from a paid checkout.
 	public let order: Order?
 	/// A unique phone number for the customer. Formatted using E.164 standard. For
@@ -346,6 +356,8 @@ public struct Checkout: Codable {
 	/// Once a shipping rate is selected by the customer it is transitioned to a
 	/// `shipping_line` object.
 	public let shippingLine: ShippingRate?
+	/// The phone number provided by the buyer after opting in to SMS marketing.
+	public let smsMarketingPhone: String?
 	/// The price at checkout before duties, shipping, and taxes.
 	public let subtotalPrice: MoneyV2?
 	/// A unique identifier for a particular checkout.
@@ -369,6 +381,41 @@ public struct Attribute: Codable {
 	public let key: String?
 	/// The value for the attribute.
 	public let value: String?
+}
+
+// MARK: - Country
+
+public struct Country: Codable {
+	/// The ISO-3166-1 code for this country, for example, "US".
+	public let isoCode: String?
+}
+
+// MARK: - Language
+
+public struct Language: Codable {
+	/// Te BCP-47 language tag. It may contain a dash followed by an
+	/// ISO 3166-1 alpha-2 region code, for example, "en-US".
+	public let isoCode: String?
+}
+
+// MARK: - Market
+
+public struct Market: Codable {
+	/// A human-readable, shop-scoped identifier.
+	public let handle: String?
+	/// A globally unique identifier.
+	public let id: String?
+}
+
+// MARK: - Localization
+
+public struct Localization: Codable {
+	/// The country of the active localized experience.
+	public let country: Country?
+	/// The language of the active localized experience.
+	public let language: Language?
+	/// The market including the country of the active localized experience.
+	public let market: Market?
 }
 
 // MARK: - MailingAddress
@@ -465,17 +512,52 @@ public struct Value: Codable {
 
 /// A single line item in the checkout, grouped by variant and attributes.
 public struct CheckoutLineItem: Codable {
-	/// The discounts that have been applied to the checkout line item by a
-	/// discount application.
+	/// The discounts that have been applied to the checkout line item by a discount application.
 	public let discountAllocations: [DiscountAllocation]?
+	/// The combined price of all of the items in the line item after line-level discounts have been applied.
+	public let finalLinePrice: MoneyV2?
 	/// A globally unique identifier.
 	public let id: String?
+	/// The properties of the line item. A shop may add, or enable customers to add custom information to a line item.
+	/// Line item propertiesof a key and value pair.
+	public let properties: [Property]?
 	/// The quantity of the line item.
 	public let quantity: Double?
+	/// The selling plan associated with the line item and the effect that each selling plan has on variants when they're purchased.
+	public let sellingPlanAllocation: SellingPlanAllocation?
 	/// The title of the line item. Defaults to the product's title.
 	public let title: String?
 	/// Product variant of the line item.
 	public let variant: ProductVariant?
+}
+
+// MARK: - Delivery
+
+public struct Delivery: Codable {
+	/// The selected delivery options for the event.
+	public let selectedDeliveryOptions: [DeliveryOption]?
+}
+
+// MARK: - DeliveryOption
+
+public struct DeliveryOption: Codable {
+	/// The cost of the delivery option.
+	public let cost: MoneyV2?
+
+	/// The cost of the delivery option after discounts have been applied.
+	public let costAfterDiscounts: MoneyV2?
+
+	/// The description of the delivery option.
+	public let description: String?
+
+	/// The unique identifier of the delivery option.
+	public let handle: String?
+
+	/// The title of the delivery option.
+	public let title: String?
+
+	/// The type of delivery option, e.g. pickup, pickupPoint, shipping, local.
+	public let type: String?
 }
 
 // MARK: - DiscountAllocation
@@ -494,8 +576,41 @@ public struct DiscountAllocation: Codable {
 /// from a shop. An order is created when a customer completes the checkout
 /// process.
 public struct Order: Codable {
+	/// The customer that placed the order
+	public let customer: OrderCustomer?
 	/// The ID of the order.
 	public let id: String?
+}
+
+// MARK: - OrderCustomer
+
+public struct OrderCustomer: Codable {
+	/// The ID of the customer.
+	public let id: String?
+}
+
+// MARK: - Property
+
+public struct Property: Codable {
+	/// The key of the property.
+	public let key: String?
+	/// The value of the property.
+	public let value: String?
+}
+
+// MARK: - SellingPlanAllocation
+
+public struct SellingPlanAllocation: Codable {
+	public let sellingPlan: SellingPlan
+}
+
+// MARK: - SellingPlan
+
+public struct SellingPlan: Codable {
+	/// A globally unique identifier.
+	public let id: String?
+	/// The name of the selling plan. For example, '6 weeks of prepaid granola, delivered weekly'.
+	public let name: String?
 }
 
 // MARK: - ShippingRate
@@ -514,6 +629,28 @@ public struct Transaction: Codable {
 	public let amount: MoneyV2?
 	/// The name of the payment provider used for the transaction.
 	public let gateway: String?
+	/// The payment method used for the transaction.
+	public let paymentMethod: TransactionPaymentMethod?
+}
+
+// MARK: - TransactionPaymentMethod
+
+public struct TransactionPaymentMethod: Codable {
+	/// The name of the payment method used for the transaction. This may further specify the payment method used.
+	public let name: String?
+
+	/// The type of payment method used for the transaction.
+	/// - creditCard: A vaulted or manually entered credit card.
+	/// - redeemable: A redeemable payment method, such as a gift card or store credit.
+	/// - deferred: A deferred payment, such as invoicing the buyer and collecting payment later.
+	/// - local: A local payment method specific to the current region or market.
+	/// - manualPayment: A manual payment method, such as an in-person retail transaction.
+	/// - paymentOnDelivery: A payment that will be collected on delivery.
+	/// - wallet: An integrated wallet, such as PayPal, Google Pay, Apple Pay, etc.
+	/// - offsite: A payment processed outside of Shopify's checkout, excluding integrated wallets.
+	/// - customOnSite: A custom payment method that is processed through a checkout extension with a payments app.
+	/// - other: Another type of payment not defined here.
+	public let type: String?
 }
 
 // MARK: PixelEventsCheckoutCompleted convenience initializers and mutators

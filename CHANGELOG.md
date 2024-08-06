@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.4 - August 7, 2024
+
+- Updates to reflect latest Web Pixel schema
+
 ## 3.0.3 - August 6, 2024
 
 - Fixes internal instrumentation
