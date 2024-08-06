@@ -111,6 +111,7 @@ class CheckoutWebView: WKWebView {
 			dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
 		}
 	}
+	var isPreloadRequest: Bool = false
 
 	// MARK: Initializers
 	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
@@ -202,6 +203,7 @@ class CheckoutWebView: WKWebView {
 		var request = URLRequest(url: url)
 
 		if isPreload && isPreloadingAvailable {
+			isPreloadRequest = true
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
 		}
 
@@ -354,8 +356,8 @@ extension CheckoutWebView: WKNavigationDelegate {
 		if let startTime = timer {
 			let endTime = Date()
 			let diff = endTime.timeIntervalSince(startTime)
-			let preloading = String(ShopifyCheckoutSheetKit.Configuration().preloading.enabled)
 			let message = "Loaded checkout in \(String(format: "%.2f", diff))s"
+			let preload = String(isPreloadRequest)
 
 			ShopifyCheckoutSheetKit.configuration.logger.log(message)
 
@@ -365,7 +367,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 					name: "checkout_finished_loading",
 					value: Int(diff * 1000),
 					type: .histogram,
-					tags: ["preloading": preloading]))
+					tags: ["preloading": preload]))
 			}
 		}
 		checkoutDidLoad = true
