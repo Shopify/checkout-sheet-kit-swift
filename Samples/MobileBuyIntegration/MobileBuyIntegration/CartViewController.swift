@@ -212,10 +212,12 @@ extension CartViewController: CheckoutDelegate {
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
 		switch event {
 		case .customEvent(let customEvent):
+			print("[PIXEL - Custom]", customEvent.name)
 			if let genericEvent = mapToGenericEvent(customEvent: customEvent) {
 				recordAnalyticsEvent(genericEvent)
 			}
 		case .standardEvent(let standardEvent):
+			print("[PIXEL - Standard]", standardEvent.name)
 			recordAnalyticsEvent(mapToGenericEvent(standardEvent: standardEvent))
 		}
 	}

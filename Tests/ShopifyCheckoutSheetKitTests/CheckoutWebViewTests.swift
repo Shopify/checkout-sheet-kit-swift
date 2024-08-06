@@ -33,9 +33,11 @@ class CheckoutWebViewTests: XCTestCase {
 	private var url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
 
 	override func setUp() {
+		ShopifyCheckoutSheetKit.configuration.preloading.enabled = true
 		view = CheckoutWebView.for(checkout: url)
         mockDelegate = MockCheckoutWebViewDelegate()
         view.viewDelegate = mockDelegate
+		view.checkoutBridge = MockCheckoutBridge.self
 	}
 
 	private func createRecoveryAgent() -> CheckoutWebView {
@@ -354,6 +356,57 @@ class CheckoutWebViewTests: XCTestCase {
 
 		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
 		XCTAssertEqual(secPurposeHeader, nil)
+		XCTAssertFalse(webView.isPreloadRequest)
+	}
+
+	func testInstrumentRequestWithPreloadingTag() {
+		let webView = LoadedRequestObservableWebView()
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: true
+		)
+
+		webView.timer = Date()
+		webView.webView(webView, didFinish: nil)
+
+		XCTAssertTrue(webView.isPreloadRequest)
+		XCTAssertEqual(webView.lastInstrumentationPayload?.name, "checkout_finished_loading")
+		XCTAssertEqual(webView.lastInstrumentationPayload?.type, .histogram)
+		XCTAssertEqual(webView.lastInstrumentationPayload?.tags, ["preloading": "true"])
+	}
+
+	func testDoesNotInstrumentRequestWithPreloadingTag() {
+		let webView = LoadedRequestObservableWebView()
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: false
+		)
+
+		webView.timer = Date()
+		webView.webView(webView, didFinish: nil)
+
+		XCTAssertFalse(webView.isPreloadRequest)
+		XCTAssertEqual(webView.lastInstrumentationPayload?.name, "checkout_finished_loading")
+		XCTAssertEqual(webView.lastInstrumentationPayload?.type, .histogram)
+		XCTAssertEqual(webView.lastInstrumentationPayload?.tags, ["preloading": "false"])
+	}
+
+	func testDoesNotInstrumentPreloadingTagIfDisabled() {
+		let webView = LoadedRequestObservableWebView()
+		ShopifyCheckoutSheetKit.configuration.preloading.enabled = false
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			/// This is not respected if preloading is disabled at a config level
+			isPreload: true
+		)
+
+		webView.timer = Date()
+		webView.webView(webView, didFinish: nil)
+
+		XCTAssertEqual(webView.lastInstrumentationPayload?.tags, ["preloading": "false"])
 	}
 
 	func testDetachBridgeCalledOnInit() {
@@ -369,10 +422,28 @@ class CheckoutWebViewTests: XCTestCase {
 
 class LoadedRequestObservableWebView: CheckoutWebView {
 	var lastLoadedURLRequest: URLRequest?
+	var lastInstrumentationPayload: InstrumentationPayload?
 
 	override func load(_ request: URLRequest) -> WKNavigation? {
 		self.lastLoadedURLRequest = request
 		return nil
+	}
+
+	override internal func instrument(_ payload: InstrumentationPayload) {
+		self.lastInstrumentationPayload = payload
+	}
+}
+
+class MockCheckoutBridge: CheckoutBridgeProtocol {
+    static var instrumentCalled = false
+    static var sendMessageCalled = false
+
+    static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {
+        instrumentCalled = true
+    }
+
+    static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
+		sendMessageCalled = true
 	}
 }
 // swiftlint:enable type_body_length
