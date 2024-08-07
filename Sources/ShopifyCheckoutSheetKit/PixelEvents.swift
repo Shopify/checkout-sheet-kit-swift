@@ -383,14 +383,10 @@ public struct Attribute: Codable {
 	public let value: String?
 }
 
-// MARK: - Country
-
 public struct Country: Codable {
 	/// The ISO-3166-1 code for this country, for example, "US".
 	public let isoCode: String?
 }
-
-// MARK: - Language
 
 public struct Language: Codable {
 	/// Te BCP-47 language tag. It may contain a dash followed by an
@@ -398,16 +394,12 @@ public struct Language: Codable {
 	public let isoCode: String?
 }
 
-// MARK: - Market
-
 public struct Market: Codable {
 	/// A human-readable, shop-scoped identifier.
 	public let handle: String?
 	/// A globally unique identifier.
 	public let id: String?
 }
-
-// MARK: - Localization
 
 public struct Localization: Codable {
 	/// The country of the active localized experience.
@@ -531,14 +523,10 @@ public struct CheckoutLineItem: Codable {
 	public let variant: ProductVariant?
 }
 
-// MARK: - Delivery
-
 public struct Delivery: Codable {
 	/// The selected delivery options for the event.
 	public let selectedDeliveryOptions: [DeliveryOption]?
 }
-
-// MARK: - DeliveryOption
 
 public struct DeliveryOption: Codable {
 	/// The cost of the delivery option.
@@ -582,14 +570,10 @@ public struct Order: Codable {
 	public let id: String?
 }
 
-// MARK: - OrderCustomer
-
 public struct OrderCustomer: Codable {
 	/// The ID of the customer.
 	public let id: String?
 }
-
-// MARK: - Property
 
 public struct Property: Codable {
 	/// The key of the property.
@@ -598,13 +582,9 @@ public struct Property: Codable {
 	public let value: String?
 }
 
-// MARK: - SellingPlanAllocation
-
 public struct SellingPlanAllocation: Codable {
 	public let sellingPlan: SellingPlan
 }
-
-// MARK: - SellingPlan
 
 public struct SellingPlan: Codable {
 	/// A globally unique identifier.
@@ -632,8 +612,6 @@ public struct Transaction: Codable {
 	/// The payment method used for the transaction.
 	public let paymentMethod: TransactionPaymentMethod?
 }
-
-// MARK: - TransactionPaymentMethod
 
 public struct TransactionPaymentMethod: Codable {
 	/// The name of the payment method used for the transaction. This may further specify the payment method used.
