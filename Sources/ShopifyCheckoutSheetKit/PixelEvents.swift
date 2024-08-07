@@ -583,7 +583,7 @@ public struct Property: Codable {
 }
 
 public struct SellingPlanAllocation: Codable {
-	public let sellingPlan: SellingPlan
+	public let sellingPlan: SellingPlan?
 }
 
 public struct SellingPlan: Codable {
