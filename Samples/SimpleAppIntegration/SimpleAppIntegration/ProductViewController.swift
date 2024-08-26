@@ -63,10 +63,6 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		}
 	}
 
-	private func presentCheckout(url: URL) {
-		ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
-	}
-
 	@IBAction private func reloadProduct() {
 		StorefrontClient.shared.product { [weak self] result in
 			if case .success(let product) = result {
@@ -96,20 +92,29 @@ class ProductViewController: UIViewController, CheckoutDelegate {
 		}
 	}
 
-	// MARK: ShopifyCheckoutSheetKitDelegate
+	private func presentCheckout(url: URL) {
+		ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
+	}
+}
 
+extension ProductViewController {
+
+	/// Use this callback to clean up any cart state
 	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-		// use this callback to clean up any cart state
+		/// no-op
 	}
 
+	/// Checkout sheet was closed by buyer
 	func checkoutDidCancel() {
 		dismiss(animated: true)
 	}
 
+	/// Client or server error thrown
 	func checkoutDidFail(error: CheckoutError) {
 		print(error)
 	}
 
+	/// Customer event emitted
 	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
 		print(#function, event)
 	}

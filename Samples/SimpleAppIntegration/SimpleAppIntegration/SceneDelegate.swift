@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 
+import ShopifyCheckoutSheetKit
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	var window: UIWindow?
@@ -35,6 +37,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			rootViewController: ProductViewController()
 		)
 		window.makeKeyAndVisible()
+
+
+		window.overrideUserInterfaceStyle = .dark
+
+		ShopifyCheckoutSheetKit.configure {
+			// Custom sheet title
+			$0.title = "Happy Burst"
+
+			// Colors
+			$0.tintColor = .systemPink
+			$0.colorScheme = .web
+		}
 
 		self.window = window
 	}

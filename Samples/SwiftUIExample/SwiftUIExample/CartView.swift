@@ -58,7 +58,7 @@ struct CartView: View {
 							.bold()
 					})
 					.accessibilityIdentifier("checkoutButton")
-					.sheet(isPresented: $isShowingCheckout) {
+					.fullScreenCover(isPresented: $isShowingCheckout) {
 						if let url = checkoutURL {
 							CheckoutSheet(checkout: url)
 								/// Configuration
@@ -160,5 +160,21 @@ struct CartLines: View {
 			.padding([.leading, .trailing], 10)
 			.frame(maxWidth: .infinity, alignment: .leading)
 		}
+	}
+}
+
+struct CartViewPreview: PreviewProvider {
+	static var previews: some View {
+		CatalogViewPreviewContent()
+	}
+}
+
+struct CartViewPreviewContent: View {
+	@State var isShowingCheckout = false
+	@State var checkoutURL: URL?
+	@StateObject var cartManager = CartManager.shared
+
+	var body: some View {
+		CartView(cartManager: CartManager.shared, checkoutURL: $checkoutURL, isShowingCheckout: $isShowingCheckout)
 	}
 }

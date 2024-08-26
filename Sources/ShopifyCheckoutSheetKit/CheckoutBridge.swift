@@ -78,18 +78,6 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 		webView.evaluateJavaScript(script)
 	}
 
-	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
-		guard let body = message.body as? String, let data = body.data(using: .utf8) else {
-			throw BridgeError.invalidBridgeEvent()
-		}
-
-		do {
-			return try JSONDecoder().decode(WebEvent.self, from: data)
-		} catch {
-			throw BridgeError.invalidBridgeEvent(error)
-		}
-	}
-
 	static internal func dispatchMessageTemplate(body: String) -> String {
 		return """
 		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
@@ -100,6 +88,18 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 			}, {passive: true, once: true});
 		}
 		"""
+	}
+
+	static func decode(_ message: WKScriptMessage) throws -> WebEvent {
+		guard let body = message.body as? String, let data = body.data(using: .utf8) else {
+			throw BridgeError.invalidBridgeEvent()
+		}
+
+		do {
+			return try JSONDecoder().decode(WebEvent.self, from: data)
+		} catch {
+			throw BridgeError.invalidBridgeEvent(error)
+		}
 	}
 }
 

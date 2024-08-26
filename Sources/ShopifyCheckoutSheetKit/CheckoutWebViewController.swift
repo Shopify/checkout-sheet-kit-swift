@@ -27,6 +27,8 @@ import WebKit
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 	weak var delegate: CheckoutDelegate?
 
+	internal var active: Bool = false
+
 	internal var checkoutView: CheckoutWebView
 
 	internal lazy var progressBar: ProgressBarView = {
@@ -75,6 +77,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	deinit {
 		progressObserver?.invalidate()
+		NotificationCenter.default.removeObserver(self)
 	}
 
 	// MARK: UIViewController Lifecycle
@@ -87,6 +90,18 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	override public func viewDidLoad() {
 		super.viewDidLoad()
+
+		///
+		NotificationCenter.default.addObserver(self,
+			selector: #selector(appDidEnterBackground),
+			name: UIApplication.didEnterBackgroundNotification,
+			object: nil)
+
+		///
+		NotificationCenter.default.addObserver(self,
+			selector: #selector(appWillEnterForeground),
+			name: UIApplication.willEnterForegroundNotification,
+			object: nil)
 
 		view.addSubview(checkoutView)
 		NSLayoutConstraint.activate([
@@ -108,6 +123,22 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		observeProgressChanges(checkoutView)
 		loadCheckout()
 	}
+
+	@objc func appDidEnterBackground() {
+        print("[----> App has entered background]")
+        active = false
+
+        // Set hidden state to true
+        // Wait for hidden state to be false
+        // Dispatch bridge event to tell checkout to start polling again
+    }
+
+    @objc func appWillEnterForeground() {
+        print("[----> App will enter foreground]")
+        active = true
+
+        // Dispatch bridge event to tell checkout to start polling again
+    }
 
 	internal func observeProgressChanges(_ view: WKWebView) {
 		progressObserver = view.observe(\.estimatedProgress, options: [.new]) { [weak self] (_, change) in

@@ -272,7 +272,20 @@ extension CheckoutWebView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
 		guard let url = action.request.url else {
+			print("[URL] -----> \(url!.absoluteString)")
 			decisionHandler(.allow)
+			return
+		}
+
+		print("[URL] Opening url - \(url.absoluteString)")
+
+		// Handle offsite payments
+		if url.absoluteString.range(of: "bogus/offsite/ui/public/payment_sessions") != nil {
+			decisionHandler(.cancel)
+			print("[URL] Opening url externally - \(url.absoluteString)")
+
+			// Open in Safari
+			UIApplication.shared.open(url)
 			return
 		}
 
