@@ -43,16 +43,11 @@ class PaymentHandler: NSObject {
 		let startComponents = calendar.dateComponents([.calendar, .year, .month, .day], from: shippingStart)
 		let endComponents = calendar.dateComponents([.calendar, .year, .month, .day], from: shippingEnd)
 
-		let shippingDelivery = PKShippingMethod(label: "Delivery", amount: NSDecimalNumber(string: "0.00"))
-		shippingDelivery.dateComponentsRange = PKDateComponentsRange(start: startComponents, end: endComponents)
-		shippingDelivery.detail = "Items sent to you address"
-		shippingDelivery.identifier = "DELIVERY"
-
 		let shippingCollection = PKShippingMethod(label: "Pick up", amount: NSDecimalNumber(string: "0.00"))
 		shippingCollection.detail = "Collect at our store"
 		shippingCollection.identifier = "PICKUP"
 
-		return [shippingDelivery, shippingCollection]
+		return [shippingCollection]
 	}
 
 	func startPayment(completion: @escaping PaymentCompletionHandler) {
