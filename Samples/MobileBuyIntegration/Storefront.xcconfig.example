@@ -18,3 +18,11 @@ COUNTRY = CA
 PROVINCE = AB
 ZIP = T1X 0L3
 PHONE = +155565708743
+
+// Auth
+
+SHOP_ID = <shop id>
+CUSTOMER_ACCOUNTS_API_CLIENT_ID = <client id>
+
+// Optional, defaults to shop.<shopId>.app://callback
+CUSTOMER_ACCOUNTS_API_REDIRECT_URI = <redirect uri>

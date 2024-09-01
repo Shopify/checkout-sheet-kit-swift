@@ -68,9 +68,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         cartController.tabBarItem.title = "Cart"
         cartController.navigationItem.title = "Cart"
 
-        /// Settings
-        settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
-        settingsController.tabBarItem.title = "Settings"
+		tabBarController.viewControllers = [
+			UINavigationController(
+				rootViewController: catalogController
+			),
+			UINavigationController(
+				rootViewController: cartController
+			),
+			UINavigationController(
+				rootViewController: loginController
+			)
+		]
+
+		if #available(iOS 15.0, *) {
+			let settingsController = UIHostingController(rootView: SettingsView())
+			settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
+			settingsController.tabBarItem.title = "Settings"
 
         subscribeToCartUpdates()
 
