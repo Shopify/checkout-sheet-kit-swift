@@ -35,6 +35,7 @@
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
 		C0408BA32C82217F00F263EC /* LoginWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0408BA22C82217F00F263EC /* LoginWebView.swift */; };
 		C0408BA52C82706F00F263EC /* LoginWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0408BA42C82706F00F263EC /* LoginWebViewController.swift */; };
+		C0408BA72C85B69A00F263EC /* JwtDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0408BA62C85B69A00F263EC /* JwtDecoder.swift */; };
 		C053D5902C81EAF7003E30D4 /* CustomerAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C053D58F2C81EAF7003E30D4 /* CustomerAccountClient.swift */; };
 		C053D5952C82110E003E30D4 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C053D5942C82110E003E30D4 /* LoginViewController.swift */; };
 		C053D5992C821435003E30D4 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C053D5982C821435003E30D4 /* LoginViewController.xib */; };
@@ -70,6 +71,7 @@
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		C0408BA22C82217F00F263EC /* LoginWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWebView.swift; sourceTree = "<group>"; };
 		C0408BA42C82706F00F263EC /* LoginWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWebViewController.swift; sourceTree = "<group>"; };
+		C0408BA62C85B69A00F263EC /* JwtDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JwtDecoder.swift; sourceTree = "<group>"; };
 		C053D58F2C81EAF7003E30D4 /* CustomerAccountClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerAccountClient.swift; sourceTree = "<group>"; };
 		C053D5942C82110E003E30D4 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		C053D5982C821435003E30D4 /* LoginViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginViewController.xib; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 				C053D58F2C81EAF7003E30D4 /* CustomerAccountClient.swift */,
 				C0408BA22C82217F00F263EC /* LoginWebView.swift */,
 				C0408BA42C82706F00F263EC /* LoginWebViewController.swift */,
+				C0408BA62C85B69A00F263EC /* JwtDecoder.swift */,
 			);
 			name = Login;
 			sourceTree = "<group>";
@@ -329,6 +332,7 @@
 				6A257A152AFBB06300610DA5 /* Logger.swift in Sources */,
 				4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */,
 				C053D5952C82110E003E30D4 /* LoginViewController.swift in Sources */,
+				C0408BA72C85B69A00F263EC /* JwtDecoder.swift in Sources */,
 				6A2E77C02CE618720067062D /* Cart.swift in Sources */,
 				6A3393652CEF9E8100E89FAA /* Theme.swift in Sources */,
 				6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */,
