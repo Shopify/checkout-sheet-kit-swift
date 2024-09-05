@@ -58,7 +58,7 @@ struct CartView: View {
 							.bold()
 					})
 					.accessibilityIdentifier("checkoutButton")
-					.fullScreenCover(isPresented: $isShowingCheckout) {
+					.sheet(isPresented: $isShowingCheckout) {
 						if let url = checkoutURL {
 							CheckoutSheet(checkout: url)
 								/// Configuration

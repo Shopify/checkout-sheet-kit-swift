@@ -30,7 +30,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	var window: UIWindow?
 
 	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
-		guard let windowScene = (scene as? UIWindowScene) else { return }
+		guard let windowScene = (scene as? UIWindowScene) else {
+			return
+		}
 
 		let tabBarController = UITabBarController()
 
@@ -74,6 +76,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
 
 		self.window = window
+	}
+
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+		// Determine who sent the URL.
+//		if let urlContext = options.urlContexts.first {
+//			let sendingAppID = urlContext.options.sourceApplication
+//			let url = urlContext.url
+//			print("source application = \(sendingAppID ?? "Unknown")")
+//			print("url = \(url)")
+//		}
+
+		guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+			  let incomingURL = userActivity.webpageURL,
+			  let components = NSURLComponents(url: incomingURL, resolvingAgainstBaseURL: true),
+			  let path = components.path else {
+			return
+		}
+
+		ShopifyCheckoutSheetKit.completePayment(checkout: incomingURL)
 	}
 
 	@objc func colorSchemeChanged() {

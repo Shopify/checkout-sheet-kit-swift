@@ -62,6 +62,19 @@ class CheckoutWebView: WKWebView {
 		return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	}
 
+	static func getCached() -> CheckoutWebView? {
+		return cache?.view
+	}
+
+	func pollForReceipt() {
+		if CheckoutWebView.cache?.view != nil {
+			print("Emitting pollForReceipt event. Bridge attached = \(self.isBridgeAttached)")
+			CheckoutBridge.sendMessage(self, messageName: "pollForReceipt", messageBody: nil)
+		} else {
+			print("Could not emit event to checkout", CheckoutWebView.cache)
+		}
+	}
+
 	static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
 		if recovery {
 			CheckoutWebView.invalidate()
@@ -272,12 +285,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
 		guard let url = action.request.url else {
-			print("[URL] -----> \(url!.absoluteString)")
 			decisionHandler(.allow)
 			return
 		}
-
-		print("[URL] Opening url - \(url.absoluteString)")
 
 		// Handle offsite payments
 		if url.absoluteString.range(of: "bogus/offsite/ui/public/payment_sessions") != nil {
@@ -469,4 +479,8 @@ extension CheckoutWebView {
 			abs(timestamp.timeIntervalSinceNow) >= timeout
 		}
 	}
+}
+
+enum CheckoutSheetError: Error {
+    case notFoundError(String)
 }

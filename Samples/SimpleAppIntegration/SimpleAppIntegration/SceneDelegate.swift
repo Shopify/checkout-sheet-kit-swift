@@ -38,18 +38,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		)
 		window.makeKeyAndVisible()
 
-
-		window.overrideUserInterfaceStyle = .dark
-
-		ShopifyCheckoutSheetKit.configure {
-			// Custom sheet title
-			$0.title = "Happy Burst"
-
-			// Colors
-			$0.tintColor = .systemPink
-			$0.colorScheme = .web
-		}
-
 		self.window = window
 	}
 }

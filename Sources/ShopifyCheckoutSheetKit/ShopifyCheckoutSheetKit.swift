@@ -59,3 +59,17 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 	from.present(viewController, animated: true)
 	return viewController
 }
+
+public func completePayment(checkout url: URL) {
+	do {
+		let cached = CheckoutWebView.getCached()
+
+		if cached != nil {
+			cached?.pollForReceipt()
+		} else {
+			throw CheckoutSheetError.notFoundError("No cached entry")
+		}
+	} catch {
+		print("[TODO: present checkout URL again here if dispatching an event fails]")
+	}
+}
