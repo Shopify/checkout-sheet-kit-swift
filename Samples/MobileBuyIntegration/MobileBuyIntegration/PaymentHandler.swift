@@ -33,21 +33,24 @@ class PaymentHandler: NSObject {
 
 	// Define the shipping methods.
 	func shippingMethodCalculator() -> [PKShippingMethod] {
-		// Calculate the pickup date.
-		let today = Date()
-		let calendar = Calendar.current
-
-		let shippingStart = calendar.date(byAdding: .day, value: 3, to: today)!
-		let shippingEnd = calendar.date(byAdding: .day, value: 5, to: today)!
-
-		let startComponents = calendar.dateComponents([.calendar, .year, .month, .day], from: shippingStart)
-		let endComponents = calendar.dateComponents([.calendar, .year, .month, .day], from: shippingEnd)
-
-		let shippingCollection = PKShippingMethod(label: "Pick up", amount: NSDecimalNumber(string: "0.00"))
+        
+        
+        
+		/*let shippingCollection = PKShippingMethod(label: "Pick up", amount: NSDecimalNumber(string: "0.00"))
 		shippingCollection.detail = "Collect at our store"
-		shippingCollection.identifier = "PICKUP"
+		shippingCollection.identifier = "PICKUP"*/
 
-		return [shippingCollection]
+        let cart = CartManager.shared.cart
+        
+        if let deliveryGroups = CartManager.shared.cart?.deliveryGroups {
+            let shippingMethod = PKShippingMethod(label: deliveryGroups.nodes.first?.deliveryOptions.first?.title ?? "Default", amount: NSDecimalNumber(decimal: deliveryGroups.nodes.first?.deliveryOptions.first?.estimatedCost.amount ?? 1))
+            shippingMethod.identifier = deliveryGroups.nodes.first?.deliveryOptions.first?.code
+            return [shippingMethod]
+        } else {
+            print("No delivery groups")
+        }
+        
+        return []
 	}
 
 	func startPayment(completion: @escaping PaymentCompletionHandler) {
@@ -90,6 +93,30 @@ class PaymentHandler: NSObject {
 		paymentRequest.recurringPaymentRequest = recurringPaymentRequest
 
 		paymentRequest.paymentSummaryItems = paymentSummaryItems
+        
+        var contact = PKContact()
+        
+        let mailingAddress = cart.buyerIdentity.deliveryAddressPreferences.first as! Buy.Storefront.MailingAddress
+        
+        
+        //if mailingAddress != nil {
+            var name = PersonNameComponents()
+            name.givenName = mailingAddress.firstName
+            name.familyName = mailingAddress.lastName
+            contact.name = name
+            
+            let postalAddress = CNMutablePostalAddress()
+            postalAddress.street = mailingAddress.address1 ?? ""
+            postalAddress.postalCode = mailingAddress.zip ?? ""
+            postalAddress.city = mailingAddress.city ?? ""
+            postalAddress.state = mailingAddress.province ?? ""
+            postalAddress.country = mailingAddress.country ?? ""
+            
+            contact.postalAddress = postalAddress
+        //}
+        
+        
+        paymentRequest.shippingContact = contact
 
 		// Display the payment request.
 		paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
@@ -121,6 +148,34 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 			errors.append(countryError)
 			status = .failure
 		}
+        
+        print("token: \(payment.token)")
+        
+        if let cartId = CartManager.shared.cart?.id {
+            let mutation = Storefront.buildMutation(inContext: nil) { $0
+                .cartSubmitForCompletion(cartId: cartId, attemptToken: payment.token.transactionIdentifier) { $0
+                    .userErrors { $0
+                        .code()
+                        .field()
+                        .message()
+                    }
+                    .result {$0
+                        .description
+                    }
+                }
+            }
+            
+            CartManager.shared.client.execute(mutation: mutation) { result in
+                if case .success(let mutation) = result {
+                    print(mutation)
+                } else {
+                    print("error in mutation")
+                }
+            }
+        }
+        
+        
+
 
 		self.paymentStatus = status
 		completion(PKPaymentAuthorizationResult(status: status, errors: errors))

@@ -41,7 +41,7 @@ class CartManager {
 		}
 	}
 
-	private let client: StorefrontClient
+	public let client: StorefrontClient
 	private let address1: String
 	private let address2: String
 	private let city: String
@@ -226,5 +226,49 @@ extension Storefront.CartQuery {
 					.currencyCode()
 				}
 			}
+            .deliveryGroups(first: 100) { $0
+                    .nodes { $0
+                        .deliveryOptions { $0
+                            .description()
+                            .title()
+                            .code()
+                            .estimatedCost { $0
+                                .amount()
+                                .currencyCode()
+                            }
+                        }
+                        .deliveryAddress { $0
+                            .address1()
+                            .zip()
+                        }
+                    }
+            }
+            .buyerIdentity{ $0
+                .deliveryAddressPreferences { $0
+                    .onMailingAddress { $0
+                        .address1()
+                        .address2()
+                        .city()
+                        .country()
+                        .zip()
+                        .firstName()
+                        .lastName()
+                        .province()
+                    }
+                }
+                .customer { $0
+                    .defaultAddress{ $0
+                        .address1()
+                        .address2()
+                        .city()
+                        .country()
+                        .zip()
+                        .firstName()
+                        .lastName()
+                        .province()
+                    }
+                }
+            }
+            
 	}
 }
