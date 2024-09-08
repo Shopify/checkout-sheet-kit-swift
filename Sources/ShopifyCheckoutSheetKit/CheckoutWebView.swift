@@ -418,7 +418,7 @@ extension CheckoutWebView: WKNavigationDelegate {
     
     private func requiresSafariBrowserLink(_ url: URL) -> Bool {
         // iDEAL payments are not permitted inside of WKWebView and must be completed from Safari
-        return url.absoluteString.contains("hooks.stripe.com")
+        return url.absoluteString.contains("/ideal/")
     }
 
 	private func isCheckout(url: URL?) -> Bool {
