@@ -223,6 +223,10 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 	func checkoutViewDidClickLink(url: URL) {
 		delegate?.checkoutDidClickLink(url: url)
 	}
+    
+    func checkoutViewDidClickLinkThatRequiresSafari(url: URL) {
+        delegate?.checkoutDidClickLinkThatRequiresSafari(url: url)
+    }
 
 	func checkoutViewDidToggleModal(modalVisible: Bool) {
 		guard let navigationController = self.navigationController else { return }

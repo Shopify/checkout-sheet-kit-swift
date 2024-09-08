@@ -29,6 +29,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent)
 	func checkoutViewDidFinishNavigation()
 	func checkoutViewDidClickLink(url: URL)
+    func checkoutViewDidClickLinkThatRequiresSafari(url: URL)
 	func checkoutViewDidFailWithError(error: CheckoutError)
 	func checkoutViewDidToggleModal(modalVisible: Bool)
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
@@ -281,6 +282,12 @@ extension CheckoutWebView: WKNavigationDelegate {
 			decisionHandler(.cancel)
 			return
 		}
+        
+        if requiresSafariBrowserLink(url) {
+            viewDelegate?.checkoutViewDidClickLinkThatRequiresSafari(url: removeExternalParam(url))
+            decisionHandler(.allow)
+            return
+        }
 
 		decisionHandler(.allow)
 	}
@@ -408,6 +415,11 @@ extension CheckoutWebView: WKNavigationDelegate {
 	private func isMailOrTelLink(_ url: URL) -> Bool {
 		return ["mailto", "tel"].contains(url.scheme)
 	}
+    
+    private func requiresSafariBrowserLink(_ url: URL) -> Bool {
+        // iDEAL payments are not permitted inside of WKWebView and must be completed from Safari
+        return url.absoluteString.contains("hooks.stripe.com")
+    }
 
 	private func isCheckout(url: URL?) -> Bool {
 		return self.url == url
