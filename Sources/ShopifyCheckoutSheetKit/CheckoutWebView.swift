@@ -23,13 +23,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 import WebKit
+import OpenTelemetryApi
+
+struct URLSessionHeadersSetter: Setter {
+    func set(carrier: inout [String: String], key: String, value: String) {
+        carrier[key] = value
+    }
+}
 
 protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidStartNavigation()
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent)
 	func checkoutViewDidFinishNavigation()
 	func checkoutViewDidClickLink(url: URL)
-	func checkoutViewDidFailWithError(error: CheckoutError)
+    func checkoutViewDidFailWithError(error: CheckoutError, parentSpan: Span?)
 	func checkoutViewDidToggleModal(modalVisible: Bool)
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
@@ -38,8 +45,14 @@ private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
 private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
 class CheckoutWebView: WKWebView {
-	private static var cache: CacheEntry?
-	internal var timer: Date?
+	
+    private var span: Span?
+    
+    private var parentSpan: Span?
+    
+    private static var cache: CacheEntry?
+	
+    internal var timer: Date?
 
 	static var preloadingActivatedByClient: Bool = false
 
@@ -62,10 +75,10 @@ class CheckoutWebView: WKWebView {
 		return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	}
 
-	static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
+    static func `for`(checkout url: URL, recovery: Bool = false, parentSpan: Span? = nil) -> CheckoutWebView {
 		if recovery {
 			CheckoutWebView.invalidate()
-			return CheckoutWebView(recovery: true)
+            return CheckoutWebView(recovery: true, parentSpan: parentSpan)
 		}
 
 		let cacheKey = url.absoluteString
@@ -117,10 +130,12 @@ class CheckoutWebView: WKWebView {
 	var isPreloadRequest: Bool = false
 
 	// MARK: Initializers
-	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
+    init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, parentSpan: Span? = nil) {
 		/// Some external payment providers require ID verification which trigger the camera
 		/// This configuration option prevents the camera from opening as a "Live Broadcast".
 		configuration.allowsInlineMediaPlayback = true
+        
+        self.parentSpan = parentSpan
 
 		if recovery {
 			/// Uses a non-persistent, private cookie store to avoid cross-instance pollution
@@ -134,11 +149,11 @@ class CheckoutWebView: WKWebView {
 		self.isRecovery = recovery
 		super.init(frame: frame, configuration: configuration)
 
-		#if DEBUG
-			if #available(iOS 16.4, *) {
-				isInspectable = true
-			}
-		#endif
+//		#if DEBUG
+//			if #available(iOS 16.4, *) {
+//                isInspectable = true
+//			}
+//		#endif
 
 		navigationDelegate = self
 		translatesAutoresizingMaskIntoConstraints = false
@@ -192,9 +207,9 @@ class CheckoutWebView: WKWebView {
 			guard let self = self else { return }
 
 			if let url = change.newValue as? URL {
-				if isConfirmation(url: url) {
-					self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
-					navigationObserver?.invalidate()
+                if self.isConfirmation(url: url) {
+                    self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: self.getOrderIdFromQuery(url: url)))
+                    self.navigationObserver?.invalidate()
 				}
 			}
 		}
@@ -203,16 +218,50 @@ class CheckoutWebView: WKWebView {
 	internal func instrument(_ payload: InstrumentationPayload) {
 		checkoutBridge.instrument(self, payload)
 	}
-
-	// MARK: -
-
+    
+    // MARK: Load webview request
+    
 	func load(checkout url: URL, isPreload: Bool = false) {
+        let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "CheckoutSheetKit", instrumentationVersion: "1.0.0")
+        
+        // Start a new span for the webview request
+        var spanBuilder = tracer.spanBuilder(spanName: "CheckoutSheetKit HTTP GET Request")
+        
+        if let parentContext = parentSpan?.context {
+            spanBuilder = spanBuilder.setParent(parentContext)
+        }
+        
+        span = spanBuilder.startSpan()
+        
+        span?.setAttribute(key: "http.method", value: "GET")
+        span?.setAttribute(key: "http.url", value: url.absoluteString)
+        span?.setAttribute(key: "service.name", value: "CheckoutSheetKit")
+        span?.setAttribute(key: "service.version", value: ShopifyCheckoutSheetKit.version)
+        span?.setAttribute(key: "theme", value: ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue)
+        span?.setAttribute(key: "device.model", value: UIDevice.current.model)
+        span?.setAttribute(key: "device.version", value: UIDevice.current.systemVersion)
+        
 		var request = URLRequest(url: url)
 
 		if isPreload && isPreloadingAvailable {
 			isPreloadRequest = true
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
+            span?.setAttribute(key: "preload", value: true)
 		}
+        
+        // Create a mutable copy of headers
+        var headers = request.allHTTPHeaderFields ?? [:]
+        
+        request.allHTTPHeaderFields = headers
+        
+        // Inject trace context into the headers
+        OpenTelemetry.instance.propagators.textMapPropagator.inject(
+            spanContext: span!.context,
+            carrier: &request.allHTTPHeaderFields!,
+            setter: URLSessionHeadersSetter()
+        )
+        
+        print("SENDING REQEUST", request.allHTTPHeaderFields)
 
 		load(request)
 	}
@@ -224,6 +273,8 @@ class CheckoutWebView: WKWebView {
 		}
 	}
 }
+
+// MARK: Bridge event handling
 
 extension CheckoutWebView: WKScriptMessageHandler {
 	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -239,7 +290,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
 						message: message ?? "Checkout unavailable.",
 						code: CheckoutUnavailable.clientError(code: code),
 						recoverable: true
-					)
+					),
+                    parentSpan: span
 				)
 			/// Error: Storefront not configured properly
 			case .configurationError(let message, let code):
@@ -247,10 +299,10 @@ extension CheckoutWebView: WKScriptMessageHandler {
 					message: message ?? "Storefront configuration error.",
 					code: CheckoutUnavailable.clientError(code: code),
 					recoverable: false
-				))
+				), parentSpan: span)
 			/// Error: Checkout expired
 			case .checkoutExpired(let message, let code):
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: code))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: code), parentSpan: span)
 			/// Checkout modal toggled
 			case let .checkoutModalToggled(modalVisible):
 				viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
@@ -263,7 +315,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				()
 			}
 		} catch {
-            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error), parentSpan: span)
 		}
 	}
 }
@@ -311,32 +363,32 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 			switch statusCode {
 			case 401:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: errorMessageForStatusCode, code: CheckoutUnavailable.httpError(statusCode: statusCode), recoverable: false))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: errorMessageForStatusCode, code: CheckoutUnavailable.httpError(statusCode: statusCode), recoverable: false), parentSpan: span)
 			case 404:
 				if let reason = headers[deprecatedReasonHeader] as? String, reason.lowercased() == checkoutLiquidNotSupportedReason {
-					viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
+					viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false), parentSpan: span)
 				} else {
 					viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 						message: errorMessageForStatusCode,
 						code: CheckoutUnavailable.httpError(statusCode: statusCode),
 						recoverable: false
-					))
+                    ), parentSpan: span)
 				}
 			case 410:
-				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired))
+				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired), parentSpan: span)
 			case 500...599:
 				viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
 					message: errorMessageForStatusCode,
 					code: CheckoutUnavailable.httpError(statusCode: statusCode),
 					recoverable: allowRecoverable
-				))
+				), parentSpan: span)
 			default:
 				viewDelegate?.checkoutViewDidFailWithError(
 					error: .checkoutUnavailable(
 						message: errorMessageForStatusCode,
 						code: CheckoutUnavailable.httpError(statusCode: statusCode),
 						recoverable: false
-					))
+					), parentSpan: span)
 			}
 
 			return .cancel
@@ -352,11 +404,20 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	/// No need to emit checkoutDidFail error here as it has been handled in handleResponse already
 	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        span?.setAttribute(key: "error", value: true)
+        span?.setAttribute(key: "error.type", value: "ProvisionalNavigationError")
+        span?.setAttribute(key: "error.message", value: error.localizedDescription)
+        
+        span?.end()
+        
 		timer = nil
 	}
 
 	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 		viewDelegate?.checkoutViewDidFinishNavigation()
+        
+        span?.setAttribute(key: "http.status_code", value: "200")
+        span?.end()
 
 		if let startTime = timer {
 			let endTime = Date()
@@ -381,10 +442,19 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
+        
+        span?.setAttribute(key: "error", value: true)
+        span?.setAttribute(key: "error.type", value: "NetworkError")
+        span?.setAttribute(key: "error.message", value: error.localizedDescription)
+        span?.end()
+        
 		viewDelegate?.checkoutViewDidFailWithError(
-			error: .sdkError(underlying: error, recoverable: !isRecovery)
+			error: .sdkError(underlying: error, recoverable: !isRecovery),
+            parentSpan: span
 		)
 	}
+    
+    // MARK: Helper functions
 
 	private func isExternalLink(_ action: WKNavigationAction) -> Bool {
 		if action.navigationType == .linkActivated && action.targetFrame == nil { return true }

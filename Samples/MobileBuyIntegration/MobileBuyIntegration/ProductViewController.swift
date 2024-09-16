@@ -121,6 +121,10 @@ class ProductViewController: UIViewController {
 			if case .success(let query) = result {
 				self?.product = query.products.nodes.randomElement()
 			}
+
+			if case .failure(let error) = result {
+				print(error)
+			}
 		}
 	}
 

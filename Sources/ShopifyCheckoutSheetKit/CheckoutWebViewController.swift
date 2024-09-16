@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import UIKit
 import WebKit
+import OpenTelemetryApi
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 	weak var delegate: CheckoutDelegate?
@@ -154,11 +155,11 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		delegate?.checkoutDidCancel()
 	}
 
-	private func presentFallbackViewController(url: URL) {
+    private func presentFallbackViewController(url: URL, parentSpan: Span?) {
 		progressObserver?.invalidate()
 		checkoutView.removeFromSuperview()
 
-		self.checkoutView = CheckoutWebView.for(checkout: url, recovery: true)
+        self.checkoutView = CheckoutWebView.for(checkout: url, recovery: true, parentSpan: parentSpan)
 		checkoutView.translatesAutoresizingMaskIntoConstraints = false
 		checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
 		checkoutView.viewDelegate = self
@@ -207,14 +208,14 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 		delegate?.checkoutDidComplete(event: event)
 	}
 
-	func checkoutViewDidFailWithError(error: CheckoutError) {
+    func checkoutViewDidFailWithError(error: CheckoutError, parentSpan: Span?) {
 		CheckoutWebView.invalidate()
 		delegate?.checkoutDidFail(error: error)
 
 		let shouldAttemptRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
 
 		if shouldAttemptRecovery {
-			self.presentFallbackViewController(url: self.checkoutURL)
+			self.presentFallbackViewController(url: self.checkoutURL, parentSpan: parentSpan)
 		} else {
 			dismiss(animated: true)
 		}

@@ -169,10 +169,10 @@ extension Configuration.ColorScheme {
 	}
 }
 
-#Preview {
-	if #available(iOS 15.0, *) {
-		SettingsView()
-	} else {
-		Text("Not supported in < iOS 15")
-	}
-}
+//#Preview {
+//	if #available(iOS 15.0, *) {
+//		SettingsView()
+//	} else {
+//		Text("Not supported in < iOS 15")
+//	}
+//}
