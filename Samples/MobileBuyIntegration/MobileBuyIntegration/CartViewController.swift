@@ -78,6 +78,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		super.viewDidAppear(animated)
 
 		tableView.reloadData()
+
+		if let url = CartManager.shared.cart?.checkoutUrl {
+			ShopifyCheckoutSheetKit.preload(checkout: url)
+		}
 	}
 
 	override func viewDidLayoutSubviews() {

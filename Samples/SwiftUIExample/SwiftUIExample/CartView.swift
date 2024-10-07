@@ -103,7 +103,15 @@ struct CartView: View {
 				}
 
 				Spacer()
-			}.padding(10)
+			}
+			.padding(10)
+			.onAppear(
+				perform: {
+					if let url = checkoutURL {
+						ShopifyCheckoutSheetKit.preload(checkout: url)
+					}
+				}
+			)
 		} else {
 			EmptyState()
 		}
