@@ -182,6 +182,7 @@ extension Storefront.CartQuery {
 			.totalQuantity()
 			.lines(first: 250) { $0
 				.nodes { $0
+					.quantity()
 					.merchandise { $0
 						.onProductVariant { $0
 							.title()
@@ -200,6 +201,7 @@ extension Storefront.CartQuery {
 					}
 				}
 			}
+			.totalQuantity()
 			.cost { $0
 				.totalAmount({ $0
 					.amount()
