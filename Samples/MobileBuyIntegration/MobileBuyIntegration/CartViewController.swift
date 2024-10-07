@@ -34,8 +34,9 @@ class CartItemCell: UITableViewCell {
     let increaseButton = UIButton(type: .system)
     let labelStackView = UIStackView()
     let quantityStackView = UIStackView()
+    let activityIndicator = UIActivityIndicatorView()
 
-    var onQuantityChange: ((Int32) -> Void)?
+    var onQuantityChange: ((_ quantity: Int32) -> Void)?
 
     private var quantity: Int32 = 0 {
         didSet {
@@ -74,8 +75,13 @@ class CartItemCell: UITableViewCell {
         labelStackView.addArrangedSubview(titleLabel)
         labelStackView.addArrangedSubview(vendorLabel)
 
+        /// Configure spinner
+		activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+		activityIndicator.hidesWhenStopped = true
+
 		/// Quantity controls
         quantityStackView.addArrangedSubview(decreaseButton)
+		quantityStackView.addArrangedSubview(activityIndicator)
         quantityStackView.addArrangedSubview(quantityLabel)
         quantityStackView.addArrangedSubview(increaseButton)
 
@@ -114,6 +120,16 @@ class CartItemCell: UITableViewCell {
         quantity += 1
         onQuantityChange?(quantity)
     }
+
+    func showLoading(_ loading: Bool) {
+		if loading {
+			quantityLabel.isHidden = true
+			activityIndicator.startAnimating()
+		} else {
+			activityIndicator.stopAnimating()
+			quantityLabel.isHidden = false
+		}
+	}
 
     func configure(with variant: Storefront.ProductVariant, quantity: Int32) {
         titleLabel.text = variant.product.title
@@ -203,8 +219,20 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 		let cell = CartItemCell()
 		cell.configure(with: variant, quantity: node.quantity)
-		cell.onQuantityChange { quantity in
-			CartManager.shared.
+		cell.onQuantityChange = { quantity in
+			/// Display loading state on row + disable checkout button
+			cell.showLoading(true)
+			self.checkoutButton.isEnabled = false
+
+			/// Invalidate checkout cache to ensure correct number of items are shown on checkout
+			ShopifyCheckoutSheetKit.invalidate()
+
+			/// Update cart quantities
+			CartManager.shared.updateQuantity(variant: node.id, quantity: quantity, completionHandler: { cart in
+				cell.showLoading(false)
+				self.checkoutButton.isEnabled = true
+				cell.quantityLabel.text = "\(cart?.lines.nodes[indexPath.item].quantity ?? 0)"
+			})
 		}
 		return cell
 	}
