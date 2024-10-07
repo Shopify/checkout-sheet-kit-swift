@@ -418,6 +418,18 @@ class CheckoutWebViewTests: XCTestCase {
 		XCTAssertFalse(view.isBridgeAttached)
 		XCTAssertTrue(secondView.isBridgeAttached)
 	}
+
+	func testCacheIsClearedOnInvalidate() {
+		ShopifyCheckoutSheetKit.configuration.preloading.enabled = true
+		let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")
+		let view = CheckoutWebView.for(checkout: url!)
+		XCTAssertTrue(view.isBridgeAttached)
+		XCTAssertTrue(CheckoutWebView.hasCacheEntry())
+
+		ShopifyCheckoutSheetKit.invalidate()
+		XCTAssertFalse(CheckoutWebView.hasCacheEntry())
+		XCTAssertFalse(view.isBridgeAttached)
+	}
 }
 
 class LoadedRequestObservableWebView: CheckoutWebView {

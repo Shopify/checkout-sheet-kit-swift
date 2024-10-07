@@ -134,7 +134,7 @@ struct EmptyState: View {
 
 struct CartLines: View {
 	var lines: [BaseCartLine]
-	@State var updating: GraphQL.ID? = nil
+	@State var updating: GraphQL.ID?
 
 	var body: some View {
 		ForEach(lines, id: \.id) { node in
@@ -183,7 +183,7 @@ struct CartLines: View {
 									Text("-").font(.title2)
 								})
 
-								if updating == node.id{
+								if updating == node.id {
 									ProgressView().progressViewStyle(CircularProgressViewStyle())
 									.scaleEffect(0.8)
 								} else {

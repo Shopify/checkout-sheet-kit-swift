@@ -26,7 +26,7 @@ import Combine
 import Foundation
 import ShopifyCheckoutSheetKit
 
-var cache: Storefront.Cart? = nil
+var cache: Storefront.Cart?
 
 public class CartManager: ObservableObject {
 	let client: StorefrontClient = StorefrontClient()

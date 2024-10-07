@@ -100,6 +100,11 @@ class CheckoutWebView: WKWebView {
 		cache = nil
 	}
 
+	/// Used only for testing
+	internal static func hasCacheEntry() -> Bool {
+		return cache != nil
+	}
+
 	// MARK: Properties
 
 	weak var viewDelegate: CheckoutWebViewDelegate?
@@ -448,7 +453,7 @@ extension CheckoutWebView {
 
 		let view: CheckoutWebView
 
-		private let timestamp = Date()
+		internal let timestamp = Date()
 
 		private let timeout = TimeInterval(60 * 5)
 
