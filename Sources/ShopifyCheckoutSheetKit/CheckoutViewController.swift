@@ -127,7 +127,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 		onComplete?(event)
 	}
 
-	public func checkoutDidCancel() {
+	public func checkoutDidCancel(state: CheckoutState) {
 		onCancel?()
 	}
 

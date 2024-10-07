@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
+import WebKit
 
 /// The version of the `ShopifyCheckoutSheetKit` library.
 public let version = "3.0.4"
@@ -58,4 +59,16 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 	let viewController = CheckoutViewController(checkout: url, delegate: delegate)
 	from.present(viewController, animated: true)
 	return viewController
+}
+
+
+/// Clears all cookies from webview instances
+public func logout(completion: (() -> Void)? = nil) {
+    let dataStore = WKWebsiteDataStore.default()
+    let websiteDataTypes = Set([WKWebsiteDataTypeCookies])
+    let date = Date(timeIntervalSince1970: 0)
+
+    dataStore.removeData(ofTypes: websiteDataTypes, modifiedSince: date) {
+        completion?()
+    }
 }

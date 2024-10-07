@@ -34,7 +34,8 @@ protocol CheckoutBridgeProtocol {
 }
 
 enum CheckoutBridge: CheckoutBridgeProtocol {
-	static let schemaVersion = "8.1"
+//	static let schemaVersion = "8.1"
+	static let schemaVersion = "unsupported-test"
 	static let messageHandler = "mobileCheckoutSdk"
 	internal static let userAgent = "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version)"
 	internal static var logger: ProductionLogger = InternalLogger()

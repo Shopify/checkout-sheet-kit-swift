@@ -24,13 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import Foundation
 import UIKit
 
+public enum CheckoutState {
+	case queued
+	case idle
+}
+
 /// A delegate protocol for managing checkout lifecycle events.
 public protocol CheckoutDelegate: AnyObject {
 	/// Tells the delegate that the checkout successfully completed, returning a completed event with order details
 	func checkoutDidComplete(event: CheckoutCompletedEvent)
 
 	/// Tells the delegate that the checkout was cancelled by the buyer.
-	func checkoutDidCancel()
+	func checkoutDidCancel(state: CheckoutState)
 
 	/// Tells the delegate that the checkout encoutered one or more errors.
 	func checkoutDidFail(error: CheckoutError)

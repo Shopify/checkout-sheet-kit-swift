@@ -206,6 +206,16 @@ class CheckoutWebView: WKWebView {
 
 	// MARK: -
 
+	func clearWebViewCookies() {
+		let dataStore = WKWebsiteDataStore.default()
+		let websiteDataTypes = Set([WKWebsiteDataTypeCookies])
+		let date = Date(timeIntervalSince1970: 0) // Clear cookies from the beginning of time
+
+		dataStore.removeData(ofTypes: websiteDataTypes, modifiedSince: date) {
+			print("Cookies cleared successfully.")
+		}
+	}
+
 	func load(checkout url: URL, isPreload: Bool = false) {
 		var request = URLRequest(url: url)
 
@@ -213,6 +223,10 @@ class CheckoutWebView: WKWebView {
 			isPreloadRequest = true
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
 		}
+
+//		request.setValue("1", forHTTPHeaderField: "X-Checkout-Web-Local-Dev")
+//		request.setValue("100", forHTTPHeaderField: "X-Shopify-C1-Queue-Duration")
+//		request.setValue("queue", forHTTPHeaderField: "X-Shopify-C1-Preview")
 
 		load(request)
 	}

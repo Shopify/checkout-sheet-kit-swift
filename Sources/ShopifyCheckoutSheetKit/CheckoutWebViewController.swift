@@ -67,6 +67,8 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		checkoutView.viewDelegate = self
 
 		view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+
+		isModalInPresentation = true
 	}
 
 	required init?(coder: NSCoder) {
@@ -151,7 +153,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 			CheckoutWebView.invalidate()
 		}
 
-		delegate?.checkoutDidCancel()
+		delegate?.checkoutDidCancel(state: CheckoutState.idle)
 	}
 
 	private func presentFallbackViewController(url: URL) {
@@ -187,6 +189,11 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		checkoutView.load(checkout: url)
 		progressBar.startAnimating()
 	}
+
+	public func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
+        print("User attempted to dismiss the modal")
+        self.delegate?.checkoutDidCancel(state: CheckoutState.idle)
+    }
 }
 
 extension CheckoutWebViewController: CheckoutWebViewDelegate {

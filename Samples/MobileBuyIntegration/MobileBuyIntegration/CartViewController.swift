@@ -139,6 +139,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 	@IBAction private func resetCart() {
 		CartManager.shared.resetCart()
+		ShopifyCheckoutSheetKit.logout {
+			print("Cleared all cookies from WKWebViewDataStore")
+		}
 	}
 
 	private func variant(at indexPath: IndexPath) -> Storefront.ProductVariant {
@@ -150,20 +153,60 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		}
 		return variant
 	}
+
+	private func topMostViewController() -> UIViewController? {
+		guard let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first else {
+			return nil
+		}
+		var topController: UIViewController? = window.rootViewController
+		while let presentedViewController = topController?.presentedViewController {
+			topController = presentedViewController
+		}
+		return topController
+	}
 }
 
 extension CartViewController: CheckoutDelegate {
 	func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+		print("[Event - checkoutDidComplete]", event.orderDetails.id)
+
 		resetCart()
 
 		ShopifyCheckoutSheetKit.configuration.logger.log("Order created: \(event.orderDetails.id)")
 	}
 
-	func checkoutDidCancel() {
-		dismiss(animated: true)
+	func checkoutDidCancel(state: CheckoutState) {
+		switch state {
+			case .queued:
+				showDismissalConfirmation()
+			default:
+				dismiss(animated: true)
+		}
+	}
+
+	func showDismissalConfirmation() {
+		if let rootViewController = topMostViewController() {
+			let alertController = UIAlertController(
+				title: "Exit queue",
+				message: "Are you sure you want to exit the queue?",
+				preferredStyle: .alert
+			)
+
+			let okAction = UIAlertAction(title: "Yes, exit", style: .default) { _ in
+				self.dismiss(animated: true)
+			}
+
+			alertController.addAction(okAction)
+			alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+			rootViewController.present(alertController, animated: true, completion: nil)
+		} else {
+			self.dismiss(animated: true)
+		}
 	}
 
 	func checkoutDidClickContactLink(url: URL) {
+		print("[Event - checkoutDidClickContactLink]", url)
 		if UIApplication.shared.canOpenURL(url) {
 			UIApplication.shared.open(url)
 		}
