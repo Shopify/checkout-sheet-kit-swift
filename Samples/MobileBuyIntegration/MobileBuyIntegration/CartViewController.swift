@@ -90,6 +90,10 @@ class CartItemCell: UITableViewCell {
         decreaseButton.titleLabel?.font = UIFont.systemFont(ofSize: 24)
 		increaseButton.titleLabel?.font = UIFont.systemFont(ofSize: 24)
 
+		activityIndicator.widthAnchor.constraint(equalToConstant: 20).isActive = true
+		quantityLabel.widthAnchor.constraint(equalToConstant: 20).isActive = true
+		quantityLabel.textAlignment = .center
+
 		decreaseButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
 		increaseButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
 
@@ -110,7 +114,7 @@ class CartItemCell: UITableViewCell {
     }
 
     @objc private func decreaseQuantity() {
-        if quantity > 0 {
+        if quantity > 1 {
             quantity -= 1
             onQuantityChange?(quantity)
         }
@@ -232,6 +236,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 				cell.showLoading(false)
 				self.checkoutButton.isEnabled = true
 				cell.quantityLabel.text = "\(cart?.lines.nodes[indexPath.item].quantity ?? 0)"
+
+				if let url = cart?.checkoutUrl {
+					ShopifyCheckoutSheetKit.preload(checkout: url)
+				}
 			})
 		}
 		return cell
