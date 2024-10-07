@@ -180,15 +180,21 @@ struct CartLines: View {
 										ShopifyCheckoutSheetKit.invalidate()
 									})
 								}, label: {
-									Text("-").font(.title2)
+									HStack {
+										Text("-").font(.title2)
+									}.frame(width: 20)
 								})
 
-								if updating == node.id {
-									ProgressView().progressViewStyle(CircularProgressViewStyle())
-									.scaleEffect(0.8)
-								} else {
-									Text("\(node.quantity)")
-								}
+								VStack {
+									if updating == node.id {
+										ProgressView().progressViewStyle(CircularProgressViewStyle())
+										.scaleEffect(0.8)
+									} else {
+										HStack {
+											Text("\(node.quantity)")
+										}.frame(width: 20)
+									}
+								}.frame(width: 20)
 
 								Button(action: {
 									/// Prevent multiple simulataneous calls
@@ -205,7 +211,9 @@ struct CartLines: View {
 										ShopifyCheckoutSheetKit.invalidate()
 									})
 								}, label: {
-									Text("+").font(.title2)
+									HStack {
+										Text("+").font(.title2)
+									}.frame(width: 20)
 								})
 							}
 						}

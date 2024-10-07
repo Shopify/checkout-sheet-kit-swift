@@ -453,7 +453,7 @@ extension CheckoutWebView {
 
 		let view: CheckoutWebView
 
-		internal let timestamp = Date()
+		private let timestamp = Date()
 
 		private let timeout = TimeInterval(60 * 5)
 
