@@ -26,6 +26,8 @@ import Combine
 import Foundation
 import ShopifyCheckoutSheetKit
 
+var cache: Storefront.Cart?
+
 public class CartManager: ObservableObject {
 	let client: StorefrontClient = StorefrontClient()
 
@@ -35,6 +37,21 @@ public class CartManager: ObservableObject {
 
 	@Published
 	var cart: Storefront.Cart?
+
+	func injectRandomCartItem() {
+		if cache == nil {
+			getRandomProduct(onCompletionHandler: { item in
+				if let variantId = item?.variants.nodes.first?.id {
+					self.addItem(variant: variantId, completionHandler: { cart in
+						cache = cart
+						self.cart = cart
+					})
+				}
+			})
+		} else {
+			cart = cache
+		}
+	}
 
 	// MARK: Cart Actions
 
@@ -48,6 +65,18 @@ public class CartManager: ObservableObject {
 			}
 			completionHandler?(self.cart)
 		}
+	}
+
+	func updateQuantity(variant: GraphQL.ID, quantity: Int32, completionHandler: ((Storefront.Cart?) -> Void)?) {
+		performCartUpdate(id: variant, quantity: quantity, handler: { result in
+			switch result {
+			case .success(let cart):
+				self.cart = cart
+			case .failure(let error):
+				print(error)
+			}
+			completionHandler?(self.cart)
+		})
 	}
 
 	func resetCart() {
@@ -75,6 +104,28 @@ public class CartManager: ObservableObject {
 	}
 
 	typealias CartResultHandler = (Result<Storefront.Cart, Error>) -> Void
+
+	private func performCartUpdate(id: GraphQL.ID, quantity: Int32, handler: @escaping CartResultHandler) {
+		let lines = [Storefront.CartLineUpdateInput.create(id: id, quantity: Input(orNull: quantity))]
+
+		if let cartID = cart?.id {
+			let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
+				.cartLinesUpdate(cartId: cartID, lines: lines) { $0
+					.cart { $0.cartManagerFragment() }
+				}
+			}
+
+			client.execute(mutation: mutation) { result in
+				if case .success(let mutation) = result, let cart = mutation.cartLinesUpdate?.cart {
+					handler(.success(cart))
+				} else {
+					handler(.failure(URLError(.unknown)))
+				}
+			}
+		} else {
+			performCartCreate(items: [id], handler: handler)
+		}
+	}
 
 	private func performCartLinesAdd(item: GraphQL.ID, handler: @escaping CartResultHandler) {
 		if let cartID = cart?.id {

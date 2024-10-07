@@ -100,6 +100,11 @@ class CheckoutWebView: WKWebView {
 		cache = nil
 	}
 
+	/// Used only for testing
+	internal static func hasCacheEntry() -> Bool {
+		return cache != nil
+	}
+
 	// MARK: Properties
 
 	weak var viewDelegate: CheckoutWebViewDelegate?

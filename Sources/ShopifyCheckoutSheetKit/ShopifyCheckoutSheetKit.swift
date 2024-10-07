@@ -52,6 +52,11 @@ public func preload(checkout url: URL) {
 	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
 }
 
+/// Invalidate the checkout cache from preload calls
+public func invalidate() {
+	CheckoutWebView.invalidate(disconnect: true)
+}
+
 /// Presents the checkout from a given `UIViewController`.
 @discardableResult
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
