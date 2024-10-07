@@ -27,6 +27,7 @@ import ShopifyCheckoutSheetKit
 
 struct CartView: View {
 	@State var cartCompleted: Bool = false
+	@State var isBusy: Bool = false
 
 	@ObservedObject var cartManager: CartManager
 	@Binding var checkoutURL: URL? {
@@ -40,7 +41,7 @@ struct CartView: View {
 		if let lines = cartManager.cart?.lines.nodes {
 			ScrollView {
 				VStack {
-					CartLines(lines: lines)
+					CartLines(lines: lines, isBusy: $isBusy)
 				}
 
 				Spacer()
@@ -50,13 +51,14 @@ struct CartView: View {
 						isShowingCheckout = true
 					}, label: {
 						Text("Checkout")
-							.padding()
-							.frame(maxWidth: .infinity)
-							.background(Color.blue)
-							.foregroundColor(.white)
-							.cornerRadius(10)
-							.bold()
 					})
+					.padding()
+					.frame(maxWidth: .infinity)
+					.background(isBusy ? Color.gray : Color.blue)
+					.foregroundColor(.white)
+					.cornerRadius(10)
+					.bold()
+					.disabled(isBusy)
 					.accessibilityIdentifier("checkoutButton")
 					.sheet(isPresented: $isShowingCheckout) {
 						if let url = checkoutURL {
@@ -134,7 +136,12 @@ struct EmptyState: View {
 
 struct CartLines: View {
 	var lines: [BaseCartLine]
-	@State var updating: GraphQL.ID?
+	@State var updating: GraphQL.ID? {
+		didSet {
+			isBusy = updating != nil
+		}
+	}
+	@Binding var isBusy: Bool
 
 	var body: some View {
 		ForEach(lines, id: \.id) { node in
@@ -235,6 +242,7 @@ struct CartViewPreview: PreviewProvider {
 struct CartViewPreviewContent: View {
 	@State var isShowingCheckout = false
 	@State var checkoutURL: URL?
+	@State var isBusy: Bool = false
 	@StateObject var cartManager = CartManager.shared
 
 	init() {
