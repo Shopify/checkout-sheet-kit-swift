@@ -48,9 +48,7 @@ struct RootTabView: View {
 		TabView {
 			CatalogView(cartManager: cartManager, checkoutURL: $checkoutURL, cart: $cartManager.cart)
 				.tabItem {
-					SwiftUI.Image(systemName: "storefront")
-						.accessibilityIdentifier("catalogTabIcon")
-					Text("Catalog")
+					Label("Catalog", systemImage: "storefront")
 				}
 
 			NavigationView {
@@ -72,10 +70,8 @@ struct RootTabView: View {
 					}
 			}
 			.tabItem {
-				SwiftUI.Image(systemName: "cart")
-					.accessibilityIdentifier("cartTabIcon")
-				Text("Cart")
-			}
+				Label("Cart", systemImage: "cart")
+			}.badge(Int(cartManager.cart?.totalQuantity ?? 0))
 		}
 	}
 }
