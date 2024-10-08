@@ -45,7 +45,7 @@ struct CatalogView: View {
 	var body: some View {
 		NavigationView {
 			VStack {
-				if let product = product {
+				if let product = product, let price = product.variants.nodes.first?.price.formattedString() {
 					VStack {
 						VStack(alignment: .leading) {
 							AsyncImage(url: product.featuredImage?.url) { image in
@@ -78,12 +78,10 @@ struct CatalogView: View {
 								.truncationMode(.tail)
 								.padding(.top, 0)
 
-							if let price = product.variants.nodes.first?.price.formattedString() {
-								Text(price)
-									.padding(2)
-									.bold()
-									.foregroundColor(.gray)
-							}
+							Text(product.description)
+								.padding(2)
+								.bold()
+								.foregroundColor(.gray)
 						}.padding(.horizontal, 15)
 
 						Button(action: {
@@ -105,7 +103,7 @@ struct CatalogView: View {
 										.foregroundColor(.white)
 										.cornerRadius(10)
 								} else {
-									Text("Add to cart")
+									Text("Add to cart - \(price)")
 										.font(.headline)
 										.padding()
 										.frame(maxWidth: 400)
@@ -143,8 +141,11 @@ struct CatalogView: View {
 				}
 			}.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
-					Text("Catalog")
-						.font(.headline)
+					if #available(iOS 16.1, *) {
+						Text("Plant").font(.headline).fontDesign(.monospaced)
+					} else {
+						Text("Plant").font(.headline)
+					}
 				}
 				ToolbarItemGroup {
 					BadgeButton(badgeCount: Int(cartManager.cart?.totalQuantity ?? 0), action: {
@@ -174,10 +175,10 @@ struct CatalogView: View {
 
 struct BadgeButton: View {
 	var badgeCount: Int
-	var action: () -> Void
+	var action: (() -> Void)?
 
 	var body: some View {
-		Button(action: action) {
+		Button(action: action ?? {}) {
 			ZStack {
 				SwiftUI.Image(systemName: "cart.fill")
 
