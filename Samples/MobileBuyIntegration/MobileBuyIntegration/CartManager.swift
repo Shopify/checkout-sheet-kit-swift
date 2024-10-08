@@ -92,6 +92,18 @@ class CartManager {
 		}
 	}
 
+	func updateQuantity(variant: GraphQL.ID, quantity: Int32, completionHandler: ((Storefront.Cart?) -> Void)?) {
+		performCartUpdate(id: variant, quantity: quantity, handler: { result in
+			switch result {
+			case .success(let cart):
+				self.cart = cart
+			case .failure(let error):
+				print(error)
+			}
+			completionHandler?(self.cart)
+		})
+	}
+
 	func resetCart() {
 		self.cart = nil
 	}
@@ -142,6 +154,28 @@ class CartManager {
 		}
 	}
 
+	private func performCartUpdate(id: GraphQL.ID, quantity: Int32, handler: @escaping CartResultHandler) {
+		let lines = [Storefront.CartLineUpdateInput.create(id: id, quantity: Input(orNull: quantity))]
+
+		if let cartID = cart?.id {
+			let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
+				.cartLinesUpdate(cartId: cartID, lines: lines) { $0
+					.cart { $0.cartManagerFragment() }
+				}
+			}
+
+			client.execute(mutation: mutation) { result in
+				if case .success(let mutation) = result, let cart = mutation.cartLinesUpdate?.cart {
+					handler(.success(cart))
+				} else {
+					handler(.failure(URLError(.unknown)))
+				}
+			}
+		} else {
+			performCartCreate(items: [id], handler: handler)
+		}
+	}
+
 	private func defaultCart(_ items: [GraphQL.ID]) -> Storefront.CartInput {
 		return Storefront.CartInput.create(
 			lines: Input(orNull: items.map({ Storefront.CartLineInput.create(merchandiseId: $0) }))
@@ -182,8 +216,11 @@ extension Storefront.CartQuery {
 			.totalQuantity()
 			.lines(first: 250) { $0
 				.nodes { $0
+					.id()
+					.quantity()
 					.merchandise { $0
 						.onProductVariant { $0
+							.id()
 							.title()
 							.price({ $0
 								.amount()
@@ -200,6 +237,7 @@ extension Storefront.CartQuery {
 					}
 				}
 			}
+			.totalQuantity()
 			.cost { $0
 				.totalAmount({ $0
 					.amount()
