@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			$0.colorScheme = .automatic
 
 			/// Enable preloading
-			$0.preloading.enabled = false
+			$0.preloading.enabled = true
 
 			/// Optional logger used for internal purposes
 			$0.logger = FileLogger("log.txt")
