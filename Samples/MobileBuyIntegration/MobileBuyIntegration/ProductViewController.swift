@@ -39,6 +39,12 @@ class ProductViewController: UIViewController {
 
 	@IBOutlet private var addToCartButton: UIButton!
 
+	private var loading = false {
+		didSet {
+			rerender()
+		}
+	}
+
 	private var product: Storefront.Product? {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
@@ -70,24 +76,43 @@ class ProductViewController: UIViewController {
 
 		if #available(iOS 15.0, *) {
 			addToCartButton.configurationUpdateHandler = {
-				$0.configuration?.showsActivityIndicator = !$0.isEnabled
+				$0.configuration?.showsActivityIndicator = self.loading
 			}
 		}
 
 		reloadProduct()
 	}
 
+	private func rerender() {
+		if #available(iOS 15.0, *) {
+			addToCartButton.configurationUpdateHandler = {
+				$0.configuration?.showsActivityIndicator = self.loading
+			}
+		}
+	}
+
+	private func setLoading(_ state: Bool) {
+		if state {
+			addToCartButton.isEnabled = false
+			loading = true
+		} else {
+			addToCartButton.isEnabled = true
+			loading = false
+		}
+	}
+
 	// MARK: Actions
 
 	@IBAction func addToCart() {
 		if let variant = product?.variants.nodes.first {
+			self.setLoading(true)
 			addToCartButton.isEnabled = false
 			let start = Date()
 			CartManager.shared.addItem(variant: variant.id) { [weak self] in
 				let diff = Date().timeIntervalSince(start)
 				let message = "Added item to cart in \(String(format: "%.0f", diff * 1000))ms"
 				ShopifyCheckoutSheetKit.configuration.logger.log(message)
-				self?.addToCartButton.isEnabled = true
+				self?.setLoading(false)
 			}
 		}
 	}
@@ -107,6 +132,7 @@ class ProductViewController: UIViewController {
 						.nodes { $0
 							.id()
 							.title()
+							.availableForSale()
 							.price { $0
 								.amount()
 								.currencyCode()
@@ -118,6 +144,7 @@ class ProductViewController: UIViewController {
 		}
 
 		StorefrontClient.shared.execute(query: query) { [weak self] result in
+			self?.setLoading(false)
 			if case .success(let query) = result {
 				self?.product = query.products.nodes.randomElement()
 			}
@@ -152,8 +179,15 @@ class ProductViewController: UIViewController {
 
 		if let variant = product.variants.nodes.first {
 			if #available(iOS 15.0, *) {
-				addToCartButton.configuration?
-					.subtitle = variant.price.formattedString()
+
+				if variant.availableForSale {
+					addToCartButton.configuration?
+						.subtitle = variant.price.formattedString()
+				} else {
+					addToCartButton.configuration?
+						.subtitle = "Out of stock"
+					addToCartButton.isEnabled = false
+				}
 			}
 		}
 	}

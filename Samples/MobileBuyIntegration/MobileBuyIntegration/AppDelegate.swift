@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			$0.logLevel = .all
 		}
 
-		print("[ShopifyCheckoutSheetKit] Log level set to .all")
+		print("[MobileBuyIntegration] Log level set to .all")
 
 		UIBarButtonItem.appearance().tintColor = .label
 

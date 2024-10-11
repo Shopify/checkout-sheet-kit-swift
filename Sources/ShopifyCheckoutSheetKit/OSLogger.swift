@@ -38,25 +38,25 @@ public class OSLogger {
     public func info(_ message: String) {
 		guard shouldEmit(.debug) else { return }
 
-        os_log("[com.shopify.checkoutsheetkit][Info] %@", log: logger, type: .info, message)
+        os_log("[ShopifyCheckoutSheetKit] (Info) - %@", log: logger, type: .info, message)
     }
 
     public func debug(_ message: String) {
 		guard shouldEmit(.debug) else { return }
 
-        os_log("[com.shopify.checkoutsheetkit][Debug] %@", log: logger, type: .debug, message)
+        os_log("[ShopifyCheckoutSheetKit] (Debug) - %@", log: logger, type: .debug, message)
     }
 
     public func error(_ message: String) {
 		guard shouldEmit(.error) else { return }
 
-        os_log("[com.shopify.checkoutsheetkit][Error] %@", log: logger, type: .error, message)
+        os_log("[ShopifyCheckoutSheetKit] (Error) - %@", log: logger, type: .error, message)
     }
 
     public func fault(_ message: String) {
 		guard shouldEmit(.error) else { return }
 
-        os_log("[com.shopify.checkoutsheetkit][Fault] %@", log: logger, type: .fault, message)
+        os_log("[ShopifyCheckoutSheetKit] (Fault) - %@", log: logger, type: .fault, message)
     }
 
     private func shouldEmit(_ choice: LogLevel) -> Bool {
