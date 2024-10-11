@@ -55,7 +55,6 @@ class CheckoutWebView: WKWebView {
 	var isRecovery = false {
 		didSet {
 			isBridgeAttached = false
-			OSLogger.shared.debug("isRecovery set to \(isRecovery), isBridgeAttached set to \(isBridgeAttached)")
 		}
 	}
 
@@ -74,6 +73,7 @@ class CheckoutWebView: WKWebView {
 		let cacheKey = url.absoluteString
 
 		guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
+			OSLogger.shared.debug("Preloading not enabled")
 			return uncacheableView()
 		}
 
@@ -83,11 +83,11 @@ class CheckoutWebView: WKWebView {
 			return view
 		}
 
+		OSLogger.shared.debug("Presenting cached entry")
 		return cache.view
 	}
 
 	static func uncacheableView() -> CheckoutWebView {
-		OSLogger.shared.debug("Preloading not in use")
 		uncacheableViewRef?.detachBridge()
 		let view = CheckoutWebView()
 		uncacheableViewRef = view
@@ -128,7 +128,7 @@ class CheckoutWebView: WKWebView {
 
 	// MARK: Initializers
 	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
-		OSLogger.shared.debug("Initializing CheckoutWebView, recovery: \(recovery)")
+		OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
 		/// Some external payment providers require ID verification which trigger the camera
 		/// This configuration option prevents the camera from opening as a "Live Broadcast".
 		configuration.allowsInlineMediaPlayback = true
@@ -165,7 +165,7 @@ class CheckoutWebView: WKWebView {
 	}
 
 	deinit {
-		OSLogger.shared.debug("De-allocating CheckoutWebView")
+		OSLogger.shared.debug("De-allocating webview")
 
 		if isRecovery {
 			navigationObserver?.invalidate()
@@ -207,7 +207,6 @@ class CheckoutWebView: WKWebView {
 			guard let self = self else { return }
 
 			if let url = change.newValue as? URL {
-				OSLogger.shared.info("Navigation changed to URL: \(url.absoluteString)")
 				if CheckoutURL(from: url).isConfirmationPage() {
 					self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
 					navigationObserver?.invalidate()
@@ -237,7 +236,7 @@ class CheckoutWebView: WKWebView {
 
 	private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {
 		if checkoutDidLoad && checkoutDidPresent && isBridgeAttached {
-			OSLogger.shared.info("Emitting presented event")
+			OSLogger.shared.info("Emitting presented event to checkout")
 			CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
 			presentedEventDidDispatch = true
 		}
@@ -286,7 +285,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 				()
 			}
 		} catch {
-			OSLogger.shared.error("Error decoding script message: \(error.localizedDescription)")
+			OSLogger.shared.error("Error decoding bridge script message: \(error.localizedDescription)")
 			viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
 		}
 	}
