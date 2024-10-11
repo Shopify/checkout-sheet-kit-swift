@@ -33,11 +33,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			$0.colorScheme = .automatic
 
 			/// Enable preloading
-			$0.preloading.enabled = true
+			$0.preloading.enabled = false
 
 			/// Optional logger used for internal purposes
 			$0.logger = FileLogger("log.txt")
+
+			$0.logLevel = .all
 		}
+
+		print("[ShopifyCheckoutSheetKit] Log level set to .all")
 
 		UIBarButtonItem.appearance().tintColor = .label
 

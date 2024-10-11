@@ -41,7 +41,6 @@ internal protocol ProductionLogger {
 
 internal struct InternalLogger: ProductionLogger {
 	public func logError(_ error: Error, _ message: String) {
-		let logMessage = "[ShopifyCheckoutSheetKit] \(message): \(error.localizedDescription) (Please report this to the Shopify team at https://github.com/Shopify/checkout-sheet-kit-swift)"
-		os_log(.error, "%{public}@", logMessage)
+		OSLogger.shared.fault("[ShopifyCheckoutSheetKit] \(message): \(error.localizedDescription) (Please report this to the Shopify team at https://github.com/Shopify/checkout-sheet-kit-swift)")
 	}
 }
