@@ -446,6 +446,40 @@ class CheckoutWebViewTests: XCTestCase {
 		XCTAssertFalse(CheckoutWebView.hasCacheEntry())
 		XCTAssertFalse(view.isBridgeAttached)
 	}
+
+	func testWebViewDidFailWithError() {
+		let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
+		let view = CheckoutWebView.for(checkout: url)
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, userInfo: nil)
+
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+		mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+		view.viewDelegate = mockDelegate
+
+		view.webView(view, didFail: nil, withError: error)
+
+        waitForExpectations(timeout: 5) { _ in
+			switch self.mockDelegate.errorReceived {
+			case .some(.sdkError(let underlying, let recoverable)):
+				XCTAssertEqual(underlying.localizedDescription, "The operation couldn’t be completed. (NSURLErrorDomain error -1001.)")
+				XCTAssertTrue(recoverable)
+			default:
+				XCTFail("checkoutDidFail(.sdkError) expected to throw")
+			}
+		}
+    }
+
+	func testWebViewDoesNotEmitDidFailForCancelledRedirect() {
+		let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
+		let view = CheckoutWebView.for(checkout: url)
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled, userInfo: nil)
+
+		view.viewDelegate = mockDelegate
+		view.webView(view, didFail: nil, withError: error)
+
+		XCTAssertNil(self.mockDelegate.errorReceived)
+    }
 }
 
 class LoadedRequestObservableWebView: CheckoutWebView {
