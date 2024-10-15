@@ -51,13 +51,13 @@ struct CartView: View {
 						isShowingCheckout = true
 					}, label: {
 						Text("Checkout")
+							.padding()
+							.frame(maxWidth: .infinity)
+							.background(isBusy ? Color.gray : Color.blue)
+							.foregroundColor(.white)
+							.cornerRadius(10)
+							.bold()
 					})
-					.padding()
-					.frame(maxWidth: .infinity)
-					.background(isBusy ? Color.gray : Color.blue)
-					.foregroundColor(.white)
-					.cornerRadius(10)
-					.bold()
 					.disabled(isBusy)
 					.accessibilityIdentifier("checkoutButton")
 					.sheet(isPresented: $isShowingCheckout) {
@@ -155,7 +155,8 @@ struct CartLines: View {
 					.frame(width: 60, height: 120)
 				}
 
-				VStack(alignment: .leading, spacing: 10) {
+				VStack(alignment: .leading, spacing: 8
+) {
 					Text(variant?.product.title ?? "")
 						.font(.body)
 						.bold()
@@ -179,12 +180,17 @@ struct CartLines: View {
 									}
 
 									updating = node.id
+
+									/// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
+									ShopifyCheckoutSheetKit.invalidate()
+
 									CartManager.shared.updateQuantity(variant: node.id, quantity: node.quantity - 1, completionHandler: { cart in
 										CartManager.shared.cart = cart
 										updating = nil
 
-										/// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
-										ShopifyCheckoutSheetKit.invalidate()
+										if let url = cart?.checkoutUrl {
+											ShopifyCheckoutSheetKit.preload(checkout: url)
+										}
 									})
 								}, label: {
 									HStack {
@@ -210,12 +216,17 @@ struct CartLines: View {
 									}
 
 									updating = node.id
+
+									/// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
+									ShopifyCheckoutSheetKit.invalidate()
+
 									CartManager.shared.updateQuantity(variant: node.id, quantity: node.quantity + 1, completionHandler: { cart in
 										CartManager.shared.cart = cart
 										updating = nil
 
-										/// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
-										ShopifyCheckoutSheetKit.invalidate()
+										if let url = cart?.checkoutUrl {
+											ShopifyCheckoutSheetKit.preload(checkout: url)
+										}
 									})
 								}, label: {
 									HStack {
