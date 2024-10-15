@@ -51,12 +51,4 @@ public struct CheckoutURL {
 	public func isMailOrTelLink() -> Bool {
 		return ["mailto", "tel"].contains(url.scheme)
 	}
-
-    public func isSecure() -> Bool {
-        return url.scheme == "https"
-    }
-
-    public func isValid() -> Bool {
-        return url.scheme != nil && url.host != nil
-    }
 }

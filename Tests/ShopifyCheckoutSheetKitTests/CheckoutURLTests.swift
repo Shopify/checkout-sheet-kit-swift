@@ -53,20 +53,4 @@ class CheckoutURLTests: XCTestCase {
         XCTAssertTrue(CheckoutURL(from: telURL).isMailOrTelLink())
         XCTAssertFalse(CheckoutURL(from: httpURL).isMailOrTelLink())
     }
-
-    func testIsSecure() {
-        let secureURL = URL(string: "https://shopify.com")!
-        let nonSecureURL = URL(string: "http://shopify.com")!
-
-        XCTAssertTrue(CheckoutURL(from: secureURL).isSecure())
-        XCTAssertFalse(CheckoutURL(from: nonSecureURL).isSecure())
-    }
-
-    func testIsValid() {
-        let validURL = URL(string: "https://shopify.com")!
-        let invalidURL = URL(string: "https:///")!  // Missing host
-
-        XCTAssertTrue(CheckoutURL(from: validURL).isValid())
-        XCTAssertFalse(CheckoutURL(from: invalidURL).isValid())
-    }
 }
