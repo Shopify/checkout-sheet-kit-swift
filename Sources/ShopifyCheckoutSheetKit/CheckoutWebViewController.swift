@@ -213,7 +213,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 		let shouldAttemptRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
 
-		if shouldAttemptRecovery {
+		if canRecoverFromError(error) && shouldAttemptRecovery {
 			self.presentFallbackViewController(url: self.checkoutURL)
 		} else {
 			dismiss(animated: true)
@@ -232,5 +232,10 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
 		delegate?.checkoutDidEmitWebPixelEvent(event: event)
+	}
+
+	private func canRecoverFromError(_ error: CheckoutError) -> Bool {
+		/// Reuse of multipass tokens will cause 422 errors. A new token must be generated
+		return !CheckoutURL(from: self.checkoutURL).isMultipassURL()
 	}
 }
