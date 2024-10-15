@@ -26,6 +26,122 @@ import UIKit
 import Combine
 import ShopifyCheckoutSheetKit
 
+class CartItemCell: UITableViewCell {
+    let titleLabel = UILabel()
+    let vendorLabel = UILabel()
+    let quantityLabel = UILabel()
+    let decreaseButton = UIButton(type: .system)
+    let increaseButton = UIButton(type: .system)
+    let labelStackView = UIStackView()
+    let quantityStackView = UIStackView()
+    let activityIndicator = UIActivityIndicatorView()
+
+    var onQuantityChange: ((_ quantity: Int32) -> Void)?
+
+    private var quantity: Int32 = 0 {
+        didSet {
+            quantityLabel.text = "\(quantity)"
+        }
+    }
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupViews()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setupViews() {
+        /// Title stack config
+        labelStackView.axis = .vertical
+        labelStackView.alignment = .leading
+        labelStackView.spacing = 4
+        labelStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        /// Quantity stack config
+        quantityStackView.axis = .horizontal
+        quantityStackView.alignment = .center
+        quantityStackView.spacing = 8
+        quantityStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        titleLabel.numberOfLines = 0
+        vendorLabel.numberOfLines = 0
+        vendorLabel.textColor = .systemBlue
+        vendorLabel.font = UIFont.systemFont(ofSize: 12)
+
+        /// Title / vendor
+        labelStackView.addArrangedSubview(titleLabel)
+        labelStackView.addArrangedSubview(vendorLabel)
+
+        /// Configure spinner
+		activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+		activityIndicator.hidesWhenStopped = true
+
+		/// Quantity controls
+        quantityStackView.addArrangedSubview(decreaseButton)
+		quantityStackView.addArrangedSubview(activityIndicator)
+        quantityStackView.addArrangedSubview(quantityLabel)
+        quantityStackView.addArrangedSubview(increaseButton)
+
+        decreaseButton.setTitle("-", for: .normal)
+        increaseButton.setTitle("+", for: .normal)
+        decreaseButton.titleLabel?.font = UIFont.systemFont(ofSize: 24)
+		increaseButton.titleLabel?.font = UIFont.systemFont(ofSize: 24)
+
+		activityIndicator.widthAnchor.constraint(equalToConstant: 20).isActive = true
+		quantityLabel.widthAnchor.constraint(equalToConstant: 20).isActive = true
+		quantityLabel.textAlignment = .center
+
+		decreaseButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+		increaseButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+
+        decreaseButton.addTarget(self, action: #selector(decreaseQuantity), for: .touchUpInside)
+        increaseButton.addTarget(self, action: #selector(increaseQuantity), for: .touchUpInside)
+
+        contentView.addSubview(labelStackView)
+        contentView.addSubview(quantityStackView)
+
+        NSLayoutConstraint.activate([
+            labelStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            labelStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            labelStackView.trailingAnchor.constraint(equalTo: quantityStackView.leadingAnchor, constant: -16),
+
+            quantityStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            quantityStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+        ])
+    }
+
+    @objc private func decreaseQuantity() {
+        if quantity > 1 {
+            quantity -= 1
+            onQuantityChange?(quantity)
+        }
+    }
+
+    @objc private func increaseQuantity() {
+        quantity += 1
+        onQuantityChange?(quantity)
+    }
+
+    func showLoading(_ loading: Bool) {
+		if loading {
+			quantityLabel.isHidden = true
+			activityIndicator.startAnimating()
+		} else {
+			activityIndicator.stopAnimating()
+			quantityLabel.isHidden = false
+		}
+	}
+
+    func configure(with variant: Storefront.ProductVariant, quantity: Int32) {
+        titleLabel.text = variant.product.title
+        vendorLabel.text = variant.product.vendor
+        self.quantity = quantity
+    }
+}
+
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
 	// MARK: Properties
@@ -67,9 +183,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		super.viewDidLoad()
 
 		tableView.register(
-			UITableViewCell.self, forCellReuseIdentifier: "row"
+			UITableViewCell.self, forCellReuseIdentifier: "CartItemCell"
 		)
 		tableView.allowsSelection = false
+		tableView.rowHeight = 80
 
 		cartDidUpdate()
 	}
@@ -101,16 +218,30 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let node = node(at: indexPath)
 		let variant = variant(at: indexPath)
 
-		var cell = tableView.dequeueReusableCell(withIdentifier: "row", for: indexPath)
-		if cell.reuseIdentifier == "row" {
-			cell = UITableViewCell(style: .subtitle, reuseIdentifier: "row")
+		let cell = CartItemCell()
+		cell.configure(with: variant, quantity: node.quantity)
+		cell.onQuantityChange = { quantity in
+			/// Display loading state on row + disable checkout button
+			cell.showLoading(true)
+			self.checkoutButton.isEnabled = false
+
+			/// Invalidate checkout cache to ensure correct number of items are shown on checkout
+			ShopifyCheckoutSheetKit.invalidate()
+
+			/// Update cart quantities
+			CartManager.shared.updateQuantity(variant: node.id, quantity: quantity, completionHandler: { cart in
+				cell.showLoading(false)
+				self.checkoutButton.isEnabled = true
+				cell.quantityLabel.text = "\(cart?.lines.nodes[indexPath.item].quantity ?? 0)"
+
+				if let url = cart?.checkoutUrl {
+					ShopifyCheckoutSheetKit.preload(checkout: url)
+				}
+			})
 		}
-
-		cell.textLabel?.text = variant.product.title
-		cell.detailTextLabel?.text = variant.product.vendor
-
 		return cell
 	}
 
@@ -145,10 +276,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 		CartManager.shared.resetCart()
 	}
 
+	private func node(at indexPath: IndexPath) -> BaseCartLine {
+		guard let lines = CartManager.shared.cart?.lines.nodes else {
+			fatalError("invald index path")
+		}
+
+		return lines[indexPath.item]
+	}
+
 	private func variant(at indexPath: IndexPath) -> Storefront.ProductVariant {
 		guard
-			let lines = CartManager.shared.cart?.lines.nodes,
-			let variant = lines[indexPath.item].merchandise as? Storefront.ProductVariant
+			let variant = node(at: indexPath).merchandise as? Storefront.ProductVariant
 		else {
 			fatalError("invald index path")
 		}
