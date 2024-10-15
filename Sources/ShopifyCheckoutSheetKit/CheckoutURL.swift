@@ -51,4 +51,12 @@ public struct CheckoutURL {
 	public func isMailOrTelLink() -> Bool {
 		return ["mailto", "tel"].contains(url.scheme)
 	}
+
+	public func isDeepLink() -> Bool {
+		guard let scheme = url.scheme else {
+			return false
+		}
+
+		return !["http", "https"].contains(scheme)
+	}
 }
