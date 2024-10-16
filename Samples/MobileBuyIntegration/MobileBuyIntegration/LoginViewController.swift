@@ -21,21 +21,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Buy
+import UIKit
 import ShopifyCheckoutSheetKit
 
-public struct AppConfiguration {
-	/// Prefill buyer information
-	public var useVaultedState: Bool = false
+class LoginViewController: UIViewController {
 
-	/// Pass in customerAccessToken after user logs in
-	public var useAuthenticatedState: Bool = false
+	@IBOutlet private var loginButton: UIButton!
 
-	/// Logger to retain Web Pixel events
-	internal let webPixelsLogger = FileLogger("analytics.txt")
-}
+	public init() {
+		super.init(nibName: nil, bundle: nil)
 
-public var appConfiguration = AppConfiguration() {
-	didSet {
-		CartManager.shared.resetCart()
+		title = "Login"
+	}
+
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
+	@IBAction func login() {
+		let client = CustomerAccountClient.shared
+		guard let authData = client.buildAuthData() else {
+			print("No auth data available to build authorization URL")
+			return
+		}
+
+		let loginWebViewController = LoginWebViewController(authData: authData, redirectUri: client.getRedirectUri())
+		if #available(iOS 13.0, *) {
+			loginWebViewController.modalPresentationStyle = .automatic
+		} else {
+			loginWebViewController.modalPresentationStyle = .overFullScreen
+		}
+		present(loginWebViewController, animated: true, completion: nil)
 	}
 }
