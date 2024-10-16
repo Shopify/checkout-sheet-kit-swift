@@ -106,6 +106,16 @@ class CheckoutViewDelegateTests: XCTestCase {
 		XCTAssertFalse(viewController.checkoutView.isRecovery)
 	}
 
+	func testDoesNotInstantiateRecoveryForMultipassURL() {
+		let controller = MockCheckoutWebViewController(
+			checkoutURL: URL(string: "https://checkout-sdk.myshopify.com/account/login/multipass/token")!, delegate: delegate)
+
+		controller.checkoutViewDidFailWithError(error:
+			.checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: true))
+
+		XCTAssertFalse(controller.checkoutView.isRecovery)
+	}
+
 	func testFailWithErrorDisablesPreloadingActivtedByClient() {
 		CheckoutWebView.preloadingActivatedByClient = true
 

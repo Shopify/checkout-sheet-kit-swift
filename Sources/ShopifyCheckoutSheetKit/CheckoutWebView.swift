@@ -197,7 +197,7 @@ class CheckoutWebView: WKWebView {
 			guard let self = self else { return }
 
 			if let url = change.newValue as? URL {
-				if isConfirmation(url: url) {
+				if CheckoutURL(from: url).isConfirmationPage() {
 					self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
 					navigationObserver?.invalidate()
 				}
@@ -281,7 +281,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 			return
 		}
 
-		if isExternalLink(action) || isMailOrTelLink(url) {
+		if isExternalLink(action) || CheckoutURL(from: url).isMailOrTelLink() {
 			viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
 			decisionHandler(.cancel)
 			return
@@ -410,26 +410,8 @@ extension CheckoutWebView: WKNavigationDelegate {
 		return urlComponents.url ?? url
     }
 
-	private func isMailOrTelLink(_ url: URL) -> Bool {
-		return ["mailto", "tel"].contains(url.scheme)
-	}
-
 	private func isCheckout(url: URL?) -> Bool {
 		return self.url == url
-	}
-
-	private func isConfirmation(url: URL) -> Bool {
-		let pattern = "^(thank[_-]you)$"
-		let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-
-		for component in url.pathComponents {
-			let range = NSRange(location: 0, length: component.utf16.count)
-			if regex?.firstMatch(in: component, options: [], range: range) != nil {
-				return true
-			}
-		}
-
-		return false
 	}
 
 	private func getOrderIdFromQuery(url: URL) -> String? {
