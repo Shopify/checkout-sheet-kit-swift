@@ -281,7 +281,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 			return
 		}
 
-		if isExternalLink(action) || CheckoutURL(from: url).isMailOrTelLink() {
+		if isExternalLink(action) || CheckoutURL(from: url).isDeepLink() {
 			viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
 			decisionHandler(.cancel)
 			return

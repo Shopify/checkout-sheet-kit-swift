@@ -44,13 +44,13 @@ class CheckoutURLTests: XCTestCase {
         XCTAssertFalse(CheckoutURL(from: nonConfirmationURL).isConfirmationPage())
     }
 
-    func testIsMailOrTelLink() {
-        let mailURL = URL(string: "mailto:someone@shopify.com")!
-        let telURL = URL(string: "tel:+1234567890")!
-        let httpURL = URL(string: "https://shopify.com")!
+    func testIsDeepLink() {
+        let secureURL = URL(string: "https://shopify.com")!
+        let nonSecureURL = URL(string: "http://shopify.com")!
+        let deeplink = URL(string: "app://deep/link")!
 
-        XCTAssertTrue(CheckoutURL(from: mailURL).isMailOrTelLink())
-        XCTAssertTrue(CheckoutURL(from: telURL).isMailOrTelLink())
-        XCTAssertFalse(CheckoutURL(from: httpURL).isMailOrTelLink())
+        XCTAssertFalse(CheckoutURL(from: secureURL).isDeepLink())
+        XCTAssertFalse(CheckoutURL(from: nonSecureURL).isDeepLink())
+        XCTAssertTrue(CheckoutURL(from: deeplink).isDeepLink())
     }
 }

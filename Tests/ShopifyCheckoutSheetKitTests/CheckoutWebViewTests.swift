@@ -118,6 +118,22 @@ class CheckoutWebViewTests: XCTestCase {
 		wait(for: [didClickLinkExpectation], timeout: 1)
 	}
 
+	func testCheckoutDidClickLinkWasCalledForDeepLink() {
+		let link = URL(string: "shopify://app/privacy")!
+		let delegate = MockCheckoutWebViewDelegate()
+		let didClickLinkExpectation = expectation(
+			description: "checkoutViewDidClickLink was called"
+		)
+		delegate.didClickLinkExpectation = didClickLinkExpectation
+		view.viewDelegate = delegate
+
+		view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { policy in
+			XCTAssertEqual(policy, .cancel)
+		}
+
+		wait(for: [didClickLinkExpectation], timeout: 1)
+	}
+
 	func testURLLinkDelegationWithExternalParam() {
 		let link = URL(string: "https://www.shopify.com/legal/privacy/app-users?open_externally=true")!
 
