@@ -24,13 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import Foundation
 
 class CheckoutCompletedEventDecoder {
-	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) throws -> CheckoutCompletedEvent {
-		let messageBody = try container.decode(String.self, forKey: .body)
+	func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using decoder: Decoder) -> CheckoutCompletedEvent {
+		do {
+			let messageBody = try container.decode(String.self, forKey: .body)
 
-		guard let data = messageBody.data(using: .utf8) else {
+			guard let data = messageBody.data(using: .utf8) else {
+				return createEmptyCheckoutCompletedEvent()
+			}
+
+			return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)
+		} catch {
+			OSLogger.shared.error("Error decoding \"completed\" event - \(error.localizedDescription)")
 			return createEmptyCheckoutCompletedEvent()
 		}
-
-		return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)
 	}
 }

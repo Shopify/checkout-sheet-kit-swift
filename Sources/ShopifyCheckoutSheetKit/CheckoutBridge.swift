@@ -37,7 +37,6 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 	static let schemaVersion = "8.1"
 	static let messageHandler = "mobileCheckoutSdk"
 	internal static let userAgent = "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version)"
-	internal static var logger: ProductionLogger = InternalLogger()
 
 	static var applicationName: String {
 		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
@@ -134,14 +133,8 @@ extension CheckoutBridge {
 
 			switch name {
 			case "completed":
-				let checkoutCompletedEventDecoder = CheckoutCompletedEventDecoder()
-				do {
-					let checkoutCompletedEvent = try checkoutCompletedEventDecoder.decode(from: container, using: decoder)
-					self = .checkoutComplete(event: checkoutCompletedEvent)
-				} catch {
-					logger.logError(error, "Error decoding CheckoutCompletedEvent")
-					self = .checkoutComplete(event: createEmptyCheckoutCompletedEvent())
-				}
+				let checkoutCompletedEvent = CheckoutCompletedEventDecoder().decode(from: container, using: decoder)
+				self = .checkoutComplete(event: checkoutCompletedEvent)
 			case "error":
 				let errorDecoder = CheckoutErrorEventDecoder()
 				let error = errorDecoder.decode(from: container, using: decoder)

@@ -63,7 +63,7 @@ class CheckoutWebView: WKWebView {
 	}
 
 	static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
-		OSLogger.shared.debug("Creating CheckoutWebView for URL: \(url.absoluteString), recovery: \(recovery)")
+		OSLogger.shared.debug("Creating webview for URL: \(url.absoluteString), recovery: \(recovery)")
 
 		if recovery {
 			CheckoutWebView.invalidate()
@@ -299,7 +299,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 		}
 
 		if isExternalLink(action) || CheckoutURL(from: url).isDeepLink() {
-			OSLogger.shared.debug("External or mail/tel link clicked: \(url.absoluteString) - policy cancelled")
+			OSLogger.shared.debug("External or deep link clicked: \(url.absoluteString) - request intercepted")
 			viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
 			decisionHandler(.cancel)
 			return
@@ -360,7 +360,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 					recoverable: allowRecoverable
 				))
 			default:
-				OSLogger.shared.debug("4xx/5xx error with status code received: \(statusCode)")
+				OSLogger.shared.debug("\(statusCode) error received")
 				viewDelegate?.checkoutViewDidFailWithError(
 					error: .checkoutUnavailable(
 						message: errorMessageForStatusCode,

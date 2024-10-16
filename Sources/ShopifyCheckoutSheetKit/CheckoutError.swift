@@ -124,7 +124,7 @@ internal class CheckoutErrorEventDecoder {
 			/// Failure to find an event in the payload array will trigger the catch block
 			return events.first!
 		} catch {
-			CheckoutBridge.logger.logError(error, "Error decoding checkout error event")
+			OSLogger.shared.error("Error decoding \"error\" event - \(error.localizedDescription)")
 			return CheckoutErrorEvent(group: .unsupported, reason: "Decoded error could not be parsed.")
 		}
 	}
