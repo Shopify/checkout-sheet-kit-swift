@@ -24,6 +24,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import Foundation
 import os.log
 
+private let subsystem = "com.shopify.checkoutsheetkit"
+
+public enum LogLevel {
+    case all, debug, error, none
+}
+
+public class OSLogger {
+    private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
+
+    public static let shared = OSLogger()
+
+    public func info(_ message: String) {
+		guard shouldEmit(.debug) else { return }
+
+        os_log("[ShopifyCheckoutSheetKit] (Info) - %@", log: logger, type: .info, message)
+    }
+
+    public func debug(_ message: String) {
+		guard shouldEmit(.debug) else { return }
+
+        os_log("[ShopifyCheckoutSheetKit] (Debug) - %@", log: logger, type: .debug, message)
+    }
+
+    public func error(_ message: String) {
+		guard shouldEmit(.error) else { return }
+
+        os_log("[ShopifyCheckoutSheetKit] (Error) - %@", log: logger, type: .error, message)
+    }
+
+    public func fault(_ message: String) {
+		guard shouldEmit(.error) else { return }
+
+        os_log("[ShopifyCheckoutSheetKit] (Fault) - %@", log: logger, type: .fault, message)
+    }
+
+    private func shouldEmit(_ choice: LogLevel) -> Bool {
+		let configLevel = ShopifyCheckoutSheetKit.configuration.logLevel
+
+		if configLevel == .none {
+			return false
+		}
+
+		return configLevel == .all || configLevel == choice
+	}
+}
+
 public protocol Logger {
 	func log(_ message: String)
 	func clearLogs()
@@ -33,15 +79,4 @@ public class NoOpLogger: Logger {
 	public func log(_ message: String) {}
 
 	public func clearLogs() {}
-}
-
-internal protocol ProductionLogger {
-	func logError(_ error: Error, _ message: String)
-}
-
-internal struct InternalLogger: ProductionLogger {
-	public func logError(_ error: Error, _ message: String) {
-		let logMessage = "[ShopifyCheckoutSheetKit] \(message): \(error.localizedDescription) (Please report this to the Shopify team at https://github.com/Shopify/checkout-sheet-kit-swift)"
-		os_log(.error, "%{public}@", logMessage)
-	}
 }

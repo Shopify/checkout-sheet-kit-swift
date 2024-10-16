@@ -37,7 +37,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 			/// Optional logger used for internal purposes
 			$0.logger = FileLogger("log.txt")
+
+			$0.logLevel = .all
 		}
+
+		print("[MobileBuyIntegration] Log level set to .all")
 
 		UIBarButtonItem.appearance().tintColor = .label
 
