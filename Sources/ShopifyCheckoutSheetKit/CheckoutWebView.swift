@@ -29,6 +29,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent)
 	func checkoutViewDidFinishNavigation()
 	func checkoutViewDidClickLink(url: URL)
+    func checkoutViewDidClickLinkThatRequiresSafari(url: URL)
 	func checkoutViewDidFailWithError(error: CheckoutError)
 	func checkoutViewDidToggleModal(modalVisible: Bool)
 	func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
@@ -304,6 +305,12 @@ extension CheckoutWebView: WKNavigationDelegate {
 			decisionHandler(.cancel)
 			return
 		}
+        
+        if requiresSafariBrowserLink(url) {
+            viewDelegate?.checkoutViewDidClickLinkThatRequiresSafari(url: removeExternalParam(url))
+            decisionHandler(.allow)
+            return
+        }
 
 		decisionHandler(.allow)
 	}
@@ -451,6 +458,11 @@ extension CheckoutWebView: WKNavigationDelegate {
 		urlComponents.queryItems = urlComponents.queryItems?.filter { !($0.name == "open_externally") }
 		return urlComponents.url ?? url
 	}
+    
+    private func requiresSafariBrowserLink(_ url: URL) -> Bool {
+        // iDEAL payments are not permitted inside of WKWebView and must be completed from Safari
+        return url.absoluteString.contains("/ideal/")
+    }
 
 	private func isCheckout(url: URL?) -> Bool {
 		return self.url == url
