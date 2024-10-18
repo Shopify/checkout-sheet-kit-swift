@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.1 - October 18, 2024
+
+- Ignore "about:blank" URLs
+
 ## 3.1.0 - October 16, 2024
 
 - Ignore cancelled redirects

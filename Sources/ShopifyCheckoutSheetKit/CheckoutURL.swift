@@ -48,8 +48,12 @@ public struct CheckoutURL {
 		return false
 	}
 
+	public func isBlank() -> Bool {
+		return url.scheme == "about" || url.absoluteString == "about:blank"
+	}
+
 	public func isDeepLink() -> Bool {
-		guard let scheme = url.scheme else {
+		guard let scheme = url.scheme, !isBlank() else {
 			return false
 		}
 
