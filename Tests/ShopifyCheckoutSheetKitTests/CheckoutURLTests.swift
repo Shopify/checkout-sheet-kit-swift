@@ -45,12 +45,22 @@ class CheckoutURLTests: XCTestCase {
     }
 
     func testIsDeepLink() {
+		/// Invalid cases
         let secureURL = URL(string: "https://shopify.com")!
         let nonSecureURL = URL(string: "http://shopify.com")!
+        let blank = URL(string: "about:blank")!
+
+		/// Valid cases
         let deeplink = URL(string: "app://deep/link")!
+        let deeplink2 = URL(string: "notes-app://")!
+        let deeplink3 = URL(string: "maps://?q=Cupertino")!
 
         XCTAssertFalse(CheckoutURL(from: secureURL).isDeepLink())
         XCTAssertFalse(CheckoutURL(from: nonSecureURL).isDeepLink())
+        XCTAssertFalse(CheckoutURL(from: blank).isDeepLink())
+
         XCTAssertTrue(CheckoutURL(from: deeplink).isDeepLink())
+        XCTAssertTrue(CheckoutURL(from: deeplink2).isDeepLink())
+        XCTAssertTrue(CheckoutURL(from: deeplink3).isDeepLink())
     }
 }
