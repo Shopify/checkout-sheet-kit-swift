@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.2 - November 6, 2024
+
+- Remove redundant code
+
 ## 3.1.1 - October 18, 2024
 
 - Ignore "about:blank" URLs

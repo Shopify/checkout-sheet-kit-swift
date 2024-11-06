@@ -172,7 +172,6 @@ struct InstrumentationPayload: Codable {
 }
 
 enum InstrumentationType: String, Codable {
-	case incrementCounter
 	case histogram
 }
 
