@@ -26,6 +26,10 @@
 	<string>$(EMAIL)</string>
 	<key>Phone</key>
 	<string>$(PHONE)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>offsitepayment</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
