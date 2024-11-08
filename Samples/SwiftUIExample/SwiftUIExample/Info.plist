@@ -6,6 +6,15 @@
 	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
 	<key>StorefrontDomain</key>
 	<string>$(STOREFRONT_DOMAIN)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>offsitepayment</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
