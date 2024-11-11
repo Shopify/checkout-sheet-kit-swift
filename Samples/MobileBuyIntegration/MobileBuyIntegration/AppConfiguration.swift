@@ -33,7 +33,7 @@ public final class AppConfiguration: ObservableObject {
     @Published public var useVaultedState: Bool = false
 
 	/// Pass in customerAccessToken after user logs in
-	public var useAuthenticatedState: Bool = false
+	public var useAuthenticatedState: Bool = true
 
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
