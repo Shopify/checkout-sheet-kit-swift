@@ -21,9 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Foundation
 import ShopifyCheckoutSheetKit
 
 public struct AppConfiguration {
+	public var storefrontDomain: String = Bundle.main.infoDictionary?["StorefrontDomain"] as? String ?? ""
+
+	public var universalLinks = UniversalLinks()
+
 	/// Prefill buyer information
 	public var useVaultedState: Bool = false
 
@@ -35,4 +40,9 @@ public var appConfiguration = AppConfiguration() {
 	didSet {
 		CartManager.shared.resetCart()
 	}
+}
+
+public struct UniversalLinks {
+	public var handleCheckoutInApp: Bool = true
+	public var handleAllURLsInApp: Bool = true
 }

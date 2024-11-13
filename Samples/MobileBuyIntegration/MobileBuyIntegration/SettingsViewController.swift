@@ -29,6 +29,8 @@ import ShopifyCheckoutSheetKit
 struct SettingsView: View {
 	@State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	@State private var useVaultedState = appConfiguration.useVaultedState
+	@State private var handleCheckoutInApp = appConfiguration.universalLinks.handleCheckoutInApp
+	@State private var handleAllURLsInApp = appConfiguration.universalLinks.handleAllURLsInApp
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
 	@State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 	@State private var colorScheme: ColorScheme = .light
@@ -45,6 +47,20 @@ struct SettingsView: View {
 						.onChange(of: useVaultedState) { newValue in
 							appConfiguration.useVaultedState = newValue
 						}
+				}
+
+				Section(header: Text("Universal Links")) {
+					Toggle("Handle Checkout URLs", isOn: $handleCheckoutInApp)
+						.onChange(of: handleCheckoutInApp) { newValue in
+							appConfiguration.universalLinks.handleCheckoutInApp = newValue
+						}
+					Toggle("Handle all Universal Links", isOn: $handleAllURLsInApp)
+						.onChange(of: handleAllURLsInApp) { newValue in
+							appConfiguration.universalLinks.handleAllURLsInApp = newValue
+						}
+
+					Text("By default, the app will only handle Checkout URLs (non-thank you page) and route everything else to Safari. This setting will route all Universal Links to the app.")
+						.font(.caption)
 				}
 
 				Section(header: Text("Theme")) {

@@ -28,6 +28,7 @@ import ShopifyCheckoutSheetKit
 class ProductViewController: UIViewController {
 
 	// MARK: Properties
+	private var handle: String?
 
 	@IBOutlet private var image: UIImageView!
 
@@ -55,8 +56,10 @@ class ProductViewController: UIViewController {
 
 	// MARK: Initializers
 
-	convenience init() {
+	convenience init(handle: String?) {
 		self.init(nibName: nil, bundle: nil)
+
+		self.handle = handle
 	}
 
 	// MARK: UIViewController Lifecycle
@@ -80,7 +83,11 @@ class ProductViewController: UIViewController {
 			}
 		}
 
-		reloadProduct()
+		if let handle = handle {
+			getProductByHandle(handle)
+		} else {
+			reloadProduct()
+		}
 	}
 
 	private func rerender() {
@@ -89,6 +96,7 @@ class ProductViewController: UIViewController {
 				$0.configuration?.showsActivityIndicator = self.loading
 			}
 		}
+		updateProductDetails()
 	}
 
 	private func setLoading(_ state: Bool) {
@@ -98,6 +106,13 @@ class ProductViewController: UIViewController {
 		} else {
 			addToCartButton.isEnabled = true
 			loading = false
+		}
+	}
+
+	private func setProduct(_ product: Storefront.Product?) {
+		if let product = product {
+			self.product = product
+			self.handle = product.handle
 		}
 	}
 
@@ -117,12 +132,14 @@ class ProductViewController: UIViewController {
 		}
 	}
 
-	@IBAction private func reloadProduct() {
-		let query = Storefront.buildQuery(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
-			.products(first: 250) { $0
+	public func getProductByHandle(_ handle: String) {
+		let context = Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
+		let query = Storefront.buildQuery(inContext: context) { $0
+			.products(first: 1, query: handle) { $0
 				.nodes { $0
 					.id()
 					.title()
+					.handle()
 					.description()
 					.vendor()
 					.featuredImage { $0
@@ -146,7 +163,42 @@ class ProductViewController: UIViewController {
 		StorefrontClient.shared.execute(query: query) { [weak self] result in
 			self?.setLoading(false)
 			if case .success(let query) = result {
-				self?.product = query.products.nodes.randomElement()
+				self?.setProduct(query.products.nodes.first)
+			}
+		}
+	}
+
+	@IBAction private func reloadProduct() {
+		let query = Storefront.buildQuery(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
+			.products(first: 250) { $0
+				.nodes { $0
+					.id()
+					.title()
+					.handle()
+					.description()
+					.vendor()
+					.featuredImage { $0
+						.url()
+					}
+					.variants(first: 1) { $0
+						.nodes { $0
+							.id()
+							.title()
+							.availableForSale()
+							.price { $0
+								.amount()
+								.currencyCode()
+							}
+						}
+					}
+				}
+			}
+		}
+
+		StorefrontClient.shared.execute(query: query) { [weak self] result in
+			self?.setLoading(false)
+			if case .success(let query) = result {
+				self?.setProduct(query.products.nodes.randomElement())
 			}
 		}
 	}
