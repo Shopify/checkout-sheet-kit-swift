@@ -256,7 +256,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Remove .pcm binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -name \"*.pcm\" -type f -delete\n\n# Remove Swiftlint binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -name \"SwiftLint*\" -type f -delete\n\n\n";
+			shellScript = "# Remove .pcm binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -name \"*.pcm\" -type f -delete\n\n# Remove Swiftlint binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -iname \"swiftlint*\" -type f -delete\n\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

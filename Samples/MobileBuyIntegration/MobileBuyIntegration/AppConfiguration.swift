@@ -21,11 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Foundation
 import ShopifyCheckoutSheetKit
 
-public struct AppConfiguration {
+public final class AppConfiguration: ObservableObject {
+	public var storefrontDomain: String = Bundle.main.infoDictionary?["StorefrontDomain"] as? String ?? ""
+
+	@Published public var universalLinks = UniversalLinks()
+
 	/// Prefill buyer information
-	public var useVaultedState: Bool = false
+	@Published public var useVaultedState: Bool = false
 
 	/// Logger to retain Web Pixel events
 	internal let webPixelsLogger = FileLogger("analytics.txt")
@@ -34,5 +39,25 @@ public struct AppConfiguration {
 public var appConfiguration = AppConfiguration() {
 	didSet {
 		CartManager.shared.resetCart()
+	}
+}
+
+public struct UniversalLinks {
+	public var checkout: Bool = true
+	public var cart: Bool = true
+	public var products: Bool = true
+
+	public var handleAllURLsInApp: Bool = true {
+		didSet {
+			if handleAllURLsInApp {
+				enableAllURLs()
+			}
+		}
+	}
+
+	private mutating func enableAllURLs() {
+		checkout = true
+		products = true
+		cart = true
 	}
 }
