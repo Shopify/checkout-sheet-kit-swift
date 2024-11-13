@@ -27,10 +27,9 @@ import ShopifyCheckoutSheetKit
 
 @available(iOS 15.0, *)
 struct SettingsView: View {
+	@ObservedObject var appConfiguration: AppConfiguration
+
 	@State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
-	@State private var useVaultedState = appConfiguration.useVaultedState
-	@State private var handleCheckoutInApp = appConfiguration.universalLinks.handleCheckoutInApp
-	@State private var handleAllURLsInApp = appConfiguration.universalLinks.handleAllURLsInApp
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
 	@State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 	@State private var colorScheme: ColorScheme = .light
@@ -43,23 +42,16 @@ struct SettingsView: View {
 						.onChange(of: preloadingEnabled) { newValue in
 							ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
 						}
-					Toggle("Prefill buyer information", isOn: $useVaultedState)
-						.onChange(of: useVaultedState) { newValue in
-							appConfiguration.useVaultedState = newValue
-						}
+					Toggle("Prefill buyer information", isOn: $appConfiguration.useVaultedState)
 				}
 
 				Section(header: Text("Universal Links")) {
-					Toggle("Handle Checkout URLs", isOn: $handleCheckoutInApp)
-						.onChange(of: handleCheckoutInApp) { newValue in
-							appConfiguration.universalLinks.handleCheckoutInApp = newValue
-						}
-					Toggle("Handle all Universal Links", isOn: $handleAllURLsInApp)
-						.onChange(of: handleAllURLsInApp) { newValue in
-							appConfiguration.universalLinks.handleAllURLsInApp = newValue
-						}
+					Toggle("Handle Checkout URLs", isOn: $appConfiguration.universalLinks.checkout)
+					Toggle("Handle Cart URLs", isOn: $appConfiguration.universalLinks.cart)
+					Toggle("Handle Product URLs", isOn: $appConfiguration.universalLinks.products)
+					Toggle("Handle all Universal Links", isOn: $appConfiguration.universalLinks.handleAllURLsInApp)
 
-					Text("By default, the app will only handle Checkout URLs (non-thank you page) and route everything else to Safari. This setting will route all Universal Links to the app.")
+					Text("By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app.")
 						.font(.caption)
 				}
 
@@ -187,7 +179,7 @@ extension Configuration.ColorScheme {
 
 #Preview {
 	if #available(iOS 15.0, *) {
-		SettingsView()
+		SettingsView(appConfiguration: appConfiguration)
 	} else {
 		Text("Not supported in < iOS 15")
 	}

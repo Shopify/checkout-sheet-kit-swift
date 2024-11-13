@@ -59,7 +59,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		]
 
 		if #available(iOS 15.0, *) {
-			let settingsController = UIHostingController(rootView: SettingsView())
+			let settingsController = UIHostingController(rootView: SettingsView(appConfiguration: appConfiguration))
 			settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
 			settingsController.tabBarItem.title = "Settings"
 
@@ -80,8 +80,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-		guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-			  let incomingURL = userActivity.webpageURL else {
+		guard
+			userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+			let incomingURL = userActivity.webpageURL,
+
+			/// Ensure URL host matches our Storefront domain
+			let host = incomingURL.host, host == appConfiguration.storefrontDomain
+		else {
 			return
 		}
 
@@ -89,25 +94,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func handleUniversalLink(url: URL) {
-		// The URL host must match the StorefrontDomain defined in our env
-		guard let host = url.host, host == appConfiguration.storefrontDomain else { return }
-
 		let storefrontUrl = StorefrontURL(from: url)
 
 		switch true {
-		case appConfiguration.universalLinks.handleCheckoutInApp && storefrontUrl.isCheckout() && !storefrontUrl.isThankYouPage():
-			if let vc = cartController {
-				ShopifyCheckoutSheetKit.present(checkout: url, from: vc, delegate: vc)
-			}
-		case appConfiguration.universalLinks.handleAllURLsInApp:
-			if storefrontUrl.isCart() {
-				navigateToCart()
-			} else if let slug = storefrontUrl.getProductSlug() {
+		/// Checkout URLs
+		case appConfiguration.universalLinks.checkout && storefrontUrl.isCheckout() && !storefrontUrl.isThankYouPage():
+			presentCheckout(url)
+		/// Cart URLs
+		case appConfiguration.universalLinks.cart && storefrontUrl.isCart():
+			navigateToCart()
+		/// Product URLs
+		case appConfiguration.universalLinks.products:
+			if let slug = storefrontUrl.getProductSlug() {
 				navigateToProduct(with: slug)
 			}
+		/// Open everything else in Safari
 		default:
-			// Open all other links in Safari
 			UIApplication.shared.open(url)
+		}
+	}
+
+	private func presentCheckout(_ url: URL) {
+		if let viewController = cartController {
+			ShopifyCheckoutSheetKit.present(checkout: url, from: viewController, delegate: viewController)
 		}
 	}
 
@@ -127,7 +136,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			tabBarVC.selectedIndex = 1
 		}
 	}
-
 
 	func navigateToProduct(with handle: String) {
 		if let pdp = self.productController {
