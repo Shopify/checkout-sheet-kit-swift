@@ -29,6 +29,10 @@ extension Storefront.MoneyV2 {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .currency
 		formatter.currencyCode = currencyCode.rawValue
-		return formatter.string(from: NSDecimalNumber(decimal: amount))
+		return isFree() ? "Free" : formatter.string(from: NSDecimalNumber(decimal: amount))
+	}
+
+	func isFree() -> Bool {
+		return amount == 0
 	}
 }

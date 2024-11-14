@@ -24,60 +24,106 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 import SwiftUI
 import ShopifyCheckoutSheetKit
+import Combine
 
+/// A SceneDelgate is a bit of a legacy concept since the introduction of the SwiftUI App Lifecycle in iOS 14.
+/// This implementation can updated to use SwiftUI's @main attribute like so:
+///
+/// @main
+/// struct MySwiftUIApp: App {
+///   var body: some Scene {
+///     WindowGroup {
+///		  ContentView()
+///     }
+///   }
+/// }
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	var window: UIWindow?
 
-	var cartController: CartViewController?
-	var productController: ProductViewController?
+	public static var cartController = CheckoutViewHostingController(rootView: CartView())
+	var productController: ProductView?
+	var productGrid: ProductGrid?
 
-	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
-		guard let windowScene = (scene as? UIWindowScene) else { return }
+	var cancellables: Set<AnyCancellable> = []
 
-		let tabBarController = UITabBarController()
+	 func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
+        guard let windowScene = (scene as? UIWindowScene) else { return }
 
-		/// Catalog
-		productController = ProductViewController()
-		productController?.tabBarItem.image = UIImage(systemName: "books.vertical")
-		productController?.tabBarItem.title = "Browse"
-		productController?.navigationItem.title = "Product details"
+        let tabBarController = UITabBarController()
 
-		/// Cart
-		cartController = CartViewController()
-		cartController?.tabBarItem.image = UIImage(systemName: "cart")
-		cartController?.tabBarItem.title = "Cart"
-		cartController?.navigationItem.title = "Cart"
+		/// Branding Logo
+		/// TODO: Fetch this from the Storefront API for the configured storefront
+        let logoImageView = UIImageView(image: UIImage(named: "logo"))
+		logoImageView.contentMode = .scaleAspectFit
+		logoImageView.widthAnchor.constraint(equalToConstant: 90).isActive = true
+		logoImageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
 
-		tabBarController.viewControllers = [
-			UINavigationController(
-				rootViewController: productController!
-			),
-			UINavigationController(
-				rootViewController: cartController!
-			)
-		]
+		/// Catalog grid view
+		productGrid = ProductGrid()
+		let productGridController = UIHostingController(rootView: productGrid)
+        productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
+        productGridController.tabBarItem.title = "Catalog"
+        productGridController.navigationItem.titleView = logoImageView
 
-		if #available(iOS 15.0, *) {
-			let settingsController = UIHostingController(rootView: SettingsView(appConfiguration: appConfiguration))
-			settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
-			settingsController.tabBarItem.title = "Settings"
+        /// Product Gallery
+        let productView = ProductGalleryView()
+        let productGalleryController = UIHostingController(rootView: productView)
+        productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
+        productGalleryController.tabBarItem.title = "Products"
+        productGalleryController.navigationItem.titleView = logoImageView
 
-			tabBarController.viewControllers?.append(UINavigationController(
-				rootViewController: settingsController
-			))
-		}
+        /// Cart
+        SceneDelegate.cartController.tabBarItem.image = UIImage(systemName: "cart")
+        SceneDelegate.cartController.tabBarItem.title = "Cart"
+		SceneDelegate.cartController.navigationItem.title = "Cart"
 
-		let window = UIWindow(windowScene: windowScene)
-		window.rootViewController = tabBarController
-		window.makeKeyAndVisible()
+		subscribeToCartUpdates()
 
-		NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+        tabBarController.viewControllers = [
+			/// Catalog grid screen
+			UINavigationController(rootViewController: productGridController),
 
-		window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+			/// Product gallery screen
+            UINavigationController(rootViewController: productGalleryController),
 
-		self.window = window
-	}
+            /// Cart screen
+            UINavigationController(rootViewController: SceneDelegate.cartController)
+        ]
+
+        if #available(iOS 15.0, *) {
+            let settingsController = UIHostingController(rootView: SettingsView(appConfiguration: appConfiguration))
+            settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
+            settingsController.tabBarItem.title = "Settings"
+
+            tabBarController.viewControllers?.append(UINavigationController(
+                rootViewController: settingsController
+            ))
+        }
+
+        let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = tabBarController
+        window.makeKeyAndVisible()
+				window.tintColor = ColorPalette.primaryColor
+
+        // Set up Notification and interface style
+        NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+        window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+
+        self.window = window
+    }
+
+    private func subscribeToCartUpdates() {
+        CartManager.shared.$cart
+            .sink { cart in
+                if let cart = cart, cart.lines.nodes.count > 0 {
+					SceneDelegate.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
+                } else {
+                    SceneDelegate.cartController.tabBarItem.badgeValue = nil
+                }
+            }
+            .store(in: &cancellables)
+    }
 
 	func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
 		guard
@@ -115,9 +161,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	private func presentCheckout(_ url: URL) {
-		if let viewController = cartController {
-			ShopifyCheckoutSheetKit.present(checkout: url, from: viewController, delegate: viewController)
-		}
+		ShopifyCheckoutSheetKit.present(checkout: url, from: SceneDelegate.cartController, delegate: SceneDelegate.cartController)
 	}
 
 	private func getRootViewController() -> UINavigationController? {
@@ -138,9 +182,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func navigateToProduct(with handle: String) {
-		if let pdp = self.productController {
-			pdp.getProductByHandle(handle)
-		}
+		ProductCache.shared.getProduct(handle: handle, completion: { _ in })
 
 		if let tabBarVC = window?.rootViewController as? UITabBarController {
 			tabBarVC.selectedIndex = 0
@@ -169,43 +211,36 @@ extension Configuration.ColorScheme {
 	}
 }
 
-public struct StorefrontURL {
-    public let url: URL
-
-    private let slug = "([\\w\\d_-]+)"
-
-    init(from url: URL) {
-        self.url = url
+class CheckoutViewHostingController: UIHostingController<CartView>, CheckoutDelegate {
+    override init(rootView: CartView) {
+        super.init(rootView: rootView)
     }
 
-    public func isThankYouPage() -> Bool {
-        return url.path.range(of: "/thank[-_]you", options: .regularExpression) != nil
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
-    public func isCheckout() -> Bool {
-		return url.path.contains("/checkout")
+    // Implementing CheckoutDelegate methods
+    func checkoutDidComplete() {
+		CartManager.shared.resetCart()
+    }
+
+    func checkoutDidCancel() {
+        dismiss(animated: true, completion: nil)
+    }
+
+    func checkoutDidFail(error: Error) {
+        print("Checkout failed: \(error.localizedDescription)")
+        // Handle checkout failure logic
+    }
+
+    func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
+		print("Checkout failed: \(error.localizedDescription)")
+        // Handle checkout failure logic
 	}
 
-	public func isCart() -> Bool {
-		return url.path.contains("/cart")
-	}
-
-	public func isCollection() -> Bool {
-		return url.path.range(of: "/collections/\(slug)", options: .regularExpression) != nil
-	}
-
-	public func isProduct() -> Bool {
-		return url.path.range(of: "/products/\(slug)", options: .regularExpression) != nil
-	}
-
-	public func getProductSlug() -> String? {
-		guard isProduct() else { return nil }
-
-		let pattern = "/products/([\\w_-]+)"
-		if let match = url.path.range(of: pattern, options: .regularExpression, range: nil, locale: nil) {
-			let slug = url.path[match].components(separatedBy: "/").last
-			return slug
-		}
-		return nil
+	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
+		print("Checkout pixel event")
+        // Handle pixel event
 	}
 }

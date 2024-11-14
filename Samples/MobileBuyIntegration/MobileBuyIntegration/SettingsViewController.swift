@@ -81,14 +81,14 @@ struct SettingsView: View {
 
 				Section(header: Text("Version")) {
 					HStack {
-						Text("App version")
+						Text("Sample app version")
 						Spacer()
 						Text(currentVersion())
 							.font(.system(size: 14))
 							.foregroundStyle(.gray)
 					}
 					HStack {
-						Text("SDK version")
+						Text("Checkout Sheet Kit version")
 						Spacer()
 						Text(ShopifyCheckoutSheetKit.version)
 							.font(.system(size: 14))
@@ -154,7 +154,7 @@ extension Configuration.ColorScheme {
 		case .automatic:
 			return "Automatic"
 		case .web:
-			return "Web Browser"
+			return "Web"
 		}
 	}
 
@@ -170,7 +170,7 @@ extension Configuration.ColorScheme {
 	var backgroundColor: UIColor {
 		switch self {
 		case .web:
-			return UIColor(red: 0.94, green: 0.94, blue: 0.91, alpha: 1.00)
+			return ColorPalette.backgroundColor
 		default:
 			return .systemBackground
 		}

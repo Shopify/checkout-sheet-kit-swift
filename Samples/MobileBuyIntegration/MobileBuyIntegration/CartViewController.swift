@@ -94,9 +94,6 @@ class CartItemCell: UITableViewCell {
 		quantityLabel.widthAnchor.constraint(equalToConstant: 20).isActive = true
 		quantityLabel.textAlignment = .center
 
-		decreaseButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
-		increaseButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
-
         decreaseButton.addTarget(self, action: #selector(decreaseQuantity), for: .touchUpInside)
         increaseButton.addTarget(self, action: #selector(increaseQuantity), for: .touchUpInside)
 
