@@ -109,7 +109,22 @@ class PaymentHandler: NSObject {
 
 extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
+    func paymentAuthorizationController(
+        _ controller: PKPaymentAuthorizationController,
+        didSelectShippingContact contact: PKContact,
+        handler completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void
+    ){
+        if contact.postalAddress?.isoCountryCode == "US" {
+            print(
+                "Address: \(contact.postalAddress?.isoCountryCode)"
+            )
+        }
+
+        completion(.init())
+    }
+
 	func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
+
 
 		// Perform basic validation on the provided contact information.
 		var errors = [Error]()
