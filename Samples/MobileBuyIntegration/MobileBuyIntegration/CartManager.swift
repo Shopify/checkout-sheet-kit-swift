@@ -171,12 +171,18 @@ class CartManager {
             })
     }
 
-    func selectShippingMethodUpdate(deliveryOptionHandle: String, completionHandler: ((Storefront.Cart?) -> Void)?) {
+    func selectShippingMethodUpdate(
+        deliveryOptionHandle: String,
+        completionHandler: ((Storefront.Cart?) -> Void)?
+    ) {
         guard let deliveryGroupId = cart?.deliveryGroups.nodes.first?.id else {
             print("No delivery group selected")
             return
         }
-        performCartShippingMethodUpdate(deliveryGroupId: deliveryGroupId, deliveryOptionHandle: deliveryOptionHandle) { result in
+        performCartShippingMethodUpdate(
+            deliveryGroupId: deliveryGroupId,
+            deliveryOptionHandle: deliveryOptionHandle
+        ) { result in
             switch result {
             case .success(let cart):
                 self.cart = cart
@@ -321,7 +327,9 @@ class CartManager {
                 country: Storefront.CountryCode.inferRegion())
         ) {
             $0
-                .cartBuyerIdentityUpdate(cartId: cartID, buyerIdentity: buyerIdentityInput) {
+                .cartBuyerIdentityUpdate(
+                    cartId: cartID, buyerIdentity: buyerIdentityInput
+                ) {
                     $0
                         .cart { $0.cartManagerFragment() }
                 }
@@ -338,35 +346,70 @@ class CartManager {
         }
     }
 
+    private func executeGraphQL(
+        with: String,
+        handler: @escaping (Result<Data, Error>) -> Void
+    ) {
+        guard
+            // TODO: remove this
+            let infoPlist = Bundle.main.infoDictionary,
+            let domain = infoPlist["StorefrontDomain"] as? String,
+            let accessToken = infoPlist["StorefrontAccessToken"] as? String
+        else {
+            print("Missing Storefront domain")
+            return
+        }
+
+        let requestURL = URL(string: "https://\(domain)/api/unstable/graphql")!
+        var request = URLRequest(url: requestURL)
+
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(
+            "application/graphql", forHTTPHeaderField: "Content-Type")
+        request.setValue(
+            accessToken, forHTTPHeaderField: "X-Shopify-Storefront-Access-Token"
+        )
+
+        request.httpMethod = "POST"
+        request.httpBody = with.data(using: .utf8)
+
+        let task = URLSession.shared.dataTask(with: request) { data, _, error in
+            DispatchQueue.main.async {
+                if let responseData = data {
+                    handler(.success(responseData))
+                } else {
+                    handler(.failure(error ?? URLError(.unknown)))
+                }
+            }
+        }
+
+        task.resume()
+    }
+
     private func performCartShippingMethodUpdate(
         deliveryGroupId: GraphQL.ID,
         deliveryOptionHandle: String,
-        handler: @escaping CartResultHandler
+        handler: @escaping (Result<DeferredCart, Error>) -> Void
     ) {
-        let cartSelectedDeliveryOptionInput = Storefront.CartSelectedDeliveryOptionInput(
-            deliveryGroupId: deliveryGroupId,
-            deliveryOptionHandle: deliveryOptionHandle
-        )
-
         guard let cartID = cart?.id else {
-            return print()
+            return print("performCartShippingMethodUpdate: Cart isn't created")
         }
 
-        let mutation = Storefront.buildMutation(
-            inContext: Storefront.InContextDirective(
-                country: Storefront.CountryCode.inferRegion())
-        ) {
-            $0
-                .cartSelectedDeliveryOptionsUpdate(cartId: cartID, selectedDeliveryOptions: [cartSelectedDeliveryOptionInput]) {
-                    $0
-                        .cart { $0.cartManagerFragment() }
+        let mutationString = createCartSelectedDeliveryOptionsUpdateQuery(
+            cartID: cartID, deliveryGroupId: deliveryGroupId,
+            deliveryOptionHandle: deliveryOptionHandle)
+
+        executeGraphQL(with: mutationString) {
+            let result = $0.flatMap { data in
+                Result {
+                    try JSONDecoder().decode(Root.self, from: data)
                 }
-        }
+            }
+            //            let result = try JSONDecoder().decode(Root.self, from: $0.)
 
-        client.execute(mutation: mutation) { result in
-            if case .success(let mutationResult) = result,
-                let cart = mutationResult.cartSelectedDeliveryOptionsUpdate?.cart
-            {
+            if case .success(let successResult) = result {
+                let cart = successResult.data.cartSelectedDeliveryOptionsUpdate
+                    .cart
                 handler(.success(cart))
             } else {
                 handler(.failure(URLError(.unknown)))
@@ -377,9 +420,11 @@ class CartManager {
     private func waitAndReloadCart(delayInSeconds: UInt32 = 1) {
         guard let cartId = cart?.id else { return }
 
-        let context = Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
-        let query = Storefront.buildQuery(inContext: context) { $0
-            .cart(id: cartId) { $0.cartManagerFragment() }
+        let context = Storefront.InContextDirective(
+            country: Storefront.CountryCode.inferRegion())
+        let query = Storefront.buildQuery(inContext: context) {
+            $0
+                .cart(id: cartId) { $0.cartManagerFragment() }
         }
 
         sleep(delayInSeconds)
@@ -454,13 +499,13 @@ extension Storefront.CartQuery {
                                     .code()
                                     .deliveryMethodType()
                                     .description()
-                                    .estimatedCost{
+                                    .estimatedCost {
                                         $0
                                             .amount()
                                             .currencyCode()
                                     }
                             }
-                }
+                    }
             }
             .lines(first: 250) {
                 $0
@@ -520,4 +565,208 @@ extension Storefront.CartQuery {
                     }
             }
     }
+}
+
+func createCartSelectedDeliveryOptionsUpdateQuery(
+    cartID: GraphQL.ID, deliveryGroupId: GraphQL.ID,
+    deliveryOptionHandle: String
+) -> String {
+    return """
+              mutation @inContext(country: "\(Storefront.CountryCode.inferRegion().rawValue)") {
+                cartSelectedDeliveryOptionsUpdate(
+                  cartId: "\(cartID.rawValue)")
+                  selectedDeliveryOptions: [{deliveryGroupId: "\(deliveryGroupId.rawValue)", deliveryOptionHandle: "\(deliveryOptionHandle)"}]
+                ) {
+                  cart {
+                    id
+                    checkoutUrl
+                    totalQuantity
+                    deliveryGroups(first: 10) {
+                      nodes {
+                        id
+                        deliveryOptions {
+                          handle
+                          title
+                          code
+                          deliveryMethodType
+                          description
+                          estimatedCost {
+                            amount
+                            currencyCode
+                          }
+                        }
+                      }
+                    }
+                    lines(first: 250) {
+                      nodes {
+                        __typename
+                        id
+                        quantity
+                        merchandise {
+                          __typename
+                          ... on ProductVariant {
+                            id
+                            title
+                            price {
+                              amount
+                              currencyCode
+                            }
+                            product {
+                              title
+                              vendor
+                              featuredImage {
+                                url
+                              }
+                            }
+                          }
+                        }
+                        cost {
+                          totalAmount {
+                            amount
+                            currencyCode
+                          }
+                        }
+                      }
+                    }
+                    cost {
+                      totalAmount {
+                        amount
+                        currencyCode
+                      }
+                      subtotalAmount {
+                        amount
+                        currencyCode
+                      }
+                      totalTaxAmount {
+                        amount
+                        currencyCode
+                      }
+                    }
+                  }
+                }
+              }
+        """
+}
+
+// TODO: Update these to include deferred/indicate not storefont
+
+// MARK: - Root
+struct Root: Codable {
+    let data: DataClass
+    let extensions: Extensions
+}
+
+// MARK: - DataClass
+struct DataClass: Codable {
+    let cartSelectedDeliveryOptionsUpdate: CartSelectedDeliveryOptionsUpdate
+}
+
+// MARK: - CartSelectedDeliveryOptionsUpdate
+struct CartSelectedDeliveryOptionsUpdate: Codable {
+    let cart: DeferredCart
+}
+
+// MARK: - Cart
+struct DeferredCart: Codable {
+    let checkoutUrl: String
+    let cost: Cost
+    let deliveryGroups: DeliveryGroups
+    let id: String
+    let lines: Lines
+    let totalQuantity: Int
+}
+
+// MARK: - Cost
+struct Cost: Codable {
+    let subtotalAmount: Amount
+    let totalAmount: Amount
+    let totalTaxAmount: Amount?
+}
+
+// MARK: - Amount
+struct Amount: Codable {
+    let amount: String
+    let currencyCode: String
+}
+
+// MARK: - DeliveryGroups
+struct DeliveryGroups: Codable {
+    let nodes: [DeliveryGroup]
+}
+
+// MARK: - DeliveryGroup
+struct DeliveryGroup: Codable {
+    let deliveryOptions: [DeliveryOption]
+    let id: String
+}
+
+// MARK: - DeliveryOption
+struct DeliveryOption: Codable {
+    let code: String
+    let deliveryMethodType: String
+    let description: String
+    let estimatedCost: Amount
+    let handle: String
+    let title: String
+}
+
+// MARK: - Lines
+struct Lines: Codable {
+    let nodes: [CartLine]
+}
+
+// MARK: - CartLine
+struct CartLine: Codable {
+    let typename: String
+    let cost: LineCost
+    let id: String
+    let merchandise: Merchandise
+    let quantity: Int
+
+    enum CodingKeys: String, CodingKey {
+        case typename = "__typename"
+        case cost, id, merchandise, quantity
+    }
+}
+
+// MARK: - LineCost
+struct LineCost: Codable {
+    let totalAmount: Amount
+}
+
+// MARK: - Merchandise
+struct Merchandise: Codable {
+    let typename: String
+    let id: String
+    let price: Amount
+    let product: Product
+    let title: String
+
+    enum CodingKeys: String, CodingKey {
+        case typename = "__typename"
+        case id, price, product, title
+    }
+}
+
+// MARK: - Product
+struct Product: Codable {
+    let featuredImage: FeaturedImage
+    let title: String
+    let vendor: String
+}
+
+// MARK: - FeaturedImage
+struct FeaturedImage: Codable {
+    let url: String
+}
+
+// MARK: - Extensions
+struct Extensions: Codable {
+    let context: Context
+}
+
+// MARK: - Context
+struct Context: Codable {
+    let country: String
+    let language: String
 }
