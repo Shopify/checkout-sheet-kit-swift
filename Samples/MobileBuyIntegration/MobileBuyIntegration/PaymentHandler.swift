@@ -102,25 +102,80 @@ class PaymentHandler: NSObject {
 				self.completionHandler(false)
 			}
 		})
-		}
+    }
 }
 
 // Set up PKPaymentAuthorizationControllerDelegate conformance.
 
 extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
+     func paymentAuthorizationController(
+        _ controller: PKPaymentAuthorizationController,
+        didSelectShippingMethod shippingMethod: PKShippingMethod,
+        handler completion: @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
+    ){
+        print("!!!!! Updating slected shipping method...")
+
+        guard let identifier = shippingMethod.identifier else {
+            print("missing shipping method identifier")
+            return
+        }
+
+        CartManager.shared
+            .selectShippingMethodUpdate(
+                deliveryOptionHandle: identifier
+            ) { result in
+            guard let cart = result else {
+                print("Error updating delivery address:")
+                return
+            }
+
+            let paymentRequestShippingContactUpdate = PKPaymentRequestShippingMethodUpdate(
+                paymentSummaryItems: self.buildPaymentSummaryItems(cart: cart)
+            )
+
+            completion(paymentRequestShippingContactUpdate)
+        }
+    }
+
     func paymentAuthorizationController(
         _ controller: PKPaymentAuthorizationController,
         didSelectShippingContact contact: PKContact,
         handler completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void
     ){
-        if contact.postalAddress?.isoCountryCode == "US" {
-            print(
-                "Address: \(contact.postalAddress?.isoCountryCode)"
-            )
-        }
+        CartManager.shared.updateDeliveryAddress(contact: contact, partial: true) { result in
+            guard let cart = result else {
+                print("Error updating delivery address:")
+                return
+            }
 
-        completion(.init())
+            guard let deliveryGroup = cart.deliveryGroups.nodes.first else {
+                print("Error updating delivery address:")
+                return
+            }
+            let shippingMethods = deliveryGroup.deliveryOptions.map {
+                let shippingMethod = PKShippingMethod(
+                    label: $0.title!,
+                    amount: NSDecimalNumber(string: "\($0.estimatedCost.amount)")
+                )
+
+                shippingMethod.detail = $0.description!
+                shippingMethod.identifier = $0.handle
+
+                return shippingMethod
+            }
+
+            
+
+            let paymentRequestShippingContactUpdate = PKPaymentRequestShippingContactUpdate(
+                errors: [],
+                paymentSummaryItems: self.buildPaymentSummaryItems(cart: cart),
+                shippingMethods: shippingMethods
+            )
+
+            completion(paymentRequestShippingContactUpdate)
+//            completion(.init())
+        }
     }
 
 	func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
@@ -153,4 +208,23 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 			}
 		}
 	}
+
+    private func buildPaymentSummaryItems(cart: Storefront.Cart) -> [PKPaymentSummaryItem] {
+        let lines = cart.lines.nodes
+        var paymentSummaryItems : [PKPaymentSummaryItem] = []
+
+        for line in lines {
+            let variant = line.merchandise as? Storefront.ProductVariant
+            let summaryItem = PKPaymentSummaryItem(label: variant!.product.title, amount: NSDecimalNumber(decimal: line.cost.totalAmount.amount), type: .final)
+            paymentSummaryItems.append(summaryItem)
+        }
+
+        let tax = PKPaymentSummaryItem(label: "Tax", amount: NSDecimalNumber(decimal: cart.cost.totalTaxAmount?.amount ?? 0), type: .final)
+        let total = PKPaymentSummaryItem(label: "Total", amount: NSDecimalNumber(decimal: cart.cost.totalAmount.amount), type: .final)
+
+        paymentSummaryItems.append(tax)
+        paymentSummaryItems.append(total)
+
+        return paymentSummaryItems
+    }
 }
