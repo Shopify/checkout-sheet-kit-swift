@@ -27,6 +27,19 @@ import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
+struct Contact {
+    let address1: String
+    let address2: String
+    let city: String
+    let country: String
+    let firstName: String
+    let lastName: String
+    let province: String
+    let zip: String
+    let email: String
+    let phone: String
+}
+
 class CartManager {
 
     static let shared = CartManager(client: .shared)
@@ -37,18 +50,10 @@ class CartManager {
     var cart: Storefront.Cart?
 
     private let client: StorefrontClient
-    private let address1: String
-    private let address2: String
-    private let city: String
-    private let country: String
-    private let firstName: String
-    private let lastName: String
-    private let province: String
-    private let zip: String
-    private let email: String
-    private let phone: String
     private let domain: String
     private let accessToken: String
+    // TODO: address/user = Contact? Think of cross platform name
+    private let vaultedContactInfo: Contact
 
     // MARK: Initializers
     init(client: StorefrontClient) {
@@ -71,16 +76,19 @@ class CartManager {
             fatalError("unable to load storefront configuration")
         }
 
-        self.address1 = address1
-        self.address2 = address2
-        self.city = city
-        self.country = country
-        self.firstName = firstName
-        self.lastName = lastName
-        self.province = province
-        self.zip = zip
-        self.email = email
-        self.phone = phone
+        self.vaultedContactInfo = .init(
+            address1: address1,
+            address2: address2,
+            city: city,
+            country: country,
+            firstName: firstName,
+            lastName: lastName,
+            province: province,
+            zip: zip,
+            email: email,
+            phone: phone
+        )
+
         self.domain = domain
         self.accessToken = accessToken
     }
@@ -117,11 +125,11 @@ class CartManager {
     }
 
     func updateDeliveryAddress(
-        contact: PKContact, partial: Bool,
+        contact: PKContact,
+        partial: Bool,
         completionHandler: ((Storefront.Cart?) -> Void)?
     ) {
         let postalAddress = contact.postalAddress
-
         // TODO: We should guard better the optionality
         let shippingAddress =
             partial
@@ -159,7 +167,7 @@ class CartManager {
 
     func selectShippingMethodUpdate(
         deliveryOptionHandle: String,
-        completionHandler: ((Storefront.Cart?) -> Void)?
+        completionHandler: ((Storefront.Cart) -> Void)?
     ) {
         guard let deliveryGroupId = cart?.deliveryGroups.nodes.first?.id else {
             print("No delivery group selected")
@@ -170,20 +178,21 @@ class CartManager {
             deliveryOptionHandle: deliveryOptionHandle
         ) { result in
             switch result {
-            case .success(let specialCart):
+            case .success:
                 print("Waitings for cart to reload")
+                self.waitAndReloadCart {
+                    if let cart = self.cart {
+                        completionHandler?(cart)
+                    }
+                }
                 /**
                   TODO: Here we're trying to make a manual request to fetch cart and then set that back with deferred data
                   alternatively we can refetch the cart afterwards (redundant request, but itll be typed correctly)
                  */
-                //                self.cart = specialCart
-                self.waitAndReloadCart()
-                print("Cart reloaded")
             case .failure(let error):
                 print(error)
             }
 
-            completionHandler?(self.cart)
         }
     }
 
@@ -227,7 +236,8 @@ class CartManager {
 
     private func getCountryCode() -> Storefront.CountryCode {
         if appConfiguration.useVaultedState {
-            let code = Storefront.CountryCode(rawValue: self.country)
+            let code = Storefront.CountryCode(
+                rawValue: self.vaultedContactInfo.country)
             return code ?? .ca
         }
 
@@ -310,7 +320,7 @@ class CartManager {
         ]
 
         let buyerIdentityInput = Storefront.CartBuyerIdentityInput.create(
-            email: Input(orNull: email),
+            email: Input(orNull: vaultedContactInfo.email),
             deliveryAddressPreferences: Input(
                 orNull: deliveryAddressPreferences
             )
@@ -410,7 +420,7 @@ class CartManager {
     private func performCartShippingMethodUpdate(
         deliveryGroupId: GraphQL.ID,
         deliveryOptionHandle: String,
-        handler: @escaping (Result<DeferredCart, Error>) -> Void
+        handler: @escaping (Result<Bool, Error>) -> Void
     ) {
         guard let cartID = cart?.id else {
             return print("performCartShippingMethodUpdate: Cart isn't created")
@@ -422,35 +432,28 @@ class CartManager {
 
         executeGraphQL(with: mutationString) {
             let result = $0.flatMap { data in
-                Result {
-                    try JSONDecoder().decode(Root.self, from: data)
+                let responseString = String(data: data, encoding: .utf8)
+                let chunks = responseString?.components(separatedBy: "\r\n\r\n")
+                    .filter { self.isValidJSON($0) }
+                
+                return Result {
+                    true
+//                    try JSONDecoder().decode(DeliveryOption.self, from: data)
                 }
             }
 
             if case .success(let successResult) = result {
-                let cart = successResult.data.cartSelectedDeliveryOptionsUpdate
-                    .cart
-                handler(.success(cart))
+                handler(.success(successResult))
             } else {
                 handler(.failure(URLError(.unknown)))
-
-                let result = $0.flatMap { data in
-                    let responseString = String(data: data, encoding: .utf8)
-                    let chunks = responseString?.components(
-                        separatedBy: "\r\n\r\n"
-                    ).filter { self.isValidJSON($0) }
-
-                    return Result {
-                        try JSONDecoder().decode(
-                            DeliveryOption
-                                .self, from: data)
-                    }
-                }
             }
         }
     }
 
-    private func waitAndReloadCart(after delayInSeconds: UInt32 = 1) {
+    private func waitAndReloadCart(
+        after delayInSeconds: UInt32 = 1,
+        handler: @escaping () -> Void
+    ) {
         guard let cartId = cart?.id else { return }
 
         let context = Storefront.InContextDirective(
@@ -465,6 +468,7 @@ class CartManager {
         client.execute(query: query) { result in
             if case .success(let queryResult) = result {
                 self.cart = queryResult.cart
+                handler()
             }
         }
     }
@@ -482,16 +486,16 @@ class CartManager {
         -> Storefront.CartInput
     {
         let deliveryAddress = Storefront.MailingAddressInput.create(
-            address1: Input(orNull: address1),
-            address2: Input(orNull: address2),
-            city: Input(orNull: city),
+            address1: Input(orNull: vaultedContactInfo.address1),
+            address2: Input(orNull: vaultedContactInfo.address2),
+            city: Input(orNull: vaultedContactInfo.city),
             company: Input(orNull: ""),
-            country: Input(orNull: country),
-            firstName: Input(orNull: firstName),
-            lastName: Input(orNull: lastName),
-            phone: Input(orNull: phone),
-            province: Input(orNull: province),
-            zip: Input(orNull: zip))
+            country: Input(orNull: vaultedContactInfo.country),
+            firstName: Input(orNull: vaultedContactInfo.firstName),
+            lastName: Input(orNull: vaultedContactInfo.lastName),
+            phone: Input(orNull: vaultedContactInfo.phone),
+            province: Input(orNull: vaultedContactInfo.province),
+            zip: Input(orNull: vaultedContactInfo.zip))
 
         let deliveryAddressPreferences = [
             Storefront.DeliveryAddressInput.create(
@@ -505,11 +509,17 @@ class CartManager {
                 })),
             buyerIdentity: Input(
                 orNull: Storefront.CartBuyerIdentityInput.create(
-                    email: Input(orNull: email),
+                    email: Input(orNull: vaultedContactInfo.email),
                     deliveryAddressPreferences: Input(
                         orNull: deliveryAddressPreferences)
                 ))
         )
+    }
+}
+
+extension Storefront.Cart {
+    func copy(cart: Storefront.Cart) -> Storefront.Cart {
+        return Storefront.Cart.init(rawValue:cart.rawValue)!
     }
 }
 
@@ -662,7 +672,7 @@ extension Storefront.CartQuery {
 //          }
 //        """
 //}
-//
+
 func createCartSelectedDeliveryOptionsUpdateQuery(
     cartID: GraphQL.ID,
     deliveryGroupId: GraphQL.ID,

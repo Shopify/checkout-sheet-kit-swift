@@ -44,13 +44,25 @@ class PaymentHandler: NSObject {
         let shippingStart = calendar.date(byAdding: .day, value: 3, to: today)!
         let shippingEnd = calendar.date(byAdding: .day, value: 5, to: today)!
 
-        let startComponents = calendar.dateComponents(
-            [.calendar, .year, .month, .day], from: shippingStart)
-        let endComponents = calendar.dateComponents(
-            [.calendar, .year, .month, .day], from: shippingEnd)
+//        let startComponents = calendar.dateComponents(
+//            [.calendar, .year, .month, .day], from: shippingStart)
+//        let endComponents = calendar.dateComponents(
+//            [.calendar, .year, .month, .day], from: shippingEnd)
+
+        guard
+            let selectedDeliveryOption = CartManager.shared.cart?.deliveryGroups
+                .nodes.first?.selectedDeliveryOption,
+            let title = selectedDeliveryOption.title
+        else {
+            return []
+            // TODO: not fatal, but useful whilst we get this setup the first time
+//            fatalError("Could not calculate shipping amount.")
+        }
 
         let shippingCollection = PKShippingMethod(
-            label: "Pick up", amount: NSDecimalNumber(string: "0.00"))
+            label: title,
+            amount: NSDecimalNumber(decimal: selectedDeliveryOption.estimatedCost.amount)
+        )
         shippingCollection.detail = "Collect at our store"
         shippingCollection.identifier = "PICKUP"
 
@@ -131,35 +143,30 @@ class PaymentHandler: NSObject {
 // Set up PKPaymentAuthorizationControllerDelegate conformance.
 
 extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
-
     func paymentAuthorizationController(
         _ controller: PKPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod,
         handler completion: @escaping (PKPaymentRequestShippingMethodUpdate) ->
             Void
     ) {
-        print("!!!!! Updating slected shipping method...")
-
         guard let identifier = shippingMethod.identifier else {
             print("missing shipping method identifier")
             return
         }
 
+        print("identifier \(identifier)")
         CartManager.shared
             .selectShippingMethodUpdate(
                 deliveryOptionHandle: identifier
-            ) { result in
-                guard let cart = result else {
-                    print("Error updating delivery address:")
-                    return
-                }
-
+            ) {
+                cart in
                 let paymentRequestShippingContactUpdate =
                     PKPaymentRequestShippingMethodUpdate(
                         paymentSummaryItems: self.buildPaymentSummaryItems(
-                            cart: cart)
+                            cart: cart,
+                            shippingMethod: shippingMethod
+                        )
                     )
-
                 completion(paymentRequestShippingContactUpdate)
             }
     }
@@ -183,7 +190,6 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
             let shippingMethods: [PKShippingMethod] = deliveryGroup
                 .deliveryOptions.compactMap {
-
                     guard
                         let title = $0.title,
                         let description = $0.description
@@ -197,7 +203,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                             string: "\($0.estimatedCost.amount)")
                     )
 
-                    shippingMethod.detail = $0.description
+                    shippingMethod.detail = description
                     shippingMethod.identifier = $0.handle
 
                     return shippingMethod
@@ -207,10 +213,9 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                 PKPaymentRequestShippingContactUpdate(
                     errors: [],
                     paymentSummaryItems: self.buildPaymentSummaryItems(
-                        cart: cart),
+                        cart: cart, shippingMethod: nil),
                     shippingMethods: shippingMethods
                 ))
-            //            completion(.init())
         }
     }
 
@@ -257,9 +262,10 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         }
     }
 
-    private func buildPaymentSummaryItems(cart: Storefront.Cart)
-        -> [PKPaymentSummaryItem]
-    {
+    private func buildPaymentSummaryItems(
+        cart: Storefront.Cart,
+        shippingMethod: PKShippingMethod?
+    ) -> [PKPaymentSummaryItem] {
         let lines = cart.lines.nodes
         var paymentSummaryItems: [PKPaymentSummaryItem] = []
 
@@ -280,7 +286,8 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         let tax = PKPaymentSummaryItem(
             label: "Tax",
             amount: NSDecimalNumber(
-                decimal: cart.cost.totalTaxAmount?.amount ?? 0),
+                decimal: cart.cost.totalTaxAmount?.amount ?? 0
+            ),
             type: .final
         )
         let total = PKPaymentSummaryItem(
@@ -288,6 +295,16 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             amount: NSDecimalNumber(decimal: cart.cost.totalAmount.amount),
             type: .final
         )
+
+        if let shippingMethod {
+            let shippingAmount = PKPaymentSummaryItem(
+                label: "Shipping",
+                amount: shippingMethod.amount,
+                type: .final
+            )
+            print("Shipping Amount \(shippingAmount.amount)")
+            paymentSummaryItems.append(shippingAmount)
+        }
 
         paymentSummaryItems.append(tax)
         paymentSummaryItems.append(total)
