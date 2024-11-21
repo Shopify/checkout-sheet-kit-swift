@@ -120,7 +120,27 @@ struct ProductView: View {
 					.foregroundStyle(.white)
 					.cornerRadius(10)
                     .disabled(!variant.availableForSale || loading)
-                    .padding(20)
+                    .padding([.leading, .trailing], 15)
+
+//                    Button(action: addToCart) {
+//                        HStack {
+//                            Text("Buy it now")
+//								.font(.headline)
+//
+//                            if loading {
+//                                ProgressView()
+//									.colorInvert()
+//                            }
+//                            Spacer()
+//
+//							Text((variant.availableForSale ? variant.price.formattedString() : "Out of stock")!)
+//                        }.padding()
+//                    }
+//					.background(addedToCart ? Color(ColorPalette.successColor) : .black)
+//					.foregroundStyle(.white)
+//					.cornerRadius(10)
+//                    .disabled(!variant.availableForSale || loading)
+//                    .padding([.leading, .trailing], 15)
                 }
             }
         }

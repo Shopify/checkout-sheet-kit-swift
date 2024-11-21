@@ -25,9 +25,8 @@ import SwiftUI
 import Combine
 import ShopifyCheckoutSheetKit
 
-@available(iOS 15.0, *)
 struct SettingsView: View {
-	@ObservedObject var appConfiguration: AppConfiguration
+	@ObservedObject var config: AppConfiguration = appConfiguration
 
 	@State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
 	@State private var logs: [String?] = LogReader.shared.readLogs() ?? []
@@ -42,14 +41,14 @@ struct SettingsView: View {
 						.onChange(of: preloadingEnabled) { newValue in
 							ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
 						}
-					Toggle("Prefill buyer information", isOn: $appConfiguration.useVaultedState)
+					Toggle("Prefill buyer information", isOn: $config.useVaultedState)
 				}
 
 				Section(header: Text("Universal Links")) {
-					Toggle("Handle Checkout URLs", isOn: $appConfiguration.universalLinks.checkout)
-					Toggle("Handle Cart URLs", isOn: $appConfiguration.universalLinks.cart)
-					Toggle("Handle Product URLs", isOn: $appConfiguration.universalLinks.products)
-					Toggle("Handle all Universal Links", isOn: $appConfiguration.universalLinks.handleAllURLsInApp)
+					Toggle("Handle Checkout URLs", isOn: $config.universalLinks.checkout)
+					Toggle("Handle Cart URLs", isOn: $config.universalLinks.cart)
+					Toggle("Handle Product URLs", isOn: $config.universalLinks.products)
+					Toggle("Handle all Universal Links", isOn: $config.universalLinks.handleAllURLsInApp)
 
 					Text("By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app.")
 						.font(.caption)
@@ -178,9 +177,5 @@ extension Configuration.ColorScheme {
 }
 
 #Preview {
-	if #available(iOS 15.0, *) {
-		SettingsView(appConfiguration: appConfiguration)
-	} else {
-		Text("Not supported in < iOS 15")
-	}
+	SettingsView()
 }

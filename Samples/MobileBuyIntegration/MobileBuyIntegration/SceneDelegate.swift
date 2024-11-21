@@ -26,26 +26,16 @@ import SwiftUI
 import ShopifyCheckoutSheetKit
 import Combine
 
-/// A SceneDelgate is a bit of a legacy concept since the introduction of the SwiftUI App Lifecycle in iOS 14.
-/// This implementation can updated to use SwiftUI's @main attribute like so:
-///
-/// @main
-/// struct MySwiftUIApp: App {
-///   var body: some Scene {
-///     WindowGroup {
-///		  ContentView()
-///     }
-///   }
-/// }
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	var window: UIWindow?
 
-	public static var cartController = CheckoutViewHostingController(rootView: CartView())
-	var productController: ProductView?
-	var productGrid: ProductGrid?
-
 	var cancellables: Set<AnyCancellable> = []
+
+	let cartController = UIHostingController(rootView: CartView())
+	let productGridController = UIHostingController(rootView: ProductGrid())
+	let productGalleryController = UIHostingController(rootView: ProductGalleryView())
+	let settingsController = UIHostingController(rootView: SettingsView())
 
 	 func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -57,26 +47,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let logoImageView = UIImageView(image: UIImage(named: "logo"))
 		logoImageView.contentMode = .scaleAspectFit
 		logoImageView.widthAnchor.constraint(equalToConstant: 90).isActive = true
-		logoImageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
 
 		/// Catalog grid view
-		productGrid = ProductGrid()
-		let productGridController = UIHostingController(rootView: productGrid)
         productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
         productGridController.tabBarItem.title = "Catalog"
         productGridController.navigationItem.titleView = logoImageView
 
         /// Product Gallery
-        let productView = ProductGalleryView()
-        let productGalleryController = UIHostingController(rootView: productView)
         productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
         productGalleryController.tabBarItem.title = "Products"
         productGalleryController.navigationItem.titleView = logoImageView
+		productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "cart"),
+            style: .plain,
+            target: self,
+            action: #selector(present)
+        )
 
         /// Cart
-        SceneDelegate.cartController.tabBarItem.image = UIImage(systemName: "cart")
-        SceneDelegate.cartController.tabBarItem.title = "Cart"
-		SceneDelegate.cartController.navigationItem.title = "Cart"
+        cartController.tabBarItem.image = UIImage(systemName: "cart")
+        cartController.tabBarItem.title = "Cart"
+		cartController.navigationItem.title = "Cart"
+
+		/// Settings
+		settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
+		settingsController.tabBarItem.title = "Settings"
 
 		subscribeToCartUpdates()
 
@@ -88,38 +83,44 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             UINavigationController(rootViewController: productGalleryController),
 
             /// Cart screen
-            UINavigationController(rootViewController: SceneDelegate.cartController)
+            UINavigationController(rootViewController: cartController),
+
+            /// Settings screen
+			UINavigationController(rootViewController: settingsController)
         ]
 
-        if #available(iOS 15.0, *) {
-            let settingsController = UIHostingController(rootView: SettingsView(appConfiguration: appConfiguration))
-            settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
-            settingsController.tabBarItem.title = "Settings"
-
-            tabBarController.viewControllers?.append(UINavigationController(
-                rootViewController: settingsController
-            ))
-        }
-
-        let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = tabBarController
-        window.makeKeyAndVisible()
-				window.tintColor = ColorPalette.primaryColor
-
-        // Set up Notification and interface style
+		/// Subscribe to color scheme changes on the settings screen
         NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
-        window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+
+		let window = createWindow(windowScene: windowScene, rootViewController: tabBarController)
+
+        CheckoutController.shared = CheckoutController(window: window)
 
         self.window = window
     }
+
+    @objc public func present() {
+		if let url = CartManager.shared.cart?.checkoutUrl {
+			self.presentCheckout(url)
+		}
+	}
+
+	private func createWindow(windowScene: UIWindowScene, rootViewController: UIViewController) -> UIWindow {
+		let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = rootViewController
+        window.makeKeyAndVisible()
+		window.tintColor = ColorPalette.primaryColor
+        window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+        return window
+	}
 
     private func subscribeToCartUpdates() {
         CartManager.shared.$cart
             .sink { cart in
                 if let cart = cart, cart.lines.nodes.count > 0 {
-					SceneDelegate.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
+					self.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
                 } else {
-                    SceneDelegate.cartController.tabBarItem.badgeValue = nil
+                    self.cartController.tabBarItem.badgeValue = nil
                 }
             }
             .store(in: &cancellables)
@@ -160,8 +161,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 	}
 
-	private func presentCheckout(_ url: URL) {
-		ShopifyCheckoutSheetKit.present(checkout: url, from: SceneDelegate.cartController, delegate: SceneDelegate.cartController)
+	public func presentCheckout(_ url: URL) {
+		CheckoutController.shared?.present(checkout: url)
 	}
 
 	private func getRootViewController() -> UINavigationController? {
@@ -211,36 +212,17 @@ extension Configuration.ColorScheme {
 	}
 }
 
-class CheckoutViewHostingController: UIHostingController<CartView>, CheckoutDelegate {
-    override init(rootView: CartView) {
-        super.init(rootView: rootView)
+extension UIWindow {
+    /// Function to get the top most view controller from the window's rootViewController
+    func topMostViewController() -> UIViewController? {
+        guard var topController = rootViewController else {
+            return nil
+        }
+
+        while let presentedViewController = topController.presentedViewController {
+            topController = presentedViewController
+        }
+
+        return topController
     }
-
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    // Implementing CheckoutDelegate methods
-    func checkoutDidComplete() {
-		CartManager.shared.resetCart()
-    }
-
-    func checkoutDidCancel() {
-        dismiss(animated: true, completion: nil)
-    }
-
-    func checkoutDidFail(error: Error) {
-        print("Checkout failed: \(error.localizedDescription)")
-        // Handle checkout failure logic
-    }
-
-    func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
-		print("Checkout failed: \(error.localizedDescription)")
-        // Handle checkout failure logic
-	}
-
-	func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-		print("Checkout pixel event")
-        // Handle pixel event
-	}
 }

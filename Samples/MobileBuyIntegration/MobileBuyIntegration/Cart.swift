@@ -60,7 +60,7 @@ struct CartView: View {
 					.disabled(isBusy)
 					.foregroundColor(.white)
 					.accessibilityIdentifier("checkoutButton")
-					.padding(.horizontal, 15)
+					.padding(.horizontal, 20)
 				}
 				.padding(.bottom, 20)
 			}
@@ -73,7 +73,7 @@ struct CartView: View {
 	}
 
 	private func preloadCheckout() {
-        CartManager.shared.preloadCheckout()
+        CheckoutController.shared?.preload()
     }
 
     private func presentCheckout() {
@@ -81,7 +81,7 @@ struct CartView: View {
 			return
         }
 
-		ShopifyCheckoutSheetKit.present(checkout: url, from: SceneDelegate.cartController, delegate: SceneDelegate.cartController)
+		CheckoutController.shared?.present(checkout: url)
     }
 }
 
@@ -136,8 +136,7 @@ struct CartLines: View {
 					.padding(.trailing, 5)
 				}
 
-				VStack(alignment: .leading, spacing: 8
-) {
+				VStack(alignment: .leading, spacing: 8) {
 					Text(variant?.product.title ?? "")
 						.font(.body)
 						.bold()
