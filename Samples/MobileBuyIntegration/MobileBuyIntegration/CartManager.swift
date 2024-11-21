@@ -121,48 +121,28 @@ class CartManager {
         completionHandler: ((Storefront.Cart?) -> Void)?
     ) {
         let postalAddress = contact.postalAddress
-        if partial {
-            guard
-                let city = postalAddress?.city,
-                let country = postalAddress?.country,
-                let province = postalAddress?.state,
-                let zip = postalAddress?.postalCode
-            else {
-                print("Missing required fields for partial delivery address")
-                return
-            }
-        } else {
-            // TODO: figure out the correct sources of the fields
-            // see: https://github.com/Shopify/portable-wallets/blob/518103cc7699c7ec2e379062a2e1df74a9442514/src/components/ApplePayButton/helpers/map-to-address.ts#L30
-            guard
-                let address1 = postalAddress?.street,
-                let address2 = postalAddress?.subLocality,
-                let city = postalAddress?.city,
-                let country = postalAddress?.country,
-                let firstName = contact.name?.givenName,
-                let lastName = contact.name?.familyName,
-                let province = postalAddress?.state,
-                let zip = postalAddress?.postalCode,
-                let email = contact.emailAddress,
-                let phone = contact.phoneNumber
-            else {
-                print("Missing required fields for full delivery address")
-                return
-            }
-        }
 
-        let shippingAddress = Storefront.MailingAddressInput.create(
-            address1: Input(orNull: address1),
-            address2: Input(orNull: address2),
-            city: Input(orNull: city),
-            company: Input(orNull: ""),
-            country: Input(orNull: country),
-            firstName: Input(orNull: firstName),
-            lastName: Input(orNull: lastName),
-            phone: Input(orNull: phone),
-            province: Input(orNull: province),
-            zip: Input(orNull: zip)
-        )
+        // TODO: We should guard better the optionality
+        let shippingAddress =
+            partial
+            ? Storefront.MailingAddressInput.create(
+                city: Input(orNull: postalAddress?.city ?? ""),
+                country: Input(orNull: postalAddress?.country ?? ""),
+                province: Input(orNull: postalAddress?.state ?? ""),
+                zip: Input(orNull: postalAddress?.postalCode ?? "")
+            )
+            : Storefront.MailingAddressInput.create(
+                address1: Input(orNull: postalAddress?.street ?? ""),
+                address2: Input(orNull: postalAddress?.subLocality ?? ""),
+                city: Input(orNull: postalAddress?.city ?? ""),
+                company: Input(orNull: ""),
+                country: Input(orNull: postalAddress?.country ?? ""),
+                firstName: Input(orNull: contact.name?.givenName ?? ""),
+                lastName: Input(orNull: contact.name?.familyName ?? ""),
+                phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
+                province: Input(orNull: postalAddress?.state ?? ""),
+                zip: Input(orNull: postalAddress?.postalCode ?? "")
+            )
 
         performCartDeliveryAddressUpdate(
             shippingAddress: shippingAddress,
@@ -171,7 +151,7 @@ class CartManager {
                 case .success(let cart):
                     self.cart = cart
                 case .failure(let error):
-                    print(error)
+                    print("performCartDeliveryAddressUpdate: \(error)")
                 }
                 completionHandler?(self.cart)
             })
@@ -657,7 +637,7 @@ extension Storefront.CartQuery {
 //            cartSelectedDeliveryOptionsUpdate(
 //              cartId: "\(cartID.rawValue)",
 //              selectedDeliveryOptions: [{
-//                    deliveryGroupId: "\(deliveryGroupId.rawValue)", 
+//                    deliveryGroupId: "\(deliveryGroupId.rawValue)",
 //                    deliveryOptionHandle: "\(deliveryOptionHandle)"
 //                }]
 //            ) {
@@ -689,33 +669,6 @@ func createCartSelectedDeliveryOptionsUpdateQuery(
     deliveryOptionHandle: String
 ) -> String {
     return """
-        fragment DeliveryGroups on Cart {
-            deliveryGroups(first: 10, withCarrierRates: true) {
-                edges {
-                  node {
-                    deliveryOptions {
-                      title
-                      handle
-                      code
-                      deliveryMethodType
-                      description
-                      estimatedCost {
-                        amount
-                      }
-                    }
-                    selectedDeliveryOption {
-                      title
-                      handle
-                      estimatedCost {
-                        amount
-                        currencyCode
-                      }
-                    }
-                  }
-                }
-              }
-          }
-
           mutation @inContext(country: \(Storefront.CountryCode.inferRegion().rawValue.uppercased())) {
             cartSelectedDeliveryOptionsUpdate(
               cartId: "\(cartID.rawValue)",
@@ -724,24 +677,49 @@ func createCartSelectedDeliveryOptionsUpdateQuery(
                     deliveryOptionHandle: "\(deliveryOptionHandle)"
                 }]
             ) {
-              cart {
-                ... DeliveryGroups @defer
-                cost {
-                  totalAmount {
-                    amount
-                    currencyCode
-                  }
-                  subtotalAmount {
-                    amount
-                    currencyCode
-                  }
-                  totalTaxAmount {
-                    amount
-                    currencyCode
+            ... @defer {
+                  cart {
+                    deliveryGroups(first: 10, withCarrierRates: true) {
+                        edges {
+                          node {
+                            deliveryOptions {
+                              title
+                              handle
+                              code
+                              deliveryMethodType
+                              description
+                              estimatedCost {
+                                amount
+                              }
+                            }
+                            selectedDeliveryOption {
+                              title
+                              handle
+                              estimatedCost {
+                                amount
+                                currencyCode
+                              }
+                            }
+                          }
+                        }
+                      }
+                    cost {
+                      totalAmount {
+                        amount
+                        currencyCode
+                      }
+                      subtotalAmount {
+                        amount
+                        currencyCode
+                      }
+                      totalTaxAmount {
+                        amount
+                        currencyCode
+                      }
+                    }
                   }
                 }
               }
-            }
           }
         """
 }
