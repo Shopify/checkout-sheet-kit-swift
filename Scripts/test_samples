@@ -6,19 +6,29 @@ set -eo pipefail
 if [[ -n $CURRENT_SIMULATOR_UUID ]]; then
     dest="id=$CURRENT_SIMULATOR_UUID"
 else
-    dest="platform=iOS Simulator,name=iPhone 16"
+    dest="platform=iOS Simulator,name=iPhone 14"
 fi
 
 cd Samples/
 
 EMPTY_ENTITLEMENTS="""
-<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\"></plist>
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict/>
+</plist>
 """
 
 build_app() {
     touch "$1/Storefront.xcconfig"
-    echo $EMPTY_ENTITLEMENTS > "$1/$1/$1.entitlements"
+
+    # Create an empty entitlements file if it doesn't already exist
+    if [[ ! -f "$1/$1/$1.entitlements" ]]; then
+        echo $EMPTY_ENTITLEMENTS > "$1/$1/$1.entitlements"
+    else
+        echo "Entitlements file already exists for $1 project."
+    fi
+
     xcodebuild clean build -scheme $1 -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
 }
 
