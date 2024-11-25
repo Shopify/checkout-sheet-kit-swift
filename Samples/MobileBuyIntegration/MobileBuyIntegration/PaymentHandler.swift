@@ -247,7 +247,15 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             status = .failure
         }
         self.paymentStatus = status
-        completion(PKPaymentAuthorizationResult(status: status, errors: errors))
+        CartManager.shared.updateCartPaymentMethod(payment: payment) { result in
+            if case .success(let result) = result {
+                completion(
+                    PKPaymentAuthorizationResult(status: status, errors: errors)
+                )
+            } else {
+                fatalError("failed to update payment method")
+            }
+        }
 
     }
 
