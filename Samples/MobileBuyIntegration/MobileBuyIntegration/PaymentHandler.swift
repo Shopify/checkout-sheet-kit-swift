@@ -44,10 +44,10 @@ class PaymentHandler: NSObject {
         let shippingStart = calendar.date(byAdding: .day, value: 3, to: today)!
         let shippingEnd = calendar.date(byAdding: .day, value: 5, to: today)!
 
-//        let startComponents = calendar.dateComponents(
-//            [.calendar, .year, .month, .day], from: shippingStart)
-//        let endComponents = calendar.dateComponents(
-//            [.calendar, .year, .month, .day], from: shippingEnd)
+        //        let startComponents = calendar.dateComponents(
+        //            [.calendar, .year, .month, .day], from: shippingStart)
+        //        let endComponents = calendar.dateComponents(
+        //            [.calendar, .year, .month, .day], from: shippingEnd)
 
         guard
             let selectedDeliveryOption = CartManager.shared.cart?.deliveryGroups
@@ -56,12 +56,13 @@ class PaymentHandler: NSObject {
         else {
             return []
             // TODO: not fatal, but useful whilst we get this setup the first time
-//            fatalError("Could not calculate shipping amount.")
+            //            fatalError("Could not calculate shipping amount.")
         }
 
         let shippingCollection = PKShippingMethod(
             label: title,
-            amount: NSDecimalNumber(decimal: selectedDeliveryOption.estimatedCost.amount)
+            amount: NSDecimalNumber(
+                decimal: selectedDeliveryOption.estimatedCost.amount)
         )
         shippingCollection.detail = "Collect at our store"
         shippingCollection.identifier = "PICKUP"
@@ -107,10 +108,10 @@ class PaymentHandler: NSObject {
         paymentRequest.supportedNetworks = PaymentHandler.supportedNetworks
         paymentRequest.shippingType = .delivery
         paymentRequest.shippingMethods = shippingMethodCalculator()
-        
+
         paymentRequest.requiredShippingContactFields = [.name, .postalAddress]
         paymentRequest.requiredBillingContactFields = [.name, .postalAddress]
-        
+
         let recurringPaymentSummaryItem = PKRecurringPaymentSummaryItem(
             label: paymentSummaryItems[0].label,
             amount: paymentSummaryItems[0].amount)
@@ -153,7 +154,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
     ) {
         guard let identifier = shippingMethod.identifier else {
             return print("missing shipping method identifier")
-            
+
         }
 
         print("identifier \(identifier)")
@@ -187,7 +188,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                 let deliveryGroup = cart.deliveryGroups.nodes.first
             else {
                 return print("Error updating delivery address:")
-                
+
             }
 
             let shippingMethods: [PKShippingMethod] = deliveryGroup
@@ -239,15 +240,15 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             let countryError =
                 PKPaymentRequest.paymentShippingAddressInvalidError(
                     withKey: CNPostalAddressCountryKey,
-                    localizedDescription: "Invalid country")
+                    localizedDescription: "Invalid country"
+                )
             errors.append(pickupError)
             errors.append(countryError)
             status = .failure
         }
         self.paymentStatus = status
-//        CartManager.shared.
         completion(PKPaymentAuthorizationResult(status: status, errors: errors))
-        
+
     }
 
     func paymentAuthorizationControllerDidFinish(
