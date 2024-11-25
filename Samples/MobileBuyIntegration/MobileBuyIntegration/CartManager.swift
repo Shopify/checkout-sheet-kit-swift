@@ -40,12 +40,23 @@ struct Contact {
     let phone: String
 }
 
-enum StorefrontError: Error {
+enum CartManagerError: LocalizedError {
     case missingConfiguration
-}
 
-let storefrontError =
-    "Missing Storefront config. Check MobileBuyIntegration/Resources/Storefront.xcconfig"
+    var failureReason: String? {
+        switch self {
+        case .missingConfiguration:
+            return "Missing Storefront config"
+        }
+    }
+
+    var recoverySuggestion: String? {
+        switch self {
+        case .missingConfiguration:
+            return "Check MobileBuyIntegration/Resources/Storefront.xcconfig"
+        }
+    }
+}
 
 class CartManager {
     static let shared = CartManager(client: .shared)
@@ -68,14 +79,16 @@ class CartManager {
             let domain = infoPlist["StorefrontDomain"] as? String,
             let accessToken = infoPlist["StorefrontAccessToken"] as? String
         else {
-            fatalError(storefrontError)
+            fatalError(
+                CartManagerError.missingConfiguration.localizedDescription
+            )
         }
 
         do {
             let vaultedContact = try CartManager.createVaultedContact()
             self.vaultedContactInfo = vaultedContact
-        } catch {
-            fatalError(storefrontError)
+        } catch let error {
+            fatalError(error.localizedDescription)
         }
 
         self.client = client
@@ -97,7 +110,7 @@ class CartManager {
             let email = infoPlist["Email"] as? String,
             let phone = infoPlist["Phone"] as? String
         else {
-            throw StorefrontError.missingConfiguration
+            throw CartManagerError.missingConfiguration
         }
 
         return Contact(
@@ -127,7 +140,7 @@ class CartManager {
             let email = infoPlist["Email"] as? String,
             let phone = infoPlist["Phone"] as? String
         else {
-            throw StorefrontError.missingConfiguration
+            throw CartManagerError.missingConfiguration
         }
 
         return Contact(
