@@ -107,8 +107,10 @@ class PaymentHandler: NSObject {
         paymentRequest.supportedNetworks = PaymentHandler.supportedNetworks
         paymentRequest.shippingType = .delivery
         paymentRequest.shippingMethods = shippingMethodCalculator()
+        
         paymentRequest.requiredShippingContactFields = [.name, .postalAddress]
-
+        paymentRequest.requiredBillingContactFields = [.name, .postalAddress]
+        
         let recurringPaymentSummaryItem = PKRecurringPaymentSummaryItem(
             label: paymentSummaryItems[0].label,
             amount: paymentSummaryItems[0].amount)
@@ -150,8 +152,8 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             Void
     ) {
         guard let identifier = shippingMethod.identifier else {
-            print("missing shipping method identifier")
-            return
+            return print("missing shipping method identifier")
+            
         }
 
         print("identifier \(identifier)")
@@ -184,8 +186,8 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             guard let cart = result,
                 let deliveryGroup = cart.deliveryGroups.nodes.first
             else {
-                print("Error updating delivery address:")
-                return
+                return print("Error updating delivery address:")
+                
             }
 
             let shippingMethods: [PKShippingMethod] = deliveryGroup
@@ -242,9 +244,10 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             errors.append(countryError)
             status = .failure
         }
-
         self.paymentStatus = status
+//        CartManager.shared.
         completion(PKPaymentAuthorizationResult(status: status, errors: errors))
+        
     }
 
     func paymentAuthorizationControllerDidFinish(
