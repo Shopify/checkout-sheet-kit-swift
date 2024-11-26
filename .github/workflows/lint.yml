@@ -19,7 +19,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - run: ./Scripts/copy_license && git diff --name-only --exit-code
+      - run: ./Scripts/ensure_license
 
   lint-podspec:
     name: CocoaPods
