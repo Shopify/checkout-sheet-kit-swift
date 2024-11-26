@@ -1,25 +1,25 @@
 /*
-MIT License
+ MIT License
 
-Copyright 2023 - Present, Shopify Inc.
+ Copyright 2023 - Present, Shopify Inc.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import Buy
 import SwiftUI
@@ -30,7 +30,7 @@ struct ProductGrid: View {
     @State private var showProductSheet = false
 
     let columns = [
-		GridItem(.flexible()),
+        GridItem(.flexible()),
         GridItem(.flexible())
     ]
 
@@ -41,7 +41,7 @@ struct ProductGrid: View {
                     ForEach(products, id: \.id) { product in
                         ProductGridItem(product: product)
                             .onTapGesture {
-								selectProductAndShowSheet(for: product)
+                                selectProductAndShowSheet(for: product)
                             }
                     }
                 } else {
@@ -56,8 +56,8 @@ struct ProductGrid: View {
                 productCache.fetchCollection()
             }
         }
-		.sheet(isPresented: $showProductSheet) {
-			ProductSheetView(product: $selectedProduct, isPresented: $showProductSheet)
+        .sheet(isPresented: $showProductSheet) {
+            ProductSheetView(product: $selectedProduct, isPresented: $showProductSheet)
         }
     }
 
@@ -75,9 +75,9 @@ struct ProductSheetView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-			if let product = product {
-				ProductView(product: product)
-			}
+            if let product = product {
+                ProductView(product: product)
+            }
 
             Button(action: {
                 isPresented = false
@@ -113,21 +113,21 @@ struct ProductGridItem: View {
                 }
             }
 
-			VStack {
-				Text(product.title)
-					.font(.headline)
-					.lineLimit(1)
-					.padding(.top, 4)
+            VStack {
+                Text(product.title)
+                    .font(.headline)
+                    .lineLimit(1)
+                    .padding(.top, 4)
 
-				if let price = product.variants.nodes.first?.price {
-					Text( price.formattedString()!)
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-				}
+                if let price = product.variants.nodes.first?.price {
+                    Text(price.formattedString()!)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
-				.frame(alignment: .leading)
+            .frame(alignment: .leading)
         }
-		.frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity)
         .padding(.bottom, 20)
     }
 }
