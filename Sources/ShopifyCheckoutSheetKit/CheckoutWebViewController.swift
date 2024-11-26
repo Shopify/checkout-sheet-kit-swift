@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 import WebKit
 
-class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
+public class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
 	weak var delegate: CheckoutDelegate?
 
 	internal var checkoutView: CheckoutWebView
@@ -61,8 +61,6 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		super.init(nibName: nil, bundle: nil)
 
 		title = ShopifyCheckoutSheetKit.configuration.title
-
-		navigationItem.rightBarButtonItem = closeBarButtonItem
 
 		checkoutView.viewDelegate = self
 

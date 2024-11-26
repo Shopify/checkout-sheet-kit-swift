@@ -64,3 +64,10 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 	from.present(viewController, animated: true)
 	return viewController
 }
+
+@discardableResult
+public func push(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutWebViewController {
+    let webViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
+    from.navigationController?.pushViewController(webViewController, animated: true)
+    return webViewController
+}
