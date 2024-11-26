@@ -26,14 +26,14 @@ import Combine
 import Foundation
 import ShopifyCheckoutSheetKit
 
-class CartManager {
+class CartManager: ObservableObject {
 
 	static let shared = CartManager(client: .shared)
 
 	// MARK: Properties
 
-	@Published
-	var cart: Storefront.Cart?
+	@Published var cart: Storefront.Cart?
+	@Published var isDirty: Bool = false
 
 	private let client: StorefrontClient
 	private let address1: String
@@ -78,6 +78,20 @@ class CartManager {
 		self.phone = phone
 	}
 
+	public func preloadCheckout() {
+		/// Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
+		if let url = cart?.checkoutUrl, isDirty {
+			ShopifyCheckoutSheetKit.preload(checkout: url)
+			markCartAsReady()
+		}
+	}
+
+	/// The cart is "ready" when ShopifyCheckoutSheetKit.preload(checkoutUrl) has been called
+	/// The dirty state will be set to false to prevent  preloading again
+	func markCartAsReady() {
+		isDirty = false
+	}
+
 	// MARK: Cart Actions
 
 	func addItem(variant: GraphQL.ID, completionHandler: (() -> Void)?) {
@@ -85,6 +99,7 @@ class CartManager {
 			switch result {
 			case .success(let cart):
 				self.cart = cart
+				self.isDirty = true
 			case .failure(let error):
 				print(error)
 			}
@@ -97,6 +112,7 @@ class CartManager {
 			switch result {
 			case .success(let cart):
 				self.cart = cart
+				self.isDirty = true
 			case .failure(let error):
 				print(error)
 			}
@@ -106,6 +122,7 @@ class CartManager {
 
 	func resetCart() {
 		self.cart = nil
+		self.isDirty = false
 	}
 
 	typealias CartResultHandler = (Result<Storefront.Cart, Error>) -> Void

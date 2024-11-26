@@ -40,6 +40,9 @@ class StorefrontClient {
 		}
 
 		client = Graph.Client(shopDomain: domain, apiKey: token)
+
+		/// Set the caching policy (1 hour)
+		client.cachePolicy = .cacheFirst(expireIn: 60 * 60)
 	}
 
 	typealias QueryResultHandler = (Result<Storefront.QueryRoot, Error>) -> Void
@@ -68,5 +71,46 @@ class StorefrontClient {
 		}
 
 		task.resume()
+	}
+}
+
+public struct StorefrontURL {
+    public let url: URL
+
+    private let slug = "([\\w\\d_-]+)"
+
+    init(from url: URL) {
+        self.url = url
+    }
+
+    public func isThankYouPage() -> Bool {
+        return url.path.range(of: "/thank[-_]you", options: .regularExpression) != nil
+    }
+
+    public func isCheckout() -> Bool {
+		return url.path.contains("/checkout")
+	}
+
+	public func isCart() -> Bool {
+		return url.path.contains("/cart")
+	}
+
+	public func isCollection() -> Bool {
+		return url.path.range(of: "/collections/\(slug)", options: .regularExpression) != nil
+	}
+
+	public func isProduct() -> Bool {
+		return url.path.range(of: "/products/\(slug)", options: .regularExpression) != nil
+	}
+
+	public func getProductSlug() -> String? {
+		guard isProduct() else { return nil }
+
+		let pattern = "/products/([\\w_-]+)"
+		if let match = url.path.range(of: pattern, options: .regularExpression, range: nil, locale: nil) {
+			let slug = url.path[match].components(separatedBy: "/").last
+			return slug
+		}
+		return nil
 	}
 }

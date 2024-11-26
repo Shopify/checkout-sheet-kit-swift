@@ -24,60 +24,107 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import UIKit
 import SwiftUI
 import ShopifyCheckoutSheetKit
+import Combine
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	var window: UIWindow?
 
-	var cartController: CartViewController?
-	var productController: ProductViewController?
+	var cancellables: Set<AnyCancellable> = []
 
-	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
-		guard let windowScene = (scene as? UIWindowScene) else { return }
+	let cartController = UIHostingController(rootView: CartView())
+	let productGridController = UIHostingController(rootView: ProductGrid())
+	let productGalleryController = UIHostingController(rootView: ProductGalleryView())
+	let settingsController = UIHostingController(rootView: SettingsView())
 
-		let tabBarController = UITabBarController()
+	 func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
+        guard let windowScene = (scene as? UIWindowScene) else { return }
 
-		/// Catalog
-		productController = ProductViewController()
-		productController?.tabBarItem.image = UIImage(systemName: "books.vertical")
-		productController?.tabBarItem.title = "Browse"
-		productController?.navigationItem.title = "Product details"
+        let tabBarController = UITabBarController()
 
-		/// Cart
-		cartController = CartViewController()
-		cartController?.tabBarItem.image = UIImage(systemName: "cart")
-		cartController?.tabBarItem.title = "Cart"
-		cartController?.navigationItem.title = "Cart"
+		/// Branding Logo
+		/// TODO: Fetch this from the Storefront API for the configured storefront
+        let logoImageView = UIImageView(image: UIImage(named: "logo"))
+		logoImageView.contentMode = .scaleAspectFit
+		logoImageView.widthAnchor.constraint(equalToConstant: 90).isActive = true
 
-		tabBarController.viewControllers = [
-			UINavigationController(
-				rootViewController: productController!
-			),
-			UINavigationController(
-				rootViewController: cartController!
-			)
-		]
+		/// Catalog grid view
+        productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
+        productGridController.tabBarItem.title = "Catalog"
+        productGridController.navigationItem.titleView = logoImageView
 
-		if #available(iOS 15.0, *) {
-			let settingsController = UIHostingController(rootView: SettingsView(appConfiguration: appConfiguration))
-			settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
-			settingsController.tabBarItem.title = "Settings"
+        /// Product Gallery
+        productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
+        productGalleryController.tabBarItem.title = "Products"
+        productGalleryController.navigationItem.titleView = logoImageView
+		productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "cart"),
+            style: .plain,
+            target: self,
+            action: #selector(present)
+        )
 
-			tabBarController.viewControllers?.append(UINavigationController(
-				rootViewController: settingsController
-			))
+        /// Cart
+        cartController.tabBarItem.image = UIImage(systemName: "cart")
+        cartController.tabBarItem.title = "Cart"
+		cartController.navigationItem.title = "Cart"
+
+		/// Settings
+		settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
+		settingsController.tabBarItem.title = "Settings"
+
+		subscribeToCartUpdates()
+
+        tabBarController.viewControllers = [
+			/// Catalog grid screen
+			UINavigationController(rootViewController: productGridController),
+
+			/// Product gallery screen
+            UINavigationController(rootViewController: productGalleryController),
+
+            /// Cart screen
+            UINavigationController(rootViewController: cartController),
+
+            /// Settings screen
+			UINavigationController(rootViewController: settingsController)
+        ]
+
+		/// Subscribe to color scheme changes on the settings screen
+        NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+
+		let window = createWindow(windowScene: windowScene, rootViewController: tabBarController)
+
+        CheckoutController.shared = CheckoutController(window: window)
+
+        self.window = window
+    }
+
+    @objc public func present() {
+		if let url = CartManager.shared.cart?.checkoutUrl {
+			self.presentCheckout(url)
 		}
-
-		let window = UIWindow(windowScene: windowScene)
-		window.rootViewController = tabBarController
-		window.makeKeyAndVisible()
-
-		NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
-
-		window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
-
-		self.window = window
 	}
+
+	private func createWindow(windowScene: UIWindowScene, rootViewController: UIViewController) -> UIWindow {
+		let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = rootViewController
+        window.makeKeyAndVisible()
+		window.tintColor = ColorPalette.primaryColor
+        window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+        return window
+	}
+
+    private func subscribeToCartUpdates() {
+        CartManager.shared.$cart
+            .sink { cart in
+                if let cart = cart, cart.lines.nodes.count > 0 {
+					self.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
+                } else {
+                    self.cartController.tabBarItem.badgeValue = nil
+                }
+            }
+            .store(in: &cancellables)
+    }
 
 	func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
 		guard
@@ -114,10 +161,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 	}
 
-	private func presentCheckout(_ url: URL) {
-		if let viewController = cartController {
-			ShopifyCheckoutSheetKit.present(checkout: url, from: viewController, delegate: viewController)
-		}
+	public func presentCheckout(_ url: URL) {
+		CheckoutController.shared?.present(checkout: url)
 	}
 
 	private func getRootViewController() -> UINavigationController? {
@@ -138,9 +183,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func navigateToProduct(with handle: String) {
-		if let pdp = self.productController {
-			pdp.getProductByHandle(handle)
-		}
+		ProductCache.shared.getProduct(handle: handle, completion: { _ in })
 
 		if let tabBarVC = window?.rootViewController as? UITabBarController {
 			tabBarVC.selectedIndex = 0
@@ -169,43 +212,17 @@ extension Configuration.ColorScheme {
 	}
 }
 
-public struct StorefrontURL {
-    public let url: URL
+extension UIWindow {
+    /// Function to get the top most view controller from the window's rootViewController
+    func topMostViewController() -> UIViewController? {
+        guard var topController = rootViewController else {
+            return nil
+        }
 
-    private let slug = "([\\w\\d_-]+)"
+        while let presentedViewController = topController.presentedViewController {
+            topController = presentedViewController
+        }
 
-    init(from url: URL) {
-        self.url = url
+        return topController
     }
-
-    public func isThankYouPage() -> Bool {
-        return url.path.range(of: "/thank[-_]you", options: .regularExpression) != nil
-    }
-
-    public func isCheckout() -> Bool {
-		return url.path.contains("/checkout")
-	}
-
-	public func isCart() -> Bool {
-		return url.path.contains("/cart")
-	}
-
-	public func isCollection() -> Bool {
-		return url.path.range(of: "/collections/\(slug)", options: .regularExpression) != nil
-	}
-
-	public func isProduct() -> Bool {
-		return url.path.range(of: "/products/\(slug)", options: .regularExpression) != nil
-	}
-
-	public func getProductSlug() -> String? {
-		guard isProduct() else { return nil }
-
-		let pattern = "/products/([\\w_-]+)"
-		if let match = url.path.range(of: pattern, options: .regularExpression, range: nil, locale: nil) {
-			let slug = url.path[match].components(separatedBy: "/").last
-			return slug
-		}
-		return nil
-	}
 }

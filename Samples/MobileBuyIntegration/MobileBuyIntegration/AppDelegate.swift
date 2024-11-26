@@ -30,7 +30,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 		ShopifyCheckoutSheetKit.configure {
 			/// Checkout color scheme setting
-			$0.colorScheme = .automatic
+			$0.colorScheme = .web
+
+			/// Customize progress bar color
+			$0.tintColor = ColorPalette.primaryColor
+
+			/// Customize sheet color (matches web configuration by default)
+			$0.backgroundColor = ColorPalette.backgroundColor
 
 			/// Enable preloading
 			$0.preloading.enabled = true
@@ -43,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 		print("[MobileBuyIntegration] Log level set to .all")
 
-		UIBarButtonItem.appearance().tintColor = .label
+		UIBarButtonItem.appearance().tintColor = ColorPalette.primaryColor
 
 		return true
 	}

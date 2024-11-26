@@ -1,13 +1,31 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@" : {
+
+    },
+    "%d" : {
+
+    },
     "✓" : {
 
     },
-    "App version" : {
+    "Add to Cart" : {
+
+    },
+    "Added" : {
+
+    },
+    "Adding..." : {
 
     },
     "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app." : {
+
+    },
+    "Checkout" : {
+
+    },
+    "Checkout Sheet Kit version" : {
 
     },
     "Clear" : {
@@ -34,6 +52,9 @@
     "Handle Product URLs" : {
 
     },
+    "Loading products..." : {
+
+    },
     "Logs" : {
 
     },
@@ -49,7 +70,7 @@
     "Preload checkout" : {
 
     },
-    "SDK version" : {
+    "Sample app version" : {
 
     },
     "Settings" : {
@@ -89,6 +110,9 @@
 
     },
     "Web pixel events" : {
+
+    },
+    "Your cart is empty." : {
 
     }
   },
