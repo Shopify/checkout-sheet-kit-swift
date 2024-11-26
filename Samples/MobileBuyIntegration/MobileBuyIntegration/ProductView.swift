@@ -121,26 +121,6 @@ struct ProductView: View {
 					.cornerRadius(10)
                     .disabled(!variant.availableForSale || loading)
                     .padding([.leading, .trailing], 15)
-
-//                    Button(action: addToCart) {
-//                        HStack {
-//                            Text("Buy it now")
-//								.font(.headline)
-//
-//                            if loading {
-//                                ProgressView()
-//									.colorInvert()
-//                            }
-//                            Spacer()
-//
-//							Text((variant.availableForSale ? variant.price.formattedString() : "Out of stock")!)
-//                        }.padding()
-//                    }
-//					.background(addedToCart ? Color(ColorPalette.successColor) : .black)
-//					.foregroundStyle(.white)
-//					.cornerRadius(10)
-//                    .disabled(!variant.availableForSale || loading)
-//                    .padding([.leading, .trailing], 15)
                 }
             }
         }
@@ -181,8 +161,6 @@ class ProductCache: ObservableObject {
     @Published public var isFetching: Bool = false
     @Published public var collection: [Storefront.Product]?
 
-    private init() {}
-
     func getProduct(handle: String?, completion: @escaping (Storefront.Product?) -> Void) {
         if let product = cachedProduct {
             completion(product)
@@ -195,7 +173,6 @@ class ProductCache: ObservableObject {
     }
 
     private func fetchProduct(by handle: String?, completion: @escaping (Storefront.Product?) -> Void) {
-        // Simulate fetching product logic; in actual implementation use your GraphQL query
         let context = Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
         let query = Storefront.buildQuery(inContext: context) { $0
             .products(first: 1, query: handle) { $0
