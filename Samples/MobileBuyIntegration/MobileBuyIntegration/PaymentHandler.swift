@@ -154,14 +154,12 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
     ) {
         guard let identifier = shippingMethod.identifier else {
             return print("missing shipping method identifier")
-
         }
 
         print("identifier \(identifier)")
+
         CartManager.shared
-            .selectShippingMethodUpdate(
-                deliveryOptionHandle: identifier
-            ) {
+            .selectShippingMethodUpdate(deliveryOptionHandle: identifier) {
                 cart in
                 let paymentRequestShippingContactUpdate =
                     PKPaymentRequestShippingMethodUpdate(
@@ -170,8 +168,14 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                             shippingMethod: shippingMethod
                         )
                     )
-                completion(paymentRequestShippingContactUpdate)
+
+                CartManager.shared.performCartPrepareForCompletion { result in
+                    if case .success = result {
+                        completion(paymentRequestShippingContactUpdate)
+                    }
+                }
             }
+
     }
 
     func paymentAuthorizationController(
@@ -181,26 +185,27 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             Void
     ) {
         do {
-
             try CartManager.shared.updateDeliveryAddress(
-                contact: contact, partial: true
+                contact: contact,
+                partial: true
             ) { result in
-
-                guard let cart = result,
-                    let deliveryGroup = cart.deliveryGroups.nodes.first
+                guard
+                    let cart = result,
+                    let firstDeliveryGroup = cart.deliveryGroups.nodes.first
                 else {
                     return print("Error updating delivery address:")
 
                 }
 
-                let shippingMethods: [PKShippingMethod] = deliveryGroup
+                let shippingMethods: [PKShippingMethod] = firstDeliveryGroup
                     .deliveryOptions.compactMap {
                         guard
                             let title = $0.title,
                             let description = $0.description
                         else {
                             print(
-                                "Invalid deliveryOption to map shipping method")
+                                "Invalid deliveryOption to map shipping method"
+                            )
                             return nil
                         }
                         let shippingMethod = PKShippingMethod(
@@ -214,21 +219,32 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
                         return shippingMethod
                     }
+                
+                CartManager.shared.performCartPrepareForCompletion { result in
+                    if case .failure(let error) = result {
+                        print(
+                            "--- Failed to prepare cart for completion! \(error) ---"
+                        )
+                    }
 
-                completion(
-                    PKPaymentRequestShippingContactUpdate(
-                        errors: [],
-                        paymentSummaryItems: self.buildPaymentSummaryItems(
-                            cart: cart, shippingMethod: nil),
-                        shippingMethods: shippingMethods
-                    ))
+                    completion(
+                        PKPaymentRequestShippingContactUpdate(
+                            errors: [],
+                            paymentSummaryItems: self.buildPaymentSummaryItems(
+                                cart: cart,
+                                shippingMethod: nil
+                            ),
+                            shippingMethods: shippingMethods
+                        )
+                    )
+                }
             }
         } catch let error {
-
             print(
                 "paymentAuthorizationController.didSelectShippingContact error: \(error)"
             )
         }
+
     }
 
     func paymentAuthorizationController(
@@ -263,7 +279,6 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             try CartManager.shared.updateCartPaymentMethod(payment: payment) {
                 result in
                 if case .success(let result) = result {
-                    print("paymentAuthorizationController result: \(result)")
                     completion(
                         PKPaymentAuthorizationResult(
                             status: .success,
@@ -272,13 +287,13 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                     )
                 } else {
                     print(
-                        "paymentAuthorizationController failed to update payment method"
+                        "paymentAuthorizationController.didAuthorizePayment failed on updateCartPaymentMethod"
                     )
                 }
             }
         } catch let error {
             print(
-                "paymentAuthorizationController.didAuthorizePayment error: \(error)"
+                "paymentAuthorizationController.didAuthorizePayment failed on updateCartPaymentMethod"
             )
         }
 
@@ -290,11 +305,10 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         controller.dismiss {
             // The payment sheet doesn't automatically dismiss once it has finished. Dismiss the payment sheet.
             DispatchQueue.main.async {
-                if self.paymentStatus == .success {
-                    self.completionHandler(true)
-                } else {
-                    self.completionHandler(false)
-                }
+                let paymentStatusCode = self.paymentStatus.rawValue as NSNumber
+                self.completionHandler(
+                    Bool(truncating: paymentStatusCode)
+                )
             }
         }
     }
