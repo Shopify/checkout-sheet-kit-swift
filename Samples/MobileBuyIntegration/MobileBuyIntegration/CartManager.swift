@@ -128,7 +128,7 @@ class CartManager {
             throw CartManagerError.missingConfiguration
         }
 
-        return Contact(
+        return .init(
             address1: address1,
             address2: address2,
             city: city,
@@ -145,7 +145,8 @@ class CartManager {
     // MARK: Cart Actions
 
     func addItem(
-        variant: GraphQL.ID, completionHandler: ((Storefront.Cart?) -> Void)?
+        variant: GraphQL.ID,
+        completionHandler: ((Storefront.Cart?) -> Void)?
     ) {
         performCartLinesAdd(item: variant) { result in
             switch result {
@@ -318,35 +319,35 @@ class CartManager {
     }
 
     private func performCartUpdate(
-        id: GraphQL.ID, quantity: Int32, handler: @escaping CartResultHandler
+        id: GraphQL.ID,
+        quantity: Int32,
+        handler: @escaping CartResultHandler
     ) {
+        guard let cartId = cart?.id else {
+            return performCartCreate(items: [id], handler: handler)
+        }
+        
         let lines = [
             Storefront.CartLineUpdateInput.create(
                 id: id, quantity: Input(orNull: quantity))
         ]
 
-        if let cartID = cart?.id {
-            let mutation = Storefront.buildMutation(
-                inContext: CartManager.ContextDirective
-            ) {
-                $0
-                    .cartLinesUpdate(cartId: cartID, lines: lines) {
-                        $0
-                            .cart { $0.cartManagerFragment() }
-                    }
+        let mutation = Storefront.buildMutation(
+            inContext: CartManager.ContextDirective
+        ) {
+            $0.cartLinesUpdate(cartId: cartId, lines: lines) {
+                $0.cart { $0.cartManagerFragment() }
             }
+        }
 
-            client.execute(mutation: mutation) { result in
-                if case .success(let mutation) = result,
-                    let cart = mutation.cartLinesUpdate?.cart
-                {
-                    handler(.success(cart))
-                } else {
-                    handler(.failure(URLError(.unknown)))
-                }
+        client.execute(mutation: mutation) { result in
+            if case .success(let mutation) = result,
+                let cart = mutation.cartLinesUpdate?.cart
+            {
+                handler(.success(cart))
+            } else {
+                handler(.failure(URLError(.unknown)))
             }
-        } else {
-            performCartCreate(items: [id], handler: handler)
         }
     }
 
@@ -366,7 +367,7 @@ class CartManager {
             deliveryAddressPreferences: deliveryAddressPreferencesInput
         )
 
-        guard let cartID = cart?.id else {
+        guard let cartId = cart?.id else {
             return print("no cart")
         }
 
@@ -374,7 +375,7 @@ class CartManager {
             inContext: CartManager.ContextDirective
         ) {
             $0.cartBuyerIdentityUpdate(
-                cartId: cartID,
+                cartId: cartId,
                 buyerIdentity: buyerIdentityInput
             ) {
                 $0.cart { $0.cartManagerFragment() }
@@ -459,12 +460,12 @@ class CartManager {
     func performCartPrepareForCompletion(
         handler: @escaping (Result<Bool, Error>) -> Void
     ) {
-        guard let cartID = cart?.id else {
+        guard let cartId = cart?.id else {
             return print("performCartPrepareForCompletion: Cart isn't created")
         }
 
         let mutationString = createCartPrepareForCompletionMutation(
-            cartID: cartID
+            cartId: cartId
         )
         //        216 Rockaway Ave, Brooklyn, NY 11233, United States
         executeGraphQL(with: mutationString) {
@@ -490,7 +491,7 @@ class CartManager {
         deliveryOptionHandle: String,
         handler: @escaping (Result<Storefront.Cart, Error>) -> Void
     ) {
-        guard let cartID = cart?.id else {
+        guard let cartId = cart?.id else {
             return print("performCartShippingMethodUpdate: Cart isn't created")
         }
 
@@ -504,7 +505,7 @@ class CartManager {
             inContext: CartManager.ContextDirective
         ) {
             $0.cartSelectedDeliveryOptionsUpdate(
-                cartId: cartID,
+                cartId: cartId,
                 selectedDeliveryOptions: [cartSelectedDeliveryOptionInput]
             ) {
                 $0.cart { $0.cartManagerFragment() }
@@ -528,7 +529,7 @@ class CartManager {
         completion: @escaping (Result<Storefront.Cart, Error>) -> Void
     ) throws {
         guard
-            let cartID = cart?.id,
+            let cartId = cart?.id,
             let billingContact = payment.billingContact,
             let totalAmount = cart?.cost.totalAmount
         else {
@@ -606,7 +607,7 @@ class CartManager {
         let mutation = Storefront.buildMutation(
             inContext: CartManager.ContextDirective
         ) {
-            $0.cartPaymentUpdate(cartId: cartID, payment: payment) {
+            $0.cartPaymentUpdate(cartId: cartId, payment: payment) {
                 $0.cart {
                     $0.cartManagerFragment()
                 }
@@ -765,10 +766,10 @@ extension Storefront.CartQuery {
     }
 }
 
-func createCartPrepareForCompletionMutation(cartID: GraphQL.ID) -> String {
+func createCartPrepareForCompletionMutation(cartId: GraphQL.ID) -> String {
     return """
           mutation @inContext(country: \(Storefront.CountryCode.inferRegion().rawValue.uppercased())) {
-            cartPrepareForCompletion(cartId: "\(cartID.rawValue)") {
+            cartPrepareForCompletion(cartId: "\(cartId.rawValue)") {
                 result {
                   __typename
                   ... on CartStatusReady {

@@ -13,7 +13,7 @@ import UIKit
 typealias PaymentCompletionHandler = (Bool) -> Void
 
 class PaymentHandler: NSObject {
-
+    // MARK: Properties
     var paymentController: PKPaymentAuthorizationController?
     var paymentSummaryItems = [PKPaymentSummaryItem]()
     var paymentStatus = PKPaymentAuthorizationStatus.failure
@@ -31,7 +31,8 @@ class PaymentHandler: NSObject {
         return (
             PKPaymentAuthorizationController.canMakePayments(),
             PKPaymentAuthorizationController.canMakePayments(
-                usingNetworks: supportedNetworks)
+                usingNetworks: supportedNetworks
+            )
         )
     }
 
@@ -49,6 +50,7 @@ class PaymentHandler: NSObject {
         //        let endComponents = calendar.dateComponents(
         //            [.calendar, .year, .month, .day], from: shippingEnd)
 
+        #warning("Missing selectedDeliveryOption will throw out of this guard")
         guard
             let selectedDeliveryOption = CartManager.shared.cart?.deliveryGroups
                 .nodes.first?.selectedDeliveryOption,
@@ -163,7 +165,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                 cart in
                 let paymentRequestShippingContactUpdate =
                     PKPaymentRequestShippingMethodUpdate(
-                        paymentSummaryItems: self.buildPaymentSummaryItems(
+                        paymentSummaryItems: self.mapToPaymentSummaryItems(
                             cart: cart,
                             shippingMethod: shippingMethod
                         )
@@ -219,7 +221,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
                         return shippingMethod
                     }
-                
+
                 CartManager.shared.performCartPrepareForCompletion { result in
                     if case .failure(let error) = result {
                         print(
@@ -230,7 +232,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                     completion(
                         PKPaymentRequestShippingContactUpdate(
                             errors: [],
-                            paymentSummaryItems: self.buildPaymentSummaryItems(
+                            paymentSummaryItems: self.mapToPaymentSummaryItems(
                                 cart: cart,
                                 shippingMethod: nil
                             ),
@@ -313,52 +315,56 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         }
     }
 
-    private func buildPaymentSummaryItems(
+    private func mapToPaymentSummaryItems(
         cart: Storefront.Cart,
         shippingMethod: PKShippingMethod?
     ) -> [PKPaymentSummaryItem] {
-        let lines = cart.lines.nodes
-        var paymentSummaryItems: [PKPaymentSummaryItem] = []
+        var paymentSummaryItems: [PKPaymentSummaryItem] = cart.lines.nodes
+            .compactMap {
+                guard
+                    let variant = $0.merchandise as? Storefront.ProductVariant
+                else {
+                    print("variant missing from merchandise")
+                    return nil
+                }
 
-        for line in lines {
-            guard let variant = line.merchandise as? Storefront.ProductVariant
-            else {
-                print("variant missing from merchandise")
-                continue
+                return PKPaymentSummaryItem(
+                    label: variant.product.title,
+                    amount: NSDecimalNumber(
+                        decimal: $0.cost.totalAmount.amount
+                    ),
+                    type: .final
+                )
             }
-            let summaryItem = PKPaymentSummaryItem(
-                label: variant.product.title,
-                amount: NSDecimalNumber(decimal: line.cost.totalAmount.amount),
-                type: .final
-            )
-            paymentSummaryItems.append(summaryItem)
-        }
-
-        let tax = PKPaymentSummaryItem(
-            label: "Tax",
-            amount: NSDecimalNumber(
-                decimal: cart.cost.totalTaxAmount?.amount ?? 0
-            ),
-            type: .final
-        )
-        let total = PKPaymentSummaryItem(
-            label: "Total",
-            amount: NSDecimalNumber(decimal: cart.cost.totalAmount.amount),
-            type: .final
-        )
 
         if let shippingMethod {
-            let shippingAmount = PKPaymentSummaryItem(
-                label: "Shipping",
-                amount: shippingMethod.amount,
-                type: .final
+            paymentSummaryItems.append(
+                PKPaymentSummaryItem(
+                    label: "Shipping",
+                    amount: shippingMethod.amount,
+                    type: .final
+                )
             )
-            print("Shipping Amount \(shippingAmount.amount)")
-            paymentSummaryItems.append(shippingAmount)
         }
 
-        paymentSummaryItems.append(tax)
-        paymentSummaryItems.append(total)
+        // Null and 0 mean different things
+        if let amount = cart.cost.totalTaxAmount?.amount {
+            paymentSummaryItems.append(
+                PKPaymentSummaryItem(
+                    label: "Tax",
+                    amount: NSDecimalNumber(decimal: amount),
+                    type: .final
+                )
+            )
+        }
+
+        paymentSummaryItems.append(
+            PKPaymentSummaryItem(
+                label: "Total",
+                amount: NSDecimalNumber(decimal: cart.cost.totalAmount.amount),
+                type: .final
+            )
+        )
 
         return paymentSummaryItems
     }
