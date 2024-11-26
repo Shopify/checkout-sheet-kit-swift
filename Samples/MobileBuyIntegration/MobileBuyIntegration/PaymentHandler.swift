@@ -41,8 +41,8 @@ class PaymentHandler: NSObject {
         let today = Date()
         let calendar = Calendar.current
 
-        let shippingStart = calendar.date(byAdding: .day, value: 3, to: today)!
-        let shippingEnd = calendar.date(byAdding: .day, value: 5, to: today)!
+        //        let shippingStart = calendar.date(byAdding: .day, value: 3, to: today)!
+        //        let shippingEnd = calendar.date(byAdding: .day, value: 5, to: today)!
 
         //        let startComponents = calendar.dateComponents(
         //            [.calendar, .year, .month, .day], from: shippingStart)
@@ -180,45 +180,54 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         handler completion: @escaping (PKPaymentRequestShippingContactUpdate) ->
             Void
     ) {
-        CartManager.shared.updateDeliveryAddress(
-            contact: contact, partial: true
-        ) { result in
+        do {
 
-            guard let cart = result,
-                let deliveryGroup = cart.deliveryGroups.nodes.first
-            else {
-                return print("Error updating delivery address:")
+            try CartManager.shared.updateDeliveryAddress(
+                contact: contact, partial: true
+            ) { result in
 
-            }
+                guard let cart = result,
+                    let deliveryGroup = cart.deliveryGroups.nodes.first
+                else {
+                    return print("Error updating delivery address:")
 
-            let shippingMethods: [PKShippingMethod] = deliveryGroup
-                .deliveryOptions.compactMap {
-                    guard
-                        let title = $0.title,
-                        let description = $0.description
-                    else {
-                        print("Invalid deliveryOption to map shipping method")
-                        return nil
-                    }
-                    let shippingMethod = PKShippingMethod(
-                        label: title,
-                        amount: NSDecimalNumber(
-                            string: "\($0.estimatedCost.amount)")
-                    )
-
-                    shippingMethod.detail = description
-                    shippingMethod.identifier = $0.handle
-
-                    return shippingMethod
                 }
 
-            completion(
-                PKPaymentRequestShippingContactUpdate(
-                    errors: [],
-                    paymentSummaryItems: self.buildPaymentSummaryItems(
-                        cart: cart, shippingMethod: nil),
-                    shippingMethods: shippingMethods
-                ))
+                let shippingMethods: [PKShippingMethod] = deliveryGroup
+                    .deliveryOptions.compactMap {
+                        guard
+                            let title = $0.title,
+                            let description = $0.description
+                        else {
+                            print(
+                                "Invalid deliveryOption to map shipping method")
+                            return nil
+                        }
+                        let shippingMethod = PKShippingMethod(
+                            label: title,
+                            amount: NSDecimalNumber(
+                                string: "\($0.estimatedCost.amount)")
+                        )
+
+                        shippingMethod.detail = description
+                        shippingMethod.identifier = $0.handle
+
+                        return shippingMethod
+                    }
+
+                completion(
+                    PKPaymentRequestShippingContactUpdate(
+                        errors: [],
+                        paymentSummaryItems: self.buildPaymentSummaryItems(
+                            cart: cart, shippingMethod: nil),
+                        shippingMethods: shippingMethods
+                    ))
+            }
+        } catch let error {
+
+            print(
+                "paymentAuthorizationController.didSelectShippingContact error: \(error)"
+            )
         }
     }
 
@@ -229,32 +238,48 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
     ) {
 
         // Perform basic validation on the provided contact information.
-        var errors = [Error]()
-        var status = PKPaymentAuthorizationStatus.success
-        if payment.shippingContact?.postalAddress?.isoCountryCode != "US" {
-            let pickupError =
-                PKPaymentRequest.paymentShippingAddressUnserviceableError(
-                    withLocalizedDescription:
-                        "Address must be in the United States to use Apple Pay in the Sample App"
-                )
-            let countryError =
-                PKPaymentRequest.paymentShippingAddressInvalidError(
-                    withKey: CNPostalAddressCountryKey,
-                    localizedDescription: "Invalid country"
-                )
-            errors.append(pickupError)
-            errors.append(countryError)
-            status = .failure
+        guard payment.shippingContact?.postalAddress?.isoCountryCode == "US"
+        else {
+            self.paymentStatus = .failure
+            return completion(
+                PKPaymentAuthorizationResult(
+                    status: .failure,
+                    errors: [
+                        PKPaymentRequest
+                            .paymentShippingAddressUnserviceableError(
+                                withLocalizedDescription:
+                                    "Address must be in the United States to use Apple Pay in the Sample App"
+                            ),
+                        PKPaymentRequest.paymentShippingAddressInvalidError(
+                            withKey: CNPostalAddressCountryKey,
+                            localizedDescription: "Invalid country"
+                        ),
+                    ]))
         }
-        self.paymentStatus = status
-        CartManager.shared.updateCartPaymentMethod(payment: payment) { result in
-            if case .success(let result) = result {
-                completion(
-                    PKPaymentAuthorizationResult(status: status, errors: errors)
-                )
-            } else {
-                fatalError("failed to update payment method")
+
+        self.paymentStatus = .success
+
+        do {
+            try CartManager.shared.updateCartPaymentMethod(payment: payment) {
+                result in
+                if case .success(let result) = result {
+                    print("paymentAuthorizationController result: \(result)")
+                    completion(
+                        PKPaymentAuthorizationResult(
+                            status: .success,
+                            errors: []
+                        )
+                    )
+                } else {
+                    print(
+                        "paymentAuthorizationController failed to update payment method"
+                    )
+                }
             }
+        } catch let error {
+            print(
+                "paymentAuthorizationController.didAuthorizePayment error: \(error)"
+            )
         }
 
     }

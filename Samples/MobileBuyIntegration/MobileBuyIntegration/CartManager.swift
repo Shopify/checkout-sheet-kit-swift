@@ -41,12 +41,19 @@ struct Contact {
 }
 
 enum CartManagerError: LocalizedError {
-    case missingConfiguration
+    case missingConfiguration, missingPostalAddress, invalidPaymentData,
+        invalidBillingAddress
 
     var failureReason: String? {
         switch self {
         case .missingConfiguration:
             return "Missing Storefront config"
+        case .missingPostalAddress:
+            return "Postal Address is nil"
+        case .invalidPaymentData:
+            return "Invalid Payment Data"
+        case .invalidBillingAddress:
+            return "Mapping billing address failed"
         }
     }
 
@@ -54,6 +61,12 @@ enum CartManagerError: LocalizedError {
         switch self {
         case .missingConfiguration:
             return "Check MobileBuyIntegration/Resources/Storefront.xcconfig"
+        case .missingPostalAddress:
+            return "Check `PKContact.postalAddress`"
+        case .invalidPaymentData:
+            return "Decoding failed - check the PKPayment"
+        case .invalidBillingAddress:
+            return "Ensure `billingContact.postalAddress` is not nil"
         }
     }
 }
@@ -65,7 +78,9 @@ class CartManager {
 
     @Published
     var cart: Storefront.Cart?
-
+    private static let ContextDirective = Storefront.InContextDirective(
+        country: Storefront.CountryCode.inferRegion()
+    )
     private let client: StorefrontClient
     private let domain: String
     private let accessToken: String
@@ -96,36 +111,6 @@ class CartManager {
         self.accessToken = accessToken
     }
 
-    static private func createVaultedContactTwo() throws -> Contact {
-        guard
-            let infoPlist = Bundle.main.infoDictionary,
-            let address1 = infoPlist["Address1"] as? String,
-            let address2 = infoPlist["Address2"] as? String,
-            let city = infoPlist["City"] as? String,
-            let country = infoPlist["Country"] as? String,
-            let firstName = infoPlist["FirstName"] as? String,
-            let lastName = infoPlist["LastName"] as? String,
-            let province = infoPlist["Province"] as? String,
-            let zip = infoPlist["Zip"] as? String,
-            let email = infoPlist["Email"] as? String,
-            let phone = infoPlist["Phone"] as? String
-        else {
-            throw CartManagerError.missingConfiguration
-        }
-
-        return Contact(
-            address1: address1,
-            address2: address2,
-            city: city,
-            country: country,
-            firstName: firstName,
-            lastName: lastName,
-            province: province,
-            zip: zip,
-            email: email,
-            phone: phone
-        )
-    }
     static private func createVaultedContact() throws -> Contact {
         guard
             let infoPlist = Bundle.main.infoDictionary,
@@ -187,46 +172,53 @@ class CartManager {
                 completionHandler?(self.cart)
             })
     }
+    enum AddressType {
+        case postal, billing
+    }
+
+    private func mapCNPostalAddress(
+        contact: PKContact
+    ) throws -> Storefront.MailingAddressInput {
+        guard let address = contact.postalAddress else {
+            throw CartManagerError.missingPostalAddress
+        }
+        return Storefront.MailingAddressInput.create(
+            address1: Input(orNull: address.street),
+            address2: Input(orNull: address.subLocality),
+            city: Input(orNull: address.city),
+            //            company: Input(orNull: ""),
+            country: Input(orNull: address.country),
+            firstName: Input(orNull: contact.name?.givenName ?? ""),
+            lastName: Input(orNull: contact.name?.familyName ?? ""),
+            phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
+            province: Input(orNull: address.state),
+            zip: Input(orNull: address.postalCode)
+        )
+    }
 
     func updateDeliveryAddress(
         contact: PKContact,
         partial: Bool,
         completionHandler: ((Storefront.Cart?) -> Void)?
-    ) {
-        let postalAddress = contact.postalAddress
-        // TODO: We should guard better the optionality
-        let shippingAddress =
-            partial
-            ? Storefront.MailingAddressInput.create(
-                city: Input(orNull: postalAddress?.city ?? ""),
-                country: Input(orNull: postalAddress?.country ?? ""),
-                province: Input(orNull: postalAddress?.state ?? ""),
-                zip: Input(orNull: postalAddress?.postalCode ?? "")
-            )
-            : Storefront.MailingAddressInput.create(
-                address1: Input(orNull: postalAddress?.street ?? ""),
-                address2: Input(orNull: postalAddress?.subLocality ?? ""),
-                city: Input(orNull: postalAddress?.city ?? ""),
-                company: Input(orNull: ""),
-                country: Input(orNull: postalAddress?.country ?? ""),
-                firstName: Input(orNull: contact.name?.givenName ?? ""),
-                lastName: Input(orNull: contact.name?.familyName ?? ""),
-                phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
-                province: Input(orNull: postalAddress?.state ?? ""),
-                zip: Input(orNull: postalAddress?.postalCode ?? "")
-            )
+    ) throws {
+        do {
+            let shippingAddress = try mapCNPostalAddress(contact: contact)
 
-        performCartDeliveryAddressUpdate(
-            shippingAddress: shippingAddress,
-            handler: { result in
-                switch result {
-                case .success(let cart):
-                    self.cart = cart
-                case .failure(let error):
-                    print("performCartDeliveryAddressUpdate: \(error)")
-                }
-                completionHandler?(self.cart)
-            })
+            performCartDeliveryAddressUpdate(
+                shippingAddress: shippingAddress,
+                handler: { result in
+                    switch result {
+                    case .success(let cart):
+                        self.cart = cart
+                    case .failure(let error):
+                        print("performCartDeliveryAddressUpdate: \(error)")
+                    }
+                    completionHandler?(self.cart)
+                })
+        } catch let error {
+            print("Failed to update delivery address with error: \(error)")
+        }
+
     }
 
     func selectShippingMethodUpdate(
@@ -312,13 +304,13 @@ class CartManager {
     ) {
         let input =
             (appConfiguration.useVaultedState)
-            ? vaultedStateCart(items)
+            ? createVaultedCartInput(items)
             : defaultCart(items)
 
         let countryCode = getCountryCode()
 
         let mutation = Storefront.buildMutation(
-            inContext: Storefront.InContextDirective(country: countryCode)
+            inContext: CartManager.ContextDirective
         ) {
             $0
                 .cartCreate(input: input) {
@@ -348,8 +340,7 @@ class CartManager {
 
         if let cartID = cart?.id {
             let mutation = Storefront.buildMutation(
-                inContext: Storefront.InContextDirective(
-                    country: Storefront.CountryCode.inferRegion())
+                inContext: CartManager.ContextDirective
             ) {
                 $0
                     .cartLinesUpdate(cartId: cartID, lines: lines) {
@@ -376,16 +367,16 @@ class CartManager {
         shippingAddress: Storefront.MailingAddressInput,
         handler: @escaping CartResultHandler
     ) {
-        let deliveryAddressPreferences = [
-            Storefront.DeliveryAddressInput.create(
-                deliveryAddress: Input(orNull: shippingAddress))
-        ]
+        let deliveryAddressPreferencesInput = Input(
+            orNull: [
+                Storefront.DeliveryAddressInput.create(
+                    deliveryAddress: Input(orNull: shippingAddress))
+            ]
+        )
 
         let buyerIdentityInput = Storefront.CartBuyerIdentityInput.create(
             email: Input(orNull: vaultedContactInfo.email),
-            deliveryAddressPreferences: Input(
-                orNull: deliveryAddressPreferences
-            )
+            deliveryAddressPreferences: deliveryAddressPreferencesInput
         )
 
         guard let cartID = cart?.id else {
@@ -393,12 +384,12 @@ class CartManager {
         }
 
         let mutation = Storefront.buildMutation(
-            inContext: Storefront.InContextDirective(
-                country: Storefront.CountryCode.inferRegion())
+            inContext: CartManager.ContextDirective
         ) {
             $0
                 .cartBuyerIdentityUpdate(
-                    cartId: cartID, buyerIdentity: buyerIdentityInput
+                    cartId: cartID,
+                    buyerIdentity: buyerIdentityInput
                 ) {
                     $0
                         .cart { $0.cartManagerFragment() }
@@ -518,40 +509,66 @@ class CartManager {
     func updateCartPaymentMethod(
         payment: PKPayment,
         completion: @escaping (Result<Storefront.Cart, Error>) -> Void
-    ) {
+    ) throws {
         guard
             let cartID = cart?.id,
-            let billingAddress = payment.billingContact?.postalAddress,
+            let billingContact = payment.billingContact,
             let totalAmount = cart?.cost.totalAmount
         else {
             fatalError("updateCartPaymentMethod: Pre-requisites not met")
         }
 
-        let header = Storefront.ApplePayWalletHeaderInput.create(
-            ephemeralPublicKey: payment.token.transactionIdentifier,  // FIX
-            publicKeyHash: payment.token.transactionIdentifier,  // FIX
-            transactionId: payment.token.transactionIdentifier  // FIX
+        let paymentToken = try? JSONDecoder().decode(
+            PaymentToken.self,
+            from: payment.token.paymentData
         )
+
+        guard let paymentToken else {
+            print(
+                "Decoding failed: .paymentData = \(payment.token.paymentData)"
+            )
+            throw CartManagerError.invalidPaymentData
+        }
+
+        //            let decodedData = Data(base64Encoded: payment.token.paymentData)!
+        //            let decodedString = String(data: decodedData, encoding: .utf8)
+        //            let paymentToken = try JSONDecoder().decode(
+        //                PaymentToken.self,
+        //                from: (decodedString?.data(using: .utf8)!)!
+        //            )
+
+        let header = Storefront.ApplePayWalletHeaderInput.create(
+            ephemeralPublicKey: paymentToken.paymentData.header
+                .ephemeralPublicKey,
+            publicKeyHash: paymentToken.paymentData.header.publicKeyHash,
+            transactionId: paymentToken.paymentData.header.transactionID,
+            applicationData: Input(
+                orNull: paymentToken.paymentData.header.applicationData
+            )
+        )
+
+        let billingAddress = try? mapCNPostalAddress(contact: billingContact)
+        guard let billingAddress else {
+            print(
+                "Invalid Billing Address: .billingAddress = \(String(describing: billingContact.postalAddress))"
+            )
+            throw CartManagerError.invalidBillingAddress
+        }
 
         let applePayWalletContent = Storefront.ApplePayWalletContentInput
             .create(
-                billingAddress: Storefront.MailingAddressInput.create(
-                    address1: Input(orNull: billingAddress.street),
-                    address2: Input(orNull: billingAddress.subLocality),
-                    city: Input(orNull: billingAddress.city),
-                    //                    company: Input(orNull: ""),
-                    country: Input(orNull: billingAddress.country),
-                    //                  firstName: Input(orNull: contact.name?.givenName),
-                    //                  lastName: Input(orNull: contact.name?.familyName),
-                    //                  phone: Input(orNull: contact.phoneNumber?.stringValue),
-                    province: Input(orNull: billingAddress.state),
-                    zip: Input(orNull: billingAddress.postalCode)
-                ),
-                data: payment.token.paymentData.base64EncodedString(),  // FIX
+                billingAddress: billingAddress,
+                data: paymentToken.paymentData.data,
                 header: header,
-                signature: payment.token.transactionIdentifier,  // FIX
-                version: payment.token.transactionIdentifier,
-                lastDigits: Input(orNull: "")
+                signature: paymentToken.paymentData.signature,
+                version: paymentToken.paymentData.version,
+                lastDigits: Input(
+                    orNull: paymentToken
+                        .paymentMethod
+                        .displayName
+                        .components(separatedBy: " ")
+                        .last
+                )
             )
 
         let walletPaymentMethod = Storefront.CartWalletPaymentMethodInput
@@ -559,7 +576,8 @@ class CartManager {
                 applePayWalletContent: Input(orNull: applePayWalletContent)
             )
 
-        let payment: Storefront.CartPaymentInput = Storefront.CartPaymentInput
+        let payment: Storefront.CartPaymentInput = Storefront
+            .CartPaymentInput
             .create(
                 amount: Storefront.MoneyInput.create(
                     amount: totalAmount.amount,
@@ -569,16 +587,13 @@ class CartManager {
             )
 
         let mutation = Storefront.buildMutation(
-            inContext: Storefront.InContextDirective(
-                country: Storefront.CountryCode.inferRegion())
+            inContext: CartManager.ContextDirective
         ) {
-            $0
-                .cartPaymentUpdate(
-                    cartId: cartID,
-                    payment: payment
-                ) {
-                    $0.cart { $0.cartManagerFragment() }
+            $0.cartPaymentUpdate(cartId: cartID, payment: payment) {
+                $0.cart {
+                    $0.cartManagerFragment()
                 }
+            }
         }
 
         client.execute(mutation: mutation) {
@@ -599,9 +614,9 @@ class CartManager {
     ) {
         guard let cartId = cart?.id else { return }
 
-        let context = Storefront.InContextDirective(
-            country: Storefront.CountryCode.inferRegion())
-        let query = Storefront.buildQuery(inContext: context) {
+        let query = Storefront.buildQuery(
+            inContext: CartManager.ContextDirective
+        ) {
             $0
                 .cart(id: cartId) { $0.cartManagerFragment() }
         }
@@ -625,7 +640,7 @@ class CartManager {
         )
     }
 
-    private func vaultedStateCart(_ items: [GraphQL.ID] = [])
+    private func createVaultedCartInput(_ items: [GraphQL.ID] = [])
         -> Storefront.CartInput
     {
         let deliveryAddress = Storefront.MailingAddressInput.create(
@@ -964,4 +979,34 @@ struct Extensions: Codable {
 struct Context: Codable {
     let country: String
     let language: String
+}
+
+// MARK: - Welcome
+struct PaymentToken: Codable {
+    let paymentData: PaymentData
+    let paymentMethod: PaymentMethod
+    let transactionIdentifier: String
+}
+
+// MARK: - PaymentData
+struct PaymentData: Codable {
+    let data: String
+    let header: Header
+    let signature, version: String
+}
+
+// MARK: - Header
+struct Header: Codable {
+    let ephemeralPublicKey, publicKeyHash, transactionID,
+        applicationData: String
+
+    enum CodingKeys: String, CodingKey {
+        case ephemeralPublicKey, publicKeyHash, applicationData
+        case transactionID = "transactionId"
+    }
+}
+
+// MARK: - PaymentMethod
+struct PaymentMethod: Codable {
+    let displayName, network, type: String
 }
