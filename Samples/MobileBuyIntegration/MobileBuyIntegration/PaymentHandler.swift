@@ -17,7 +17,7 @@ class PaymentHandler: NSObject {
     var paymentController: PKPaymentAuthorizationController?
     var paymentSummaryItems = [PKPaymentSummaryItem]()
     var paymentStatus = PKPaymentAuthorizationStatus.failure
-    var completionHandler: PaymentCompletionHandler!
+    var paymentCompletionHandler: PaymentCompletionHandler?
 
     static let supportedNetworks: [PKPaymentNetwork] = [
         .amex,
@@ -73,9 +73,12 @@ class PaymentHandler: NSObject {
     }
 
     func startPayment(completion: @escaping PaymentCompletionHandler) {
-        completionHandler = completion
+        self.paymentCompletionHandler = completion
 
-        let cart = CartManager.shared.cart!
+        guard let cart = CartManager.shared.cart else {
+            return print("ERROR - No cart available")
+        }
+
         let lines = cart.lines.nodes
         paymentSummaryItems = []
 
@@ -139,7 +142,7 @@ class PaymentHandler: NSObject {
                 debugPrint("Presented payment controller")
             } else {
                 debugPrint("Failed to present payment controller")
-                self.completionHandler(false)
+                self.paymentCompletionHandler?(false)
             }
         })
     }
@@ -180,6 +183,35 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
     }
 
+    // TODO: Move this to group with other mappers
+    private func mapToPKShippingMethods(
+        firstDeliveryGroup: Storefront.CartDeliveryGroup
+    ) -> [PKShippingMethod] {
+        firstDeliveryGroup
+            .deliveryOptions.compactMap {
+                guard
+                    let title = $0.title,
+                    let description = $0.description
+                else {
+                    print(
+                        "Invalid deliveryOption to map shipping method"
+                    )
+                    return nil
+                }
+                let shippingMethod = PKShippingMethod(
+                    label: title,
+                    amount: NSDecimalNumber(
+                        string: "\($0.estimatedCost.amount)"
+                    )
+                )
+
+                shippingMethod.detail = description
+                shippingMethod.identifier = $0.handle
+
+                return shippingMethod
+            }
+    }
+
     func paymentAuthorizationController(
         _ controller: PKPaymentAuthorizationController,
         didSelectShippingContact contact: PKContact,
@@ -199,29 +231,22 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
                 }
 
-                let shippingMethods: [PKShippingMethod] = firstDeliveryGroup
-                    .deliveryOptions.compactMap {
-                        guard
-                            let title = $0.title,
-                            let description = $0.description
-                        else {
-                            print(
-                                "Invalid deliveryOption to map shipping method"
-                            )
-                            return nil
-                        }
-                        let shippingMethod = PKShippingMethod(
-                            label: title,
-                            amount: NSDecimalNumber(
-                                string: "\($0.estimatedCost.amount)")
+                let shippingMethods = self.mapToPKShippingMethods(
+                    firstDeliveryGroup: firstDeliveryGroup
+                )
+
+                CartManager.shared.performCartPrepareForCompletion { result in
+                    if case .failure(let error) = result {
+                        print(
+                            "--- Failed to prepare cart for completion! \(error) ---"
                         )
-
-                        shippingMethod.detail = description
-                        shippingMethod.identifier = $0.handle
-
-                        return shippingMethod
                     }
+                }
 
+                #warning(
+                    "TO BE REMOVED - This prevents the processing loader from halting flow"
+                )
+                sleep(7)
                 CartManager.shared.performCartPrepareForCompletion { result in
                     if case .failure(let error) = result {
                         print(
@@ -260,7 +285,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         else {
             self.paymentStatus = .failure
             return completion(
-                PKPaymentAuthorizationResult(
+                .init(
                     status: .failure,
                     errors: [
                         PKPaymentRequest
@@ -272,7 +297,9 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                             withKey: CNPostalAddressCountryKey,
                             localizedDescription: "Invalid country"
                         ),
-                    ]))
+                    ]
+                )
+            )
         }
 
         self.paymentStatus = .success
@@ -281,12 +308,8 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             try CartManager.shared.updateCartPaymentMethod(payment: payment) {
                 result in
                 if case .success(let result) = result {
-                    completion(
-                        PKPaymentAuthorizationResult(
-                            status: .success,
-                            errors: []
-                        )
-                    )
+                    print("updateCartPaymentMethod \(result)")
+                    completion(.init(status: .success, errors: []))
                 } else {
                     print(
                         "paymentAuthorizationController.didAuthorizePayment failed on updateCartPaymentMethod"
@@ -295,7 +318,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             }
         } catch let error {
             print(
-                "paymentAuthorizationController.didAuthorizePayment failed on updateCartPaymentMethod"
+                "paymentAuthorizationController.didAuthorizePayment failed on updateCartPaymentMethod \(error)"
             )
         }
 
@@ -308,9 +331,8 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             // The payment sheet doesn't automatically dismiss once it has finished. Dismiss the payment sheet.
             DispatchQueue.main.async {
                 let paymentStatusCode = self.paymentStatus.rawValue as NSNumber
-                self.completionHandler(
-                    Bool(truncating: paymentStatusCode)
-                )
+                self.paymentCompletionHandler?(
+                    Bool(truncating: paymentStatusCode))
             }
         }
     }
@@ -328,7 +350,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                     return nil
                 }
 
-                return PKPaymentSummaryItem(
+                return .init(
                     label: variant.product.title,
                     amount: NSDecimalNumber(
                         decimal: $0.cost.totalAmount.amount
@@ -339,7 +361,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
         if let shippingMethod {
             paymentSummaryItems.append(
-                PKPaymentSummaryItem(
+                .init(
                     label: "Shipping",
                     amount: shippingMethod.amount,
                     type: .final
@@ -350,7 +372,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         // Null and 0 mean different things
         if let amount = cart.cost.totalTaxAmount?.amount {
             paymentSummaryItems.append(
-                PKPaymentSummaryItem(
+                .init(
                     label: "Tax",
                     amount: NSDecimalNumber(decimal: amount),
                     type: .final
@@ -359,7 +381,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         paymentSummaryItems.append(
-            PKPaymentSummaryItem(
+            .init(
                 label: "Total",
                 amount: NSDecimalNumber(decimal: cart.cost.totalAmount.amount),
                 type: .final
