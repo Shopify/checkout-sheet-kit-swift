@@ -253,7 +253,7 @@ class CartManager {
         let lines = [Storefront.CartLineInput.create(merchandiseId: item)]
 
         let mutation = Storefront.buildMutation(
-            inContext: .init(country: Storefront.CountryCode.inferRegion())
+            inContext: CartManager.ContextDirective
         ) {
             $0.cartLinesAdd(lines: lines, cartId: cartId) {
                 $0.cart { $0.cartManagerFragment() }
@@ -272,10 +272,12 @@ class CartManager {
         }
     }
 
+    // TODO: Move this to a DI param for CartManager - Cart shouldn't know about vaulted
     private func getCountryCode() -> Storefront.CountryCode {
         if appConfiguration.useVaultedState {
             let code = Storefront.CountryCode(
-                rawValue: self.vaultedContactInfo.country)
+                rawValue: self.vaultedContactInfo.country
+            )
             return code ?? .ca
         }
 
@@ -287,7 +289,7 @@ class CartManager {
         handler: @escaping CartResultHandler
     ) {
         let input =
-            (appConfiguration.useVaultedState)
+            appConfiguration.useVaultedState
             ? createVaultedCartInput(items)
             : createDefaultCartInput(items)
 
