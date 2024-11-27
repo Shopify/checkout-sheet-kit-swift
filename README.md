@@ -452,7 +452,7 @@ In addition to specifying the line items, the Cart can include buyer identity (n
 
 > [!NOTE]
 > Multipass errors are not "recoverable" (See [Error Handling](#error-handling)) due to their one-time nature. Failed requests containing multipass URLs
-> will require re-generating new tokens. 
+> will require re-generating new tokens.
 
 #### Shop Pay
 
@@ -460,9 +460,7 @@ To initialize accelerated Shop Pay checkout, the cart can set a [walletPreferenc
 
 #### Customer Account API
 
-We are working on a library to provide buyer sign-in and authentication powered by the [new Customer Account API](https://www.shopify.com/partners/blog/introducing-customer-account-api-for-headless-stores)—stay tuned.
-
----
+The Customer Account API allows you to authenticate buyers and provide a personalized checkout experience. For detailed implementation instructions, see our [Customer Account API Authentication Guide](docs/authentication.md).
 
 ### Contributing
 
