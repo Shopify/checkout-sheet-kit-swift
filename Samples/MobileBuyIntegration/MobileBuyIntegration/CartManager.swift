@@ -28,16 +28,41 @@ import PassKit
 import ShopifyCheckoutSheetKit
 
 struct Contact {
-    let address1: String
-    let address2: String
-    let city: String
-    let country: String
-    let firstName: String
-    let lastName: String
-    let province: String
-    let zip: String
-    let email: String
-    let phone: String
+    let address1, address2, city, country, firstName, lastName, province, zip,
+        email, phone: String
+    
+    enum Errors: Error {
+        case missingConfiguration
+    }
+    
+    init() throws {
+        guard
+            let infoPlist = Bundle.main.infoDictionary,
+            let address1 = infoPlist["Address1"] as? String,
+            let address2 = infoPlist["Address2"] as? String,
+            let city = infoPlist["City"] as? String,
+            let country = infoPlist["Country"] as? String,
+            let firstName = infoPlist["FirstName"] as? String,
+            let lastName = infoPlist["LastName"] as? String,
+            let province = infoPlist["Province"] as? String,
+            let zip = infoPlist["Zip"] as? String,
+            let email = infoPlist["Email"] as? String,
+            let phone = infoPlist["Phone"] as? String
+        else {
+            throw Contact.Errors.missingConfiguration
+        }
+
+        self.address1 = address1
+        self.address2 = address2
+        self.city = city
+        self.country = country
+        self.firstName = firstName
+        self.lastName = lastName
+        self.province = province
+        self.zip = zip
+        self.email = email
+        self.phone = phone
+    }
 }
 
 enum CartManagerError: LocalizedError {
@@ -100,8 +125,7 @@ class CartManager {
         }
 
         do {
-            let vaultedContact = try CartManager.createVaultedContact()
-            self.vaultedContactInfo = vaultedContact
+            self.vaultedContactInfo = try Contact()
         } catch let error {
             fatalError(error.localizedDescription)
         }
@@ -109,37 +133,6 @@ class CartManager {
         self.client = client
         self.domain = domain
         self.accessToken = accessToken
-    }
-
-    static private func createVaultedContact() throws -> Contact {
-        guard
-            let infoPlist = Bundle.main.infoDictionary,
-            let address1 = infoPlist["Address1"] as? String,
-            let address2 = infoPlist["Address2"] as? String,
-            let city = infoPlist["City"] as? String,
-            let country = infoPlist["Country"] as? String,
-            let firstName = infoPlist["FirstName"] as? String,
-            let lastName = infoPlist["LastName"] as? String,
-            let province = infoPlist["Province"] as? String,
-            let zip = infoPlist["Zip"] as? String,
-            let email = infoPlist["Email"] as? String,
-            let phone = infoPlist["Phone"] as? String
-        else {
-            throw CartManagerError.missingConfiguration
-        }
-
-        return .init(
-            address1: address1,
-            address2: address2,
-            city: city,
-            country: country,
-            firstName: firstName,
-            lastName: lastName,
-            province: province,
-            zip: zip,
-            email: email,
-            phone: phone
-        )
     }
 
     // MARK: Cart Actions
@@ -173,6 +166,7 @@ class CartManager {
             completionHandler?(self.cart)
         }
     }
+
     enum AddressType {
         case postal, billing
     }
@@ -183,6 +177,7 @@ class CartManager {
         guard let address = contact.postalAddress else {
             throw CartManagerError.missingPostalAddress
         }
+
         return Storefront.MailingAddressInput.create(
             address1: Input(orNull: address.street),
             address2: Input(orNull: address.subLocality),
@@ -326,7 +321,7 @@ class CartManager {
         guard let cartId = cart?.id else {
             return performCartCreate(items: [id], handler: handler)
         }
-        
+
         let lines = [
             Storefront.CartLineUpdateInput.create(
                 id: id, quantity: Input(orNull: quantity))
@@ -625,29 +620,6 @@ class CartManager {
             completion(.success(_cart))
         }
     }
-
-    //    private func waitAndReloadCart(
-    //        after delayInSeconds: UInt32 = 1,
-    //        handler: @escaping () -> Void
-    //    ) {
-    //        guard let cartId = cart?.id else { return }
-    //
-    //        let query = Storefront.buildQuery(
-    //            inContext: CartManager.ContextDirective
-    //        ) {
-    //            $0
-    //                .cart(id: cartId) { $0.cartManagerFragment() }
-    //        }
-    //
-    //        sleep(delayInSeconds)
-    //
-    //        client.execute(query: query) { result in
-    //            if case .success(let queryResult) = result {
-    //                self.cart = queryResult.cart
-    //                handler()
-    //            }
-    //        }
-    //    }
 
     private func createDefaultCartInput(_ items: [GraphQL.ID])
         -> Storefront.CartInput
