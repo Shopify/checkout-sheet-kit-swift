@@ -197,7 +197,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	@objc func payPressed(sender: AnyObject) {
 		paymentHandler.startPayment { (success) in
 			if success {
-				self.performSegue(withIdentifier: "Confirmation", sender: self)
+                #warning("Errors due to no screen - this will be resolved after rebasing with Marks changes")
+//				self.performSegue(withIdentifier: "Confirmation", sender: self)
 			}
 		}
 	}

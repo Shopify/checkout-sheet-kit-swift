@@ -123,7 +123,7 @@ class ProductViewController: UIViewController {
 			self.setLoading(true)
 			addToCartButton.isEnabled = false
 			let start = Date()
-			CartManager.shared.addItem(variant: variant.id) { [weak self] in
+			CartManager.shared.addItem(variant: variant.id) { [weak self] _ in
 				let diff = Date().timeIntervalSince(start)
 				let message = "Added item to cart in \(String(format: "%.0f", diff * 1000))ms"
 				ShopifyCheckoutSheetKit.configuration.logger.log(message)
