@@ -30,11 +30,11 @@ import ShopifyCheckoutSheetKit
 struct Contact {
     let address1, address2, city, country, firstName, lastName, province, zip,
         email, phone: String
-    
+
     enum Errors: Error {
         case missingConfiguration
     }
-    
+
     init() throws {
         guard
             let infoPlist = Bundle.main.infoDictionary,
@@ -200,21 +200,18 @@ class CartManager {
         do {
             let shippingAddress = try mapCNPostalAddress(contact: contact)
 
-            performCartDeliveryAddressUpdate(
-                shippingAddress: shippingAddress,
-                handler: { result in
-                    switch result {
-                    case .success(let cart):
-                        self.cart = cart
-                    case .failure(let error):
-                        print("performCartDeliveryAddressUpdate: \(error)")
-                    }
-                    completionHandler?(self.cart)
-                })
+            performCartDeliveryAddressUpdate(shippingAddress: shippingAddress) {
+                switch $0 {
+                case .success(let cart):
+                    self.cart = cart
+                case .failure(let error):
+                    print("performCartDeliveryAddressUpdate: \(error)")
+                }
+                completionHandler?(self.cart)
+            }
         } catch let error {
             print("Failed to update delivery address with error: \(error)")
         }
-
     }
 
     func selectShippingMethodUpdate(
