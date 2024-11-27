@@ -261,14 +261,15 @@ class CartManager {
         }
 
         client.execute(mutation: mutation) { result in
-            guard
-                case .success(let mutation) = result,
-                let cart = mutation.cartLinesAdd?.cart
-            else {
-                return handler(.failure(URLError(.unknown)))
-            }
+            #warning("accessing cart in this if could throw")
 
-            handler(.success(cart))
+            if case .success(let result) = result,
+                let cart = result.cartLinesAdd?.cart
+            {
+                handler(.success(cart))
+            } else {
+                handler(.failure(URLError(.unknown)))
+            }
         }
     }
 
@@ -302,6 +303,8 @@ class CartManager {
         }
 
         client.execute(mutation: mutation) { result in
+            #warning("accessing cart in this if could throw")
+
             if case .success(let mutation) = result,
                 let cart = mutation.cartCreate?.cart
             {
@@ -335,8 +338,10 @@ class CartManager {
         }
 
         client.execute(mutation: mutation) { result in
-            if case .success(let mutation) = result,
-                let cart = mutation.cartLinesUpdate?.cart
+            #warning("accessing cart in this if could throw")
+
+            if case .success(let result) = result,
+                let cart = result.cartLinesUpdate?.cart
             {
                 handler(.success(cart))
             } else {
@@ -349,6 +354,10 @@ class CartManager {
         shippingAddress: Storefront.MailingAddressInput,
         handler: @escaping CartResultHandler
     ) {
+        guard let cartId = cart?.id else {
+            return print("no cart")
+        }
+
         let deliveryAddressPreferencesInput = Input(
             orNull: [
                 Storefront.DeliveryAddressInput.create(
@@ -360,10 +369,6 @@ class CartManager {
             email: Input(orNull: vaultedContactInfo.email),
             deliveryAddressPreferences: deliveryAddressPreferencesInput
         )
-
-        guard let cartId = cart?.id else {
-            return print("no cart")
-        }
 
         let mutation = Storefront.buildMutation(
             inContext: CartManager.ContextDirective
@@ -377,6 +382,8 @@ class CartManager {
         }
 
         client.execute(mutation: mutation) { result in
+            #warning("accessing cart in this if could throw")
+
             if case .success(let mutationResult) = result,
                 let cart = mutationResult.cartBuyerIdentityUpdate?.cart
             {
@@ -393,8 +400,7 @@ class CartManager {
     ) {
         guard
             let requestURL = URL(
-                string: "https://\(self.domain)/api/unstable/graphql"
-            )
+                string: "https://\(self.domain)/api/unstable/graphql")
         else {
             return print(
                 "executeGraphQL: URL construction failed for domain: \(self.domain)."
@@ -405,10 +411,7 @@ class CartManager {
 
         request.setValue(
             "multipart/mixed; boundary=graphql", forHTTPHeaderField: "Accept")
-        //        request.setValue(
-        //            "application/json",
-        //            forHTTPHeaderField: "Accept"
-        //        )
+
         request.setValue(
             "application/graphql",
             forHTTPHeaderField: "Content-Type"
@@ -429,7 +432,6 @@ class CartManager {
                     error == nil
                 else {
                     return handler(.failure(error ?? URLError(.unknown)))
-
                 }
                 handler(.success(data))
             }
@@ -442,11 +444,9 @@ class CartManager {
         guard let data = string.data(using: .utf8) else { return false }
 
         do {
-            // Attempt to serialize the data to a JSON object
             _ = try JSONSerialization.jsonObject(with: data, options: [])
             return true
         } catch {
-            // If an error is thrown, the string is not valid JSON
             return false
         }
     }
@@ -461,19 +461,14 @@ class CartManager {
         let mutationString = createCartPrepareForCompletionMutation(
             cartId: cartId
         )
-        //        216 Rockaway Ave, Brooklyn, NY 11233, United States
+
         executeGraphQL(with: mutationString) {
-            let result = $0.flatMap { data in
+            if case .success(let data) = $0 {
                 let responseString = String(data: data, encoding: .utf8)
                 print(
                     "performCartPrepareForCompletion \(String(describing: responseString))"
                 )
-
-                return Result { true }
-            }
-
-            if case .success(let successResult) = result {
-                handler(.success(successResult))
+                handler(.success(true))
             } else {
                 handler(.failure(URLError(.unknown)))
             }
@@ -507,6 +502,7 @@ class CartManager {
         }
 
         client.execute(mutation: mutation) { result in
+            #warning("accessing cart in this if could throw")
             if case .success(let mutationResult) = result,
                 let cart = mutationResult.cartSelectedDeliveryOptionsUpdate?
                     .cart
