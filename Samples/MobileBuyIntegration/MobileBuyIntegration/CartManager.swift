@@ -65,36 +65,6 @@ struct Contact {
     }
 }
 
-enum CartManagerError: LocalizedError {
-    case missingConfiguration, missingPostalAddress, invalidPaymentData,
-        invalidBillingAddress
-
-    var failureReason: String? {
-        switch self {
-        case .missingConfiguration:
-            return "Missing Storefront config"
-        case .missingPostalAddress:
-            return "Postal Address is nil"
-        case .invalidPaymentData:
-            return "Invalid Payment Data"
-        case .invalidBillingAddress:
-            return "Mapping billing address failed"
-        }
-    }
-
-    var recoverySuggestion: String? {
-        switch self {
-        case .missingConfiguration:
-            return "Check MobileBuyIntegration/Resources/Storefront.xcconfig"
-        case .missingPostalAddress:
-            return "Check `PKContact.postalAddress`"
-        case .invalidPaymentData:
-            return "Decoding failed - check the PKPayment"
-        case .invalidBillingAddress:
-            return "Ensure `billingContact.postalAddress` is not nil"
-        }
-    }
-}
 
 class CartManager {
     static let shared = CartManager(client: .shared)
@@ -112,6 +82,37 @@ class CartManager {
     // TODO: address/user = Contact? Think of cross platform name
     private let vaultedContactInfo: Contact
 
+    enum Errors: LocalizedError {
+        case missingConfiguration, missingPostalAddress, invalidPaymentData,
+            invalidBillingAddress
+
+        var failureReason: String? {
+            switch self {
+            case .missingConfiguration:
+                return "Missing Storefront config"
+            case .missingPostalAddress:
+                return "Postal Address is nil"
+            case .invalidPaymentData:
+                return "Invalid Payment Data"
+            case .invalidBillingAddress:
+                return "Mapping billing address failed"
+            }
+        }
+
+        var recoverySuggestion: String? {
+            switch self {
+            case .missingConfiguration:
+                return "Check MobileBuyIntegration/Resources/Storefront.xcconfig"
+            case .missingPostalAddress:
+                return "Check `PKContact.postalAddress`"
+            case .invalidPaymentData:
+                return "Decoding failed - check the PKPayment"
+            case .invalidBillingAddress:
+                return "Ensure `billingContact.postalAddress` is not nil"
+            }
+        }
+    }
+    
     // MARK: Initializers
     init(client: StorefrontClient) {
         guard
@@ -120,7 +121,7 @@ class CartManager {
             let accessToken = infoPlist["StorefrontAccessToken"] as? String
         else {
             fatalError(
-                CartManagerError.missingConfiguration.localizedDescription
+                CartManager.Errors.missingConfiguration.localizedDescription
             )
         }
 
@@ -175,7 +176,7 @@ class CartManager {
         contact: PKContact
     ) throws -> Storefront.MailingAddressInput {
         guard let address = contact.postalAddress else {
-            throw CartManagerError.missingPostalAddress
+            throw CartManager.Errors.missingPostalAddress
         }
 
         return Storefront.MailingAddressInput.create(
@@ -535,7 +536,7 @@ class CartManager {
             print(
                 "Decoding failed: .paymentData = \(payment.token.paymentData)"
             )
-            throw CartManagerError.invalidPaymentData
+            throw CartManager.Errors.invalidPaymentData
         }
 
         //            let decodedData = Data(base64Encoded: payment.token.paymentData)!
@@ -560,7 +561,7 @@ class CartManager {
             print(
                 "Invalid Billing Address: .billingAddress = \(String(describing: billingContact.postalAddress))"
             )
-            throw CartManagerError.invalidBillingAddress
+            throw CartManager.Errors.invalidBillingAddress
         }
 
         let applePayWalletContent = Storefront.ApplePayWalletContentInput
