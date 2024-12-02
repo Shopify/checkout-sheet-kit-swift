@@ -65,7 +65,6 @@ struct Contact {
     }
 }
 
-
 class CartManager {
     static let shared = CartManager(client: .shared)
     private static let ContextDirective = Storefront.InContextDirective(
@@ -112,7 +111,7 @@ class CartManager {
             }
         }
     }
-    
+
     // MARK: Initializers
     init(client: StorefrontClient) {
         guard
@@ -463,12 +462,25 @@ class CartManager {
             cartId: cartId
         )
 
+        #warning(
+            "TO BE REMOVED - replace with buy sdk when its included - due Jan 2025"
+            // TODO: if errors/userErrors > 0 return failure
+        )
         executeGraphQL(with: mutationString) {
+
             if case .success(let data) = $0 {
                 let responseString = String(data: data, encoding: .utf8)
                 print(
                     "performCartPrepareForCompletion \(String(describing: responseString))"
                 )
+                guard let responseString else {
+                    return handler(.failure(URLError(.unknown)))
+                }
+
+                if responseString.contains(/CartStatusNotReady/) {
+                    return handler(.failure(URLError(.unknown)))
+                }
+
                 handler(.success(true))
             } else {
                 handler(.failure(URLError(.unknown)))
