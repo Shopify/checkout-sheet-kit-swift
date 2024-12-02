@@ -452,7 +452,7 @@ In addition to specifying the line items, the Cart can include buyer identity (n
 
 > [!NOTE]
 > Multipass errors are not "recoverable" (See [Error Handling](#error-handling)) due to their one-time nature. Failed requests containing multipass URLs
-> will require re-generating new tokens. 
+> will require re-generating new tokens.
 
 #### Shop Pay
 
@@ -461,6 +461,22 @@ To initialize accelerated Shop Pay checkout, the cart can set a [walletPreferenc
 #### Customer Account API
 
 We are working on a library to provide buyer sign-in and authentication powered by the [new Customer Account API](https://www.shopify.com/partners/blog/introducing-customer-account-api-for-headless-stores)—stay tuned.
+
+### Offsite Payments
+
+Certain payment providers finalize transactions by redirecting customers to external banking apps. To enhance the user experience for your buyers, you can set up your storefront to support Universal Links on iOS, allowing customers to be redirected back to your app once the payment is completed.
+
+See the [Universal Links guide](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/documentation/universal_links.md) for information on how to get started with adding support for Offsite Payments in your app.
+
+It is crucial for your app to be configured to handle URL clicks during the checkout process effectively. By default, the kit includes the following delegate method to manage these interactions. This code ensures that external links, such as HTTPS and deep links, are opened correctly by iOS.
+
+```swift
+public func checkoutDidClickLink(url: URL) {
+  if UIApplication.shared.canOpenURL(url) {
+    UIApplication.shared.open(url)
+  }
+}
+```
 
 ---
 
