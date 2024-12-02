@@ -139,16 +139,17 @@ class CartManager {
 
     func addItem(
         variant: GraphQL.ID,
-        completionHandler: ((Storefront.Cart?) -> Void)?
+        handler completion: @escaping (_: Storefront.Cart?) -> Void
     ) {
         performCartLinesAdd(item: variant) { result in
             switch result {
             case .success(let cart):
                 self.cart = cart
+                completion(self.cart)
             case .failure(let error):
-                print(error)
+                print("addItem error \(error)")
+                completion(nil)
             }
-            completionHandler?(self.cart)
         }
     }
 
@@ -160,10 +161,11 @@ class CartManager {
             switch result {
             case .success(let cart):
                 self.cart = cart
+                completionHandler?(self.cart)
             case .failure(let error):
-                print(error)
+                print("updateQuantity error \(error)")
+                completionHandler?(nil)
             }
-            completionHandler?(self.cart)
         }
     }
 
@@ -216,7 +218,7 @@ class CartManager {
 
     func selectShippingMethodUpdate(
         deliveryOptionHandle: String,
-        completionHandler: ((Storefront.Cart) -> Void)?
+        handler completion: ((Storefront.Cart?) -> Void)?
     ) {
         guard let deliveryGroupId = cart?.deliveryGroups.nodes.first?.id else {
             return print("No delivery group selected")
@@ -227,10 +229,13 @@ class CartManager {
             deliveryOptionHandle: deliveryOptionHandle
         ) { result in
             switch result {
-            case .success:
+            case .success(let result):
+                self.cart = result
+                completion?(result)
                 #warning("UPDATE self.cart")
             case .failure(let error):
                 print(error)
+                completion?(nil)
             }
 
         }
@@ -511,6 +516,10 @@ class CartManager {
                 selectedDeliveryOptions: [cartSelectedDeliveryOptionInput]
             ) {
                 $0.cart { $0.cartManagerFragment() }
+                    .userErrors{
+                        $0.code().message()
+                    }
+                    
             }
         }
 

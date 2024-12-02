@@ -26,8 +26,7 @@ class PaymentHandler: NSObject {
         .visa,
     ]
 
-    class func applePayStatus() -> (canMakePayments: Bool, canSetupCards: Bool)
-    {
+    class func applePayStatus() -> (canMakePayments: Bool, canSetupCards: Bool) {
         return (
             PKPaymentAuthorizationController.canMakePayments(),
             PKPaymentAuthorizationController.canMakePayments(
@@ -166,6 +165,10 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         CartManager.shared
             .selectShippingMethodUpdate(deliveryOptionHandle: identifier) {
                 cart in
+                guard let cart else {
+                    fatalError("Bad Cart")
+                }
+
                 let paymentRequestShippingContactUpdate =
                     PKPaymentRequestShippingMethodUpdate(
                         paymentSummaryItems: self.mapToPaymentSummaryItems(
@@ -180,7 +183,6 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                     }
                 }
             }
-
     }
 
     // TODO: Move this to group with other mappers
