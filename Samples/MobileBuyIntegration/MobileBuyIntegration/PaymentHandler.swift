@@ -16,7 +16,11 @@ class PaymentHandler: NSObject {
     // MARK: Properties
     var paymentController: PKPaymentAuthorizationController?
     var paymentSummaryItems = [PKPaymentSummaryItem]()
-    var paymentStatus = PKPaymentAuthorizationStatus.failure
+    /**
+     * Starts as nil when no payment status has been made
+     * Question: Should be reset to nil when starting a new payment process?
+     */
+    var paymentStatus: PKPaymentAuthorizationStatus? = nil
     var paymentCompletionHandler: PaymentCompletionHandler?
 
     static let supportedNetworks: [PKPaymentNetwork] = [
@@ -166,6 +170,8 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             .selectShippingMethodUpdate(deliveryOptionHandle: identifier) {
                 cart in
                 guard let cart else {
+                    // NOTE: this can throw when the delivery groups change their handle and
+                    // the api fails to accept our post with selecting the handle
                     fatalError("Bad Cart")
                 }
 
@@ -229,8 +235,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                     let cart = result,
                     let firstDeliveryGroup = cart.deliveryGroups.nodes.first
                 else {
-                    return print("Error updating delivery address:")
-
+                    return print("[didSelectShippingContact][updateDeliveryAddress] Invalid success response")
                 }
 
                 let shippingMethods = self.mapToPKShippingMethods(
@@ -240,19 +245,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                 CartManager.shared.performCartPrepareForCompletion { result in
                     if case .failure(let error) = result {
                         print(
-                            "--- Failed to prepare cart for completion! \(error) ---"
-                        )
-                    }
-                }
-
-                #warning(
-                    "TO BE REMOVED - This prevents the processing loader from halting flow"
-                )
-                sleep(7)
-                CartManager.shared.performCartPrepareForCompletion { result in
-                    if case .failure(let error) = result {
-                        print(
-                            "--- Failed to prepare cart for completion! \(error) ---"
+                            "[didSelectShippingContact][performCartPrepareForCompletion] error \(error)"
                         )
                     }
 
@@ -270,7 +263,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             }
         } catch let error {
             print(
-                "paymentAuthorizationController.didSelectShippingContact error: \(error)"
+                "[didSelectShippingContact] error: \(error)"
             )
         }
 
@@ -304,24 +297,25 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             )
         }
 
-        self.paymentStatus = .success
-
         do {
+
             try CartManager.shared.updateCartPaymentMethod(payment: payment) {
                 result in
-                if case .success(let result) = result {
-                    print("updateCartPaymentMethod \(result)")
-                    completion(.init(status: .success, errors: []))
-                } else {
-                    print(
-                        "paymentAuthorizationController.didAuthorizePayment failed on updateCartPaymentMethod"
-                    )
+                switch result {
+                case .success(let result):
+                    print("[didAuthorizePayment][updateCartPaymentMethod][success]: \(result)")
+                    self.paymentStatus = .success
+                    return completion(.init(status: .success, errors: nil))
+                case .failure(let error):
+                    print("[didAuthorizePayment][updateCartPaymentMethod][failure]: \(error)")
+                    self.paymentStatus = .failure
+                    return completion(.init(status: .failure, errors: [error]))
                 }
             }
         } catch let error {
-            print(
-                "paymentAuthorizationController.didAuthorizePayment failed on updateCartPaymentMethod \(error)"
-            )
+            print("[didAuthorizePayment][error]: \(error)")
+            self.paymentStatus = .failure
+            completion(.init(status: .failure, errors: [error]))
         }
 
     }
@@ -332,9 +326,12 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         controller.dismiss {
             // The payment sheet doesn't automatically dismiss once it has finished. Dismiss the payment sheet.
             DispatchQueue.main.async {
-                let paymentStatusCode = self.paymentStatus.rawValue as NSNumber
-                self.paymentCompletionHandler?(
-                    Bool(truncating: paymentStatusCode))
+                guard let paymentStatus = self.paymentStatus?.rawValue as? NSNumber else { return }
+                self.paymentCompletionHandler?(Bool(truncating: paymentStatus))
+
+                // Reset state after closing sheet
+                self.paymentStatus = nil
+                self.paymentCompletionHandler = nil
             }
         }
     }
@@ -361,13 +358,9 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                 )
             }
 
-        if let shippingMethod {
+        if let amount = shippingMethod?.amount {
             paymentSummaryItems.append(
-                .init(
-                    label: "Shipping",
-                    amount: shippingMethod.amount,
-                    type: .final
-                )
+                .init(label: "Shipping", amount: amount, type: .final)
             )
         }
 

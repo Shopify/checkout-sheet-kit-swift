@@ -234,7 +234,9 @@ class CartManager {
                 completion?(result)
                 #warning("UPDATE self.cart")
             case .failure(let error):
-                print(error)
+                print(
+                    "Failed to update shipping method with error: \(error.localizedDescription)"
+                )
                 completion?(nil)
             }
 
@@ -516,10 +518,10 @@ class CartManager {
                 selectedDeliveryOptions: [cartSelectedDeliveryOptionInput]
             ) {
                 $0.cart { $0.cartManagerFragment() }
-                    .userErrors{
+                    .userErrors {
                         $0.code().message()
                     }
-                    
+
             }
         }
 
@@ -536,8 +538,12 @@ class CartManager {
         }
     }
 
+    func parsePKPaymentTokenPaymentData(_ paymentData: String) {
+
+    }
+
     func updateCartPaymentMethod(
-        payment: PKPayment,
+        payment: PKPayment,  // REFACTOR: this method should just receive the decoded payment token
         completion: @escaping (Result<Storefront.Cart, Error>) -> Void
     ) throws {
         guard
@@ -548,33 +554,34 @@ class CartManager {
             fatalError("updateCartPaymentMethod: Pre-requisites not met")
         }
 
-        let paymentToken = try? JSONDecoder().decode(
-            PaymentToken.self,
-            from: payment.token.paymentData
-        )
+        var paymentData: PaymentData?
+        do {
+            let paymentDataString = String(data: payment.token.paymentData, encoding: .utf8)
+//            print(" paymentDataString: \(String(describing: paymentDataString))")
+            paymentData = try JSONDecoder().decode(
+                PaymentData.self,
+                from: payment.token.paymentData
+            )
+        } catch let error {
+            fatalError("error decoding payment data: \(error)")
+        }
 
-        guard let paymentToken else {
+        guard let paymentData else {
             print(
-                "Decoding failed: .paymentData = \(payment.token.paymentData)"
+                "Decoding failed: .paymentData = \(payment.token)"
             )
             throw CartManager.Errors.invalidPaymentData
         }
 
-        //            let decodedData = Data(base64Encoded: payment.token.paymentData)!
-        //            let decodedString = String(data: decodedData, encoding: .utf8)
-        //            let paymentToken = try JSONDecoder().decode(
-        //                PaymentToken.self,
-        //                from: (decodedString?.data(using: .utf8)!)!
-        //            )
-
         let header = Storefront.ApplePayWalletHeaderInput.create(
-            ephemeralPublicKey: paymentToken.paymentData.header
+            ephemeralPublicKey: paymentData.header
                 .ephemeralPublicKey,
-            publicKeyHash: paymentToken.paymentData.header.publicKeyHash,
-            transactionId: paymentToken.paymentData.header.transactionID,
-            applicationData: Input(
-                orNull: paymentToken.paymentData.header.applicationData
-            )
+            publicKeyHash: paymentData.header.publicKeyHash,
+            transactionId: paymentData.header.transactionId
+                // TODO: Is it required to send applicationData, useful to send cart checkout url?
+                //            applicationData: Input(
+                //                orNull: paymentData.header.applicationData
+                //            )
         )
 
         let billingAddress = try? mapCNPostalAddress(contact: billingContact)
@@ -585,17 +592,19 @@ class CartManager {
             throw CartManager.Errors.invalidBillingAddress
         }
 
+
         let applePayWalletContent = Storefront.ApplePayWalletContentInput
             .create(
                 billingAddress: billingAddress,
-                data: paymentToken.paymentData.data,
+                data: paymentData.data,
                 header: header,
-                signature: paymentToken.paymentData.signature,
-                version: paymentToken.paymentData.version,
+                signature: paymentData.signature,
+                version: paymentData.version,
                 lastDigits: Input(
-                    orNull: paymentToken
+                    orNull: payment
+                        .token
                         .paymentMethod
-                        .displayName
+                        .displayName?
                         .components(separatedBy: " ")
                         .last
                 )
@@ -839,19 +848,14 @@ struct PaymentToken: Codable {
 }
 
 struct PaymentData: Codable {
-    let data: String
+    let data, signature: String
     let header: Header
-    let signature, version: String
+    let version: String
 }
 
 struct Header: Codable {
-    let ephemeralPublicKey, publicKeyHash, transactionID,
-        applicationData: String
-
-    enum CodingKeys: String, CodingKey {
-        case ephemeralPublicKey, publicKeyHash, applicationData
-        case transactionID = "transactionId"
-    }
+    let transactionId: String
+    let ephemeralPublicKey, publicKeyHash: String
 }
 
 struct PaymentMethod: Codable {
