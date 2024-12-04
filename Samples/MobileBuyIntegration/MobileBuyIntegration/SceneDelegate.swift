@@ -26,6 +26,13 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
 
+enum Screen: Int, CaseIterable {
+    case catalog
+    case products
+    case cart
+    case settings
+}
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
@@ -41,6 +48,39 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let tabBarController = UITabBarController()
 
+        setupControllers()
+        subscribeToCartUpdates()
+        subscribeToColorSchemeChanges()
+
+        var viewControllers: [UIViewController?] = Array(repeating: nil, count: Screen.allCases.count)
+
+        /// Catalog screen
+        viewControllers[Screen.catalog.rawValue] = UINavigationController(rootViewController: productGridController)
+
+        /// Product gallery screen
+        viewControllers[Screen.products.rawValue] = UINavigationController(rootViewController: productGalleryController)
+
+        /// Cart screen
+        viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: cartController)
+
+        /// Settings screen
+        viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
+
+        tabBarController.viewControllers = viewControllers.compactMap { $0 }
+
+        let window = createWindow(windowScene: windowScene, rootViewController: tabBarController)
+
+        CheckoutController.shared = CheckoutController(window: window)
+
+        self.window = window
+    }
+
+    private func subscribeToColorSchemeChanges() {
+        /// Subscribe to color scheme changes on the settings screen
+        NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+    }
+
+    private func setupControllers() {
         /// Branding Logo
         /// TODO: Fetch this from the Storefront API for the configured storefront
         let logoImageView = UIImageView(image: UIImage(named: "logo"))
@@ -71,31 +111,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
         settingsController.tabBarItem.title = "Settings"
-
-        subscribeToCartUpdates()
-
-        tabBarController.viewControllers = [
-            /// Catalog grid screen
-            UINavigationController(rootViewController: productGridController),
-
-            /// Product gallery screen
-            UINavigationController(rootViewController: productGalleryController),
-
-            /// Cart screen
-            UINavigationController(rootViewController: cartController),
-
-            /// Settings screen
-            UINavigationController(rootViewController: settingsController)
-        ]
-
-        /// Subscribe to color scheme changes on the settings screen
-        NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
-
-        let window = createWindow(windowScene: windowScene, rootViewController: tabBarController)
-
-        CheckoutController.shared = CheckoutController(window: window)
-
-        self.window = window
     }
 
     @objc public func present() {
@@ -148,7 +163,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             presentCheckout(url)
         /// Cart URLs
         case appConfiguration.universalLinks.cart && storefrontUrl.isCart():
-            navigateToCart()
+            navigateTo(.cart)
         /// Product URLs
         case appConfiguration.universalLinks.products:
             if let slug = storefrontUrl.getProductSlug() {
@@ -164,6 +179,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         CheckoutController.shared?.present(checkout: url)
     }
 
+    func navigateTo(_ screen: Screen) {
+        if let tabBarVC = window?.rootViewController as? UITabBarController {
+            tabBarVC.selectedIndex = screen.rawValue
+        }
+    }
+
+    func navigateToProduct(with handle: String) {
+        ProductCache.shared.getProduct(handle: handle, completion: { _ in })
+        navigateTo(.catalog)
+    }
+
+    @objc func colorSchemeChanged() {
+        window?.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+    }
+
     private func getRootViewController() -> UINavigationController? {
         return window?.rootViewController as? UINavigationController
     }
@@ -173,24 +203,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return nil
         }
         return tabBarVC.viewControllers?[index] as? UINavigationController
-    }
-
-    func navigateToCart() {
-        if let tabBarVC = window?.rootViewController as? UITabBarController {
-            tabBarVC.selectedIndex = 1
-        }
-    }
-
-    func navigateToProduct(with handle: String) {
-        ProductCache.shared.getProduct(handle: handle, completion: { _ in })
-
-        if let tabBarVC = window?.rootViewController as? UITabBarController {
-            tabBarVC.selectedIndex = 0
-        }
-    }
-
-    @objc func colorSchemeChanged() {
-        window?.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
     }
 }
 
