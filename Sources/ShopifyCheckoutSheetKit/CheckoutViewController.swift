@@ -109,11 +109,13 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 }
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
+    
 	var onComplete: ((CheckoutCompletedEvent) -> Void)?
 	var onCancel: (() -> Void)?
 	var onFail: ((CheckoutError) -> Void)?
 	var onPixelEvent: ((PixelEvent) -> Void)?
 	var onLinkClick: ((URL) -> Void)?
+    var onLinkClickThatRequiresSafari: ((URL) -> Void)?
 
 	public func checkoutDidFail(error: CheckoutError) {
 		onFail?(error)
@@ -142,6 +144,15 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 			UIApplication.shared.open(url)
 		}
 	}
+    
+    public func checkoutDidClickLinkThatRequiresSafari(url: URL) {
+        if let onLinkClickThatRequiresSafari = onLinkClickThatRequiresSafari {
+            onLinkClickThatRequiresSafari(url)
+            return
+        }
+        
+        UIApplication.shared.open(url)
+    }
 }
 
 public protocol CheckoutConfigurable {
