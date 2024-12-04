@@ -6,6 +6,8 @@
 	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
 	<key>StorefrontDomain</key>
 	<string>$(STOREFRONT_DOMAIN)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location may be required to locate pickup points near you when you request this shipping option.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
