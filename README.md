@@ -5,6 +5,37 @@
 
 **Shopify Checkout Sheet Kit** is a Swift Package library that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
+## Table of contents
+
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+  - [Package.swift](#packageswift)
+  - [Xcode](#xcode)
+  - [CocoaPods](#cocoapods)
+- [Programmatic Usage](#programmatic-usage)
+- [SwiftUI Usage](#swiftui-usage)
+- [Configuration](#configuration)
+  - [`colorScheme`](#colorscheme)
+  - [`tintColor`](#tintcolor)
+  - [`backgroundColor`](#backgroundcolor)
+  - [`title`](#title)
+  - [SwiftUI Configuration](#swiftui-configuration)
+- [Preloading](#preloading)
+  - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
+  - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
+- [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
+- [Error handling](#error-handling)
+  - [`CheckoutError`](#checkouterror)
+  - [Integrating with Web Pixels, monitoring behavioral data](#integrating-with-web-pixels-monitoring-behavioral-data)
+- [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
+  - [Cart: buyer bag, identity, and preferences](#cart-buyer-bag-identity-and-preferences)
+  - [Multipass](#multipass)
+  - [Shop Pay](#shop-pay)
+  - [Customer Account API](#customer-account-api)
+- [Offsite Payments](#offsite-payments)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Requirements
 
 - Swift 5.7+
