@@ -1,17 +1,18 @@
 # Universal Links
 
-- [Universal Links](#universal-links)
-  - [What are Universal Links?](#what-are-universal-links)
-  - [Setting Up an Entitlements File for Universal Links](#setting-up-an-entitlements-file-for-universal-links)
-    - [Steps to Configure the Entitlements File](#steps-to-configure-the-entitlements-file)
-    - [Points to Consider](#points-to-consider)
-  - [Configuring Universal Links for your Storefront](#configuring-universal-links-for-your-storefront)
-  - [Important: The catch-all route `*`](#important-the-catch-all-route-)
-  - [Handling Universal Links in your app](#handling-universal-links-in-your-app)
-  - [Security Considerations](#security-considerations)
-  - [Testing](#testing)
-  - [Troubleshooting](#troubleshooting)
-  - [Further Reading and Resources](#further-reading-and-resources)
+- [What are Universal Links?](#what-are-universal-links)
+- [Setting Up an Entitlements File for Universal Links](#setting-up-an-entitlements-file-for-universal-links)
+  - [Steps to Configure the Entitlements File](#steps-to-configure-the-entitlements-file)
+  - [Points to Consider](#points-to-consider)
+- [Configuring Universal Links for your Storefront](#configuring-universal-links-for-your-storefront)
+- [Important: The catch-all route `*`](#important-the-catch-all-route-)
+- [Handling Universal Links in your app](#handling-universal-links-in-your-app)
+- [Security Considerations](#security-considerations)
+- [Testing](#testing)
+  - [1. Validate Associated Domains](#1-validate-associated-domains)
+  - [2. Trigger a Universal Link from terminal](#2-trigger-a-universal-link-from-terminal)
+  - [3. Universal Links Diagnostics (real device only)](#3-universal-links-diagnostics-real-device-only)
+- [Further Reading and Resources](#further-reading-and-resources)
 
 ## What are Universal Links?
 
@@ -247,28 +248,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 ## Testing
 
+### 1. Validate Associated Domains
+
+Verify that your app's entitlements file includes the correct associated domains.
+
+Ensure that the `.well-known/apple-app-site-association` file is accessible by going to `"https://{your_storefront_domain}/.well-known/apple-app-site-association"`. Remember that this file will only be accesible on a custom hosted domain, and not a "*.myshopify.com" domain.
+
+### 2. Trigger a Universal Link from terminal
+
 With Universal Links set up, you can test the implementation in the simulator by triggering URLs manually with:
 
 ```sh
 xcrun simctl openurl booted https://www.example.com/cart
 ```
 
-## Troubleshooting
+### 3. Universal Links Diagnostics (real device only)
 
-1. Ensure Associated Domains:
+Open "Settings" on a real device and search "Universal links":
 
-Verify that your app's entitlements file includes the correct associated domains.
+<img src="media/settings_search_universal_links.jpg" width="300" />
 
-Ensure that the `.well-known/apple-app-site-association` file is accessible by going to "https://{your_storefront_domain}/.well-known/apple-app-site-association". Remember that this file will only be accesible on a custom hosted domain, and not a "*.myshopify.com" domain.
+Go to "Diagnostics":
 
+<img src="media/settings_developer_universal_links.jpg" width="300" />
 
-2. Universal Links Diagnostics
+Enter the URL for your store:
 
-See https://developer.apple.com/documentation/technotes/tn3155-debugging-universal-links#Test-universal-links-behavior for more information regarding testing Universal Links.
+<img src="media/settings_diagnostics.jpg" width="300" />
 
+Hit "Go" to ensure the well known files have been configured correctly.
+
+<img src="media/settings_diagnostics_configured.jpg" width="300" />
 
 ## Further Reading and Resources
 
 For more comprehensive information, consider visiting:
 
 - [Apple's Official Universal Links Documentation](https://developer.apple.com/documentation/xcode/supporting-universal-links-in-your-app)
+- [Testing Universal Links](https://developer.apple.com/documentation/technotes/tn3155-debugging-universal-links#Test-universal-links-behavior)
