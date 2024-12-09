@@ -21,8 +21,11 @@
   - [`title`](#title)
   - [SwiftUI Configuration](#swiftui-configuration)
 - [Preloading](#preloading)
+  - [Important considerations](#important-considerations)
+  - [Flash Sales](#flash-sales)
+  - [When to preload](#when-to-preload)
+  - [Cache invalidation](#cache-invalidation)
   - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
-  - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
 - [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
 - [Error handling](#error-handling)
   - [`CheckoutError`](#checkouterror)
@@ -36,7 +39,7 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-## Requirements
+### Requirements
 
 - Swift 5.7+
 - iOS SDK 13.0+
@@ -271,7 +274,7 @@ CheckoutSheet(checkout: checkoutURL)
 
 ### Preloading
 
-Initializing a checkout session requires communicating with Shopify servers and, depending on the network weather and the quality of the buyer's connection, can result in undesirable wait time for the buyer. To help optimize and deliver the best experience, the SDK provides a preloading hint that allows app developers to signal and initialize the checkout session in the background and ahead of time.
+Initializing a checkout session requires communicating with Shopify servers, thus depending on the network quality and bandwidth available to the buyer can result in undesirable waiting time for the buyer. To help optimize and deliver the best experience, the SDK provides a `preloading` "hint" that allows developers to signal that the checkout session should be initialized in the background, ahead of time.
 
 Preloading is an advanced feature that can be toggled via a runtime flag:
 
@@ -281,7 +284,8 @@ ShopifyCheckoutSheetKit.configure {
 }
 ```
 
-When enabled, preloading a checkout is as simple as:
+Once enabled, preloading a checkout is as simple as calling
+`preload(checkoutUrl)` with a valid `checkoutUrl`.
 
 ```swift
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
@@ -293,6 +297,38 @@ Setting enabled to `false` will cause all calls to the `preload` function to be 
 ShopifyCheckoutSheetKit.preloading.enabled = false
 ShopifyCheckoutSheetKit.preload(checkout: checkoutURL) // no-op
 ```
+
+#### Important considerations
+
+1. Initiating preload results in background network requests and additional
+   CPU/memory utilization for the client, and should be used when there is a
+   high likelihood that the buyer will soon request to checkout—e.g. when the
+   buyer navigates to the cart overview or a similar app-specific experience.
+2. A preloaded checkout session reflects the cart contents at the time when
+   `preload` is called. If the cart is updated after `preload` is called, the
+   application needs to call `preload` again to reflect the updated checkout
+   session.
+3. Calling `preload(checkoutUrl)` is a hint, **not a guarantee**: the library
+   may debounce or ignore calls to this API depending on various conditions; the
+   preload may not complete before `present(checkoutUrl)` is called, in which
+   case the buyer may still see a spinner while the checkout session is
+   finalized.
+
+#### Flash Sales
+
+It is important to note that during Flash Sales or periods of high amounts of traffic, buyers may be entered into a queue system.
+
+**Calls to preload which result in a buyer being enqueued will be rejected.** This means that a buyer will never enter the queue without their knowledge.
+
+#### When to preload
+
+Calling `preload()` each time an item is added to a buyer's cart can put significant strain on Shopify systems, which in return can result in rejected requests. Rejected requests will not result in a visual error shown to users, but will degrade the experience since they will need to load checkout from scratch.
+
+Instead, a better approach is to call `preload()` when you have a strong enough signal that the buyer intends to check out. In some cases this might mean a buyer has navigated to a "cart" screen.
+
+#### Cache invalidation
+
+Should you wish to manually clear the preload cache, there is a `ShopifyCheckoutSheetKit.invalidate()` helper function to do so.
 
 #### Lifecycle management for preloaded checkout
 
@@ -308,11 +344,6 @@ The library will automatically invalidate/abort preload under following conditio
 - When `ShopifyCheckoutSheetKit.Configuration` object is updated by the application (e.g., theming changes)
 
 A preloaded checkout _is not_ automatically invalidated when checkout sheet is closed. For example, if a buyer loads the checkout and then exits, the preloaded checkout is retained and should be updated when cart contents change.
-
-#### Additional considerations for preloaded checkout
-
-1. Preloading is a hint, not a guarantee: the library may debounce or ignore calls depending on various conditions; the preload may not complete before `present(checkout:)` is called, in which case the buyer may still see a progress bar while the checkout session is finalized.
-1. Preloading results in background network requests and additional CPU/memory utilization for the client and should be used responsibly. For example, conditionally based on state of the client and when there is a high likelihood that the buyer will soon request to checkout.
 
 ### Monitoring the lifecycle of a checkout session
 
