@@ -351,10 +351,10 @@ A preloaded checkout _is not_ automatically invalidated when checkout sheet is c
 
 ## Monitoring the lifecycle of a checkout session
 
-You can use the `ShopifyCheckoutSheetKitDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
+You can use the `CheckoutDelegate` protocol to register callbacks for key lifecycle events during the checkout session:
 
 ```swift
-extension MyViewController: ShopifyCheckoutSheetKitDelegate {
+extension MyViewController: CheckoutDelegate {
   func checkoutDidComplete(event: CheckoutCompletedEvent) {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.
@@ -438,7 +438,7 @@ class MyViewController: UIViewController {
   }
 }
 
-extension MyViewController: ShopifyCheckoutSheetKitDelegate {
+extension MyViewController: CheckoutDelegate {
   func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
     switch event {
       case .standardEvent(let standardEvent):
