@@ -1,0 +1,16 @@
+name: checkout-sheet-kit-swift
+
+type: ios
+
+up:
+  - ruby
+  - custom:
+      name: Setup entitlements
+      met?: ([ -f "./samples/MobileBuyIntegration/MobileBuyIntegration/MobileBuyIntegration.entitlements" ] || exit 1;)
+      meet: ./scripts/setup_entitlements
+
+packages:
+  - xcode
+  - homebrew:
+      - swiftlint
+      - swiftformat
