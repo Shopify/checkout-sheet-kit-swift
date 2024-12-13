@@ -35,6 +35,7 @@
   - [Shop Pay](#shop-pay)
   - [Customer Account API](#customer-account-api)
 - [Offsite Payments](#offsite-payments)
+- [Explore the sample apps](#explore-the-sample-apps)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -543,6 +544,10 @@ public func checkoutDidClickLink(url: URL) {
 ```
 
 ---
+
+## Explore the sample apps
+
+See the [samples](samples) directory for a handful of sample iOS applications and a guide to get started.
 
 ## Contributing
 
