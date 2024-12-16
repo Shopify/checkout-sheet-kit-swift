@@ -186,13 +186,13 @@ class CartManager {
 
         return Storefront.MailingAddressInput.create(
             address1: Input(orNull: address.street),
-//            address1: Input(orNull: "709 Fountain Ave"),
+            //            address1: Input(orNull: "709 Fountain Ave"),
             address2: Input(orNull: address.subLocality),
             city: Input(orNull: address.city),
             //            company: Input(orNull: ""),
             country: Input(orNull: address.country),
             firstName: Input(orNull: contact.name?.givenName ?? ""),
-                        lastName: Input(orNull: contact.name?.familyName ?? ""),
+            lastName: Input(orNull: contact.name?.familyName ?? ""),
             phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
             province: Input(orNull: address.state),
             zip: Input(orNull: address.postalCode)
@@ -237,7 +237,6 @@ class CartManager {
             case .success(let result):
                 self.cart = result
                 completion?(result)
-                #warning("UPDATE self.cart")
             case .failure(let error):
                 print(
                     "Failed to update shipping method with error: \(error.localizedDescription)"
@@ -267,7 +266,7 @@ class CartManager {
         let mutation = Storefront.buildMutation(
             inContext: CartManager.ContextDirective
         ) {
-            $0.cartLinesAdd(lines: lines, cartId: cartId) {
+            $0.cartLinesAdd(cartId: cartId, lines: lines) {
                 $0.cart { $0.cartManagerFragment() }
             }
         }
@@ -406,94 +405,37 @@ class CartManager {
         }
     }
 
-    private func executeGraphQL(
-        with queryString: String,
-        handler: @escaping (Result<Data, Error>) -> Void
-    ) {
-        guard
-            let requestURL = URL(
-                string: "https://\(self.domain)/api/unstable/graphql")
-        else {
-            return print(
-                "executeGraphQL: URL construction failed for domain: \(self.domain)."
-            )
-        }
-
-        var request = URLRequest(url: requestURL)
-
-        request.setValue(
-            "multipart/mixed; boundary=graphql", forHTTPHeaderField: "Accept")
-
-        request.setValue(
-            "application/graphql",
-            forHTTPHeaderField: "Content-Type"
-        )
-        request.setValue(
-            self.accessToken,
-            forHTTPHeaderField: "X-Shopify-Storefront-Access-Token"
-        )
-
-        request.httpMethod = "POST"
-        request.httpBody = queryString.data(using: .utf8)
-
-        let task = URLSession.shared.dataTask(with: request) {
-            _data, _, error in
-            DispatchQueue.main.async {
-                guard
-                    let data = _data,
-                    error == nil
-                else {
-                    return handler(.failure(error ?? URLError(.unknown)))
-                }
-                handler(.success(data))
-            }
-        }
-
-        task.resume()
-    }
-
-    func isValidJSON(_ string: String) -> Bool {
-        guard let data = string.data(using: .utf8) else { return false }
-
-        do {
-            _ = try JSONSerialization.jsonObject(with: data, options: [])
-            return true
-        } catch {
-            return false
-        }
-    }
-
     func performCartPrepareForCompletion(
-        handler: @escaping (Result<Bool, Error>) -> Void
+        handler: @escaping (Result<Storefront.Cart, Error>) -> Void
     ) {
         guard let cartId = cart?.id else {
             return print("performCartPrepareForCompletion: Cart isn't created")
         }
 
-        let mutationString = createCartPrepareForCompletionMutation(
-            cartId: cartId
-        )
-
-        #warning(
-            "TO BE REMOVED - replace with buy sdk when its included - due Jan 2025"
-            // TODO: if errors/userErrors > 0 return failure
-        )
-        executeGraphQL(with: mutationString) {
-
-            if case .success(let data) = $0 {
-                let responseString = String(data: data, encoding: .utf8)
-//                print(
-//                    "performCartPrepareForCompletion \(String(describing: responseString))"
-//                )
-                guard let responseString else {
-                    return handler(.failure(URLError(.unknown)))
+        let mutation = Storefront.buildMutation(
+            inContext: CartManager.ContextDirective
+        ) {
+            $0.cartPrepareForCompletion(cartId: cartId) {
+                $0.result {
+                    $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
+                    $0.onCartThrottled { $0.pollAfter() }
+                    $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
+                    $0.onCartStatusNotReady {
+                        $0.cart { $0.cartManagerFragment() }
+                            .errors { $0.code().message() }
+                    }
                 }
+            }
+        }
 
-                if responseString.contains(/CartStatusNotReady/) {
-                    return handler(.failure(URLError(.unknown)))
-                }
-
-                handler(.success(true))
+        client.execute(mutation: mutation) { result in
+            #warning("accessing cart in this if could throw")
+            if case .success(let mutationResult) = result,
+                let result = mutationResult.cartPrepareForCompletion
+                    as? CartSubmitForCompletionResult,
+                let cart = (result as? Storefront.CartStatusReady)?.cart
+            {
+                handler(.success(cart))
             } else {
                 handler(.failure(URLError(.unknown)))
             }
@@ -556,8 +498,6 @@ class CartManager {
 
         var paymentData: PaymentData?
         do {
-            //            let paymentDataString = String(data: payment.token.paymentData, encoding: .utf8)
-            //            print(" paymentDataString: \(String(describing: paymentDataString))")
             paymentData = try JSONDecoder().decode(
                 PaymentData.self,
                 from: payment.token.paymentData
@@ -657,7 +597,7 @@ class CartManager {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
                     $0
-                        .onSubmitSuccess { $0.attemptId() }
+                        .onSubmitSuccess { $0.redirectUrl() }
                         .onSubmitFailed { $0.checkoutUrl() }
                         .onSubmitAlreadyAccepted { $0.attemptId() }
                         .onSubmitThrottled { $0.pollAfter() }
@@ -676,12 +616,14 @@ class CartManager {
                 {
                     do {
                         let jsonString = try JSONSerialization.data(withJSONObject: result.rawValue)
-                        let json = try JSONSerialization.jsonObject(with: jsonString) as? [String: Any]
-                        
+                        let json =
+                            try JSONSerialization.jsonObject(with: jsonString) as? [String: Any]
+
                         guard
                             let json = json,
                             let userErrors = json["userErrors"] as? [String: Any],
-                            let userErrors = try? JSONSerialization.data(withJSONObject: userErrors),
+                            let userErrors = try? JSONSerialization.data(
+                                withJSONObject: userErrors),
                             let error = String(data: userErrors, encoding: .utf8)
                         else {
                             return completion(
@@ -689,7 +631,7 @@ class CartManager {
                             )
                         }
 
-                        let err = CartApiError.apiErrors( error )
+                        let err = CartApiError.apiErrors(error)
                         return completion(.failure(err))
                     } catch {
                         return completion(
@@ -703,7 +645,7 @@ class CartManager {
                 else {
                     return completion(.failure(CartApiError.apiErrors("No result")))
                 }
-//                print("[CartManager][submitForCompletion] Success \(result)")
+                //                print("[CartManager][submitForCompletion] Success \(result)")
                 completion(.success(result))
                 self.cart = nil
             case .failure(let error):
@@ -780,6 +722,10 @@ extension Storefront.CartQuery {
                                     $0.amount()
                                         .currencyCode()
                                 }
+                        }.selectedDeliveryOption {
+                            $0.title().handle().estimatedCost {
+                                $0.amount().currencyCode()
+                            }
                         }
                 }
             }
@@ -830,89 +776,6 @@ extension Storefront.CartQuery {
     }
 }
 
-func createCartPrepareForCompletionMutation(cartId: GraphQL.ID) -> String {
-    return """
-          mutation @inContext(country: \(Storefront.CountryCode.inferRegion().rawValue.uppercased())) {
-            cartPrepareForCompletion(cartId: "\(cartId.rawValue)") {
-                result {
-                  __typename
-                  ... on CartStatusReady {
-                    cart {
-                      ...CartFragment
-                    }
-                  }
-                  ... on CartStatusNotReady {
-                    cart {
-                      ...CartFragment
-                    }
-                    errors {
-                      code
-                      message
-                    }
-                  }
-                  ... on CartThrottled {
-                    pollAfter
-                  }
-                }
-                
-                userErrors {
-                  field
-                  code
-                  message
-                }
-          }
-        }
-
-        fragment CartFragment on Cart {
-            deliveryGroups(first: 10) {
-                edges {
-                  node {
-                    deliveryOptions {
-                      title
-                      handle
-                      code
-                      deliveryMethodType
-                      description
-                      estimatedCost {
-                        amount
-                      }
-                    }
-                    selectedDeliveryOption {
-                      title
-                      handle
-                      estimatedCost {
-                        amount
-                        currencyCode
-                      }
-                    }
-                  }
-                }
-            }
-            cost {
-              totalAmount {
-                amount
-                currencyCode
-              }
-              subtotalAmount {
-                amount
-                currencyCode
-              }
-              totalTaxAmount {
-                amount
-                currencyCode
-              }
-            }
-          }
-        """
-}
-
-// MARK: - PaymentToken Decoders
-struct PaymentToken: Codable {
-    let paymentData: PaymentData
-    let paymentMethod: PaymentMethod
-    let transactionIdentifier: String
-}
-
 struct PaymentData: Codable {
     let data, signature: String
     let header: Header
@@ -924,6 +787,3 @@ struct Header: Codable {
     let ephemeralPublicKey, publicKeyHash: String
 }
 
-struct PaymentMethod: Codable {
-    let displayName, network, type: String
-}
