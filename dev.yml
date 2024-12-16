@@ -1,0 +1,22 @@
+name: checkout-sheet-kit-swift
+
+type: ios
+
+up:
+  - ruby
+  - custom:
+      name: Ensure Storefront.xcconfig file
+      met?: |
+        ([ -f "./samples/MobileBuyIntegration/Storefront.xcconfig" ] || exit 1)
+      meet: ./scripts/ensure_storefront_config
+  - custom:
+      name: Setup entitlements
+      met?: |
+        ([ -f "./samples/MobileBuyIntegration/MobileBuyIntegration/MobileBuyIntegration.entitlements" ] || exit 1;)
+      meet: ./scripts/setup_entitlements
+
+packages:
+  - xcode
+  - homebrew:
+      - swiftlint
+      - swiftformat
