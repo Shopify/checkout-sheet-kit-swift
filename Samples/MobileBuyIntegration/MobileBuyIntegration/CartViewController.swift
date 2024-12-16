@@ -195,10 +195,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 
 	@objc func payPressed(sender: AnyObject) {
-		paymentHandler.startPayment { (success) in
+		paymentHandler.startPayment { (success, checkoutUrl) in
+            ShopifyCheckoutSheetKit.present(checkout: checkoutUrl, from: self)
 			if success {
                 #warning("Errors due to no screen - this will be resolved after rebasing with Marks changes")
 //				self.performSegue(withIdentifier: "Confirmation", sender: self)
+                
 			}
 		}
 	}

@@ -10,7 +10,7 @@ import PassKit
 import ShopifyCheckoutSheetKit
 import UIKit
 
-typealias PaymentCompletionHandler = (Bool) -> Void
+typealias PaymentCompletionHandler = (Bool, URL) -> Void
 
 class PaymentHandler: NSObject {
     // MARK: Properties
@@ -145,7 +145,10 @@ class PaymentHandler: NSObject {
                 debugPrint("Presented payment controller")
             } else {
                 debugPrint("Failed to present payment controller")
-                self.paymentCompletionHandler?(false)
+                guard let checkoutUrl = CartManager.shared.cart?.checkoutUrl else {
+                    return
+                }
+                self.paymentCompletionHandler?(false, checkoutUrl)
             }
         })
     }
@@ -235,13 +238,17 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                     let cart = result,
                     let firstDeliveryGroup = cart.deliveryGroups.nodes.first
                 else {
-                    return print("[didSelectShippingContact][updateDeliveryAddress] Invalid success response")
+                    return print(
+                        "[didSelectShippingContact][updateDeliveryAddress] Invalid success response"
+                    )
                 }
 
                 let shippingMethods = self.mapToPKShippingMethods(
                     firstDeliveryGroup: firstDeliveryGroup
                 )
 
+                CartManager.shared.performCartPrepareForCompletion { $0 }
+                sleep(7)
                 CartManager.shared.performCartPrepareForCompletion { result in
                     if case .failure(let error) = result {
                         print(
@@ -297,27 +304,30 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             )
         }
 
-        do {
-
-            try CartManager.shared.updateCartPaymentMethod(payment: payment) {
-                result in
-                switch result {
-                case .success(let result):
-                    print("[didAuthorizePayment][updateCartPaymentMethod][success]: \(result)")
-                    self.paymentStatus = .success
-                    return completion(.init(status: .success, errors: nil))
-                case .failure(let error):
-                    print("[didAuthorizePayment][updateCartPaymentMethod][failure]: \(error)")
-                    self.paymentStatus = .failure
-                    return completion(.init(status: .failure, errors: [error]))
+        CartManager.shared.updateCartPaymentMethod(payment: payment) {
+            updateCartPaymentMethodResult in
+            switch updateCartPaymentMethodResult {
+            case .success:
+                print("[didAuthorizePayment][updateCartPaymentMethod][success]")
+                CartManager.shared.submitForCompletion {
+                    submitForCompletionResult in
+                    switch submitForCompletionResult {
+                    case .success:
+                        print("[didAuthorizePayment][submitForCompletion][success]")
+                        self.paymentStatus = .success
+                        return completion(.init(status: .success, errors: nil))
+                    case .failure(let error):
+                        print("[didAuthorizePayment][submitForCompletion][failure] \(error)")
+                        self.paymentStatus = .failure
+                        return completion(.init(status: .failure, errors: [error]))
+                    }
                 }
+            case .failure(let error):
+                print("[didAuthorizePayment][updateCartPaymentMethod][failure]: \(error)")
+                self.paymentStatus = .failure
+                return completion(.init(status: .failure, errors: [error]))
             }
-        } catch let error {
-            print("[didAuthorizePayment][error]: \(error)")
-            self.paymentStatus = .failure
-            completion(.init(status: .failure, errors: [error]))
         }
-
     }
 
     func paymentAuthorizationControllerDidFinish(
@@ -326,8 +336,19 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         controller.dismiss {
             // The payment sheet doesn't automatically dismiss once it has finished. Dismiss the payment sheet.
             DispatchQueue.main.async {
-                guard let paymentStatus = self.paymentStatus?.rawValue as? NSNumber else { return }
-                self.paymentCompletionHandler?(Bool(truncating: paymentStatus))
+                guard
+                    let paymentStatus = self.paymentStatus?.rawValue as? NSNumber,
+                    let url = CartManager.shared.cart?.checkoutUrl
+                else {
+                    print(
+                        "Failed to map payment status to URL \(String(describing: CartManager.shared.cart))"
+                    )
+                    return
+                }
+                self.paymentCompletionHandler?(
+                    Bool(truncating: paymentStatus),
+                    url
+                )
 
                 // Reset state after closing sheet
                 self.paymentStatus = nil
