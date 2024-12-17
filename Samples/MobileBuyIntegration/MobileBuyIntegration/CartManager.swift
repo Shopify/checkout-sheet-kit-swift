@@ -597,7 +597,7 @@ class CartManager {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
                     $0
-                        .onSubmitSuccess { $0.redirectUrl() }
+                        .onSubmitSuccess { $0.attemptId() }
                         .onSubmitFailed { $0.checkoutUrl() }
                         .onSubmitAlreadyAccepted { $0.attemptId() }
                         .onSubmitThrottled { $0.pollAfter() }

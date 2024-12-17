@@ -247,8 +247,6 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                     firstDeliveryGroup: firstDeliveryGroup
                 )
 
-                CartManager.shared.performCartPrepareForCompletion { $0 }
-                sleep(7)
                 CartManager.shared.performCartPrepareForCompletion { result in
                     if case .failure(let error) = result {
                         print(
