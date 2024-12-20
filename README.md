@@ -5,39 +5,40 @@
 
 **Shopify Checkout Sheet Kit** is a Swift Package library that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
-- [Requirements](#requirements)
-- [Getting Started](#getting-started)
-  - [Package.swift](#packageswift)
-  - [Xcode](#xcode)
-  - [CocoaPods](#cocoapods)
-- [Programmatic Usage](#programmatic-usage)
-- [SwiftUI Usage](#swiftui-usage)
-- [Configuration](#configuration)
-  - [`colorScheme`](#colorscheme)
-  - [`tintColor`](#tintcolor)
-  - [`backgroundColor`](#backgroundcolor)
-  - [`title`](#title)
-  - [SwiftUI Configuration](#swiftui-configuration)
-- [Preloading](#preloading)
-  - [Important considerations](#important-considerations)
-  - [Flash Sales](#flash-sales)
-  - [When to preload](#when-to-preload)
-  - [Cache invalidation](#cache-invalidation)
-  - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
-  - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
-- [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
-  - [Integrating with Web Pixels, monitoring behavioral data](#integrating-with-web-pixels-monitoring-behavioral-data)
-- [Error handling](#error-handling)
-  - [`CheckoutError`](#checkouterror)
-- [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
-  - [Cart: buyer bag, identity, and preferences](#cart-buyer-bag-identity-and-preferences)
-  - [Multipass](#multipass)
-  - [Shop Pay](#shop-pay)
-  - [Customer Account API](#customer-account-api)
-- [Offsite Payments](#offsite-payments)
-- [Explore the sample apps](#explore-the-sample-apps)
-- [Contributing](#contributing)
-- [License](#license)
+- [Shopify Checkout Sheet Kit - Swift](#shopify-checkout-sheet-kit---swift)
+  - [Requirements](#requirements)
+  - [Getting Started](#getting-started)
+    - [Package.swift](#packageswift)
+    - [Xcode](#xcode)
+    - [CocoaPods](#cocoapods)
+  - [Programmatic Usage](#programmatic-usage)
+  - [SwiftUI Usage](#swiftui-usage)
+  - [Configuration](#configuration)
+    - [`colorScheme`](#colorscheme)
+    - [`tintColor`](#tintcolor)
+    - [`backgroundColor`](#backgroundcolor)
+    - [`title`](#title)
+    - [SwiftUI Configuration](#swiftui-configuration)
+  - [Preloading](#preloading)
+    - [Important considerations](#important-considerations)
+    - [Flash Sales](#flash-sales)
+    - [When to preload](#when-to-preload)
+    - [Cache invalidation](#cache-invalidation)
+    - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
+    - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
+  - [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
+    - [Integrating with Web Pixels, monitoring behavioral data](#integrating-with-web-pixels-monitoring-behavioral-data)
+  - [Error handling](#error-handling)
+    - [`CheckoutError`](#checkouterror)
+  - [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
+    - [Cart: buyer bag, identity, and preferences](#cart-buyer-bag-identity-and-preferences)
+    - [Multipass](#multipass)
+    - [Shop Pay](#shop-pay)
+    - [Customer Account API](#customer-account-api)
+  - [Offsite Payments](#offsite-payments)
+  - [Explore the sample apps](#explore-the-sample-apps)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Requirements
 
@@ -525,7 +526,8 @@ To initialize accelerated Shop Pay checkout, the cart can set a [walletPreferenc
 
 ### Customer Account API
 
-We are working on a library to provide buyer sign-in and authentication powered by the [new Customer Account API](https://www.shopify.com/partners/blog/introducing-customer-account-api-for-headless-stores)—stay tuned.
+The Customer Account API allows you to authenticate buyers and provide a personalized checkout experience.
+For detailed implementation instructions, see our [Customer Account API Authentication Guide](https://shopify.dev/docs/storefronts/headless/mobile-apps/checkout-sheet-kit/authenticate-checkouts).
 
 ## Offsite Payments
 
