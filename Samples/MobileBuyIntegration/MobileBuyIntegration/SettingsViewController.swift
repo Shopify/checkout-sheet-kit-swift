@@ -29,7 +29,7 @@ struct SettingsView: View {
     @ObservedObject var config: AppConfiguration = appConfiguration
 
     @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
-	@State private var useAuthenticatedState = appConfiguration.useAuthenticatedState
+    @State private var useAuthenticatedState = appConfiguration.useAuthenticatedState
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
     @State private var colorScheme: ColorScheme = .light
@@ -53,10 +53,10 @@ struct SettingsView: View {
 
                     Text("By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app.")
                         .font(.caption)
-					Toggle("Authenticate cart when logged in", isOn: $useAuthenticatedState)
-						.onChange(of: useAuthenticatedState) { newValue in
-							appConfiguration.useAuthenticatedState = newValue
-						}
+                    Toggle("Authenticate cart when logged in", isOn: $useAuthenticatedState)
+                        .onChange(of: useAuthenticatedState) { newValue in
+                            appConfiguration.useAuthenticatedState = newValue
+                        }
                 }
 
                 Section(header: Text("Theme")) {

@@ -35,6 +35,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let productGridController = UIHostingController(rootView: ProductGrid())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
     let settingsController = UIHostingController(rootView: SettingsView())
+    let loginController = UIHostingController(rootView: LoginView())
 
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -68,22 +69,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         cartController.tabBarItem.title = "Cart"
         cartController.navigationItem.title = "Cart"
 
-		tabBarController.viewControllers = [
-			UINavigationController(
-				rootViewController: loginController
-			),
-			UINavigationController(
-				rootViewController: catalogController
-			),
-			UINavigationController(
-				rootViewController: cartController
-			)
-		]
+        /// Login
+        loginController.tabBarItem.image = UIImage(systemName: "person.2.circle")
+        loginController.tabBarItem.title = "Login"
+        loginController.navigationItem.title = "Login"
 
-		if #available(iOS 15.0, *) {
-			let settingsController = UIHostingController(rootView: SettingsView())
-			settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
-			settingsController.tabBarItem.title = "Settings"
+        /// Settings
+        settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
+        settingsController.tabBarItem.title = "Settings"
 
         subscribeToCartUpdates()
 
@@ -98,7 +91,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             UINavigationController(rootViewController: cartController),
 
             /// Settings screen
-            UINavigationController(rootViewController: settingsController)
+            UINavigationController(rootViewController: settingsController),
+
+            UINavigationController(rootViewController: loginController)
         ]
 
         /// Subscribe to color scheme changes on the settings screen

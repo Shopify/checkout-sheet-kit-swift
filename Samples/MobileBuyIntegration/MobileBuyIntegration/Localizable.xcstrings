@@ -19,6 +19,9 @@
     "Adding..." : {
 
     },
+    "Authenticate cart when logged in" : {
+
+    },
     "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app." : {
 
     },
@@ -26,9 +29,6 @@
 
     },
     "Checkout Sheet Kit version" : {
-
-    },
-    "Authenticate cart when logged in" : {
 
     },
     "Clear" : {
@@ -58,6 +58,12 @@
     "Loading products..." : {
 
     },
+    "Login" : {
+
+    },
+    "Logout" : {
+
+    },
     "Logs" : {
 
     },
@@ -71,6 +77,9 @@
 
     },
     "Preload checkout" : {
+
+    },
+    "Refresh Token" : {
 
     },
     "Sample app version" : {
@@ -113,6 +122,12 @@
 
     },
     "Web pixel events" : {
+
+    },
+    "You are logged in" : {
+
+    },
+    "You are not logged in" : {
 
     },
     "Your cart is empty." : {

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2147F3E42B502AA9005546F3 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2147F3E32B502AA9005546F3 /* ShopifyCheckoutSheetKit */; };
 		2147F3E62B502AFD005546F3 /* checkout-sheet-kit-swift in Resources */ = {isa = PBXBuildFile; fileRef = 2147F3E52B502AFD005546F3 /* checkout-sheet-kit-swift */; };
+		2722118C2CF77C3600A4D881 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2722118B2CF77C3600A4D881 /* LoginView.swift */; };
+		27F6B1BF2CF9E30500AA2A59 /* AuthenticationWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F6B1BE2CF9E30200AA2A59 /* AuthenticationWebView.swift */; };
 		4EA7F9B62A9D2B9D003276A1 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7F9B42A9D2B9D003276A1 /* SettingsViewController.swift */; };
 		4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */; };
 		4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */; };
@@ -43,6 +45,8 @@
 
 /* Begin PBXFileReference section */
 		2147F3E52B502AFD005546F3 /* checkout-sheet-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-sheet-kit-swift"; path = ../..; sourceTree = "<group>"; };
+		2722118B2CF77C3600A4D881 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		27F6B1BE2CF9E30200AA2A59 /* AuthenticationWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationWebView.swift; sourceTree = "<group>"; };
 		4EA7F9B42A9D2B9D003276A1 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileBuyIntegration.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -141,6 +145,7 @@
 				4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */,
 				86250DE32AD5521C002E45C2 /* AppConfiguration.swift */,
 				4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */,
+				2722118B2CF77C3600A4D881 /* LoginView.swift */,
 				4EF54F232A6F456B00F5E407 /* CartManager.swift */,
 				4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */,
 				4EBBA76E2A5F0CE200193E19 /* ProductView.swift */,
@@ -183,6 +188,7 @@
 		C053D5932C820913003E30D4 /* Login */ = {
 			isa = PBXGroup;
 			children = (
+				27F6B1BE2CF9E30200AA2A59 /* AuthenticationWebView.swift */,
 				C053D5942C82110E003E30D4 /* LoginViewController.swift */,
 				C053D5982C821435003E30D4 /* LoginViewController.xib */,
 				C053D58F2C81EAF7003E30D4 /* CustomerAccountClient.swift */,
@@ -336,8 +342,10 @@
 				6A2E77C02CE618720067062D /* Cart.swift in Sources */,
 				6A3393652CEF9E8100E89FAA /* Theme.swift in Sources */,
 				6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */,
+				27F6B1BF2CF9E30500AA2A59 /* AuthenticationWebView.swift in Sources */,
 				C053D5902C81EAF7003E30D4 /* CustomerAccountClient.swift in Sources */,
 				4EA7F9B62A9D2B9D003276A1 /* SettingsViewController.swift in Sources */,
+				2722118C2CF77C3600A4D881 /* LoginView.swift in Sources */,
 				6A3467332B600E64007314A8 /* LogsView.swift in Sources */,
 				6A257A132AFBA78500610DA5 /* LogReader.swift in Sources */,
 				6A3393632CEF742500E89FAA /* CheckoutController.swift in Sources */,

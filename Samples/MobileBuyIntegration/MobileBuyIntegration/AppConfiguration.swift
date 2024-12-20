@@ -32,8 +32,8 @@ public final class AppConfiguration: ObservableObject {
     /// Prefill buyer information
     @Published public var useVaultedState: Bool = false
 
-	/// Pass in customerAccessToken after user logs in
-	public var useAuthenticatedState: Bool = true
+    /// Pass in customerAccessToken after user logs in
+    public var useAuthenticatedState: Bool = true
 
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")

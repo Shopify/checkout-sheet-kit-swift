@@ -1,49 +1,51 @@
 /*
-MIT License
+ MIT License
 
-Copyright 2023 - Present, Shopify Inc.
+ Copyright 2023 - Present, Shopify Inc.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import UIKit
 import WebKit
 
 class LoginWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate, LoginWebViewDelegate {
+    static let shared = LoginWebViewController()
 
-	internal var loginWebView: LoginWebView
-    internal var authenticationClient: CustomerAccountClient = CustomerAccountClient.shared
+    var loginWebView: LoginWebView
+    var authenticationClient: CustomerAccountClient = .shared
 
-	internal var progressObserver: NSKeyValueObservation?
+    var progressObserver: NSKeyValueObservation?
 
-	public init() {
-		self.loginWebView = LoginWebView()
+    public init() {
+        loginWebView = LoginWebView()
 
-		super.init(nibName: nil, bundle: nil)
+        super.init(nibName: nil, bundle: nil)
 
-		title = "Login"
+        title = "Login"
 
         loginWebView.viewDelegate = self
-	}
+    }
 
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     func login() {
         guard !authenticationClient.isAuthenticated() else {
@@ -68,27 +70,27 @@ class LoginWebViewController: UIViewController, UIAdaptivePresentationController
         loginWebView.load(URLRequest(url: authData.authorizationUrl))
     }
 
-    func refreshToken() {
-        guard authenticationClient.isAuthenticated() else {
-            print("Customer account is not authenticated.")
-            return
-        }
-
-        let refreshToken = authenticationClient.getRefreshToken()
-        guard refreshToken != nil else {
-            print("No refresh token available to build refresh token URL.")
-            return
-        }
-
-        authenticationClient
-            .refreshAccessToken(refreshToken: refreshToken!, callback: { token, error in
-                guard let nonNilToken = token else {
-                    self.loginFailed(error: error ?? "Unknown error")
-                    return
-                }
-                self.loginComplete(token: nonNilToken)
-            })
-    }
+//    func refreshToken() {
+//        guard authenticationClient.isAuthenticated() else {
+//            print("Customer account is not authenticated.")
+//            return
+//        }
+//
+//        let refreshToken = authenticationClient.getRefreshToken()
+//        guard refreshToken != nil else {
+//            print("No refresh token available to build refresh token URL.")
+//            return
+//        }
+//
+//        authenticationClient
+//            .refreshAccessToken(refreshToken: refreshToken!, callback: { token, error in
+//                guard let nonNilToken = token else {
+//                    self.loginFailed(error: error ?? "Unknown error")
+//                    return
+//                }
+//                self.loginComplete(token: nonNilToken)
+//            })
+//    }
 
     func logout() {
         guard authenticationClient.isAuthenticated() else {
@@ -114,20 +116,20 @@ class LoginWebViewController: UIViewController, UIAdaptivePresentationController
         )
     }
 
-	func loginComplete(token: String) {
-		DispatchQueue.main.async {
-			let idToken = CustomerAccountClient.shared.decodedIdToken()
+    func loginComplete(token _: String) {
+        DispatchQueue.main.async {
+            let idToken = CustomerAccountClient.shared.decodedIdToken()
             let sfApiAccessToken = CustomerAccountClient.shared.getSfApiAccessToken()
             let accessToken = CustomerAccountClient.shared.getAccessToken()
             let accessTokenExpiration = AccessTokenExpirationManager.shared.getExpirationDate(accessToken: accessToken!)
-			let email = idToken?["email"] ?? ""
-			let message = "Logged in (or was already logged in) - \(email!)\n SFP API Access Token:\(sfApiAccessToken!)\n Expiration Date:\(accessTokenExpiration!)"
+            let email = idToken?["email"] ?? ""
+            let message = "Logged in (or was already logged in) - \(email!)\n SFP API Access Token:\(sfApiAccessToken!)\n Expiration Date:\(accessTokenExpiration!)"
 
-			self.showAlert(title: "Login complete", message: message, completion: {
-				self.dismiss(animated: true)
-			})
-		}
-	}
+            self.showAlert(title: "Login complete", message: message, completion: {
+                self.dismiss(animated: true)
+            })
+        }
+    }
 
     func logoutComplete() {
         DispatchQueue.main.async {
@@ -139,34 +141,34 @@ class LoginWebViewController: UIViewController, UIAdaptivePresentationController
         }
     }
 
-	func loginFailed(error: String) {
-		DispatchQueue.main.async {
-			self.showAlert(title: "Login failed", message: "Failed to log in with error \(error)", completion: {
-				self.dismiss(animated: true)
-			})
-		}
-	}
+    func loginFailed(error: String) {
+        DispatchQueue.main.async {
+            self.showAlert(title: "Login failed", message: "Failed to log in with error \(error)", completion: {
+                self.dismiss(animated: true)
+            })
+        }
+    }
 
-	override public func viewDidLoad() {
-		super.viewDidLoad()
+    override public func viewDidLoad() {
+        super.viewDidLoad()
 
-		view.addSubview(loginWebView)
-		NSLayoutConstraint.activate([
-			loginWebView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-			loginWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			loginWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			loginWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-		])
-	}
+        view.addSubview(loginWebView)
+        NSLayoutConstraint.activate([
+            loginWebView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            loginWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loginWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            loginWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
 }
 
 extension LoginWebViewController {
-	func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
-		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-		alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
-			completion?()
-		}))
+    func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
+            completion?()
+        }))
 
-		self.present(alert, animated: true, completion: nil)
-	}
+        present(alert, animated: true, completion: nil)
+    }
 }
