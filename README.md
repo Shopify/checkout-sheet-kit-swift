@@ -549,7 +549,7 @@ public func checkoutDidClickLink(url: URL) {
 
 ## Explore the sample apps
 
-See the [samples](samples) directory for a handful of sample iOS applications and a guide to get started.
+See the [Samples](Samples) directory for a handful of sample iOS applications and a guide to get started.
 
 ## Contributing
 
