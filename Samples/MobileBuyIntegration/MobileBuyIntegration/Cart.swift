@@ -31,6 +31,7 @@ struct CartView: View {
     @State var isBusy: Bool = false
 
     @ObservedObject var cartManager: CartManager = .shared
+    @ObservedObject var config: AppConfiguration = appConfiguration
 
     var body: some View {
         let _ = Self._printChanges()
@@ -69,7 +70,7 @@ struct CartView: View {
                     .accessibilityIdentifier("checkoutButton")
                     .padding(.horizontal, 20)
 
-                    if appConfiguration.ApplePayEnabled {
+                    if config.ApplePayEnabled {
                         PayWithApplePayButton(
                             .checkout,
                             action: handleApplePayPress,
