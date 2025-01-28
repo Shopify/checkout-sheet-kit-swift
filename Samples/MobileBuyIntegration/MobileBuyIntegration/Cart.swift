@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import _PassKit_SwiftUI
 import Buy
 import ShopifyCheckoutSheetKit
 import SwiftUI
@@ -42,25 +43,45 @@ struct CartView: View {
                 }
 
                 VStack {
-                    Button(action: presentCheckout, label: {
-                        HStack {
-                            Text("Checkout")
-                                .fontWeight(.bold)
-                            Spacer()
-                            if let amount = cartManager.cart?.cost.totalAmount, let total = amount.formattedString() {
-                                Text(total)
+                    Button(
+                        action: presentCheckout,
+                        label: {
+                            HStack {
+                                Text("Checkout")
                                     .fontWeight(.bold)
+                                Spacer()
+                                if let amount = cartManager.cart?.cost.totalAmount,
+                                   let total = amount.formattedString()
+                                {
+                                    Text(total)
+                                        .fontWeight(.bold)
+                                }
                             }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
+                            .cornerRadius(10)
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
-                        .cornerRadius(10)
-                    })
+                    )
                     .disabled(isBusy)
                     .foregroundColor(.white)
                     .accessibilityIdentifier("checkoutButton")
                     .padding(.horizontal, 20)
+
+                    if #available(iOS 16.0, *) {
+                        PayWithApplePayButton(
+                            .checkout,
+                            action: { print("pressed") },
+                            fallback: { Text("Apple Pay not available") }
+                        )
+                        .disabled(isBusy)
+                        .frame(maxHeight: 50)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 20)
+                        .cornerRadius(10)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
                 .padding(.bottom, 20)
             }
