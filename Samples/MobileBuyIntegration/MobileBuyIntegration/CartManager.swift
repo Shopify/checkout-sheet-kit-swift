@@ -27,44 +27,6 @@ import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
-struct Contact {
-    let address1, address2, city, country, firstName, lastName, province, zip,
-        email, phone: String
-
-    enum Errors: Error {
-        case missingConfiguration
-    }
-
-    init() throws {
-        guard
-            let infoPlist = Bundle.main.infoDictionary,
-            let address1 = infoPlist["Address1"] as? String,
-            let address2 = infoPlist["Address2"] as? String,
-            let city = infoPlist["City"] as? String,
-            let country = infoPlist["Country"] as? String,
-            let firstName = infoPlist["FirstName"] as? String,
-            let lastName = infoPlist["LastName"] as? String,
-            let province = infoPlist["Province"] as? String,
-            let zip = infoPlist["Zip"] as? String,
-            let email = infoPlist["Email"] as? String,
-            let phone = infoPlist["Phone"] as? String
-        else {
-            throw Contact.Errors.missingConfiguration
-        }
-
-        self.address1 = address1
-        self.address2 = address2
-        self.city = city
-        self.country = country
-        self.firstName = firstName
-        self.lastName = lastName
-        self.province = province
-        self.zip = zip
-        self.email = email
-        self.phone = phone
-    }
-}
-
 enum CartApiError: Error {
     case apiErrors(String)
 }
@@ -80,64 +42,12 @@ class CartManager: ObservableObject {
     @Published var cart: Storefront.Cart?
     @Published var isDirty: Bool = false
     private let client: StorefrontClient
-    private let domain: String
-    private let accessToken: String
-    // TODO: address/user = Contact? Think of cross platform name
-    private let vaultedContactInfo: Contact
-
-    enum Errors: LocalizedError {
-        case missingConfiguration, missingPostalAddress, invalidPaymentData,
-             invalidBillingAddress
-
-        var failureReason: String? {
-            switch self {
-            case .missingConfiguration:
-                return "Missing Storefront config"
-            case .missingPostalAddress:
-                return "Postal Address is nil"
-            case .invalidPaymentData:
-                return "Invalid Payment Data"
-            case .invalidBillingAddress:
-                return "Mapping billing address failed"
-            }
-        }
-
-        var recoverySuggestion: String? {
-            switch self {
-            case .missingConfiguration:
-                return "Check MobileBuyIntegration/Resources/Storefront.xcconfig"
-            case .missingPostalAddress:
-                return "Check `PKContact.postalAddress`"
-            case .invalidPaymentData:
-                return "Decoding failed - check the PKPayment"
-            case .invalidBillingAddress:
-                return "Ensure `billingContact.postalAddress` is not nil"
-            }
-        }
-    }
+    private let vaultedContactInfo: InfoDictionary = .shared
 
     // MARK: Initializers
 
     init(client: StorefrontClient) {
-        guard
-            let infoPlist = Bundle.main.infoDictionary,
-            let domain = infoPlist["StorefrontDomain"] as? String,
-            let accessToken = infoPlist["StorefrontAccessToken"] as? String
-        else {
-            fatalError(
-                CartManager.Errors.missingConfiguration.localizedDescription
-            )
-        }
-
-        do {
-            vaultedContactInfo = try Contact()
-        } catch {
-            fatalError(error.localizedDescription)
-        }
-
         self.client = client
-        self.domain = domain
-        self.accessToken = accessToken
     }
 
     public func preloadCheckout() {
@@ -202,13 +112,10 @@ class CartManager: ObservableObject {
 
         return Storefront.MailingAddressInput.create(
             address1: Input(orNull: address.street),
-//                        address1: Input(orNull: "709 Fountain Ave"),
             address2: Input(orNull: address.subLocality),
             city: Input(orNull: address.city),
-            //            company: Input(orNull: ""),
             country: Input(orNull: address.country),
             firstName: Input(orNull: contact.name?.givenName ?? ""),
-//            lastName: Input(orNull: "test"),
             lastName: Input(orNull: contact.name?.familyName ?? ""),
             phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
             province: Input(orNull: address.state),
@@ -728,86 +635,31 @@ class CartManager: ObservableObject {
     }
 }
 
-extension Storefront.CartQuery {
-    @discardableResult
-    func cartManagerFragment() -> Storefront.CartQuery {
-        id()
-            .checkoutUrl()
-            .totalQuantity()
-            .deliveryGroups(first: 10) {
-                $0.nodes {
-                    $0.id()
-                        .deliveryOptions {
-                            $0.handle()
-                                .title()
-                                .code()
-                                .deliveryMethodType()
-                                .description()
-                                .estimatedCost {
-                                    $0.amount()
-                                        .currencyCode()
-                                }
-                        }.selectedDeliveryOption {
-                            $0.title().handle().estimatedCost {
-                                $0.amount().currencyCode()
-                            }
-                        }
-                }
+extension CartManager {
+    enum Errors: LocalizedError {
+        case missingPostalAddress, invalidPaymentData,
+             invalidBillingAddress
+
+        var failureReason: String? {
+            switch self {
+            case .missingPostalAddress:
+                return "Postal Address is nil"
+            case .invalidPaymentData:
+                return "Invalid Payment Data"
+            case .invalidBillingAddress:
+                return "Mapping billing address failed"
             }
-            .lines(first: 250) {
-                $0.nodes {
-                    $0.id()
-                        .quantity()
-                        .merchandise {
-                            $0.onProductVariant {
-                                $0.id()
-                                    .title()
-                                    .price {
-                                        $0.amount()
-                                            .currencyCode()
-                                    }
-                                    .product {
-                                        $0.title()
-                                            .vendor()
-                                            .featuredImage {
-                                                $0.url()
-                                            }
-                                    }
-                            }
-                        }
-                        .cost {
-                            $0.totalAmount {
-                                $0.amount()
-                                    .currencyCode()
-                            }
-                        }
-                }
+        }
+
+        var recoverySuggestion: String? {
+            switch self {
+            case .missingPostalAddress:
+                return "Check `PKContact.postalAddress`"
+            case .invalidPaymentData:
+                return "Decoding failed - check the PKPayment"
+            case .invalidBillingAddress:
+                return "Ensure `billingContact.postalAddress` is not nil"
             }
-            .totalQuantity()
-            .cost {
-                $0.totalAmount {
-                    $0.amount()
-                        .currencyCode()
-                }
-                .subtotalAmount {
-                    $0.amount()
-                        .currencyCode()
-                }
-                .totalTaxAmount {
-                    $0.amount()
-                        .currencyCode()
-                }
-            }
+        }
     }
-}
-
-struct PaymentData: Codable {
-    let data, signature: String
-    let header: Header
-    let version: String
-}
-
-struct Header: Codable {
-    let transactionId: String
-    let ephemeralPublicKey, publicKeyHash: String
 }

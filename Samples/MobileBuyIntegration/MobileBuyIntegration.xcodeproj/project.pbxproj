@@ -34,6 +34,9 @@
 		6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
 		CB05E6BD2D493B8F00466376 /* PaymentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BC2D493B8B00466376 /* PaymentHandler.swift */; };
+		CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BE2D4951D700466376 /* InfoDictionary.swift */; };
+		CB05E6C12D4954A600466376 /* Payment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C02D49549700466376 /* Payment.swift */; };
+		CB05E6C42D4954E800466376 /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Api.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +68,9 @@
 		6AE865492CE3BB6500A4971C /* MobileBuyIntegration.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobileBuyIntegration.entitlements; sourceTree = "<group>"; };
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CB05E6BC2D493B8B00466376 /* PaymentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentHandler.swift; sourceTree = "<group>"; };
+		CB05E6BE2D4951D700466376 /* InfoDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDictionary.swift; sourceTree = "<group>"; };
+		CB05E6C02D49549700466376 /* Payment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Payment.swift; sourceTree = "<group>"; };
+		CB05E6C32D4954E400466376 /* Api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +129,8 @@
 		4EBBA77F2A5F0DA300193E19 /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				CB05E6C22D4954DF00466376 /* Extensions */,
+				CB05E6BE2D4951D700466376 /* InfoDictionary.swift */,
 				CB05E6BB2D493B8200466376 /* ApplePay */,
 				6A3393642CEF9E7F00E89FAA /* Theme.swift */,
 				6A3393622CEF742200E89FAA /* CheckoutController.swift */,
@@ -173,9 +181,18 @@
 		CB05E6BB2D493B8200466376 /* ApplePay */ = {
 			isa = PBXGroup;
 			children = (
+				CB05E6C02D49549700466376 /* Payment.swift */,
 				CB05E6BC2D493B8B00466376 /* PaymentHandler.swift */,
 			);
 			path = ApplePay;
+			sourceTree = "<group>";
+		};
+		CB05E6C22D4954DF00466376 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CB05E6C32D4954E400466376 /* Api.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -306,14 +323,17 @@
 				4EBBA7B02A5F222F00193E19 /* MoneyV2+Format.swift in Sources */,
 				6A2E77BE2CE606490067062D /* Catalog.swift in Sources */,
 				4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */,
+				CB05E6C42D4954E800466376 /* Api.swift in Sources */,
 				4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */,
 				4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */,
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,
 				86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */,
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,
+				CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */,
 				6A257A152AFBB06300610DA5 /* Logger.swift in Sources */,
 				CB05E6BD2D493B8F00466376 /* PaymentHandler.swift in Sources */,
 				4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */,
+				CB05E6C12D4954A600466376 /* Payment.swift in Sources */,
 				6A2E77C02CE618720067062D /* Cart.swift in Sources */,
 				6A3393652CEF9E8100E89FAA /* Theme.swift in Sources */,
 				6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */,
