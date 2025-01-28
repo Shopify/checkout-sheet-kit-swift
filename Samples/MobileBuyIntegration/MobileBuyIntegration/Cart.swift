@@ -80,7 +80,7 @@ struct CartView: View {
                         .padding(.horizontal, 20)
                         .cornerRadius(10)
                     } else {
-                        // Fallback on earlier versions
+                        Text("Apple Pay is not supported")
                     }
                 }
                 .padding(.bottom, 20)
