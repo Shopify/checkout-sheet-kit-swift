@@ -28,6 +28,7 @@ import UIKit
 class CheckoutController: UIViewController {
     var window: UIWindow?
     var root: UIViewController?
+    let paymentHandler = PaymentHandler()
 
     init(window: UIWindow?) {
         self.window = window
@@ -50,6 +51,16 @@ class CheckoutController: UIViewController {
 
     public func preload() {
         CartManager.shared.preloadCheckout()
+    }
+
+    public func payWithApplePay() {
+        paymentHandler.startPayment { success, checkoutUrl in
+            ShopifyCheckoutSheetKit.present(checkout: checkoutUrl, from: self)
+            if success {
+                #warning("Errors due to no screen - this will be resolved after rebasing with Marks changes")
+//                self.performSegue(withIdentifier: "Confirmation", sender: self)
+            }
+        }
     }
 }
 

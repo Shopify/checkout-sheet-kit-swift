@@ -68,20 +68,16 @@ struct CartView: View {
                     .accessibilityIdentifier("checkoutButton")
                     .padding(.horizontal, 20)
 
-                    if #available(iOS 16.0, *) {
-                        PayWithApplePayButton(
-                            .checkout,
-                            action: { print("pressed") },
-                            fallback: { Text("Apple Pay not available") }
-                        )
-                        .disabled(isBusy)
-                        .frame(maxHeight: 50)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        .cornerRadius(10)
-                    } else {
-                        Text("Apple Pay is not supported")
-                    }
+                    PayWithApplePayButton(
+                        .checkout,
+                        action: handleApplePayPress,
+                        fallback: { Text("Apple Pay not available") }
+                    )
+                    .disabled(isBusy)
+                    .frame(maxHeight: 50)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 20)
+                    .cornerRadius(10)
                 }
                 .padding(.bottom, 20)
             }
@@ -103,6 +99,10 @@ struct CartView: View {
         }
 
         CheckoutController.shared?.present(checkout: url)
+    }
+
+    private func handleApplePayPress() {
+        CheckoutController.shared?.payWithApplePay()
     }
 }
 
