@@ -34,6 +34,9 @@ public final class AppConfiguration: ObservableObject {
 
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
+
+    // Displays the Checkout with ApplePay button
+    @Published var ApplePayEnabled: Bool = true
 }
 
 public var appConfiguration = AppConfiguration() {

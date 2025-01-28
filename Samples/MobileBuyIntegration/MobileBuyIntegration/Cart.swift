@@ -33,6 +33,7 @@ struct CartView: View {
     @ObservedObject var cartManager: CartManager = .shared
 
     var body: some View {
+        let _ = Self._printChanges()
         if let lines = cartManager.cart?.lines.nodes {
             ZStack(alignment: .bottom) {
                 ScrollView {
@@ -68,15 +69,17 @@ struct CartView: View {
                     .accessibilityIdentifier("checkoutButton")
                     .padding(.horizontal, 20)
 
-                    PayWithApplePayButton(
-                        .checkout,
-                        action: handleApplePayPress,
-                        fallback: { Text("Apple Pay not available") }
-                    )
-                    .disabled(isBusy)
-                    .frame(maxWidth: .infinity, maxHeight: 20)
-                    .padding(.horizontal, 20)
-                    .cornerRadius(10)
+                    if appConfiguration.ApplePayEnabled {
+                        PayWithApplePayButton(
+                            .checkout,
+                            action: handleApplePayPress,
+                            fallback: { Text("Apple Pay not available") }
+                        )
+                        .disabled(isBusy)
+                        .frame(maxWidth: .infinity, maxHeight: 50)
+                        .padding(.horizontal, 20)
+                        .cornerRadius(10)
+                    }
                 }
                 .padding(.bottom, 20)
             }
