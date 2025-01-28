@@ -546,7 +546,7 @@
 			repositoryURL = "https://github.com/Shopify/mobile-buy-sdk-ios";
 			requirement = {
 				kind = exactVersion;
-				version = 11.3.0;
+				version = 2025.1.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
