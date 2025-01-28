@@ -74,8 +74,7 @@ struct CartView: View {
                         fallback: { Text("Apple Pay not available") }
                     )
                     .disabled(isBusy)
-                    .frame(maxHeight: 50)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: 20)
                     .padding(.horizontal, 20)
                     .cornerRadius(10)
                 }
