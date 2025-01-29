@@ -44,7 +44,7 @@ class PaymentHandler: NSObject {
         .amex,
         .discover,
         .masterCard,
-        .visa,
+        .visa
     ]
 
     class func applePayStatus() -> (canMakePayments: Bool, canSetupCards: Bool) {
@@ -61,7 +61,7 @@ class PaymentHandler: NSObject {
         #warning("Missing selectedDeliveryOption will throw out of this guard")
         guard
             let selectedDeliveryOption = CartManager.shared.cart?.deliveryGroups
-                .nodes.first?.selectedDeliveryOption,
+            .nodes.first?.selectedDeliveryOption,
             let title = selectedDeliveryOption.title
         else {
             return []
@@ -195,12 +195,12 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                 )
             )
             return paymentRequestShippingContactUpdate
-        } catch (let error) {
+        } catch {
             print(
                 CartManager.Errors.apiErrors(
                     requestName: "cartSelectedDeliveryOptionsUpdate  or cartPrepareForCompletion",
                     message:
-                        "Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
+                    "Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
                 )
             )
 
@@ -212,7 +212,6 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             )
         }
     }
-
 
     func paymentAuthorizationController(
         _: PKPaymentAuthorizationController,
@@ -256,58 +255,49 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         }
     }
 
-    //    func paymentAuthorizationController(
-    //        _: PKPaymentAuthorizationController,
-    //        didAuthorizePayment payment: PKPayment,
-    //        handler completion: @escaping (PKPaymentAuthorizationResult) -> Void
-    //    ) {
-    //        // Perform basic validation on the provided contact information.
-    //        guard payment.shippingContact?.postalAddress?.isoCountryCode == "US"
-    //        else {
-    //            paymentStatus = .failure
-    //            return completion(
-    //                .init(
-    //                    status: .failure,
-    //                    errors: [
-    //                        PKPaymentRequest
-    //                            .paymentShippingAddressUnserviceableError(
-    //                                withLocalizedDescription:
-    //                                "Address must be in the United States to use Apple Pay in the Sample App"
-    //                            ),
-    //                        PKPaymentRequest.paymentShippingAddressInvalidError(
-    //                            withKey: CNPostalAddressCountryKey,
-    //                            localizedDescription: "Invalid country"
-    //                        )
-    //                    ]
-    //                )
-    //            )
-    //        }
-    //
-    //        CartManager.shared.updateCartPaymentMethod(payment: payment) {
-    //            updateCartPaymentMethodResult in
-    //            switch updateCartPaymentMethodResult {
-    //            case .success:
-    //                print("[didAuthorizePayment][updateCartPaymentMethod][success]")
-    //                CartManager.shared.submitForCompletion {
-    //                    submitForCompletionResult in
-    //                    switch submitForCompletionResult {
-    //                    case .success:
-    //                        print("[didAuthorizePayment][submitForCompletion][success]")
-    //                        self.paymentStatus = .success
-    //                        return completion(.init(status: .success, errors: nil))
-    //                    case let .failure(error):
-    //                        print("[didAuthorizePayment][submitForCompletion][failure] \(error)")
-    //                        self.paymentStatus = .failure
-    //                        return completion(.init(status: .failure, errors: [error]))
-    //                    }
-    //                }
-    //            case let .failure(error):
-    //                print("[didAuthorizePayment][updateCartPaymentMethod][failure]: \(error)")
-    //                self.paymentStatus = .failure
-    //                return completion(.init(status: .failure, errors: [error]))
-    //            }
-    //        }
-    //    }
+    func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment
+    ) async -> PKPaymentAuthorizationResult {
+        // Perform basic validation on the provided contact information.
+        guard payment.shippingContact?.postalAddress?.isoCountryCode == "US"
+        else {
+            paymentStatus = .failure
+            return .init(
+                status: .failure,
+                errors: [
+                    PKPaymentRequest
+                        .paymentShippingAddressUnserviceableError(
+                            withLocalizedDescription:
+                            "Address must be in the United States to use Apple Pay in the Sample App"
+                        ),
+                    PKPaymentRequest.paymentShippingAddressInvalidError(
+                        withKey: CNPostalAddressCountryKey,
+                        localizedDescription: "Invalid country"
+                    )
+                ]
+            )
+        }
+
+        do {
+            let response = try await CartManager.shared.performCartPaymentUpdate(payment: payment)
+
+            print("[didAuthorizePayment][updateCartPaymentMethod][success]")
+        } catch {
+            print("[didAuthorizePayment][updateCartPaymentMethod][failure]: \(error)")
+            paymentStatus = .failure
+            return PKPaymentAuthorizationResult(status: .failure, errors: [error])
+        }
+
+        do {
+            let response = try await CartManager.shared.performSubmitForCompletion()
+            paymentStatus = .success
+            return PKPaymentAuthorizationResult(status: .success, errors: nil)
+        } catch {
+            print("[didAuthorizePayment][submitForCompletion][failure] \(error)")
+            paymentStatus = .failure
+            return PKPaymentAuthorizationResult(status: .failure, errors: [error])
+        }
+    }
 
     func paymentAuthorizationControllerDidFinish(
         _ controller: PKPaymentAuthorizationController
@@ -335,5 +325,4 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             }
         }
     }
-
 }

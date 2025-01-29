@@ -230,7 +230,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             ShopifyCheckoutSheetKit.invalidate()
 
             /// Update cart quantities
-            CartManager.shared.updateQuantity(variant: node.id, quantity: quantity, completionHandler: { cart in
+            CartManager.shared.performUpdateQuantity(variant: node.id, quantity: quantity, completionHandler: { cart in
                 cell.showLoading(false)
                 self.checkoutButton.isEnabled = true
                 cell.quantityLabel.text = "\(cart?.lines.nodes[indexPath.item].quantity ?? 0)"

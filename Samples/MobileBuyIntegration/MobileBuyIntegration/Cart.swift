@@ -190,7 +190,7 @@ struct CartLines: View {
                                     /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                     ShopifyCheckoutSheetKit.invalidate()
 
-                                    CartManager.shared.updateQuantity(variant: node.id, quantity: node.quantity - 1, completionHandler: { cart in
+                                    CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity - 1, completionHandler: { cart in
                                         CartManager.shared.cart = cart
                                         updating = nil
 
@@ -225,7 +225,7 @@ struct CartLines: View {
                                     /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                     ShopifyCheckoutSheetKit.invalidate()
 
-                                    CartManager.shared.updateQuantity(variant: node.id, quantity: node.quantity + 1, completionHandler: { cart in
+                                    CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity + 1, completionHandler: { cart in
                                         CartManager.shared.cart = cart
                                         updating = nil
 

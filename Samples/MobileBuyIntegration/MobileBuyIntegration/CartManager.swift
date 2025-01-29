@@ -62,7 +62,7 @@ class CartManager: ObservableObject {
 
     // MARK: Cart Actions
 
-    func addItem(
+    func performAddItem(
         variant: GraphQL.ID,
         handler completion: @escaping (_: Storefront.Cart?) -> Void
     ) {
@@ -78,7 +78,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func updateQuantity(
+    func performUpdateQuantity(
         variant: GraphQL.ID,
         quantity: Int32,
         completionHandler: ((Storefront.Cart?) -> Void)?
@@ -345,7 +345,9 @@ class CartManager: ObservableObject {
         }
     }
 
-    private func performCartShippingMethodUpdate(deliveryGroupId: GraphQL.ID, deliveryOptionHandle: String) async throws -> Storefront.Cart {
+    private func performCartShippingMethodUpdate(
+        deliveryGroupId: GraphQL.ID, deliveryOptionHandle: String
+    ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart is nil")
         }
@@ -377,32 +379,33 @@ class CartManager: ObservableObject {
             }
             return cart
         } catch {
-            throw Errors.apiErrors(requestName: "cartSelectedDeliveryOptionsUpdate", message: "\(error)")
+            throw Errors.apiErrors(
+                requestName: "cartSelectedDeliveryOptionsUpdate", message: "\(error)"
+            )
         }
     }
 
     // TODO: Rename to selectCartPaymentMethod
-    func updateCartPaymentMethod(
-        payment: PKPayment, // REFACTOR: this method should just receive the decoded payment token
-        completion: @escaping (Result<Storefront.Cart, Error>) -> Void
-    ) {
+    func performCartPaymentUpdate(
+        payment: PKPayment // REFACTOR: this method should just receive the decoded payment token
+    ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
-            return completion(.failure(Errors.invariant(message: "cartId is nil")))
+            throw Errors.invariant(message: "cartId is nil")
         }
 
         guard
             let billingContact = payment.billingContact,
             let billingPostalAddress = billingContact.postalAddress
         else {
-            return completion(.failure(Errors.invariant(message: "billingContact is nil")))
+            throw Errors.invariant(message: "billingContact is nil")
         }
 
         guard let totalAmount = cart?.cost.totalAmount else {
-            return completion(.failure(Errors.invariant(message: "cart?.cost.totalAmount is nil")))
+            throw Errors.invariant(message: "cart?.cost.totalAmount is nil")
         }
 
         guard let paymentData = decodePaymentData(payment: payment) else {
-            return completion(.failure(Errors.invalidPaymentData))
+            throw Errors.invalidPaymentData
         }
 
         let paymentInput = StorefrontInputFactory.shared.createPaymentInput(
@@ -413,31 +416,24 @@ class CartManager: ObservableObject {
             billingPostalAddress: billingPostalAddress
         )
 
-        let mutation = Storefront.buildMutation(
-            inContext: CartManager.ContextDirective
-        ) {
+        let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartPaymentUpdate(cartId: cartId, payment: paymentInput) {
-                $0.cart {
-                    $0.cartManagerFragment()
-                }
+                $0.cart { $0.cartManagerFragment() }
             }
         }
 
-        client.execute(mutation: mutation) {
-            guard
-                case let .success(result) = $0,
-                let _cart = result.cartPaymentUpdate?.cart
-            else {
-                return completion(.failure(URLError(.unknown)))
+        do {
+            let response = try await client.executeAsync(mutation: mutation)
+            guard let cart = response.cartPaymentUpdate?.cart else {
+                throw Errors.invariant(message: "cart returned nil")
             }
-
-            completion(.success(_cart))
+            return cart
+        } catch {
+            throw Errors.apiErrors(requestName: "cartPaymentUpdate", message: "\(error)")
         }
     }
 
-    func submitForCompletion(
-        completion: @escaping (Result<Storefront.SubmitSuccess, Error>) -> Void
-    ) {
+    func performSubmitForCompletion() async throws -> Storefront.SubmitSuccess {
         guard let cartId = cart?.id else {
             fatalError("[invariant_violation][submitForCompletion]: cart id is null")
         }
@@ -453,70 +449,54 @@ class CartManager: ObservableObject {
                 }
             }
         }
-        client.execute(mutation: mutation) {
-            result in
-            switch result {
-            case let .success(result):
-                /**
-                 * TODO: how to handle the union type of success response
-                 * CartUserError  SubmitSuccess etc.
-                 */
-                if let result = result.cartSubmitForCompletion?.result as? Storefront.CartUserError {
-                    do {
-                        let jsonString = try JSONSerialization.data(withJSONObject: result.rawValue)
-                        let json =
-                            try JSONSerialization.jsonObject(with: jsonString) as? [String: Any]
 
-                        guard
-                            let json = json,
-                            let userErrors = json["userErrors"] as? [String: Any],
-                            let userErrors = try? JSONSerialization.data(
-                                withJSONObject: userErrors),
-                            let error = String(data: userErrors, encoding: .utf8)
-                        else {
-                            return completion(
-                                .failure(
-                                    Errors
-                                        .apiErrors(
-                                            requestName: "cartSubmitForCompletion",
-                                            message: "Unknown encountered"
-                                        )
-                                )
-                            )
-                        }
+        do {
+            let result = try await client.executeAsync(mutation: mutation)
+            /**
+             * TODO: how to handle the union type of success response
+             * CartUserError  SubmitSuccess etc.
+             */
+            if let result = result.cartSubmitForCompletion?.result as? Storefront.CartUserError {
+                do {
+                    let jsonString = try JSONSerialization.data(withJSONObject: result.rawValue)
+                    let json = try JSONSerialization.jsonObject(with: jsonString) as? [String: Any]
 
-                        let err = Errors.apiErrors(
-                            requestName: "cartSubmitForCompletion", message: error
-                        )
-                        return completion(.failure(err))
-                    } catch {
-                        return completion(
-                            .failure(
-                                Errors.apiErrors(
-                                    requestName: "cartSubmitForCompletion",
-                                    message: "Failed to stringify cart error"
-
-                                ))
+                    guard
+                        let json = json,
+                        let userErrors = json["userErrors"] as? [String: Any],
+                        let userErrors = try? JSONSerialization.data(
+                            withJSONObject: userErrors),
+                        let error = String(data: userErrors, encoding: .utf8)
+                    else {
+                        throw Errors.apiErrors(
+                            requestName: "cartSubmitForCompletion",
+                            message: "Unknown encountered"
                         )
                     }
-                }
 
-                guard
-                    let result = result.cartSubmitForCompletion?.result as? Storefront.SubmitSuccess
-                else {
-                    return completion(
-                        .failure(
-                            Errors.apiErrors(
-                                requestName: "cartSubmitForCompletion",
-                                message: "No result"
-                            )))
+                    throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: error)
+                } catch {
+                    throw Errors.apiErrors(
+                        requestName: "cartSubmitForCompletion",
+                        message: "Failed to stringify cart error"
+                    )
                 }
-                completion(.success(result))
-                self.cart = nil
-            case let .failure(error):
-                print("[CartManager][submitForCompletion] error \(error)")
-                return completion(.failure(URLError(.unknown)))
             }
+
+            guard let result = result.cartSubmitForCompletion?.result as? Storefront.SubmitSuccess
+            else {
+                throw Errors.apiErrors(
+                    requestName: "cartSubmitForCompletion",
+                    message: "No result"
+                )
+            }
+            DispatchQueue.main.async {
+                self.cart = nil
+            }
+            return result
+        } catch {
+            print("[CartManager][submitForCompletion] error \(error)")
+            throw error
         }
     }
 }

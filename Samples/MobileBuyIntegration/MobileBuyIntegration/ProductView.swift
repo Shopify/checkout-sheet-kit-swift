@@ -136,7 +136,7 @@ struct ProductView: View {
         loading = true
         let start = Date()
 
-        CartManager.shared.addItem(variant: variant.id) { _ in
+        CartManager.shared.performAddItem(variant: variant.id) { _ in
             let diff = Date().timeIntervalSince(start)
             let message = "Added item to cart in \(String(format: "%.0f", diff * 1000))ms"
             ShopifyCheckoutSheetKit.configuration.logger.log(message)
