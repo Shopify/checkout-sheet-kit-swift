@@ -21,6 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import PassKit
+
 struct PaymentData: Codable {
     let data, signature: String
     let header: Header
@@ -30,4 +32,11 @@ struct PaymentData: Codable {
 struct Header: Codable {
     let transactionId: String
     let ephemeralPublicKey, publicKeyHash: String
+}
+
+func decodePaymentData(payment: PKPayment) -> PaymentData? {
+    return try? JSONDecoder().decode(
+        PaymentData.self,
+        from: payment.token.paymentData
+    )
 }

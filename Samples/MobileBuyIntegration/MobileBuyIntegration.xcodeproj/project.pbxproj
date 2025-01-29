@@ -36,7 +36,7 @@
 		CB05E6BD2D493B8F00466376 /* PaymentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BC2D493B8B00466376 /* PaymentHandler.swift */; };
 		CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BE2D4951D700466376 /* InfoDictionary.swift */; };
 		CB05E6C12D4954A600466376 /* PaymentCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C02D49549700466376 /* PaymentCodable.swift */; };
-		CB05E6C42D4954E800466376 /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Api.swift */; };
+		CB05E6C42D4954E800466376 /* Storefront.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Storefront.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,7 +70,7 @@
 		CB05E6BC2D493B8B00466376 /* PaymentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentHandler.swift; sourceTree = "<group>"; };
 		CB05E6BE2D4951D700466376 /* InfoDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDictionary.swift; sourceTree = "<group>"; };
 		CB05E6C02D49549700466376 /* PaymentCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCodable.swift; sourceTree = "<group>"; };
-		CB05E6C32D4954E400466376 /* Api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
+		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +131,7 @@
 			children = (
 				CB05E6BE2D4951D700466376 /* InfoDictionary.swift */,
 				4EF54F232A6F456B00F5E407 /* CartManager.swift */,
+				4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */,
 				CB05E6C22D4954DF00466376 /* Extensions */,
 				CB05E6BB2D493B8200466376 /* ApplePay */,
 				6A3393642CEF9E7F00E89FAA /* Theme.swift */,
@@ -140,7 +141,6 @@
 				4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */,
 				86250DE32AD5521C002E45C2 /* AppConfiguration.swift */,
 				4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */,
-				4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */,
 				4EBBA76E2A5F0CE200193E19 /* ProductView.swift */,
 				4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */,
 				4EA7F9B42A9D2B9D003276A1 /* SettingsViewController.swift */,
@@ -190,7 +190,7 @@
 		CB05E6C22D4954DF00466376 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				CB05E6C32D4954E400466376 /* Api.swift */,
+				CB05E6C32D4954E400466376 /* Storefront.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -323,7 +323,7 @@
 				4EBBA7B02A5F222F00193E19 /* MoneyV2+Format.swift in Sources */,
 				6A2E77BE2CE606490067062D /* Catalog.swift in Sources */,
 				4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */,
-				CB05E6C42D4954E800466376 /* Api.swift in Sources */,
+				CB05E6C42D4954E800466376 /* Storefront.swift in Sources */,
 				4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */,
 				4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */,
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,

@@ -23,6 +23,7 @@
 
 import Buy
 import Foundation
+import PassKit
 
 class StorefrontClient {
     static let shared = StorefrontClient()
@@ -106,10 +107,126 @@ public struct StorefrontURL {
         guard isProduct() else { return nil }
 
         let pattern = "/products/([\\w_-]+)"
-        if let match = url.path.range(of: pattern, options: .regularExpression, range: nil, locale: nil) {
+        if let match = url.path.range(
+            of: pattern, options: .regularExpression, range: nil, locale: nil)
+        {
             let slug = url.path[match].components(separatedBy: "/").last
             return slug
         }
         return nil
+    }
+}
+
+class StorefrontInputFactory {
+    static let shared = StorefrontInputFactory()
+
+    enum Errors: Error {
+        case invariant(String)
+    }
+
+    public func createVaultedCartInput(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
+        let vaultedContactInfo = InfoDictionary.shared
+        let deliveryAddress = Storefront.MailingAddressInput.create(
+            address1: Input(orNull: vaultedContactInfo.address1),
+            address2: Input(orNull: vaultedContactInfo.address2),
+            city: Input(orNull: vaultedContactInfo.city),
+            company: Input(orNull: ""),
+            country: Input(orNull: vaultedContactInfo.country),
+            firstName: Input(orNull: vaultedContactInfo.firstName),
+            lastName: Input(orNull: vaultedContactInfo.lastName),
+            phone: Input(orNull: vaultedContactInfo.phone),
+            province: Input(orNull: vaultedContactInfo.province),
+            zip: Input(orNull: vaultedContactInfo.zip)
+        )
+
+        let deliveryAddressPreferences = [
+            Storefront.DeliveryAddressInput.create(
+                deliveryAddress: Input(orNull: deliveryAddress))
+        ]
+
+        return Storefront.CartInput.create(
+            lines: Input(
+                orNull: items.map {
+                    Storefront.CartLineInput.create(merchandiseId: $0)
+                }),
+            buyerIdentity: Input(
+                orNull: Storefront.CartBuyerIdentityInput.create(
+                    email: Input(orNull: vaultedContactInfo.email),
+                    deliveryAddressPreferences: Input(
+                        orNull: deliveryAddressPreferences)
+                ))
+        )
+    }
+
+    public func createDefaultCartInput(_ items: [GraphQL.ID]) -> Storefront.CartInput {
+        return Storefront.CartInput.create(
+            lines: Input(
+                orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
+            )
+        )
+    }
+
+    public func createMailingAddressInput(contact: PKContact, address: CNPostalAddress)
+        -> Storefront.MailingAddressInput
+    {
+        return Storefront.MailingAddressInput.create(
+            address1: Input(orNull: address.street),
+            address2: Input(orNull: address.subLocality),
+            city: Input(orNull: address.city),
+            country: Input(orNull: address.country),
+            firstName: Input(orNull: contact.name?.givenName ?? ""),
+            lastName: Input(orNull: contact.name?.familyName ?? ""),
+            phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
+            province: Input(orNull: address.state),
+            zip: Input(orNull: address.postalCode)
+        )
+    }
+
+    public func createPaymentInput(
+        payment: PKPayment,
+        paymentData: PaymentData,
+        totalAmount: Storefront.MoneyV2,
+        billingContact: PKContact,
+        billingPostalAddress: CNPostalAddress
+    ) -> Storefront.CartPaymentInput {
+        let billingAddressInput = StorefrontInputFactory.shared.createMailingAddressInput(
+            contact: billingContact,
+            address: billingPostalAddress
+        )
+
+        let header = Storefront.ApplePayWalletHeaderInput.create(
+            ephemeralPublicKey: paymentData.header.ephemeralPublicKey,
+            publicKeyHash: paymentData.header.publicKeyHash,
+            transactionId: paymentData.header.transactionId
+        )
+
+        let applePayWalletContent = Storefront.ApplePayWalletContentInput
+            .create(
+                billingAddress: billingAddressInput,
+                data: paymentData.data,
+                header: header,
+                signature: paymentData.signature,
+                version: paymentData.version,
+                lastDigits: Input(
+                    orNull: payment
+                        .token
+                        .paymentMethod
+                        .displayName?
+                        .components(separatedBy: " ")
+                        .last
+                )
+            )
+
+        let walletPaymentMethod = Storefront.CartWalletPaymentMethodInput
+            .create(applePayWalletContent: Input(orNull: applePayWalletContent))
+
+        return Storefront.CartPaymentInput.create(
+            amount: Storefront.MoneyInput.create(
+                amount: totalAmount.amount,
+                currencyCode: totalAmount.currencyCode
+            ),
+            walletPaymentMethod: Input(orNull: walletPaymentMethod)
+        )
+
     }
 }

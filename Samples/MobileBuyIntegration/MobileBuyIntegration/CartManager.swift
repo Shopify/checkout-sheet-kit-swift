@@ -27,10 +27,6 @@ import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
-enum CartApiError: Error {
-    case apiErrors(String)
-}
-
 class CartManager: ObservableObject {
     static let shared = CartManager(client: .shared)
     private static let ContextDirective = Storefront.InContextDirective(
@@ -66,10 +62,7 @@ class CartManager: ObservableObject {
 
     // MARK: Cart Actions
 
-    func addItem(
-        variant: GraphQL.ID,
-        handler completion: @escaping (_: Storefront.Cart?) -> Void
-    ) {
+    func addItem(variant: GraphQL.ID, handler completion: @escaping (_: Storefront.Cart?) -> Void) {
         performCartLinesAdd(item: variant) { result in
             switch result {
             case let .success(cart):
@@ -97,30 +90,6 @@ class CartManager: ObservableObject {
                 completionHandler?(nil)
             }
         }
-    }
-
-    enum AddressType {
-        case postal, billing
-    }
-
-    private func mapCNPostalAddress(
-        contact: PKContact
-    ) throws -> Storefront.MailingAddressInput {
-        guard let address = contact.postalAddress else {
-            throw CartManager.Errors.missingPostalAddress
-        }
-
-        return Storefront.MailingAddressInput.create(
-            address1: Input(orNull: address.street),
-            address2: Input(orNull: address.subLocality),
-            city: Input(orNull: address.city),
-            country: Input(orNull: address.country),
-            firstName: Input(orNull: contact.name?.givenName ?? ""),
-            lastName: Input(orNull: contact.name?.familyName ?? ""),
-            phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
-            province: Input(orNull: address.state),
-            zip: Input(orNull: address.postalCode)
-        )
     }
 
     // TODO: Rename to selectDeliveryAddress
@@ -205,7 +174,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(result) = result,
-               let cart = result.cartLinesAdd?.cart
+                let cart = result.cartLinesAdd?.cart
             {
                 handler(.success(cart))
             } else {
@@ -232,8 +201,8 @@ class CartManager: ObservableObject {
     ) {
         let input =
             appConfiguration.useVaultedState
-                ? createVaultedCartInput(items)
-                : createDefaultCartInput(items)
+            ? StorefrontInputFactory.shared.createVaultedCartInput(items)
+            : StorefrontInputFactory.shared.createDefaultCartInput(items)
 
         let mutation = Storefront.buildMutation(
             inContext: CartManager.ContextDirective
@@ -247,7 +216,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(mutation) = result,
-               let cart = mutation.cartCreate?.cart
+                let cart = mutation.cartCreate?.cart
             {
                 handler(.success(cart))
             } else {
@@ -283,7 +252,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(result) = result,
-               let cart = result.cartLinesUpdate?.cart
+                let cart = result.cartLinesUpdate?.cart
             {
                 handler(.success(cart))
             } else {
@@ -327,7 +296,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(mutationResult) = result,
-               let cart = mutationResult.cartBuyerIdentityUpdate?.cart
+                let cart = mutationResult.cartBuyerIdentityUpdate?.cart
             {
                 handler(.success(cart))
             } else {
@@ -361,10 +330,9 @@ class CartManager: ObservableObject {
 
         client.execute(mutation: mutation) { result in
             #warning("accessing cart in this if could throw")
-            if
-                case let .success(mutationResult) = result,
+            if case let .success(mutationResult) = result,
                 let result = mutationResult.cartPrepareForCompletion?.result
-                as? Storefront.CartStatusReady,
+                    as? Storefront.CartStatusReady,
                 let cart = result.cart
             {
                 self.cart = cart
@@ -406,8 +374,8 @@ class CartManager: ObservableObject {
 
         client.execute(mutation: mutation) { result in
             if case let .success(mutationResult) = result,
-               let cart = mutationResult.cartSelectedDeliveryOptionsUpdate?
-               .cart
+                let cart = mutationResult.cartSelectedDeliveryOptionsUpdate?
+                    .cart
             {
                 handler(.success(cart))
             } else {
@@ -418,89 +386,40 @@ class CartManager: ObservableObject {
 
     // TODO: Rename to selectCartPaymentMethod
     func updateCartPaymentMethod(
-        payment: PKPayment, // REFACTOR: this method should just receive the decoded payment token
+        payment: PKPayment,  // REFACTOR: this method should just receive the decoded payment token
         completion: @escaping (Result<Storefront.Cart, Error>) -> Void
     ) {
+        guard let cartId = cart?.id else {
+            return completion(.failure(Errors.invariant(message: "cartId is nil")))
+        }
+
         guard
-            let cartId = cart?.id,
             let billingContact = payment.billingContact,
-            let totalAmount = cart?.cost.totalAmount
+            let billingPostalAddress = billingContact.postalAddress
         else {
-            fatalError("updateCartPaymentMethod: Pre-requisites not met")
+            return completion(.failure(Errors.invariant(message: "billingContact is nil")))
         }
 
-        var paymentData: PaymentData?
-        do {
-            paymentData = try JSONDecoder().decode(
-                PaymentData.self,
-                from: payment.token.paymentData
-            )
-        } catch {
-            fatalError("error decoding payment data: \(error)")
+        guard let totalAmount = cart?.cost.totalAmount else {
+            return completion(.failure(Errors.invariant(message: "cart?.cost.totalAmount is nil")))
         }
 
-        guard let paymentData else {
-            print(
-                "Decoding failed: .paymentData = \(payment.token)"
-            )
-            return completion(.failure(CartManager.Errors.invalidPaymentData))
+        guard let paymentData = decodePaymentData(payment: payment) else {
+            return completion(.failure(Errors.invalidPaymentData))
         }
 
-        let header = Storefront.ApplePayWalletHeaderInput.create(
-            ephemeralPublicKey: paymentData.header
-                .ephemeralPublicKey,
-            publicKeyHash: paymentData.header.publicKeyHash,
-            transactionId: paymentData.header.transactionId
-            // TODO: Is it required to send applicationData, useful to send cart checkout url?
-            //            applicationData: Input(
-            //                orNull: paymentData.header.applicationData
-            //            )
+        let paymentInput = StorefrontInputFactory.shared.createPaymentInput(
+            payment: payment,
+            paymentData: paymentData,
+            totalAmount: totalAmount,
+            billingContact: billingContact,
+            billingPostalAddress: billingPostalAddress
         )
-
-        let billingAddress = try? mapCNPostalAddress(contact: billingContact)
-        guard let billingAddress else {
-            print(
-                "Invalid Billing Address: .billingAddress = \(String(describing: billingContact.postalAddress))"
-            )
-            return completion(.failure(CartManager.Errors.invalidBillingAddress))
-        }
-
-        let applePayWalletContent = Storefront.ApplePayWalletContentInput
-            .create(
-                billingAddress: billingAddress,
-                data: paymentData.data,
-                header: header,
-                signature: paymentData.signature,
-                version: paymentData.version,
-                lastDigits: Input(
-                    orNull: payment
-                        .token
-                        .paymentMethod
-                        .displayName?
-                        .components(separatedBy: " ")
-                        .last
-                )
-            )
-
-        let walletPaymentMethod = Storefront.CartWalletPaymentMethodInput
-            .create(
-                applePayWalletContent: Input(orNull: applePayWalletContent)
-            )
-
-        let payment = Storefront
-            .CartPaymentInput
-            .create(
-                amount: Storefront.MoneyInput.create(
-                    amount: totalAmount.amount,
-                    currencyCode: totalAmount.currencyCode
-                ),
-                walletPaymentMethod: Input(orNull: walletPaymentMethod)
-            )
 
         let mutation = Storefront.buildMutation(
             inContext: CartManager.ContextDirective
         ) {
-            $0.cartPaymentUpdate(cartId: cartId, payment: payment) {
+            $0.cartPaymentUpdate(cartId: cartId, payment: paymentInput) {
                 $0.cart {
                     $0.cartManagerFragment()
                 }
@@ -545,7 +464,8 @@ class CartManager: ObservableObject {
                  * TODO: how to handle the union type of success response
                  * CartUserError  SubmitSuccess etc.
                  */
-                if let result = result.cartSubmitForCompletion?.result as? Storefront.CartUserError {
+                if let result = result.cartSubmitForCompletion?.result as? Storefront.CartUserError
+                {
                     do {
                         let jsonString = try JSONSerialization.data(withJSONObject: result.rawValue)
                         let json =
@@ -559,15 +479,27 @@ class CartManager: ObservableObject {
                             let error = String(data: userErrors, encoding: .utf8)
                         else {
                             return completion(
-                                .failure(CartApiError.apiErrors("Unknown encountered"))
+                                .failure(
+                                    Errors
+                                        .apiErrors(
+                                            requestName: "cartSubmitForCompletion",
+                                            message: "Unknown encountered"
+                                        )
+                                )
                             )
                         }
 
-                        let err = CartApiError.apiErrors(error)
+                        let err = Errors.apiErrors(
+                            requestName: "cartSubmitForCompletion", message: error)
                         return completion(.failure(err))
                     } catch {
                         return completion(
-                            .failure(CartApiError.apiErrors("Failed to stringify cart error"))
+                            .failure(
+                                Errors.apiErrors(
+                                    requestName: "cartSubmitForCompletion",
+                                    message: "Failed to stringify cart error"
+
+                                ))
                         )
                     }
                 }
@@ -575,9 +507,13 @@ class CartManager: ObservableObject {
                 guard
                     let result = result.cartSubmitForCompletion?.result as? Storefront.SubmitSuccess
                 else {
-                    return completion(.failure(CartApiError.apiErrors("No result")))
+                    return completion(
+                        .failure(
+                            Errors.apiErrors(
+                                requestName: "cartSubmitForCompletion",
+                                message: "No result"
+                            )))
                 }
-                //                print("[CartManager][submitForCompletion] Success \(result)")
                 completion(.success(result))
                 self.cart = nil
             case let .failure(error):
@@ -586,68 +522,27 @@ class CartManager: ObservableObject {
             }
         }
     }
-
-    private func createDefaultCartInput(_ items: [GraphQL.ID])
-        -> Storefront.CartInput
-    {
-        return Storefront.CartInput.create(
-            lines: Input(
-                orNull: items.map {
-                    Storefront.CartLineInput.create(merchandiseId: $0)
-                }
-            )
-        )
-    }
-
-    private func createVaultedCartInput(_ items: [GraphQL.ID] = [])
-        -> Storefront.CartInput
-    {
-        let deliveryAddress = Storefront.MailingAddressInput.create(
-            address1: Input(orNull: vaultedContactInfo.address1),
-            address2: Input(orNull: vaultedContactInfo.address2),
-            city: Input(orNull: vaultedContactInfo.city),
-            company: Input(orNull: ""),
-            country: Input(orNull: vaultedContactInfo.country),
-            firstName: Input(orNull: vaultedContactInfo.firstName),
-            lastName: Input(orNull: vaultedContactInfo.lastName),
-            phone: Input(orNull: vaultedContactInfo.phone),
-            province: Input(orNull: vaultedContactInfo.province),
-            zip: Input(orNull: vaultedContactInfo.zip)
-        )
-
-        let deliveryAddressPreferences = [
-            Storefront.DeliveryAddressInput.create(
-                deliveryAddress: Input(orNull: deliveryAddress))
-        ]
-
-        return Storefront.CartInput.create(
-            lines: Input(
-                orNull: items.map {
-                    Storefront.CartLineInput.create(merchandiseId: $0)
-                }),
-            buyerIdentity: Input(
-                orNull: Storefront.CartBuyerIdentityInput.create(
-                    email: Input(orNull: vaultedContactInfo.email),
-                    deliveryAddressPreferences: Input(
-                        orNull: deliveryAddressPreferences)
-                ))
-        )
-    }
 }
 
 extension CartManager {
     enum Errors: LocalizedError {
         case missingPostalAddress, invalidPaymentData,
-             invalidBillingAddress
+            invalidBillingAddress
+        case apiErrors(requestName: String, message: String)
+        case invariant(message: String)
 
         var failureReason: String? {
             switch self {
+            case .invariant(let message):
+                return "invariant failed: \(message)"
             case .missingPostalAddress:
                 return "Postal Address is nil"
             case .invalidPaymentData:
                 return "Invalid Payment Data"
             case .invalidBillingAddress:
                 return "Mapping billing address failed"
+            case .apiErrors(let requestName, let message):
+                return "Request: \(requestName) Failed. Message: \(message)"
             }
         }
 
@@ -659,6 +554,10 @@ extension CartManager {
                 return "Decoding failed - check the PKPayment"
             case .invalidBillingAddress:
                 return "Ensure `billingContact.postalAddress` is not nil"
+            case .apiErrors(let requestName, _):
+                return "Check the API response for more details: \(requestName)"
+            case .invariant(let message):
+                return "Resolve preconditions before continuing"
             }
         }
     }
