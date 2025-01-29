@@ -167,51 +167,51 @@ class PaymentHandler: NSObject {
 // Set up PKPaymentAuthorizationControllerDelegate conformance.
 
 extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
-//    func paymentAuthorizationController(
-//        _: PKPaymentAuthorizationController,
-//        didSelectShippingMethod shippingMethod: PKShippingMethod,
-//        handler completion: @escaping (PKPaymentRequestShippingMethodUpdate) ->
-//            Void
-//    ) {
-//        guard let identifier = shippingMethod.identifier else {
-//            return print("missing shipping method identifier")
-//        }
-//        // TODO: remove these fatals as they are for debugging
-//        guard let cart = CartManager.shared.cart else {
-//            fatalError("no cart")
-//        }
-//        if cart.deliveryGroups.nodes.isEmpty {
-//            fatalError("no delivery groups")
-//        }
-//
-//        print("identifier \(identifier)")
-//
-//        CartManager.shared
-//            .selectShippingMethodUpdate(deliveryOptionHandle: identifier) {
-//                result in
-//                if case let .failure(error) = result {
-//                    fatalError(
-//                        "[Fail][selectShippingMethodUpdate]. Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
-//                    )
-//                }
-//
-//                // TODO: this seems to resolve the above shipping method update failing?
-//                //                CartManager.shared.performCartPrepareForCompletion { $0 }
-//                //                sleep(5)
-//                CartManager.shared.performCartPrepareForCompletion { result in
-//                    if case .success = result {
-//                        let paymentRequestShippingContactUpdate =
-//                            PKPaymentRequestShippingMethodUpdate(
-//                                paymentSummaryItems: self.mapToPaymentSummaryItems(
-//                                    cart: CartManager.shared.cart,
-//                                    shippingMethod: shippingMethod
-//                                )
-//                            )
-//                        completion(paymentRequestShippingContactUpdate)
-//                    }
-//                }
-//            }
-//    }
+    //    func paymentAuthorizationController(
+    //        _: PKPaymentAuthorizationController,
+    //        didSelectShippingMethod shippingMethod: PKShippingMethod,
+    //        handler completion: @escaping (PKPaymentRequestShippingMethodUpdate) ->
+    //            Void
+    //    ) {
+    //        guard let identifier = shippingMethod.identifier else {
+    //            return print("missing shipping method identifier")
+    //        }
+    //        // TODO: remove these fatals as they are for debugging
+    //        guard let cart = CartManager.shared.cart else {
+    //            fatalError("no cart")
+    //        }
+    //        if cart.deliveryGroups.nodes.isEmpty {
+    //            fatalError("no delivery groups")
+    //        }
+    //
+    //        print("identifier \(identifier)")
+    //
+    //        CartManager.shared
+    //            .selectShippingMethodUpdate(deliveryOptionHandle: identifier) {
+    //                result in
+    //                if case let .failure(error) = result {
+    //                    fatalError(
+    //                        "[Fail][selectShippingMethodUpdate]. Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
+    //                    )
+    //                }
+    //
+    //                // TODO: this seems to resolve the above shipping method update failing?
+    //                //                CartManager.shared.performCartPrepareForCompletion { $0 }
+    //                //                sleep(5)
+    //                CartManager.shared.performCartPrepareForCompletion { result in
+    //                    if case .success = result {
+    //                        let paymentRequestShippingContactUpdate =
+    //                            PKPaymentRequestShippingMethodUpdate(
+    //                                paymentSummaryItems: self.mapToPaymentSummaryItems(
+    //                                    cart: CartManager.shared.cart,
+    //                                    shippingMethod: shippingMethod
+    //                                )
+    //                            )
+    //                        completion(paymentRequestShippingContactUpdate)
+    //                    }
+    //                }
+    //            }
+    //    }
 
     // TODO: Move this to group with other mappers
     private func mapToPKShippingMethods(
@@ -240,108 +240,99 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             }
     }
 
-//    func paymentAuthorizationController(
-//        _: PKPaymentAuthorizationController,
-//        didSelectShippingContact contact: PKContact,
-//        handler completion: @escaping (PKPaymentRequestShippingContactUpdate) ->
-//            Void
-//    ) {
-//        do {
-//            try CartManager.shared.updateDeliveryAddress(
-//                contact: contact,
-//                partial: true
-//            ) { result in
-//                guard
-//                    let cart = result,
-//                    let firstDeliveryGroup = cart.deliveryGroups.nodes.first
-//                else {
-//                    return print(
-//                        "[didSelectShippingContact][updateDeliveryAddress] Invalid success response"
-//                    )
-//                }
-//
-//                let shippingMethods = self.mapToPKShippingMethods(
-//                    firstDeliveryGroup: firstDeliveryGroup
-//                )
-//
-//                CartManager.shared.performCartPrepareForCompletion { result in
-//                    if case let .failure(error) = result {
-//                        print(
-//                            "[didSelectShippingContact][performCartPrepareForCompletion] error \(error)"
-//                        )
-//                    }
-//
-//                    completion(
-//                        PKPaymentRequestShippingContactUpdate(
-//                            errors: [],
-//                            paymentSummaryItems: self.mapToPaymentSummaryItems(
-//                                cart: CartManager.shared.cart,
-//                                shippingMethod: nil
-//                            ),
-//                            shippingMethods: shippingMethods
-//                        )
-//                    )
-//                }
-//            }
-//        } catch {
-//            print(
-//                "[didSelectShippingContact] error: \(error)"
-//            )
-//        }
-//    }
+    func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController,
+        didSelectShippingContact contact: PKContact
+    ) async -> PKPaymentRequestShippingContactUpdate {
+        do {
+            _ = try await CartManager.shared.updateDeliveryAddress(
+                contact: contact,
+                partial: true
+            )
 
-//    func paymentAuthorizationController(
-//        _: PKPaymentAuthorizationController,
-//        didAuthorizePayment payment: PKPayment,
-//        handler completion: @escaping (PKPaymentAuthorizationResult) -> Void
-//    ) {
-//        // Perform basic validation on the provided contact information.
-//        guard payment.shippingContact?.postalAddress?.isoCountryCode == "US"
-//        else {
-//            paymentStatus = .failure
-//            return completion(
-//                .init(
-//                    status: .failure,
-//                    errors: [
-//                        PKPaymentRequest
-//                            .paymentShippingAddressUnserviceableError(
-//                                withLocalizedDescription:
-//                                "Address must be in the United States to use Apple Pay in the Sample App"
-//                            ),
-//                        PKPaymentRequest.paymentShippingAddressInvalidError(
-//                            withKey: CNPostalAddressCountryKey,
-//                            localizedDescription: "Invalid country"
-//                        )
-//                    ]
-//                )
-//            )
-//        }
-//
-//        CartManager.shared.updateCartPaymentMethod(payment: payment) {
-//            updateCartPaymentMethodResult in
-//            switch updateCartPaymentMethodResult {
-//            case .success:
-//                print("[didAuthorizePayment][updateCartPaymentMethod][success]")
-//                CartManager.shared.submitForCompletion {
-//                    submitForCompletionResult in
-//                    switch submitForCompletionResult {
-//                    case .success:
-//                        print("[didAuthorizePayment][submitForCompletion][success]")
-//                        self.paymentStatus = .success
-//                        return completion(.init(status: .success, errors: nil))
-//                    case let .failure(error):
-//                        print("[didAuthorizePayment][submitForCompletion][failure] \(error)")
-//                        self.paymentStatus = .failure
-//                        return completion(.init(status: .failure, errors: [error]))
-//                    }
-//                }
-//            case let .failure(error):
-//                print("[didAuthorizePayment][updateCartPaymentMethod][failure]: \(error)")
-//                self.paymentStatus = .failure
-//                return completion(.init(status: .failure, errors: [error]))
-//            }
-//        }
-//    }
+            guard let firstDeliveryGroup = CartManager.shared.cart?.deliveryGroups.nodes.first else {
+                throw CartManager.Errors.invariant(message: "deliveryGroups empty")
+            }
+
+            let shippingMethods = mapToPKShippingMethods(
+                firstDeliveryGroup: firstDeliveryGroup
+            )
+
+            _ = try await CartManager.shared.performCartPrepareForCompletion()
+
+            return PKPaymentRequestShippingContactUpdate(
+                errors: [],
+                paymentSummaryItems: mapToPaymentSummaryItems(
+                    cart: CartManager.shared.cart,
+                    shippingMethod: nil
+                ),
+                shippingMethods: shippingMethods
+            )
+        } catch {
+            print("[didSelectShippingContact] error: \(error)")
+            return PKPaymentRequestShippingContactUpdate(
+                errors: [error],
+                paymentSummaryItems: mapToPaymentSummaryItems(
+                    cart: CartManager.shared.cart,
+                    shippingMethod: nil
+                ),
+                shippingMethods: []
+            )
+        }
+    }
+
+    //    func paymentAuthorizationController(
+    //        _: PKPaymentAuthorizationController,
+    //        didAuthorizePayment payment: PKPayment,
+    //        handler completion: @escaping (PKPaymentAuthorizationResult) -> Void
+    //    ) {
+    //        // Perform basic validation on the provided contact information.
+    //        guard payment.shippingContact?.postalAddress?.isoCountryCode == "US"
+    //        else {
+    //            paymentStatus = .failure
+    //            return completion(
+    //                .init(
+    //                    status: .failure,
+    //                    errors: [
+    //                        PKPaymentRequest
+    //                            .paymentShippingAddressUnserviceableError(
+    //                                withLocalizedDescription:
+    //                                "Address must be in the United States to use Apple Pay in the Sample App"
+    //                            ),
+    //                        PKPaymentRequest.paymentShippingAddressInvalidError(
+    //                            withKey: CNPostalAddressCountryKey,
+    //                            localizedDescription: "Invalid country"
+    //                        )
+    //                    ]
+    //                )
+    //            )
+    //        }
+    //
+    //        CartManager.shared.updateCartPaymentMethod(payment: payment) {
+    //            updateCartPaymentMethodResult in
+    //            switch updateCartPaymentMethodResult {
+    //            case .success:
+    //                print("[didAuthorizePayment][updateCartPaymentMethod][success]")
+    //                CartManager.shared.submitForCompletion {
+    //                    submitForCompletionResult in
+    //                    switch submitForCompletionResult {
+    //                    case .success:
+    //                        print("[didAuthorizePayment][submitForCompletion][success]")
+    //                        self.paymentStatus = .success
+    //                        return completion(.init(status: .success, errors: nil))
+    //                    case let .failure(error):
+    //                        print("[didAuthorizePayment][submitForCompletion][failure] \(error)")
+    //                        self.paymentStatus = .failure
+    //                        return completion(.init(status: .failure, errors: [error]))
+    //                    }
+    //                }
+    //            case let .failure(error):
+    //                print("[didAuthorizePayment][updateCartPaymentMethod][failure]: \(error)")
+    //                self.paymentStatus = .failure
+    //                return completion(.init(status: .failure, errors: [error]))
+    //            }
+    //        }
+    //    }
 
     func paymentAuthorizationControllerDidFinish(
         _ controller: PKPaymentAuthorizationController
