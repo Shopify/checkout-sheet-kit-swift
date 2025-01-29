@@ -190,12 +190,13 @@ struct CartLines: View {
                                     /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                     ShopifyCheckoutSheetKit.invalidate()
 
-                                    CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity - 1, completionHandler: { cart in
+                                    _Concurrency.Task {
+                                        let cart = try await CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity - 1)
                                         CartManager.shared.cart = cart
                                         updating = nil
 
                                         CartManager.shared.preloadCheckout()
-                                    })
+                                    }
                                 }, label: {
                                     Image(systemName: "minus")
                                         .font(.system(size: 12))
@@ -225,14 +226,13 @@ struct CartLines: View {
                                     /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                     ShopifyCheckoutSheetKit.invalidate()
 
-                                    CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity + 1, completionHandler: { cart in
+                                    _Concurrency.Task {
+                                        let cart = try await CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity + 1)
                                         CartManager.shared.cart = cart
                                         updating = nil
 
-                                        if let url = cart?.checkoutUrl {
-                                            ShopifyCheckoutSheetKit.preload(checkout: url)
-                                        }
-                                    })
+                                        ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
+                                    }
                                 }, label: {
                                     Image(systemName: "plus")
                                         .font(.system(size: 12))

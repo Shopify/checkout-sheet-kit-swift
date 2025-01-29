@@ -30,13 +30,13 @@ struct ProductGrid: View {
     @State private var showProductSheet = false
 
     let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10))
     ]
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 0) {
+            LazyVGrid(columns: columns, spacing: 2) {
                 if let products = productCache.collection, !products.isEmpty {
                     ForEach(products, id: \.id) { product in
                         ProductGridItem(product: product)
@@ -95,21 +95,35 @@ struct ProductSheetView: View {
 
 struct ProductGridItem: View {
     let product: Storefront.Product
-
-    let imageHeight = 200.0
-
+    let maxWidth = UIScreen.main.bounds.width / 2 - 10
     var body: some View {
         VStack {
             if let imageURL = product.featuredImage?.url {
                 AsyncImage(url: imageURL) { image in
                     image
                         .resizable()
-                        .scaledToFit()
-                        .frame(height: imageHeight)
+                        .scaledToFill()
+                        .frame(maxWidth: maxWidth)
+                        .frame(height: 150)
+                        .clipped()
                 } placeholder: {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(height: imageHeight)
+                        .frame(maxWidth: maxWidth)
+                        .frame(height: 150)
+                        .clipped()
+                }
+            } else {
+                ZStack {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(maxWidth: maxWidth)
+                        .frame(height: 150)
+                        .clipped()
+
+                    Image(systemName: "photo.badge.exclamationmark")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.white)
                 }
             }
 
@@ -127,8 +141,6 @@ struct ProductGridItem: View {
             }
             .frame(alignment: .leading)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.bottom, 20)
     }
 }
 
