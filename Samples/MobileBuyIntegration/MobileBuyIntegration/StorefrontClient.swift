@@ -58,19 +58,19 @@ class StorefrontClient {
 
         task.resume()
     }
-    
+
     func executeAsync(query: Storefront.QueryRootQuery) async throws -> Storefront.QueryRoot {
-        return try await withCheckedThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { continuation in
             let task = client.queryGraphWith(query) { query, error in
-                if let root = query{
-                    continuation.resume(returning: root)
-                } else {
-                    continuation.resume(throwing: error ?? URLError(.unknown))
+                guard let query = query else {
+                    return continuation.resume(throwing: error ?? URLError(.unknown))
                 }
+
+                continuation.resume(returning: query)
             }
+            task.resume()
         }
     }
-
 
     typealias MutationResultHandler = (Result<Storefront.Mutation, Error>) -> Void
 
@@ -85,19 +85,21 @@ class StorefrontClient {
 
         task.resume()
     }
-    
-    func executeAsync(mutation: Storefront.MutationQuery) async throws -> Storefront.Mutation{
-        return try await withCheckedThrowingContinuation  { continuation in
-            let task = client.mutateGraphWith(mutation) { mutation, error in
-                if let root = mutation {
-                    continuation.resume(returning: root)
-                } else {
-                    continuation.resume(throwing: error ?? URLError(.unknown))
+
+    func executeAsync(mutation: Storefront.MutationQuery) async throws -> Storefront.Mutation {
+        try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.main.async {
+                let task = self.client.mutateGraphWith(mutation) { mutation, error in
+                    guard let mutation = mutation else {
+                        return continuation.resume(throwing: error ?? URLError(.unknown))
+                    }
+
+                    continuation.resume(returning: mutation)
                 }
+                task.resume()
             }
         }
     }
-
 }
 
 public struct StorefrontURL {
