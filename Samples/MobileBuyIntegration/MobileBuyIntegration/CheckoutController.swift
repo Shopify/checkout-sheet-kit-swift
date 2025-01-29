@@ -54,19 +54,21 @@ class CheckoutController: UIViewController {
     }
 
     public func payWithApplePay() {
-        paymentHandler.startApplePayCheckout { success, checkoutUrl in
-            ShopifyCheckoutSheetKit.present(checkout: checkoutUrl, from: self)
-            if success {
-                #warning("Errors due to no screen - this will be resolved after rebasing with Marks changes")
-//                self.performSegue(withIdentifier: "Confirmation", sender: self)
+        paymentHandler.startApplePayCheckout { success in
+            if !success, let checkoutUrl = CartManager.shared.cart?.checkoutUrl {
+                ShopifyCheckoutSheetKit.present(checkout: checkoutUrl, from: self)
             }
+
+            guard let redirectUrl = CartManager.shared.cart?.checkoutUrl else { return }
+            ShopifyCheckoutSheetKit.present(checkout: redirectUrl, from: self)
         }
     }
 }
 
 extension CheckoutController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
-        OSLogger.shared.debug("[CheckoutDelegate] Checkout completed. Order ID: \(event.orderDetails.id)")
+        OSLogger.shared.debug(
+            "[CheckoutDelegate] Checkout completed. Order ID: \(event.orderDetails.id)")
         CartManager.shared.resetCart()
     }
 

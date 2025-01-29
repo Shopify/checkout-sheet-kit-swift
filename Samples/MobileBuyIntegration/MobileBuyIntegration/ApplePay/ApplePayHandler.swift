@@ -26,7 +26,7 @@ import PassKit
 import ShopifyCheckoutSheetKit
 import UIKit
 
-typealias PaymentCompletionHandler = (Bool, URL) -> Void
+typealias PaymentCompletionHandler = (Bool) -> Void
 
 class ApplePayHandler: NSObject {
     // MARK: Properties
@@ -85,7 +85,7 @@ class ApplePayHandler: NSObject {
             if !presented {
                 debugPrint("Failed to present payment controller, falling back to CSK")
                 guard let checkoutUrl = CartManager.shared.cart?.checkoutUrl else { return }
-                self.paymentCompletionHandler?(false, checkoutUrl)
+                self.paymentCompletionHandler?(false)
             }
         })
     }
@@ -241,15 +241,15 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                     )
                 }
 
-                guard let url = CartManager.shared.redirectUrl else {
-                    guard let url = CartManager.shared.cart?.checkoutUrl else {
+                guard let redirectUrl = CartManager.shared.redirectUrl else {
+                    guard let checkoutUrl = CartManager.shared.cart?.checkoutUrl else {
                         return print("Decelerate flow failure")
                     }
-                    self.paymentCompletionHandler?(false, url)
+                    self.paymentCompletionHandler?(false)
                     return
                 }
 
-                self.paymentCompletionHandler?(Bool(truncating: paymentStatus), url)
+                self.paymentCompletionHandler?(Bool(truncating: paymentStatus))
             }
         }
     }
