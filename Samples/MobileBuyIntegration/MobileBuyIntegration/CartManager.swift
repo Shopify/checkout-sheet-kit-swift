@@ -96,22 +96,33 @@ class CartManager: ObservableObject {
     func updateDeliveryAddress(
         contact: PKContact,
         partial _: Bool,
-        completionHandler: ((Storefront.Cart?) -> Void)?
-    ) throws {
-        do {
-            let shippingAddress = try mapCNPostalAddress(contact: contact)
+        handler completion: @escaping (Result<Storefront.Cart, Errors>) -> Void
+    ) {
+        guard let address = contact.postalAddress else {
+            return completion(.failure(.invariant(message: "contact.postalAddress is nil")))
+        }
 
-            performCartDeliveryAddressUpdate(shippingAddress: shippingAddress) {
-                switch $0 {
-                case let .success(cart):
-                    self.cart = cart
-                case let .failure(error):
-                    print("performCartDeliveryAddressUpdate: \(error)")
-                }
-                completionHandler?(self.cart)
+        let shippingAddress = StorefrontInputFactory.shared.createMailingAddressInput(
+            contact: contact,
+            address: address
+        )
+
+        performCartDeliveryAddressUpdate(shippingAddress: shippingAddress) {
+            switch $0 {
+            case let .success(cart):
+                self.cart = cart
+                completion(.success(cart))
+            case let .failure(error):
+                print("performCartDeliveryAddressUpdate: \(error)")
+                    return completion(
+                        .failure(
+                            .apiErrors(
+                                requestName: "performCartDeliveryAddressUpdate",
+                                message: "Error: \(error)"
+                            )
+                        )
+                    )
             }
-        } catch {
-            print("Failed to update delivery address with error: \(error)")
         }
     }
 
@@ -174,7 +185,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(result) = result,
-                let cart = result.cartLinesAdd?.cart
+               let cart = result.cartLinesAdd?.cart
             {
                 handler(.success(cart))
             } else {
@@ -201,8 +212,8 @@ class CartManager: ObservableObject {
     ) {
         let input =
             appConfiguration.useVaultedState
-            ? StorefrontInputFactory.shared.createVaultedCartInput(items)
-            : StorefrontInputFactory.shared.createDefaultCartInput(items)
+                ? StorefrontInputFactory.shared.createVaultedCartInput(items)
+                : StorefrontInputFactory.shared.createDefaultCartInput(items)
 
         let mutation = Storefront.buildMutation(
             inContext: CartManager.ContextDirective
@@ -216,7 +227,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(mutation) = result,
-                let cart = mutation.cartCreate?.cart
+               let cart = mutation.cartCreate?.cart
             {
                 handler(.success(cart))
             } else {
@@ -252,7 +263,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(result) = result,
-                let cart = result.cartLinesUpdate?.cart
+               let cart = result.cartLinesUpdate?.cart
             {
                 handler(.success(cart))
             } else {
@@ -296,7 +307,7 @@ class CartManager: ObservableObject {
             #warning("accessing cart in this if could throw")
 
             if case let .success(mutationResult) = result,
-                let cart = mutationResult.cartBuyerIdentityUpdate?.cart
+               let cart = mutationResult.cartBuyerIdentityUpdate?.cart
             {
                 handler(.success(cart))
             } else {
@@ -331,9 +342,9 @@ class CartManager: ObservableObject {
         client.execute(mutation: mutation) { result in
             #warning("accessing cart in this if could throw")
             if case let .success(mutationResult) = result,
-                let result = mutationResult.cartPrepareForCompletion?.result
-                    as? Storefront.CartStatusReady,
-                let cart = result.cart
+               let result = mutationResult.cartPrepareForCompletion?.result
+               as? Storefront.CartStatusReady,
+               let cart = result.cart
             {
                 self.cart = cart
                 handler(.success(cart))
@@ -374,8 +385,8 @@ class CartManager: ObservableObject {
 
         client.execute(mutation: mutation) { result in
             if case let .success(mutationResult) = result,
-                let cart = mutationResult.cartSelectedDeliveryOptionsUpdate?
-                    .cart
+               let cart = mutationResult.cartSelectedDeliveryOptionsUpdate?
+               .cart
             {
                 handler(.success(cart))
             } else {
@@ -386,7 +397,7 @@ class CartManager: ObservableObject {
 
     // TODO: Rename to selectCartPaymentMethod
     func updateCartPaymentMethod(
-        payment: PKPayment,  // REFACTOR: this method should just receive the decoded payment token
+        payment: PKPayment, // REFACTOR: this method should just receive the decoded payment token
         completion: @escaping (Result<Storefront.Cart, Error>) -> Void
     ) {
         guard let cartId = cart?.id else {
@@ -464,8 +475,7 @@ class CartManager: ObservableObject {
                  * TODO: how to handle the union type of success response
                  * CartUserError  SubmitSuccess etc.
                  */
-                if let result = result.cartSubmitForCompletion?.result as? Storefront.CartUserError
-                {
+                if let result = result.cartSubmitForCompletion?.result as? Storefront.CartUserError {
                     do {
                         let jsonString = try JSONSerialization.data(withJSONObject: result.rawValue)
                         let json =
@@ -490,7 +500,8 @@ class CartManager: ObservableObject {
                         }
 
                         let err = Errors.apiErrors(
-                            requestName: "cartSubmitForCompletion", message: error)
+                            requestName: "cartSubmitForCompletion", message: error
+                        )
                         return completion(.failure(err))
                     } catch {
                         return completion(
@@ -527,13 +538,13 @@ class CartManager: ObservableObject {
 extension CartManager {
     enum Errors: LocalizedError {
         case missingPostalAddress, invalidPaymentData,
-            invalidBillingAddress
+             invalidBillingAddress
         case apiErrors(requestName: String, message: String)
         case invariant(message: String)
 
         var failureReason: String? {
             switch self {
-            case .invariant(let message):
+            case let .invariant(message):
                 return "invariant failed: \(message)"
             case .missingPostalAddress:
                 return "Postal Address is nil"
@@ -541,7 +552,7 @@ extension CartManager {
                 return "Invalid Payment Data"
             case .invalidBillingAddress:
                 return "Mapping billing address failed"
-            case .apiErrors(let requestName, let message):
+            case let .apiErrors(requestName, message):
                 return "Request: \(requestName) Failed. Message: \(message)"
             }
         }
@@ -554,9 +565,9 @@ extension CartManager {
                 return "Decoding failed - check the PKPayment"
             case .invalidBillingAddress:
                 return "Ensure `billingContact.postalAddress` is not nil"
-            case .apiErrors(let requestName, _):
+            case let .apiErrors(requestName, _):
                 return "Check the API response for more details: \(requestName)"
-            case .invariant(let message):
+            case let .invariant(message):
                 return "Resolve preconditions before continuing"
             }
         }

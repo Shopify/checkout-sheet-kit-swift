@@ -108,8 +108,8 @@ public struct StorefrontURL {
 
         let pattern = "/products/([\\w_-]+)"
         if let match = url.path.range(
-            of: pattern, options: .regularExpression, range: nil, locale: nil)
-        {
+            of: pattern, options: .regularExpression, range: nil, locale: nil
+        ) {
             let slug = url.path[match].components(separatedBy: "/").last
             return slug
         }
@@ -227,6 +227,5 @@ class StorefrontInputFactory {
             ),
             walletPaymentMethod: Input(orNull: walletPaymentMethod)
         )
-
     }
 }
