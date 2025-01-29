@@ -25,7 +25,7 @@ import Foundation
 import ShopifyCheckoutSheetKit
 
 public final class AppConfiguration: ObservableObject {
-    public var storefrontDomain: String = Bundle.main.infoDictionary?["StorefrontDomain"] as? String ?? ""
+    public var storefrontDomain: String = InfoDictionary.shared.domain
 
     @Published public var universalLinks = UniversalLinks()
 

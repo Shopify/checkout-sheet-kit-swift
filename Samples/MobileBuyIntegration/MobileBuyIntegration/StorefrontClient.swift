@@ -31,15 +31,11 @@ class StorefrontClient {
     private let client: Graph.Client
 
     private init() {
-        guard
-            let infoPlist = Bundle.main.infoDictionary,
-            let domain = infoPlist["StorefrontDomain"] as? String,
-            let token = infoPlist["StorefrontAccessToken"] as? String
-        else {
-            fatalError("unable to load storefront configuration")
-        }
-
-        client = Graph.Client(shopDomain: domain, apiKey: token)
+        client = Graph
+            .Client(
+                shopDomain: InfoDictionary.shared.domain,
+                apiKey: InfoDictionary.shared.accessToken
+            )
 
         /// Set the caching policy (1 hour)
         client.cachePolicy = .cacheFirst(expireIn: 60 * 60)

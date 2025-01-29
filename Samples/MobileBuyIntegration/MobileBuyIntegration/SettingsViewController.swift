@@ -117,15 +117,7 @@ struct SettingsView: View {
     }
 
     private func currentVersion() -> String {
-        guard
-            let info = Bundle.main.infoDictionary,
-            let version = info["CFBundleShortVersionString"] as? String,
-            let buildNumber = info["CFBundleVersion"] as? String
-        else {
-            return "--"
-        }
-
-        return "\(version) (\(buildNumber))"
+        return "\(InfoDictionary.shared.version) (\(InfoDictionary.shared.buildNumber))"
     }
 }
 

@@ -30,7 +30,7 @@ class InfoDictionary {
     static let shared = InfoDictionary()
 
     let address1, address2, city, country, firstName, lastName, province, zip,
-        email, phone, domain, accessToken: String
+        email, phone, domain, accessToken, version, buildNumber: String
 
     init() {
         guard
@@ -46,7 +46,9 @@ class InfoDictionary {
             let email = infoPlist["Email"] as? String,
             let phone = infoPlist["Phone"] as? String,
             let domain = infoPlist["StorefrontDomain"] as? String,
-            let accessToken = infoPlist["StorefrontAccessToken"] as? String
+            let accessToken = infoPlist["StorefrontAccessToken"] as? String,
+            let version = infoPlist["CFBundleShortVersionString"] as? String,
+            let buildNumber = infoPlist["CFBundleVersion"] as? String
         else {
             fatalError("Missing required configuration. Check your info.plist.")
         }
@@ -63,5 +65,7 @@ class InfoDictionary {
         self.phone = phone
         self.domain = domain
         self.accessToken = accessToken
+        self.version = version
+        self.buildNumber = buildNumber
     }
 }

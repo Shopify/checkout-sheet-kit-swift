@@ -49,7 +49,7 @@ class ApplePayHandler: NSObject {
         .amex,
         .discover,
         .masterCard,
-        .visa,
+        .visa
     ]
 
     /*
@@ -125,7 +125,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                 CartManager.Errors.apiErrors(
                     requestName: "cartSelectedDeliveryOptionsUpdate  or cartPrepareForCompletion",
                     message:
-                        "Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
+                    "Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
                 )
             )
 
@@ -195,12 +195,12 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                     PKPaymentRequest
                         .paymentShippingAddressUnserviceableError(
                             withLocalizedDescription:
-                                "Address must be in the United States to use Apple Pay in the Sample App"
+                            "Address must be in the United States to use Apple Pay in the Sample App"
                         ),
                     PKPaymentRequest.paymentShippingAddressInvalidError(
                         withKey: CNPostalAddressCountryKey,
                         localizedDescription: "Invalid country"
-                    ),
+                    )
                 ]
             )
         }
