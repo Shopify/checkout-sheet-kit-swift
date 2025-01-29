@@ -58,6 +58,19 @@ class StorefrontClient {
 
         task.resume()
     }
+    
+    func executeAsync(query: Storefront.QueryRootQuery) async throws -> Storefront.QueryRoot {
+        return try await withCheckedThrowingContinuation { continuation in
+            let task = client.queryGraphWith(query) { query, error in
+                if let root = query{
+                    continuation.resume(returning: root)
+                } else {
+                    continuation.resume(throwing: error ?? URLError(.unknown))
+                }
+            }
+        }
+    }
+
 
     typealias MutationResultHandler = (Result<Storefront.Mutation, Error>) -> Void
 
@@ -72,6 +85,19 @@ class StorefrontClient {
 
         task.resume()
     }
+    
+    func executeAsync(mutation: Storefront.MutationQuery) async throws -> Storefront.Mutation{
+        return try await withCheckedThrowingContinuation  { continuation in
+            let task = client.mutateGraphWith(mutation) { mutation, error in
+                if let root = mutation {
+                    continuation.resume(returning: root)
+                } else {
+                    continuation.resume(throwing: error ?? URLError(.unknown))
+                }
+            }
+        }
+    }
+
 }
 
 public struct StorefrontURL {
