@@ -231,7 +231,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
             /// Update cart quantities
             _Concurrency.Task {
-                let cart = try await CartManager.shared.performUpdateQuantity(variant: node.id, quantity: quantity)
+                let cart = try await CartManager.shared.performCartLinesUpdate(id: node.id, quantity: quantity)
 
                 cell.showLoading(false)
                 self.checkoutButton.isEnabled = true

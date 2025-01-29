@@ -191,7 +191,7 @@ struct CartLines: View {
                                     ShopifyCheckoutSheetKit.invalidate()
 
                                     _Concurrency.Task {
-                                        let cart = try await CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity - 1)
+                                        let cart = try await CartManager.shared.performCartLinesUpdate(id: node.id, quantity: node.quantity - 1)
                                         CartManager.shared.cart = cart
                                         updating = nil
 
@@ -215,31 +215,37 @@ struct CartLines: View {
                                     }
                                 }.frame(width: 20)
 
-                                Button(action: {
-                                    /// Prevent multiple simulataneous calls
-                                    guard updating != node.id else {
-                                        return
+                                Button(
+                                    action: {
+                                        /// Prevent multiple simulataneous calls
+                                        guard updating != node.id else {
+                                            return
+                                        }
+
+                                        updating = node.id
+
+                                        /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
+                                        ShopifyCheckoutSheetKit.invalidate()
+
+                                        _Concurrency.Task {
+                                            let cart = try await CartManager.shared.performCartLinesUpdate(
+                                                id: node.id,
+                                                quantity: node.quantity + 1
+                                            )
+                                            CartManager.shared.cart = cart
+                                            updating = nil
+
+                                            ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
+                                        }
+                                    },
+                                    label: {
+                                        Image(systemName: "plus")
+                                            .font(.system(size: 12))
+                                            .frame(width: 32, height: 32)
+                                            .background(Color.gray.opacity(0.1))
+                                            .clipShape(Circle())
                                     }
-
-                                    updating = node.id
-
-                                    /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
-                                    ShopifyCheckoutSheetKit.invalidate()
-
-                                    _Concurrency.Task {
-                                        let cart = try await CartManager.shared.performUpdateQuantity(variant: node.id, quantity: node.quantity + 1)
-                                        CartManager.shared.cart = cart
-                                        updating = nil
-
-                                        ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
-                                    }
-                                }, label: {
-                                    Image(systemName: "plus")
-                                        .font(.system(size: 12))
-                                        .frame(width: 32, height: 32)
-                                        .background(Color.gray.opacity(0.1))
-                                        .clipShape(Circle())
-                                })
+                                )
                             }
                             .padding(.trailing, 10)
                         }

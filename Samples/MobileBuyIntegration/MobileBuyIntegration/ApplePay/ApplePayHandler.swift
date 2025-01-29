@@ -84,7 +84,6 @@ class ApplePayHandler: NSObject {
         paymentController.present(completion: { (presented: Bool) in
             if !presented {
                 debugPrint("Failed to present payment controller, falling back to CSK")
-                guard let checkoutUrl = CartManager.shared.cart?.checkoutUrl else { return }
                 self.paymentCompletionHandler?(false)
             }
         })
@@ -107,7 +106,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         do {
-            _ = try await CartManager.shared.selectShippingMethodUpdate(
+            _ = try await CartManager.shared.performCartSelectedDeliveryOptionsUpdate(
                 deliveryOptionHandle: identifier
             )
 
@@ -143,7 +142,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
         do {
-            _ = try await CartManager.shared.updateDeliveryAddress(
+            _ = try await CartManager.shared.performBuyerIdentityUpdate(
                 contact: contact,
                 partial: true
             )
@@ -214,7 +213,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         do {
-            let response = try await CartManager.shared.performSubmitForCompletion()
+            let response = try await CartManager.shared.performCartSubmitForCompletion()
             CartManager.shared.redirectUrl = response.redirectUrl
             paymentStatus = .success
             return PKPaymentAuthorizationResult(status: .success, errors: nil)
@@ -239,14 +238,6 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                     return print(
                         "Unknown payment status \(String(describing: CartManager.shared.cart))"
                     )
-                }
-
-                guard let redirectUrl = CartManager.shared.redirectUrl else {
-                    guard let checkoutUrl = CartManager.shared.cart?.checkoutUrl else {
-                        return print("Decelerate flow failure")
-                    }
-                    self.paymentCompletionHandler?(false)
-                    return
                 }
 
                 self.paymentCompletionHandler?(Bool(truncating: paymentStatus))
