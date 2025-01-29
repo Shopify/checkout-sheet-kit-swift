@@ -34,7 +34,6 @@ struct CartView: View {
     @ObservedObject var config: AppConfiguration = appConfiguration
 
     var body: some View {
-        let _ = Self._printChanges()
         if let lines = cartManager.cart?.lines.nodes {
             ZStack(alignment: .bottom) {
                 ScrollView {
