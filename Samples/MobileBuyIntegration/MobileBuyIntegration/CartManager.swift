@@ -124,29 +124,22 @@ class CartManager: ObservableObject {
         }
     }
 
-    func selectShippingMethodUpdate(
-        deliveryOptionHandle: String,
-        handler completion: @escaping CartResultHandler
-    ) {
+    func selectShippingMethodUpdate(deliveryOptionHandle: String) async throws -> Storefront.Cart {
         guard let deliveryGroupId = cart?.deliveryGroups.nodes.first?.id else {
-            return print("No delivery group selected")
+            throw Errors.invariant(message: "No deliveryGroups")
         }
 
-        performCartShippingMethodUpdate(
-            deliveryGroupId: deliveryGroupId,
-            deliveryOptionHandle: deliveryOptionHandle
-        ) { result in
-            switch result {
-            case let .success(result):
-                self.cart = result
-                completion(.success(result))
-            case let .failure(error):
-                /**
-                 * if cartPrepareForCompletion returns errors/usererrors
-                 * then deliveryGroups are invalidated resulting in throws here
-                 */
-                completion(.failure(error))
+        do {
+            let response = try await performCartShippingMethodUpdate(
+                deliveryGroupId: deliveryGroupId,
+                deliveryOptionHandle: deliveryOptionHandle
+            )
+            DispatchQueue.main.async {
+                self.cart = response
             }
+            return response
+        } catch {
+            throw Errors.apiErrors(requestName: "cartShippingMethodUpdate", message: "\(error)")
         }
     }
 
@@ -352,13 +345,9 @@ class CartManager: ObservableObject {
         }
     }
 
-    private func performCartShippingMethodUpdate(
-        deliveryGroupId: GraphQL.ID,
-        deliveryOptionHandle: String,
-        handler: @escaping (Result<Storefront.Cart, Error>) -> Void
-    ) {
+    private func performCartShippingMethodUpdate(deliveryGroupId: GraphQL.ID, deliveryOptionHandle: String) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
-            return print("performCartShippingMethodUpdate: Cart isn't created")
+            throw Errors.invariant(message: "cart is nil")
         }
 
         let cartSelectedDeliveryOptionInput =
@@ -381,15 +370,14 @@ class CartManager: ObservableObject {
             }
         }
 
-        client.execute(mutation: mutation) { result in
-            if case let .success(mutationResult) = result,
-               let cart = mutationResult.cartSelectedDeliveryOptionsUpdate?
-               .cart
-            {
-                handler(.success(cart))
-            } else {
-                handler(.failure(URLError(.unknown)))
+        do {
+            let response = try await client.executeAsync(mutation: mutation)
+            guard let cart = response.cartSelectedDeliveryOptionsUpdate?.cart else {
+                throw Errors.invariant(message: "cart returned nil")
             }
+            return cart
+        } catch {
+            throw Errors.apiErrors(requestName: "cartSelectedDeliveryOptionsUpdate", message: "\(error)")
         }
     }
 
@@ -542,8 +530,6 @@ extension CartManager {
 
         var failureReason: String? {
             switch self {
-            case let .invariant(message):
-                return "invariant failed: \(message)"
             case .missingPostalAddress:
                 return "Postal Address is nil"
             case .invalidPaymentData:
@@ -552,6 +538,8 @@ extension CartManager {
                 return "Mapping billing address failed"
             case let .apiErrors(requestName, message):
                 return "Request: \(requestName) Failed. Message: \(message)"
+            case let .invariant(message):
+                return "invariant failed: \(message)"
             }
         }
 
@@ -565,7 +553,7 @@ extension CartManager {
                 return "Ensure `billingContact.postalAddress` is not nil"
             case let .apiErrors(requestName, _):
                 return "Check the API response for more details: \(requestName)"
-            case let .invariant(message):
+            case .invariant:
                 return "Resolve preconditions before continuing"
             }
         }

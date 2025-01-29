@@ -37,6 +37,7 @@
 		CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BE2D4951D700466376 /* InfoDictionary.swift */; };
 		CB05E6C12D4954A600466376 /* PaymentCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C02D49549700466376 /* PaymentCodable.swift */; };
 		CB05E6C42D4954E800466376 /* Storefront.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Storefront.swift */; };
+		CB05E6C62D4A5AB600466376 /* PaymentFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C52D4A5AB200466376 /* PaymentFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -71,6 +72,7 @@
 		CB05E6BE2D4951D700466376 /* InfoDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDictionary.swift; sourceTree = "<group>"; };
 		CB05E6C02D49549700466376 /* PaymentCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCodable.swift; sourceTree = "<group>"; };
 		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
+		CB05E6C52D4A5AB200466376 /* PaymentFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +183,7 @@
 		CB05E6BB2D493B8200466376 /* ApplePay */ = {
 			isa = PBXGroup;
 			children = (
+				CB05E6C52D4A5AB200466376 /* PaymentFactory.swift */,
 				CB05E6C02D49549700466376 /* PaymentCodable.swift */,
 				CB05E6BC2D493B8B00466376 /* PaymentHandler.swift */,
 			);
@@ -323,6 +326,7 @@
 				4EBBA7B02A5F222F00193E19 /* MoneyV2+Format.swift in Sources */,
 				6A2E77BE2CE606490067062D /* Catalog.swift in Sources */,
 				4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */,
+				CB05E6C62D4A5AB600466376 /* PaymentFactory.swift in Sources */,
 				CB05E6C42D4954E800466376 /* Storefront.swift in Sources */,
 				4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */,
 				4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */,

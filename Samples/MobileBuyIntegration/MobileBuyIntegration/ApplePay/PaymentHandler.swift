@@ -44,7 +44,7 @@ class PaymentHandler: NSObject {
         .amex,
         .discover,
         .masterCard,
-        .visa
+        .visa,
     ]
 
     class func applePayStatus() -> (canMakePayments: Bool, canSetupCards: Bool) {
@@ -61,7 +61,7 @@ class PaymentHandler: NSObject {
         #warning("Missing selectedDeliveryOption will throw out of this guard")
         guard
             let selectedDeliveryOption = CartManager.shared.cart?.deliveryGroups
-            .nodes.first?.selectedDeliveryOption,
+                .nodes.first?.selectedDeliveryOption,
             let title = selectedDeliveryOption.title
         else {
             return []
@@ -167,78 +167,52 @@ class PaymentHandler: NSObject {
 // Set up PKPaymentAuthorizationControllerDelegate conformance.
 
 extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
-    //    func paymentAuthorizationController(
-    //        _: PKPaymentAuthorizationController,
-    //        didSelectShippingMethod shippingMethod: PKShippingMethod,
-    //        handler completion: @escaping (PKPaymentRequestShippingMethodUpdate) ->
-    //            Void
-    //    ) {
-    //        guard let identifier = shippingMethod.identifier else {
-    //            return print("missing shipping method identifier")
-    //        }
-    //        // TODO: remove these fatals as they are for debugging
-    //        guard let cart = CartManager.shared.cart else {
-    //            fatalError("no cart")
-    //        }
-    //        if cart.deliveryGroups.nodes.isEmpty {
-    //            fatalError("no delivery groups")
-    //        }
-    //
-    //        print("identifier \(identifier)")
-    //
-    //        CartManager.shared
-    //            .selectShippingMethodUpdate(deliveryOptionHandle: identifier) {
-    //                result in
-    //                if case let .failure(error) = result {
-    //                    fatalError(
-    //                        "[Fail][selectShippingMethodUpdate]. Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
-    //                    )
-    //                }
-    //
-    //                // TODO: this seems to resolve the above shipping method update failing?
-    //                //                CartManager.shared.performCartPrepareForCompletion { $0 }
-    //                //                sleep(5)
-    //                CartManager.shared.performCartPrepareForCompletion { result in
-    //                    if case .success = result {
-    //                        let paymentRequestShippingContactUpdate =
-    //                            PKPaymentRequestShippingMethodUpdate(
-    //                                paymentSummaryItems: self.mapToPaymentSummaryItems(
-    //                                    cart: CartManager.shared.cart,
-    //                                    shippingMethod: shippingMethod
-    //                                )
-    //                            )
-    //                        completion(paymentRequestShippingContactUpdate)
-    //                    }
-    //                }
-    //            }
-    //    }
-
-    // TODO: Move this to group with other mappers
-    private func mapToPKShippingMethods(
-        firstDeliveryGroup: Storefront.CartDeliveryGroup
-    ) -> [PKShippingMethod] {
-        firstDeliveryGroup
-            .deliveryOptions.compactMap {
-                guard
-                    let title = $0.title,
-                    let description = $0.description
-                else {
-                    print("Invalid deliveryOption to map shipping method")
-                    return nil
-                }
-                let shippingMethod = PKShippingMethod(
-                    label: title,
-                    amount: NSDecimalNumber(
-                        string: "\($0.estimatedCost.amount)"
-                    )
+    func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController,
+        didSelectShippingMethod shippingMethod: PKShippingMethod
+    ) async -> PKPaymentRequestShippingMethodUpdate {
+        guard let identifier = shippingMethod.identifier else {
+            print(CartManager.Errors.invariant(message: "Shipping method identifier is nil"))
+            return PKPaymentRequestShippingMethodUpdate(
+                paymentSummaryItems: PaymentFactory.shared.mapToPaymentSummaryItems(
+                    cart: CartManager.shared.cart,
+                    shippingMethod: nil
                 )
+            )
+        }
 
-                shippingMethod.detail = description
-                shippingMethod.identifier = $0.handle
+        do {
+            _ = try await CartManager.shared.selectShippingMethodUpdate(
+                deliveryOptionHandle: identifier
+            )
 
-                return shippingMethod
-            }
+            let cart = try await CartManager.shared.performCartPrepareForCompletion()
+
+            let paymentRequestShippingContactUpdate = PKPaymentRequestShippingMethodUpdate(
+                paymentSummaryItems: PaymentFactory.shared.mapToPaymentSummaryItems(
+                    cart: cart,
+                    shippingMethod: shippingMethod
+                )
+            )
+            return paymentRequestShippingContactUpdate
+        } catch (let error) {
+            print(
+                CartManager.Errors.apiErrors(
+                    requestName: "cartSelectedDeliveryOptionsUpdate  or cartPrepareForCompletion",
+                    message:
+                        "Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
+                )
+            )
+
+            return PKPaymentRequestShippingMethodUpdate(
+                paymentSummaryItems: PaymentFactory.shared.mapToPaymentSummaryItems(
+                    cart: CartManager.shared.cart,
+                    shippingMethod: nil
+                )
+            )
+        }
     }
+
 
     func paymentAuthorizationController(
         _: PKPaymentAuthorizationController,
@@ -250,11 +224,12 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
                 partial: true
             )
 
-            guard let firstDeliveryGroup = CartManager.shared.cart?.deliveryGroups.nodes.first else {
+            guard let firstDeliveryGroup = CartManager.shared.cart?.deliveryGroups.nodes.first
+            else {
                 throw CartManager.Errors.invariant(message: "deliveryGroups empty")
             }
 
-            let shippingMethods = mapToPKShippingMethods(
+            let shippingMethods = PaymentFactory.shared.mapToPKShippingMethods(
                 firstDeliveryGroup: firstDeliveryGroup
             )
 
@@ -262,7 +237,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
 
             return PKPaymentRequestShippingContactUpdate(
                 errors: [],
-                paymentSummaryItems: mapToPaymentSummaryItems(
+                paymentSummaryItems: PaymentFactory.shared.mapToPaymentSummaryItems(
                     cart: CartManager.shared.cart,
                     shippingMethod: nil
                 ),
@@ -272,7 +247,7 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
             print("[didSelectShippingContact] error: \(error)")
             return PKPaymentRequestShippingContactUpdate(
                 errors: [error],
-                paymentSummaryItems: mapToPaymentSummaryItems(
+                paymentSummaryItems: PaymentFactory.shared.mapToPaymentSummaryItems(
                     cart: CartManager.shared.cart,
                     shippingMethod: nil
                 ),
@@ -361,57 +336,4 @@ extension PaymentHandler: PKPaymentAuthorizationControllerDelegate {
         }
     }
 
-    private func mapToPaymentSummaryItems(
-        cart: Storefront.Cart?,
-        shippingMethod: PKShippingMethod?
-    ) -> [PKPaymentSummaryItem] {
-        guard let cart, !cart.lines.nodes.isEmpty else {
-            return []
-        }
-
-        var paymentSummaryItems: [PKPaymentSummaryItem] = cart.lines.nodes
-            .compactMap {
-                guard
-                    let variant = $0.merchandise as? Storefront.ProductVariant
-                else {
-                    print("variant missing from merchandise")
-                    return nil
-                }
-
-                return .init(
-                    label: variant.product.title,
-                    amount: NSDecimalNumber(
-                        decimal: $0.cost.totalAmount.amount
-                    ),
-                    type: .final
-                )
-            }
-
-        if let amount = shippingMethod?.amount {
-            paymentSummaryItems.append(
-                .init(label: "Shipping", amount: amount, type: .final)
-            )
-        }
-
-        // Null and 0 mean different things
-        if let amount = cart.cost.totalTaxAmount?.amount {
-            paymentSummaryItems.append(
-                .init(
-                    label: "Tax",
-                    amount: NSDecimalNumber(decimal: amount),
-                    type: .final
-                )
-            )
-        }
-
-        paymentSummaryItems.append(
-            .init(
-                label: "Total",
-                amount: NSDecimalNumber(decimal: cart.cost.totalAmount.amount),
-                type: .final
-            )
-        )
-
-        return paymentSummaryItems
-    }
 }
