@@ -39,6 +39,7 @@ class CartManager: ObservableObject {
     @Published var isDirty: Bool = false
     private let client: StorefrontClient
     private let vaultedContactInfo: InfoDictionary = .shared
+    public var redirectUrl: URL?
 
     // MARK: Initializers
 

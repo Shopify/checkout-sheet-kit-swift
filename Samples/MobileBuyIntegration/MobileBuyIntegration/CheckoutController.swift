@@ -28,7 +28,7 @@ import UIKit
 class CheckoutController: UIViewController {
     var window: UIWindow?
     var root: UIViewController?
-    let paymentHandler = PaymentHandler()
+    let paymentHandler = ApplePayHandler()
 
     init(window: UIWindow?) {
         self.window = window
@@ -54,7 +54,7 @@ class CheckoutController: UIViewController {
     }
 
     public func payWithApplePay() {
-        paymentHandler.startPayment { success, checkoutUrl in
+        paymentHandler.startApplePayCheckout { success, checkoutUrl in
             ShopifyCheckoutSheetKit.present(checkout: checkoutUrl, from: self)
             if success {
                 #warning("Errors due to no screen - this will be resolved after rebasing with Marks changes")
