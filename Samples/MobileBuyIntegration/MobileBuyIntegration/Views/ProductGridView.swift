@@ -31,7 +31,7 @@ struct ProductGridView: View {
 
     let columns = [
         GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
-        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10))
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
     ]
 
     var body: some View {
@@ -96,36 +96,33 @@ struct ProductSheetView: View {
 struct ProductGridItem: View {
     let product: Storefront.Product
     let maxWidth = UIScreen.main.bounds.width / 2 - 10
+    
     var body: some View {
         VStack {
-            if let imageURL = product.featuredImage?.url {
-                AsyncImage(url: imageURL) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(maxWidth: maxWidth)
-                        .frame(height: 150)
-                        .clipped()
-                } placeholder: {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(maxWidth: maxWidth)
-                        .frame(height: 150)
-                        .clipped()
-                }
-            } else {
-                ZStack {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
+            ZStack {
+                if let imageURL = product.featuredImage?.url {
+                    AsyncImage(url: imageURL) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                    }
+                } else {
+                    ZStack {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
 
-                    Image(systemName: "photo.badge.exclamationmark")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.white)
+                        Image(systemName: "photo.badge.exclamationmark")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.white)
+                    }
                 }
-                .frame(maxWidth: maxWidth)
-                .frame(height: 150)
-                .clipped()
             }
+            .frame(maxWidth: maxWidth)
+            .frame(height: 150)
+            .clipped()
 
             VStack {
                 Text(product.title)
