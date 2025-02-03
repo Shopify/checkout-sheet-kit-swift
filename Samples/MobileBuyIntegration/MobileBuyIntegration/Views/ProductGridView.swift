@@ -117,14 +117,14 @@ struct ProductGridItem: View {
                 ZStack {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(maxWidth: maxWidth)
-                        .frame(height: 150)
-                        .clipped()
 
                     Image(systemName: "photo.badge.exclamationmark")
                         .font(.system(size: 40))
                         .foregroundStyle(.white)
                 }
+                .frame(maxWidth: maxWidth)
+                .frame(height: 150)
+                .clipped()
             }
 
             VStack {
