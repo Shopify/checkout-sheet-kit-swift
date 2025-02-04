@@ -27,6 +27,7 @@ import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
+// swiftlint:disable type_body_length
 class CartManager: ObservableObject {
     static let shared = CartManager(client: .shared)
     private static let ContextDirective = Storefront.InContextDirective(
@@ -220,9 +221,9 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartSelectedDeliveryOptionsUpdate(deliveryOptionHandle: String) async throws
-        -> Storefront.Cart
-    {
+    func performCartSelectedDeliveryOptionsUpdate(
+        deliveryOptionHandle: String
+    ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
