@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import _PassKit_SwiftUI
 import Buy
+import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
