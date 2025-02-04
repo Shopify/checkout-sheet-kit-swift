@@ -132,7 +132,7 @@ public class CartManager: ObservableObject {
 			let lines = [Storefront.CartLineInput.create(merchandiseId: item)]
 
 			let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
-				.cartLinesAdd(lines: lines, cartId: cartID) { $0
+				.cartLinesAdd(cartId: cartID, lines: lines) { $0
 					.cart { $0.cartManagerFragment() }
 				}
 			}

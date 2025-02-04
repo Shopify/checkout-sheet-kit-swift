@@ -24,19 +24,19 @@
 import Buy
 import SwiftUI
 
-struct ProductGrid: View {
+struct ProductGridView: View {
     @StateObject private var productCache = ProductCache.shared
     @State private var selectedProduct: Storefront.Product?
     @State private var showProductSheet = false
 
     let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10))
     ]
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 0) {
+            LazyVGrid(columns: columns, spacing: 2) {
                 if let products = productCache.collection, !products.isEmpty {
                     ForEach(products, id: \.id) { product in
                         ProductGridItem(product: product)
@@ -95,23 +95,34 @@ struct ProductSheetView: View {
 
 struct ProductGridItem: View {
     let product: Storefront.Product
-
-    let imageHeight = 200.0
+    let maxWidth = UIScreen.main.bounds.width / 2 - 10
 
     var body: some View {
         VStack {
-            if let imageURL = product.featuredImage?.url {
-                AsyncImage(url: imageURL) { image in
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: imageHeight)
-                } placeholder: {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(height: imageHeight)
+            ZStack {
+                if let imageURL = product.featuredImage?.url {
+                    AsyncImage(url: imageURL) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                    }
+                } else {
+                    ZStack {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+
+                        Image(systemName: "photo.badge.exclamationmark")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.white)
+                    }
                 }
             }
+            .frame(maxWidth: maxWidth)
+            .frame(height: 150)
+            .clipped()
 
             VStack {
                 Text(product.title)
@@ -127,13 +138,11 @@ struct ProductGridItem: View {
             }
             .frame(alignment: .leading)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.bottom, 20)
     }
 }
 
 struct ProductGrid_Previews: PreviewProvider {
     static var previews: some View {
-        ProductGrid()
+        ProductGridView()
     }
 }
