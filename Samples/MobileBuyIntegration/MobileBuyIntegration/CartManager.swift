@@ -85,7 +85,7 @@ class CartManager: ObservableObject {
 
         do {
             let response = try await client.executeAsync(mutation: mutation)
-            
+
             guard let cart = response.cartLinesAdd?.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
@@ -119,7 +119,7 @@ class CartManager: ObservableObject {
 
         do {
             let response = try await client.executeAsync(mutation: mutation)
-            
+
             guard let cart = response.cartLinesUpdate?.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
@@ -176,7 +176,7 @@ class CartManager: ObservableObject {
 
         do {
             let response = try await client.executeAsync(mutation: mutation)
-            
+
             guard let cart = response.cartBuyerIdentityUpdate?.cart else {
                 throw Errors.invariant(message: "returned cart is nil")
             }
@@ -194,8 +194,8 @@ class CartManager: ObservableObject {
     private func performCartCreate(items: [GraphQL.ID] = []) async throws -> Storefront.Cart {
         let input =
             appConfiguration.useVaultedState
-            ? StorefrontInputFactory.shared.createVaultedCartInput(items)
-            : StorefrontInputFactory.shared.createDefaultCartInput(items)
+                ? StorefrontInputFactory.shared.createVaultedCartInput(items)
+                : StorefrontInputFactory.shared.createDefaultCartInput(items)
 
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartCreate(input: input) {
@@ -205,7 +205,7 @@ class CartManager: ObservableObject {
 
         do {
             let response = try await client.executeAsync(mutation: mutation)
-            
+
             guard let cart = response.cartCreate?.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
@@ -253,7 +253,7 @@ class CartManager: ObservableObject {
 
         do {
             let response = try await client.executeAsync(mutation: mutation)
-            
+
             guard let cart = response.cartSelectedDeliveryOptionsUpdate?.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
@@ -272,7 +272,7 @@ class CartManager: ObservableObject {
     }
 
     func performCartPaymentUpdate(
-        payment: PKPayment  // REFACTOR: this method should just receive the decoded payment token
+        payment: PKPayment // REFACTOR: this method should just receive the decoded payment token
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
@@ -309,7 +309,7 @@ class CartManager: ObservableObject {
 
         do {
             let response = try await client.executeAsync(mutation: mutation)
-            
+
             guard let cart = response.cartPaymentUpdate?.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
@@ -350,7 +350,7 @@ class CartManager: ObservableObject {
 
             guard
                 let result = response.cartPrepareForCompletion?.result
-                    as? Storefront.CartStatusReady,
+                as? Storefront.CartStatusReady,
                 let cart = result.cart
             else {
                 throw Errors.invariant(
@@ -385,10 +385,10 @@ class CartManager: ObservableObject {
 
         do {
             let response = try await client.executeAsync(mutation: mutation)
-            
+
             guard
                 let submissionResult = response.cartSubmitForCompletion?.result
-                    as? Storefront.SubmitSuccess
+                as? Storefront.SubmitSuccess
             else {
                 throw Errors.invariant(message: "submit result is not of type SubmitSuccess")
             }
@@ -412,7 +412,7 @@ class CartManager: ObservableObject {
 extension CartManager {
     enum Errors: LocalizedError {
         case missingPostalAddress, invalidPaymentData,
-            invalidBillingAddress
+             invalidBillingAddress
         case apiErrors(requestName: String, message: String)
         case invariant(message: String)
 

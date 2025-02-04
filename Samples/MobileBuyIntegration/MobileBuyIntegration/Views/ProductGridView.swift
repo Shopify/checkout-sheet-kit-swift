@@ -31,7 +31,7 @@ struct ProductGridView: View {
 
     let columns = [
         GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
-        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10))
     ]
 
     var body: some View {
@@ -96,7 +96,7 @@ struct ProductSheetView: View {
 struct ProductGridItem: View {
     let product: Storefront.Product
     let maxWidth = UIScreen.main.bounds.width / 2 - 10
-    
+
     var body: some View {
         VStack {
             ZStack {
