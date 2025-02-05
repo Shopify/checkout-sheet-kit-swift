@@ -314,7 +314,7 @@
 		};
 		6A9124C62CF6114E0076C21C /* Run Swiftformat over sample code */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -326,7 +326,7 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftformat >/dev/null; then\n\tswiftformat \"${SRCROOT}\" \nelse  \n\techo \"error: SwiftFormat not installed, download using \\\"brew install swiftformat\\\"\"\nfi\n";
 		};
