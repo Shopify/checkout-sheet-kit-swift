@@ -46,11 +46,12 @@ struct ProductView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                if let imageURL = product.featuredImage?.url {
-                    ZStack {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
+                ZStack {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 400)
 
+                    if let imageURL = product.featuredImage?.url {
                         AsyncImage(url: imageURL) { phase in
                             switch phase {
                             case .empty:
@@ -220,7 +221,7 @@ struct ProductGalleryView: View {
     var body: some View {
         TabView {
             if productCache.collection?.isEmpty ?? true {
-                Text("Loading products...").padding()
+                ProgressView()
             } else {
                 ForEach(productCache.collection!, id: \.id) { product in
                     ProductView(product: product)
