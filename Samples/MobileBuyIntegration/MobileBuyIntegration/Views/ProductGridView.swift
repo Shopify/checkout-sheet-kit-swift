@@ -34,30 +34,33 @@ struct ProductGridView: View {
         GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10))
     ]
 
+    func isEmpty() -> Bool {
+        guard let collection = productCache.collection else { return true }
+        return collection.isEmpty
+    }
+
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 2) {
-                if let products = productCache.collection, !products.isEmpty {
-                    ForEach(products, id: \.id) { product in
+        if isEmpty() {
+            ProgressView()
+                .onAppear {
+                    productCache.fetchCollection()
+                }
+
+        } else {
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 2) {
+                    ForEach(productCache.collection ?? [], id: \.id) { product in
                         ProductGridItem(product: product)
                             .onTapGesture {
                                 selectProductAndShowSheet(for: product)
                             }
                     }
-                } else {
-                    Text("Loading products...")
-                        .padding()
                 }
+                .padding(.horizontal, 5)
             }
-            .padding(.horizontal, 5)
-        }
-        .onAppear {
-            if productCache.collection == nil {
-                productCache.fetchCollection()
+            .sheet(isPresented: $showProductSheet) {
+                ProductSheetView(product: $selectedProduct, isPresented: $showProductSheet)
             }
-        }
-        .sheet(isPresented: $showProductSheet) {
-            ProductSheetView(product: $selectedProduct, isPresented: $showProductSheet)
         }
     }
 

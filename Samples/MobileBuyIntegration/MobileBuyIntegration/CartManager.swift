@@ -409,6 +409,7 @@ class CartManager: ObservableObject {
         isDirty = false
     }
 }
+
 // swiftlint:enable type_body_length
 
 extension CartManager {
