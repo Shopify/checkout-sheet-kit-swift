@@ -25,7 +25,7 @@ import UIKit
 import WebKit
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
-	weak var delegate: CheckoutDelegate?
+    internal var delegate: CheckoutDelegate?
 
 	internal var checkoutView: CheckoutWebView
 
@@ -150,7 +150,6 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		if !CheckoutWebView.preloadingActivatedByClient {
 			CheckoutWebView.invalidate()
 		}
-
 		delegate?.checkoutDidCancel()
 	}
 

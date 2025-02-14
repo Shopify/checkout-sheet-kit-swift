@@ -40,7 +40,16 @@ class CartManager: ObservableObject {
     private let vaultedContactInfo: InfoDictionary = .shared
     public var redirectUrl: URL?
 
-    @Published var cart: Storefront.Cart?
+    @Published var cart: Storefront.Cart? {
+        didSet {
+            if cart == nil {
+                isDirty = false
+            } else {
+                isDirty = true
+            }
+        }
+    }
+
     @Published var isDirty: Bool = false
 
     // MARK: Initializers
