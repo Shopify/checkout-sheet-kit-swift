@@ -159,6 +159,7 @@ class CartManager: ObservableObject {
         )
 
         let buyerIdentityInput = StorefrontInputFactory.shared.createCartBuyerIdentityInput(
+            // During ApplePay `contact.emailAddress` is nil until `didAuthorizePayment`
             email: contact.emailAddress ?? "",
             deliveryAddressPreferencesInput: deliveryAddressPreferencesInput
         )
@@ -405,6 +406,7 @@ class CartManager: ObservableObject {
         isDirty = false
     }
 }
+
 // swiftlint:enable type_body_length
 
 extension CartManager {

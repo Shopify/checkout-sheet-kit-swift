@@ -270,5 +270,4 @@ class StorefrontInputFactory {
             walletPaymentMethod: Input(orNull: walletPaymentMethod)
         )
     }
-
 }

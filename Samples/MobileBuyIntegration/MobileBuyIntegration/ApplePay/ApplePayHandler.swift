@@ -182,7 +182,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             )
         }
     }
-    
+
     func paymentAuthorizationController(
         _: PKPaymentAuthorizationController,
         didAuthorizePayment payment: PKPayment
@@ -191,23 +191,11 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
          * Apply validations that make sense for your business requirements
          */
         guard
-        let shippingContact = payment.shippingContact,
-            payment.shippingContact?.postalAddress?.isoCountryCode == "US" else {
+            let shippingContact = payment.shippingContact,
+            payment.shippingContact?.postalAddress?.isoCountryCode == "US"
+        else {
             paymentStatus = .failure
-            return .init(
-                status: .failure,
-                errors: [
-                    PKPaymentRequest
-                        .paymentShippingAddressUnserviceableError(
-                            withLocalizedDescription:
-                            "Address must be in the United States to use Apple Pay in the Sample App"
-                        ),
-                    PKPaymentRequest.paymentShippingAddressInvalidError(
-                        withKey: CNPostalAddressCountryKey,
-                        localizedDescription: "Invalid country"
-                    )
-                ]
-            )
+            return PassKitFactory.shared.createPKPaymentUSAdressError()
         }
 
         guard
@@ -215,18 +203,9 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             emailAddress.isEmpty == false
         else {
             paymentStatus = .failure
-            return .init(
-                status: .failure,
-                errors: [
-                    PKPaymentRequest
-                        .paymentContactInvalidError(
-                            withContactField: PKContactField.emailAddress,
-                            localizedDescription: "Email address is a required field"
-                        )
-                ]
-            )
+            return PassKitFactory.shared.createPKPaymentEmailError()
         }
-        
+
         if appConfiguration.useVaultedState == false {
             /**
              * (Optional) If the user is a guest and you haven't set an email on buyerIdentity
@@ -243,7 +222,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                 return PKPaymentAuthorizationResult(status: .failure, errors: [error])
             }
         }
-        
+
         do {
             _ = try await CartManager.shared.performCartPaymentUpdate(payment: payment)
         } catch {
