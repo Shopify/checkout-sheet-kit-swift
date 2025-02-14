@@ -42,8 +42,8 @@ class PassKitFactory {
         paymentRequest.shippingType = .delivery
         paymentRequest.shippingMethods = createDefaultShippingMethod()
 
-        paymentRequest.requiredShippingContactFields = [.name, .postalAddress]
-        paymentRequest.requiredBillingContactFields = [.name, .postalAddress]
+        paymentRequest.requiredShippingContactFields = [.name, .postalAddress, .emailAddress]
+        paymentRequest.requiredBillingContactFields = [.name, .postalAddress, .emailAddress]
 
         paymentRequest.paymentSummaryItems = paymentSummaryItems
 

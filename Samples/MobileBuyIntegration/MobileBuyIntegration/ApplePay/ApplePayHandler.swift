@@ -182,7 +182,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             )
         }
     }
-
+    
     func paymentAuthorizationController(
         _: PKPaymentAuthorizationController,
         didAuthorizePayment payment: PKPayment
@@ -190,7 +190,9 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         /**
          * Apply validations that make sense for your business requirements
          */
-        guard payment.shippingContact?.postalAddress?.isoCountryCode == "US" else {
+        guard
+        let shippingContact = payment.shippingContact,
+            payment.shippingContact?.postalAddress?.isoCountryCode == "US" else {
             paymentStatus = .failure
             return .init(
                 status: .failure,
@@ -208,6 +210,40 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             )
         }
 
+        guard
+            let emailAddress = shippingContact.emailAddress,
+            emailAddress.isEmpty == false
+        else {
+            paymentStatus = .failure
+            return .init(
+                status: .failure,
+                errors: [
+                    PKPaymentRequest
+                        .paymentContactInvalidError(
+                            withContactField: PKContactField.emailAddress,
+                            localizedDescription: "Email address is a required field"
+                        )
+                ]
+            )
+        }
+        
+        if appConfiguration.useVaultedState == false {
+            /**
+             * (Optional) If the user is a guest and you haven't set an email on buyerIdentity
+             * update the buyerIdentity with the shippingContact.email
+             */
+            do {
+                _ = try await CartManager.shared.performBuyerIdentityUpdate(
+                    contact: shippingContact,
+                    partial: true
+                )
+            } catch {
+                print("[didAuthorizePayment][performCartBuyerIdentityUpdate][failure] \(error)")
+                paymentStatus = .failure
+                return PKPaymentAuthorizationResult(status: .failure, errors: [error])
+            }
+        }
+        
         do {
             _ = try await CartManager.shared.performCartPaymentUpdate(payment: payment)
         } catch {

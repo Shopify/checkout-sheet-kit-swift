@@ -37,7 +37,6 @@ class CartManager: ObservableObject {
     // MARK: Properties
 
     private let client: StorefrontClient
-    private let vaultedContactInfo: InfoDictionary = .shared
     public var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
@@ -159,9 +158,9 @@ class CartManager: ObservableObject {
             ]
         )
 
-        let buyerIdentityInput = Storefront.CartBuyerIdentityInput.create(
-            email: Input(orNull: vaultedContactInfo.email),
-            deliveryAddressPreferences: deliveryAddressPreferencesInput
+        let buyerIdentityInput = StorefrontInputFactory.shared.createCartBuyerIdentityInput(
+            email: contact.emailAddress ?? "",
+            deliveryAddressPreferencesInput: deliveryAddressPreferencesInput
         )
 
         let mutation = Storefront.buildMutation(
@@ -193,10 +192,7 @@ class CartManager: ObservableObject {
     }
 
     private func performCartCreate(items: [GraphQL.ID] = []) async throws -> Storefront.Cart {
-        let input =
-            appConfiguration.useVaultedState
-                ? StorefrontInputFactory.shared.createVaultedCartInput(items)
-                : StorefrontInputFactory.shared.createDefaultCartInput(items)
+        let input = StorefrontInputFactory.shared.createCartInput(items)
 
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartCreate(input: input) {
