@@ -144,50 +144,68 @@ public struct StorefrontURL {
 class StorefrontInputFactory {
     static let shared = StorefrontInputFactory()
 
+    private let vaultedContactInfo: InfoDictionary = .shared
+
     enum Errors: Error {
         case invariant(String)
     }
 
-    public func createVaultedCartInput(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
-        let vaultedContactInfo = InfoDictionary.shared
-        let deliveryAddress = Storefront.MailingAddressInput.create(
-            address1: Input(orNull: vaultedContactInfo.address1),
-            address2: Input(orNull: vaultedContactInfo.address2),
-            city: Input(orNull: vaultedContactInfo.city),
-            company: Input(orNull: ""),
-            country: Input(orNull: vaultedContactInfo.country),
-            firstName: Input(orNull: vaultedContactInfo.firstName),
-            lastName: Input(orNull: vaultedContactInfo.lastName),
-            phone: Input(orNull: vaultedContactInfo.phone),
-            province: Input(orNull: vaultedContactInfo.province),
-            zip: Input(orNull: vaultedContactInfo.zip)
-        )
+    public func createCartInput(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
+        if appConfiguration.useVaultedState {
+            let deliveryAddress = Storefront.MailingAddressInput.create(
+                address1: Input(orNull: vaultedContactInfo.address1),
+                address2: Input(orNull: vaultedContactInfo.address2),
+                city: Input(orNull: vaultedContactInfo.city),
+                company: Input(orNull: ""),
+                country: Input(orNull: vaultedContactInfo.country),
+                firstName: Input(orNull: vaultedContactInfo.firstName),
+                lastName: Input(orNull: vaultedContactInfo.lastName),
+                phone: Input(orNull: vaultedContactInfo.phone),
+                province: Input(orNull: vaultedContactInfo.province),
+                zip: Input(orNull: vaultedContactInfo.zip)
+            )
 
-        let deliveryAddressPreferences = [
-            Storefront.DeliveryAddressInput.create(
-                deliveryAddress: Input(orNull: deliveryAddress))
-        ]
+            let deliveryAddressPreferences = [
+                Storefront.DeliveryAddressInput.create(
+                    deliveryAddress: Input(orNull: deliveryAddress))
+            ]
 
-        return Storefront.CartInput.create(
-            lines: Input(
-                orNull: items.map {
-                    Storefront.CartLineInput.create(merchandiseId: $0)
-                }),
-            buyerIdentity: Input(
-                orNull: Storefront.CartBuyerIdentityInput.create(
-                    email: Input(orNull: vaultedContactInfo.email),
-                    deliveryAddressPreferences: Input(
-                        orNull: deliveryAddressPreferences)
-                ))
-        )
+            return Storefront.CartInput.create(
+                lines: Input(
+                    orNull: items.map {
+                        Storefront.CartLineInput.create(merchandiseId: $0)
+                    }),
+                buyerIdentity: Input(
+                    orNull: Storefront.CartBuyerIdentityInput.create(
+                        email: Input(orNull: vaultedContactInfo.email),
+                        deliveryAddressPreferences: Input(
+                            orNull: deliveryAddressPreferences)
+                    ))
+            )
+        } else {
+            return Storefront.CartInput.create(
+                lines: Input(
+                    orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
+                )
+            )
+        }
     }
 
-    public func createDefaultCartInput(_ items: [GraphQL.ID]) -> Storefront.CartInput {
-        return Storefront.CartInput.create(
-            lines: Input(
-                orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
+    public func createCartBuyerIdentityInput(
+        email: String,
+        deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
+    ) -> Storefront.CartBuyerIdentityInput {
+        if appConfiguration.useVaultedState {
+            return Storefront.CartBuyerIdentityInput.create(
+                email: Input(orNull: vaultedContactInfo.email),
+                deliveryAddressPreferences: deliveryAddressPreferencesInput
             )
-        )
+        } else {
+            return Storefront.CartBuyerIdentityInput.create(
+                email: Input(orNull: email),
+                deliveryAddressPreferences: deliveryAddressPreferencesInput
+            )
+        }
     }
 
     public func createMailingAddressInput(

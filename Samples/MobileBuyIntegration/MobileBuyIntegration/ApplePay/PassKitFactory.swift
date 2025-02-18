@@ -42,8 +42,8 @@ class PassKitFactory {
         paymentRequest.shippingType = .delivery
         paymentRequest.shippingMethods = createDefaultShippingMethod()
 
-        paymentRequest.requiredShippingContactFields = [.name, .postalAddress]
-        paymentRequest.requiredBillingContactFields = [.name, .postalAddress]
+        paymentRequest.requiredShippingContactFields = [.name, .postalAddress, .emailAddress]
+        paymentRequest.requiredBillingContactFields = [.name, .postalAddress, .emailAddress]
 
         paymentRequest.paymentSummaryItems = paymentSummaryItems
 
@@ -179,5 +179,35 @@ class PassKitFactory {
         )
 
         return paymentSummaryItems
+    }
+
+    func createPKPaymentUSAdressError() -> PKPaymentAuthorizationResult {
+        return .init(
+            status: .failure,
+            errors: [
+                PKPaymentRequest
+                    .paymentShippingAddressUnserviceableError(
+                        withLocalizedDescription:
+                        "Address must be in the United States to use Apple Pay in the Sample App"
+                    ),
+                PKPaymentRequest.paymentShippingAddressInvalidError(
+                    withKey: CNPostalAddressCountryKey,
+                    localizedDescription: "Invalid country"
+                )
+            ]
+        )
+    }
+
+    func createPKPaymentEmailError() -> PKPaymentAuthorizationResult {
+        return .init(
+            status: .failure,
+            errors: [
+                PKPaymentRequest
+                    .paymentContactInvalidError(
+                        withContactField: PKContactField.emailAddress,
+                        localizedDescription: "Email address is a required field"
+                    )
+            ]
+        )
     }
 }

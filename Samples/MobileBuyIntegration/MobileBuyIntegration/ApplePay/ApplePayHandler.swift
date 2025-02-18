@@ -190,22 +190,37 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         /**
          * Apply validations that make sense for your business requirements
          */
-        guard payment.shippingContact?.postalAddress?.isoCountryCode == "US" else {
+        guard
+            let shippingContact = payment.shippingContact,
+            payment.shippingContact?.postalAddress?.isoCountryCode == "US"
+        else {
             paymentStatus = .failure
-            return .init(
-                status: .failure,
-                errors: [
-                    PKPaymentRequest
-                        .paymentShippingAddressUnserviceableError(
-                            withLocalizedDescription:
-                            "Address must be in the United States to use Apple Pay in the Sample App"
-                        ),
-                    PKPaymentRequest.paymentShippingAddressInvalidError(
-                        withKey: CNPostalAddressCountryKey,
-                        localizedDescription: "Invalid country"
-                    )
-                ]
-            )
+            return PassKitFactory.shared.createPKPaymentUSAdressError()
+        }
+
+        guard
+            let emailAddress = shippingContact.emailAddress,
+            emailAddress.isEmpty == false
+        else {
+            paymentStatus = .failure
+            return PassKitFactory.shared.createPKPaymentEmailError()
+        }
+
+        if appConfiguration.useVaultedState == false {
+            /**
+             * (Optional) If the user is a guest and you haven't set an email on buyerIdentity
+             * update the buyerIdentity with the shippingContact.email
+             */
+            do {
+                _ = try await CartManager.shared.performBuyerIdentityUpdate(
+                    contact: shippingContact,
+                    partial: true
+                )
+            } catch {
+                print("[didAuthorizePayment][performCartBuyerIdentityUpdate][failure] \(error)")
+                paymentStatus = .failure
+                return PKPaymentAuthorizationResult(status: .failure, errors: [error])
+            }
         }
 
         do {
