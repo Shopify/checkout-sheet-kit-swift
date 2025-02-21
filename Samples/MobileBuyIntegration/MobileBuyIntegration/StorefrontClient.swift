@@ -192,7 +192,7 @@ class StorefrontInputFactory {
     }
 
     public func createCartBuyerIdentityInput(
-        email: String,
+        email: String?,
         deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
     ) -> Storefront.CartBuyerIdentityInput {
         if appConfiguration.useVaultedState {

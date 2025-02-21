@@ -151,13 +151,8 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                 partial: true
             )
 
-            guard let firstDeliveryGroup = CartManager.shared.cart?.deliveryGroups.nodes.first
-            else {
-                throw CartManager.Errors.invariant(message: "deliveryGroups empty")
-            }
-
             let shippingMethods = PassKitFactory.shared.createShippingMethods(
-                firstDeliveryGroup: firstDeliveryGroup
+                firstDeliveryGroup: CartManager.shared.cart?.deliveryGroups.nodes.first
             )
 
             _ = try await CartManager.shared.performCartPrepareForCompletion()
