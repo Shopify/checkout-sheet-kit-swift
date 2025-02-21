@@ -85,9 +85,16 @@ class CartManager: ObservableObject {
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
+            guard let payload = try await client.executeAsync(mutation: mutation).cartLinesAdd
+            else { throw CartManager.Errors.payloadUnwrap }
 
-            guard let cart = response.cartLinesAdd?.cart else {
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
@@ -115,13 +122,24 @@ class CartManager: ObservableObject {
         ) {
             $0.cartLinesUpdate(cartId: cartId, lines: lines) {
                 $0.cart { $0.cartManagerFragment() }
+                    .userErrors {
+                        $0.code().message()
+                    }
             }
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
+            guard
+                let payload = try await client.executeAsync(mutation: mutation).cartLinesUpdate
+            else { throw CartManager.Errors.payloadUnwrap }
 
-            guard let cart = response.cartLinesUpdate?.cart else {
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
@@ -171,14 +189,23 @@ class CartManager: ObservableObject {
                 cartId: cartId,
                 buyerIdentity: buyerIdentityInput
             ) {
-                $0.cart { $0.cartManagerFragment() }
+                $0.cart { $0.cartManagerFragment() }.userErrors { $0.code().message() }
             }
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
+            guard
+                let payload = try await client.executeAsync(mutation: mutation)
+                .cartBuyerIdentityUpdate
+            else { throw CartManager.Errors.payloadUnwrap }
 
-            guard let cart = response.cartBuyerIdentityUpdate?.cart else {
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
                 throw Errors.invariant(message: "returned cart is nil")
             }
 
@@ -201,13 +228,21 @@ class CartManager: ObservableObject {
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartCreate(input: input) {
                 $0.cart { $0.cartManagerFragment() }
+                    .userErrors { $0.code().message() }
             }
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
+            guard let payload = try await client.executeAsync(mutation: mutation).cartCreate
+            else { throw CartManager.Errors.payloadUnwrap }
 
-            guard let cart = response.cartCreate?.cart else {
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
@@ -253,9 +288,18 @@ class CartManager: ObservableObject {
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
+            guard
+                let payload = try await client.executeAsync(mutation: mutation)
+                .cartSelectedDeliveryOptionsUpdate
+            else { throw CartManager.Errors.payloadUnwrap }
 
-            guard let cart = response.cartSelectedDeliveryOptionsUpdate?.cart else {
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
@@ -305,13 +349,24 @@ class CartManager: ObservableObject {
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartPaymentUpdate(cartId: cartId, payment: paymentInput) {
                 $0.cart { $0.cartManagerFragment() }
+                    .userErrors {
+                        $0.code().message()
+                    }
             }
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
+            guard
+                let payload = try await client.executeAsync(mutation: mutation).cartPaymentUpdate
+            else { throw CartManager.Errors.payloadUnwrap }
 
-            guard let cart = response.cartPaymentUpdate?.cart else {
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
@@ -337,21 +392,28 @@ class CartManager: ObservableObject {
                 $0.result {
                     $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
                     $0.onCartThrottled { $0.pollAfter() }
-                    $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
                     $0.onCartStatusNotReady {
                         $0.cart { $0.cartManagerFragment() }
                             .errors { $0.code().message() }
                     }
-                }
+                }.userErrors { $0.code().message() }
             }
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
+            guard
+                let payload = try await client.executeAsync(mutation: mutation)
+                .cartPrepareForCompletion
+            else { throw CartManager.Errors.payloadUnwrap }
+
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
 
             guard
-                let result = response.cartPrepareForCompletion?.result
-                as? Storefront.CartStatusReady,
+                let result = payload.result as? Storefront.CartStatusReady,
                 let cart = result.cart
             else {
                 throw Errors.invariant(
@@ -377,20 +439,27 @@ class CartManager: ObservableObject {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
                     $0.onSubmitSuccess { $0.redirectUrl() }
-                        .onSubmitFailed { $0.checkoutUrl() }
-                        .onSubmitAlreadyAccepted { $0.attemptId() }
-                        .onSubmitThrottled { $0.pollAfter() }
+                    $0.onSubmitFailed { $0.checkoutUrl() }
+                    $0.onSubmitAlreadyAccepted { $0.attemptId() }
+                    $0.onSubmitThrottled { $0.pollAfter() }
                 }
+                .userErrors { $0.code().message() }
             }
         }
 
         do {
-            let response = try await client.executeAsync(mutation: mutation)
-
             guard
-                let submissionResult = response.cartSubmitForCompletion?.result
-                as? Storefront.SubmitSuccess
-            else {
+                let payload = try await client.executeAsync(mutation: mutation)
+                .cartSubmitForCompletion
+            else { throw CartManager.Errors.payloadUnwrap }
+
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let submissionResult = payload.result as? Storefront.SubmitSuccess else {
                 throw Errors.invariant(message: "submit result is not of type SubmitSuccess")
             }
 
@@ -415,7 +484,7 @@ class CartManager: ObservableObject {
 extension CartManager {
     enum Errors: LocalizedError {
         case missingPostalAddress, invalidPaymentData,
-             invalidBillingAddress
+             invalidBillingAddress, payloadUnwrap
         case apiErrors(requestName: String, message: String)
         case invariant(message: String)
 
@@ -427,6 +496,8 @@ extension CartManager {
                 return "Invalid Payment Data"
             case .invalidBillingAddress:
                 return "Mapping billing address failed"
+            case .payloadUnwrap:
+                return "Request Payload failed to unwrap"
             case let .apiErrors(requestName, message):
                 return "Request: \(requestName) Failed. Message: \(message)"
             case let .invariant(message):
@@ -442,11 +513,17 @@ extension CartManager {
                 return "Decoding failed - check the PKPayment"
             case .invalidBillingAddress:
                 return "Ensure `billingContact.postalAddress` is not nil"
+            case .payloadUnwrap:
+                return "Check the previous request was executed"
             case let .apiErrors(requestName, _):
-                return "Check the API response for more details: \(requestName)"
+                return "Check the API payload for more details: \(requestName)"
             case .invariant:
                 return "Resolve preconditions before continuing"
             }
         }
+    }
+
+    static func userErrorMessage(errors: [Storefront.CartUserError]) -> String {
+        return "userErrors should be [], received: \(String(describing: errors))"
     }
 }
