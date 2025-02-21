@@ -52,8 +52,9 @@ struct CartView: View {
                                     .fontWeight(.bold)
                                 Spacer()
                                 if
-                                   let amount = cartManager.cart?.cost.totalAmount,
-                                   let total = amount.formattedString() {
+                                    let amount = cartManager.cart?.cost.totalAmount,
+                                    let total = amount.formattedString()
+                                {
                                     Text(total)
                                         .fontWeight(.bold)
                                 }
