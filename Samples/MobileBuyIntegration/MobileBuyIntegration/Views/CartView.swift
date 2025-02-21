@@ -109,7 +109,7 @@ struct CartView: View {
     }
 }
 
-// swiftlint:enableopening_brace
+// swiftlint:enable opening_brace
 
 struct EmptyState: View {
     var body: some View {
