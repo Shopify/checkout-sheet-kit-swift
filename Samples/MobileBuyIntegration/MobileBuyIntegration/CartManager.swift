@@ -178,7 +178,7 @@ class CartManager: ObservableObject {
 
         let buyerIdentityInput = StorefrontInputFactory.shared.createCartBuyerIdentityInput(
             // During ApplePay `contact.emailAddress` is nil until `didAuthorizePayment`
-            email: contact.emailAddress ?? "",
+            email: contact.emailAddress,
             deliveryAddressPreferencesInput: deliveryAddressPreferencesInput
         )
 

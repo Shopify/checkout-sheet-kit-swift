@@ -108,8 +108,13 @@ class PassKitFactory {
     }
 
     public func createShippingMethods(
-        firstDeliveryGroup: Storefront.CartDeliveryGroup
+        /**
+         * Default to first delivery group when user changes their delivery contact
+         * `nil` for digital products
+         */
+        firstDeliveryGroup: Storefront.CartDeliveryGroup?
     ) -> [PKShippingMethod] {
+        guard let firstDeliveryGroup else { return [] }
         return firstDeliveryGroup.deliveryOptions.compactMap {
             guard let title = $0.title, let description = $0.description else {
                 print("Invalid deliveryOption to map shipping method")
