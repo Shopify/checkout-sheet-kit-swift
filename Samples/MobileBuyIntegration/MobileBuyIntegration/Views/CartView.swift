@@ -26,6 +26,7 @@ import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
+// swiftlint:disable opening_brace
 struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
@@ -51,9 +52,8 @@ struct CartView: View {
                                 Text("Checkout")
                                     .fontWeight(.bold)
                                 Spacer()
-                                if
-                                    let amount = cartManager.cart?.cost.totalAmount,
-                                    let total = amount.formattedString()
+                                if let amount = cartManager.cart?.cost.totalAmount,
+                                   let total = amount.formattedString()
                                 {
                                     Text(total)
                                         .fontWeight(.bold)
@@ -108,6 +108,8 @@ struct CartView: View {
         CheckoutController.shared?.payWithApplePay()
     }
 }
+
+// swiftlint:enableopening_brace
 
 struct EmptyState: View {
     var body: some View {
