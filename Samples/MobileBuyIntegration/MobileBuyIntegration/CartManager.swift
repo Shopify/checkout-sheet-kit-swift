@@ -40,6 +40,7 @@ class CartManager: ObservableObject {
     public var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
+    @Published var tax: Decimal?
     @Published var isDirty: Bool = false
 
     // MARK: Initializers
@@ -387,10 +388,10 @@ class CartManager: ObservableObject {
         ) {
             $0.cartPrepareForCompletion(cartId: cartId) {
                 $0.result {
-                    $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
+                    $0.onCartStatusReady { $0.cart { $0.cartPrepareForCompletionFragment() } }
                     $0.onCartThrottled { $0.pollAfter() }
                     $0.onCartStatusNotReady {
-                        $0.cart { $0.cartManagerFragment() }
+                        $0.cart { $0.cartPrepareForCompletionFragment() }
                             .errors { $0.code().message() }
                     }
                 }.userErrors { $0.code().message() }
@@ -411,17 +412,20 @@ class CartManager: ObservableObject {
 
             guard
                 let result = payload.result as? Storefront.CartStatusReady,
-                let cart = result.cart
+                let _cart = result.cart
             else {
                 throw Errors.invariant(
                     message: "CartPrepareForCompletionResult is not CartStatusReady")
             }
 
             DispatchQueue.main.async {
-                self.cart = cart
+                self.cart = _cart
+                if let tax = _cart.cost.totalTaxAmount?.amount {
+                    self.tax = tax
+                }
             }
 
-            return cart
+            return _cart
         } catch {
             throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
         }

@@ -81,7 +81,7 @@ extension Storefront.BaseCartLineQuery {
 
 extension Storefront.CartQuery {
     @discardableResult
-    func cartManagerFragment() -> Storefront.CartQuery {
+    func cartPrepareForCompletionFragment() -> Storefront.CartQuery {
         id()
             .checkoutUrl()
             .totalQuantity()
@@ -106,6 +106,34 @@ extension Storefront.CartQuery {
                         .currencyCode()
                 }
                 .totalTaxAmount {
+                    $0.amount()
+                        .currencyCode()
+                }
+            }
+    }
+
+    @discardableResult
+    func cartManagerFragment() -> Storefront.CartQuery {
+        id()
+            .checkoutUrl()
+            .totalQuantity()
+            .deliveryGroups(first: 10) {
+                $0.nodes {
+                    $0.deliveryGroupsFragment()
+                }
+            }
+            .lines(first: 250) {
+                $0.nodes {
+                    $0.cartLineFragment()
+                }
+            }
+            .totalQuantity()
+            .cost {
+                $0.totalAmount {
+                    $0.amount()
+                        .currencyCode()
+                }
+                .subtotalAmount {
                     $0.amount()
                         .currencyCode()
                 }
