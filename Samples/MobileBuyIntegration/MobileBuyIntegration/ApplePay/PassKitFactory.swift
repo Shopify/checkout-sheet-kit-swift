@@ -136,9 +136,9 @@ class PassKitFactory {
     }
 
     public func createPaymentSummaryItems(
-        cart: Storefront.Cart?, shippingMethod: PKShippingMethod?
+        shippingMethod: PKShippingMethod?
     ) -> [PKPaymentSummaryItem] {
-        guard let cart, !cart.lines.nodes.isEmpty else {
+        guard let cart = CartManager.shared.cart, !cart.lines.nodes.isEmpty else {
             return []
         }
 
@@ -167,11 +167,11 @@ class PassKitFactory {
         }
 
         // Null and 0 mean different things
-        if let amount = cart.cost.totalTaxAmount?.amount {
+        if let tax = CartManager.shared.tax {
             paymentSummaryItems.append(
                 .init(
                     label: "Tax",
-                    amount: NSDecimalNumber(decimal: amount),
+                    amount: NSDecimalNumber(decimal: tax),
                     type: .final
                 )
             )

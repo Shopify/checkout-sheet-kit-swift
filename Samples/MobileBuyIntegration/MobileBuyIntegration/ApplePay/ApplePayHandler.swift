@@ -103,7 +103,6 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             print(CartManager.Errors.invariant(message: "Shipping method identifier is nil"))
             return PKPaymentRequestShippingMethodUpdate(
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
                     shippingMethod: nil
                 )
             )
@@ -118,7 +117,6 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
 
             let paymentRequestShippingContactUpdate = PKPaymentRequestShippingMethodUpdate(
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: cart,
                     shippingMethod: shippingMethod
                 )
             )
@@ -134,7 +132,6 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
 
             return PKPaymentRequestShippingMethodUpdate(
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
                     shippingMethod: nil
                 )
             )
@@ -160,7 +157,6 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             return PKPaymentRequestShippingContactUpdate(
                 errors: [],
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
                     shippingMethod: nil
                 ),
                 shippingMethods: shippingMethods
@@ -170,7 +166,6 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             return PKPaymentRequestShippingContactUpdate(
                 errors: [error],
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
                     shippingMethod: nil
                 ),
                 shippingMethods: []
