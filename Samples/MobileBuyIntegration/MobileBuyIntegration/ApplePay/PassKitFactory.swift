@@ -52,7 +52,6 @@ class PassKitFactory {
 
     func createPaymentSummaryItems() -> [PKPaymentSummaryItem] {
         guard let cart = CartManager.shared.cart else { return [] }
-        let tax = CartManager.shared.tax
 
         var paymentSummaryItems: [PKPaymentSummaryItem] = []
 
@@ -70,7 +69,7 @@ class PassKitFactory {
             )
         }
 
-        if let tax {
+        if let tax = CartManager.shared.tax {
             paymentSummaryItems.append(
                 .init(
                     label: "Tax",
