@@ -105,6 +105,11 @@ extension Storefront.CartQuery {
                     $0.amount()
                         .currencyCode()
                 }
+                /**
+                 * `totalTaxAmount` is deprecated from most cart operations
+                 * it remains safe to access from `cartPrepareForCompletion`
+                 * We are aware that the deprecation note shows on this node and will aim to fix
+                 */
                 .totalTaxAmount {
                     $0.amount()
                         .currencyCode()
