@@ -40,6 +40,12 @@ class CartManager: ObservableObject {
     public var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
+    /**
+     * Represents the `cart.totalTaxAmount.amount`
+     * Due to BuySDK throwing if you access a property that hasn't been requested
+     * this is separated off from the cart due to this behaviour, as the `totalTaxAmount` is
+     * deprecated from cart operations except prepareForCompletion 
+     */
     @Published var tax: Decimal?
     @Published var isDirty: Bool = false
 
