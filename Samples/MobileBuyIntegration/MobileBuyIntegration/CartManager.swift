@@ -44,7 +44,7 @@ class CartManager: ObservableObject {
      * Represents the `cart.totalTaxAmount.amount`
      * Due to BuySDK throwing if you access a property that hasn't been requested
      * this is separated off from the cart due to this behaviour, as the `totalTaxAmount` is
-     * deprecated from cart operations except prepareForCompletion 
+     * deprecated from cart operations except prepareForCompletion
      */
     @Published var tax: Decimal?
     @Published var isDirty: Bool = false
@@ -418,20 +418,23 @@ class CartManager: ObservableObject {
 
             guard
                 let result = payload.result as? Storefront.CartStatusReady,
-                let cartResult = result.cart
+                let cart = result.cart
             else {
                 throw Errors.invariant(
                     message: "CartPrepareForCompletionResult is not CartStatusReady")
             }
 
             DispatchQueue.main.async {
-                self.cart = cartResult
-                if let tax = cartResult.cost.totalTaxAmount?.amount {
+                self.cart = cart
+                /**
+                 * Note - `totalTaxAmount` will not be available on self.cart, only access local value
+                 */
+                if let tax = cart.cost.totalTaxAmount?.amount {
                     self.tax = tax
                 }
             }
 
-            return cartResult
+            return cart
         } catch {
             throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
         }
