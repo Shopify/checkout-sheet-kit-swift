@@ -412,20 +412,20 @@ class CartManager: ObservableObject {
 
             guard
                 let result = payload.result as? Storefront.CartStatusReady,
-                let _cart = result.cart
+                let cartResult = result.cart
             else {
                 throw Errors.invariant(
                     message: "CartPrepareForCompletionResult is not CartStatusReady")
             }
 
             DispatchQueue.main.async {
-                self.cart = _cart
-                if let tax = _cart.cost.totalTaxAmount?.amount {
+                self.cart = cartResult
+                if let tax = cartResult.cost.totalTaxAmount?.amount {
                     self.tax = tax
                 }
             }
 
-            return _cart
+            return cartResult
         } catch {
             throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
         }
