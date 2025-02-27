@@ -142,6 +142,10 @@ extension Storefront.CartQuery {
                     $0.amount()
                         .currencyCode()
                 }
+                .totalTaxAmount {
+                    $0.amount()
+                        .currencyCode()
+                }
             }
     }
 }

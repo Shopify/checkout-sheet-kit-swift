@@ -159,7 +159,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performBuyerIdentityUpdate(
+    func performCartBuyerIdentityUpdate(
         contact: PKContact,
         partial _: Bool
     ) async throws -> Storefront.Cart {
