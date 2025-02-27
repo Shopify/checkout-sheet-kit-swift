@@ -40,6 +40,13 @@ class CartManager: ObservableObject {
     public var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
+    /**
+     * Represents the `cart.totalTaxAmount.amount`
+     * Due to BuySDK throwing if you access a property that hasn't been requested
+     * this is separated off from the cart due to this behaviour, as the `totalTaxAmount` is
+     * deprecated from cart operations except prepareForCompletion
+     */
+    @Published var totalTaxAmount: Decimal?
     @Published var isDirty: Bool = false
 
     // MARK: Initializers
@@ -152,14 +159,13 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performBuyerIdentityUpdate(
+    func performCartBuyerIdentityUpdate(
         contact: PKContact,
         partial _: Bool
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
-
         guard let address = contact.postalAddress else {
             throw Errors.invariant(message: "contact.postalAddress is nil")
         }
@@ -345,7 +351,7 @@ class CartManager: ObservableObject {
 
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartPaymentUpdate(cartId: cartId, payment: paymentInput) {
-                $0.cart { $0.cartManagerFragment() }
+                $0.cart { $0.cartPrepareForCompletionFragment() }
                     .userErrors {
                         $0.code().message()
                     }
@@ -387,10 +393,10 @@ class CartManager: ObservableObject {
         ) {
             $0.cartPrepareForCompletion(cartId: cartId) {
                 $0.result {
-                    $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
+                    $0.onCartStatusReady { $0.cart { $0.cartPrepareForCompletionFragment() } }
                     $0.onCartThrottled { $0.pollAfter() }
                     $0.onCartStatusNotReady {
-                        $0.cart { $0.cartManagerFragment() }
+                        $0.cart { $0.cartPrepareForCompletionFragment() }
                             .errors { $0.code().message() }
                     }
                 }.userErrors { $0.code().message() }
@@ -419,6 +425,12 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                /**
+                 * Note - `totalTaxAmount` will not be available on self.cart, only access local value
+                 */
+                if let tax = cart.cost.totalTaxAmount?.amount {
+                    self.totalTaxAmount = tax
+                }
             }
 
             return cart
@@ -436,7 +448,9 @@ class CartManager: ObservableObject {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
                     $0.onSubmitSuccess { $0.redirectUrl() }
-                    $0.onSubmitFailed { $0.checkoutUrl() }
+                    $0.onSubmitFailed { $0.checkoutUrl().errors {
+                        $0.code().message()
+                    } }
                     $0.onSubmitAlreadyAccepted { $0.attemptId() }
                     $0.onSubmitThrottled { $0.pollAfter() }
                 }
