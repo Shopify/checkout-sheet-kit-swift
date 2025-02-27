@@ -69,7 +69,7 @@ class PassKitFactory {
             )
         }
 
-        if let tax = CartManager.shared.tax {
+        if let tax = CartManager.shared.totalTaxAmount {
             paymentSummaryItems.append(
                 .init(
                     label: "Tax",
@@ -167,7 +167,7 @@ class PassKitFactory {
         }
 
         // Null and 0 mean different things
-        if let tax = CartManager.shared.tax {
+        if let tax = CartManager.shared.totalTaxAmount {
             paymentSummaryItems.append(
                 .init(
                     label: "Tax",

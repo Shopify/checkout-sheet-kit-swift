@@ -46,7 +46,7 @@ class CartManager: ObservableObject {
      * this is separated off from the cart due to this behaviour, as the `totalTaxAmount` is
      * deprecated from cart operations except prepareForCompletion
      */
-    @Published var tax: Decimal?
+    @Published var totalTaxAmount: Decimal?
     @Published var isDirty: Bool = false
 
     // MARK: Initializers
@@ -166,7 +166,6 @@ class CartManager: ObservableObject {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
-
         guard let address = contact.postalAddress else {
             throw Errors.invariant(message: "contact.postalAddress is nil")
         }
@@ -352,7 +351,7 @@ class CartManager: ObservableObject {
 
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartPaymentUpdate(cartId: cartId, payment: paymentInput) {
-                $0.cart { $0.cartManagerFragment() }
+                $0.cart { $0.cartPrepareForCompletionFragment() }
                     .userErrors {
                         $0.code().message()
                     }
@@ -430,7 +429,7 @@ class CartManager: ObservableObject {
                  * Note - `totalTaxAmount` will not be available on self.cart, only access local value
                  */
                 if let tax = cart.cost.totalTaxAmount?.amount {
-                    self.tax = tax
+                    self.totalTaxAmount = tax
                 }
             }
 
@@ -449,7 +448,9 @@ class CartManager: ObservableObject {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
                     $0.onSubmitSuccess { $0.redirectUrl() }
-                    $0.onSubmitFailed { $0.checkoutUrl() }
+                    $0.onSubmitFailed { $0.checkoutUrl().errors {
+                        $0.code().message()
+                    } }
                     $0.onSubmitAlreadyAccepted { $0.attemptId() }
                     $0.onSubmitThrottled { $0.pollAfter() }
                 }
