@@ -191,21 +191,13 @@ class StorefrontInputFactory {
         }
     }
 
-    public func createCartBuyerIdentityInput(
-        email: String?,
-        deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
-    ) -> Storefront.CartBuyerIdentityInput {
-        if appConfiguration.useVaultedState {
-            return Storefront.CartBuyerIdentityInput.create(
-                email: Input(orNull: vaultedContactInfo.email),
-                deliveryAddressPreferences: deliveryAddressPreferencesInput
-            )
-        } else {
-            return Storefront.CartBuyerIdentityInput.create(
-                email: Input(orNull: email),
-                deliveryAddressPreferences: deliveryAddressPreferencesInput
-            )
-        }
+    public func createCartBuyerIdentityInput(email: String) -> Storefront.CartBuyerIdentityInput {
+        return Storefront.CartBuyerIdentityInput.create(
+            email: Input(
+                orNull: appConfiguration.useVaultedState ? vaultedContactInfo.email : email
+            ),
+            deliveryAddressPreferences: Input(orNull: [])
+        )
     }
 
     public func createMailingAddressInput(
@@ -268,6 +260,33 @@ class StorefrontInputFactory {
                 currencyCode: totalAmount.currencyCode
             ),
             walletPaymentMethod: Input(orNull: walletPaymentMethod)
+        )
+    }
+
+    public func createCartSelectableAddressInput(
+        contact: PKContact,
+        address: CNPostalAddress,
+        selected: Bool? = true,
+        oneTimeUse: Bool? = true
+    ) -> Storefront.CartSelectableAddressInput {
+        let cartDeliveryAddressInput = Storefront.CartDeliveryAddressInput.create(
+            address1: Input(orNull: address.street),
+            address2: Input(orNull: address.subLocality),
+            city: Input(orNull: address.city),
+            countryCode: Input(orNull: Storefront.CountryCode(rawValue: address.isoCountryCode)),
+            firstName: Input(orNull: contact.name?.givenName ?? ""),
+            lastName: Input(orNull: contact.name?.familyName ?? ""),
+            phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
+            provinceCode: Input(orNull: address.state),
+            zip: Input(orNull: address.postalCode)
+        )
+
+        return Storefront.CartSelectableAddressInput.create(
+            address: Storefront.CartAddressInput.create(
+                deliveryAddress: Input(orNull: cartDeliveryAddressInput)
+            ),
+            selected: Input(orNull: selected),
+            oneTimeUse: Input(orNull: oneTimeUse)
         )
     }
 }

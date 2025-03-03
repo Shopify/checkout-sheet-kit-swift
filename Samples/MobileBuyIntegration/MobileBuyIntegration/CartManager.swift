@@ -152,44 +152,31 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performBuyerIdentityUpdate(
-        contact: PKContact,
-        partial _: Bool
-    ) async throws -> Storefront.Cart {
+    /**
+     * Provides cart the emailAddress during Apple Pay
+     * `contact.emailAddress` is nil prior to `didAuthorizePayment`
+     *
+     * See: https://shopify.dev/docs/api/storefront/latest/mutations/cartBuyerIdentityUpdate
+     */
+    func performCartBuyerIdentityUpdate(contact: PKContact) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
-
-        guard let address = contact.postalAddress else {
-            throw Errors.invariant(message: "contact.postalAddress is nil")
+        guard let email = contact.emailAddress else {
+            throw Errors.invariant(message: "contact.emailAddress should be defined")
         }
 
-        let shippingAddress = StorefrontInputFactory.shared.createMailingAddressInput(
-            contact: contact,
-            address: address
-        )
-
-        let deliveryAddressPreferencesInput = Input(
-            orNull: [
-                Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: shippingAddress))
-            ]
-        )
-
         let buyerIdentityInput = StorefrontInputFactory.shared.createCartBuyerIdentityInput(
-            // During ApplePay `contact.emailAddress` is nil until `didAuthorizePayment`
-            email: contact.emailAddress,
-            deliveryAddressPreferencesInput: deliveryAddressPreferencesInput
+            email: email
         )
 
         let mutation = Storefront.buildMutation(
             inContext: CartManager.ContextDirective
         ) {
-            $0.cartBuyerIdentityUpdate(
-                cartId: cartId,
-                buyerIdentity: buyerIdentityInput
-            ) {
-                $0.cart { $0.cartManagerFragment() }.userErrors { $0.code().message() }
+            $0.cartBuyerIdentityUpdate(cartId: cartId, buyerIdentity: buyerIdentityInput) {
+                $0.cart { $0.cartManagerFragment() }
+                    .userErrors { $0.code().message() }
+                    .warnings { $0.code().message().target() }
             }
         }
 
@@ -250,6 +237,55 @@ class CartManager: ObservableObject {
             return cart
         } catch {
             throw Errors.apiErrors(requestName: "cartCreate", message: "\(error)")
+        }
+    }
+
+    func performDeliveryAddressesAdd(contact: PKContact) async throws -> Storefront.Cart {
+        guard let cartId = cart?.id else {
+            throw Errors.invariant(message: "cart.id should be defined")
+        }
+        guard let address = contact.postalAddress else {
+            throw Errors.invariant(message: "contact.postalAddress is nil")
+        }
+
+        let cartSelectableAddressInput = StorefrontInputFactory.shared.createCartSelectableAddressInput(
+            contact: contact,
+            address: address,
+            selected: true,
+            oneTimeUse: true
+        )
+
+        let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
+            $0.cartDeliveryAddressesAdd(cartId: cartId, addresses: [cartSelectableAddressInput]) {
+                $0.cart { $0.cartManagerFragment() }
+                    .userErrors { $0.code().message() }
+                    .warnings { $0.code().message().target() }
+            }
+        }
+
+        do {
+            guard
+                let payload = try await client.executeAsync(mutation: mutation)
+                .cartDeliveryAddressesAdd
+            else { throw CartManager.Errors.payloadUnwrap }
+
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
+                throw Errors.invariant(message: "returned cart is nil")
+            }
+
+            DispatchQueue.main.async {
+                self.cart = cart
+            }
+
+            return cart
+        } catch {
+            throw Errors.apiErrors(requestName: "cartBuyerIdentityUpdate", message: "\(error)")
         }
     }
 

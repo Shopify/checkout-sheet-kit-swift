@@ -146,10 +146,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
         do {
-            _ = try await CartManager.shared.performBuyerIdentityUpdate(
-                contact: contact,
-                partial: true
-            )
+            _ = try await CartManager.shared.performDeliveryAddressesAdd(contact: contact)
 
             let shippingMethods = PassKitFactory.shared.createShippingMethods(
                 firstDeliveryGroup: CartManager.shared.cart?.deliveryGroups.nodes.first
@@ -207,9 +204,8 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
              * update the buyerIdentity with the shippingContact.email
              */
             do {
-                _ = try await CartManager.shared.performBuyerIdentityUpdate(
-                    contact: shippingContact,
-                    partial: true
+                _ = try await CartManager.shared.performCartBuyerIdentityUpdate(
+                    contact: shippingContact
                 )
             } catch {
                 print("[didAuthorizePayment][performCartBuyerIdentityUpdate][failure] \(error)")
