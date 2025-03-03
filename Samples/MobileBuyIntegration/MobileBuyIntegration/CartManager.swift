@@ -240,7 +240,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performDeliveryAddressesAdd(contact: PKContact) async throws -> Storefront.Cart {
+    func performCartDeliveryAddressesAdd(contact: PKContact) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
