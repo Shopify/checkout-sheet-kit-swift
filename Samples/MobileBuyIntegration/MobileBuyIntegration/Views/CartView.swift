@@ -282,12 +282,12 @@ struct ShopPayButton: View {
                     label: {
                         Image("shop_pay")
                             .resizable()
+                            .aspectRatio(contentMode: .fit)
                             .cornerRadius(10)
                             .frame(maxWidth: .infinity)
                     }
                 )
                 .cornerRadius(10)
-                .frame(maxWidth: .infinity, maxHeight: 50)
                 .padding(.horizontal, 20)
             }
         }
