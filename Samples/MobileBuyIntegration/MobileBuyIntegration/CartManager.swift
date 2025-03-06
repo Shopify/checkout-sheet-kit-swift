@@ -64,6 +64,23 @@ class CartManager: ObservableObject {
 
     // MARK: Cart Actions
 
+    func performCheckShopPayStatus() async throws -> Bool {
+        let query = Storefront.buildQuery(
+            inContext: CartManager.ContextDirective
+        ) {
+            $0.shop { $0.paymentSettings { $0.supportedDigitalWallets() } }
+        }
+
+        do {
+            let payload = try await client.executeAsync(query: query).shop
+
+            return payload.paymentSettings.supportedDigitalWallets
+                .contains(Storefront.DigitalWallet.shopifyPay)
+        } catch {
+            throw CartManager.Errors.apiErrors(requestName: "shop", message: "\(error)")
+        }
+    }
+
     /**
      * Creates cart if no cart.id present, or adds line items to pre-existing cart
      * Non-idempotent - subsequent calls for existing cartLine items will increase quantity by 1

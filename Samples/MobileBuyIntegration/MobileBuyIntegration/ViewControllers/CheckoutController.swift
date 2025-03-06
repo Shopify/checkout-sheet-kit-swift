@@ -53,6 +53,17 @@ class CheckoutController: UIViewController {
         CartManager.shared.preloadCheckout()
     }
 
+    public func updateIsShopPayEnabled() async throws -> Bool {
+        return try await CartManager.shared.performCheckShopPayStatus()
+    }
+
+    public func checkoutWithShopPay() async {
+        let payment = URLQueryItem(name: "payment", value: "shop_pay")
+        let url = CartManager.shared.cart!.checkoutUrl.appending(queryItems: [payment])
+        CheckoutController.shared?
+            .present(checkout: url)
+    }
+
     public func payWithApplePay() {
         paymentHandler.startApplePayCheckout { success in
             print("success: \(success)")

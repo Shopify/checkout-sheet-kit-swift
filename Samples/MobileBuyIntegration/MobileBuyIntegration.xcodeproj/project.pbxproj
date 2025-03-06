@@ -38,6 +38,7 @@
 		CB05E6C12D4954A600466376 /* PaymentCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C02D49549700466376 /* PaymentCodable.swift */; };
 		CB05E6C42D4954E800466376 /* Storefront.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Storefront.swift */; };
 		CB05E6C62D4A5AB600466376 /* PassKitFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C52D4A5AB200466376 /* PassKitFactory.swift */; };
+		CBBF2C4D2D79C1D100712A87 /* shop_pay.png in Resources */ = {isa = PBXBuildFile; fileRef = CBBF2C4C2D79C1D100712A87 /* shop_pay.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		CB05E6C02D49549700466376 /* PaymentCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCodable.swift; sourceTree = "<group>"; };
 		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
 		CB05E6C52D4A5AB200466376 /* PassKitFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassKitFactory.swift; sourceTree = "<group>"; };
+		CBBF2C4C2D79C1D100712A87 /* shop_pay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shop_pay.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +121,7 @@
 		4EBBA77E2A5F0D8E00193E19 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				CBBF2C4C2D79C1D100712A87 /* shop_pay.png */,
 				4EBBA7A72A5F10C400193E19 /* Storefront.xcconfig */,
 				4EBBA7732A5F0CE200193E19 /* Assets.xcassets */,
 				4EBBA7752A5F0CE200193E19 /* LaunchScreen.storyboard */,
@@ -287,6 +290,7 @@
 				4EBBA7772A5F0CE200193E19 /* LaunchScreen.storyboard in Resources */,
 				6A3D7ADC2B8E01460010EB27 /* Localizable.xcstrings in Resources */,
 				4EBBA7742A5F0CE200193E19 /* Assets.xcassets in Resources */,
+				CBBF2C4D2D79C1D100712A87 /* shop_pay.png in Resources */,
 				2147F3E62B502AFD005546F3 /* checkout-sheet-kit-swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
