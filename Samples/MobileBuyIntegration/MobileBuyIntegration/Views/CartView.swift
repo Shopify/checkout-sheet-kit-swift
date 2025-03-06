@@ -30,7 +30,6 @@ import SwiftUI
 struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
-    @State var isShopPayEnabled: Bool = false
 
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
@@ -71,25 +70,7 @@ struct CartView: View {
                     .accessibilityIdentifier("checkoutButton")
                     .padding(.horizontal, 20)
 
-                    if isShopPayEnabled {
-                        Button(
-                            action: {
-                                _Concurrency.Task {
-                                    await CheckoutController.shared?.checkoutWithShopPay()
-                                }
-                            },
-                            label: {
-                                Image("shop_pay")
-                                    .resizable()
-                                    .cornerRadius(10)
-                                    .frame(maxWidth: .infinity)
-                            }
-                        )
-                        .cornerRadius(10)
-                        .disabled(isBusy)
-                        .frame(maxWidth: .infinity, maxHeight: 50)
-                        .padding(.horizontal, 20)
-                    }
+                    ShopPayButton()
 
                     if config.applePayEnabled {
                         PayWithApplePayButton(
@@ -107,17 +88,6 @@ struct CartView: View {
             }
             .onAppear {
                 preloadCheckout()
-                _Concurrency.Task {
-                    do {
-                        guard let update = CheckoutController.shared?.updateIsShopPayEnabled else {
-                            return
-                        }
-                        isShopPayEnabled = try await update()
-
-                    } catch {
-                        print(error)
-                    }
-                }
             }
         } else {
             EmptyState()
@@ -293,6 +263,46 @@ struct CartLines: View {
             Divider()
                 .background(Color.gray.opacity(0.3))
                 .padding(.vertical, 2)
+        }
+    }
+}
+
+struct ShopPayButton: View {
+    @State var isShopPayEnabled: Bool = false
+
+    var body: some View {
+        VStack {
+            if isShopPayEnabled {
+                Button(
+                    action: {
+                        _Concurrency.Task {
+                            await CheckoutController.shared?.checkoutWithShopPay()
+                        }
+                    },
+                    label: {
+                        Image("shop_pay")
+                            .resizable()
+                            .cornerRadius(10)
+                            .frame(maxWidth: .infinity)
+                    }
+                )
+                .cornerRadius(10)
+                .frame(maxWidth: .infinity, maxHeight: 50)
+                .padding(.horizontal, 20)
+            }
+        }
+        .onAppear {
+            _Concurrency.Task {
+                do {
+                    guard let update = CheckoutController.shared?.updateIsShopPayEnabled else {
+                        return
+                    }
+                    isShopPayEnabled = try await update()
+
+                } catch {
+                    print(error)
+                }
+            }
         }
     }
 }
