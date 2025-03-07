@@ -45,19 +45,39 @@ struct CartView: View {
                 }
 
                 VStack {
+                    if let amount = cartManager.cart?.cost.totalAmount,
+                       let total = amount.formattedString()
+                    {
+                        HStack {
+                            Text("Total:")
+                                .fontWeight(.bold)
+                                .font(.system(size: 22))
+
+                            Spacer()
+                            Text(total)
+                        }
+                    }
+
+                    if config.applePayEnabled {
+                        PayWithApplePayButton(
+                            .plain,
+                            action: handleApplePayPress,
+                            fallback: { Text("Apple Pay not available") }
+                        )
+                        .cornerRadius(10)
+                        .disabled(isBusy)
+                        .frame(maxWidth: .infinity, maxHeight: 50)
+                    }
+
+                    ShopPayButton()
+
                     Button(
                         action: presentCheckout,
                         label: {
                             HStack {
                                 Text("Checkout")
                                     .fontWeight(.bold)
-                                Spacer()
-                                if let amount = cartManager.cart?.cost.totalAmount,
-                                   let total = amount.formattedString()
-                                {
-                                    Text(total)
-                                        .fontWeight(.bold)
-                                }
+                                    .font(.system(size: 22))
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
@@ -68,23 +88,9 @@ struct CartView: View {
                     .disabled(isBusy)
                     .foregroundColor(.white)
                     .accessibilityIdentifier("checkoutButton")
-                    .padding(.horizontal, 20)
-
-                    ShopPayButton()
-
-                    if config.applePayEnabled {
-                        PayWithApplePayButton(
-                            .checkout,
-                            action: handleApplePayPress,
-                            fallback: { Text("Apple Pay not available") }
-                        )
-                        .cornerRadius(10)
-                        .disabled(isBusy)
-                        .frame(maxWidth: .infinity, maxHeight: 50)
-                        .padding(.horizontal, 20)
-                    }
                 }
                 .padding(.bottom, 20)
+                .padding(.horizontal, 20)
             }
             .onAppear {
                 preloadCheckout()
@@ -288,7 +294,6 @@ struct ShopPayButton: View {
                     }
                 )
                 .cornerRadius(10)
-                .padding(.horizontal, 20)
             }
         }
         .onAppear {
