@@ -83,7 +83,7 @@ Once the SDK has been added as a dependency, you can import the library:
 import ShopifyCheckoutSheetKit
 ```
 
-To present a checkout to the buyer, your application must first obtain a checkoutUrl. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and query the [checkoutUrl](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). Alternatively, a [cart permalink](https://help.shopify.com/en/manual/products/details/cart-permalink) can be provided. You can use any GraphQL client to obtain a checkoutUrl and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
+To present a checkout to the buyer, your application must first obtain a checkout URL. The most common way is to use the [Storefront GraphQL API](https://shopify.dev/docs/api/storefront) to assemble a cart (via `cartCreate` and related update mutations) and load the [`checkoutUrl`](https://shopify.dev/docs/api/storefront/2023-10/objects/Cart#field-cart-checkouturl). Alternatively, a [cart permalink](https://help.shopify.com/en/manual/products/details/cart-permalink) can be provided. You can use any GraphQL client to obtain a checkout URL and we recommend Shopify's [Mobile Buy SDK for iOS](https://github.com/Shopify/mobile-buy-sdk-ios) to simplify the development workflow:
 
 ```swift
 import Buy
