@@ -112,7 +112,8 @@ public class CartManager: ObservableObject {
 			let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
 				.cartLinesUpdate(cartId: cartID, lines: lines) { $0
 					.cart { $0.cartManagerFragment() }
-				}
+          .userErrors { $0.code().message() }
+        }
 			}
 
 			client.execute(mutation: mutation) { result in
@@ -134,6 +135,7 @@ public class CartManager: ObservableObject {
 			let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
 				.cartLinesAdd(cartId: cartID, lines: lines) { $0
 					.cart { $0.cartManagerFragment() }
+          .userErrors { $0.code().message() }
 				}
 			}
 
@@ -153,6 +155,7 @@ public class CartManager: ObservableObject {
 		let mutation = Storefront.buildMutation(inContext: Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())) { $0
 			.cartCreate(input: defaultCart(items)) { $0
 				.cart { $0.cartManagerFragment() }
+        .userErrors { $0.code().message() }
 			}
 		}
 
