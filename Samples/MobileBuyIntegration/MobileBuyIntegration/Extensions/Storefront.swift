@@ -81,6 +81,43 @@ extension Storefront.BaseCartLineQuery {
 
 extension Storefront.CartQuery {
     @discardableResult
+    func cartPrepareForCompletionFragment() -> Storefront.CartQuery {
+        id()
+            .checkoutUrl()
+            .totalQuantity()
+            .deliveryGroups(first: 10) {
+                $0.nodes {
+                    $0.deliveryGroupsFragment()
+                }
+            }
+            .lines(first: 250) {
+                $0.nodes {
+                    $0.cartLineFragment()
+                }
+            }
+            .totalQuantity()
+            .cost {
+                $0.totalAmount {
+                    $0.amount()
+                        .currencyCode()
+                }
+                .subtotalAmount {
+                    $0.amount()
+                        .currencyCode()
+                }
+                /**
+                 * `totalTaxAmount` is deprecated from most cart operations
+                 * it remains safe to access from `cartPrepareForCompletion`
+                 * We are aware that the deprecation note shows on this node and will aim to fix
+                 */
+                .totalTaxAmount {
+                    $0.amount()
+                        .currencyCode()
+                }
+            }
+    }
+
+    @discardableResult
     func cartManagerFragment() -> Storefront.CartQuery {
         id()
             .checkoutUrl()
