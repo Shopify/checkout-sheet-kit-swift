@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.3 - March 21, 2025
+
+- Add Carthage support
+
 ## 3.1.2 - November 6, 2024
 
 - Remove redundant code
