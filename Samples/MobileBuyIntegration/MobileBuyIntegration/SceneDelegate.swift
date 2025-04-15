@@ -30,6 +30,7 @@ enum Screen: Int, CaseIterable {
     case catalog
     case products
     case cart
+    case profile
     case settings
 }
 
@@ -41,6 +42,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let cartController = UIHostingController(rootView: CartView())
     let productGridController = UIHostingController(rootView: ProductGridView())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
+    let profileController = UIHostingController(rootView: ProfileView())
     let settingsController = UIHostingController(rootView: SettingsView())
 
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
@@ -62,6 +64,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         /// Cart screen
         viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: cartController)
+
+        /// Profile screen
+        viewControllers[Screen.profile.rawValue] = UINavigationController(rootViewController: profileController)
 
         /// Settings screen
         viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
@@ -107,6 +112,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         cartController.tabBarItem.image = UIImage(systemName: "cart")
         cartController.tabBarItem.title = "Cart"
         cartController.navigationItem.title = "Cart"
+
+        /// Profile
+        profileController.tabBarItem.image = UIImage(systemName: "person")
+        profileController.tabBarItem.title = "Profile"
+        profileController.navigationItem.title = "Profile"
 
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")

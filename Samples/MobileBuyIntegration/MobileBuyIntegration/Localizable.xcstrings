@@ -10,6 +10,9 @@
     "✓" : {
 
     },
+    "Account" : {
+
+    },
     "Add to Cart" : {
 
     },
@@ -17,6 +20,9 @@
 
     },
     "Adding..." : {
+
+    },
+    "Addresses" : {
 
     },
     "Apple Pay not available" : {
@@ -58,6 +64,12 @@
     "Loading products..." : {
 
     },
+    "Login" : {
+
+    },
+    "Login Information" : {
+
+    },
     "Logs" : {
 
     },
@@ -67,13 +79,28 @@
     "OK" : {
       "comment" : "Default action"
     },
+    "Order History" : {
+
+    },
+    "Password" : {
+
+    },
+    "Payment Methods" : {
+
+    },
     "Prefill buyer information" : {
 
     },
     "Preload checkout" : {
 
     },
+    "Profile" : {
+
+    },
     "Sample app version" : {
+
+    },
+    "Saved Addresses" : {
 
     },
     "Settings" : {
@@ -106,10 +133,16 @@
     "Show Checkout with ApplePay button" : {
 
     },
+    "Sign Out" : {
+
+    },
     "Theme" : {
 
     },
     "Universal Links" : {
+
+    },
+    "Username" : {
 
     },
     "Version" : {

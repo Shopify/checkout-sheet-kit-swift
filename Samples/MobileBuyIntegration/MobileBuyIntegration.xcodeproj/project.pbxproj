@@ -38,6 +38,7 @@
 		CB05E6C12D4954A600466376 /* PaymentCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C02D49549700466376 /* PaymentCodable.swift */; };
 		CB05E6C42D4954E800466376 /* Storefront.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Storefront.swift */; };
 		CB05E6C62D4A5AB600466376 /* PassKitFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C52D4A5AB200466376 /* PassKitFactory.swift */; };
+		CB5CC63A2DAE556E00273F04 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5CC6392DAE556E00273F04 /* ProfileView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		CB05E6C02D49549700466376 /* PaymentCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCodable.swift; sourceTree = "<group>"; };
 		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
 		CB05E6C52D4A5AB200466376 /* PassKitFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassKitFactory.swift; sourceTree = "<group>"; };
+		CB5CC6392DAE556E00273F04 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,6 +197,7 @@
 		CB05E6C72D4B81B200466376 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				CB5CC6392DAE556E00273F04 /* ProfileView.swift */,
 				6A2E77BF2CE6186F0067062D /* CartView.swift */,
 				6A2E77BD2CE606400067062D /* ProductGridView.swift */,
 				6A3467322B600E64007314A8 /* LogsView.swift */,
@@ -344,6 +347,7 @@
 				4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */,
 				CB05E6C62D4A5AB600466376 /* PassKitFactory.swift in Sources */,
 				CB05E6C42D4954E800466376 /* Storefront.swift in Sources */,
+				CB5CC63A2DAE556E00273F04 /* ProfileView.swift in Sources */,
 				4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */,
 				4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */,
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,
