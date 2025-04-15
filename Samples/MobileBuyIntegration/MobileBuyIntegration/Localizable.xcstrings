@@ -10,9 +10,6 @@
     "✓" : {
 
     },
-    "Account" : {
-
-    },
     "Add to Cart" : {
 
     },
@@ -20,9 +17,6 @@
 
     },
     "Adding..." : {
-
-    },
-    "Addresses" : {
 
     },
     "Apple Pay not available" : {
@@ -79,13 +73,7 @@
     "OK" : {
       "comment" : "Default action"
     },
-    "Order History" : {
-
-    },
     "Password" : {
-
-    },
-    "Payment Methods" : {
 
     },
     "Prefill buyer information" : {
@@ -94,13 +82,7 @@
     "Preload checkout" : {
 
     },
-    "Profile" : {
-
-    },
     "Sample app version" : {
-
-    },
-    "Saved Addresses" : {
 
     },
     "Settings" : {

@@ -24,7 +24,7 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @State private var username: String = ""
+    @State private var email: String = ""
     @State private var password: String = ""
     @State private var isLoggedIn: Bool = false
 
@@ -33,7 +33,7 @@ struct ProfileView: View {
             Form {
                 if !isLoggedIn {
                     Section(header: Text("Login Information")) {
-                        TextField("Username", text: $username)
+                        TextField("email", text: $email)
                             .autocapitalization(.none)
                         SecureField("Password", text: $password)
 
@@ -43,7 +43,7 @@ struct ProfileView: View {
                                 .padding(.vertical, 8)
                         }
                         .buttonStyle(.borderedProminent)
-                        .disabled(username.isEmpty || password.isEmpty)
+                        .disabled(email.isEmpty || password.isEmpty)
                     }
                 } else {
                     Section {
@@ -54,21 +54,21 @@ struct ProfileView: View {
                     }
                 }
             }
-            .navigationTitle("Profile")
         }
-    }
-
-    private func logout() {
-        isLoggedIn = false
-        username = ""
-        password = ""
     }
 
     private func login() {
-        if !username.isEmpty, !password.isEmpty {
+        if !email.isEmpty, !password.isEmpty {
             isLoggedIn = true
         }
     }
+    
+    private func logout() {
+        isLoggedIn = false
+        email = ""
+        password = ""
+    }
+
 }
 
 #Preview {
