@@ -37,6 +37,12 @@
     "Clear logs" : {
 
     },
+    "Email" : {
+
+    },
+    "Error" : {
+
+    },
     "Events" : {
 
     },
@@ -82,6 +88,9 @@
     "Preload checkout" : {
 
     },
+    "Profile" : {
+
+    },
     "Sample app version" : {
 
     },
@@ -122,9 +131,6 @@
 
     },
     "Universal Links" : {
-
-    },
-    "Username" : {
 
     },
     "Version" : {

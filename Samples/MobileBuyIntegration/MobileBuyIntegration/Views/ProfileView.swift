@@ -27,14 +27,26 @@ struct ProfileView: View {
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var isLoggedIn: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+
+    init() {
+        // Try to load credentials from keychain on init
+        if let credentials = try? KeychainManager.shared.getCredentials() {
+            _email = State(initialValue: credentials.email)
+            _password = State(initialValue: credentials.password)
+            _isLoggedIn = State(initialValue: true)
+        }
+    }
 
     var body: some View {
         NavigationView {
             Form {
                 if !isLoggedIn {
                     Section(header: Text("Login Information")) {
-                        TextField("email", text: $email)
+                        TextField("Email", text: $email)
                             .autocapitalization(.none)
+                            .keyboardType(.emailAddress)
                         SecureField("Password", text: $password)
 
                         Button(action: login) {
@@ -54,21 +66,38 @@ struct ProfileView: View {
                     }
                 }
             }
+            .navigationTitle("Profile")
+            .alert("Error", isPresented: $showAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(alertMessage)
+            }
         }
     }
 
     private func login() {
         if !email.isEmpty, !password.isEmpty {
-            isLoggedIn = true
+            do {
+                try KeychainManager.shared.saveCredentials(email: email, password: password)
+                isLoggedIn = true
+            } catch {
+                showAlert = true
+                alertMessage = "Failed to save credentials: \(error.localizedDescription)"
+            }
         }
     }
-    
-    private func logout() {
-        isLoggedIn = false
-        email = ""
-        password = ""
-    }
 
+    private func logout() {
+        do {
+            try KeychainManager.shared.clearCredentials()
+            isLoggedIn = false
+            email = ""
+            password = ""
+        } catch {
+            showAlert = true
+            alertMessage = "Failed to clear credentials: \(error.localizedDescription)"
+        }
+    }
 }
 
 #Preview {
