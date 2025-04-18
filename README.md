@@ -75,6 +75,14 @@ pod "ShopifyCheckoutSheetKit", "~> 3"
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
 
+### Carthage
+Include the following dependency in your Cartfile:
+
+```ruby
+github "Shopify/checkout-sheet-kit-swift" ~> 3.0.0
+```
+Check out the [Carthage docs](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos) for more info.
+
 ## Programmatic Usage
 
 Once the SDK has been added as a dependency, you can import the library:
