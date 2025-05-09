@@ -573,6 +573,7 @@ public struct Order: Codable {
 public struct OrderCustomer: Codable {
 	/// The ID of the customer.
 	public let id: String?
+	public let isFirstOrder: Bool?
 }
 
 public struct Property: Codable {
