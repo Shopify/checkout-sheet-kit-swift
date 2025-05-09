@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.3 - November 6, 2024
+
+- Ensure `self.delegate` is set for `CheckoutViewController` after state changes
+
+https://github.com/Shopify/checkout-sheet-kit-swift/pull/296
+
 ## 3.1.2 - November 6, 2024
 
 - Remove redundant code
