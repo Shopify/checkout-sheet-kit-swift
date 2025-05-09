@@ -132,9 +132,9 @@ extension CheckoutBridge {
 			let name = try container.decode(String.self, forKey: .name)
 
 			switch name {
-			case "completed":
-				let checkoutCompletedEvent = CheckoutCompletedEventDecoder().decode(from: container, using: decoder)
-				self = .checkoutComplete(event: checkoutCompletedEvent)
+			// case "completed":
+			// 	let checkoutCompletedEvent = CheckoutCompletedEventDecoder().decode(from: container, using: decoder)
+			// 	self = .checkoutComplete(event: checkoutCompletedEvent)
 			case "error":
 				let errorDecoder = CheckoutErrorEventDecoder()
 				let error = errorDecoder.decode(from: container, using: decoder)

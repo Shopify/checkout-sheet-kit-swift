@@ -38,6 +38,9 @@ class CartManager: ObservableObject {
 
     private let client: StorefrontClient
     public var redirectUrl: URL?
+    // These should be configured properly for your app
+    private let clientId = "YOUR_CLIENT_ID"
+    private let shopDomain = "YOUR_SHOP_DOMAIN"
 
     @Published var cart: Storefront.Cart?
     @Published var isDirty: Bool = false
@@ -57,7 +60,7 @@ class CartManager: ObservableObject {
     }
 
     /// The cart is "ready" when ShopifyCheckoutSheetKit.preload(checkoutUrl) has been called
-    /// The dirty state will be set to false to prevent  preloading again
+    /// The dirty state will be set to false to prevent preloading again
     func markCartAsReady() {
         isDirty = false
     }
@@ -262,7 +265,6 @@ class CartManager: ObservableObject {
         guard let deliveryGroupId = cart?.deliveryGroups.nodes.first?.id else {
             throw Errors.invariant(message: "deliveryGroups.length should be greater than zero")
         }
-
         let cartSelectedDeliveryOptionInput =
             Storefront.CartSelectedDeliveryOptionInput(
                 deliveryGroupId: deliveryGroupId,
@@ -430,7 +432,6 @@ class CartManager: ObservableObject {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
-
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
@@ -469,6 +470,9 @@ class CartManager: ObservableObject {
         }
     }
 
+    /**
+     * Resets the cart state
+     */
     func resetCart() {
         cart = nil
         isDirty = false

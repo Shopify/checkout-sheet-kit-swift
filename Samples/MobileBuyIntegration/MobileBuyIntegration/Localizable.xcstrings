@@ -37,6 +37,12 @@
     "Clear logs" : {
 
     },
+    "Copied!" : {
+
+    },
+    "Customer Account" : {
+
+    },
     "Email" : {
 
     },
@@ -122,6 +128,9 @@
       }
     },
     "Show Checkout with ApplePay button" : {
+
+    },
+    "Sign in" : {
 
     },
     "Sign Out" : {

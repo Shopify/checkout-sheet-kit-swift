@@ -151,6 +151,9 @@ class StorefrontInputFactory {
     }
 
     public func createCartInput(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
+        // Try to get customer access token
+        let customerAccessToken = try? KeychainManager.shared.getShopifyToken()
+
         if appConfiguration.useVaultedState {
             let deliveryAddress = Storefront.MailingAddressInput.create(
                 address1: Input(orNull: vaultedContactInfo.address1),
@@ -178,6 +181,7 @@ class StorefrontInputFactory {
                 buyerIdentity: Input(
                     orNull: Storefront.CartBuyerIdentityInput.create(
                         email: Input(orNull: vaultedContactInfo.email),
+                        customerAccessToken: Input(orNull: customerAccessToken?.accessToken),
                         deliveryAddressPreferences: Input(
                             orNull: deliveryAddressPreferences)
                     ))
@@ -186,6 +190,12 @@ class StorefrontInputFactory {
             return Storefront.CartInput.create(
                 lines: Input(
                     orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
+                ),
+                buyerIdentity: Input(
+                    orNull: customerAccessToken != nil ?
+                        Storefront.CartBuyerIdentityInput.create(
+                            customerAccessToken: Input(orNull: customerAccessToken?.accessToken)
+                        ) : nil
                 )
             )
         }
@@ -195,14 +205,19 @@ class StorefrontInputFactory {
         email: String?,
         deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
     ) -> Storefront.CartBuyerIdentityInput {
+        // Try to get customer access token
+        let customerAccessToken = try? KeychainManager.shared.getShopifyToken()
+
         if appConfiguration.useVaultedState {
             return Storefront.CartBuyerIdentityInput.create(
                 email: Input(orNull: vaultedContactInfo.email),
+                customerAccessToken: Input(orNull: customerAccessToken?.accessToken),
                 deliveryAddressPreferences: deliveryAddressPreferencesInput
             )
         } else {
             return Storefront.CartBuyerIdentityInput.create(
                 email: Input(orNull: email),
+                customerAccessToken: Input(orNull: customerAccessToken?.accessToken),
                 deliveryAddressPreferences: deliveryAddressPreferencesInput
             )
         }

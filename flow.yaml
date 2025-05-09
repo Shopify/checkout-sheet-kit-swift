@@ -1,0 +1,16 @@
+appId: com.shopify.checkoutKit.SwiftUIExample
+---
+# - launchApp
+# - tapOn: "Açai palets 1kg"
+- tapOn: "Add to cart.*"
+# - assertVisible: "Added"
+# - assertVisible: "Add to Cart"
+# - tapOn: "Close"
+- tapOn: "Cart"
+- tapOn: "Checkout"
+# - swipe:
+#     start: 50%, 100% # From (90% of width, 0% of height)
+#     end: 50%, 10% # To (10% of width, 50% of height)
+- swipe:
+    from: checkout
+    direction: DOWN

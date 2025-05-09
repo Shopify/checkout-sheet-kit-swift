@@ -29,6 +29,7 @@ enum KeychainError: Error {
     case unknown(OSStatus)
     case itemNotFound
     case invalidItemFormat
+    case serializationError
 }
 
 class KeychainManager {
@@ -37,6 +38,7 @@ class KeychainManager {
     private init() {}
 
     private let service = Bundle.main.bundleIdentifier ?? "com.shopify.checkout-sheet-kit"
+    private let shopifyTokenKey = "shopifyToken"
 
     func saveCredentials(email: String, password: String) throws {
         // Save email
@@ -57,12 +59,46 @@ class KeychainManager {
         try deleteItem(for: "password")
     }
 
+    // MARK: - Shopify Token Methods
+
+    func saveShopifyToken(_ token: ShopifyToken) throws {
+        let encoder = JSONEncoder()
+        guard let tokenData = try? encoder.encode(token) else {
+            throw KeychainError.serializationError
+        }
+
+        try saveData(tokenData, for: shopifyTokenKey)
+    }
+
+    func getShopifyToken() throws -> ShopifyToken {
+        let tokenData = try getData(for: shopifyTokenKey)
+
+        let decoder = JSONDecoder()
+        guard let token = try? decoder.decode(ShopifyToken.self, from: tokenData) else {
+            throw KeychainError.serializationError
+        }
+
+        return token
+    }
+
+    func clearShopifyToken() throws {
+        try deleteItem(for: shopifyTokenKey)
+    }
+
     private func saveItem(_ item: String, for key: String) throws {
+        guard let data = item.data(using: .utf8) else {
+            throw KeychainError.serializationError
+        }
+
+        try saveData(data, for: key)
+    }
+
+    private func saveData(_ data: Data, for key: String) throws {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
-            kSecValueData as String: item.data(using: .utf8)!
+            kSecValueData as String: data
         ]
 
         let status = SecItemAdd(query as CFDictionary, nil)
@@ -76,7 +112,7 @@ class KeychainManager {
             ]
 
             let attributes: [String: Any] = [
-                kSecValueData as String: item.data(using: .utf8)!
+                kSecValueData as String: data
             ]
 
             let updateStatus = SecItemUpdate(updateQuery as CFDictionary, attributes as CFDictionary)
@@ -89,6 +125,16 @@ class KeychainManager {
     }
 
     private func getString(for key: String) throws -> String {
+        let data = try getData(for: key)
+
+        guard let string = String(data: data, encoding: .utf8) else {
+            throw KeychainError.invalidItemFormat
+        }
+
+        return string
+    }
+
+    private func getData(for key: String) throws -> Data {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -103,13 +149,11 @@ class KeychainManager {
             throw KeychainError.itemNotFound
         }
 
-        guard let data = result as? Data,
-              let string = String(data: data, encoding: .utf8)
-        else {
+        guard let data = result as? Data else {
             throw KeychainError.invalidItemFormat
         }
 
-        return string
+        return data
     }
 
     private func deleteItem(for key: String) throws {

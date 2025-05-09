@@ -40,6 +40,7 @@
 		CB05E6C62D4A5AB600466376 /* PassKitFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C52D4A5AB200466376 /* PassKitFactory.swift */; };
 		CB5CC63A2DAE556E00273F04 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5CC6392DAE556E00273F04 /* ProfileView.swift */; };
 		CB5CC63C2DAEB9D200273F04 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5CC63B2DAEB9D200273F04 /* KeychainManager.swift */; };
+		CB5CC63E2DAEBBD200273F04 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5CC63D2DAEBBD200273F04 /* ProfileViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +78,7 @@
 		CB05E6C52D4A5AB200466376 /* PassKitFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassKitFactory.swift; sourceTree = "<group>"; };
 		CB5CC6392DAE556E00273F04 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		CB5CC63B2DAEB9D200273F04 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		CB5CC63D2DAEBBD200273F04 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -214,6 +216,7 @@
 		CB05E6C82D4B81EF00466376 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				CB5CC63D2DAEBBD200273F04 /* ProfileViewController.swift */,
 				4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */,
 				6A3393622CEF742200E89FAA /* CheckoutController.swift */,
 			);
@@ -349,6 +352,7 @@
 				6A2E77BE2CE606490067062D /* ProductGridView.swift in Sources */,
 				4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */,
 				CB05E6C62D4A5AB600466376 /* PassKitFactory.swift in Sources */,
+				CB5CC63E2DAEBBD200273F04 /* ProfileViewController.swift in Sources */,
 				CB05E6C42D4954E800466376 /* Storefront.swift in Sources */,
 				CB5CC63A2DAE556E00273F04 /* ProfileView.swift in Sources */,
 				4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */,

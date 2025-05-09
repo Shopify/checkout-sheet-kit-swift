@@ -45,7 +45,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let profileController = UIHostingController(rootView: ProfileView())
     let settingsController = UIHostingController(rootView: SettingsView())
 
-    func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
+    func scene(
+        _ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions
+    ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let tabBarController = UITabBarController()
@@ -54,22 +56,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         subscribeToCartUpdates()
         subscribeToColorSchemeChanges()
 
-        var viewControllers: [UIViewController?] = Array(repeating: nil, count: Screen.allCases.count)
+        var viewControllers: [UIViewController?] = Array(
+            repeating: nil, count: Screen.allCases.count
+        )
 
         /// Catalog screen
-        viewControllers[Screen.catalog.rawValue] = UINavigationController(rootViewController: productGridController)
+        viewControllers[Screen.catalog.rawValue] = UINavigationController(
+            rootViewController: productGridController)
 
         /// Product gallery screen
-        viewControllers[Screen.products.rawValue] = UINavigationController(rootViewController: productGalleryController)
+        viewControllers[Screen.products.rawValue] = UINavigationController(
+            rootViewController: productGalleryController)
 
         /// Cart screen
-        viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: cartController)
+        viewControllers[Screen.cart.rawValue] = UINavigationController(
+            rootViewController: cartController)
 
         /// Profile screen
-        viewControllers[Screen.profile.rawValue] = UINavigationController(rootViewController: profileController)
+        viewControllers[Screen.profile.rawValue] = UINavigationController(
+            rootViewController: profileController)
 
         /// Settings screen
-        viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
+        viewControllers[Screen.settings.rawValue] = UINavigationController(
+            rootViewController: settingsController)
 
         tabBarController.viewControllers = viewControllers.compactMap { $0 }
 
@@ -82,7 +91,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     private func subscribeToColorSchemeChanges() {
         /// Subscribe to color scheme changes on the settings screen
-        NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil
+        )
     }
 
     private func setupControllers() {
@@ -115,8 +126,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         /// Profile
         profileController.tabBarItem.image = UIImage(systemName: "person")
-        profileController.tabBarItem.title = "Profile"
-        profileController.navigationItem.title = "Profile"
+        profileController.tabBarItem.title = "Account"
+        profileController.navigationItem.title = "Account"
 
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
@@ -129,12 +140,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
 
-    private func createWindow(windowScene: UIWindowScene, rootViewController: UIViewController) -> UIWindow {
+    private func createWindow(windowScene: UIWindowScene, rootViewController: UIViewController)
+        -> UIWindow
+    {
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = rootViewController
         window.makeKeyAndVisible()
         window.tintColor = ColorPalette.primaryColor
-        window.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+        window.overrideUserInterfaceStyle =
+            ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
         return window
     }
 
@@ -171,7 +185,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         switch true {
         /// Checkout URLs
-        case appConfiguration.universalLinks.checkout && storefrontUrl.isCheckout() && !storefrontUrl.isThankYouPage():
+        case appConfiguration.universalLinks.checkout && storefrontUrl.isCheckout()
+            && !storefrontUrl.isThankYouPage():
             presentCheckout(url)
         /// Cart URLs
         case appConfiguration.universalLinks.cart && storefrontUrl.isCart():
@@ -203,7 +218,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     @objc func colorSchemeChanged() {
-        window?.overrideUserInterfaceStyle = ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
+        window?.overrideUserInterfaceStyle =
+            ShopifyCheckoutSheetKit.configuration.colorScheme.userInterfaceStyle
     }
 
     private func getRootViewController() -> UINavigationController? {
