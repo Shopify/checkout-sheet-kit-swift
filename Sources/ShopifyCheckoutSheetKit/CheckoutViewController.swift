@@ -79,14 +79,14 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 	}
 
 	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {
-        guard
-            let webViewController = uiViewController
-                .viewControllers
-                .compactMap({ $0 as? CheckoutWebViewController })
-                .first
-        else { return }
+		guard
+			let webViewController = uiViewController
+				.viewControllers
+				.compactMap({ $0 as? CheckoutWebViewController })
+				.first
+		else { return }
 
-        webViewController.delegate = delegate
+		webViewController.delegate = delegate
 	}
 
 	/// Lifecycle methods
