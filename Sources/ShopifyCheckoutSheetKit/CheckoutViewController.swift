@@ -84,7 +84,10 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 				.viewControllers
 				.compactMap({ $0 as? CheckoutWebViewController })
 				.first
-		else { return }
+		else {
+			OSLogger.shared.debug("[CheckoutViewController#updateUIViewController]: No ViewControllers matching CheckoutWebViewController")
+			return
+		}
 
 		webViewController.delegate = delegate
 	}
