@@ -2,4 +2,4 @@
 
 set -e
 
-(cd Samples/MobileBuyIntegration && ./scripts/generate_entitlements.sh)
+(cd Samples/MobileBuyIntegration && ./Scripts/generate_entitlements.sh)
