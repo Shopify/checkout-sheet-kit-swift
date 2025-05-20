@@ -25,12 +25,14 @@ import Combine
 import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
+import WebKit
 
 enum Screen: Int, CaseIterable {
     case catalog
     case products
     case cart
     case settings
+    case webView
 }
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -42,6 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let productGridController = UIHostingController(rootView: ProductGridView())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
     let settingsController = UIHostingController(rootView: SettingsView())
+    let webViewController = WebViewViewController()
 
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -65,6 +68,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         /// Settings screen
         viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
+
+        /// Web View screen
+        viewControllers[Screen.webView.rawValue] = UINavigationController(rootViewController: webViewController)
 
         tabBarController.viewControllers = viewControllers.compactMap { $0 }
 
@@ -111,6 +117,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
         settingsController.tabBarItem.title = "Settings"
+
+        /// Web View
+        webViewController.tabBarItem.image = UIImage(systemName: "globe")
+        webViewController.tabBarItem.title = "Web"
+        webViewController.navigationItem.title = "Web View"
     }
 
     @objc public func present() {

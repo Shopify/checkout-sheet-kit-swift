@@ -33,6 +33,7 @@
 		6A3D7ADC2B8E01460010EB27 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6A3D7ADB2B8E01460010EB27 /* Localizable.xcstrings */; };
 		6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
+		C09732512DDC91A5000A739C /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09732502DDC91A5000A739C /* WebViewViewController.swift */; };
 		CB05E6BD2D493B8F00466376 /* ApplePayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BC2D493B8B00466376 /* ApplePayHandler.swift */; };
 		CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BE2D4951D700466376 /* InfoDictionary.swift */; };
 		CB05E6C12D4954A600466376 /* PaymentCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C02D49549700466376 /* PaymentCodable.swift */; };
@@ -68,6 +69,7 @@
 		6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CountryCode+inferRegion.swift"; sourceTree = "<group>"; };
 		6AE865492CE3BB6500A4971C /* MobileBuyIntegration.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobileBuyIntegration.entitlements; sourceTree = "<group>"; };
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		C09732502DDC91A5000A739C /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
 		CB05E6BC2D493B8B00466376 /* ApplePayHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayHandler.swift; sourceTree = "<group>"; };
 		CB05E6BE2D4951D700466376 /* InfoDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDictionary.swift; sourceTree = "<group>"; };
 		CB05E6C02D49549700466376 /* PaymentCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCodable.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 				4EBBA7B32A5F230900193E19 /* Packages */,
 				4EBBA7682A5F0CE200193E19 /* Products */,
 				4EBBA7B52A5F231500193E19 /* Frameworks */,
+				C09732502DDC91A5000A739C /* WebViewViewController.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -347,6 +350,7 @@
 				4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */,
 				4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */,
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,
+				C09732512DDC91A5000A739C /* WebViewViewController.swift in Sources */,
 				86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */,
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,
 				CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */,

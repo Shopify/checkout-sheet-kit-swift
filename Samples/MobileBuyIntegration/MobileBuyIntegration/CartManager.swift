@@ -80,7 +80,7 @@ class CartManager: ObservableObject {
         ) {
             $0.cartLinesAdd(cartId: cartId, lines: lines) {
                 $0.cart { $0.cartManagerFragment() }
-                  .userErrors { $0.code().message() }
+                    .userErrors { $0.code().message() }
             }
         }
 

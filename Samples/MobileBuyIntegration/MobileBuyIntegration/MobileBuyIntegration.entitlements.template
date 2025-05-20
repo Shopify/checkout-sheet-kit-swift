@@ -10,6 +10,7 @@
 	<array>
 		<string>webcredentials:{STOREFRONT_DOMAIN}</string>
 		<string>applinks:{STOREFRONT_DOMAIN}</string>
+		<string>applinks:shop.app</string>
 	</array>
 </dict>
 </plist>
