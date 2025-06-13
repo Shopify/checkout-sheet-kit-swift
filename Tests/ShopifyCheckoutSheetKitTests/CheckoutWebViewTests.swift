@@ -462,7 +462,7 @@ class CheckoutWebViewTests: XCTestCase {
         waitForExpectations(timeout: 5) { _ in
 			switch self.mockDelegate.errorReceived {
 			case .some(.sdkError(let underlying, let recoverable)):
-				XCTAssertEqual(underlying.localizedDescription, "The operation couldn’t be completed. (NSURLErrorDomain error -1001.)")
+				XCTAssertEqual(underlying.localizedDescription, "The operation couldn't be completed. (NSURLErrorDomain error -1001.)")
 				XCTAssertTrue(recoverable)
 			default:
 				XCTFail("checkoutDidFail(.sdkError) expected to throw")
@@ -480,6 +480,32 @@ class CheckoutWebViewTests: XCTestCase {
 
 		XCTAssertNil(self.mockDelegate.errorReceived)
     }
+
+	func testAuthenticationHeaderIsAddedWithConfig() {
+		let webView = LoadedRequestObservableWebView()
+		let authConfig = AuthenticationConfig(payload: "jwt-token-example", version: "v1")
+		webView.checkoutConfig = CheckoutConfig(authentication: authConfig)
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: false
+		)
+
+		let authHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Checkout-Sheet-Protocol-Consumer")
+		XCTAssertEqual(authHeader, "{payload: jwt-token-example, version: v1}")
+	}
+
+	func testAuthenticationHeaderNotAddedWithoutConfig() {
+		let webView = LoadedRequestObservableWebView()
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: false
+		)
+
+		let authHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Checkout-Sheet-Protocol-Consumer")
+		XCTAssertNil(authHeader)
+	}
 }
 
 class LoadedRequestObservableWebView: CheckoutWebView {

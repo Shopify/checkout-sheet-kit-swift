@@ -126,6 +126,8 @@ class CheckoutWebView: WKWebView {
 	}
 	var isPreloadRequest: Bool = false
 
+	var checkoutConfig: CheckoutConfig?
+
 	// MARK: Initializers
 	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
 		OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
@@ -229,6 +231,13 @@ class CheckoutWebView: WKWebView {
 		if isPreload && isPreloadingAvailable {
 			isPreloadRequest = true
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
+		}
+
+		// Add authentication header if config is provided
+		if let auth = checkoutConfig?.authentication {
+			let headerValue = "{payload: \(auth.payload), version: \(auth.version)}"
+			request.setValue(headerValue, forHTTPHeaderField: "Shopify-Checkout-Sheet-Protocol-Consumer")
+			OSLogger.shared.debug("Added authentication header for checkout")
 		}
 
 		load(request)
