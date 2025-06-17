@@ -2,6 +2,19 @@ name: checkout-sheet-kit-swift
 
 type: ios
 
+check:
+  lint: /opt/dev/bin/dev lint
+  build: /opt/dev/bin/dev build
+  test: /opt/dev/bin/dev test
+  build_sample_app: /opt/dev/bin/dev build_sample_app
+
+packages:
+  - xcode
+  - homebrew:
+      - swiftlint
+      - swiftformat
+      - xcbeautify
+
 up:
   - ruby
   - custom:
@@ -14,9 +27,55 @@ up:
       met?: |
         ([ -f "./samples/MobileBuyIntegration/MobileBuyIntegration/MobileBuyIntegration.entitlements" ] || exit 1;)
       meet: ./scripts/setup_entitlements
+  - custom:
+      name: Setup Git Hooks
+      met?: |
+        PRE_COMMIT_ORIG="scripts/pre-commit"
+        PRE_PUSH_ORIG="scripts/pre-push"
+        PRE_COMMIT_DEST=".git/hooks/pre-commit"
+        PRE_PUSH_DEST=".git/hooks/pre-push.d/100-custom-lint-and-format"
 
-packages:
-  - xcode
-  - homebrew:
-      - swiftlint
-      - swiftformat
+        if [ ! -f "$PRE_COMMIT_DEST" ] || [ ! -f "$PRE_PUSH_DEST" ]; then
+          exit 1
+        fi
+
+        calculate_sha() {
+          shasum -a 256 "$1" | cut -d ' ' -f 1
+        }
+
+        ORIG_COMMIT_SHA=$(calculate_sha "$PRE_COMMIT_ORIG")
+        DEST_COMMIT_SHA=$(calculate_sha "$PRE_COMMIT_DEST")
+        ORIG_PUSH_SHA=$(calculate_sha "$PRE_PUSH_ORIG")
+        DEST_PUSH_SHA=$(calculate_sha "$PRE_PUSH_DEST")
+
+        if [ "$ORIG_COMMIT_SHA" = "$DEST_COMMIT_SHA" ] && [ "$ORIG_PUSH_SHA" = "$DEST_PUSH_SHA" ]; then
+          exit 0
+        else
+          exit 1
+        fi
+      meet: |
+        cp scripts/pre-commit .git/hooks/pre-commit
+        cp scripts/pre-push .git/hooks/pre-push.d/100-custom-lint-and-format
+        chmod +x .git/hooks/pre-commit
+        chmod +x .git/hooks/pre-push.d/100-custom-lint-and-format
+
+commands:
+  build:
+    desc: Build the project
+    run: scripts/build_package.sh
+
+  lint:
+    desc: Run lint (no fix) with SwiftFormat and SwiftLint
+    run: scripts/lint_package.sh
+
+  fix:
+    desc: Autofix with SwiftFormat and SwiftLint
+    run: scripts/fix_package.sh
+
+  test:
+    desc: Run tests with SwiftTesting
+    run: scripts/test_package.sh
+
+  build_sample_app:
+    desc: Build the sample app
+    run: scripts/build_sample_app.sh
