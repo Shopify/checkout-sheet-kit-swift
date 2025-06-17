@@ -15,7 +15,3 @@ To get started you will first need to generate the an `entitlements` file for th
 ```sh
 ./Scripts/setup_entitlements
 ```
-
-## SimpleAppIntegration
-
-This project demonstrates how to use the `ShopifyCheckoutSheetKit` library with a custom built Storefront GraphQL API client.

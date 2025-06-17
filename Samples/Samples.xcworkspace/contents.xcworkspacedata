@@ -2,12 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:SimpleAppIntegration/SimpleAppIntegration.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:MobileBuyIntegration/MobileBuyIntegration.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:SwiftUIExample/SwiftUIExample.xcodeproj">
    </FileRef>
 </Workspace>
