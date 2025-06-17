@@ -1,3 +1,4 @@
+--exclude Sources/Buy
 --indent 4
 --linebreaks lf
 --wraparguments before-first
@@ -6,4 +7,4 @@
 --allman false
 --semicolons inline
 --trimwhitespace always
---disable redundantReturn
+--disable redundantReturn,preferKeyPath

@@ -1,7 +1,11 @@
 disabled_rules:
-  - line_length
-  - file_length
-  - non_optional_string_data_conversion
+  - identifier_name
+  - todo
+  - type_name
+  - trailing_comma # Conflicts with SwiftFormat
+  - function_body_length
+  - opening_brace
+  - type_body_length
 
 opt_in_rules:
   - array_init
