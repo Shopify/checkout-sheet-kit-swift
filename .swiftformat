@@ -7,3 +7,4 @@
 --semicolons inline
 --trimwhitespace always
 --disable redundantReturn
+--swiftversion 5.10

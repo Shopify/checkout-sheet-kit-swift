@@ -154,7 +154,7 @@ struct ProductView: View {
     }
 
     private func setProduct(_ product: Storefront.Product?) {
-        if let product = product {
+        if let product {
             self.product = product
             handle = product.handle
         }
