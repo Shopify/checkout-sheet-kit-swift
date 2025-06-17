@@ -40,7 +40,7 @@ class ProgressBarView: UIView {
 
         NSLayoutConstraint.activate([
             progressBar.topAnchor.constraint(equalTo: topAnchor),
-            progressBar.heightAnchor.constraint(equalToConstant: 1),
+            progressBar.heightAnchor.constraint(equalToConstant: 1)
         ])
 
         progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.tintColor

@@ -114,7 +114,7 @@ class CartManager: ObservableObject {
         }
 
         let lines = [
-            Storefront.CartLineUpdateInput.create(id: id, quantity: Input(orNull: quantity)),
+            Storefront.CartLineUpdateInput.create(id: id, quantity: Input(orNull: quantity))
         ]
 
         let mutation = Storefront.buildMutation(
@@ -171,7 +171,7 @@ class CartManager: ObservableObject {
         let deliveryAddressPreferencesInput = Input(
             orNull: [
                 Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: shippingAddress)),
+                    deliveryAddress: Input(orNull: shippingAddress))
             ]
         )
 

@@ -92,7 +92,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             checkoutView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
         view.addSubview(progressBar)
@@ -100,7 +100,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             progressBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             progressBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            progressBar.heightAnchor.constraint(equalToConstant: 1),
+            progressBar.heightAnchor.constraint(equalToConstant: 1)
         ])
         view.bringSubviewToFront(progressBar)
 
@@ -168,7 +168,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             checkoutView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
         view.addSubview(progressBar)
@@ -177,7 +177,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             progressBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             progressBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            progressBar.heightAnchor.constraint(equalToConstant: 1),
+            progressBar.heightAnchor.constraint(equalToConstant: 1)
         ])
         view.bringSubviewToFront(checkoutView)
         view.bringSubviewToFront(progressBar)

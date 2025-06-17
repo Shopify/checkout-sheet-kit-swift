@@ -167,7 +167,7 @@ class StorefrontInputFactory {
 
             let deliveryAddressPreferences = [
                 Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: deliveryAddress)),
+                    deliveryAddress: Input(orNull: deliveryAddress))
             ]
 
             return Storefront.CartInput.create(

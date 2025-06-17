@@ -198,7 +198,7 @@ class PassKitFactory {
                 PKPaymentRequest.paymentShippingAddressInvalidError(
                     withKey: CNPostalAddressCountryKey,
                     localizedDescription: "Invalid country"
-                ),
+                )
             ]
         )
     }
@@ -211,7 +211,7 @@ class PassKitFactory {
                     .paymentContactInvalidError(
                         withContactField: PKContactField.emailAddress,
                         localizedDescription: "Email address is a required field"
-                    ),
+                    )
             ]
         )
     }

@@ -107,7 +107,7 @@ class CartItemCell: UITableViewCell {
             labelStackView.trailingAnchor.constraint(equalTo: quantityStackView.leadingAnchor, constant: -16),
 
             quantityStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            quantityStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            quantityStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
 

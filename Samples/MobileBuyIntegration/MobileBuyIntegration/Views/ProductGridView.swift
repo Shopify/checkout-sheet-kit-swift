@@ -31,7 +31,7 @@ struct ProductGridView: View {
 
     let columns = [
         GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
-        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10))
     ]
 
     var body: some View {
