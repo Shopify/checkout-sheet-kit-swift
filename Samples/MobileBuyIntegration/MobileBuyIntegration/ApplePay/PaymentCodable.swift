@@ -35,7 +35,7 @@ struct Header: Codable {
 }
 
 func decodePaymentData(payment: PKPayment) -> PaymentData? {
-    return try? JSONDecoder().decode(
+    try? JSONDecoder().decode(
         PaymentData.self,
         from: payment.token.paymentData
     )

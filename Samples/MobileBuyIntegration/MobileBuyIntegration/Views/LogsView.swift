@@ -78,6 +78,6 @@ struct LogsView: View {
     }
 
     private func readLogs() -> [String?] {
-        return LogReader.shared.readLogs(limit: 100) ?? []
+        LogReader.shared.readLogs(limit: 100) ?? []
     }
 }

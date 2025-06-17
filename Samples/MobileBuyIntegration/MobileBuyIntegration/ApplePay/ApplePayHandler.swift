@@ -49,7 +49,7 @@ class ApplePayHandler: NSObject {
         .amex,
         .discover,
         .masterCard,
-        .visa
+        .visa,
     ]
 
     /*

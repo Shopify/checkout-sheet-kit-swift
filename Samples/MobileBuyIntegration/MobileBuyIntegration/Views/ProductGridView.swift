@@ -31,7 +31,7 @@ struct ProductGridView: View {
 
     let columns = [
         GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
-        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10))
+        GridItem(.fixed(UIScreen.main.bounds.width / 2 - 10)),
     ]
 
     var body: some View {
@@ -75,7 +75,7 @@ struct ProductSheetView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            if let product = product {
+            if let product {
                 ProductView(product: product)
             }
 

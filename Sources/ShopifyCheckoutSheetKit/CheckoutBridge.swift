@@ -54,9 +54,9 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
     static func userAgentWithOptionalSuffix(_ userAgentString: String) -> String {
         if let platform = ShopifyCheckoutSheetKit.configuration.platform?.rawValue {
-            return "\(userAgentString) \(platform)"
+            "\(userAgentString) \(platform)"
         } else {
-            return userAgentString
+            userAgentString
         }
     }
 
@@ -67,11 +67,10 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
     }
 
     static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
-        let dispatchMessageBody: String
-        if let body = messageBody {
-            dispatchMessageBody = "'\(messageName)', \(body)"
+        let dispatchMessageBody = if let body = messageBody {
+            "'\(messageName)', \(body)"
         } else {
-            dispatchMessageBody = "'\(messageName)'"
+            "'\(messageName)'"
         }
         let script = dispatchMessageTemplate(body: dispatchMessageBody)
         webView.evaluateJavaScript(script)
@@ -90,7 +89,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
     }
 
     static func dispatchMessageTemplate(body: String) -> String {
-        return """
+        """
         if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
         	window.MobileCheckoutSdk.dispatchMessage(\(body));
         } else {

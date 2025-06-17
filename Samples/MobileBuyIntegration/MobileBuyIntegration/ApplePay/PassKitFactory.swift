@@ -187,7 +187,7 @@ class PassKitFactory {
     }
 
     func createPKPaymentUSAdressError() -> PKPaymentAuthorizationResult {
-        return .init(
+        .init(
             status: .failure,
             errors: [
                 PKPaymentRequest
@@ -198,20 +198,20 @@ class PassKitFactory {
                 PKPaymentRequest.paymentShippingAddressInvalidError(
                     withKey: CNPostalAddressCountryKey,
                     localizedDescription: "Invalid country"
-                )
+                ),
             ]
         )
     }
 
     func createPKPaymentEmailError() -> PKPaymentAuthorizationResult {
-        return .init(
+        .init(
             status: .failure,
             errors: [
                 PKPaymentRequest
                     .paymentContactInvalidError(
                         withContactField: PKContactField.emailAddress,
                         localizedDescription: "Email address is a required field"
-                    )
+                    ),
             ]
         )
     }

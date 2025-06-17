@@ -58,7 +58,7 @@ class StorefrontClient {
     func executeAsync(query: Storefront.QueryRootQuery) async throws -> Storefront.QueryRoot {
         try await withCheckedThrowingContinuation { continuation in
             let task = client.queryGraphWith(query) { query, error in
-                guard let query = query else {
+                guard let query else {
                     return continuation.resume(throwing: error ?? URLError(.unknown))
                 }
 
@@ -86,7 +86,7 @@ class StorefrontClient {
         try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.main.async {
                 let task = self.client.mutateGraphWith(mutation) { mutation, error in
-                    guard let mutation = mutation else {
+                    guard let mutation else {
                         return continuation.resume(throwing: error ?? URLError(.unknown))
                     }
 
@@ -108,23 +108,23 @@ public struct StorefrontURL {
     }
 
     public func isThankYouPage() -> Bool {
-        return url.path.range(of: "/thank[-_]you", options: .regularExpression) != nil
+        url.path.range(of: "/thank[-_]you", options: .regularExpression) != nil
     }
 
     public func isCheckout() -> Bool {
-        return url.path.contains("/checkout")
+        url.path.contains("/checkout")
     }
 
     public func isCart() -> Bool {
-        return url.path.contains("/cart")
+        url.path.contains("/cart")
     }
 
     public func isCollection() -> Bool {
-        return url.path.range(of: "/collections/\(slug)", options: .regularExpression) != nil
+        url.path.range(of: "/collections/\(slug)", options: .regularExpression) != nil
     }
 
     public func isProduct() -> Bool {
-        return url.path.range(of: "/products/\(slug)", options: .regularExpression) != nil
+        url.path.range(of: "/products/\(slug)", options: .regularExpression) != nil
     }
 
     public func getProductSlug() -> String? {
@@ -167,7 +167,7 @@ class StorefrontInputFactory {
 
             let deliveryAddressPreferences = [
                 Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: deliveryAddress))
+                    deliveryAddress: Input(orNull: deliveryAddress)),
             ]
 
             return Storefront.CartInput.create(
@@ -196,12 +196,12 @@ class StorefrontInputFactory {
         deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
     ) -> Storefront.CartBuyerIdentityInput {
         if appConfiguration.useVaultedState {
-            return Storefront.CartBuyerIdentityInput.create(
+            Storefront.CartBuyerIdentityInput.create(
                 email: Input(orNull: vaultedContactInfo.email),
                 deliveryAddressPreferences: deliveryAddressPreferencesInput
             )
         } else {
-            return Storefront.CartBuyerIdentityInput.create(
+            Storefront.CartBuyerIdentityInput.create(
                 email: Input(orNull: email),
                 deliveryAddressPreferences: deliveryAddressPreferencesInput
             )
@@ -211,7 +211,7 @@ class StorefrontInputFactory {
     public func createMailingAddressInput(
         contact: PKContact, address: CNPostalAddress
     ) -> Storefront.MailingAddressInput {
-        return Storefront.MailingAddressInput.create(
+        Storefront.MailingAddressInput.create(
             address1: Input(orNull: address.street),
             address2: Input(orNull: address.subLocality),
             city: Input(orNull: address.city),

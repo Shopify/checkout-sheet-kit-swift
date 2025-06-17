@@ -92,7 +92,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             checkoutView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
 
         view.addSubview(progressBar)
@@ -100,7 +100,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             progressBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             progressBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            progressBar.heightAnchor.constraint(equalToConstant: 1)
+            progressBar.heightAnchor.constraint(equalToConstant: 1),
         ])
         view.bringSubviewToFront(progressBar)
 
@@ -110,14 +110,14 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     func observeProgressChanges(_ view: WKWebView) {
         progressObserver = view.observe(\.estimatedProgress, options: [.new]) { [weak self] _, change in
-            guard let self = self else { return }
+            guard let self else { return }
             if let newProgress = change.newValue {
                 let estimatedProgress = Float(newProgress)
-                self.progressBar.setProgress(estimatedProgress, animated: true)
+                progressBar.setProgress(estimatedProgress, animated: true)
                 if estimatedProgress < 1.0 {
-                    self.progressBar.startAnimating()
+                    progressBar.startAnimating()
                 } else {
-                    self.progressBar.stopAnimating()
+                    progressBar.stopAnimating()
                 }
             }
         }
@@ -132,7 +132,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             initialNavigation = true
             checkoutView.load(checkout: checkoutURL)
             progressBar.startAnimating()
-        } else if checkoutView.isLoading && initialNavigation {
+        } else if checkoutView.isLoading, initialNavigation {
             progressBar.startAnimating()
         }
     }
@@ -168,7 +168,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             checkoutView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
 
         view.addSubview(progressBar)
@@ -177,7 +177,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             progressBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             progressBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            progressBar.heightAnchor.constraint(equalToConstant: 1)
+            progressBar.heightAnchor.constraint(equalToConstant: 1),
         ])
         view.bringSubviewToFront(checkoutView)
         view.bringSubviewToFront(progressBar)
@@ -211,7 +211,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
         let shouldAttemptRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
 
-        if canRecoverFromError(error) && shouldAttemptRecovery {
+        if canRecoverFromError(error), shouldAttemptRecovery {
             presentFallbackViewController(url: checkoutURL)
         } else {
             dismiss(animated: true)
@@ -223,7 +223,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
     }
 
     func checkoutViewDidToggleModal(modalVisible: Bool) {
-        guard let navigationController = navigationController else { return }
+        guard let navigationController else { return }
 
         navigationController.setNavigationBarHidden(modalVisible, animated: true)
     }
@@ -234,6 +234,6 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
     private func canRecoverFromError(_: CheckoutError) -> Bool {
         /// Reuse of multipass tokens will cause 422 errors. A new token must be generated
-        return !CheckoutURL(from: checkoutURL).isMultipassURL()
+        !CheckoutURL(from: checkoutURL).isMultipassURL()
     }
 }

@@ -114,7 +114,7 @@ class CartManager: ObservableObject {
         }
 
         let lines = [
-            Storefront.CartLineUpdateInput.create(id: id, quantity: Input(orNull: quantity))
+            Storefront.CartLineUpdateInput.create(id: id, quantity: Input(orNull: quantity)),
         ]
 
         let mutation = Storefront.buildMutation(
@@ -171,7 +171,7 @@ class CartManager: ObservableObject {
         let deliveryAddressPreferencesInput = Input(
             orNull: [
                 Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: shippingAddress))
+                    deliveryAddress: Input(orNull: shippingAddress)),
             ]
         )
 
@@ -487,39 +487,39 @@ extension CartManager {
         var failureReason: String? {
             switch self {
             case .missingPostalAddress:
-                return "Postal Address is nil"
+                "Postal Address is nil"
             case .invalidPaymentData:
-                return "Invalid Payment Data"
+                "Invalid Payment Data"
             case .invalidBillingAddress:
-                return "Mapping billing address failed"
+                "Mapping billing address failed"
             case .payloadUnwrap:
-                return "Request Payload failed to unwrap"
+                "Request Payload failed to unwrap"
             case let .apiErrors(requestName, message):
-                return "Request: \(requestName) Failed. Message: \(message)"
+                "Request: \(requestName) Failed. Message: \(message)"
             case let .invariant(message):
-                return "invariant failed: \(message)"
+                "invariant failed: \(message)"
             }
         }
 
         var recoverySuggestion: String? {
             switch self {
             case .missingPostalAddress:
-                return "Check `PKContact.postalAddress`"
+                "Check `PKContact.postalAddress`"
             case .invalidPaymentData:
-                return "Decoding failed - check the PKPayment"
+                "Decoding failed - check the PKPayment"
             case .invalidBillingAddress:
-                return "Ensure `billingContact.postalAddress` is not nil"
+                "Ensure `billingContact.postalAddress` is not nil"
             case .payloadUnwrap:
-                return "Check the previous request was executed"
+                "Check the previous request was executed"
             case let .apiErrors(requestName, _):
-                return "Check the API payload for more details: \(requestName)"
+                "Check the API payload for more details: \(requestName)"
             case .invariant:
-                return "Resolve preconditions before continuing"
+                "Resolve preconditions before continuing"
             }
         }
     }
 
     static func userErrorMessage(errors: [Storefront.CartUserError]) -> String {
-        return "userErrors should be [], received: \(String(describing: errors))"
+        "userErrors should be [], received: \(String(describing: errors))"
     }
 }

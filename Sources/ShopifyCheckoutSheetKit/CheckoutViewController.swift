@@ -52,7 +52,7 @@ public extension CheckoutViewController {
         }
 
         public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-            return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
+            CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
         }
 
         public func updateUIViewController(_: CheckoutViewController, context _: Self.Context) {}
@@ -74,7 +74,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     }
 
     public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-        return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+        CheckoutViewController(checkout: checkoutURL, delegate: delegate)
     }
 
     public func updateUIViewController(_: CheckoutViewController, context _: Self.Context) {}
@@ -131,7 +131,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     }
 
     public func checkoutDidClickLink(url: URL) {
-        if let onLinkClick = onLinkClick {
+        if let onLinkClick {
             onLinkClick(url)
             return
         }

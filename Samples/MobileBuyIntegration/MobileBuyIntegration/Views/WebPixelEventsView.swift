@@ -77,6 +77,6 @@ struct WebPixelsEventsView: View {
     }
 
     private func readLogs() -> [String?] {
-        return WebPixelsLogReader.shared.readLogs() ?? []
+        WebPixelsLogReader.shared.readLogs() ?? []
     }
 }

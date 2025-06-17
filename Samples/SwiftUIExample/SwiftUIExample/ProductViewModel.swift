@@ -168,7 +168,7 @@ public class CartManager: ObservableObject {
     }
 
     private func defaultCart(_ items: [GraphQL.ID]) -> Storefront.CartInput {
-        return Storefront.CartInput.create(
+        Storefront.CartInput.create(
             lines: Input(orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) })
         )
     }
@@ -261,6 +261,6 @@ extension Storefront.MoneyV2 {
 
 extension Storefront {
     func inferContext() -> Storefront.InContextDirective {
-        return Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
+        Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
     }
 }

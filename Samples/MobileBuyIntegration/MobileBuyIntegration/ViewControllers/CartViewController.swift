@@ -107,7 +107,7 @@ class CartItemCell: UITableViewCell {
             labelStackView.trailingAnchor.constraint(equalTo: quantityStackView.leadingAnchor, constant: -16),
 
             quantityStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            quantityStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            quantityStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
         ])
     }
 
@@ -208,11 +208,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     // MARK: UITableViewDataSource
 
     func numberOfSections(in _: UITableView) -> Int {
-        return 1
+        1
     }
 
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        return CartManager.shared.cart?.lines.nodes.count ?? 0
+        CartManager.shared.cart?.lines.nodes.count ?? 0
     }
 
     func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -382,7 +382,7 @@ extension CartViewController {
 // analytics examples
 extension CartViewController {
     private func mapToGenericEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
-        return AnalyticsEvent(
+        AnalyticsEvent(
             name: standardEvent.name!,
             userId: getUserId(),
             timestamp: standardEvent.timestamp!,
@@ -404,7 +404,7 @@ extension CartViewController {
     }
 
     private func decodeAndMap(event: CustomEvent, decoder _: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
-        return AnalyticsEvent(
+        AnalyticsEvent(
             name: event.name!,
             userId: getUserId(),
             timestamp: event.timestamp!,
@@ -414,7 +414,7 @@ extension CartViewController {
 
     private func getUserId() -> String {
         // return ID for user used in your existing analytics system
-        return "123"
+        "123"
     }
 
     func recordAnalyticsEvent(_ event: AnalyticsEvent) {

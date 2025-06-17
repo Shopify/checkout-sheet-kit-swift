@@ -85,13 +85,11 @@ extension CheckoutController: CheckoutDelegate {
     }
 
     func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        var eventName: String?
-
-        switch event {
+        var eventName: String? = switch event {
         case let .standardEvent(event):
-            eventName = event.name
+            event.name
         case let .customEvent(event):
-            eventName = event.name
+            event.name
         }
 
         OSLogger.shared.debug("[CheckoutDelegate] Pixel event: \(eventName ?? "")")

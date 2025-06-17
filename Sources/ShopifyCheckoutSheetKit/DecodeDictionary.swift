@@ -104,7 +104,7 @@ extension UnkeyedDecodingContainer {
     }
 
     mutating func decode(_ type: [String: Any].Type) throws -> [String: Any] {
-        let nestedContainer = try self.nestedContainer(keyedBy: JSONCodingKeys.self)
+        let nestedContainer = try nestedContainer(keyedBy: JSONCodingKeys.self)
         return try nestedContainer.decode(type)
     }
 }

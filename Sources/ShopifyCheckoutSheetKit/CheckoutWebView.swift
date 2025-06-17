@@ -59,7 +59,7 @@ class CheckoutWebView: WKWebView {
     }
 
     var isPreloadingAvailable: Bool {
-        return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
+        !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
     }
 
     static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
@@ -77,7 +77,7 @@ class CheckoutWebView: WKWebView {
             return uncacheableView()
         }
 
-        guard let cache = cache, cacheKey == cache.key, !cache.isStale else {
+        guard let cache, cacheKey == cache.key, !cache.isStale else {
             let view = CheckoutWebView()
             CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
             return view
@@ -107,7 +107,7 @@ class CheckoutWebView: WKWebView {
 
     /// Used only for testing
     static func hasCacheEntry() -> Bool {
-        return cache != nil
+        cache != nil
     }
 
     // MARK: Properties
@@ -208,11 +208,11 @@ class CheckoutWebView: WKWebView {
 
     private func observeNavigationChanges() {
         navigationObserver = observe(\.url, options: [.new]) { [weak self] _, change in
-            guard let self = self else { return }
+            guard let self else { return }
 
             if let url = change.newValue as? URL {
                 if CheckoutURL(from: url).isConfirmationPage() {
-                    self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
+                    viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
                     navigationObserver?.invalidate()
                 }
             }
@@ -230,7 +230,7 @@ class CheckoutWebView: WKWebView {
         OSLogger.shared.info("Loading checkout URL: \(url.absoluteString), isPreload: \(isPreload)")
         var request = URLRequest(url: url)
 
-        if isPreload && isPreloadingAvailable {
+        if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
             request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
         }
@@ -239,7 +239,7 @@ class CheckoutWebView: WKWebView {
     }
 
     private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {
-        if checkoutDidLoad && checkoutDidPresent && isBridgeAttached {
+        if checkoutDidLoad, checkoutDidPresent, isBridgeAttached {
             OSLogger.shared.info("Emitting presented event to checkout")
             CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
             presentedEventDidDispatch = true
@@ -458,7 +458,7 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     private func isCheckout(url: URL?) -> Bool {
-        return self.url == url
+        self.url == url
     }
 
     private func getOrderIdFromQuery(url: URL) -> String? {

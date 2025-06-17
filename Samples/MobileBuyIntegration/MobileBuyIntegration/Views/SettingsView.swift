@@ -117,7 +117,7 @@ struct SettingsView: View {
     }
 
     private func currentVersion() -> String {
-        return "\(InfoDictionary.shared.version) (\(InfoDictionary.shared.buildNumber))"
+        "\(InfoDictionary.shared.version) (\(InfoDictionary.shared.buildNumber))"
     }
 }
 
@@ -140,31 +140,31 @@ extension Configuration.ColorScheme {
     var prettyTitle: String {
         switch self {
         case .light:
-            return "Light"
+            "Light"
         case .dark:
-            return "Dark"
+            "Dark"
         case .automatic:
-            return "Automatic"
+            "Automatic"
         case .web:
-            return "Web"
+            "Web"
         }
     }
 
     var tintColor: UIColor {
         switch self {
         case .web:
-            return UIColor(red: 0.18, green: 0.16, blue: 0.22, alpha: 1.00)
+            UIColor(red: 0.18, green: 0.16, blue: 0.22, alpha: 1.00)
         default:
-            return UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+            UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
         }
     }
 
     var backgroundColor: UIColor {
         switch self {
         case .web:
-            return ColorPalette.backgroundColor
+            ColorPalette.backgroundColor
         default:
-            return .systemBackground
+            .systemBackground
         }
     }
 }

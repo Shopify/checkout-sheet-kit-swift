@@ -45,7 +45,7 @@ struct CatalogView: View {
     var body: some View {
         NavigationView {
             VStack {
-                if let product = product, let price = product.variants.nodes.first?.price.formattedString() {
+                if let product, let price = product.variants.nodes.first?.price.formattedString() {
                     VStack {
                         VStack(alignment: .leading) {
                             AsyncImage(url: product.featuredImage?.url) { image in

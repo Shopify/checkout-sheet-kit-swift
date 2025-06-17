@@ -131,7 +131,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func subscribeToCartUpdates() {
         CartManager.shared.$cart
             .sink { cart in
-                if let cart = cart, cart.lines.nodes.count > 0 {
+                if let cart, cart.lines.nodes.count > 0 {
                     DispatchQueue.main.async {
                         self.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
                     }
@@ -197,7 +197,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     private func getRootViewController() -> UINavigationController? {
-        return window?.rootViewController as? UINavigationController
+        window?.rootViewController as? UINavigationController
     }
 
     private func getNavigationController(forTab index: Int) -> UINavigationController? {
@@ -216,11 +216,11 @@ extension Configuration.ColorScheme {
     var userInterfaceStyle: UIUserInterfaceStyle {
         switch self {
         case .light:
-            return .light
+            .light
         case .dark:
-            return .dark
+            .dark
         default:
-            return .unspecified
+            .unspecified
         }
     }
 }

@@ -179,7 +179,7 @@ class CheckoutWebViewTests: XCTestCase {
         let urls = [
             "http://shopify1.shopify.com/checkouts/c/12345/thank-you?order_id=1234",
             "http://shopify1.shopify.com/checkouts/c/12345/thank_you?order_id=1234",
-            "http://shopify1.shopify.com/checkouts/c/12345/thank_you/completed?order_id=1234"
+            "http://shopify1.shopify.com/checkouts/c/12345/thank_you/completed?order_id=1234",
         ]
 
         for url in urls {

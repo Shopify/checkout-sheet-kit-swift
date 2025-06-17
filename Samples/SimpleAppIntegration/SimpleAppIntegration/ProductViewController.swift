@@ -77,7 +77,7 @@ class ProductViewController: UIViewController, CheckoutDelegate {
     }
 
     private func updateProductDetails() {
-        guard let product = product else { return }
+        guard let product else { return }
 
         titleLabel.text = product.title
 

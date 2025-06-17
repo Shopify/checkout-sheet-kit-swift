@@ -33,6 +33,6 @@ extension Storefront.MoneyV2 {
     }
 
     func isFree() -> Bool {
-        return amount == 0
+        amount == 0
     }
 }

@@ -74,7 +74,7 @@ public enum CheckoutError: Swift.Error {
              let .checkoutUnavailable(_, _, recoverable),
              let .configurationError(_, _, recoverable),
              let .sdkError(_, recoverable):
-            return recoverable
+            recoverable
         }
     }
 }

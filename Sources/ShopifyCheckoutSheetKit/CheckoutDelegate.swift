@@ -60,7 +60,7 @@ public extension CheckoutDelegate {
     }
 
     func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return error.isRecoverable
+        error.isRecoverable
     }
 
     private func handleUrl(_ url: URL) {

@@ -31,7 +31,7 @@ public struct CheckoutURL {
     }
 
     public func isMultipassURL() -> Bool {
-        return url.absoluteString.contains("multipass")
+        url.absoluteString.contains("multipass")
     }
 
     public func isConfirmationPage() -> Bool {
@@ -49,7 +49,7 @@ public struct CheckoutURL {
     }
 
     public func isBlank() -> Bool {
-        return url.scheme == "about" || url.absoluteString == "about:blank"
+        url.scheme == "about" || url.absoluteString == "about:blank"
     }
 
     public func isDeepLink() -> Bool {

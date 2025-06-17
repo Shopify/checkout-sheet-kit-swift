@@ -319,7 +319,7 @@ class CheckoutBridgeTests: XCTestCase {
     }
 
     private func expectedPresentedScript() -> String {
-        return """
+        """
         if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
         	window.MobileCheckoutSdk.dispatchMessage('presented');
         } else {
@@ -331,7 +331,7 @@ class CheckoutBridgeTests: XCTestCase {
     }
 
     private func expectedPayloadScript() -> String {
-        return """
+        """
         if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
         	window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
         } else {
@@ -343,17 +343,17 @@ class CheckoutBridgeTests: XCTestCase {
     }
 
     private func createPayload(_ jsonString: String) -> String {
-        return jsonString
+        jsonString
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "\n", with: "")
     }
 
     private func createErrorEventPayload(_ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
-        return WKScriptMessageMock(body: "{\"name\": \"error\",\"body\": \"\(createPayload(jsonString))\"}")
+        WKScriptMessageMock(body: "{\"name\": \"error\",\"body\": \"\(createPayload(jsonString))\"}")
     }
 
     private func createEventPayload(name: String, _ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
-        return WKScriptMessageMock(body: "{\"name\": \"\(name)\",\"body\": \"\(createPayload(jsonString))\"}")
+        WKScriptMessageMock(body: "{\"name\": \"\(name)\",\"body\": \"\(createPayload(jsonString))\"}")
     }
 }
 

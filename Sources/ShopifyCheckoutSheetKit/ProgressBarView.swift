@@ -40,7 +40,7 @@ class ProgressBarView: UIView {
 
         NSLayoutConstraint.activate([
             progressBar.topAnchor.constraint(equalTo: topAnchor),
-            progressBar.heightAnchor.constraint(equalToConstant: 1)
+            progressBar.heightAnchor.constraint(equalToConstant: 1),
         ])
 
         progressBar.tintColor = ShopifyCheckoutSheetKit.configuration.tintColor
@@ -49,7 +49,7 @@ class ProgressBarView: UIView {
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
 
-        if let superview = superview {
+        if let superview {
             progressBar.leadingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.leadingAnchor).isActive = true
             progressBar.trailingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.trailingAnchor).isActive = true
         }
