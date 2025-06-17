@@ -1,4 +1,4 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -ex
 set -eo pipefail
@@ -29,7 +29,8 @@ build_app() {
         echo "Entitlements file already exists for $1 project."
     fi
 
-    xcodebuild clean build -scheme $1 -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
+    ../Scripts/build.sh $1
+    
 }
 
 build_app SimpleAppIntegration

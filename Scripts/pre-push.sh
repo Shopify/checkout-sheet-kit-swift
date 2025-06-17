@@ -15,7 +15,7 @@ cleanup() {
 trap cleanup EXIT
 
 # Run scripts in parallel, capturing all output
-scripts/lint_package.sh > "$LINT_LOG" 2>&1 &
+scripts/lint.sh > "$LINT_LOG" 2>&1 &
 LINT_PID=$!
 
 scripts/test_package.sh > "$TEST_LOG" 2>&1 &
