@@ -4,3 +4,4 @@
 xcuserdata
 **/Storefront.xcconfig
 **/*.entitlements
+.vscode/settings.json
