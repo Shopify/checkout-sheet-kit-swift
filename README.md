@@ -42,8 +42,8 @@
 
 ## Requirements
 
-- Swift 5.7+
-- iOS SDK 13.0+
+- Swift 5.10+
+- iOS SDK 17.0+
 - The SDK is not compatible with checkout.liquid. The Shopify Store must be migrated for extensibility
 
 ## Getting Started
