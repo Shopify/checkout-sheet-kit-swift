@@ -14,8 +14,8 @@ let package = Package(
             name: "ShopifyCheckoutSheetKit",
             targets: ["ShopifyCheckoutSheetKit"]),
         .library(
-            name: "Buy",
-            targets: ["Buy"])
+            name: "BuySDK",
+            targets: ["BuySDK"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -28,6 +28,11 @@ let package = Package(
         .target(
             name: "ShopifyCheckoutSheetKit",
             dependencies: []),
+        .target(
+            name: "BuySDK",
+            dependencies: [],
+            path: "Sources/Buy"
+        ),
         .testTarget(
             name: "ShopifyCheckoutSheetKitTests",
             dependencies: ["ShopifyCheckoutSheetKit"],
