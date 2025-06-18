@@ -233,7 +233,7 @@ class CheckoutBridgeTests: XCTestCase {
 	}
 
 	func testDecodeSupportsWebPixelsEventWithAdditionalDataAttributes() throws {
-		let body = "{\"name\": \"page_viewed\",\"event\": {\"id\": \"123\",\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": { \"checkout\": {\"currencyCode\": \"USD\"}, \"cart\": {\"cartId\": \"123\"} }, \"context\": {}}}"
+		let body = "{\"name\": \"checkout_completed\",\"event\": {\"id\": \"123\",\"name\": \"checkout_completed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": { \"checkout\": {\"currencyCode\": \"USD\", \"order\": {\"customer\": { \"id\":\"456\",\"isFirstOrder\":true }}}}, \"context\": {}}}"
 			.replacingOccurrences(of: "\"", with: "\\\"")
 			.replacingOccurrences(of: "\n", with: "")
 
@@ -251,9 +251,11 @@ class CheckoutBridgeTests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual("page_viewed", pageViewedEvent.name)
+		XCTAssertEqual("checkout_completed", pageViewedEvent.name)
 		XCTAssertEqual("123", pageViewedEvent.id)
 		XCTAssertEqual("USD", pageViewedEvent.data?.checkout?.currencyCode)
+		XCTAssertEqual("456", pageViewedEvent.data?.checkout?.order?.customer?.id)
+		XCTAssertEqual(true, pageViewedEvent.data?.checkout?.order?.customer?.isFirstOrder)
 		XCTAssertEqual("2024-01-04T09:48:53.358Z", pageViewedEvent.timestamp)
 	}
 
