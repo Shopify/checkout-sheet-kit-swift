@@ -12,7 +12,10 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "ShopifyCheckoutSheetKit",
-            targets: ["ShopifyCheckoutSheetKit"])
+            targets: ["ShopifyCheckoutSheetKit"]),
+        .library(
+            name: "Buy",
+            targets: ["Buy"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
