@@ -24,6 +24,10 @@ opt_in_rules:
     indented_cases: false
   - fallthrough
 
+excluded:
+  - Sources/Buy/*
+  - .build/*
+
 nesting:
   type_level:
     warning: 2
