@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   s.swift_version = "5.10"
 
-  s.ios.deployment_target = "17.0"
+  s.ios.deployment_target = "15.0"
 
   s.source_files = "Sources/ShopifyCheckoutSheetKit/**/*.swift"
 
