@@ -139,7 +139,7 @@ struct ProductView: View {
             loading = true
             let start = Date()
 
-            _ = try await CartManager.shared.performCartLinesAdd(variant: variant.id)
+            try await CartManager.shared.performCartLinesAdd(variant: variant.id)
 
             let diff = Date().timeIntervalSince(start)
             let message = "Added item to cart in \(String(format: "%.0f", diff * 1000))ms"

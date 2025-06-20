@@ -78,7 +78,7 @@ class CartManager: ObservableObject {
      * Creates cart if no cart.id present, or adds line items to pre-existing cart
      * Non-idempotent - subsequent calls for existing cartLine items will increase quantity by 1
      */
-    func performCartLinesAdd(variant: GraphQL.ID) async throws -> Storefront.Cart {
+    @discardableResult func performCartLinesAdd(variant: GraphQL.ID) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             return try await performCartCreate(items: [variant])
         }
