@@ -12,11 +12,6 @@ if [[ "$MODE" != "check" && "$MODE" != "fix" ]]; then
     exit 1
 fi
 
-# Add homebrew to PATH on ARM64 Macs
-if [[ "$(uname -m)" == arm64 ]]; then
-    export PATH="/opt/homebrew/bin:$PATH"
-fi
-
 # Function to provide installation instructions
 print_install_instructions() {
     echo "🔧 FIX:"
