@@ -14,9 +14,31 @@ up:
       met?: |
         ([ -f "./samples/MobileBuyIntegration/MobileBuyIntegration/MobileBuyIntegration.entitlements" ] || exit 1;)
       meet: ./scripts/setup_entitlements
+  - custom:
+      name: Setup Git Hooks
+      met?: |
+        PRE_COMMIT_LINK=".git/hooks/pre-commit.d/100-pre-commit"
+        
+        # Check if the symlink exists and points to the correct location
+        if [ -L "$PRE_COMMIT_LINK" ] && [ "$(readlink "$PRE_COMMIT_LINK")" = "../../../Scripts/pre-commit" ]; then
+          exit 0
+        else
+          exit 1
+        fi
+      meet: |
+        mkdir -p .git/hooks/pre-commit.d
+        ln -sfn ../../../Scripts/pre-commit .git/hooks/pre-commit.d/100-pre-commit
 
 packages:
   - xcode
   - homebrew:
       - swiftlint
       - swiftformat
+
+commands:
+  lint:
+    desc: Check Format & Lint issues
+    run: scripts/lint
+  fix:
+    desc: Autofix Format & Lint issues
+    run: scripts/lint fix
