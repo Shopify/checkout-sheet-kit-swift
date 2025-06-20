@@ -20,3 +20,11 @@ packages:
   - homebrew:
       - swiftlint
       - swiftformat
+
+commands:
+  lint:
+    desc: Check Format & Lint issues
+    run: scripts/lint
+  lint-fix:
+    desc: Autofix Format & Lint issues
+    run: scripts/lint fix
