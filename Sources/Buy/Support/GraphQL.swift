@@ -1,12 +1,14 @@
-//
-//  GraphQL.swift
-//  Shopify
-//
-//  Created by Dylan Thacker-Smith on 2015-11-12.
-//  Copyright (c) 2025 Shopify
-//
-//  MIT Licensed. See LICENCE.txt file in the root of this project for details.
-//
+/*
+
+ GraphQL.swift
+ Shopify
+
+ Created by Dylan Thacker-Smith on 2015-11-12.
+ Copyright (c) 2025 Shopify
+
+ MIT Licensed. See LICENCE.txt file in the root of this project for details.
+
+*/
 
 import Foundation
 
