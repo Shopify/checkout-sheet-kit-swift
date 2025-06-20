@@ -40,12 +40,15 @@ class CartManager: ObservableObject {
     public var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
-    /**
-     * Represents the `cart.totalTaxAmount.amount`
-     * Due to BuySDK throwing if you access a property that hasn't been requested
-     * this is separated off from the cart due to this behaviour, as the `totalTaxAmount` is
-     * deprecated from cart operations except prepareForCompletion
-     */
+/**
+ * Represents the cart's total tax amount (`cart.totalTaxAmount.amount`).
+ * 
+ * This property is handled separately from the main cart object because:
+ * 1. The BuySDK throws errors when accessing unrequested properties
+ * 2. `totalTaxAmount` is deprecated in most cart operations (only available in `prepareForCompletion`)
+ * 
+ * By isolating this property, we avoid SDK errors while maintaining access to tax data when needed.
+ */
     @Published var totalTaxAmount: Decimal?
     @Published var isDirty: Bool = false
 
