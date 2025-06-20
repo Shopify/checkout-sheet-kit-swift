@@ -3,11 +3,7 @@
 set -ex
 set -eo pipefail
 
-if [[ -n $CURRENT_SIMULATOR_UUID ]]; then
-    dest="id=$CURRENT_SIMULATOR_UUID"
-else
-    dest="platform=iOS Simulator,name=iPhone 14"
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd Samples/
 
@@ -29,7 +25,7 @@ build_app() {
         echo "Entitlements file already exists for $1 project."
     fi
 
-    xcodebuild clean build -scheme $1 -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation | xcpretty -c
+    $SCRIPT_DIR/xcode_run "clean build" $1 
 }
 
 build_app MobileBuyIntegration
