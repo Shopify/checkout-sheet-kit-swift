@@ -78,7 +78,21 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 		return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
 	}
 
-	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {}
+	public func updateUIViewController(_ uiViewController: CheckoutViewController, context: Self.Context) {
+		guard
+			let webViewController = uiViewController
+				.viewControllers
+				.compactMap({ $0 as? CheckoutWebViewController })
+				.first
+		else {
+			return
+		}
+            OSLogger.shared.debug(
+                "[CheckoutViewController#updateUIViewController]: No ViewControllers matching CheckoutWebViewController \(uiViewController.viewControllers.map {String(describing: $0.self)}.joined(separator: ""))"
+            )
+
+		webViewController.delegate = delegate
+	}
 
 	/// Lifecycle methods
 
