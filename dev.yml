@@ -14,6 +14,30 @@ up:
       met?: |
         ([ -f "./samples/MobileBuyIntegration/MobileBuyIntegration/MobileBuyIntegration.entitlements" ] || exit 1;)
       meet: ./scripts/setup_entitlements
+  - custom:
+      name: Setup Git Hooks
+      met?: |
+        PRE_COMMIT_ORIG=".githooks/pre-commit"
+        PRE_COMMIT_DEST=".git/hooks/pre-commit"
+        
+        if [ ! -f "$PRE_COMMIT_DEST" ]; then
+          exit 1
+        fi
+        
+        calculate_sha() {
+          shasum -a 256 "$1" | cut -d ' ' -f 1
+        }
+        
+        ORIG_COMMIT_SHA=$(calculate_sha "$PRE_COMMIT_ORIG")
+        DEST_COMMIT_SHA=$(calculate_sha "$PRE_COMMIT_DEST")
+        
+        if [ "$ORIG_COMMIT_SHA" = "$DEST_COMMIT_SHA" ]; then
+          exit 0
+        else
+          exit 1
+        fi
+      meet: |
+        cp -p Scripts/pre-commit .git/hooks/pre-commit
 
 packages:
   - xcode

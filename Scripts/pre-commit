@@ -1,0 +1,11 @@
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+$SCRIPT_DIR/lint
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Continue with the commit
+echo "🚀 All checks passed, continuing with commit..."
+exit 0
