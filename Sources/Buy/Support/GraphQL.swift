@@ -1,25 +1,12 @@
-/*
-MIT License
-
-Copyright 2023 - Present, Shopify Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+//
+//  GraphQL.swift
+//  Shopify
+//
+//  Created by Dylan Thacker-Smith on 2015-11-12.
+//  Copyright (c) 2025 Shopify
+//
+//  MIT Licensed. See LICENCE.txt file in the root of this project for details.
+//
 
 import Foundation
 
@@ -29,8 +16,8 @@ extension GraphQL.ID: Hashable {
 	}
 }
 
-public class GraphQL {
-	public class Selection {
+package class GraphQL {
+    package class Selection {
 		let field: String
 		let alias: String?
 		let args: String?
@@ -283,7 +270,7 @@ public class GraphQL {
 	}
 }
 
-public struct GraphQLResponse<DataType: GraphQL.AbstractResponse> {
+package struct GraphQLResponse<DataType: GraphQL.AbstractResponse> {
 	internal let data: DataType?
 	internal let errors: [GraphQL.ResponseError]?
 
@@ -327,20 +314,20 @@ public struct GraphQLResponse<DataType: GraphQL.AbstractResponse> {
 	}
 }
 
-public protocol GraphQLQuery {
+package protocol GraphQLQuery {
 	associatedtype Response
 }
 
-public protocol GraphQLObject {
+package protocol GraphQLObject {
 	associatedtype Query
 }
 
-public struct SchemaViolationError: Error {
+package struct SchemaViolationError: Error {
 	let type: GraphQL.AbstractResponse.Type
 	let field: String
 	let value: Any
 
-	public init(type: GraphQL.AbstractResponse.Type, field: String, value: Any) {
+	package  init(type: GraphQL.AbstractResponse.Type, field: String, value: Any) {
 		self.type = type
 		self.field = field
 		self.value = value
@@ -384,12 +371,12 @@ public enum Input<T> {
 }
 
 extension GraphQL.Selection: Equatable {}
-public func ==(lhs: GraphQL.Selection, rhs: GraphQL.Selection) -> Bool {
+package func ==(lhs: GraphQL.Selection, rhs: GraphQL.Selection) -> Bool {
 	return (lhs === rhs) || (lhs.field == rhs.field && lhs.alias == rhs.alias && lhs.args == rhs.args && lhs.subfields == rhs.subfields)
 }
 
 extension GraphQL.AbstractQuery: Equatable {}
-public func ==(lhs: GraphQL.AbstractQuery, rhs: GraphQL.AbstractQuery) -> Bool {
+package func ==(lhs: GraphQL.AbstractQuery, rhs: GraphQL.AbstractQuery) -> Bool {
 	return (lhs === rhs) || (lhs.selections == rhs.selections)
 }
 

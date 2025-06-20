@@ -1,31 +1,34 @@
-/*
-MIT License
-
-Copyright 2023 - Present, Shopify Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+//
+//  Graph.Client.swift
+//  Buy
+//
+//  Created by Shopify.
+//  Copyright (c) 2025 Shopify Inc. All rights reserved.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+//
 
 import Foundation
 
 internal typealias JSON = [String: Any]
 
-extension Graph {
+package extension Graph {
 
     /// A completion handler for GraphQL `query` requests.
     ///
@@ -36,7 +39,7 @@ extension Graph {
     /// - Important:
     /// `query` and `error` are **not** mutually exclusive. In other words, it is valid for a request to return both a non-nil `query` and `error`. In this case, the `error` generally represents an issue with only a subset of the query.
     ///
-    public typealias QueryCompletion = (_ query: Storefront.QueryRoot?, _ error: QueryError?) -> Void
+    typealias QueryCompletion = (_ query: Storefront.QueryRoot?, _ error: QueryError?) -> Void
 
     /// A completion handler for GraphQL `mutation` requests.
     ///
@@ -47,20 +50,20 @@ extension Graph {
     /// - Important:
     /// `mutation` and `error` are **not** mutually exclusive. In other words, it is valid for a request to return both a non-nil `mutation` and `error`. In this case, the `error` generally represents an issue with only a subset of the query.
     ///
-    public typealias MutationCompletion = (_ mutation: Storefront.Mutation?, _ error: QueryError?) -> Void
+    typealias MutationCompletion = (_ mutation: Storefront.Mutation?, _ error: QueryError?) -> Void
 
     /// The `Graph.Client` is a network layer designed to abstract the communication with the Shopify GraphQL endpoint
     /// by handling the serialization and deserialization of GraphQL models for `query` and `mutation` requests.
     /// In addition, the `Client` will take care of appending the necessary headers for authorizing the network
     /// requests based on the provided `shopDomain` and `apiKey`.
     ///
-    public class Client {
+    package class Client {
 
         /// Cache policy to use for all `query` operations produced by this instance of `Graph.Client`
-        public var cachePolicy: CachePolicy = .networkOnly
+        package var cachePolicy: CachePolicy = .networkOnly
 
         /// The `URLSession` backing all `Client` network operations. You can provide your own session when initializing a new `Client`.
-        public let session: URLSession
+        let session: URLSession
 
         internal let cache: Cache
 
@@ -78,7 +81,7 @@ extension Graph {
         ///     - session:    A `URLSession` to use for this client. If left blank, a session with a `default` configuration will be created.
         ///     - locale:     The buyer's current locale. Supported values are limited to locales available to your shop.
         ///
-        public init(shopDomain: String, apiKey: String, session: URLSession = URLSession(configuration: URLSessionConfiguration.default), locale: Locale? = nil) {
+         package init(shopDomain: String, apiKey: String, session: URLSession = URLSession(configuration: URLSessionConfiguration.default), locale: Locale? = nil) {
 
             let shopURL  = Client.urlFor(shopDomain)
             self.apiURL  = Client.urlFor(shopDomain, path: "/api/\(Storefront.Schema.version)/graphql")
@@ -124,7 +127,7 @@ extension Graph {
         /// task.resume()
         /// ````
         ///
-        public func queryGraphWith(_ query: Storefront.QueryRootQuery, cachePolicy: CachePolicy? = nil, retryHandler: RetryHandler<Storefront.QueryRoot>? = nil, completionHandler: @escaping QueryCompletion) -> Task {
+        package func queryGraphWith(_ query: Storefront.QueryRootQuery, cachePolicy: CachePolicy? = nil, retryHandler: RetryHandler<Storefront.QueryRoot>? = nil, completionHandler: @escaping QueryCompletion) -> Task {
             return self.graphRequestTask(
                 query: query,
                 cachePolicy: cachePolicy ?? self.cachePolicy,
@@ -152,7 +155,7 @@ extension Graph {
         /// task.resume()
         /// ````
         ///
-        public func mutateGraphWith(_ mutation: Storefront.MutationQuery, retryHandler: RetryHandler<Storefront.Mutation>? = nil, completionHandler: @escaping MutationCompletion) -> Task {
+        package func mutateGraphWith(_ mutation: Storefront.MutationQuery, retryHandler: RetryHandler<Storefront.Mutation>? = nil, completionHandler: @escaping MutationCompletion) -> Task {
             return self.graphRequestTask(
                 query: mutation,
                 cachePolicy: .networkOnly,
@@ -164,7 +167,7 @@ extension Graph {
         // ----------------------------------
         // MARK: - Request Management -
         //
-        private func graphRequestTask<Q: GraphQL.AbstractQuery, R: GraphQL.AbstractResponse>(query: Q, cachePolicy: CachePolicy, retryHandler: RetryHandler<R>? = nil, completionHandler: @escaping (R?, QueryError?) -> Void) -> Task {
+        package func graphRequestTask<Q: GraphQL.AbstractQuery, R: GraphQL.AbstractResponse>(query: Q, cachePolicy: CachePolicy, retryHandler: RetryHandler<R>? = nil, completionHandler: @escaping (R?, QueryError?) -> Void) -> Task {
 
             let request = self.graphRequestFor(query: query)
             return InternalTask<R>(
