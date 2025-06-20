@@ -25,6 +25,11 @@ let package = Package(
         .target(
             name: "ShopifyCheckoutSheetKit",
             dependencies: []),
+        .target(
+            name: "BuySDK",
+            dependencies: [],
+            path: "Sources/Buy"
+        ),
         .testTarget(
             name: "ShopifyCheckoutSheetKitTests",
             dependencies: ["ShopifyCheckoutSheetKit"],
