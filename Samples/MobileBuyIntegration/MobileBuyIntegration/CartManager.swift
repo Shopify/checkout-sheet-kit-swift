@@ -40,15 +40,15 @@ class CartManager: ObservableObject {
     public var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
-/**
- * Represents the cart's total tax amount (`cart.totalTaxAmount.amount`).
- * 
- * This property is handled separately from the main cart object because:
- * 1. The BuySDK throws errors when accessing unrequested properties
- * 2. `totalTaxAmount` is deprecated in most cart operations (only available in `prepareForCompletion`)
- * 
- * By isolating this property, we avoid SDK errors while maintaining access to tax data when needed.
- */
+    /**
+     * Represents the cart's total tax amount (`cart.totalTaxAmount.amount`).
+     *
+     * This property is handled separately from the main cart object because:
+     * 1. The BuySDK throws errors when accessing unrequested properties
+     * 2. `totalTaxAmount` is deprecated in most cart operations (only available in `prepareForCompletion`)
+     *
+     * By isolating this property, we avoid SDK errors while maintaining access to tax data when needed.
+     */
     @Published var totalTaxAmount: Decimal?
     @Published var isDirty: Bool = false
 
@@ -426,20 +426,20 @@ class CartManager: ObservableObject {
             }
 
             DispatchQueue.main.async {
-                self.cart = cartWithResolvedPendingTerms 
+                self.cart = cartWithResolvedPendingTerms
                 /**
                  * IMPORTANT: Special handling for `totalTaxAmount`:
-                 * - Deprecated field only available from `cartPrepareForCompletion` mutation
+                 * - Deprecated field on cart, except from `cartPrepareForCompletion` mutation
                  * - Not included in standard cart fragments used by other mutations
                  * - Accessing `self.cart.cost.totalTaxAmount` will throw if cart was set by other mutations
-                 * - Store separately to preserve the value when cart is updated by subsequent operations
+                 * - Store separately to preserve the value when cart is updated by subsequent mutations
                  */
                 if let tax = cartWithResolvedPendingTerms.cost.totalTaxAmount?.amount {
                     self.totalTaxAmount = tax
                 }
             }
 
-            return cartWithTaxes
+            return cartWithResolvedPendingTerms
         } catch {
             throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
         }
