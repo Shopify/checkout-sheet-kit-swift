@@ -90,7 +90,7 @@ class CartManager: ObservableObject {
         ) {
             $0.cartLinesAdd(cartId: cartId, lines: lines) {
                 $0.cart { $0.cartManagerFragment() }
-                  .userErrors { $0.code().message() }
+                    .userErrors { $0.code().message() }
             }
         }
 
@@ -419,23 +419,27 @@ class CartManager: ObservableObject {
 
             guard
                 let result = payload.result as? Storefront.CartStatusReady,
-                let cart = result.cart
+                let cartWithResolvedPendingTerms = result.cart
             else {
                 throw Errors.invariant(
                     message: "CartPrepareForCompletionResult is not CartStatusReady")
             }
 
             DispatchQueue.main.async {
-                self.cart = cart
+                self.cart = cartWithResolvedPendingTerms 
                 /**
-                 * Note - `totalTaxAmount` will not be available on self.cart, only access local value
+                 * IMPORTANT: Special handling for `totalTaxAmount`:
+                 * - Deprecated field only available from `cartPrepareForCompletion` mutation
+                 * - Not included in standard cart fragments used by other mutations
+                 * - Accessing `self.cart.cost.totalTaxAmount` will throw if cart was set by other mutations
+                 * - Store separately to preserve the value when cart is updated by subsequent operations
                  */
-                if let tax = cart.cost.totalTaxAmount?.amount {
+                if let tax = cartWithResolvedPendingTerms.cost.totalTaxAmount?.amount {
                     self.totalTaxAmount = tax
                 }
             }
 
-            return cart
+            return cartWithTaxes
         } catch {
             throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
         }
@@ -450,9 +454,11 @@ class CartManager: ObservableObject {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
                     $0.onSubmitSuccess { $0.redirectUrl() }
-                    $0.onSubmitFailed { $0.checkoutUrl().errors {
-                        $0.code().message()
-                    } }
+                    $0.onSubmitFailed {
+                        $0.checkoutUrl().errors {
+                            $0.code().message()
+                        }
+                    }
                     $0.onSubmitAlreadyAccepted { $0.attemptId() }
                     $0.onSubmitThrottled { $0.pollAfter() }
                 }
