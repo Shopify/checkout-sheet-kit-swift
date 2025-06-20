@@ -161,7 +161,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartBuyerIdentityUpdate(
+    @discardableResult func performCartBuyerIdentityUpdate(
         contact: PKContact,
         partial _: Bool
     ) async throws -> Storefront.Cart {
@@ -261,7 +261,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartSelectedDeliveryOptionsUpdate(
+    @discardableResult func performCartSelectedDeliveryOptionsUpdate(
         deliveryOptionHandle: String
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
@@ -321,7 +321,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartPaymentUpdate(
+    @discardableResult func performCartPaymentUpdate(
         payment: PKPayment // REFACTOR: this method should just receive the decoded payment token
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
@@ -385,7 +385,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartPrepareForCompletion() async throws -> Storefront.Cart {
+    @discardableResult func performCartPrepareForCompletion() async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }

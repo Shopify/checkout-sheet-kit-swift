@@ -109,7 +109,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         do {
-            _ = try await CartManager.shared.performCartSelectedDeliveryOptionsUpdate(
+            try await CartManager.shared.performCartSelectedDeliveryOptionsUpdate(
                 deliveryOptionHandle: identifier
             )
 
@@ -124,7 +124,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         do {
-            _ = try await CartManager.shared.performCartPrepareForCompletion()
+            try await CartManager.shared.performCartPrepareForCompletion()
 
             return PKPaymentRequestShippingMethodUpdate(
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
@@ -145,7 +145,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
         do {
-            _ = try await CartManager.shared.performCartBuyerIdentityUpdate(
+            try await CartManager.shared.performCartBuyerIdentityUpdate(
                 contact: contact,
                 partial: true
             )
@@ -154,7 +154,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                 firstDeliveryGroup: CartManager.shared.cart?.deliveryGroups.nodes.first
             )
 
-            _ = try await CartManager.shared.performCartPrepareForCompletion()
+            try await CartManager.shared.performCartPrepareForCompletion()
 
             return PKPaymentRequestShippingContactUpdate(
                 errors: [],
@@ -182,10 +182,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         /**
          * Apply validations that make sense for your business requirements
          */
-        guard
-            let shippingContact = payment.shippingContact
-//            payment.shippingContact?.postalAddress?.isoCountryCode == "US"
-        else {
+        guard let shippingContact = payment.shippingContact else {
             paymentStatus = .failure
             return PassKitFactory.shared.createPKPaymentUSAdressError()
         }
@@ -204,7 +201,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             }
 
             do {
-                _ = try await CartManager.shared.performCartBuyerIdentityUpdate(
+                try await CartManager.shared.performCartBuyerIdentityUpdate(
                     contact: shippingContact,
                     partial: true
                 )
@@ -216,9 +213,9 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         do {
-            _ = try await CartManager.shared.performCartPrepareForCompletion()
+            try await CartManager.shared.performCartPrepareForCompletion()
             sleep(1)
-            _ = try await CartManager.shared.performCartPaymentUpdate(payment: payment)
+            try await CartManager.shared.performCartPaymentUpdate(payment: payment)
         } catch {
             print("[didAuthorizePayment][performCartPaymentUpdate][failure] \(error)")
             paymentStatus = .failure
