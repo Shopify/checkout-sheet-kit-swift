@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.1.3 - 17 June, 2025
+## 3.2.0 - 20 June, 2025
 
 - Ensure `self.delegate` is set for `CheckoutViewController` after state changes
 
