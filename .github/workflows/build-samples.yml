@@ -11,4 +11,4 @@ jobs:
   call-workflow-passing-data:
     uses: ./.github/workflows/test-workflow.yml
     with:
-      test-path: ./Scripts/test_samples
+      test-path: ./Scripts/build_samples

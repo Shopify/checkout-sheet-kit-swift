@@ -3,10 +3,6 @@
 set -ex
 set -eo pipefail
 
-if [[ -n $CURRENT_SIMULATOR_UUID ]]; then
-    dest="id=$CURRENT_SIMULATOR_UUID"
-else
-    dest="platform=iOS Simulator,name=iPhone 14"
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-xcodebuild clean test -scheme ShopifyCheckoutSheetKit -sdk iphonesimulator -destination "$dest" -skipPackagePluginValidation
+$SCRIPT_DIR/xcode_run test ShopifyCheckoutSheetKit
