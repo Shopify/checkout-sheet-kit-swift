@@ -17,16 +17,17 @@ up:
   - custom:
       name: Setup Git Hooks
       met?: |
-        PRE_COMMIT_DEST=".git/hooks/pre-commit"
+        PRE_COMMIT_LINK=".git/hooks/pre-commit.d/100-pre-commit"
         
-        # Check if it's a symlink pointing to the correct location
-        if [ -L "$PRE_COMMIT_DEST" ] && [ "$(readlink "$PRE_COMMIT_DEST")" = "../../Scripts/pre-commit" ]; then
+        # Check if the symlink exists and points to the correct location
+        if [ -L "$PRE_COMMIT_LINK" ] && [ "$(readlink "$PRE_COMMIT_LINK")" = "../../../Scripts/pre-commit" ]; then
           exit 0
         else
           exit 1
         fi
       meet: |
-        ln -sf ../../Scripts/pre-commit .git/hooks/pre-commit
+        mkdir -p .git/hooks/pre-commit.d
+        ln -sfn ../../../Scripts/pre-commit .git/hooks/pre-commit.d/100-pre-commit
 
 packages:
   - xcode
