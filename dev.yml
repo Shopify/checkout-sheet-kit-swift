@@ -20,3 +20,4 @@ packages:
   - homebrew:
       - swiftlint
       - swiftformat
+      - xcbeautify
