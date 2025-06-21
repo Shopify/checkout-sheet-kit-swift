@@ -42,14 +42,46 @@ public func configure(_ block: (inout Configuration) -> Void) {
 	block(&configuration)
 }
 
+/// Configuration for partner authentication.
+public struct AuthenticationConfig {
+	/// The JWT authentication payload.
+	public let payload: String
+
+	/// The authentication version, e.g. "v1" or "v2".
+	public let version: String
+
+	public init(payload: String, version: String) {
+		self.payload = payload
+		self.version = version
+	}
+}
+
+/// General configuration for checkout presentation.
+public struct CheckoutConfig {
+	/// Authentication configuration for partner identification.
+	public let authentication: AuthenticationConfig?
+
+	/// Initialize with authentication configuration.
+	public init(authentication: AuthenticationConfig? = nil) {
+		self.authentication = authentication
+	}
+
+	// In the future, other configurations can be added here:
+	// public let branding: BrandingConfig?
+	// public let analytics: AnalyticsConfig?
+	// etc.
+}
+
 /// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
+public func preload(checkout url: URL, config: CheckoutConfig? = nil) {
 	guard configuration.preloading.enabled else {
 		return
 	}
 
 	CheckoutWebView.preloadingActivatedByClient = true
-	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
+	let webView = CheckoutWebView.for(checkout: url)
+	webView.checkoutConfig = config
+	webView.load(checkout: url, isPreload: true)
 }
 
 /// Invalidate the checkout cache from preload calls
@@ -59,8 +91,8 @@ public func invalidate() {
 
 /// Presents the checkout from a given `UIViewController`.
 @discardableResult
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-	let viewController = CheckoutViewController(checkout: url, delegate: delegate)
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil, config: CheckoutConfig? = nil) -> CheckoutViewController {
+	let viewController = CheckoutViewController(checkout: url, delegate: delegate, config: config)
 	from.present(viewController, animated: true)
 	return viewController
 }

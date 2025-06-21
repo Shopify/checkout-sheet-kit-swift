@@ -3,7 +3,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) [![GitHub Release](https://img.shields.io/github/release/shopify/checkout-sheet-kit-swift.svg?style=flat)]()
 ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
 
-**Shopify Checkout Sheet Kit** is a Swift Package library that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
+**Shopify Checkout Sheet Kit** is a Swift Package library that enables Swift apps to provide the world's highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
 - [Shopify Checkout Sheet Kit - Swift](#shopify-checkout-sheet-kit---swift)
   - [Requirements](#requirements)
@@ -35,6 +35,7 @@
     - [Multipass](#multipass)
     - [Shop Pay](#shop-pay)
     - [Customer Account API](#customer-account-api)
+    - [Partner Authentication](#partner-authentication)
   - [Offsite Payments](#offsite-payments)
   - [Explore the sample apps](#explore-the-sample-apps)
   - [Contributing](#contributing)
@@ -528,6 +529,33 @@ To initialize accelerated Shop Pay checkout, the cart can set a [walletPreferenc
 
 The Customer Account API allows you to authenticate buyers and provide a personalized checkout experience.
 For detailed implementation instructions, see our [Customer Account API Authentication Guide](https://shopify.dev/docs/storefronts/headless/mobile-apps/checkout-sheet-kit/authenticate-checkouts).
+
+### Partner Authentication
+
+If you're a Shopify Partner developing a custom integration with the Checkout Sheet Protocol, you can authenticate as a partner to access additional features and permissions granted by Shopify.
+
+Partner authentication is performed by providing a JWT token in the request headers when loading the checkout. This process requires:
+
+1. Having a Shopify Partner app with API credentials (API key and Shared Secret)
+2. Installing that app on the merchant's shop to obtain an access token
+3. Properly encrypting and formatting the authentication payload
+
+To enable partner authentication in your app:
+
+```swift
+// Create an authentication configuration
+let authConfig = AuthenticationConfig(payload: "YOUR_JWT_TOKEN", version: "v2")
+
+// Create a checkout configuration with authentication
+let checkoutConfig = CheckoutConfig(authentication: authConfig)
+
+// Present checkout with the configuration
+ShopifyCheckoutSheetKit.present(checkout: checkoutURL, from: self, delegate: self, config: checkoutConfig)
+```
+
+The JWT token should be generated on your secure server according to the Checkout Sheet Protocol authentication requirements. This token is then passed to your mobile app and used with the CheckoutConfig to authenticate the checkout session.
+
+For more details about the authentication process and JWT token format, refer to the [Checkout Sheet Protocol documentation](https://github.com/Shopify-Partners/shopify-checkout-sheet-protocol-releases/blob/main/integration-guide/checkout-sheet-protocol/authentication.md).
 
 ## Offsite Payments
 

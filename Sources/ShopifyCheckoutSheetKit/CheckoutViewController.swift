@@ -25,8 +25,8 @@ import UIKit
 import SwiftUI
 
 public class CheckoutViewController: UINavigationController {
-	public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-		let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
+	public init(checkout url: URL, delegate: CheckoutDelegate? = nil, config: CheckoutConfig? = nil) {
+		let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, config: config)
 		rootViewController.notifyPresented()
 		super.init(rootViewController: rootViewController)
 		presentationController?.delegate = rootViewController
