@@ -59,4 +59,12 @@ public struct CheckoutURL {
 
 		return !["http", "https"].contains(scheme)
 	}
+	
+	public func isWebLink() -> Bool {
+		guard let scheme = url.scheme else {
+			return false
+		}
+		
+		return ["http", "https"].contains(scheme)
+	}
 }

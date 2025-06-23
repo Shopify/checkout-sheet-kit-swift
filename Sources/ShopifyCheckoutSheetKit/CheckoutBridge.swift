@@ -34,30 +34,19 @@ protocol CheckoutBridgeProtocol {
 }
 
 enum CheckoutBridge: CheckoutBridgeProtocol {
-	static let schemaVersion = "8.1"
+	static let schemaVersion = "2025-04"
 	static let messageHandler = "mobileCheckoutSdk"
-	internal static let userAgent = "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version)"
 
 	static var applicationName: String {
-		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-		let userAgentString = "\(userAgent) (\(schemaVersion);\(theme);standard)"
-
-		return userAgentWithOptionalSuffix(userAgentString)
+		let platform = ShopifyCheckoutSheetKit.configuration.platform?.rawValue ?? "iOS"
+		let userAgentString = "CheckoutKit/\(ShopifyCheckoutSheetKit.version) (\(platform)) CheckoutSheetProtocol/\(schemaVersion)"
+		return userAgentString
 	}
 
 	static var recoveryAgent: String {
-		let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-		let userAgentString = "\(userAgent) (noconnect;\(theme);standard_recovery)"
-
-		return userAgentWithOptionalSuffix(userAgentString)
-	}
-
-	static func userAgentWithOptionalSuffix(_ userAgentString: String) -> String {
-		if let platform = ShopifyCheckoutSheetKit.configuration.platform?.rawValue {
-			return "\(userAgentString) \(platform)"
-		} else {
-			return userAgentString
-		}
+		let platform = ShopifyCheckoutSheetKit.configuration.platform?.rawValue ?? "iOS"
+		let userAgentString = "CheckoutKit/\(ShopifyCheckoutSheetKit.version) (\(platform)) CheckoutSheetProtocol/noconnect"
+		return userAgentString
 	}
 
 	static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {
@@ -91,11 +80,11 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
 	static internal func dispatchMessageTemplate(body: String) -> String {
 		return """
-		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-			window.MobileCheckoutSdk.dispatchMessage(\(body));
+		if (window.Shopify?.CheckoutSheetProtocol?.postMessage) {
+			window.Shopify.CheckoutSheetProtocol.postMessage(\(body));
 		} else {
 			window.addEventListener('mobileCheckoutBridgeReady', function () {
-				window.MobileCheckoutSdk.dispatchMessage(\(body));
+				window.Shopify.CheckoutSheetProtocol.postMessage(\(body));
 			}, {passive: true, once: true});
 		}
 		"""

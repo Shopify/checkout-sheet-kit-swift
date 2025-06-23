@@ -228,7 +228,12 @@ class CheckoutWebView: WKWebView {
 
 		if isPreload && isPreloadingAvailable {
 			isPreloadRequest = true
-			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
+		}
+
+		// Add checkout kit headers
+		let headers = checkoutKitHeaders(isPreload: isPreload)
+		for (key, value) in headers {
+			request.setValue(value, forHTTPHeaderField: key)
 		}
 
 		load(request)
@@ -303,6 +308,39 @@ extension CheckoutWebView: WKNavigationDelegate {
 			viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
 			decisionHandler(.cancel)
 			return
+		}
+
+		// Check if we need to inject headers for main frame navigation
+		if action.targetFrame?.isMainFrame == true && CheckoutURL(from: url).isWebLink() {
+			let currentHeaders = action.request.allHTTPHeaderFields ?? [:]
+			let checkoutHeaders = checkoutKitHeaders()
+			var shouldOverride = false
+			var newHeaders = currentHeaders
+			
+			let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
+			let shouldHaveColorSchemeHeader = !(colorScheme == .web || colorScheme == .automatic)
+			
+			if shouldHaveColorSchemeHeader && !currentHeaders.hasColorSchemeHeader() {
+				let headersWithColorScheme = currentHeaders.withColorScheme()
+				newHeaders.merge(headersWithColorScheme) { _, new in new }
+				shouldOverride = true
+			}
+			
+			if !currentHeaders.hasBrandingHeader() {
+				let headersWithBranding = currentHeaders.withBranding()
+				newHeaders.merge(headersWithBranding) { _, new in new }
+				shouldOverride = true
+			}
+			
+			if shouldOverride {
+				var request = URLRequest(url: url)
+				for (key, value) in newHeaders {
+					request.setValue(value, forHTTPHeaderField: key)
+				}
+				webView.load(request)
+				decisionHandler(.cancel)
+				return
+			}
 		}
 
 		decisionHandler(.allow)
