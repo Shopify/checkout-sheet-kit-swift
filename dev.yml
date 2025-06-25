@@ -23,6 +23,7 @@ packages:
 
 commands:
   lint:
+    aliases: [style]
     desc: Check Format & Lint issues
     run: scripts/lint
   fix:
