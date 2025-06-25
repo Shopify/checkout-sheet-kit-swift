@@ -26,9 +26,9 @@ import Foundation
 internal struct Headers {
 	static let purpose = "Sec-Purpose"
 	static let purposePrefetch = "prefetch"
-	
+
 	static let prefersColorScheme = "Sec-CH-Prefers-Color-Scheme"
-	
+
 	static let branding = "X-Shopify-Checkout-Kit-Branding"
 	static let brandingCheckoutKit = "CHECKOUT_KIT"
 	static let brandingWeb = "WEB_DEFAULT"
@@ -36,11 +36,11 @@ internal struct Headers {
 
 internal func checkoutKitHeaders(isPreload: Bool = false) -> [String: String] {
 	var headers = [String: String]()
-	
+
 	if isPreload {
 		headers[Headers.purpose] = Headers.purposePrefetch
 	}
-	
+
 	return headers
 		.withColorScheme()
 		.withBranding()
@@ -49,7 +49,7 @@ internal func checkoutKitHeaders(isPreload: Bool = false) -> [String: String] {
 internal extension Dictionary where Key == String, Value == String {
 	func withColorScheme() -> [String: String] {
 		var headers = self
-		
+
 		let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 		switch colorScheme {
 		case .light:
@@ -59,13 +59,13 @@ internal extension Dictionary where Key == String, Value == String {
 		case .automatic, .web:
 			break // Don't add header for automatic or web color schemes
 		}
-		
+
 		return headers
 	}
-	
+
 	func withBranding() -> [String: String] {
 		var headers = self
-		
+
 		let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 		switch colorScheme {
 		case .web:
@@ -73,18 +73,18 @@ internal extension Dictionary where Key == String, Value == String {
 		default:
 			headers[Headers.branding] = Headers.brandingCheckoutKit
 		}
-		
+
 		return headers
 	}
-	
+
 	func hasColorSchemeHeader() -> Bool {
 		return hasHeader(Headers.prefersColorScheme)
 	}
-	
+
 	func hasBrandingHeader() -> Bool {
 		return hasHeader(Headers.branding)
 	}
-	
+
 	private func hasHeader(_ headerName: String) -> Bool {
 		return self.keys.contains { key in
 			key.caseInsensitiveCompare(headerName) == .orderedSame

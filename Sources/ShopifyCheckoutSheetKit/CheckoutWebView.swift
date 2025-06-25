@@ -316,22 +316,22 @@ extension CheckoutWebView: WKNavigationDelegate {
 			let checkoutHeaders = checkoutKitHeaders()
 			var shouldOverride = false
 			var newHeaders = currentHeaders
-			
+
 			let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
 			let shouldHaveColorSchemeHeader = !(colorScheme == .web || colorScheme == .automatic)
-			
+
 			if shouldHaveColorSchemeHeader && !currentHeaders.hasColorSchemeHeader() {
 				let headersWithColorScheme = currentHeaders.withColorScheme()
 				newHeaders.merge(headersWithColorScheme) { _, new in new }
 				shouldOverride = true
 			}
-			
+
 			if !currentHeaders.hasBrandingHeader() {
 				let headersWithBranding = currentHeaders.withBranding()
 				newHeaders.merge(headersWithBranding) { _, new in new }
 				shouldOverride = true
 			}
-			
+
 			if shouldOverride {
 				var request = URLRequest(url: url)
 				for (key, value) in newHeaders {
