@@ -42,14 +42,35 @@ public func configure(_ block: (inout Configuration) -> Void) {
 	block(&configuration)
 }
 
+/// Configuration for partner authentication.
+public struct CheckoutOptions {
+	public struct AppAuthentication {
+		/// The JWT authentication token.
+		public let token: String
+		public init(token: String) {
+			self.token = token
+		}
+	}
+
+	/// App authentication configuration for partner identification.
+	public let appAuthentication: AppAuthentication?
+
+	/// Initialize with app authentication configuration.
+	public init(appAuthentication: AppAuthentication? = nil) {
+		self.appAuthentication = appAuthentication
+	}
+}
+
 /// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
+public func preload(checkout url: URL, options: CheckoutOptions? = nil) {
 	guard configuration.preloading.enabled else {
 		return
 	}
 
 	CheckoutWebView.preloadingActivatedByClient = true
-	CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
+	let webView = CheckoutWebView.for(checkout: url)
+	webView.checkoutOptions = options
+	webView.load(checkout: url, isPreload: true)
 }
 
 /// Invalidate the checkout cache from preload calls
@@ -59,8 +80,8 @@ public func invalidate() {
 
 /// Presents the checkout from a given `UIViewController`.
 @discardableResult
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-	let viewController = CheckoutViewController(checkout: url, delegate: delegate)
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) -> CheckoutViewController {
+	let viewController = CheckoutViewController(checkout: url, delegate: delegate, options: options)
 	from.present(viewController, animated: true)
 	return viewController
 }
