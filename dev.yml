@@ -38,4 +38,4 @@ commands:
     run: ./scripts/build_samples
   test_package:
     desc: Test the Package
-    run: ./scripts/test_package
+    run: ./scripts/xcode_run test ShopifyCheckoutSheetKit
