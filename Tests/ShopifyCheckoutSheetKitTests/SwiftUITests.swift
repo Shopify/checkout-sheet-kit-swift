@@ -156,4 +156,15 @@ class CheckoutConfigurableTests: XCTestCase {
 		checkoutSheet.title(title)
 		XCTAssertEqual(ShopifyCheckoutSheetKit.configuration.title, title)
 	}
+
+	func testCloseButtonTintColor() {
+		let color = UIColor.green
+		checkoutSheet.closeButtonTintColor(color)
+		XCTAssertEqual(ShopifyCheckoutSheetKit.configuration.closeButtonTintColor, color)
+	}
+
+	func testCloseButtonTintColorNil() {
+		checkoutSheet.closeButtonTintColor(nil)
+		XCTAssertNil(ShopifyCheckoutSheetKit.configuration.closeButtonTintColor)
+	}
 }

@@ -163,6 +163,7 @@ public protocol CheckoutConfigurable {
 	func colorScheme(_ colorScheme: ShopifyCheckoutSheetKit.Configuration.ColorScheme) -> Self
 	func tintColor(_ color: UIColor) -> Self
 	func title(_ title: String) -> Self
+	func closeButtonTintColor(_ color: UIColor?) -> Self
 }
 
 extension CheckoutConfigurable {
@@ -183,6 +184,11 @@ extension CheckoutConfigurable {
 
 	@discardableResult public func title(_ title: String) -> Self {
 		ShopifyCheckoutSheetKit.configuration.title = title
+		return self
+	}
+
+	@discardableResult public func closeButtonTintColor(_ color: UIColor?) -> Self {
+		ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = color
 		return self
 	}
 }
