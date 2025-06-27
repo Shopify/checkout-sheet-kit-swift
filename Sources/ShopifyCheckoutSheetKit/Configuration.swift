@@ -54,6 +54,9 @@ public struct Configuration {
 
 	public var title: String = NSLocalizedString("shopify_checkout_sheet_title", value: "Checkout", comment: "The title of the checkout sheet.")
 
+	/// The tint color for the close button. If nil, uses the system default.
+	public var closeButtonTintColor: UIColor?
+
 	/// Custom enum for identifying traffic from alternative platforms
 	public var platform: Platform?
 
