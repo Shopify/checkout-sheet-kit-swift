@@ -26,28 +26,28 @@ import UIKit
 @testable import ShopifyCheckoutSheetKit
 
 class ConfigurationTests: XCTestCase {
-	
+
 	override func setUp() {
 		super.setUp()
 		// Reset configuration to defaults
 		ShopifyCheckoutSheetKit.configuration = Configuration()
 	}
-	
+
 	func testCloseButtonTintColorDefaultsToNil() {
 		XCTAssertNil(ShopifyCheckoutSheetKit.configuration.closeButtonTintColor)
 	}
-	
+
 	func testCloseButtonTintColorCanBeSet() {
 		let customColor = UIColor.red
 		ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = customColor
-		
+
 		XCTAssertEqual(ShopifyCheckoutSheetKit.configuration.closeButtonTintColor, customColor)
 	}
-	
+
 	func testCloseButtonTintColorCanBeReset() {
 		ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = .blue
 		XCTAssertNotNil(ShopifyCheckoutSheetKit.configuration.closeButtonTintColor)
-		
+
 		ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = nil
 		XCTAssertNil(ShopifyCheckoutSheetKit.configuration.closeButtonTintColor)
 	}

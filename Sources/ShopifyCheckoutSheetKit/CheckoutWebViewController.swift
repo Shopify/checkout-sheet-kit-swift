@@ -43,9 +43,9 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		if let closeButtonTintColor = ShopifyCheckoutSheetKit.configuration.closeButtonTintColor {
 			let image = UIImage(systemName: "xmark.circle.fill")
 			let item = UIBarButtonItem(
-				image: image, 
-				style: .plain, 
-				target: self, 
+				image: image,
+				style: .plain,
+				target: self,
 				action: #selector(close)
 			)
 			item.tintColor = closeButtonTintColor

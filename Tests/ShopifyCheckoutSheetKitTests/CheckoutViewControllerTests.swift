@@ -209,7 +209,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 	func testCloseButtonUsesSystemDefaultWhenTintColorIsNil() {
 		ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = nil
 		let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
-		
+
 		let closeButton = controller.navigationItem.rightBarButtonItem
 		XCTAssertNotNil(closeButton)
 		XCTAssertEqual(closeButton?.style, .plain)
@@ -220,7 +220,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 		let customColor = UIColor.red
 		ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = customColor
 		let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
-		
+
 		let closeButton = controller.navigationItem.rightBarButtonItem
 		XCTAssertNotNil(closeButton)
 		XCTAssertEqual(closeButton?.style, .plain)
@@ -231,10 +231,10 @@ class CheckoutViewDelegateTests: XCTestCase {
 	func testCloseButtonImageIsXMarkCircleFill() {
 		ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = .blue
 		let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
-		
+
 		let closeButton = controller.navigationItem.rightBarButtonItem
 		let expectedImage = UIImage(systemName: "xmark.circle.fill")
-		
+
 		XCTAssertNotNil(closeButton?.image)
 		XCTAssertNotNil(expectedImage)
 		// Verify it's using custom image rather than system button item
