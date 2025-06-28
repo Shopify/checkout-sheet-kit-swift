@@ -103,26 +103,16 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             print(CartManager.Errors.invariant(message: "Shipping method identifier is nil"))
             return PKPaymentRequestShippingMethodUpdate(
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
                     shippingMethod: nil
                 )
             )
         }
 
         do {
-            _ = try await CartManager.shared.performCartSelectedDeliveryOptionsUpdate(
+            try await CartManager.shared.performCartSelectedDeliveryOptionsUpdate(
                 deliveryOptionHandle: identifier
             )
 
-            let cart = try await CartManager.shared.performCartPrepareForCompletion()
-
-            let paymentRequestShippingContactUpdate = PKPaymentRequestShippingMethodUpdate(
-                paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: cart,
-                    shippingMethod: shippingMethod
-                )
-            )
-            return paymentRequestShippingContactUpdate
         } catch {
             print(
                 CartManager.Errors.apiErrors(
@@ -131,10 +121,19 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                     "Check response from cartSelectedDeliveryOptionsUpdate or cartPrepareForCompletion \(error)"
                 )
             )
+        }
+
+        do {
+            try await CartManager.shared.performCartPrepareForCompletion()
 
             return PKPaymentRequestShippingMethodUpdate(
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
+                    shippingMethod: shippingMethod
+                )
+            )
+        } catch {
+            return PKPaymentRequestShippingMethodUpdate(
+                paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
                     shippingMethod: nil
                 )
             )
@@ -146,7 +145,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
         do {
-            _ = try await CartManager.shared.performBuyerIdentityUpdate(
+            try await CartManager.shared.performCartBuyerIdentityUpdate(
                 contact: contact,
                 partial: true
             )
@@ -155,12 +154,11 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                 firstDeliveryGroup: CartManager.shared.cart?.deliveryGroups.nodes.first
             )
 
-            _ = try await CartManager.shared.performCartPrepareForCompletion()
+            try await CartManager.shared.performCartPrepareForCompletion()
 
             return PKPaymentRequestShippingContactUpdate(
                 errors: [],
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
                     shippingMethod: nil
                 ),
                 shippingMethods: shippingMethods
@@ -170,7 +168,6 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             return PKPaymentRequestShippingContactUpdate(
                 errors: [error],
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
-                    cart: CartManager.shared.cart,
                     shippingMethod: nil
                 ),
                 shippingMethods: []
@@ -185,29 +182,26 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         /**
          * Apply validations that make sense for your business requirements
          */
-        guard
-            let shippingContact = payment.shippingContact,
-            payment.shippingContact?.postalAddress?.isoCountryCode == "US"
-        else {
+        guard let shippingContact = payment.shippingContact else {
             paymentStatus = .failure
             return PassKitFactory.shared.createPKPaymentUSAdressError()
         }
 
-        guard
-            let emailAddress = shippingContact.emailAddress,
-            emailAddress.isEmpty == false
-        else {
-            paymentStatus = .failure
-            return PassKitFactory.shared.createPKPaymentEmailError()
-        }
-
+        /**
+         * (Optional) If the user is a guest and you haven't set an email on buyerIdentity
+         * update the buyerIdentity with the shippingContact.email
+         */
         if appConfiguration.useVaultedState == false {
-            /**
-             * (Optional) If the user is a guest and you haven't set an email on buyerIdentity
-             * update the buyerIdentity with the shippingContact.email
-             */
+            guard
+                let emailAddress = shippingContact.emailAddress,
+                emailAddress.isEmpty == false
+            else {
+                paymentStatus = .failure
+                return PassKitFactory.shared.createPKPaymentEmailError()
+            }
+
             do {
-                _ = try await CartManager.shared.performBuyerIdentityUpdate(
+                try await CartManager.shared.performCartBuyerIdentityUpdate(
                     contact: shippingContact,
                     partial: true
                 )
@@ -219,7 +213,9 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         do {
-            _ = try await CartManager.shared.performCartPaymentUpdate(payment: payment)
+            try await CartManager.shared.performCartPrepareForCompletion()
+            sleep(1)
+            try await CartManager.shared.performCartPaymentUpdate(payment: payment)
         } catch {
             print("[didAuthorizePayment][performCartPaymentUpdate][failure] \(error)")
             paymentStatus = .failure
@@ -227,6 +223,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         do {
+            sleep(1)
             let response = try await CartManager.shared.performCartSubmitForCompletion()
             CartManager.shared.redirectUrl = response.redirectUrl
             paymentStatus = .success

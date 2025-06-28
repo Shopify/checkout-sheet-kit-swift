@@ -40,6 +40,16 @@ class CartManager: ObservableObject {
     public var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
+    /**
+     * Represents the cart's total tax amount (`cart.totalTaxAmount.amount`).
+     *
+     * This property is handled separately from the main cart object because:
+     * 1. The BuySDK throws errors when accessing unrequested properties
+     * 2. `totalTaxAmount` is deprecated in most cart operations (only available in `prepareForCompletion`)
+     *
+     * By isolating this property, we avoid SDK errors while maintaining access to tax data when needed.
+     */
+    @Published var totalTaxAmount: Decimal?
     @Published var isDirty: Bool = false
 
     // MARK: Initializers
@@ -68,7 +78,7 @@ class CartManager: ObservableObject {
      * Creates cart if no cart.id present, or adds line items to pre-existing cart
      * Non-idempotent - subsequent calls for existing cartLine items will increase quantity by 1
      */
-    func performCartLinesAdd(variant: GraphQL.ID) async throws -> Storefront.Cart {
+    @discardableResult func performCartLinesAdd(variant: GraphQL.ID) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             return try await performCartCreate(items: [variant])
         }
@@ -80,7 +90,7 @@ class CartManager: ObservableObject {
         ) {
             $0.cartLinesAdd(cartId: cartId, lines: lines) {
                 $0.cart { $0.cartManagerFragment() }
-                  .userErrors { $0.code().message() }
+                    .userErrors { $0.code().message() }
             }
         }
 
@@ -151,14 +161,13 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performBuyerIdentityUpdate(
+    @discardableResult func performCartBuyerIdentityUpdate(
         contact: PKContact,
         partial _: Bool
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
-
         guard let address = contact.postalAddress else {
             throw Errors.invariant(message: "contact.postalAddress is nil")
         }
@@ -252,7 +261,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartSelectedDeliveryOptionsUpdate(
+    @discardableResult func performCartSelectedDeliveryOptionsUpdate(
         deliveryOptionHandle: String
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
@@ -312,7 +321,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartPaymentUpdate(
+    @discardableResult func performCartPaymentUpdate(
         payment: PKPayment // REFACTOR: this method should just receive the decoded payment token
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
@@ -344,7 +353,7 @@ class CartManager: ObservableObject {
 
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartPaymentUpdate(cartId: cartId, payment: paymentInput) {
-                $0.cart { $0.cartManagerFragment() }
+                $0.cart { $0.cartPrepareForCompletionFragment() }
                     .userErrors {
                         $0.code().message()
                     }
@@ -376,7 +385,7 @@ class CartManager: ObservableObject {
         }
     }
 
-    func performCartPrepareForCompletion() async throws -> Storefront.Cart {
+    @discardableResult func performCartPrepareForCompletion() async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
             throw Errors.invariant(message: "cart.id should be defined")
         }
@@ -386,10 +395,10 @@ class CartManager: ObservableObject {
         ) {
             $0.cartPrepareForCompletion(cartId: cartId) {
                 $0.result {
-                    $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
+                    $0.onCartStatusReady { $0.cart { $0.cartPrepareForCompletionFragment() } }
                     $0.onCartThrottled { $0.pollAfter() }
                     $0.onCartStatusNotReady {
-                        $0.cart { $0.cartManagerFragment() }
+                        $0.cart { $0.cartPrepareForCompletionFragment() }
                             .errors { $0.code().message() }
                     }
                 }.userErrors { $0.code().message() }
@@ -410,17 +419,27 @@ class CartManager: ObservableObject {
 
             guard
                 let result = payload.result as? Storefront.CartStatusReady,
-                let cart = result.cart
+                let cartWithResolvedPendingTerms = result.cart
             else {
                 throw Errors.invariant(
                     message: "CartPrepareForCompletionResult is not CartStatusReady")
             }
 
             DispatchQueue.main.async {
-                self.cart = cart
+                self.cart = cartWithResolvedPendingTerms
+                /**
+                 * IMPORTANT: Special handling for `totalTaxAmount`:
+                 * - Deprecated field on cart, except from `cartPrepareForCompletion` mutation
+                 * - Not included in standard cart fragments used by other mutations
+                 * - Accessing `self.cart.cost.totalTaxAmount` will throw if cart was set by other mutations
+                 * - Store separately to preserve the value when cart is updated by subsequent mutations
+                 */
+                if let tax = cartWithResolvedPendingTerms.cost.totalTaxAmount?.amount {
+                    self.totalTaxAmount = tax
+                }
             }
 
-            return cart
+            return cartWithResolvedPendingTerms
         } catch {
             throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
         }
@@ -435,7 +454,11 @@ class CartManager: ObservableObject {
             $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
                 $0.result {
                     $0.onSubmitSuccess { $0.redirectUrl() }
-                    $0.onSubmitFailed { $0.checkoutUrl() }
+                    $0.onSubmitFailed {
+                        $0.checkoutUrl().errors {
+                            $0.code().message()
+                        }
+                    }
                     $0.onSubmitAlreadyAccepted { $0.attemptId() }
                     $0.onSubmitThrottled { $0.pollAfter() }
                 }
