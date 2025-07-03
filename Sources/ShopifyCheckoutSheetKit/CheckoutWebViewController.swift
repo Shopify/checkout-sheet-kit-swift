@@ -40,9 +40,21 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 	private let checkoutURL: URL
 
 	private lazy var closeBarButtonItem: UIBarButtonItem = {
-		return UIBarButtonItem(
-			barButtonSystemItem: .close, target: self, action: #selector(close)
-		)
+		if let closeButtonTintColor = ShopifyCheckoutSheetKit.configuration.closeButtonTintColor {
+			let image = UIImage(systemName: "xmark.circle.fill")
+			let item = UIBarButtonItem(
+				image: image,
+				style: .plain,
+				target: self,
+				action: #selector(close)
+			)
+			item.tintColor = closeButtonTintColor
+			return item
+		} else {
+			return UIBarButtonItem(
+				barButtonSystemItem: .close, target: self, action: #selector(close)
+			)
+		}
 	}()
 
 	internal var progressObserver: NSKeyValueObservation?

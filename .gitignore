@@ -5,3 +5,6 @@ xcuserdata
 **/Storefront.xcconfig
 **/*.entitlements
 .vscode/settings.json
+.claude/
+CLAUDE.md
+
