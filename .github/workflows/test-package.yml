@@ -1,4 +1,4 @@
-name: Run SDK Tests
+name: Run Package Tests
 
 on:
   push:
@@ -11,4 +11,4 @@ jobs:
   call-workflow-passing-data:
     uses: ./.github/workflows/test-workflow.yml
     with:
-      test-path: ./Scripts/test_package
+      test-path: ./scripts/xcode_run test ShopifyCheckoutSheetKit

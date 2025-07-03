@@ -20,6 +20,7 @@ packages:
   - homebrew:
       - swiftlint
       - swiftformat
+      - xcbeautify
 
 commands:
   lint:
@@ -29,3 +30,12 @@ commands:
   fix:
     desc: Autofix Format & Lint issues
     run: scripts/lint fix
+  build_package:
+    desc: Build the Package
+    run: ./scripts/xcode_run build ShopifyCheckoutSheetKit
+  build_samples:
+    desc: Build the Samples
+    run: ./scripts/build_samples
+  test_package:
+    desc: Test the Package
+    run: ./scripts/xcode_run test ShopifyCheckoutSheetKit
