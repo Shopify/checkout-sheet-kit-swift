@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.0 - July 3, 2025
+
+Allow customizing the close button tint for the checkout sheet.
+
 ## 3.2.0 - 20 June, 2025
 
 - Ensure `self.delegate` is set for `CheckoutViewController` after state changes
