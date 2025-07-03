@@ -35,7 +35,7 @@ protocol CheckoutBridgeProtocol {
 
 enum CheckoutBridge: CheckoutBridgeProtocol {
 	static let schemaVersion = "2025-04"
-	static let messageHandler = "mobileCheckoutSdk"
+	static let messageHandler = "CheckoutSheetProtocolConsumer"
 
 	static var applicationName: String {
 		let platform = ShopifyCheckoutSheetKit.configuration.platform?.rawValue ?? "iOS"
