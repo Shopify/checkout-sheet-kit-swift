@@ -18,6 +18,7 @@
     - [`tintColor`](#tintcolor)
     - [`backgroundColor`](#backgroundcolor)
     - [`title`](#title)
+    - [`closeButtonTintColor`](#closebuttontintcolor)
     - [SwiftUI Configuration](#swiftui-configuration)
   - [Preloading](#preloading)
     - [Important considerations](#important-considerations)
@@ -141,6 +142,7 @@ struct ContentView: View {
            .colorScheme(.automatic)
            .tintColor(.blue)
            .backgroundColor(.white)
+           .closeButtonTintColor(.red)
 
            /// Lifecycle events
            .onCancel {
@@ -256,6 +258,18 @@ Here is an example of a `Localizable.xcstrings` containing translations for 2 lo
 }
 ```
 
+### `closeButtonTintColor`
+
+The color of the close button in the navigation bar can be customized via the `closeButtonTintColor` property. When set to a custom color, the close button will use a custom SF Symbol (`xmark.circle.fill`) with the specified tint color. When set to `nil` (default), the standard system close button appearance is used.
+
+```swift
+// Use a custom UI color
+ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+
+// Use a system color
+ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = .systemRed
+```
+
 ### SwiftUI Configuration
 
 Similarly, configuration modifiers are available to set the configuration of your checkout when using SwiftUI:
@@ -266,6 +280,7 @@ CheckoutSheet(checkout: checkoutURL)
   .colorScheme(.automatic)
   .tintColor(.blue)
   .backgroundColor(.black)
+  .closeButtonTintColor(.red)
 ```
 
 > [!NOTE]
