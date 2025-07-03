@@ -4,6 +4,7 @@ type: ios
 
 up:
   - ruby
+  - bundler
   - custom:
       name: Ensure Storefront.xcconfig file
       met?: |
