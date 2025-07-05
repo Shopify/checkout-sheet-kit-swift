@@ -61,7 +61,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
 	// MARK: Initializers
 
-	public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
+	public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
 		self.checkoutURL = url
 		self.delegate = delegate
 
@@ -69,6 +69,9 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 		checkoutView.translatesAutoresizingMaskIntoConstraints = false
 		checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
 		self.checkoutView = checkoutView
+
+        // Store checkout configuration for use when loading the checkout
+        checkoutView.checkoutOptions = options
 
 		super.init(nibName: nil, bundle: nil)
 

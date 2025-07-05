@@ -480,6 +480,32 @@ class CheckoutWebViewTests: XCTestCase {
 
 		XCTAssertNil(self.mockDelegate.errorReceived)
     }
+
+	func testAppAuthenticationHeaderIsAddedWithConfig() {
+		let webView = LoadedRequestObservableWebView()
+        let appAuthConfig = CheckoutOptions.AppAuthentication(token: "jwt-token-example")
+		webView.checkoutOptions = CheckoutOptions(appAuthentication: appAuthConfig)
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: false
+		)
+
+		let authHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Checkout-Kit-Consumer")
+		XCTAssertEqual(authHeader, "{payload: jwt-token-example, version: v2}")
+	}
+
+	func testAppAuthenticationHeaderNotAddedWithoutConfig() {
+		let webView = LoadedRequestObservableWebView()
+
+		webView.load(
+			checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+			isPreload: false
+		)
+
+		let authHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Checkout-Kit-Consumer")
+		XCTAssertNil(authHeader)
+	}
 }
 
 class LoadedRequestObservableWebView: CheckoutWebView {

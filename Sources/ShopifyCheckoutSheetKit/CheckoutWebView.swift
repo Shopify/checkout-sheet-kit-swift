@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 
 import UIKit
-import WebKit
+@preconcurrency import WebKit
 
 protocol CheckoutWebViewDelegate: AnyObject {
 	func checkoutViewDidStartNavigation()
@@ -125,6 +125,8 @@ class CheckoutWebView: WKWebView {
 		}
 	}
 	var isPreloadRequest: Bool = false
+
+	var checkoutOptions: CheckoutOptions?
 
 	// MARK: Initializers
 	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
@@ -229,6 +231,13 @@ class CheckoutWebView: WKWebView {
 		if isPreload && isPreloadingAvailable {
 			isPreloadRequest = true
 			request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
+		}
+
+		// Add app authentication header if config is provided
+		if let appAuth = checkoutOptions?.appAuthentication {
+			let headerValue = "{payload: \(appAuth.token), version: v2}"
+			request.setValue(headerValue, forHTTPHeaderField: "Shopify-Checkout-Kit-Consumer")
+			OSLogger.shared.debug("Added app authentication header for checkout")
 		}
 
 		load(request)
