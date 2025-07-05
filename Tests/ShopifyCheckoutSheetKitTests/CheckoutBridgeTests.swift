@@ -42,20 +42,20 @@ class CheckoutBridgeTests: XCTestCase {
 	func testReturnsStandardUserAgent() {
 		let version = ShopifyCheckoutSheetKit.version
 		let schemaVersion = CheckoutBridge.schemaVersion
-		XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard)")
+		XCTAssertEqual(CheckoutBridge.applicationName, "CheckoutKit/\(version) (iOS) CheckoutSheetProtocol/\(schemaVersion)")
 	}
 
 	func testReturnsRecoveryUserAgent() {
 		let version = ShopifyCheckoutSheetKit.version
-		XCTAssertEqual(CheckoutBridge.recoveryAgent, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery)")
+		XCTAssertEqual(CheckoutBridge.recoveryAgent, "CheckoutKit/\(version) (iOS) CheckoutSheetProtocol/noconnect")
 	}
 
 	func testReturnsUserAgentWithCustomPlatformSuffix() {
 		let version = ShopifyCheckoutSheetKit.version
 		let schemaVersion = CheckoutBridge.schemaVersion
 		ShopifyCheckoutSheetKit.configuration.platform = Platform.reactNative
-		XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative")
-		XCTAssertEqual(CheckoutBridge.recoveryAgent, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) ReactNative")
+		XCTAssertEqual(CheckoutBridge.applicationName, "CheckoutKit/\(version) (ReactNative) CheckoutSheetProtocol/\(schemaVersion)")
+		XCTAssertEqual(CheckoutBridge.recoveryAgent, "CheckoutKit/\(version) (ReactNative) CheckoutSheetProtocol/noconnect")
 		ShopifyCheckoutSheetKit.configuration.platform = nil
 	}
 
@@ -320,11 +320,11 @@ class CheckoutBridgeTests: XCTestCase {
 
 	private func expectedPresentedScript() -> String {
 		return """
-		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-			window.MobileCheckoutSdk.dispatchMessage('presented');
+		if (window.Shopify?.CheckoutSheetProtocol?.postMessage) {
+			window.Shopify.CheckoutSheetProtocol.postMessage('presented');
 		} else {
 			window.addEventListener('mobileCheckoutBridgeReady', function () {
-				window.MobileCheckoutSdk.dispatchMessage('presented');
+				window.Shopify.CheckoutSheetProtocol.postMessage('presented');
 			}, {passive: true, once: true});
 		}
 		"""
@@ -332,11 +332,11 @@ class CheckoutBridgeTests: XCTestCase {
 
 	private func expectedPayloadScript() -> String {
 		return """
-		if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-			window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
+		if (window.Shopify?.CheckoutSheetProtocol?.postMessage) {
+			window.Shopify.CheckoutSheetProtocol.postMessage('payload', {"one": true});
 		} else {
 			window.addEventListener('mobileCheckoutBridgeReady', function () {
-				window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
+				window.Shopify.CheckoutSheetProtocol.postMessage('payload', {"one": true});
 			}, {passive: true, once: true});
 		}
 		"""
