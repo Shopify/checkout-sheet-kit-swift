@@ -7,6 +7,11 @@ license_text = "/*\n" + File.read('LICENSE') + "*/\n"
 normalized_license = license_text.gsub(/\s+/, ' ').strip
 
 Find.find('.') do |path|
+  # Skip build and dependency directories
+  if File.directory?(path) && ['.build', '.swiftpm', 'DerivedData', '.git'].include?(File.basename(path))
+    Find.prune
+  end
+  
   next unless File.file?(path) && path.end_with?('.swift') && !path.end_with?('Package.swift')
 
   # Read the current content of the Swift file
