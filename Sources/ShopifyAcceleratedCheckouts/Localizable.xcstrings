@@ -1,0 +1,1047 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "action.view" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View %{content}"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View %{content}"
+          }
+        }
+      }
+    },
+    "brand.amazon_pay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amazon Pay"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amazon Pay"
+          }
+        }
+      }
+    },
+    "brand.apple_pay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Pay"
+          }
+        }
+      }
+    },
+    "brand.buy_with_prime" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy with Prime"
+          }
+        }
+      }
+    },
+    "brand.google_pay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Google Pay"
+          }
+        }
+      }
+    },
+    "brand.paypal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPal"
+          }
+        }
+      }
+    },
+    "brand.shop_pay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shop Pay"
+          }
+        }
+      }
+    },
+    "buy_with_button_content" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy with %{wallet}"
+          }
+        }
+      }
+    },
+    "delivery_promises.connect_delivery_promises" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{promiseOne} and %{promiseTwo}"
+          }
+        }
+      }
+    },
+    "error_dialogs.checkout.button_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "error_dialogs.checkout.generic_error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checkout is currently unavailable due to technical problems. Please try again in a few minutes."
+          }
+        }
+      }
+    },
+    "error_dialogs.checkout.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transaction failed"
+          }
+        }
+      }
+    },
+    "error_dialogs.wallet.eligibility_error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Items that were eligible for %{wallet} are no longer in your cart."
+          }
+        }
+      }
+    },
+    "error_dialogs.wallet.generic_error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There was an issue with %{wallet}. Try again or use a different payment method."
+          }
+        }
+      }
+    },
+    "error_dialogs.wallet.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{wallet} unavailable"
+          }
+        }
+      }
+    },
+    "errors.address_unserviceable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{shopName} does not currently deliver to this address. Use a different address to complete your purchase."
+          }
+        }
+      }
+    },
+    "errors.applepay.unsupported" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ApplePay is not supported on your device."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ApplePay is not supported on your device."
+          }
+        }
+      }
+    },
+    "errors.currency.mismatch" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your cart and currency has been updated based on your shipping country."
+          }
+        }
+      }
+    },
+    "errors.emojis.address1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address line cannot contain emojis"
+          }
+        }
+      }
+    },
+    "errors.emojis.address2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second address line cannot contain emojis"
+          }
+        }
+      }
+    },
+    "errors.emojis.city" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "City cannot contain emojis"
+          }
+        }
+      }
+    },
+    "errors.emojis.first_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First name cannot contain emojis"
+          }
+        }
+      }
+    },
+    "errors.emojis.last_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last name cannot contain emojis"
+          }
+        }
+      }
+    },
+    "errors.emojis.postal_code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postal code/zip cannot contain emojis"
+          }
+        }
+      }
+    },
+    "errors.html_tags.address1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address line cannot contain HTML tags"
+          }
+        }
+      }
+    },
+    "errors.html_tags.address2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second address line cannot contain HTML tags"
+          }
+        }
+      }
+    },
+    "errors.html_tags.city" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "City cannot contain HTML tags"
+          }
+        }
+      }
+    },
+    "errors.html_tags.first_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First name cannot contain HTML tags"
+          }
+        }
+      }
+    },
+    "errors.html_tags.last_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last name cannot contain HTML tags"
+          }
+        }
+      }
+    },
+    "errors.invalid.address1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid address"
+          }
+        }
+      }
+    },
+    "errors.invalid.address2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid apartment, suite, etc."
+          }
+        }
+      }
+    },
+    "errors.invalid.billing_address" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid billing address"
+          }
+        }
+      }
+    },
+    "errors.invalid.city" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid city"
+          }
+        }
+      }
+    },
+    "errors.invalid.country" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a country / region"
+          }
+        }
+      }
+    },
+    "errors.invalid.discount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid discount"
+          }
+        }
+      }
+    },
+    "errors.invalid.email" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid email"
+          }
+        }
+      }
+    },
+    "errors.invalid.emirate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid emirate"
+          }
+        }
+      }
+    },
+    "errors.invalid.first_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid first name"
+          }
+        }
+      }
+    },
+    "errors.invalid.last_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid last name"
+          }
+        }
+      }
+    },
+    "errors.invalid.payment_method" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid payment method"
+          }
+        }
+      }
+    },
+    "errors.invalid.phone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid phone number"
+          }
+        }
+      }
+    },
+    "errors.invalid.postal_code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid zip / postal code"
+          }
+        }
+      }
+    },
+    "errors.invalid.shipping_address" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid shipping address"
+          }
+        }
+      }
+    },
+    "errors.invalid.zone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a valid state / province"
+          }
+        }
+      }
+    },
+    "errors.missing.address1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an address"
+          }
+        }
+      }
+    },
+    "errors.missing.address2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an apartment, suite, etc."
+          }
+        }
+      }
+    },
+    "errors.missing.city" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a city"
+          }
+        }
+      }
+    },
+    "errors.missing.country" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a country"
+          }
+        }
+      }
+    },
+    "errors.missing.email" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an email address"
+          }
+        }
+      }
+    },
+    "errors.missing.emirate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an emirate"
+          }
+        }
+      }
+    },
+    "errors.missing.first_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a first name"
+          }
+        }
+      }
+    },
+    "errors.missing.last_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a last name"
+          }
+        }
+      }
+    },
+    "errors.missing.phone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a phone number"
+          }
+        }
+      }
+    },
+    "errors.missing.postal_code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a ZIP / postal code"
+          }
+        }
+      }
+    },
+    "errors.missing.shipping_option" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a shipping method"
+          }
+        }
+      }
+    },
+    "errors.missing.zone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a state / province"
+          }
+        }
+      }
+    },
+    "errors.too_long.address1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address line is too long"
+          }
+        }
+      }
+    },
+    "errors.too_long.address2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second address line is too long"
+          }
+        }
+      }
+    },
+    "errors.too_long.city" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "City is too long"
+          }
+        }
+      }
+    },
+    "errors.too_long.first_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First name is too long"
+          }
+        }
+      }
+    },
+    "errors.too_long.last_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last name is too long"
+          }
+        }
+      }
+    },
+    "errors.url.first_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First name cannot contain a URL"
+          }
+        }
+      }
+    },
+    "errors.url.last_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last name cannot contain a URL"
+          }
+        }
+      }
+    },
+    "express_checkout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Express checkout"
+          }
+        }
+      }
+    },
+    "instruments_copy.checkout.buy_now" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy it now"
+          }
+        }
+      }
+    },
+    "more_payment_options" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More payment options"
+          }
+        }
+      }
+    },
+    "order_summary.discount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discount"
+          }
+        }
+      }
+    },
+    "order_summary.duties" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duties"
+          }
+        }
+      }
+    },
+    "order_summary.shipping" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shipping"
+          }
+        }
+      }
+    },
+    "order_summary.shipping_one_time_purchase" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shipping (One-time purchase)"
+          }
+        }
+      }
+    },
+    "order_summary.shipping_subscription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shipping (Subscription)"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.day.one" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "day"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.day.other" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{count} days"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.month.one" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "month"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.month.other" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{count} months"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.week.one" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "week"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.week.other" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{count} weeks"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.year.one" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "year"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_intervals.year.other" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{count} years"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_total_tooltip_line" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Does not include shipping, tax, duties, or any applicable discounts"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_totals" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{fixedPrice} every %{interval}"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_totals_with_policies.one" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First payment %{fixedPrice}, then %{recurringPrice} every %{interval}"
+          }
+        }
+      }
+    },
+    "order_summary.subscriptions.recurring_totals_with_policies.other" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First %{count} payments %{fixedPrice} each, then %{recurringPrice} every %{interval}"
+          }
+        }
+      }
+    },
+    "order_summary.subtotal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtotal"
+          }
+        }
+      }
+    },
+    "order_summary.taxes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taxes"
+          }
+        }
+      }
+    },
+    "order_summary.total" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
+    },
+    "shipping_methods.choose_delivery_strategy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a delivery method"
+          }
+        }
+      }
+    },
+    "shipping_methods.connect_shipping_methods" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%{methodOne} and %{methodTwo}"
+          }
+        }
+      }
+    },
+    "shop_promise_delivery.next_day" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next-day delivery"
+          }
+        }
+      }
+    },
+    "shop_promise_delivery.same_day" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same-day delivery"
+          }
+        }
+      }
+    },
+    "shop_promise_delivery.two_day" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2-day delivery"
+          }
+        }
+      }
+    },
+    "subscriptions.cancellation_policy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancellation policy"
+          }
+        }
+      }
+    },
+    "subscriptions.policy_not_found" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The subscription policy could not be found. Refresh the page or contact us for more information."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
