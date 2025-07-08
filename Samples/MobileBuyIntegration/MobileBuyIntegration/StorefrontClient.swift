@@ -58,7 +58,7 @@ class StorefrontClient {
     func executeAsync(query: Storefront.QueryRootQuery) async throws -> Storefront.QueryRoot {
         try await withCheckedThrowingContinuation { continuation in
             let task = client.queryGraphWith(query) { query, error in
-                guard let query = query else {
+                guard let query else {
                     return continuation.resume(throwing: error ?? URLError(.unknown))
                 }
 
@@ -86,7 +86,7 @@ class StorefrontClient {
         try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.main.async {
                 let task = self.client.mutateGraphWith(mutation) { mutation, error in
-                    guard let mutation = mutation else {
+                    guard let mutation else {
                         return continuation.resume(throwing: error ?? URLError(.unknown))
                     }
 

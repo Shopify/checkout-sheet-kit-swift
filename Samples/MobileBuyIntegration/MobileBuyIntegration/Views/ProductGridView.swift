@@ -75,7 +75,7 @@ struct ProductSheetView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            if let product = product {
+            if let product {
                 ProductView(product: product)
             }
 
