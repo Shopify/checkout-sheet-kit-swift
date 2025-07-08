@@ -39,9 +39,9 @@ public class CheckoutViewController: UINavigationController {
 }
 
 /// Deprecated
-public extension CheckoutViewController {
+extension CheckoutViewController {
     @available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
-    struct Representable: UIViewControllerRepresentable {
+    public struct Representable: UIViewControllerRepresentable {
         @Binding var checkoutURL: URL?
 
         let delegate: CheckoutDelegate?
@@ -165,28 +165,28 @@ public protocol CheckoutConfigurable {
     func closeButtonTintColor(_ color: UIColor?) -> Self
 }
 
-public extension CheckoutConfigurable {
-    @discardableResult func backgroundColor(_ color: UIColor) -> Self {
+extension CheckoutConfigurable {
+    @discardableResult public func backgroundColor(_ color: UIColor) -> Self {
         ShopifyCheckoutSheetKit.configuration.backgroundColor = color
         return self
     }
 
-    @discardableResult func colorScheme(_ colorScheme: ShopifyCheckoutSheetKit.Configuration.ColorScheme) -> Self {
+    @discardableResult public func colorScheme(_ colorScheme: ShopifyCheckoutSheetKit.Configuration.ColorScheme) -> Self {
         ShopifyCheckoutSheetKit.configuration.colorScheme = colorScheme
         return self
     }
 
-    @discardableResult func tintColor(_ color: UIColor) -> Self {
+    @discardableResult public func tintColor(_ color: UIColor) -> Self {
         ShopifyCheckoutSheetKit.configuration.tintColor = color
         return self
     }
 
-    @discardableResult func title(_ title: String) -> Self {
+    @discardableResult public func title(_ title: String) -> Self {
         ShopifyCheckoutSheetKit.configuration.title = title
         return self
     }
 
-    @discardableResult func closeButtonTintColor(_ color: UIColor?) -> Self {
+    @discardableResult public func closeButtonTintColor(_ color: UIColor?) -> Self {
         ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = color
         return self
     }

@@ -65,8 +65,8 @@ public struct Configuration {
     public var logLevel: LogLevel = .error
 }
 
-public extension Configuration {
-    enum ColorScheme: String, CaseIterable {
+extension Configuration {
+    public enum ColorScheme: String, CaseIterable {
         /// Uses a light, idiomatic color scheme.
         case light
         /// Uses a dark, idiomatic color scheme.
@@ -78,16 +78,16 @@ public extension Configuration {
     }
 }
 
-public extension Configuration {
-    struct Confetti {
+extension Configuration {
+    public struct Confetti {
         public var enabled: Bool = false
 
         public var particles = [UIImage]()
     }
 }
 
-public extension Configuration {
-    struct Preloading {
+extension Configuration {
+    public struct Preloading {
         public var enabled: Bool = true {
             didSet {
                 CheckoutWebView.preloadingActivatedByClient = false

@@ -27,8 +27,8 @@ public struct CheckoutCompletedEvent: Codable {
     public let orderDetails: OrderDetails
 }
 
-public extension CheckoutCompletedEvent {
-    struct Address: Codable {
+extension CheckoutCompletedEvent {
+    public struct Address: Codable {
         public let address1: String?
         public let address2: String?
         public let city: String?
@@ -42,13 +42,13 @@ public extension CheckoutCompletedEvent {
         public let zoneCode: String?
     }
 
-    struct CartInfo: Codable {
+    public struct CartInfo: Codable {
         public let lines: [CartLine]
         public let price: Price
         public let token: String
     }
 
-    struct CartLineImage: Codable {
+    public struct CartLineImage: Codable {
         public let altText: String?
         // swiftlint:disable identifier_name
         public let lg: String
@@ -57,7 +57,7 @@ public extension CheckoutCompletedEvent {
         // swiftlint:enable identifier_name
     }
 
-    struct CartLine: Codable {
+    public struct CartLine: Codable {
         public let discounts: [Discount]?
         public let image: CartLineImage?
         public let merchandiseId: String?
@@ -67,18 +67,18 @@ public extension CheckoutCompletedEvent {
         public let title: String
     }
 
-    struct DeliveryDetails: Codable {
+    public struct DeliveryDetails: Codable {
         public let additionalInfo: String?
         public let location: Address?
         public let name: String?
     }
 
-    struct DeliveryInfo: Codable {
+    public struct DeliveryInfo: Codable {
         public let details: DeliveryDetails
         public let method: String
     }
 
-    struct Discount: Codable {
+    public struct Discount: Codable {
         public let amount: Money?
         public let applicationType: String?
         public let title: String?
@@ -86,7 +86,7 @@ public extension CheckoutCompletedEvent {
         public let valueType: String?
     }
 
-    struct OrderDetails: Codable {
+    public struct OrderDetails: Codable {
         public let billingAddress: Address?
         public let cart: CartInfo
         public let deliveries: [DeliveryInfo]?
@@ -96,12 +96,12 @@ public extension CheckoutCompletedEvent {
         public let phone: String?
     }
 
-    struct PaymentMethod: Codable {
+    public struct PaymentMethod: Codable {
         public let details: [String: String?]
         public let type: String
     }
 
-    struct Price: Codable {
+    public struct Price: Codable {
         public let discounts: [Discount]?
         public let shipping: Money?
         public let subtotal: Money?
@@ -109,7 +109,7 @@ public extension CheckoutCompletedEvent {
         public let total: Money?
     }
 
-    struct Money: Codable {
+    public struct Money: Codable {
         public let amount: Double?
         public let currencyCode: String?
     }

@@ -476,8 +476,8 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 }
 
-private extension CheckoutWebView {
-    struct CacheEntry {
+extension CheckoutWebView {
+    fileprivate struct CacheEntry {
         let key: String
 
         let view: CheckoutWebView
