@@ -26,7 +26,7 @@ import Foundation
 class ShopifyBundleFinder {}
 
 extension Bundle {
-    static var ShopifyCheckoutSheetKit: Bundle {
+    static internal var ShopifyCheckoutSheetKit: Bundle {
         #if COCOAPODS
             guard let cocoapodsBundle = Bundle(for: ShopifyBundleFinder.self)
                 .url(forResource: "ShopifyCheckoutSheetKit", withExtension: "bundle")
