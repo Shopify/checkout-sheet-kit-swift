@@ -37,7 +37,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
 private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
-class CheckoutWebView: WKWebView {
+public class CheckoutWebView: WKWebView {
 	private static var cache: CacheEntry?
 	internal var timer: Date?
 
@@ -125,6 +125,8 @@ class CheckoutWebView: WKWebView {
 		}
 	}
 	var isPreloadRequest: Bool = false
+	var autoResizeHeight: Bool = false
+	var onHeightChange: ((CGFloat) -> Void)?
 
 	// MARK: Initializers
 	init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
@@ -244,7 +246,7 @@ class CheckoutWebView: WKWebView {
 }
 
 extension CheckoutWebView: WKScriptMessageHandler {
-	func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+	public func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
 		do {
 			switch try CheckoutBridge.decode(message) {
 			/// Completed event
@@ -292,7 +294,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 }
 
 extension CheckoutWebView: WKNavigationDelegate {
-	func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+	public func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 		guard let url = action.request.url else {
 			decisionHandler(.allow)
 			return
@@ -308,7 +310,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 		decisionHandler(.allow)
 	}
 
-	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+	public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 		if let response = navigationResponse.response as? HTTPURLResponse {
 			decisionHandler(handleResponse(response))
 			return
@@ -375,7 +377,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 		return .allow
 	}
 
-	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+	public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		let url = webView.url?.absoluteString ?? ""
 		OSLogger.shared.info("Started provisional navigation - url:\(url)")
 		timer = Date()
@@ -383,13 +385,13 @@ extension CheckoutWebView: WKNavigationDelegate {
 	}
 
 	/// No need to emit checkoutDidFail error here as it has been handled in handleResponse already
-	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+	public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 		let url = webView.url?.absoluteString ?? ""
 		OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
 		timer = nil
 	}
 
-	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+	public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 		viewDelegate?.checkoutViewDidFinishNavigation()
 
 		if let startTime = timer {
@@ -411,9 +413,15 @@ extension CheckoutWebView: WKNavigationDelegate {
 		}
 		checkoutDidLoad = true
 		timer = nil
+
+		if autoResizeHeight {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+				self.startAppHeightMonitoring()
+			}
+		}
 	}
 
-	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+	public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		timer = nil
 
 		let nsError = error as NSError
@@ -437,9 +445,9 @@ extension CheckoutWebView: WKNavigationDelegate {
 		}
 
 		guard let url = action.request.url else { return false }
-		guard let url = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+		guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
 
-		guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?.value else { return false }
+		guard let openExternally = urlComponents.queryItems?.first(where: { $0.name == "open_externally" })?.value else { return false }
 
 		return openExternally.lowercased() == "true" || openExternally == "1"
 	}
@@ -469,7 +477,35 @@ extension CheckoutWebView: WKNavigationDelegate {
 
 		return nil
 	}
+
+	private func startAppHeightMonitoring() {
+		// Create a timer that checks app element height every 500ms
+		Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+			self?.checkAppElementHeight()
+		}
+	}
+
+	private func checkAppElementHeight() {
+		let script = """
+		(function() {
+			const appElement = document.getElementById('app');
+			if (appElement) {
+				return Math.max(appElement.offsetHeight, appElement.scrollHeight, appElement.clientHeight);
+			}
+			return 0;
+		})();
+		"""
+
+		evaluateJavaScript(script) { [weak self] result, error in
+			guard let self = self, let height = result as? CGFloat, height > 0 else { return }
+
+			DispatchQueue.main.async {
+				self.onHeightChange?(height)
+			}
+		}
+	}
 }
+
 
 extension CheckoutWebView {
 	fileprivate struct CacheEntry {
