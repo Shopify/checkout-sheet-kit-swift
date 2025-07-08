@@ -46,20 +46,20 @@ public protocol CheckoutDelegate: AnyObject {
     func checkoutDidEmitWebPixelEvent(event: PixelEvent)
 }
 
-public extension CheckoutDelegate {
-    func checkoutDidComplete(event _: CheckoutCompletedEvent) {
+extension CheckoutDelegate {
+    public func checkoutDidComplete(event _: CheckoutCompletedEvent) {
         /// No-op by default
     }
 
-    func checkoutDidClickLink(url: URL) {
+    public func checkoutDidClickLink(url: URL) {
         handleUrl(url)
     }
 
-    func checkoutDidFail(error: CheckoutError) throws {
+    public func checkoutDidFail(error: CheckoutError) throws {
         throw error
     }
 
-    func shouldRecoverFromError(error: CheckoutError) -> Bool {
+    public func shouldRecoverFromError(error: CheckoutError) -> Bool {
         return error.isRecoverable
     }
 

@@ -8,3 +8,4 @@
 --trimwhitespace always
 --disable redundantReturn
 --swiftversion 5.7.1
+--extensionacl on-declarations
