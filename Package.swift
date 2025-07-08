@@ -13,6 +13,10 @@ let package = Package(
         .library(
             name: "ShopifyCheckoutSheetKit",
             targets: ["ShopifyCheckoutSheetKit"]
+        ),
+        .library(
+            name: "ShopifyAcceleratedCheckouts",
+            targets: ["ShopifyAcceleratedCheckouts"]
         )
     ],
     dependencies: [
@@ -27,9 +31,21 @@ let package = Package(
             name: "ShopifyCheckoutSheetKit",
             dependencies: []
         ),
+        .target(
+            name: "ShopifyAcceleratedCheckouts",
+            dependencies: ["ShopifyCheckoutSheetKit"],
+            resources: [.process("Localizable.xcstrings")]
+        ),
         .testTarget(
             name: "ShopifyCheckoutSheetKitTests",
             dependencies: ["ShopifyCheckoutSheetKit"],
+            plugins: [
+                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
+            ]
+        ),
+        .testTarget(
+            name: "ShopifyAcceleratedCheckoutsTests",
+            dependencies: ["ShopifyAcceleratedCheckouts"],
             plugins: [
                 .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
             ]
