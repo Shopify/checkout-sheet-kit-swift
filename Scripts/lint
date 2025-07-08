@@ -1,19 +1,17 @@
 #!/bin/bash
 
-# Parse arguments for verbose flag
+# Check for verbose flag
 VERBOSE=false
-ARGS=()
+if [[ "$*" == *"--verbose"* ]]; then
+    VERBOSE=true
+fi
 
-for arg in "$@"; do
-    if [[ "$arg" == "--verbose" ]]; then
-        VERBOSE=true
-    else
-        ARGS+=("$arg")
-    fi
-done
-
-# Default to check mode if no argument provided
-MODE="${ARGS[0]:-check}"
+# Accept --verbose before check/fix
+if [[ "$1" == "--verbose" ]]; then
+    MODE="${2:-check}"
+else
+    MODE="${1:-check}"
+fi
 
 # Validate the mode
 if [[ "$MODE" != "check" && "$MODE" != "fix" ]]; then
@@ -77,22 +75,27 @@ else
 fi
 echo "SwiftFormat exit status: $FORMAT_STATUS"
 
+# Function to print error messages for linting issues
+print_linting_error() {
+    local tool_name=$1
+    echo "❌ $tool_name detected issues that need to be fixed."
+    echo "🔧 How to fix:"
+    echo "   Shopify employee? Run 'dev fix' or 'dev lint --verbose' to see detailed output"
+    echo "   Not a Shopify employee? Run './Scripts/lint fix' to auto-fix issues"
+    if [[ "$tool_name" == "SwiftLint" ]]; then
+        echo "   Then fix any remaining non-autofixable issues manually"
+    fi
+}
+
 # Handle exit codes for check mode
 if [[ "$MODE" == "check" ]]; then
     if [ $LINT_STATUS -ne 0 ]; then
-        echo "❌ SwiftLint detected issues that need to be fixed."
-        echo "🔧 How to fix:"
-        echo "   Shopify employee? Run 'dev fix' or 'dev lint --verbose' to see detailed output"
-        echo "   Not a Shopify employee? Run './Scripts/lint fix' to auto-fix issues"
-        echo "   Then fix any remaining non-autofixable issues manually"
+        print_linting_error "SwiftLint"
         exit 1
     fi
     
     if [ $FORMAT_STATUS -ne 0 ]; then
-        echo "❌ SwiftFormat detected issues that need to be fixed."
-        echo "🔧 How to fix:"
-        echo "   Shopify employee? Run 'dev fix' or 'dev lint --verbose' to see detailed output"
-        echo "   Not a Shopify employee? Run './Scripts/lint fix' to auto-fix issues"
+        print_linting_error "SwiftFormat"
         exit 1
     fi
     
