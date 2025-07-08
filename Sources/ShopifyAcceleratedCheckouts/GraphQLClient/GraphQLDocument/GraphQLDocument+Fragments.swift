@@ -276,7 +276,7 @@ extension GraphQLDocument {
         """
 
         static var all: String {
-            allCases.map { $0.rawValue }.joined(separator: "\n\n")
+            allCases.map(\.rawValue).joined(separator: "\n\n")
         }
     }
 }
