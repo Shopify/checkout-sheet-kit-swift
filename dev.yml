@@ -2,6 +2,15 @@ name: checkout-sheet-kit-swift
 
 type: ios
 
+packages:
+  - xcode
+  - homebrew:
+      - swiftlint
+      - swiftformat
+      - xcbeautify
+      - rover
+      - jq
+
 up:
   - ruby
   - custom:
@@ -15,12 +24,9 @@ up:
         ([ -f "./samples/MobileBuyIntegration/MobileBuyIntegration/MobileBuyIntegration.entitlements" ] || exit 1;)
       meet: ./scripts/setup_entitlements
 
-packages:
-  - xcode
-  - homebrew:
-      - swiftlint
-      - swiftformat
-      - xcbeautify
+
+check:
+  lint: /opt/dev/bin/dev lint
 
 commands:
   lint:
@@ -30,12 +36,42 @@ commands:
   fix:
     desc: Autofix Format & Lint issues
     run: scripts/lint fix
-  build_package:
-    desc: Build the Package
-    run: ./scripts/xcode_run build ShopifyCheckoutSheetKit
-  build_samples:
-    desc: Build the Samples
-    run: ./scripts/build_samples
-  test_package:
-    desc: Test the Package
-    run: ./scripts/xcode_run test ShopifyCheckoutSheetKit
+  build:
+    subcommands:
+      packages:
+        desc: Build the Package
+        run: |
+          ./scripts/xcode_run build ShopifyCheckoutSheetKit
+          ./scripts/xcode_run build ShopifyAcceleratedCheckouts
+      samples:
+        desc: Build the Samples
+        run: ./scripts/build_samples
+  test:
+    subcommands:
+      packages:
+        desc: Test the Packages
+        run: |
+          ./scripts/xcode_run test ShopifyCheckoutSheetKitTests
+          ./scripts/xcode_run test ShopifyAcceleratedCheckoutsTests
+      samples:
+        desc: Test the Samples
+        run: ./scripts/test_samples
+
+  apollo:
+    subcommands:
+      download_schema:
+        desc: Download GraphQL Schema
+        run: |
+          cd Samples/ShopifyAcceleratedCheckoutsApp
+          BUILD_SETTINGS=$(xcodebuild -showBuildSettings -scheme ShopifyAcceleratedCheckoutsApp -json | jq -r '.[0].buildSettings')
+          TOKEN=$(echo "$BUILD_SETTINGS" | jq -r '.STOREFRONT_ACCESS_TOKEN')
+          DOMAIN=$(echo "$BUILD_SETTINGS" | jq -r '.STOREFRONT_DOMAIN')
+          API_VERSION=$(echo "$BUILD_SETTINGS" | jq -r '.API_VERSION')
+          rover graph introspect https://$DOMAIN/api/$API_VERSION/graphql --header="X-Shopify-Storefront-Access-Token: $TOKEN" --output schema.$API_VERSION.graphqls
+
+      codegen:
+        desc: Generate Apollo Client
+        run: |
+          cd ./Samples/ShopifyAcceleratedCheckoutsApp/
+          ./apollo-ios-cli generate 
+          /opt/dev/bin/dev fix

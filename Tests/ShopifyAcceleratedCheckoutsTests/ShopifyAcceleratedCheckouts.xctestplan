@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "E8FDA05D-6BB0-4BF0-AB04-7A9540FAED0C",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "ShopifyAcceleratedCheckoutsTests",
+        "name" : "ShopifyAcceleratedCheckoutsTests"
+      }
+    }
+  ],
+  "version" : 1
+}

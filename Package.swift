@@ -12,7 +12,12 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "ShopifyCheckoutSheetKit",
-            targets: ["ShopifyCheckoutSheetKit"])
+            targets: ["ShopifyCheckoutSheetKit"]
+        ),
+        .library(
+            name: "ShopifyAcceleratedCheckouts",
+            targets: ["ShopifyAcceleratedCheckouts"]
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -24,12 +29,26 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "ShopifyCheckoutSheetKit",
-            dependencies: []),
+            dependencies: []
+        ),
+        .target(
+            name: "ShopifyAcceleratedCheckouts",
+            dependencies: ["ShopifyCheckoutSheetKit"],
+            resources: [.process("Localizable.xcstrings")]
+        ),
         .testTarget(
             name: "ShopifyCheckoutSheetKitTests",
             dependencies: ["ShopifyCheckoutSheetKit"],
             plugins: [
                 .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
-            ])
+            ]
+        ),
+        .testTarget(
+            name: "ShopifyAcceleratedCheckoutsTests",
+            dependencies: ["ShopifyAcceleratedCheckouts"],
+            plugins: [
+                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
+            ]
+        )
     ]
 )
