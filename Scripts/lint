@@ -1,14 +1,27 @@
 #!/bin/bash
 
+# Parse arguments for verbose flag
+VERBOSE=false
+ARGS=()
+
+for arg in "$@"; do
+    if [[ "$arg" == "--verbose" ]]; then
+        VERBOSE=true
+    else
+        ARGS+=("$arg")
+    fi
+done
+
 # Default to check mode if no argument provided
-MODE="${1:-check}"
+MODE="${ARGS[0]:-check}"
 
 # Validate the mode
 if [[ "$MODE" != "check" && "$MODE" != "fix" ]]; then
     echo "❌ Invalid mode: $MODE"
-    echo "Usage: $0 [check|fix]"
+    echo "Usage: $0 [check|fix] [--verbose]"
     echo "  check: Run linters in check mode (default)"
     echo "  fix:   Run linters in fix mode to auto-fix issues"
+    echo "  --verbose: Show detailed output from linters"
     exit 1
 fi
 
@@ -36,13 +49,18 @@ if ! which swiftformat >/dev/null; then
 fi
 
 # Run SwiftLint
+QUIET_FLAG=""
+if [[ "$VERBOSE" == "false" ]]; then
+    QUIET_FLAG="--quiet"
+fi
+
 if [[ "$MODE" == "check" ]]; then
     echo "🔄 Running SwiftLint in check mode..."
-    swiftlint lint --strict --quiet Samples Sources/ShopifyAcceleratedCheckouts
+    swiftlint lint --strict $QUIET_FLAG Samples Sources/ShopifyAcceleratedCheckouts
     LINT_STATUS=$?
 else
     echo "🔄 Running SwiftLint in fix mode..."
-    swiftlint lint --fix --quiet Samples Sources/ShopifyAcceleratedCheckouts
+    swiftlint lint --fix $QUIET_FLAG Samples Sources/ShopifyAcceleratedCheckouts
     LINT_STATUS=$?
 fi
 echo "SwiftLint exit status: $LINT_STATUS"
@@ -50,11 +68,11 @@ echo "SwiftLint exit status: $LINT_STATUS"
 # Run SwiftFormat
 if [[ "$MODE" == "check" ]]; then
     echo "🔄 Running SwiftFormat in check mode..."
-    swiftformat . --quiet --lint
+    swiftformat . $QUIET_FLAG --lint
     FORMAT_STATUS=$?
 else
     echo "🔄 Running SwiftFormat in fix mode..."
-    swiftformat . --quiet
+    swiftformat . $QUIET_FLAG
     FORMAT_STATUS=$?
 fi
 echo "SwiftFormat exit status: $FORMAT_STATUS"
@@ -64,7 +82,7 @@ if [[ "$MODE" == "check" ]]; then
     if [ $LINT_STATUS -ne 0 ]; then
         echo "❌ SwiftLint detected issues that need to be fixed."
         echo "🔧 How to fix:"
-        echo "   Shopify employee? Run 'dev fix' or './Scripts/lint fix'"
+        echo "   Shopify employee? Run 'dev fix' or 'dev lint --verbose' to see detailed output"
         echo "   Not a Shopify employee? Run './Scripts/lint fix' to auto-fix issues"
         echo "   Then fix any remaining non-autofixable issues manually"
         exit 1
@@ -73,7 +91,7 @@ if [[ "$MODE" == "check" ]]; then
     if [ $FORMAT_STATUS -ne 0 ]; then
         echo "❌ SwiftFormat detected issues that need to be fixed."
         echo "🔧 How to fix:"
-        echo "   Shopify employee? Run 'dev fix' or './Scripts/lint fix'"
+        echo "   Shopify employee? Run 'dev fix' or 'dev lint --verbose' to see detailed output"
         echo "   Not a Shopify employee? Run './Scripts/lint fix' to auto-fix issues"
         exit 1
     fi
