@@ -30,6 +30,7 @@ enum Screen: Int, CaseIterable {
     case catalog
     case products
     case cart
+    case chat
     case settings
 }
 
@@ -41,7 +42,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let cartController = UIHostingController(rootView: CartView())
     let productGridController = UIHostingController(rootView: ProductGridView())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
-    let settingsController = UIHostingController(rootView: SettingsView())
+    let chatController = UIHostingController(rootView: ChatView())
+    let settingsController = UIHostingController(rootView: AnyView(SettingsView().environmentObject(CartManager.shared)))
 
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -62,6 +64,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         /// Cart screen
         viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: cartController)
+
+        /// Chat screen
+        viewControllers[Screen.chat.rawValue] = UINavigationController(rootViewController: chatController)
 
         /// Settings screen
         viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
@@ -107,6 +112,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         cartController.tabBarItem.image = UIImage(systemName: "cart")
         cartController.tabBarItem.title = "Cart"
         cartController.navigationItem.title = "Cart"
+
+        /// Chat
+        chatController.tabBarItem.image = UIImage(systemName: "message.circle")
+        chatController.tabBarItem.title = "Chat"
+        chatController.navigationItem.title = "Chat Support"
 
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")

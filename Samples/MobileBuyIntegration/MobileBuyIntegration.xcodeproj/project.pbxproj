@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2147F3E42B502AA9005546F3 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2147F3E32B502AA9005546F3 /* ShopifyCheckoutSheetKit */; };
 		2147F3E62B502AFD005546F3 /* checkout-sheet-kit-swift in Resources */ = {isa = PBXBuildFile; fileRef = 2147F3E52B502AFD005546F3 /* checkout-sheet-kit-swift */; };
+		273247322E1BEC9000A9B14E /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273247312E1BEC9000A9B14E /* ChatView.swift */; };
 		4EA7F9B62A9D2B9D003276A1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7F9B42A9D2B9D003276A1 /* SettingsView.swift */; };
 		4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */; };
 		4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		2147F3E52B502AFD005546F3 /* checkout-sheet-kit-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "checkout-sheet-kit-swift"; path = ../..; sourceTree = "<group>"; };
+		273247312E1BEC9000A9B14E /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		4EA7F9B42A9D2B9D003276A1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileBuyIntegration.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 		CB05E6C72D4B81B200466376 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				273247312E1BEC9000A9B14E /* ChatView.swift */,
 				6A2E77BF2CE6186F0067062D /* CartView.swift */,
 				6A2E77BD2CE606400067062D /* ProductGridView.swift */,
 				6A3467322B600E64007314A8 /* LogsView.swift */,
@@ -354,6 +357,7 @@
 				CB05E6BD2D493B8F00466376 /* ApplePayHandler.swift in Sources */,
 				4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */,
 				CB05E6C12D4954A600466376 /* PaymentCodable.swift in Sources */,
+				273247322E1BEC9000A9B14E /* ChatView.swift in Sources */,
 				6A2E77C02CE618720067062D /* CartView.swift in Sources */,
 				6A3393652CEF9E8100E89FAA /* Theme.swift in Sources */,
 				6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */,

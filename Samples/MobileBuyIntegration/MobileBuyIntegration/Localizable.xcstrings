@@ -10,6 +10,9 @@
     "✓" : {
 
     },
+    "🛍️ Complete Your Purchase" : {
+
+    },
     "Add to Cart" : {
 
     },
@@ -25,7 +28,16 @@
     "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app." : {
 
     },
+    "Chat Support" : {
+
+    },
     "Checkout" : {
+
+    },
+    "Checkout Complete" : {
+
+    },
+    "Checkout Error" : {
 
     },
     "Checkout Sheet Kit version" : {
@@ -53,6 +65,9 @@
 
     },
     "Handle Product URLs" : {
+
+    },
+    "Loading checkout..." : {
 
     },
     "Loading products..." : {
@@ -109,6 +124,9 @@
     "Theme" : {
 
     },
+    "Type a message..." : {
+
+    },
     "Universal Links" : {
 
     },
@@ -116,6 +134,9 @@
 
     },
     "Web pixel events" : {
+
+    },
+    "You can complete your checkout right here:" : {
 
     },
     "Your cart is empty." : {
