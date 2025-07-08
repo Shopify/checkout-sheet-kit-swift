@@ -2,6 +2,10 @@ disabled_rules:
   - line_length
   - file_length
   - non_optional_string_data_conversion
+  - type_body_length
+  - type_name  
+  - identifier_name
+  - opening_brace
 
 opt_in_rules:
   - array_init

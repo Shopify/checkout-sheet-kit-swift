@@ -23,7 +23,7 @@ struct GraphQLDocument {
         )
 
         let fragmentDefinitions = sortedFragments
-            .map { $0.rawValue }
+            .map(\.rawValue)
             .joined(separator: "\n\n")
 
         return """
@@ -106,8 +106,9 @@ struct GraphQLDocument {
         }
 
         let definition = fragment.rawValue
-        if let match = regex.firstMatch(in: definition, options: [], range: NSRange(definition.startIndex..., in: definition)),
-           let range = Range(match.range(at: 1), in: definition)
+        if
+            let match = regex.firstMatch(in: definition, options: [], range: NSRange(definition.startIndex..., in: definition)),
+            let range = Range(match.range(at: 1), in: definition)
         {
             return String(definition[range])
         }
