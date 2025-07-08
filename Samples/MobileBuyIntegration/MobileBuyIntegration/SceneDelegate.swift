@@ -131,7 +131,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func subscribeToCartUpdates() {
         CartManager.shared.$cart
             .sink { cart in
-                if let cart = cart, cart.lines.nodes.count > 0 {
+                if let cart, cart.lines.nodes.count > 0 {
                     DispatchQueue.main.async {
                         self.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
                     }

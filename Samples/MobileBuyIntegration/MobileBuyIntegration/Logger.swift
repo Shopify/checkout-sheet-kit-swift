@@ -46,7 +46,7 @@ class FileLogger: Logger {
     }
 
     public func log(_ message: String) {
-        guard let fileHandle = fileHandle else {
+        guard let fileHandle else {
             print("File handle is nil")
             return
         }
