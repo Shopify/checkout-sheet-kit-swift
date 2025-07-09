@@ -93,15 +93,17 @@ struct Internal_ShopPayButton: View {
     }
 }
 
-#Preview {
-    if #available(iOS 17.0, *) {
+@available(iOS 17.0, *)
+struct ShopPayButton_Previews: PreviewProvider {
+    static var previews: some View {
         let mockCommonConfiguration = ShopifyAcceleratedCheckouts.Configuration(
             shopDomain: "test-shop.myshopify.com",
             storefrontAccessToken: "test-token"
         )
 
         ShopPayButton(
-            identifier: .variant(variantID: "gid://Shopify/ProductVariant/123", quantity: 1), eventHandlers: EventHandlers()
+            identifier: .variant(variantID: "gid://Shopify/ProductVariant/123", quantity: 1),
+            eventHandlers: EventHandlers()
         )
         .padding()
         .environment(mockCommonConfiguration)
