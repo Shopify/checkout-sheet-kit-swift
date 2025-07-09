@@ -1,9 +1,25 @@
-//
-//  AcceleratedCheckoutButtons.swift
-//  ShopifyAcceleratedCheckouts
-//
-//  Created by Kieran Barrie Osgood on 06/06/2025.
-//
+/*
+ MIT License
+
+ Copyright 2023 - Present, Shopify Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
@@ -79,10 +95,10 @@ public struct AcceleratedCheckoutButtons: View {
 
 // MARK: AcceleratedCheckoutButtons Modifiers
 
-public extension AcceleratedCheckoutButtons {
+extension AcceleratedCheckoutButtons {
     /// Modifies the wallet options supported
     /// Defaults: [.applepay]
-    func withWallets(_ wallets: [Wallet]) -> AcceleratedCheckoutButtons {
+    public func withWallets(_ wallets: [Wallet]) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.wallets = wallets
         return newView
@@ -102,7 +118,7 @@ public extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when checkout succeeds
     /// - Returns: A view with the checkout success handler set
-    func onComplete(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
+    public func onComplete(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.checkoutSuccessHandler = action
         return newView
@@ -122,7 +138,7 @@ public extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when checkout fails
     /// - Returns: A view with the checkout error handler set
-    func onFail(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
+    public func onFail(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.checkoutErrorHandler = action
         return newView
@@ -142,7 +158,7 @@ public extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when checkout is cancelled
     /// - Returns: A view with the checkout cancel handler set
-    func onCancel(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
+    public func onCancel(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.checkoutCancelHandler = action
         return newView
@@ -162,7 +178,7 @@ public extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to determine if recovery should be attempted
     /// - Returns: A view with the error recovery handler set
-    func onShouldRecoverFromError(_ action: @escaping (ShopifyCheckoutSheetKit.CheckoutError) -> Bool) -> AcceleratedCheckoutButtons {
+    public func onShouldRecoverFromError(_ action: @escaping (ShopifyCheckoutSheetKit.CheckoutError) -> Bool) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.shouldRecoverFromErrorHandler = action
         return newView
@@ -182,7 +198,7 @@ public extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when a link is clicked
     /// - Returns: A view with the link click handler set
-    func onClickLink(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
+    public func onClickLink(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.clickLinkHandler = action
         return newView
@@ -202,7 +218,7 @@ public extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when a pixel event is emitted
     /// - Returns: A view with the web pixel event handler set
-    func onWebPixelEvent(_ action: @escaping (ShopifyCheckoutSheetKit.PixelEvent) -> Void) -> AcceleratedCheckoutButtons {
+    public func onWebPixelEvent(_ action: @escaping (ShopifyCheckoutSheetKit.PixelEvent) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.webPixelEventHandler = action
         return newView
