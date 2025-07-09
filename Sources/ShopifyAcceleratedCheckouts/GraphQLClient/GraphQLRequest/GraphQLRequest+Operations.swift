@@ -28,6 +28,7 @@
 //  Created by Kieran Barrie Osgood on 27/06/2025.
 //
 
+@available(iOS 17.0, *)
 enum Operations {
     static func cartCreate(
         variables: [String: Any] = [:]

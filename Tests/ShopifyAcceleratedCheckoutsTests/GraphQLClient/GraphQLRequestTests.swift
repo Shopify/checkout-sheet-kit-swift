@@ -29,6 +29,7 @@
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
 
+@available(iOS 17.0, *)
 final class GraphQLRequestTests: XCTestCase {
     // MARK: - Test Response Types
 
