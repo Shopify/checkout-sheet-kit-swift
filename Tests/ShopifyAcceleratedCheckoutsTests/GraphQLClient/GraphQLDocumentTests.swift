@@ -30,7 +30,6 @@ import XCTest
 
 @testable import ShopifyAcceleratedCheckouts
 
-@available(iOS 17.0, *)
 final class GraphQLDocumentTests: XCTestCase {
     // MARK: - Fragment Detection Tests
 
