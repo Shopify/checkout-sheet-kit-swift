@@ -29,7 +29,6 @@
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
 
-@available(iOS 17.0, *)
 final class GraphQLClientTests: XCTestCase {
     // MARK: - Helper Methods
 

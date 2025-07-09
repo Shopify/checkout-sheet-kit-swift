@@ -29,7 +29,6 @@
 import Foundation
 
 /// A lightweight GraphQL client for the Storefront API without external dependencies
-@available(iOS 17.0, *)
 class GraphQLClient {
     private let url: URL
     private let headers: [String: String]

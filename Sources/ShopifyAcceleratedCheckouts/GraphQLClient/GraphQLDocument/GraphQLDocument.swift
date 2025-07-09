@@ -30,7 +30,6 @@ import Foundation
 
 /// Container around a GraphQL language string.
 /// Includes necessary fragments for the operation.
-@available(iOS 17.0, *)
 struct GraphQLDocument {
     static func build(operation: Queries) -> String { _build(operation.rawValue) }
     static func build(operation: Mutations) -> String { _build(operation.rawValue) }
