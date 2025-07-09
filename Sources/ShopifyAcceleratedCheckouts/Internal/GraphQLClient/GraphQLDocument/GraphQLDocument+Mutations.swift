@@ -119,7 +119,7 @@ extension GraphQLDocument {
           cartPrepareForCompletion(cartId: $cartId) {
             result {
               __typename
-                                          ... on CartStatusReady {
+              ... on CartStatusReady {
                 cart {
                   ...CartFragment
                 }
@@ -149,9 +149,9 @@ extension GraphQLDocument {
           cartSubmitForCompletion(cartId: $cartId, attemptToken: $attemptToken) {
             result {
               __typename
-                            ... on SubmitSuccess {
-                    redirectUrl
-                  }
+              ... on SubmitSuccess {
+                redirectUrl
+              }
               ... on SubmitFailed {
                 checkoutUrl
                 errors {
