@@ -123,16 +123,6 @@ enum Operations {
         )
     }
 
-    static func getProducts(
-        variables: [String: Any] = [:]
-    ) -> GraphQLRequest<StorefrontAPI.ProductsQueryResponse> {
-        return GraphQLRequest(
-            operation: .products,
-            responseType: StorefrontAPI.ProductsQueryResponse.self,
-            variables: variables
-        )
-    }
-
     static func getShop(
         variables: [String: Any] = [:]
     ) -> GraphQLRequest<StorefrontAPI.ShopQueryResponse> {

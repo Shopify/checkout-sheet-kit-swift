@@ -176,16 +176,6 @@ final class GraphQLRequestTests: XCTestCase {
         XCTAssertTrue(operation.query.contains("cart("))
     }
 
-    func testGetProductsOperation() {
-        // When
-        let operation = Operations.getProducts()
-
-        // Then
-        XCTAssertTrue(operation.responseType == StorefrontAPI.ProductsQueryResponse.self)
-        XCTAssertTrue(operation.query.contains("query GetProducts("))
-        XCTAssertTrue(operation.query.contains("products("))
-    }
-
     // MARK: - Type Safety Tests
 
     func testOperationTypeInference() {

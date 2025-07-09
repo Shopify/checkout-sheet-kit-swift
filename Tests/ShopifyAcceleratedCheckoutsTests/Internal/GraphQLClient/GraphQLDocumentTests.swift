@@ -74,30 +74,6 @@ final class GraphQLDocumentTests: XCTestCase {
         )
     }
 
-    func testHandlesOperationWithNoFragments() {
-        let document = GraphQLDocument.build(operation: .products)
-
-        // Should not include any fragments
-        XCTAssertFalse(
-            document.contains("fragment CartFragment"), "Document should not contain CartFragment"
-        )
-        XCTAssertFalse(
-            document.contains("fragment CartUserErrorFragment"),
-            "Document should not contain CartUserErrorFragment"
-        )
-        XCTAssertFalse(
-            document.contains("fragment CartDeliveryGroupFragment"),
-            "Document should not contain CartDeliveryGroupFragment"
-        )
-        XCTAssertFalse(
-            document.contains("fragment CartLineFragment"),
-            "Document should not contain CartLineFragment"
-        )
-
-        // Should still contain the operation
-        XCTAssertTrue(document.contains("query GetProducts"), "Document should contain the query")
-    }
-
     // MARK: - Mutation Tests
 
     func testMutationFragments() {
@@ -132,28 +108,6 @@ final class GraphQLDocumentTests: XCTestCase {
 
         let cartFragmentCount = document.components(separatedBy: "fragment CartFragment").count - 1
         XCTAssertEqual(cartFragmentCount, 1, "CartFragment should appear exactly once")
-    }
-
-    func testHandlesFragmentReferencesInComments() {
-        // If we had an operation with fragment references in comments, they should be ignored
-        let document = GraphQLDocument.build(operation: .products)
-
-        XCTAssertFalse(
-            document.contains("fragment CartFragment"), "Should not include fragments from comments"
-        )
-    }
-
-    func testHandlesFragmentReferencesInStrings() {
-        // Similar to comments, fragment references inside GraphQL strings should be ignored
-        // This ensures our regex doesn't match inside string literals
-        let document = GraphQLDocument.build(operation: .products)
-
-        // The products query doesn't use fragments, so none should be included
-        // even if fragment names appeared in string values
-        XCTAssertFalse(
-            document.contains("fragment CartFragment"),
-            "Should not include fragments from string literals"
-        )
     }
 
     func testHandlesAllMutationsCorrectly() {

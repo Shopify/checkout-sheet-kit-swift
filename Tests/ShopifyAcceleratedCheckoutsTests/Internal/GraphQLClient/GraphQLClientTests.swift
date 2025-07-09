@@ -163,11 +163,6 @@ final class GraphQLClientTests: XCTestCase {
         let cartOp = Operations.getCart()
         XCTAssertTrue(cartOp.responseType == StorefrontAPI.CartQueryResponse.self)
         XCTAssertFalse(cartOp.query.isEmpty)
-
-        // Test products query
-        let productsOp = Operations.getProducts()
-        XCTAssertTrue(productsOp.responseType == StorefrontAPI.ProductsQueryResponse.self)
-        XCTAssertFalse(productsOp.query.isEmpty)
     }
 
     func testPreDefinedMutationOperations() {
@@ -205,10 +200,6 @@ final class GraphQLClientTests: XCTestCase {
         let cartQuery = GraphQLDocument.build(operation: .cart)
         XCTAssertTrue(cartQuery.contains("query GetCart"))
         XCTAssertTrue(cartQuery.contains("cart(id: $id)"))
-
-        let productsQuery = GraphQLDocument.build(operation: .products)
-        XCTAssertTrue(productsQuery.contains("query GetProducts"))
-        XCTAssertTrue(productsQuery.contains("products(first: $first)"))
     }
 
     func testGraphQLDocumentMutations() {

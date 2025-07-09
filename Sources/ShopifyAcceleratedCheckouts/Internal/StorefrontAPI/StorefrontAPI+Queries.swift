@@ -42,21 +42,6 @@ extension StorefrontAPI {
         return response.data?.cart
     }
 
-    /// Get products
-    /// - Parameter first: Number of products to fetch
-    /// - Returns: Array of products
-    func products(first limit: Int = 10) async throws -> [Product] {
-        let variables: [String: Any] = [
-            "first": limit
-        ]
-
-        let response = try await client.query(
-            Operations.getProducts(variables: variables)
-        )
-
-        return response.data?.products.nodes ?? []
-    }
-
     /// Get shop information
     /// - Returns: Shop details
     func shop() async throws -> Shop {

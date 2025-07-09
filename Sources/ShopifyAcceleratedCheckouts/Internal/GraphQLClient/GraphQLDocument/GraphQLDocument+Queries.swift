@@ -31,28 +31,6 @@ extension GraphQLDocument {
         }
         """
 
-        case products = """
-        query GetProducts($first: Int = 10) {
-          products(first: $first) {
-            nodes {
-              id
-              title
-              variants(first: 10) {
-                nodes {
-                  id
-                  title
-                  requiresShipping
-                  price {
-                    amount
-                    currencyCode
-                  }
-                }
-              }
-            }
-          }
-        }
-        """
-
         case shop = """
         query GetShop {
           shop {
