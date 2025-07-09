@@ -32,7 +32,7 @@ struct ShopPayButton: View {
     let identifier: CheckoutIdentifier
     let eventHandlers: EventHandlers
 
-    public init(
+    init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers()
     ) {
