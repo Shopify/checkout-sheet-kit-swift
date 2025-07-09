@@ -478,53 +478,34 @@ extension StorefrontAPI {
 
     // MARK: - Mutation Payloads
 
-    /// Cart create payload
-    struct CartCreatePayload: Codable {
+    struct CartPayload: Codable {
         let cart: Cart?
         let userErrors: [CartUserError]
     }
+    
+    /// Cart create payload
+    typealias CartCreatePayload = CartPayload
 
     /// Cart buyer identity update payload
-    struct CartBuyerIdentityUpdatePayload: Codable {
-        let cart: Cart?
-        let userErrors: [CartUserError]
-    }
+    typealias CartBuyerIdentityUpdatePayload = CartPayload
 
     /// Cart delivery addresses add payload
-    struct CartDeliveryAddressesAddPayload: Codable {
-        let cart: Cart?
-        let userErrors: [CartUserError]
-    }
+    typealias CartDeliveryAddressesAddPayload = CartPayload
 
     /// Cart delivery addresses update payload
-    struct CartDeliveryAddressesUpdatePayload: Codable {
-        let cart: Cart?
-        let userErrors: [CartUserError]
-    }
+    typealias CartDeliveryAddressesUpdatePayload = CartPayload
 
     /// Cart selected delivery options update payload
-    struct CartSelectedDeliveryOptionsUpdatePayload: Codable {
-        let cart: Cart?
-        let userErrors: [CartUserError]
-    }
+    typealias CartSelectedDeliveryOptionsUpdatePayload = CartPayload
 
     /// Cart payment update payload
-    struct CartPaymentUpdatePayload: Codable {
-        let cart: Cart?
-        let userErrors: [CartUserError]
-    }
+    typealias CartPaymentUpdatePayload = CartPayload
 
     /// Cart remove personal data payload
-    struct CartRemovePersonalDataPayload: Codable {
-        let cart: Cart?
-        let userErrors: [CartUserError]
-    }
+    typealias CartRemovePersonalDataPayload = CartPayload
 
     /// Cart prepare for completion payload
-    struct CartPrepareForCompletionPayload: Codable {
-        let result: CartPrepareForCompletionResult?
-        let userErrors: [CartUserError]
-    }
+    typealias CartPrepareForCompletionPayload = CartPayload
 
     /// Cart prepare for completion result (union type)
     enum CartPrepareForCompletionResult: Codable {
