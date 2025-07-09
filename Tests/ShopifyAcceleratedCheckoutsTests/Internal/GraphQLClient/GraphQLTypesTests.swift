@@ -27,19 +27,16 @@ final class GraphQLTypesTests: XCTestCase {
     // MARK: - GraphQLRequest Encoding Tests
 
     func testGraphQLRequestEncodingWithVariables() throws {
-        // Given
         let operation = GraphQLRequest(
             query: "query GetUser($id: ID!) { user(id: $id) { name } }",
             responseType: String.self,
             variables: ["id": "123", "active": true]
         )
 
-        // When
         let encoder = JSONEncoder()
         let data = try encoder.encode(operation)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
 
-        // Then
         XCTAssertEqual(json?["query"] as? String, operation.query)
         XCTAssertNotNil(json?["variables"])
 
@@ -49,25 +46,21 @@ final class GraphQLTypesTests: XCTestCase {
     }
 
     func testGraphQLRequestEncodingWithoutVariables() throws {
-        // Given
         let operation = GraphQLRequest(
             query: "query { users { name } }",
             responseType: String.self,
             variables: [:]
         )
 
-        // When
         let encoder = JSONEncoder()
         let data = try encoder.encode(operation)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
 
-        // Then
         XCTAssertEqual(json?["query"] as? String, operation.query)
         XCTAssertNil(json?["variables"])
     }
 
     func testGraphQLRequestEncodingWithComplexVariables() throws {
-        // Given
         let operation = GraphQLRequest(
             query: "mutation CreateUser($input: UserInput!) { createUser(input: $input) { id } }",
             responseType: String.self,
@@ -84,12 +77,10 @@ final class GraphQLTypesTests: XCTestCase {
             ]
         )
 
-        // When
         let encoder = JSONEncoder()
         let data = try encoder.encode(operation)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
 
-        // Then
         XCTAssertNotNil(json?["variables"])
         let variables = json?["variables"] as? [String: Any]
         let input = variables?["input"] as? [String: Any]
@@ -105,7 +96,6 @@ final class GraphQLTypesTests: XCTestCase {
     // MARK: - GraphQLResponse Tests
 
     func testGraphQLResponseDecodingWithData() throws {
-        // Given
         struct User: Decodable {
             let id: String
             let name: String
@@ -126,11 +116,9 @@ final class GraphQLTypesTests: XCTestCase {
         }
         """
 
-        // When
         let data = json.data(using: .utf8)!
         let response = try JSONDecoder().decode(GraphQLResponse<UserResponse>.self, from: data)
 
-        // Then
         XCTAssertNotNil(response.data)
         XCTAssertEqual(response.data?.user.id, "123")
         XCTAssertEqual(response.data?.user.name, "John Doe")
@@ -139,7 +127,6 @@ final class GraphQLTypesTests: XCTestCase {
     }
 
     func testGraphQLResponseDecodingWithErrors() throws {
-        // Given
         struct EmptyResponse: Decodable {}
 
         let json = """
@@ -159,11 +146,9 @@ final class GraphQLTypesTests: XCTestCase {
         }
         """
 
-        // When
         let data = json.data(using: .utf8)!
         let response = try JSONDecoder().decode(GraphQLResponse<EmptyResponse>.self, from: data)
 
-        // Then
         XCTAssertNil(response.data)
         XCTAssertNotNil(response.errors)
         XCTAssertTrue(response.hasErrors)
@@ -179,7 +164,6 @@ final class GraphQLTypesTests: XCTestCase {
     }
 
     func testGraphQLResponseDecodingWithExtensions() throws {
-        // Given
         struct EmptyResponse: Decodable {}
 
         let json = """
@@ -195,11 +179,9 @@ final class GraphQLTypesTests: XCTestCase {
         }
         """
 
-        // When
         let data = json.data(using: .utf8)!
         let response = try JSONDecoder().decode(GraphQLResponse<EmptyResponse>.self, from: data)
 
-        // Then
         XCTAssertNotNil(response.extensions)
         XCTAssertEqual(response.extensions?["requestId"]?.value as? String, "abc123")
         XCTAssertEqual(response.extensions?["cost"]?.value as? Int, 42)
@@ -240,14 +222,12 @@ final class GraphQLTypesTests: XCTestCase {
     }
 
     func testGraphQLErrorWithMultipleErrors() {
-        // Given
         let errors = [
             GraphQLResponseError(message: "Error 1", path: nil, locations: nil, extensions: nil),
             GraphQLResponseError(message: "Error 2", path: nil, locations: nil, extensions: nil)
         ]
         let graphQLError = GraphQLError.graphQLErrors(errors)
 
-        // Then
         XCTAssertEqual(graphQLError.errorDescription, "GraphQL errors: Error 1, Error 2")
     }
 
@@ -344,7 +324,6 @@ final class GraphQLTypesTests: XCTestCase {
     }
 
     func testAnyCodableWithNestedStructures() throws {
-        // Given
         let nested: [String: Any] = [
             "user": [
                 "id": 123,
@@ -357,11 +336,9 @@ final class GraphQLTypesTests: XCTestCase {
             ]
         ]
 
-        // When
         let encoded = try JSONEncoder().encode(AnyCodable(nested))
         let decoded = try JSONDecoder().decode(AnyCodable.self, from: encoded)
 
-        // Then
         let result = decoded.value as? [String: Any]
         let user = result?["user"] as? [String: Any]
         XCTAssertEqual(user?["id"] as? Int, 123)

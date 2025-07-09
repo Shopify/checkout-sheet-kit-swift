@@ -172,7 +172,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Cart Create Tests
 
     func testCartCreateSuccessWithItems() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -223,17 +222,14 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let cart = try await storefrontAPI.cartCreate(with: [GraphQLScalars.ID("gid://shopify/ProductVariant/1")])
 
-        // Then
         XCTAssertEqual(cart.id.rawValue, "gid://shopify/Cart/created-123")
         XCTAssertEqual(cart.totalQuantity, 2)
         XCTAssertEqual(cart.lines.nodes.count, 1)
     }
 
     func testCartCreateSuccessEmptyCart() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -261,17 +257,14 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let cart = try await storefrontAPI.cartCreate()
 
-        // Then
         XCTAssertEqual(cart.id.rawValue, "gid://shopify/Cart/empty-123")
         XCTAssertEqual(cart.totalQuantity, 0)
         XCTAssertTrue(cart.lines.nodes.isEmpty)
     }
 
     func testCartCreateWithUserErrors() async {
-        // Given
         let json = """
         {
             "data": {
@@ -288,7 +281,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         await XCTAssertThrowsGraphQLError(
             try await storefrontAPI
                 .cartCreate(with: [GraphQLScalars.ID("gid://shopify/ProductVariant/1")]),
@@ -298,7 +290,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testCartCreateRequestValidation() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -326,14 +317,12 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let variantIds = [
             GraphQLScalars.ID("gid://shopify/ProductVariant/1"),
             GraphQLScalars.ID("gid://shopify/ProductVariant/2")
         ]
         _ = try await storefrontAPI.cartCreate(with: variantIds)
 
-        // Then
         XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
 
         guard let body = MockURLProtocol.capturedRequestBody else {
@@ -354,7 +343,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Buyer Identity Update Tests
 
     func testCartBuyerIdentityUpdateSuccess() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -384,18 +372,15 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let cart = try await storefrontAPI.cartBuyerIdentityUpdate(
             id: GraphQLScalars.ID("gid://shopify/Cart/123"),
             email: "test@example.com"
         )
 
-        // Then
         XCTAssertEqual(cart.buyerIdentity?.email, "test@example.com")
     }
 
     func testCartBuyerIdentityUpdateInvalidEmail() async {
-        // Given
         let json = """
         {
             "data": {
@@ -412,7 +397,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         await XCTAssertThrowsGraphQLError(
             try await storefrontAPI.cartBuyerIdentityUpdate(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
@@ -426,7 +410,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Delivery Address Add Tests
 
     func testCartDeliveryAddressesAddSuccess() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -480,7 +463,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let address = StorefrontAPI.Address(
             address1: "123 Test St",
             city: "Test City",
@@ -494,14 +476,12 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             address: address
         )
 
-        // Then
         XCTAssertNotNil(cart.delivery)
         XCTAssertEqual(cart.delivery?.addresses.first?.address?.address1, "123 Test St")
         XCTAssertEqual(cart.deliveryGroups.nodes.first?.deliveryOptions.count, 1)
     }
 
     func testCartDeliveryAddressesAddValidationError() async {
-        // Given
         let json = """
         {
             "data": {
@@ -518,7 +498,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let address = StorefrontAPI.Address(
             address1: "123 Test St",
             city: "Test City",
@@ -527,7 +506,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             zip: "INVALID"
         )
 
-        // Then
         do {
             _ = try await storefrontAPI.cartDeliveryAddressesAdd(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
@@ -542,7 +520,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
                 "Unexpected error type: \(type(of: error))"
             )
 
-            // When cart is null, validateCart throws invalidResponse
             guard case .invalidResponse = error as? GraphQLError else {
                 XCTFail("Expected GraphQLError.invalidResponse but got: \(error)")
                 return
@@ -551,13 +528,11 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testCartDeliveryAddressesAddRequestValidation() async throws {
-        // Given
         let json = """
         {"data": {"cartDeliveryAddressesAdd": {"cart": null, "userErrors": []}}}
         """
         mockJSONResponse(json)
 
-        // When
         let address = StorefrontAPI.Address(
             address1: "123 Test St",
             address2: "Apt 4B",
@@ -584,14 +559,12 @@ final class StorefrontAPIMutationsTests: XCTestCase {
                 "Unexpected error type: \(type(of: error))"
             )
 
-            // When cart is null, validateCart throws invalidResponse
             guard case .invalidResponse = error as? GraphQLError else {
                 XCTFail("Expected GraphQLError.invalidResponse but got: \(error)")
                 return
             }
         }
 
-        // Then
         XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
 
         guard let body = MockURLProtocol.capturedRequestBody else {
@@ -618,7 +591,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Selected Delivery Options Update Tests
 
     func testCartSelectedDeliveryOptionsUpdateSuccess() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -667,14 +639,12 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let cart = try await storefrontAPI.cartSelectedDeliveryOptionsUpdate(
             id: GraphQLScalars.ID("gid://shopify/Cart/123"),
             deliveryGroupId: GraphQLScalars.ID("gid://shopify/CartDeliveryGroup/1"),
             deliveryOptionHandle: "express"
         )
 
-        // Then
         XCTAssertEqual(cart.deliveryGroups.nodes.first?.selectedDeliveryOption?.handle, "express")
         XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "34.99")!)
     }
@@ -682,7 +652,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Cart Payment Update Tests
 
     func testCartPaymentUpdateSuccess() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -710,7 +679,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let applePayPayment = StorefrontAPI.ApplePayPayment(
             billingAddress: StorefrontAPI.Address(
                 address1: "123 Billing St",
@@ -738,19 +706,16 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             applePayPayment: applePayPayment
         )
 
-        // Then
         XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "34.99")!)
         XCTAssertNotNil(cart.cost.totalTaxAmount)
     }
 
     func testCartPaymentUpdateRequestValidation() async throws {
-        // Given
         let json = """
         {"data": {"cartPaymentUpdate": {"cart": null, "userErrors": []}}}
         """
         mockJSONResponse(json)
 
-        // When
         let applePayPayment = StorefrontAPI.ApplePayPayment(
             billingAddress: StorefrontAPI.Address(
                 address1: "456 Test Ave",
@@ -794,7 +759,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             }
         }
 
-        // Then
         XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
 
         guard let body = MockURLProtocol.capturedRequestBody else {
@@ -822,7 +786,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Cart Remove Personal Data Tests
 
     func testCartRemovePersonalDataSuccess() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -850,17 +813,14 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         try await storefrontAPI.cartRemovePersonalData(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
 
-        // Then - Should not throw
         XCTAssertTrue(true)
     }
 
     // MARK: - Cart Prepare For Completion Tests
 
     func testCartPrepareForCompletionReady() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -892,10 +852,8 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let result = try await storefrontAPI.cartPrepareForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
 
-        // Then
         XCTAssertNotNil(result.cart)
         XCTAssertEqual(result.cart?.id.rawValue, "gid://shopify/Cart/123")
         XCTAssertEqual(result.cart?.buyerIdentity?.email, "test@example.com")
@@ -903,7 +861,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testCartPrepareForCompletionNotReady() async {
-        // Given
         let json = """
         {
             "data": {
@@ -929,7 +886,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartPrepareForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
             XCTFail("Expected error to be thrown")
@@ -954,7 +910,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testCartPrepareForCompletionThrottled() async {
-        // Given
         let json = """
         {
             "data": {
@@ -970,7 +925,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartPrepareForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
             XCTFail("Expected error to be thrown")
@@ -994,7 +948,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Cart Submit For Completion Tests
 
     func testCartSubmitForCompletionSuccess() async throws {
-        // Given
         let json = """
         {
             "data": {
@@ -1010,15 +963,12 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When
         let result = try await storefrontAPI.cartSubmitForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
 
-        // Then
         XCTAssertEqual(result.redirectUrl.url.absoluteString, "https://test.myshopify.com/checkout/success/12345")
     }
 
     func testCartSubmitForCompletionFailed() async {
-        // Given
         let json = """
         {
             "data": {
@@ -1040,7 +990,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartSubmitForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
             XCTFail("Expected error to be thrown")
@@ -1064,7 +1013,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testCartSubmitForCompletionAlreadyAccepted() async {
-        // Given
         let json = """
         {
             "data": {
@@ -1080,7 +1028,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartSubmitForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
             XCTFail("Expected error to be thrown")
@@ -1102,7 +1049,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testCartSubmitForCompletionThrottled() async {
-        // Given
         let json = """
         {
             "data": {
@@ -1118,7 +1064,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartSubmitForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
             XCTFail("Expected error to be thrown")
@@ -1140,13 +1085,11 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testCartSubmitForCompletionRequestValidation() async throws {
-        // Given
         let json = """
         {"data": {"cartSubmitForCompletion": {"result": null, "userErrors": []}}}
         """
         mockJSONResponse(json)
 
-        // When
         do {
             _ = try await storefrontAPI.cartSubmitForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/789"))
             XCTFail("Expected error to be thrown")
@@ -1163,7 +1106,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             }
         }
 
-        // Then
         XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
 
         guard let body = MockURLProtocol.capturedRequestBody else {
@@ -1186,10 +1128,8 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     // MARK: - Error Handling Tests
 
     func testMutationWithNetworkError() async {
-        // Given
         mockErrorResponse(URLError(.notConnectedToInternet))
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartCreate()
             XCTFail("Expected error to be thrown")
@@ -1202,7 +1142,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testMutationWithGraphQLErrors() async {
-        // Given
         let json = """
         {
             "data": null,
@@ -1217,7 +1156,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartCreate()
             XCTFail("Expected error to be thrown")
@@ -1238,7 +1176,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testMutationWithMalformedResponse() async {
-        // Given
         let json = """
         {
             "data": {
@@ -1253,7 +1190,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartCreate()
             XCTFail("Expected error to be thrown")
@@ -1269,7 +1205,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testUserErrorWithCheckoutURLThrowsCartUserError() async {
-        // Given
         let json = """
         {
             "data": {
@@ -1301,7 +1236,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartCreate()
             XCTFail("Expected error to be thrown")
@@ -1316,7 +1250,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
     }
 
     func testUserErrorWithoutCheckoutURLThrowsCartUserError() async {
-        // Given
         let json = """
         {
             "data": {
@@ -1348,7 +1281,6 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        // When/Then
         do {
             _ = try await storefrontAPI.cartBuyerIdentityUpdate(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),

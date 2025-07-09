@@ -482,7 +482,7 @@ extension StorefrontAPI {
         let cart: Cart?
         let userErrors: [CartUserError]
     }
-    
+
     /// Cart create payload
     typealias CartCreatePayload = CartPayload
 
