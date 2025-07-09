@@ -36,7 +36,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         line: UInt = #line
     ) async {
         do {
-            let _ = try await expression()
+            _ = try await expression()
             XCTFail(message(), file: file, line: line)
         } catch {
             errorHandler(error)
@@ -52,7 +52,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         line: UInt = #line
     ) async {
         do {
-            let _ = try await expression()
+            _ = try await expression()
             XCTFail(errorDescription, file: file, line: line)
         } catch {
             guard let graphQLError = error as? GraphQLError else {

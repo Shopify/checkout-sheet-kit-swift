@@ -54,11 +54,11 @@ fi
 
 if [[ "$MODE" == "check" ]]; then
     echo "🔄 Running SwiftLint in check mode..."
-    swiftlint lint --strict $QUIET_FLAG Samples Sources/ShopifyAcceleratedCheckouts
+    swiftlint lint --strict $QUIET_FLAG .
     LINT_STATUS=$?
 else
     echo "🔄 Running SwiftLint in fix mode..."
-    swiftlint lint --fix $QUIET_FLAG Samples Sources/ShopifyAcceleratedCheckouts
+    swiftlint lint --fix $QUIET_FLAG .
     LINT_STATUS=$?
 fi
 echo "SwiftLint exit status: $LINT_STATUS"
