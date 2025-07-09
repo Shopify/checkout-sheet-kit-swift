@@ -226,7 +226,7 @@ class TaskTests: XCTestCase {
     }
 
     func testExponentialDelayRespectsCap() {
-        let baseDelay: TimeInterval = 10.0  // 10 seconds
+        let baseDelay: TimeInterval = 10.0 // 10 seconds
 
         // At attempt 3: 10 * 2^3 = 80s, should be capped at 30s
         let delay = exponentialDelay(for: 3, with: baseDelay)
