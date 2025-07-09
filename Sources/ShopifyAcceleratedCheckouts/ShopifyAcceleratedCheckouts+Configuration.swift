@@ -59,9 +59,11 @@ extension ShopifyAcceleratedCheckouts {
 
     @Observable public class Customer {
         public var email: String?
+        public var phoneNumber: String?
 
-        public init(email: String?) {
+        public init(email: String?, phoneNumber: String?) {
             self.email = email
+            self.phoneNumber = phoneNumber
         }
     }
 }
