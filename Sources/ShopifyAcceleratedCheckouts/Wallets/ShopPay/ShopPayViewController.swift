@@ -33,8 +33,8 @@ import SwiftUI
     var eventHandlers: EventHandlers
 
     init(
-        identifier: CheckoutIdentifier, 
-        configuration: ShopifyAcceleratedCheckouts.Configuration, 
+        identifier: CheckoutIdentifier,
+        configuration: ShopifyAcceleratedCheckouts.Configuration,
         eventHandlers: EventHandlers = EventHandlers()
     ) {
         self.configuration = configuration

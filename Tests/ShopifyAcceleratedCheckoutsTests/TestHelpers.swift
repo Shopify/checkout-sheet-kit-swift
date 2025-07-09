@@ -52,11 +52,11 @@ extension ShopifyAcceleratedCheckouts.Configuration {
 @available(iOS 17.0, *)
 extension ShopifyAcceleratedCheckouts.Customer {
     static var testCustomer: ShopifyAcceleratedCheckouts.Customer {
-        return ShopifyAcceleratedCheckouts.Customer(email: "test@shopify.com")
+        return ShopifyAcceleratedCheckouts.Customer(email: "test@shopify.com", phoneNumber: "+447777777777")
     }
 
     static func testCustomer(email: String? = "test@shopify.com") -> ShopifyAcceleratedCheckouts.Customer {
-        return ShopifyAcceleratedCheckouts.Customer(email: email)
+        return ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: "+447777777777")
     }
 }
 
