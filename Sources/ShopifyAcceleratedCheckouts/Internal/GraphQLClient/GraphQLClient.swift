@@ -61,9 +61,7 @@ class GraphQLClient {
     func mutate<T: Decodable>(_ operation: GraphQLRequest<T>) async throws -> GraphQLResponse<T> {
         return try await execute(operation: operation)
     }
-}
 
-extension GraphQLClient {
     /// Execute a raw GraphQL request
     private func execute<T: Decodable>(
         operation: GraphQLRequest<T>
