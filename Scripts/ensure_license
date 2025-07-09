@@ -6,6 +6,9 @@ require 'find'
 license_text = "/*\n" + File.read('LICENSE') + "*/\n"
 normalized_license = license_text.gsub(/\s+/, ' ').strip
 
+# Array to collect files with incorrect licenses
+incorrectly_formatted_files = []
+
 Find.find('.') do |path|
   # Skip build and dependency directories
   if File.directory?(path) && ['.build', '.swiftpm', 'DerivedData', '.git'].include?(File.basename(path))
@@ -26,9 +29,18 @@ Find.find('.') do |path|
 
   # Check if the existing license matches the normalized expected license
   if existing_license != normalized_license
-    puts "License missing or incorrect in file: #{path}"
-    exit 1
+    incorrectly_formatted_files << path
   else
     puts "✔️ #{path}"
   end
+end
+
+# Exit with appropriate code based on results
+if incorrectly_formatted_files.length > 0
+  puts "\n❌ Found #{incorrectly_formatted_files.length} file(s) with incorrect licenses:"
+  incorrectly_formatted_files.each { |file| puts "  - #{file}" }
+  exit 1
+else
+  puts "\nAll files have correct licenses! ✅"
+  exit 0
 end
