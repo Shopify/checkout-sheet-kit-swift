@@ -1,7 +1,7 @@
-
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
 
+@available(iOS 17.0, *)
 class ShopSettingsTests: XCTestCase {
     override func setUp() {
         super.setUp()
