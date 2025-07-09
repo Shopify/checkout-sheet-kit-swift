@@ -21,13 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  GraphQLDocument+Mutations.swift
-//  ShopifyAcceleratedCheckouts
-//
-//  Created by Kieran Barrie Osgood on 24/06/2025.
-//
-
 extension GraphQLDocument {
     enum Mutations: String, CaseIterable {
         case cartCreate = """

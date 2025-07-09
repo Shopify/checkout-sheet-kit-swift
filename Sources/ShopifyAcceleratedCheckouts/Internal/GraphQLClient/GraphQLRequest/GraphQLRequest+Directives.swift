@@ -21,13 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  GraphQLRequest+Directives.swift
-//  ShopifyAcceleratedCheckouts
-//
-//  Created by Kieran Barrie Osgood on 27/06/2025.
-//
-
 import Foundation
 
 /// The country and language context for the API requests

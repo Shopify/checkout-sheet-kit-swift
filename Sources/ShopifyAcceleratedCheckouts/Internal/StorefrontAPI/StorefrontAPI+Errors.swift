@@ -21,13 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  StorefrontAPI+Errors.swift
-//  ShopifyAcceleratedCheckouts
-//
-//  Created by Kieran Barrie Osgood on 08/07/2025.
-//
-
 import Foundation
 
 @available(iOS 17.0, *)

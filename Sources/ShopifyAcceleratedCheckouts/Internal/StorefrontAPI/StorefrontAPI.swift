@@ -21,11 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  StorefrontAPI.swift
-//  ShopifyAcceleratedCheckouts
-//
-
 import Foundation
 
 /// High-level API for Storefront operations using the custom GraphQL client

@@ -21,11 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  GraphQLScalars.swift
-//  ShopifyAcceleratedCheckouts
-//
-
 import Foundation
 
 /// Custom scalar types for the Storefront API

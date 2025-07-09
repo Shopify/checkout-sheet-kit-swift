@@ -21,13 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  GraphQLResponse.swift
-//  ShopifyAcceleratedCheckouts
-//
-//  Created by Kieran Barrie Osgood on 27/06/2025.
-//
-
 /// GraphQL response structure
 struct GraphQLResponse<T: Decodable>: Decodable {
     let data: T?

@@ -21,11 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  GraphQLDocument+Queries.swift
-//  ShopifyAcceleratedCheckouts
-//
-
 extension GraphQLDocument {
     enum Queries: String {
         case cart = """

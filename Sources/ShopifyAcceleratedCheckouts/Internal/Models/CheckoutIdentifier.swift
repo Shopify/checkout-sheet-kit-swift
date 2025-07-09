@@ -21,13 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//
-//  CheckoutIdentifier.swift
-//  ShopifyAcceleratedCheckouts
-//
-//  Created by Kieran Barrie Osgood on 04/06/2025.
-//
-
 // MARK: Identifier helpers
 
 /// Type of identifier used for checkout
