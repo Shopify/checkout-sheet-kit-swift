@@ -505,7 +505,10 @@ extension StorefrontAPI {
     typealias CartRemovePersonalDataPayload = CartPayload
 
     /// Cart prepare for completion payload
-    typealias CartPrepareForCompletionPayload = CartPayload
+    struct CartPrepareForCompletionPayload: Codable {
+        let result: CartPrepareForCompletionResult?
+        let userErrors: [CartUserError]
+    }
 
     /// Cart prepare for completion result (union type)
     enum CartPrepareForCompletionResult: Codable {
