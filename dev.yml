@@ -24,7 +24,6 @@ up:
         ([ -f "./samples/MobileBuyIntegration/MobileBuyIntegration/MobileBuyIntegration.entitlements" ] || exit 1;)
       meet: ./scripts/setup_entitlements
 
-
 check:
   lint: /opt/dev/bin/dev lint
 
@@ -51,8 +50,7 @@ commands:
       packages:
         desc: Test the Packages
         run: |
-          ./scripts/xcode_run test ShopifyCheckoutSheetKitTests
-          ./scripts/xcode_run test ShopifyAcceleratedCheckoutsTests
+          ./scripts/xcode_run test ShopifyCheckoutSheetKit-Package
       samples:
         desc: Test the Samples
         run: ./scripts/test_samples

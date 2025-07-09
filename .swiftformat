@@ -6,6 +6,6 @@
 --allman false
 --semicolons inline
 --trimwhitespace always
---disable redundantReturn
+--disable redundantReturn,hoistAwait,preferKeyPath
 --swiftversion 5.7.1
 --extensionacl on-declarations
