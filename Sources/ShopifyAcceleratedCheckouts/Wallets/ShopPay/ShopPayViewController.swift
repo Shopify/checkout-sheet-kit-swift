@@ -109,29 +109,29 @@ import SwiftUI
 extension ShopPayViewController: CheckoutDelegate {
     func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
         checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutSuccessHandler?()
+        eventHandlers.checkoutDidComplete?()
     }
 
     func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
         checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutErrorHandler?()
+        eventHandlers.checkoutDidFail?()
     }
 
     func checkoutDidCancel() {
         /// x right button on CSK doesn't dismiss automatically
         checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutCancelHandler?()
+        eventHandlers.checkoutDidCancel?()
     }
 
     func checkoutShouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
-        return eventHandlers.shouldRecoverFromErrorHandler?(error) ?? false
+        return eventHandlers.shouldRecoverFromError?(error) ?? false
     }
 
     func checkoutDidClickLink(url: URL) {
-        eventHandlers.clickLinkHandler?(url)
+        eventHandlers.checkoutDidClickLink?(url)
     }
 
     func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        eventHandlers.webPixelEventHandler?(event)
+        eventHandlers.checkoutDidEmitWebPixelEvent?(event)
     }
 }
