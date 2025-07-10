@@ -30,7 +30,7 @@ import Foundation
 
     /// Initialize the Storefront API
     /// - Parameters:
-    ///   - shopDomain: The shop domain (e.g., "example.myshopify.com")
+    ///   - storefrontDomain: The shop domain (e.g., "example.myshopify.com")
     ///   - storefrontAccessToken: The storefront access token
     ///   - apiVersion: The API version to use (defaults to "2025-07")
     ///   - countryCode: Optional country code for localization
