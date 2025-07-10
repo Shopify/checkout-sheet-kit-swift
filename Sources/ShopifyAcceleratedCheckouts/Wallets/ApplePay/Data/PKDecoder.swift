@@ -43,7 +43,7 @@ class PKDecoder {
     // https:github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/create-payment-request.ts
     public func createPaymentRequest() throws -> PKPaymentRequest {
         guard let cart = cart() else {
-            throw ShopifyAcceleratedCheckouts.Error.invariant(message: .nilCart)
+            throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
         }
         let paymentRequest = PKPaymentRequest()
         let currencyCode = cart.cost.totalAmount.currencyCode
@@ -140,7 +140,6 @@ class PKDecoder {
     /// Required contact fields for all transactions.
     /// - Used for billing address in all cases
     /// - Also used for shipping address when `isShippingRequired() == true`
-    ///
     static let requiredAddressFields: Set<PKContactField> = [
         .name,
         .postalAddress
@@ -165,10 +164,10 @@ class PKDecoder {
     /// https://github.com/Shopify/portable-wallets/blob/85f2f8ec83d801d2b93e405aa71237fb7316c838/src/components/AcceleratedCheckout/AcceleratedCheckout.ts#L450
     func isShippingRequired() throws -> Bool {
         guard let cart = cart() else {
-            throw ShopifyAcceleratedCheckouts.Error.invariant(message: .nilCart)
+            throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
         }
 
-        /// Check if any line item's merchandise requires shipping
+        // Check if any line item's merchandise requires shipping
         for line in cart.lines.nodes {
             if let variant = line.merchandise, variant.requiresShipping {
                 return true

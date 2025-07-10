@@ -1,6 +1,30 @@
+/*
+ MIT License
+
+ Copyright 2023 - Present, Shopify Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
 
+@available(iOS 17.0, *)
 class ErrorHandlerTests: XCTestCase {
     func testUseEmirate_whenShippingCountryIsAE_returnsTrue() {
         let shippingCountry = "AE"
@@ -142,8 +166,9 @@ class ErrorHandlerTests: XCTestCase {
     }
 
     func testMap_whenApiErrorIsCurrencyChanged_returnsInterruptWithCurrencyChangedReason() {
-        let error = Api.Error.currencyChanged
-        let result = ErrorHandler.map(error: error, shippingCountry: "US")
+        let error = StorefrontAPI.Errors.currencyChanged
+        let cart = createCartMock(shippingCountry: "US")
+        let result = ErrorHandler.map(error: error, cart: cart)
 
         switch result {
         case let .interrupt(reason, checkoutURL):
@@ -152,6 +177,48 @@ class ErrorHandlerTests: XCTestCase {
         default:
             XCTFail("Expected interrupt action with currencyChanged reason")
         }
+    }
+
+    // MARK: - Test Helpers
+
+    private func createCartMock(shippingCountry: String?) -> StorefrontAPI.Cart {
+        let address = StorefrontAPI.CartDeliveryAddress(
+            address1: nil,
+            address2: nil,
+            city: nil,
+            countryCode: shippingCountry,
+            firstName: nil,
+            lastName: nil,
+            phone: nil,
+            provinceCode: nil,
+            zip: nil
+        )
+
+        let selectableAddress = StorefrontAPI.CartSelectableAddress(
+            id: GraphQLScalars.ID("test-address-id"),
+            selected: true,
+            address: address
+        )
+
+        let delivery = StorefrontAPI.CartDelivery(addresses: [selectableAddress])
+
+        return StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://example.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: nil,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: delivery,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: 100.0, currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
     }
 
     private struct TestError: Error, Equatable {

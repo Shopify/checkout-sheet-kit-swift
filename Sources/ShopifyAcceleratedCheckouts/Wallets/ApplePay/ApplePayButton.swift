@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
@@ -28,7 +29,7 @@ import SwiftUI
 /// A view that displays an Apple Pay button for checkout
 @available(iOS 17.0, *)
 @available(macOS, unavailable)
-internal struct ApplePayButton: View {
+struct ApplePayButton: View {
     /// The configuration for Apple Pay
     @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
     private var configuration
@@ -79,7 +80,7 @@ internal struct ApplePayButton: View {
     public func withLabel(_ label: PayWithApplePayButtonLabel) -> some View {
         var view = self
         view.label = label
-        return view.id(UUID())
+        return view
     }
 }
 
@@ -87,7 +88,7 @@ internal struct ApplePayButton: View {
 /// This is an internal view to allow Environment injection of the shared configuration app wide
 @available(iOS 17.0, *)
 @available(macOS, unavailable)
-internal struct Internal_ApplePayButton: View {
+struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style
     private var label: PayWithApplePayButtonLabel = .plain
 
@@ -115,12 +116,12 @@ internal struct Internal_ApplePayButton: View {
             identifier: identifier,
             configuration: configuration
         )
-        controller.onComplete = eventHandlers.checkoutSuccessHandler
-        controller.onFail = eventHandlers.checkoutErrorHandler
-        controller.onCancel = eventHandlers.checkoutCancelHandler
-        controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromErrorHandler
-        controller.onClickLink = eventHandlers.clickLinkHandler
-        controller.onWebPixelEvent = eventHandlers.webPixelEventHandler
+        controller.onComplete = eventHandlers.checkoutDidComplete
+        controller.onFail = eventHandlers.checkoutDidFail
+        controller.onCancel = eventHandlers.checkoutDidCancel
+        controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
+        controller.onClickLink = eventHandlers.checkoutDidClickLink
+        controller.onWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
         self.label = label
     }
 
@@ -128,7 +129,7 @@ internal struct Internal_ApplePayButton: View {
         PayWithApplePayButton(
             label,
             action: {
-                Task { try? await controller.startPayment() }
+                Task { await controller.startPayment() }
             },
             fallback: {
                 // content == nil ? Text("errors.applepay.unsupported") : content
@@ -146,6 +147,7 @@ let mockCommonConfiguration = ShopifyAcceleratedCheckouts.Configuration(
     storefrontDomain: "my-shop.myshopify.com",
     storefrontAccessToken: "asdb"
 )
+
 @available(iOS 17.0, *)
 let mockApplePayConfiguration = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
     merchantIdentifier: "merchantid",
@@ -172,7 +174,9 @@ let mockConfiguration = ApplePayConfigurationWrapper(
     shopSettings: mockShopSettings
 )
 
+@available(iOS 17.0, *)
 let mockLocale = Locale(identifier: "en")
+
 @available(iOS 17.0, *)
 let mockController = MockApplePayViewController(
     identifier: .cart(cartID: "gid://Shopify/Cart/12345"),
@@ -185,12 +189,28 @@ let mockController = MockApplePayViewController(
         super.init(identifier: identifier, configuration: configuration)
     }
 
-    override func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart? {
-        /// Return nil for mock preview
-        return nil
+    override func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart {
+        // Return nil for mock preview
+        return StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL("")!),
+            totalQuantity: 1,
+            buyerIdentity: nil,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: 0, currencyCode: "USD"),
+                subtotalAmount: StorefrontAPI.MoneyV2(amount: 0, currencyCode: "USD"),
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
     }
 
-    override func startPayment() async throws {
+    override func startPayment() async {
         print("Mock: startPayment called")
     }
 }
@@ -209,6 +229,7 @@ let mockController = MockApplePayViewController(
     .environment(mockShopSettings)
 }
 
+@available(iOS 17.0, *)
 #Preview("Fallback Message") {
     Text("errors.applepay.unsupported".localizedString)
         .environment(\.locale, mockLocale)

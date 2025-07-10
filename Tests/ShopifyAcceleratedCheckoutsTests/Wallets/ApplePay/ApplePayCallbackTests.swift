@@ -1,3 +1,27 @@
+/*
+ MIT License
+
+ Copyright 2023 - Present, Shopify Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+
 import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
@@ -5,6 +29,8 @@ import XCTest
 
 @available(iOS 17.0, *)
 final class ApplePayCallbackTests: XCTestCase {
+    // MARK: - Properties
+
     var viewController: ApplePayViewController!
     var mockConfiguration: ApplePayConfigurationWrapper!
     var mockIdentifier: CheckoutIdentifier!
@@ -12,12 +38,14 @@ final class ApplePayCallbackTests: XCTestCase {
     var errorExpectation: XCTestExpectation!
     var cancelExpectation: XCTestExpectation!
 
+    // MARK: - Setup
+
     override func setUp() {
         super.setUp()
 
         // Create mock configuration
         let commonConfig = ShopifyAcceleratedCheckouts.Configuration(
-            shopDomain: "test-shop.myshopify.com",
+            storefrontDomain: "test-shop.myshopify.com",
             storefrontAccessToken: "test-token"
         )
 
@@ -44,7 +72,7 @@ final class ApplePayCallbackTests: XCTestCase {
 
         mockIdentifier = .cart(cartID: "gid://Shopify/Cart/test-cart-id")
 
-        // Create view controller
+        // Create SUT
         viewController = ApplePayViewController(
             identifier: mockIdentifier,
             configuration: mockConfiguration
@@ -60,6 +88,8 @@ final class ApplePayCallbackTests: XCTestCase {
         cancelExpectation = nil
         super.tearDown()
     }
+
+    // MARK: - Success Callback Tests
 
     func testSuccessCallbackInvoked() async {
         successExpectation = expectation(description: "Success callback should be invoked")
@@ -94,6 +124,8 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
 
+    // MARK: - Error Callback Tests
+
     func testErrorCallbackInvoked() async {
         errorExpectation = expectation(description: "Error callback should be invoked")
         var callbackInvoked = false
@@ -125,6 +157,8 @@ final class ApplePayCallbackTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
+
+    // MARK: - Cancel Callback Tests
 
     func testCancelCallbackInvoked() async {
         cancelExpectation = expectation(description: "Cancel callback should be invoked")
@@ -159,6 +193,8 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
 
+    // MARK: - No Callback Tests
+
     func testNoCallbackWhenCheckoutCancelled() async {
         var successInvoked = false
         var errorInvoked = false
@@ -185,6 +221,8 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
+
+    // MARK: - Thread Safety Tests
 
     func testCallbackThreadSafety() async {
         let iterations = 12 // Multiple of 3 for even distribution
@@ -233,6 +271,8 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertEqual(errorCount, iterations / 3, "Error callback should be invoked correct number of times")
         XCTAssertEqual(cancelCount, iterations / 3, "Cancel callback should be invoked correct number of times")
     }
+
+    // MARK: - Edge Case Tests
 
     func testMultipleCallbackAssignments() async {
         var firstCallbackInvoked = false
@@ -284,6 +324,8 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
 
+    // MARK: - shouldRecoverFromError Callback Tests
+
     func testShouldRecoverFromErrorCallbackInvoked() async {
         let expectation = expectation(description: "shouldRecoverFromError callback should be invoked")
         var passedError: ShopifyCheckoutSheetKit.CheckoutError?
@@ -297,14 +339,13 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .unknown), recoverable: true)
-        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
-            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
-            return
+        let result = await MainActor.run {
+            viewController.shouldRecoverFromError(error: testError)
         }
-        delegate.shouldRecoverFromError(error: testError)
 
         await fulfillment(of: [expectation], timeout: 1.0)
         XCTAssertNotNil(passedError, "Error should be passed to callback")
+        XCTAssertTrue(result, "Should return true as returned by callback")
     }
 
     func testShouldRecoverFromErrorCallbackReturnsCorrectValue() async {
@@ -313,20 +354,20 @@ final class ApplePayCallbackTests: XCTestCase {
         await MainActor.run {
             viewController.onShouldRecoverFromError = { _ in
                 callbackInvoked = true
-                return true // Even though we return true, the delegate method will return false
+                return true
             }
         }
 
         let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test", code: .clientError(code: .unknown), recoverable: true)
-        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
-            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
-            return
+        let result = await MainActor.run {
+            viewController.shouldRecoverFromError(error: testError)
         }
-        delegate.shouldRecoverFromError(error: testError)
 
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         XCTAssertTrue(callbackInvoked, "Callback should be invoked")
+        XCTAssertTrue(result, "Should return true as specified by callback")
     }
+
+    // MARK: - checkoutDidClickLink Callback Tests
 
     func testCheckoutDidClickLinkCallbackInvoked() async {
         let expectation = expectation(description: "checkoutDidClickLink callback should be invoked")
@@ -340,11 +381,9 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testURL = URL(string: "https://test-shop.myshopify.com/products/test")!
-        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
-            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
-            return
+        await MainActor.run {
+            viewController.checkoutDidClickLink(url: testURL)
         }
-        delegate.checkoutDidClickLink(url: testURL)
 
         await fulfillment(of: [expectation], timeout: 1.0)
         XCTAssertEqual(passedURL, testURL, "URL should be passed to callback")
@@ -356,11 +395,9 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testURL = URL(string: "https://test-shop.myshopify.com")!
-        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
-            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
-            return
+        await MainActor.run {
+            viewController.checkoutDidClickLink(url: testURL) // Should not crash
         }
-        delegate.checkoutDidClickLink(url: testURL) // Should not crash
 
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         XCTAssertTrue(true, "Should not crash when callback is nil")
@@ -381,16 +418,20 @@ final class ApplePayCallbackTests: XCTestCase {
             }
         }
 
-        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
-            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
-            return
-        }
-        for url in testURLs {
-            delegate.checkoutDidClickLink(url: url)
+        await MainActor.run {
+            for url in testURLs {
+                viewController.checkoutDidClickLink(url: url)
+            }
         }
 
         try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
         XCTAssertEqual(capturedURLs.count, testURLs.count, "All URLs should be captured")
         XCTAssertEqual(capturedURLs, testURLs, "URLs should be captured in order")
     }
+
+    // MARK: - checkoutDidEmitWebPixelEvent Callback Tests
+
+    // MARK: - Thread Safety Tests for New Callbacks
 }
+
+// Mock types are no longer needed since we're testing callbacks directly

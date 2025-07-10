@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 import Foundation
 
 @available(iOS 17.0, *)
@@ -33,7 +34,7 @@ class ErrorHandler {
         case cartThrottled
         case notEnoughStock
         case other
-        /// These errors are unhandled by Portable Wallets
+        // These errors are unhandled by Portable Wallets
         case unhandled
 
         var queryParam: String? {
@@ -44,7 +45,7 @@ class ErrorHandler {
             case .notEnoughStock: "wallet_not_enough_stock"
             case .other: nil
             case .unhandled: nil
-            /// These are handled in checkout-web by default
+            // These are handled in checkout-web by default
             case .cartThrottled: nil
             case .outOfStock: nil
             }
@@ -64,14 +65,14 @@ class ErrorHandler {
         let sortedActions = actionsSortedByPrecedence(actions: actions)
 
         guard let action = sortedActions.first else {
-            /// This list should not be empty, otherwise we would not be in this error handling flow
-            print("ErrorHandler: getHighestPriorityAction: actions list is empty")
+            // This list should not be empty, otherwise we would not be in this error handling flow
+            print("[ErrorHandler][getHighestPriorityAction]: actions list is empty")
             return .interrupt(reason: .other)
         }
 
         switch action {
         case .showError:
-            /// We want to surface messages for all errors, not just the first one
+            // We want to surface messages for all errors, not just the first one
             let allErrors = combinedErrors(actions: sortedActions)
             return .showError(errors: allErrors)
         default:
@@ -79,7 +80,15 @@ class ErrorHandler {
         }
     }
 
-    static func map(error: Error, shippingCountry: String? = nil) -> PaymentSheetAction? {
+    static func getShippingCountry(cart: StorefrontAPI.Cart?) -> String? {
+        let shippingAddress =
+            cart?.delivery?.addresses.first(where: { $0.selected })?
+                .address as? StorefrontAPI.CartDeliveryAddress
+        return shippingAddress?.countryCode
+    }
+
+    static func map(error: Error, cart: StorefrontAPI.Cart?) -> PaymentSheetAction? {
+        let shippingCountry = getShippingCountry(cart: cart)
         switch error {
         case let cartUserError as StorefrontAPI.CartUserError:
             // Handle StorefrontAPI errors directly - we don't have the cart here but the checkout URL
@@ -120,7 +129,7 @@ class ErrorHandler {
         switch action {
         case let .interrupt(reason, _):
             if reason == .unhandled {
-                /// Unhandled errors have lowest priority in Portable Wallets
+                // Unhandled errors have lowest priority in Portable Wallets
                 return 3
             }
             return 1

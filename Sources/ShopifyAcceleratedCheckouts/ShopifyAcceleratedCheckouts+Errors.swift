@@ -25,12 +25,12 @@ import Foundation
 
 extension ShopifyAcceleratedCheckouts {
     enum Error: LocalizedError {
-        case invariant(message: String)
+        case invariant(expected: String)
 
         func toString() -> String {
             switch self {
-            case let .invariant(message):
-                return message
+            case let .invariant(expected):
+                return "received nil, expected: \(expected)"
             }
         }
     }
