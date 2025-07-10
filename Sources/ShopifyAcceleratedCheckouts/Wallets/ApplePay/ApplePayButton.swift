@@ -97,12 +97,7 @@ struct Internal_ApplePayButton: View {
     ///   - identifier: The identifier to use for checkout
     ///   - label: The label to display on the Apple Pay button
     ///   - configuration: The configuration for Apple Pay
-    ///   - checkoutSuccessHandler: The handler to call on successful checkout
-    ///   - checkoutErrorHandler: The handler to call on checkout error
-    ///   - checkoutCancelHandler: The handler to call on checkout cancel
-    ///   - shouldRecoverFromErrorHandler: The handler to determine error recovery
-    ///   - clickLinkHandler: The handler to call when links are clicked
-    ///   - webPixelEventHandler: The handler to call for web pixel events
+    ///   - eventHandlers: The event handlers for checkout events (defaults to EventHandlers())
     init(
         identifier: CheckoutIdentifier,
         label: PayWithApplePayButtonLabel,
