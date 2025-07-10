@@ -30,6 +30,7 @@ extension GraphQLDocument {
           totalQuantity
           buyerIdentity {
             email
+            phone
           }
           deliveryGroups(first: 10) {
             nodes {

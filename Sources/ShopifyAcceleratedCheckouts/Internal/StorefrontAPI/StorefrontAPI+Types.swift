@@ -62,6 +62,7 @@ extension StorefrontAPI {
     /// Cart buyer identity
     struct CartBuyerIdentity: Codable {
         let email: String?
+        let phone: String?
     }
 
     /// Cart delivery information

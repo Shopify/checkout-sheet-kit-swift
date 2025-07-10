@@ -36,13 +36,13 @@ import Foundation
     ///   - countryCode: Optional country code for localization
     ///   - languageCode: Optional language code for localization
     init(
-        shopDomain: String,
+        storefrontDomain: String,
         storefrontAccessToken: String,
         apiVersion: String = ShopifyAcceleratedCheckouts.apiVersion,
         countryCode: CountryCode = .US,
         languageCode: LanguageCode = .EN
     ) {
-        let url = URL(string: "https://\(shopDomain)/api/\(apiVersion)/graphql.json")!
+        let url = URL(string: "https://\(storefrontDomain)/api/\(apiVersion)/graphql.json")!
 
         client = GraphQLClient(
             url: url,
