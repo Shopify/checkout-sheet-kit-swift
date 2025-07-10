@@ -42,7 +42,7 @@ final class ShopPayCallbackTests: XCTestCase {
         super.setUp()
 
         mockConfiguration = ShopifyAcceleratedCheckouts.Configuration(
-            shopDomain: "test-shop.myshopify.com",
+            storefrontDomain: "test-shop.myshopify.com",
             storefrontAccessToken: "test-token"
         )
 

@@ -107,7 +107,7 @@ final class StorefrontAPIQueriesTests: XCTestCase {
 
         // Create StorefrontAPI instance - it will use the default URLSession which will pick up our mock
         storefrontAPI = StorefrontAPI(
-            shopDomain: "test.myshopify.com",
+            storefrontDomain: "test.myshopify.com",
             storefrontAccessToken: "test-token",
             countryCode: CountryCode.US,
             languageCode: LanguageCode.EN

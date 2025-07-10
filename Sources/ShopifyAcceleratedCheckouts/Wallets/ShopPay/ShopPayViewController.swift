@@ -41,7 +41,7 @@ import SwiftUI
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         storefront = StorefrontAPI(
-            shopDomain: configuration.storefrontDomain,
+            storefrontDomain: configuration.storefrontDomain,
             storefrontAccessToken: configuration.storefrontAccessToken
         )
     }

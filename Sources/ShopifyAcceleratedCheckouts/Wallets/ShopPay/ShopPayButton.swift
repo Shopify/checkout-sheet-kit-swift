@@ -99,7 +99,7 @@ internal struct Internal_ShopPayButton: View {
 struct ShopPayButton_Previews: PreviewProvider {
     static var previews: some View {
         let mockCommonConfiguration = ShopifyAcceleratedCheckouts.Configuration(
-            shopDomain: "test-shop.myshopify.com",
+            storefrontDomain: "test-shop.myshopify.com",
             storefrontAccessToken: "test-token"
         )
 

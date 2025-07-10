@@ -462,7 +462,9 @@ class CheckoutWebViewTests: XCTestCase {
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
             case let .some(.sdkError(underlying, recoverable)):
-                XCTAssertEqual(underlying.localizedDescription, "The operation couldn’t be completed. (NSURLErrorDomain error -1001.)")
+                let nsError = underlying as NSError
+                XCTAssertEqual(nsError.domain, NSURLErrorDomain)
+                XCTAssertEqual(nsError.code, NSURLErrorTimedOut)
                 XCTAssertTrue(recoverable)
             default:
                 XCTFail("checkoutDidFail(.sdkError) expected to throw")
