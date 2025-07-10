@@ -49,7 +49,7 @@ extension ShopifyAcceleratedCheckouts {
             storefrontAccessToken: String,
             customer: Customer? = nil
         ) {
-            self.storefrontDomain = shopDomain
+            storefrontDomain = shopDomain
             self.storefrontAccessToken = storefrontAccessToken
             self.customer = customer
         }

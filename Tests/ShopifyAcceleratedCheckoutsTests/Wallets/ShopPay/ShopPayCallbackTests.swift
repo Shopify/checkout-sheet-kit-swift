@@ -29,7 +29,7 @@ import XCTest
 final class ShopPayCallbackTests: XCTestCase {
     // MARK: - Properties
 
-    var sut: ShopPayViewController!
+    var viewController: ShopPayViewController!
     var mockConfiguration: ShopifyAcceleratedCheckouts.Configuration!
     var mockIdentifier: CheckoutIdentifier!
     var successExpectation: XCTestExpectation!
@@ -48,15 +48,14 @@ final class ShopPayCallbackTests: XCTestCase {
 
         mockIdentifier = .cart(cartID: "gid://Shopify/Cart/test-cart-id")
 
-        // Create SUT
-        sut = ShopPayViewController(
+        viewController = ShopPayViewController(
             identifier: mockIdentifier,
             configuration: mockConfiguration
         )
     }
 
     override func tearDown() {
-        sut = nil
+        viewController = nil
         mockConfiguration = nil
         mockIdentifier = nil
         successExpectation = nil
@@ -71,23 +70,23 @@ final class ShopPayCallbackTests: XCTestCase {
         successExpectation = expectation(description: "Success callback should be invoked")
         var callbackInvoked = false
 
-        sut.eventHandlers = EventHandlers(
+        viewController.eventHandlers = EventHandlers(
             checkoutSuccessHandler: { [weak self] in
                 callbackInvoked = true
                 self?.successExpectation.fulfill()
             }
         )
 
-        sut.eventHandlers.checkoutSuccessHandler?()
+        viewController.eventHandlers.checkoutSuccessHandler?()
 
         await fulfillment(of: [successExpectation], timeout: 1.0)
         XCTAssertTrue(callbackInvoked, "Success callback should have been invoked")
     }
 
     func testSuccessCallbackNotInvokedWhenNil() {
-        XCTAssertNil(sut.eventHandlers.checkoutSuccessHandler)
+        XCTAssertNil(viewController.eventHandlers.checkoutSuccessHandler)
 
-        sut.eventHandlers.checkoutSuccessHandler?() // Should not crash
+        viewController.eventHandlers.checkoutSuccessHandler?() // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -98,23 +97,23 @@ final class ShopPayCallbackTests: XCTestCase {
         errorExpectation = expectation(description: "Error callback should be invoked")
         var callbackInvoked = false
 
-        sut.eventHandlers = EventHandlers(
+        viewController.eventHandlers = EventHandlers(
             checkoutErrorHandler: { [weak self] in
                 callbackInvoked = true
                 self?.errorExpectation.fulfill()
             }
         )
 
-        sut.eventHandlers.checkoutErrorHandler?()
+        viewController.eventHandlers.checkoutErrorHandler?()
 
         await fulfillment(of: [errorExpectation], timeout: 1.0)
         XCTAssertTrue(callbackInvoked, "Error callback should have been invoked")
     }
 
     func testErrorCallbackNotInvokedWhenNil() {
-        XCTAssertNil(sut.eventHandlers.checkoutErrorHandler)
+        XCTAssertNil(viewController.eventHandlers.checkoutErrorHandler)
 
-        sut.eventHandlers.checkoutErrorHandler?() // Should not crash
+        viewController.eventHandlers.checkoutErrorHandler?() // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -125,23 +124,23 @@ final class ShopPayCallbackTests: XCTestCase {
         cancelExpectation = expectation(description: "Cancel callback should be invoked")
         var callbackInvoked = false
 
-        sut.eventHandlers = EventHandlers(
+        viewController.eventHandlers = EventHandlers(
             checkoutCancelHandler: { [weak self] in
                 callbackInvoked = true
                 self?.cancelExpectation.fulfill()
             }
         )
 
-        sut.eventHandlers.checkoutCancelHandler?()
+        viewController.eventHandlers.checkoutCancelHandler?()
 
         await fulfillment(of: [cancelExpectation], timeout: 1.0)
         XCTAssertTrue(callbackInvoked, "Cancel callback should have been invoked")
     }
 
     func testCancelCallbackNotInvokedWhenNil() {
-        XCTAssertNil(sut.eventHandlers.checkoutCancelHandler)
+        XCTAssertNil(viewController.eventHandlers.checkoutCancelHandler)
 
-        sut.eventHandlers.checkoutCancelHandler?() // Should not crash
+        viewController.eventHandlers.checkoutCancelHandler?() // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -150,44 +149,44 @@ final class ShopPayCallbackTests: XCTestCase {
 
     func testCheckoutCompleteCallback() {
         var completeInvoked = false
-        sut.eventHandlers = EventHandlers(
+        viewController.eventHandlers = EventHandlers(
             checkoutSuccessHandler: { completeInvoked = true }
         )
 
-        sut.eventHandlers.checkoutSuccessHandler?()
+        viewController.eventHandlers.checkoutSuccessHandler?()
 
         XCTAssertTrue(completeInvoked, "Complete callback should be invoked")
     }
 
     func testCheckoutFailCallback() {
         var failInvoked = false
-        sut.eventHandlers = EventHandlers(
+        viewController.eventHandlers = EventHandlers(
             checkoutErrorHandler: { failInvoked = true }
         )
 
-        sut.eventHandlers.checkoutErrorHandler?()
+        viewController.eventHandlers.checkoutErrorHandler?()
 
         XCTAssertTrue(failInvoked, "Fail callback should be invoked")
     }
 
     func testCheckoutCancelCallback() {
         var cancelInvoked = false
-        sut.eventHandlers = EventHandlers(
+        viewController.eventHandlers = EventHandlers(
             checkoutCancelHandler: { cancelInvoked = true }
         )
 
-        sut.eventHandlers.checkoutCancelHandler?()
+        viewController.eventHandlers.checkoutCancelHandler?()
 
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
 
     func testCheckoutDidCancelDelegateBehavior() {
         var cancelInvoked = false
-        sut.eventHandlers = EventHandlers(
+        viewController.eventHandlers = EventHandlers(
             checkoutCancelHandler: { cancelInvoked = true }
         )
 
-        sut.checkoutDidCancel()
+        viewController.checkoutDidCancel()
 
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
