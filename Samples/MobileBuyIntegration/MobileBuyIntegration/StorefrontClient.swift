@@ -33,7 +33,7 @@ class StorefrontClient {
     private init() {
         client = Graph
             .Client(
-                shopDomain: InfoDictionary.shared.domain,
+                storefrontDomain: InfoDictionary.shared.domain,
                 apiKey: InfoDictionary.shared.accessToken
             )
 

@@ -90,7 +90,7 @@ To present a checkout to the buyer, your application must first obtain a checkou
 import Buy
 
 let client = Graph.Client(
-  shopDomain: "yourshop.myshopify.com",
+  storefrontDomain: "yourshop.myshopify.com",
   apiKey: "<storefront access token>"
 )
 
