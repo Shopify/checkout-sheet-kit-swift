@@ -362,6 +362,7 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
 }
 
 // MARK: - Mock Helper Methods
+
 @available(iOS 17.0, *)
 private func createCartUserError(code: StorefrontAPI.CartErrorCode?, field: [String]?) -> StorefrontAPI.CartUserError {
     return StorefrontAPI.CartUserError(
