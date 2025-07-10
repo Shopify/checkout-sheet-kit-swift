@@ -95,7 +95,7 @@ class CartManager: ObservableObject {
             }
 
             guard let cart = payload.cart else {
-                throw Errors.invariant(expected: "cart")
+                throw Errors.invariant(message: "cart returned nil")
             }
 
             DispatchQueue.main.async {
@@ -138,7 +138,7 @@ class CartManager: ObservableObject {
             }
 
             guard let cart = payload.cart else {
-                throw Errors.invariant(expected: "cart")
+                throw Errors.invariant(message: "cart returned nil")
             }
 
             DispatchQueue.main.async {
@@ -156,11 +156,11 @@ class CartManager: ObservableObject {
         partial _: Bool
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
-            throw Errors.invariant(expected: "cart.id")
+            throw Errors.invariant(message: "cart.id should be defined")
         }
 
         guard let address = contact.postalAddress else {
-            throw Errors.invariant(expected: "contact.postalAddress")
+            throw Errors.invariant(message: "contact.postalAddress is nil")
         }
 
         let shippingAddress = StorefrontInputFactory.shared.createMailingAddressInput(
@@ -205,7 +205,7 @@ class CartManager: ObservableObject {
             }
 
             guard let cart = payload.cart else {
-                throw Errors.invariant(expected: "cart")
+                throw Errors.invariant(message: "returned cart is nil")
             }
 
             DispatchQueue.main.async {
@@ -239,7 +239,7 @@ class CartManager: ObservableObject {
             }
 
             guard let cart = payload.cart else {
-                throw Errors.invariant(expected: "cart")
+                throw Errors.invariant(message: "cart returned nil")
             }
 
             DispatchQueue.main.async {
@@ -256,11 +256,11 @@ class CartManager: ObservableObject {
         deliveryOptionHandle: String
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
-            throw Errors.invariant(expected: "cart.id")
+            throw Errors.invariant(message: "cart.id should be defined")
         }
 
         guard let deliveryGroupId = cart?.deliveryGroups.nodes.first?.id else {
-            throw Errors.invariant(expected: "deliveryGroups")
+            throw Errors.invariant(message: "deliveryGroups.length should be greater than zero")
         }
 
         let cartSelectedDeliveryOptionInput =
@@ -296,7 +296,7 @@ class CartManager: ObservableObject {
             }
 
             guard let cart = payload.cart else {
-                throw Errors.invariant(expected: "cart")
+                throw Errors.invariant(message: "cart returned nil")
             }
 
             DispatchQueue.main.async {
@@ -316,18 +316,18 @@ class CartManager: ObservableObject {
         payment: PKPayment // REFACTOR: this method should just receive the decoded payment token
     ) async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
-            throw Errors.invariant(expected: "cart.id")
+            throw Errors.invariant(message: "cart.id should be defined")
         }
 
         guard
             let billingContact = payment.billingContact,
             let billingPostalAddress = billingContact.postalAddress
         else {
-            throw Errors.invariant(expected: "billingContact")
+            throw Errors.invariant(message: "billingContact is nil")
         }
 
         guard let totalAmount = cart?.cost.totalAmount else {
-            throw Errors.invariant(expected: "cart.cost.totalAmount")
+            throw Errors.invariant(message: "cart?.cost.totalAmount is nil")
         }
 
         guard let paymentData = decodePaymentData(payment: payment) else {
@@ -363,7 +363,7 @@ class CartManager: ObservableObject {
             }
 
             guard let cart = payload.cart else {
-                throw Errors.invariant(expected: "cart")
+                throw Errors.invariant(message: "cart returned nil")
             }
 
             DispatchQueue.main.async {
@@ -378,7 +378,7 @@ class CartManager: ObservableObject {
 
     func performCartPrepareForCompletion() async throws -> Storefront.Cart {
         guard let cartId = cart?.id else {
-            throw Errors.invariant(expected: "cart.id")
+            throw Errors.invariant(message: "cart.id should be defined")
         }
 
         let mutation = Storefront.buildMutation(
@@ -428,7 +428,7 @@ class CartManager: ObservableObject {
 
     func performCartSubmitForCompletion() async throws -> Storefront.SubmitSuccess {
         guard let cartId = cart?.id else {
-            throw Errors.invariant(expected: "cart.id")
+            throw Errors.invariant(message: "cart.id should be defined")
         }
 
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
@@ -456,7 +456,7 @@ class CartManager: ObservableObject {
             }
 
             guard let submissionResult = payload.result as? Storefront.SubmitSuccess else {
-                throw Errors.invariant(expected: "SubmitSuccess")
+                throw Errors.invariant(message: "submit result is not of type SubmitSuccess")
             }
 
             DispatchQueue.main.async {
