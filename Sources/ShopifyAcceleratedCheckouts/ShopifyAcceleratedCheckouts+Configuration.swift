@@ -31,7 +31,7 @@ extension ShopifyAcceleratedCheckouts {
         /// Example: `my-shop.myshopify.com`
         ///
         /// See: https://shopify.dev/docs/storefronts/themes/getting-started/build-a-theme#get-the-shop-domain
-        public var shopDomain: String
+        public var storefrontDomain: String
 
         /// The storefront access token.
         ///
@@ -49,7 +49,7 @@ extension ShopifyAcceleratedCheckouts {
             storefrontAccessToken: String,
             customer: Customer? = nil
         ) {
-            self.shopDomain = shopDomain
+            self.storefrontDomain = shopDomain
             self.storefrontAccessToken = storefrontAccessToken
             self.customer = customer
         }

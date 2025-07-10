@@ -41,7 +41,7 @@ import SwiftUI
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         storefront = StorefrontAPI(
-            shopDomain: configuration.shopDomain,
+            shopDomain: configuration.storefrontDomain,
             storefrontAccessToken: configuration.storefrontAccessToken
         )
     }
@@ -82,7 +82,7 @@ import SwiftUI
             return cart?.checkoutUrl.url
         case let .variant(_, quantity):
             return URL(
-                string: "https://\(configuration.shopDomain)/cart/\(identifier.getTokenComponent()):\(quantity)"
+                string: "https://\(configuration.storefrontDomain)/cart/\(identifier.getTokenComponent()):\(quantity)"
             )
         case .invariant:
             return nil
