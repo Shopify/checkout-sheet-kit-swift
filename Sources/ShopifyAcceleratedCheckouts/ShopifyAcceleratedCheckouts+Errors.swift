@@ -24,28 +24,13 @@
 import Foundation
 
 extension ShopifyAcceleratedCheckouts {
-    enum InvariantMessages: String {
-        case nilCart = "cart is nil."
-        case nilDisplayName = "displayName is nil."
-        case nilPayment = "payment is nil."
-        case nilPaymentData = "paymentData is nil."
-        case nilEmail = "email is nil."
-        case nilShippingMethodID = "shippingMethodID is nil."
-        case nilShippingMethod = "shippingMethod is nil."
-        case nilBillingAddress = "billingAddress is nil."
-        case nilLastDigits = "lastDigits is nil."
-        case nilPostalAddress = "postalAddress is nil."
-        case nilBillingContact = "billingContact is nil."
-        case nilShippingContact = "shippingContact is nil."
-    }
-
     enum Error: LocalizedError {
-        case invariant(message: InvariantMessages)
+        case invariant(message: String)
 
         func toString() -> String {
             switch self {
             case let .invariant(message):
-                return message.rawValue
+                return message
             }
         }
     }
