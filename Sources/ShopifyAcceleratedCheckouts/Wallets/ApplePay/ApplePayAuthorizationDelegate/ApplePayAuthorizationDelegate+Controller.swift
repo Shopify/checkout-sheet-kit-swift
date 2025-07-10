@@ -95,57 +95,38 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         do {
             pkEncoder.payment = payment
             await transition(to: .paymentAuthorized(payment: payment))
-
             let cartID = try pkEncoder.cartID.get()
 
             if pkDecoder.requiredContactFields.count > 0 {
-                if let email = try? pkEncoder.email.get() {
-                    do {
-                        _ = try await controller.storefront.cartBuyerIdentityUpdate(
-                            id: cartID,
-                            email: email
-                        )
-                        let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                        try setCart(to: result.cart)
-                    } catch let error as ShopifyAcceleratedCheckouts.Error {
-                        throw error
-                    } catch {
-                        throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cartBuyerIdentityUpdate")
-                    }
-                }
+                _ = try await controller.storefront.cartBuyerIdentityUpdate(
+                    id: cartID,
+                    email: try? pkEncoder.email.get(),
+                    phoneNumber: try? pkEncoder.phoneNumber.get()
+                )
+                var result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+                try setCart(to: result.cart)
             }
 
             if try pkDecoder.isShippingRequired() {
                 let shippingAddress = try pkEncoder.shippingAddress.get()
-                do {
-                    _ = try await upsertShippingAddress(to: shippingAddress, validate: true)
-                    let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                    try setCart(to: result.cart)
-                } catch let error as ShopifyAcceleratedCheckouts.Error {
-                    throw error
-                } catch {
-                    throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "shippingAddress")
-                }
+                _ = try await upsertShippingAddress(to: shippingAddress, validate: true)
+
+                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+                try setCart(to: result.cart)
             }
 
             let totalAmount = try pkEncoder.totalAmount.get()
             let applePayPayment = try pkEncoder.applePayPayment.get()
 
-            do {
-                _ = try await controller.storefront.cartPaymentUpdate(
-                    id: cartID,
-                    totalAmount: totalAmount,
-                    applePayPayment: applePayPayment
-                )
+            _ = try await controller.storefront.cartPaymentUpdate(
+                id: cartID,
+                totalAmount: totalAmount,
+                applePayPayment: applePayPayment
+            )
 
-                let response = try await controller.storefront.cartSubmitForCompletion(id: cartID)
+            let response = try await controller.storefront.cartSubmitForCompletion(id: cartID)
 
-                await transition(to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url))
-            } catch let error as ShopifyAcceleratedCheckouts.Error {
-                throw error
-            } catch {
-                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cartPayment")
-            }
+            await transition(to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url))
 
             return pkDecoder.paymentAuthorizationResult()
         } catch {
