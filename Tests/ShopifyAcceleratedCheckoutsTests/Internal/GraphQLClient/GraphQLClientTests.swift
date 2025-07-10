@@ -29,12 +29,12 @@ final class GraphQLClientTests: XCTestCase {
     // MARK: - Helper Methods
 
     private func createTestClient(
-        shopDomain: String = "test.myshopify.com",
+        storefrontDomain: String = "test.myshopify.com",
         storefrontAccessToken: String? = "test-token",
         apiVersion: String = "2025-07",
         context: InContextDirective = InContextDirective()
     ) -> GraphQLClient {
-        let url = URL(string: "https://\(shopDomain)/api/\(apiVersion)/graphql.json")!
+        let url = URL(string: "https://\(storefrontDomain)/api/\(apiVersion)/graphql.json")!
         var headers: [String: String] = [:]
 
         if let token = storefrontAccessToken {
@@ -52,7 +52,7 @@ final class GraphQLClientTests: XCTestCase {
 
     func testInitializationWithValidDomain() {
         let client = createTestClient(
-            shopDomain: "test.myshopify.com",
+            storefrontDomain: "test.myshopify.com",
             storefrontAccessToken: "test-token",
             apiVersion: "2025-07"
         )
@@ -65,7 +65,7 @@ final class GraphQLClientTests: XCTestCase {
     func testInitializationWithContext() {
         let context = InContextDirective(countryCode: CountryCode.CA, languageCode: LanguageCode.FR)
         let client = createTestClient(
-            shopDomain: "test.myshopify.com",
+            storefrontDomain: "test.myshopify.com",
             context: context
         )
 
@@ -75,7 +75,7 @@ final class GraphQLClientTests: XCTestCase {
 
     func testInitializationWithDefaultApiVersion() {
         let client = createTestClient(
-            shopDomain: "test.myshopify.com"
+            storefrontDomain: "test.myshopify.com"
         )
 
         XCTAssertNotNil(client)
@@ -86,7 +86,7 @@ final class GraphQLClientTests: XCTestCase {
         // Test with custom country code and language
         let context1 = InContextDirective(countryCode: CountryCode.GB, languageCode: LanguageCode.EN)
         let client1 = createTestClient(
-            shopDomain: "test.myshopify.com",
+            storefrontDomain: "test.myshopify.com",
             context: context1
         )
 
@@ -96,7 +96,7 @@ final class GraphQLClientTests: XCTestCase {
         // Test with different values
         let context2 = InContextDirective(countryCode: CountryCode.DE, languageCode: LanguageCode.DE)
         let client2 = createTestClient(
-            shopDomain: "test.myshopify.com",
+            storefrontDomain: "test.myshopify.com",
             context: context2
         )
 
@@ -218,7 +218,7 @@ final class GraphQLClientTests: XCTestCase {
     func testClientWithDifferentConfigurations() {
         // Test with all parameters
         let fullClient = createTestClient(
-            shopDomain: "shop.myshopify.com",
+            storefrontDomain: "shop.myshopify.com",
             storefrontAccessToken: "token123",
             apiVersion: "2025-01",
             context: InContextDirective(countryCode: CountryCode.AU, languageCode: LanguageCode.EN)
@@ -227,7 +227,7 @@ final class GraphQLClientTests: XCTestCase {
 
         // Test with minimal parameters
         let minimalClient = createTestClient(
-            shopDomain: "shop.myshopify.com"
+            storefrontDomain: "shop.myshopify.com"
         )
         XCTAssertNotNil(minimalClient)
     }
