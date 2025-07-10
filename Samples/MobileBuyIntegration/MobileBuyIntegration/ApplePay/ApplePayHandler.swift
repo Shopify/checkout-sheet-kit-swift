@@ -31,20 +31,14 @@ typealias PaymentCompletionHandler = (Bool) -> Void
 class ApplePayHandler: NSObject {
     // MARK: Properties
 
-    /**
-     * Starts as nil when no payment status has been made
-     */
+    /// Starts as nil when no payment status has been made
     var paymentStatus: PKPaymentAuthorizationStatus?
 
-    /**
-     * Instantiated during `startApplePayCheckout`
-     * called at the end of the payment process after PaymentHandler#didAuthorizePayment
-     */
+    /// Instantiated during `startApplePayCheckout`
+    /// called at the end of the payment process after PaymentHandler#didAuthorizePayment
     var paymentCompletionHandler: PaymentCompletionHandler?
 
-    /**
-     * Card types not present in this list will not be shown as available for ApplePay
-     */
+    /// Card types not present in this list will not be shown as available for ApplePay
     static let SupportedNetworks: [PKPaymentNetwork] = [
         .amex,
         .discover,
@@ -52,27 +46,20 @@ class ApplePayHandler: NSObject {
         .visa
     ]
 
-    /*
-     * The merchant’s two-letter ISO 3166 country code.
-     */
+    /// The merchant's two-letter ISO 3166 country code.
     static let CountryCode = "US"
 
-    /**
-     * The three-letter ISO 4217 currency code that determines the currency the payment request uses.
-     */
+    /// The three-letter ISO 4217 currency code that determines the currency the payment request uses.
     static let CurrencyCode = "USD"
 
-    /**
-     * This value must match one of the merchant identifiers specified by the Merchant IDs
-     * Entitlement key in the app’s entitlements. For more information on adding merchant IDs,
-     * see Configure Apple Pay (iOS, watchOS).*
-     * @see: https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest/1619305-merchantidentifier
-     */
+    /// This value must match one of the merchant identifiers specified by the Merchant IDs
+    /// Entitlement key in the app's entitlements. For more information on adding merchant IDs,
+    /// see Configure Apple Pay (iOS, watchOS).
+    ///
+    /// See: https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest/1619305-merchantidentifier
     static let MerchantId = "merchant.com.shopify.example.MobileBuyIntegration.ApplePay"
 
-    /**
-     * Opens the ApplePay sheet, populating values from the cart into PassKit representations
-     */
+    /// Opens the ApplePay sheet, populating values from the cart into PassKit representations
     func startApplePayCheckout(completion: @escaping PaymentCompletionHandler) {
         paymentCompletionHandler = completion
 
@@ -182,9 +169,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         _: PKPaymentAuthorizationController,
         didAuthorizePayment payment: PKPayment
     ) async -> PKPaymentAuthorizationResult {
-        /**
-         * Apply validations that make sense for your business requirements
-         */
+        /// Apply validations that make sense for your business requirements
         guard
             let shippingContact = payment.shippingContact,
             payment.shippingContact?.postalAddress?.isoCountryCode == "US"
@@ -202,10 +187,8 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
 
         if appConfiguration.useVaultedState == false {
-            /**
-             * (Optional) If the user is a guest and you haven't set an email on buyerIdentity
-             * update the buyerIdentity with the shippingContact.email
-             */
+            /// (Optional) If the user is a guest and you haven't set an email on buyerIdentity
+            /// update the buyerIdentity with the shippingContact.email
             do {
                 _ = try await CartManager.shared.performBuyerIdentityUpdate(
                     contact: shippingContact,
