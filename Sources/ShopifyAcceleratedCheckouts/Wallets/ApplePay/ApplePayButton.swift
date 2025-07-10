@@ -186,7 +186,7 @@ let mockController = MockApplePayViewController(
     }
 
     override func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart? {
-        // Return nil for mock preview
+        /// Return nil for mock preview
         return nil
     }
 

@@ -32,10 +32,10 @@ func exponentialDelay(for attempt: Int = 1, with retryDelay: TimeInterval) -> UI
     let backoffMultiplier = pow(2.0, Double(attempt))
     let delayInSeconds = retryDelay * backoffMultiplier
 
-    // Cap the maximum delay at 30 seconds
+    /// Cap the maximum delay at 30 seconds
     let cappedDelay = min(delayInSeconds, 30.0)
 
-    // Convert to nanoseconds
+    /// Convert to nanoseconds
     let delayInNanoseconds = cappedDelay * oneSecond
 
     return UInt64(delayInNanoseconds)

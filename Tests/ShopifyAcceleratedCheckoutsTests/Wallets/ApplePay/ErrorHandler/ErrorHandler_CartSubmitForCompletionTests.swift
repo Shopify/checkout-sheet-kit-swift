@@ -424,7 +424,6 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
         }
     }
 
-
     func testMap_whenPayloadResultIsNil_returnsInterruptWithOtherReason() {
         let payload = StorefrontAPI.CartSubmitForCompletionPayload(
             result: nil,

@@ -137,11 +137,10 @@ class PKDecoder {
         return update
     }
 
-    /**
-     * Required contact fields for all transactions.
-     * - Used for billing address in all cases
-     * - Also used for shipping address when `isShippingRequired() == true`
-     */
+    /// Required contact fields for all transactions.
+    /// - Used for billing address in all cases
+    /// - Also used for shipping address when `isShippingRequired() == true`
+    ///
     static let requiredAddressFields: Set<PKContactField> = [
         .name,
         .postalAddress
@@ -169,7 +168,7 @@ class PKDecoder {
             throw ShopifyAcceleratedCheckouts.Error.invariant(message: .nilCart)
         }
 
-        // Check if any line item's merchandise requires shipping
+        /// Check if any line item's merchandise requires shipping
         for line in cart.lines.nodes {
             if let variant = line.merchandise, variant.requiresShipping {
                 return true

@@ -1,4 +1,3 @@
-
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
 

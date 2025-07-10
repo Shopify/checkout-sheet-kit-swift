@@ -100,7 +100,7 @@ class GraphQLClient {
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        // Add all provided headers
+        /// Add all provided headers
         for (key, value) in headers {
             let value = value as String
             urlRequest.setValue(value, forHTTPHeaderField: key)

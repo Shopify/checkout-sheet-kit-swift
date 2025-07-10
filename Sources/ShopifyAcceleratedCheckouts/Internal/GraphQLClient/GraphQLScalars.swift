@@ -77,7 +77,7 @@ enum GraphQLScalars {
             if let date = formatter.date(from: dateString) {
                 self.date = date
             } else {
-                // Fallback without fractional seconds
+                /// Fallback without fractional seconds
                 formatter.formatOptions = [.withInternetDateTime]
                 if let date = formatter.date(from: dateString) {
                     self.date = date

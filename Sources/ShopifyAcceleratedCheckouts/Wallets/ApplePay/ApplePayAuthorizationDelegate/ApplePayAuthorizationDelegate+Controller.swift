@@ -26,10 +26,9 @@ import ShopifyCheckoutSheetKit
 
 @available(iOS 17.0, *)
 extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegate {
-    /**
-     * First called on payment sheet presentation, is re-called every time a user changes their
-     * shipping address, only applies if the cart contains shippable products
-     */
+    /// First called on payment sheet presentation, is re-called every time a user changes their
+    /// shipping address, only applies if the cart contains shippable products
+    ///
     func paymentAuthorizationController(
         _: PKPaymentAuthorizationController,
         didSelectShippingContact contact: PKContact
@@ -114,9 +113,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 throw ValidationErrors.emailInvalid(message: "errors.missing.email".localizedString)
             }
 
-            /**
-             * (Optional) If the user is a guest then email becomes available now
-             */
+            /// (Optional) If the user is a guest then email becomes available now
+            ///
             var cart = try await controller.storefront.cartBuyerIdentityUpdate(
                 id: cartID,
                 email: email

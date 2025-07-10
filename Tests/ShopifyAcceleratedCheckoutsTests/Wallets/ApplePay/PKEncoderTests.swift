@@ -7,7 +7,6 @@ import XCTest
 class PKEncoderTests: XCTestCase {
     private var cart: () -> Api.Types.Cart? = { nil }
 
-
     private func createMockContact(
         givenName: String? = nil,
         familyName: String? = nil,
@@ -54,7 +53,6 @@ class PKEncoderTests: XCTestCase {
         return PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { self.cart() })
     }
 
-
     func testMapToCountryCodeFromApplePay() {
         XCTAssertEqual(encoder.mapToCountryCode(code: "us"), "US")
     }
@@ -96,7 +94,6 @@ class PKEncoderTests: XCTestCase {
         XCTAssertNil(encoder.getValue(code: unknownCode))
         XCTAssertEqual(encoder.mapToCountryCode(code: unknownCode), "CA")
     }
-
 
     func testDoesNotPadIncompletePostalCodes() throws {
         let contact = createMockContact(

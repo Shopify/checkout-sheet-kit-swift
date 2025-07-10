@@ -1,4 +1,3 @@
-
 import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
@@ -6,14 +5,12 @@ import XCTest
 
 @available(iOS 17.0, *)
 final class ApplePayCallbackTests: XCTestCase {
-
     var sut: ApplePayViewController!
     var mockConfiguration: ApplePayConfigurationWrapper!
     var mockIdentifier: CheckoutIdentifier!
     var successExpectation: XCTestExpectation!
     var errorExpectation: XCTestExpectation!
     var cancelExpectation: XCTestExpectation!
-
 
     override func setUp() {
         super.setUp()
@@ -64,7 +61,6 @@ final class ApplePayCallbackTests: XCTestCase {
         super.tearDown()
     }
 
-
     func testSuccessCallbackInvoked() async {
         successExpectation = expectation(description: "Success callback should be invoked")
         var callbackInvoked = false
@@ -98,7 +94,6 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
 
-
     func testErrorCallbackInvoked() async {
         errorExpectation = expectation(description: "Error callback should be invoked")
         var callbackInvoked = false
@@ -130,7 +125,6 @@ final class ApplePayCallbackTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
-
 
     func testCancelCallbackInvoked() async {
         cancelExpectation = expectation(description: "Cancel callback should be invoked")
@@ -165,7 +159,6 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
 
-
     func testNoCallbackWhenCheckoutCancelled() async {
         var successInvoked = false
         var errorInvoked = false
@@ -192,7 +185,6 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
-
 
     func testCallbackThreadSafety() async {
         let iterations = 12 // Multiple of 3 for even distribution
@@ -241,7 +233,6 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertEqual(errorCount, iterations / 3, "Error callback should be invoked correct number of times")
         XCTAssertEqual(cancelCount, iterations / 3, "Cancel callback should be invoked correct number of times")
     }
-
 
     func testMultipleCallbackAssignments() async {
         var firstCallbackInvoked = false
@@ -293,7 +284,6 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
 
-
     func testShouldRecoverFromErrorCallbackInvoked() async {
         let expectation = expectation(description: "shouldRecoverFromError callback should be invoked")
         var passedError: ShopifyCheckoutSheetKit.CheckoutError?
@@ -331,7 +321,6 @@ final class ApplePayCallbackTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         XCTAssertTrue(callbackInvoked, "Callback should be invoked")
     }
-
 
     func testCheckoutDidClickLinkCallbackInvoked() async {
         let expectation = expectation(description: "checkoutDidClickLink callback should be invoked")
@@ -389,7 +378,4 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertEqual(capturedURLs.count, testURLs.count, "All URLs should be captured")
         XCTAssertEqual(capturedURLs, testURLs, "URLs should be captured in order")
     }
-
-
 }
-

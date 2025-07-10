@@ -19,7 +19,6 @@ import XCTest
          super.tearDown()
      }
 
-
      func testShouldReturnLineItemDiscountAllocations() throws {
          // Create a cart with line items that have discount allocations
          let cart = try createCart(
@@ -140,7 +139,6 @@ import XCTest
          XCTAssertEqual(result[2].code, "test-code-1")
          XCTAssertEqual(result[2].amount, 10.0)
      }
-
 
      func testThrowsErrorForNilCart() {
          XCTAssertThrowsError(try factory.createDiscountAllocations(cart: nil)) { error in
@@ -296,7 +294,6 @@ import XCTest
              XCTAssertGreaterThan(result[i].amount, 0) // Line discounts
          }
      }
-
 
      private func createCart(
          lineItemDiscounts: [(code: String, amount: Double)],

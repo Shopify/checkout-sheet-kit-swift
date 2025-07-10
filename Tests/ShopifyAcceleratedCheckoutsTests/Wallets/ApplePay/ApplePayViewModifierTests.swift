@@ -1,15 +1,12 @@
-
 @testable import ShopifyAcceleratedCheckouts
 import SwiftUI
 import XCTest
 
 @available(iOS 17.0, *)
 final class ApplePayViewModifierTests: XCTestCase {
-
     var mockConfiguration: ShopifyAcceleratedCheckouts.Configuration!
     var mockApplePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration!
     var mockShopSettings: ShopSettings!
-
 
     override func setUp() {
         super.setUp()
@@ -41,7 +38,6 @@ final class ApplePayViewModifierTests: XCTestCase {
         mockShopSettings = nil
         super.tearDown()
     }
-
 
     func testOnSuccessModifier() {
         var successCallbackInvoked = false
@@ -85,7 +81,6 @@ final class ApplePayViewModifierTests: XCTestCase {
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
 
-
     func testOnCancelModifier() {
         var cancelCallbackInvoked = false
         let cancelAction = {
@@ -128,7 +123,6 @@ final class ApplePayViewModifierTests: XCTestCase {
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
 
-
     func testOnErrorModifier() {
         var errorCallbackInvoked = false
         let errorAction = {
@@ -146,7 +140,6 @@ final class ApplePayViewModifierTests: XCTestCase {
         errorAction()
         XCTAssertTrue(errorCallbackInvoked, "Error callback should be invoked when called")
     }
-
 
     func testCombinedModifiers() {
         var successInvoked = false
@@ -175,7 +168,6 @@ final class ApplePayViewModifierTests: XCTestCase {
         errorAction()
         XCTAssertTrue(errorInvoked, "Error callback should be invoked")
     }
-
 
     func testEnvironmentPropagation() {
         var parentSuccessInvoked = false
@@ -206,7 +198,6 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully without handlers")
     }
-
 
     func testAllCallbackModifiersCombined() {
         var successInvoked = false
@@ -247,7 +238,6 @@ final class ApplePayViewModifierTests: XCTestCase {
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
 
-
     func testCompleteIntegrationWithAllModifiers() {
         var successCount = 0
         var errorCount = 0
@@ -271,7 +261,6 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(modifiedView, "Modified view should be created successfully")
     }
-
 
     private func extractEnvironmentValue<T>(from _: Mirror, keyPath _: KeyPath<EnvironmentValues, T>) -> T? {
         // This is a simplified helper - in real tests you might use ViewInspector or similar

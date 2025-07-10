@@ -1,4 +1,3 @@
-
 import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
@@ -7,12 +6,10 @@ import XCTest
 
 @available(iOS 17.0, *)
 final class ApplePayIntegrationTests: XCTestCase {
-
     var mockConfiguration: ApplePayConfigurationWrapper!
     var mockCommonConfiguration: ShopifyAcceleratedCheckouts.Configuration!
     var mockApplePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration!
     var mockShopSettings: ShopSettings!
-
 
     override func setUp() {
         super.setUp()
@@ -51,7 +48,6 @@ final class ApplePayIntegrationTests: XCTestCase {
         mockShopSettings = nil
         super.tearDown()
     }
-
 
     func testViewModifierWithButtonIntegration() async {
         var callbackInvoked = false
@@ -113,7 +109,6 @@ final class ApplePayIntegrationTests: XCTestCase {
         }
     }
 
-
     func testInvariantIdentifierHandling() {
         let identifier = CheckoutIdentifier.invariant
 
@@ -154,7 +149,6 @@ final class ApplePayIntegrationTests: XCTestCase {
         XCTAssertNotNil(modifiedView, "Modified view should exist")
     }
 
-
     func testCheckoutDelegateCancelCallback() async {
         var cancelCallbackInvoked = false
 
@@ -179,7 +173,6 @@ final class ApplePayIntegrationTests: XCTestCase {
             XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")
         }
     }
-
 
     func testCheckoutDidClickLinkDelegateIntegration() async {
         var callbackInvoked = false
