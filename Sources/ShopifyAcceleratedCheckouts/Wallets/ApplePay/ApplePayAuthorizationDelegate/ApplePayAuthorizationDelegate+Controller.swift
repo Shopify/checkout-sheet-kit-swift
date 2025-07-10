@@ -92,10 +92,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didAuthorizePayment payment: PKPayment
     ) async -> PKPaymentAuthorizationResult {
-        await transition(to: .paymentAuthorized(payment: payment))
-
-        pkEncoder.payment = payment
         do {
+            pkEncoder.payment = payment
+            await transition(to: .paymentAuthorized(payment: payment))
+
             let cartID = try pkEncoder.cartID.get()
 
             if pkDecoder.requiredContactFields.count > 0 {
