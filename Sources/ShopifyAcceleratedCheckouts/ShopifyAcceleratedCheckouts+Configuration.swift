@@ -45,11 +45,11 @@ extension ShopifyAcceleratedCheckouts {
         public var customer: Customer?
 
         public init(
-            shopDomain: String,
+            storefrontDomain: String,
             storefrontAccessToken: String,
             customer: Customer? = nil
         ) {
-            storefrontDomain = shopDomain
+            self.storefrontDomain = storefrontDomain
             self.storefrontAccessToken = storefrontAccessToken
             self.customer = customer
         }

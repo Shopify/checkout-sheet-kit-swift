@@ -30,19 +30,19 @@ import PassKit
 extension ShopifyAcceleratedCheckouts.Configuration {
     static var testConfiguration: ShopifyAcceleratedCheckouts.Configuration {
         return ShopifyAcceleratedCheckouts.Configuration(
-            shopDomain: "test-shop.myshopify.com",
+            storefrontDomain: "test-shop.myshopify.com",
             storefrontAccessToken: "test-token",
             customer: ShopifyAcceleratedCheckouts.Customer.testCustomer
         )
     }
 
     static func testConfiguration(
-        shopDomain: String = "test-shop.myshopify.com",
+        storefrontDomain: String = "test-shop.myshopify.com",
         storefrontAccessToken: String = "test-token",
         customer: ShopifyAcceleratedCheckouts.Customer? = nil
     ) -> ShopifyAcceleratedCheckouts.Configuration {
         return ShopifyAcceleratedCheckouts.Configuration(
-            shopDomain: shopDomain,
+            storefrontDomain: storefrontDomain,
             storefrontAccessToken: storefrontAccessToken,
             customer: customer
         )

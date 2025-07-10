@@ -42,7 +42,7 @@ final class ShopPayCallbackTests: XCTestCase {
         super.setUp()
 
         mockConfiguration = ShopifyAcceleratedCheckouts.Configuration(
-            shopDomain: "test-shop.myshopify.com",
+            storefrontDomain: "test-shop.myshopify.com",
             storefrontAccessToken: "test-token"
         )
 
@@ -71,22 +71,22 @@ final class ShopPayCallbackTests: XCTestCase {
         var callbackInvoked = false
 
         viewController.eventHandlers = EventHandlers(
-            checkoutSuccessHandler: { [weak self] in
+            checkoutDidComplete: { [weak self] in
                 callbackInvoked = true
                 self?.successExpectation.fulfill()
             }
         )
 
-        viewController.eventHandlers.checkoutSuccessHandler?()
+        viewController.eventHandlers.checkoutDidComplete?()
 
         await fulfillment(of: [successExpectation], timeout: 1.0)
         XCTAssertTrue(callbackInvoked, "Success callback should have been invoked")
     }
 
     func testSuccessCallbackNotInvokedWhenNil() {
-        XCTAssertNil(viewController.eventHandlers.checkoutSuccessHandler)
+        XCTAssertNil(viewController.eventHandlers.checkoutDidComplete)
 
-        viewController.eventHandlers.checkoutSuccessHandler?() // Should not crash
+        viewController.eventHandlers.checkoutDidComplete?() // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -98,22 +98,22 @@ final class ShopPayCallbackTests: XCTestCase {
         var callbackInvoked = false
 
         viewController.eventHandlers = EventHandlers(
-            checkoutErrorHandler: { [weak self] in
+            checkoutDidFail: { [weak self] in
                 callbackInvoked = true
                 self?.errorExpectation.fulfill()
             }
         )
 
-        viewController.eventHandlers.checkoutErrorHandler?()
+        viewController.eventHandlers.checkoutDidFail?()
 
         await fulfillment(of: [errorExpectation], timeout: 1.0)
         XCTAssertTrue(callbackInvoked, "Error callback should have been invoked")
     }
 
     func testErrorCallbackNotInvokedWhenNil() {
-        XCTAssertNil(viewController.eventHandlers.checkoutErrorHandler)
+        XCTAssertNil(viewController.eventHandlers.checkoutDidFail)
 
-        viewController.eventHandlers.checkoutErrorHandler?() // Should not crash
+        viewController.eventHandlers.checkoutDidFail?() // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -125,22 +125,22 @@ final class ShopPayCallbackTests: XCTestCase {
         var callbackInvoked = false
 
         viewController.eventHandlers = EventHandlers(
-            checkoutCancelHandler: { [weak self] in
+            checkoutDidCancel: { [weak self] in
                 callbackInvoked = true
                 self?.cancelExpectation.fulfill()
             }
         )
 
-        viewController.eventHandlers.checkoutCancelHandler?()
+        viewController.eventHandlers.checkoutDidCancel?()
 
         await fulfillment(of: [cancelExpectation], timeout: 1.0)
         XCTAssertTrue(callbackInvoked, "Cancel callback should have been invoked")
     }
 
     func testCancelCallbackNotInvokedWhenNil() {
-        XCTAssertNil(viewController.eventHandlers.checkoutCancelHandler)
+        XCTAssertNil(viewController.eventHandlers.checkoutDidCancel)
 
-        viewController.eventHandlers.checkoutCancelHandler?() // Should not crash
+        viewController.eventHandlers.checkoutDidCancel?() // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -150,10 +150,10 @@ final class ShopPayCallbackTests: XCTestCase {
     func testCheckoutCompleteCallback() {
         var completeInvoked = false
         viewController.eventHandlers = EventHandlers(
-            checkoutSuccessHandler: { completeInvoked = true }
+            checkoutDidComplete: { completeInvoked = true }
         )
 
-        viewController.eventHandlers.checkoutSuccessHandler?()
+        viewController.eventHandlers.checkoutDidComplete?()
 
         XCTAssertTrue(completeInvoked, "Complete callback should be invoked")
     }
@@ -161,10 +161,10 @@ final class ShopPayCallbackTests: XCTestCase {
     func testCheckoutFailCallback() {
         var failInvoked = false
         viewController.eventHandlers = EventHandlers(
-            checkoutErrorHandler: { failInvoked = true }
+            checkoutDidFail: { failInvoked = true }
         )
 
-        viewController.eventHandlers.checkoutErrorHandler?()
+        viewController.eventHandlers.checkoutDidFail?()
 
         XCTAssertTrue(failInvoked, "Fail callback should be invoked")
     }
@@ -172,10 +172,10 @@ final class ShopPayCallbackTests: XCTestCase {
     func testCheckoutCancelCallback() {
         var cancelInvoked = false
         viewController.eventHandlers = EventHandlers(
-            checkoutCancelHandler: { cancelInvoked = true }
+            checkoutDidCancel: { cancelInvoked = true }
         )
 
-        viewController.eventHandlers.checkoutCancelHandler?()
+        viewController.eventHandlers.checkoutDidCancel?()
 
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
@@ -183,7 +183,7 @@ final class ShopPayCallbackTests: XCTestCase {
     func testCheckoutDidCancelDelegateBehavior() {
         var cancelInvoked = false
         viewController.eventHandlers = EventHandlers(
-            checkoutCancelHandler: { cancelInvoked = true }
+            checkoutDidCancel: { cancelInvoked = true }
         )
 
         viewController.checkoutDidCancel()

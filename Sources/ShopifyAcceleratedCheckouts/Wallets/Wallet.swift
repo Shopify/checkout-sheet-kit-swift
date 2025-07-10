@@ -32,27 +32,27 @@ public enum Wallet {
 
 /// Event handlers for wallet buttons
 public struct EventHandlers {
-    public var checkoutSuccessHandler: (() -> Void)?
-    public var checkoutErrorHandler: (() -> Void)?
-    public var checkoutCancelHandler: (() -> Void)?
-    public var shouldRecoverFromErrorHandler: ((ShopifyCheckoutSheetKit.CheckoutError) -> Bool)?
-    public var clickLinkHandler: ((URL) -> Void)?
-    public var webPixelEventHandler: ((ShopifyCheckoutSheetKit.PixelEvent) -> Void)?
+    public var checkoutDidComplete: (() -> Void)?
+    public var checkoutDidFail: (() -> Void)?
+    public var checkoutDidCancel: (() -> Void)?
+    public var shouldRecoverFromError: ((ShopifyCheckoutSheetKit.CheckoutError) -> Bool)?
+    public var checkoutDidClickLink: ((URL) -> Void)?
+    public var checkoutDidEmitWebPixelEvent: ((ShopifyCheckoutSheetKit.PixelEvent) -> Void)?
 
     public init(
-        checkoutSuccessHandler: (() -> Void)? = nil,
-        checkoutErrorHandler: (() -> Void)? = nil,
-        checkoutCancelHandler: (() -> Void)? = nil,
-        shouldRecoverFromErrorHandler: ((ShopifyCheckoutSheetKit.CheckoutError) -> Bool)? = nil,
-        clickLinkHandler: ((URL) -> Void)? = nil,
-        webPixelEventHandler: ((ShopifyCheckoutSheetKit.PixelEvent) -> Void)? = nil
+        checkoutDidComplete: (() -> Void)? = nil,
+        checkoutDidFail: (() -> Void)? = nil,
+        checkoutDidCancel: (() -> Void)? = nil,
+        shouldRecoverFromError: ((ShopifyCheckoutSheetKit.CheckoutError) -> Bool)? = nil,
+        checkoutDidClickLink: ((URL) -> Void)? = nil,
+        checkoutDidEmitWebPixelEvent: ((ShopifyCheckoutSheetKit.PixelEvent) -> Void)? = nil
     ) {
-        self.checkoutSuccessHandler = checkoutSuccessHandler
-        self.checkoutErrorHandler = checkoutErrorHandler
-        self.checkoutCancelHandler = checkoutCancelHandler
-        self.shouldRecoverFromErrorHandler = shouldRecoverFromErrorHandler
-        self.clickLinkHandler = clickLinkHandler
-        self.webPixelEventHandler = webPixelEventHandler
+        self.checkoutDidComplete = checkoutDidComplete
+        self.checkoutDidFail = checkoutDidFail
+        self.checkoutDidCancel = checkoutDidCancel
+        self.shouldRecoverFromError = shouldRecoverFromError
+        self.checkoutDidClickLink = checkoutDidClickLink
+        self.checkoutDidEmitWebPixelEvent = checkoutDidEmitWebPixelEvent
     }
 }
 
