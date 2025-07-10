@@ -5,7 +5,7 @@ import XCTest
 
 @available(iOS 17.0, *)
 final class ApplePayCallbackTests: XCTestCase {
-    var sut: ApplePayViewController!
+    var viewController: ApplePayViewController!
     var mockConfiguration: ApplePayConfigurationWrapper!
     var mockIdentifier: CheckoutIdentifier!
     var successExpectation: XCTestExpectation!
@@ -44,15 +44,15 @@ final class ApplePayCallbackTests: XCTestCase {
 
         mockIdentifier = .cart(cartID: "gid://Shopify/Cart/test-cart-id")
 
-        // Create SUT
-        sut = ApplePayViewController(
+        // Create view controller
+        viewController = ApplePayViewController(
             identifier: mockIdentifier,
             configuration: mockConfiguration
         )
     }
 
     override func tearDown() {
-        sut = nil
+        viewController = nil
         mockConfiguration = nil
         mockIdentifier = nil
         successExpectation = nil
@@ -66,14 +66,14 @@ final class ApplePayCallbackTests: XCTestCase {
         var callbackInvoked = false
 
         await MainActor.run {
-            sut.onComplete = { [weak self] in
+            viewController.onComplete = { [weak self] in
                 callbackInvoked = true
                 self?.successExpectation.fulfill()
             }
         }
 
         await MainActor.run {
-            sut.onComplete?()
+            viewController.onComplete?()
         }
 
         await fulfillment(of: [successExpectation], timeout: 1.0)
@@ -82,11 +82,11 @@ final class ApplePayCallbackTests: XCTestCase {
 
     func testSuccessCallbackNotInvokedWhenNil() async {
         await MainActor.run {
-            XCTAssertNil(sut.onComplete)
+            XCTAssertNil(viewController.onComplete)
         }
 
         await MainActor.run {
-            sut.onComplete?() // Should not crash
+            viewController.onComplete?() // Should not crash
         }
 
         // Wait a moment to ensure no crash occurs
@@ -99,14 +99,14 @@ final class ApplePayCallbackTests: XCTestCase {
         var callbackInvoked = false
 
         await MainActor.run {
-            sut.onFail = { [weak self] in
+            viewController.onFail = { [weak self] in
                 callbackInvoked = true
                 self?.errorExpectation.fulfill()
             }
         }
 
         await MainActor.run {
-            sut.onFail?()
+            viewController.onFail?()
         }
 
         await fulfillment(of: [errorExpectation], timeout: 1.0)
@@ -115,11 +115,11 @@ final class ApplePayCallbackTests: XCTestCase {
 
     func testErrorCallbackNotInvokedWhenNil() async {
         await MainActor.run {
-            XCTAssertNil(sut.onFail)
+            XCTAssertNil(viewController.onFail)
         }
 
         await MainActor.run {
-            sut.onFail?() // Should not crash
+            viewController.onFail?() // Should not crash
         }
 
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
@@ -131,14 +131,14 @@ final class ApplePayCallbackTests: XCTestCase {
         var callbackInvoked = false
 
         await MainActor.run {
-            sut.onCancel = { [weak self] in
+            viewController.onCancel = { [weak self] in
                 callbackInvoked = true
                 self?.cancelExpectation.fulfill()
             }
         }
 
         await MainActor.run {
-            sut.onCancel?()
+            viewController.onCancel?()
         }
 
         await fulfillment(of: [cancelExpectation], timeout: 1.0)
@@ -147,12 +147,12 @@ final class ApplePayCallbackTests: XCTestCase {
 
     func testCancelCallbackNotInvokedWhenNil() async {
         let isNil = await MainActor.run {
-            sut.onCancel == nil
+            viewController.onCancel == nil
         }
         XCTAssertTrue(isNil, "onCancel should be nil")
 
         await MainActor.run {
-            sut.onCancel?() // Should not crash
+            viewController.onCancel?() // Should not crash
         }
 
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
@@ -165,19 +165,19 @@ final class ApplePayCallbackTests: XCTestCase {
         var cancelInvoked = false
 
         await MainActor.run {
-            sut.onComplete = {
+            viewController.onComplete = {
                 successInvoked = true
             }
-            sut.onFail = {
+            viewController.onFail = {
                 errorInvoked = true
             }
-            sut.onCancel = {
+            viewController.onCancel = {
                 cancelInvoked = true
             }
         }
 
         await MainActor.run {
-            sut.onCancel?()
+            viewController.onCancel?()
         }
 
         try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
@@ -194,17 +194,17 @@ final class ApplePayCallbackTests: XCTestCase {
         let lock = NSLock()
 
         await MainActor.run {
-            sut.onComplete = {
+            viewController.onComplete = {
                 lock.lock()
                 successCount += 1
                 lock.unlock()
             }
-            sut.onFail = {
+            viewController.onFail = {
                 lock.lock()
                 errorCount += 1
                 lock.unlock()
             }
-            sut.onCancel = {
+            viewController.onCancel = {
                 lock.lock()
                 cancelCount += 1
                 lock.unlock()
@@ -214,11 +214,11 @@ final class ApplePayCallbackTests: XCTestCase {
         for i in 0 ..< iterations {
             await MainActor.run {
                 if i % 3 == 0 {
-                    sut.onComplete?()
+                    viewController.onComplete?()
                 } else if i % 3 == 1 {
-                    sut.onFail?()
+                    viewController.onFail?()
                 } else {
-                    sut.onCancel?()
+                    viewController.onCancel?()
                 }
             }
 
@@ -240,18 +240,18 @@ final class ApplePayCallbackTests: XCTestCase {
 
         await MainActor.run {
             // First assignment
-            sut.onComplete = {
+            viewController.onComplete = {
                 firstCallbackInvoked = true
             }
 
             // Second assignment (should replace first)
-            sut.onComplete = {
+            viewController.onComplete = {
                 secondCallbackInvoked = true
             }
         }
 
         await MainActor.run {
-            sut.onComplete?()
+            viewController.onComplete?()
         }
 
         try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
@@ -265,18 +265,18 @@ final class ApplePayCallbackTests: XCTestCase {
 
         await MainActor.run {
             // First assignment
-            sut.onCancel = {
+            viewController.onCancel = {
                 firstCallbackInvoked = true
             }
 
             // Second assignment (should replace first)
-            sut.onCancel = {
+            viewController.onCancel = {
                 secondCallbackInvoked = true
             }
         }
 
         await MainActor.run {
-            sut.onCancel?()
+            viewController.onCancel?()
         }
 
         try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
@@ -289,7 +289,7 @@ final class ApplePayCallbackTests: XCTestCase {
         var passedError: ShopifyCheckoutSheetKit.CheckoutError?
 
         await MainActor.run {
-            sut.onShouldRecoverFromError = { error in
+            viewController.onShouldRecoverFromError = { error in
                 passedError = error
                 expectation.fulfill()
                 return true
@@ -297,7 +297,7 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .unknown), recoverable: true)
-        let delegate = sut.authorizationDelegate as! ApplePayAuthorizationDelegate
+        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
         delegate.shouldRecoverFromError(error: testError)
 
         await fulfillment(of: [expectation], timeout: 1.0)
@@ -308,14 +308,14 @@ final class ApplePayCallbackTests: XCTestCase {
         var callbackInvoked = false
 
         await MainActor.run {
-            sut.onShouldRecoverFromError = { _ in
+            viewController.onShouldRecoverFromError = { _ in
                 callbackInvoked = true
                 return true // Even though we return true, the delegate method will return false
             }
         }
 
         let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test", code: .clientError(code: .unknown), recoverable: true)
-        let delegate = sut.authorizationDelegate as! ApplePayAuthorizationDelegate
+        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
         delegate.shouldRecoverFromError(error: testError)
 
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
@@ -327,14 +327,14 @@ final class ApplePayCallbackTests: XCTestCase {
         var passedURL: URL?
 
         await MainActor.run {
-            sut.onClickLink = { url in
+            viewController.onClickLink = { url in
                 passedURL = url
                 expectation.fulfill()
             }
         }
 
         let testURL = URL(string: "https://test-shop.myshopify.com/products/test")!
-        let delegate = sut.authorizationDelegate as! ApplePayAuthorizationDelegate
+        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
         delegate.checkoutDidClickLink(url: testURL)
 
         await fulfillment(of: [expectation], timeout: 1.0)
@@ -343,11 +343,11 @@ final class ApplePayCallbackTests: XCTestCase {
 
     func testCheckoutDidClickLinkCallbackNotInvokedWhenNil() async {
         await MainActor.run {
-            XCTAssertNil(sut.onClickLink)
+            XCTAssertNil(viewController.onClickLink)
         }
 
         let testURL = URL(string: "https://test-shop.myshopify.com")!
-        let delegate = sut.authorizationDelegate as! ApplePayAuthorizationDelegate
+        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
         delegate.checkoutDidClickLink(url: testURL) // Should not crash
 
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
@@ -364,12 +364,12 @@ final class ApplePayCallbackTests: XCTestCase {
         ]
 
         await MainActor.run {
-            sut.onClickLink = { url in
+            viewController.onClickLink = { url in
                 capturedURLs.append(url)
             }
         }
 
-        let delegate = sut.authorizationDelegate as! ApplePayAuthorizationDelegate
+        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
         for url in testURLs {
             delegate.checkoutDidClickLink(url: url)
         }
