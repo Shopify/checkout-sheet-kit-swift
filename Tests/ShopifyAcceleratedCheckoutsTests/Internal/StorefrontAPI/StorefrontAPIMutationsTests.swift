@@ -144,7 +144,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
         // Create StorefrontAPI instance
         storefrontAPI = StorefrontAPI(
-            shopDomain: "test.myshopify.com",
+            storefrontDomain: "test.myshopify.com",
             storefrontAccessToken: "test-token",
             countryCode: CountryCode.US,
             languageCode: LanguageCode.EN
