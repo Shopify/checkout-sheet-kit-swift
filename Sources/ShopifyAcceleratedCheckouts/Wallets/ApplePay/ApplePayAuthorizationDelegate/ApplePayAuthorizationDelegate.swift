@@ -28,7 +28,7 @@ import ShopifyCheckoutSheetKit
 @available(iOS 17.0, *)
 class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     let configuration: ApplePayConfigurationWrapper
-    let abortError = ShopifyAcceleratedCheckouts.Error.invariant(message: .nilCart)
+    let abortError = ShopifyAcceleratedCheckouts.Error.invariant(message: "cart is nil")
     var controller: PayController
     var checkoutViewController: CheckoutViewController?
 

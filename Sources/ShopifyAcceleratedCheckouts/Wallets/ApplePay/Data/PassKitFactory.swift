@@ -292,7 +292,7 @@ class PassKitFactory {
 
         var lineItems: [PKPaymentSummaryItem] = []
 
-        /// 1. Subtotal (sum of all line items before discounts)
+        // 1. Subtotal (sum of all line items before discounts)
         // https://github.com/Shopify/portable-wallets/blob/main/src/utils/get-subtotal-from-line-items.ts#L17
         let subtotal = getSubtotalFromLineItems(cart: cart)
 

@@ -32,7 +32,7 @@ class PKEncoder {
     var paymentData: PaymentData?
     private var selectedShippingContact: Result<PKContact, ShopifyAcceleratedCheckouts.Error> =
         .failure(
-            .invariant(message: .nilShippingContact)
+            .invariant(message: "shippingContact is nil")
         )
     var configuration: ApplePayConfigurationWrapper
 
@@ -67,29 +67,29 @@ class PKEncoder {
 
     var cartID: Result<StorefrontAPI.Types.ID, ShopifyAcceleratedCheckouts.Error> {
         guard let cartID = cart()?.id else {
-            return .failure(.invariant(message: .nilCart))
+            return .failure(.invariant(message: "cart is nil"))
         }
         return .success(cartID)
     }
 
     var selectedDeliveryOptionHandle: Result<StorefrontAPI.Types.ID, ShopifyAcceleratedCheckouts.Error> {
         guard let selectedShippingMethod else {
-            return .failure(.invariant(message: .nilShippingMethod))
+            return .failure(.invariant(message: "shippingMethod is nil"))
         }
         /// The deliveryOptionHandle is set as the shippingMethodIdentifier in PKDecoder.swift
         ///
         guard let identifier = selectedShippingMethod.identifier else {
-            return .failure(.invariant(message: .nilShippingMethodID))
+            return .failure(.invariant(message: "shippingMethodID is nil"))
         }
         return .success(StorefrontAPI.Types.ID(identifier))
     }
 
     var deliveryGroupID: Result<StorefrontAPI.Types.ID, ShopifyAcceleratedCheckouts.Error> {
         guard let cart = cart() else {
-            return .failure(.invariant(message: .nilCart))
+            return .failure(.invariant(message: "cart is nil"))
         }
         guard let selectedShippingMethodId = try? selectedDeliveryOptionHandle.get() else {
-            return .failure(.invariant(message: .nilShippingMethodID))
+            return .failure(.invariant(message: "shippingMethodID is nil"))
         }
         guard
             let deliveryGroupID = PassKitFactory.shared.getDeliveryOptionHandle(
@@ -97,7 +97,7 @@ class PKEncoder {
                 by: selectedShippingMethodId
             )
         else {
-            return .failure(.invariant(message: .nilShippingMethodID))
+            return .failure(.invariant(message: "shippingMethodID is nil"))
         }
         return .success(deliveryGroupID)
     }
@@ -106,7 +106,7 @@ class PKEncoder {
 
     var billingContact: Result<PKContact, ShopifyAcceleratedCheckouts.Error> {
         guard let billingContact = payment?.billingContact else {
-            return .failure(.invariant(message: .nilPayment))
+            return .failure(.invariant(message: "payment is nil"))
         }
         return .success(billingContact)
     }
@@ -121,7 +121,7 @@ class PKEncoder {
             case .success:
                 return selectedShippingContact
             case .failure:
-                return .failure(.invariant(message: .nilPayment))
+                return .failure(.invariant(message: "payment is nil"))
             }
         }
         set { selectedShippingContact = newValue }
@@ -130,7 +130,7 @@ class PKEncoder {
     typealias LastDigits = String
     var lastDigits: Result<LastDigits, ShopifyAcceleratedCheckouts.Error> {
         guard let payment else {
-            return .failure(.invariant(message: .nilPayment))
+            return .failure(.invariant(message: "payment is nil"))
         }
         guard
             let digits = payment
@@ -140,7 +140,7 @@ class PKEncoder {
             .components(separatedBy: " ")
             .last
         else {
-            return .failure(.invariant(message: .nilDisplayName))
+            return .failure(.invariant(message: "displayName is nil"))
         }
         return .success(digits)
     }
@@ -171,7 +171,7 @@ class PKEncoder {
         -> Result<StorefrontAPI.Types.Address, ShopifyAcceleratedCheckouts.Error>
     {
         guard let postalAddress = contact?.postalAddress else {
-            return .failure(.invariant(message: .nilPostalAddress))
+            return .failure(.invariant(message: "postalAddress is nil"))
         }
         let country = mapToCountryCode(code: postalAddress.isoCountryCode)
         // HK does not have postal codes. Apple Pay puts Region in postalCode
@@ -226,21 +226,21 @@ class PKEncoder {
 
     var billingAddress: Result<StorefrontAPI.Types.Address, ShopifyAcceleratedCheckouts.Error> {
         guard let contact = try? billingContact.get() else {
-            return .failure(.invariant(message: .nilBillingContact))
+            return .failure(.invariant(message: "billingContact is nil"))
         }
         return pkContactToAddress(contact: contact)
     }
 
     var shippingAddress: Result<StorefrontAPI.Types.Address, ShopifyAcceleratedCheckouts.Error> {
         guard let contact = try? shippingContact.get() else {
-            return .failure(.invariant(message: .nilShippingContact))
+            return .failure(.invariant(message: "shippingContact is nil"))
         }
         return pkContactToAddress(contact: contact)
     }
 
     var totalAmount: Result<StorefrontAPI.Types.Money, ShopifyAcceleratedCheckouts.Error> {
         guard let cart = cart() else {
-            return .failure(.invariant(message: .nilCart))
+            return .failure(.invariant(message: "cart is nil"))
         }
         return .success(
             StorefrontAPI.Types.Money(
@@ -268,7 +268,7 @@ class PKEncoder {
             let email = contact.emailAddress,
             !email.isEmpty
         else {
-            return .failure(.invariant(message: .nilEmail))
+            return .failure(.invariant(message: "email is nil"))
         }
 
         return .success(email)
@@ -276,16 +276,16 @@ class PKEncoder {
 
     var applePayPayment: Result<StorefrontAPI.Types.ApplePayPayment, ShopifyAcceleratedCheckouts.Error> {
         guard let payment else {
-            return .failure(.invariant(message: .nilPayment))
+            return .failure(.invariant(message: "payment is nil"))
         }
         guard let paymentData = decodePaymentData(payment: payment) else {
-            return .failure(.invariant(message: .nilPaymentData))
+            return .failure(.invariant(message: "paymentData is nil"))
         }
         guard let billingAddress = try? billingAddress.get() else {
-            return .failure(.invariant(message: .nilBillingAddress))
+            return .failure(.invariant(message: "billingAddress is nil"))
         }
         guard let lastDigits = try? lastDigits.get() else {
-            return .failure(.invariant(message: .nilLastDigits))
+            return .failure(.invariant(message: "lastDigits is nil"))
         }
 
         return .success(
