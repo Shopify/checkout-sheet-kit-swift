@@ -183,26 +183,30 @@ protocol PayController: AnyObject {
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "checkoutIdentifier")
             }
         } catch let error as StorefrontAPI.Errors {
-            switch error {
-            case let .userError(userErrors, cart):
-                guard let cart else { throw error }
-                let action = ErrorHandler.map(errors: userErrors, shippingCountry: nil, cart: cart)
-                try await handleErrorAction(action: action, cart: cart)
-                return cart
-
-            case let .warning(type, cart):
-                guard let cart else { throw error }
-                let action = ErrorHandler.map(warningType: type, cart: cart)
-                try await handleErrorAction(action: action, cart: cart)
-                return cart
-
-            default:
-                await authorizationDelegate.transition(to: .unexpectedError(error: error))
-                throw error
-            }
+            return try await handleStorefrontError(error)
         } catch {
             await authorizationDelegate.transition(to: .terminalError(error: error))
             await onFail?()
+            throw error
+        }
+    }
+
+    private func handleStorefrontError(_ error: StorefrontAPI.Errors) async throws -> StorefrontAPI.Types.Cart {
+        switch error {
+        case let .userError(userErrors, cart):
+            guard let cart else { throw error }
+            let action = ErrorHandler.map(errors: userErrors, shippingCountry: nil, cart: cart)
+            try await handleErrorAction(action: action, cart: cart)
+            return cart
+
+        case let .warning(type, cart):
+            guard let cart else { throw error }
+            let action = ErrorHandler.map(warningType: type, cart: cart)
+            try await handleErrorAction(action: action, cart: cart)
+            return cart
+
+        default:
+            await authorizationDelegate.transition(to: .unexpectedError(error: error))
             throw error
         }
     }

@@ -49,6 +49,7 @@ extension ErrorHandler {
         }
     }
 
+    // swiftlint:disable cyclomatic_complexity
     private static func getErrorAction(error: StorefrontAPI.SubmissionError, shippingCountry: String?, checkoutURL: URL?)
         -> PaymentSheetAction
     {
@@ -423,6 +424,8 @@ extension ErrorHandler {
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
         }
     }
+
+    // swiftlint:enable cyclomatic_complexity
 
     private static func filterGenericViolations(errors: [StorefrontAPI.SubmissionError]) -> [StorefrontAPI.SubmissionError] {
         // If the only error is paymentsUnacceptablePaymentAmount, return it

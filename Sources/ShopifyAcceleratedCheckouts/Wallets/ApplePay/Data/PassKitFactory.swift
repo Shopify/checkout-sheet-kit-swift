@@ -151,7 +151,34 @@ class PassKitFactory {
         let lineItemDiscountAllocations = cart.lines.nodes.flatMap { $0.discountAllocations }
 
         // Find discount codes that are applicable but not already accounted for
-        let applicableOtherDiscountCodes = cart.discountCodes.filter { discountCode in
+        let applicableOtherDiscountCodes = findApplicableUnaccountedDiscountCodes(
+            cart: cart,
+            lineItemDiscountAllocations: lineItemDiscountAllocations
+        )
+
+        // Map applicable discount codes to synthetic discount allocations with 0 amount
+        // These are typically shipping discounts that don't show up in other allocations
+        let shippingDiscounts = createShippingDiscounts(
+            discountCodes: applicableOtherDiscountCodes,
+            currencyCode: currencyCode
+        )
+
+        // Convert cart discount allocations
+        let cartDiscounts = convertDiscountAllocations(cart.discountAllocations)
+
+        // Convert line item discount allocations
+        let productDiscounts = convertDiscountAllocations(lineItemDiscountAllocations)
+
+        // Return combined array: shipping discounts + cart discounts + product discounts
+        return shippingDiscounts + cartDiscounts + productDiscounts
+    }
+
+    /// Finds discount codes that are applicable but not already accounted for in allocations
+    private func findApplicableUnaccountedDiscountCodes(
+        cart: StorefrontAPI.Cart,
+        lineItemDiscountAllocations: [StorefrontAPI.CartDiscountAllocation]
+    ) -> [StorefrontAPI.CartDiscountCode] {
+        return cart.discountCodes.filter { discountCode in
             guard discountCode.applicable else { return false }
 
             // Check if not in cart discount allocations
@@ -166,76 +193,57 @@ class PassKitFactory {
 
             return !allocations
         }
+    }
 
-        // Map applicable discount codes to synthetic discount allocations with 0 amount
-        // These are typically shipping discounts that don't show up in other allocations
-        let shippingDiscounts: [DiscountAllocationInfo] =
-            applicableOtherDiscountCodes
-                .map { discountCode in
-                    DiscountAllocationInfo(
-                        code: discountCode.code,
-                        amount: 0,
-                        currencyCode: currencyCode
-                    )
-                }
+    /// Creates shipping discount allocations with 0 amount for applicable discount codes
+    private func createShippingDiscounts(
+        discountCodes: [StorefrontAPI.CartDiscountCode],
+        currencyCode: String
+    ) -> [DiscountAllocationInfo] {
+        return discountCodes.map { discountCode in
+            DiscountAllocationInfo(
+                code: discountCode.code,
+                amount: 0,
+                currencyCode: currencyCode
+            )
+        }
+    }
 
-        // Convert cart discount allocations
-        let cartDiscounts: [DiscountAllocationInfo] = cart.discountAllocations
-            .compactMap { allocation in
-                let code: String? =
-                    if case let .code(codeAllocation) = allocation {
-                        codeAllocation.code
-                    } else {
-                        nil
-                    }
+    /// Converts cart discount allocations to DiscountAllocationInfo
+    private func convertDiscountAllocations(
+        _ allocations: [StorefrontAPI.CartDiscountAllocation]
+    ) -> [DiscountAllocationInfo] {
+        return allocations.compactMap { allocation in
+            convertSingleDiscountAllocation(allocation)
+        }
+    }
 
-                let (discountedAmount, currencyCode) =
-                    switch allocation {
-                    case let .automatic(auto):
-                        (auto.discountedAmount.amount, auto.discountedAmount.currencyCode)
-                    case let .code(code):
-                        (code.discountedAmount.amount, code.discountedAmount.currencyCode)
-                    case let .custom(custom):
-                        (custom.discountedAmount.amount, custom.discountedAmount.currencyCode)
-                    }
-
-                return DiscountAllocationInfo(
-                    code: code,
-                    amount: discountedAmount,
-                    currencyCode: currencyCode
-                )
+    /// Converts a single discount allocation to DiscountAllocationInfo
+    private func convertSingleDiscountAllocation(
+        _ allocation: StorefrontAPI.CartDiscountAllocation
+    ) -> DiscountAllocationInfo {
+        let code: String? =
+            if case let .code(codeAllocation) = allocation {
+                codeAllocation.code
+            } else {
+                nil
             }
 
-        // Convert line item discount allocations
-        let productDiscounts: [DiscountAllocationInfo] =
-            lineItemDiscountAllocations
-                .compactMap { allocation in
-                    let code: String? =
-                        if case let .code(codeAllocation) = allocation {
-                            codeAllocation.code
-                        } else {
-                            nil
-                        }
+        let (discountedAmount, currencyCode) =
+            switch allocation {
+            case let .automatic(auto):
+                (auto.discountedAmount.amount, auto.discountedAmount.currencyCode)
+            case let .code(code):
+                (code.discountedAmount.amount, code.discountedAmount.currencyCode)
+            case let .custom(custom):
+                (custom.discountedAmount.amount, custom.discountedAmount.currencyCode)
+            }
 
-                    let (discountedAmount, currencyCode) =
-                        switch allocation {
-                        case let .automatic(auto):
-                            (auto.discountedAmount.amount, auto.discountedAmount.currencyCode)
-                        case let .code(code):
-                            (code.discountedAmount.amount, code.discountedAmount.currencyCode)
-                        case let .custom(custom):
-                            (custom.discountedAmount.amount, custom.discountedAmount.currencyCode)
-                        }
-
-                    return DiscountAllocationInfo(
-                        code: code,
-                        amount: discountedAmount,
-                        currencyCode: currencyCode
-                    )
-                }
-
-        // Return combined array: shipping discounts + cart discounts + product discounts
-        return shippingDiscounts + cartDiscounts + productDiscounts
+        return DiscountAllocationInfo(
+            code: code,
+            amount: discountedAmount,
+            currencyCode: currencyCode
+        )
     }
 
     /// Computes the cartesian product of a 2D array. The cartesian product is the set of all possible

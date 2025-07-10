@@ -84,16 +84,16 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     }
 
     func transition(to nextState: ApplePayState) async {
-        let oldValue = state
-
-        // Validate the transition before applying it
-        guard oldValue.canTransition(to: nextState) else {
+        guard state.canTransition(to: nextState) else {
             #if DEBUG
-                print("⚠️ Invalid state transition attempted: \(String(describing: oldValue)) -> \(String(describing: nextState))")
+                print(
+                    "⚠️ Invalid state transition attempted: \(String(describing: state)) -> \(String(describing: nextState))"
+                )
             #endif
             return
         }
 
+        let previousState = state
         state = nextState
 
         switch state {
@@ -101,19 +101,10 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
             try? await startPaymentRequest()
 
         case .reset:
-            pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
-            pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
-            selectedShippingAddressID = nil
-            checkoutURL = nil
-            await transition(to: .idle)
+            await onReset()
 
         case .interrupt:
-            try? await _Concurrency.Task.retrying {
-                let cartID = try self.pkEncoder.cartID.get()
-                try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
-                    id: cartID
-                )
-            }.value
+            await onInterrupt()
 
         case let .presentingCSK(url):
             guard let url else { return }
@@ -124,22 +115,43 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         /// - present Checkout to resolve errors (checkoutUrl, possibly with interrupt query params)
         /// - transition to .reset e.g. if user is dismissing/cancelling the payment sheets
         case .completed:
-            switch oldValue {
-            case .paymentAuthorizationFailed,
-                 .interrupt,
-                 .unexpectedError,
-                 .paymentAuthorized:
-                await transition(to: .presentingCSK(url: url))
-
-            case let .cartSubmittedForCompletion(redirectURL):
-                await transition(to: .presentingCSK(url: redirectURL))
-
-            default:
-                await transition(to: .reset)
-            }
+            await onCompleted(previousState: previousState)
 
         default:
             break
+        }
+    }
+
+    private func onReset() async {
+        pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
+        pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
+        selectedShippingAddressID = nil
+        checkoutURL = nil
+        await transition(to: .idle)
+    }
+
+    private func onInterrupt() async {
+        try? await _Concurrency.Task.retrying {
+            let cartID = try self.pkEncoder.cartID.get()
+            try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
+                id: cartID
+            )
+        }.value
+    }
+
+    private func onCompleted(previousState: ApplePayState) async {
+        switch previousState {
+        case .paymentAuthorizationFailed,
+             .interrupt,
+             .unexpectedError,
+             .paymentAuthorized:
+            await transition(to: .presentingCSK(url: url))
+
+        case let .cartSubmittedForCompletion(redirectURL):
+            await transition(to: .presentingCSK(url: redirectURL))
+
+        default:
+            await transition(to: .reset)
         }
     }
 
