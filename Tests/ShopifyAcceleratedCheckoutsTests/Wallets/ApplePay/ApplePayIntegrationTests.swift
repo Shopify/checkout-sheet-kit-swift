@@ -21,7 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-
 import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
@@ -167,7 +166,7 @@ final class ApplePayIntegrationTests: XCTestCase {
 
         let button = ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart"),
-            eventHandlers: EventHandlers(checkoutSuccessHandler: successHandler)
+            eventHandlers: EventHandlers(checkoutDidComplete: successHandler)
         )
 
         // Apply additional modifiers (simulating view updates)

@@ -92,3 +92,48 @@ extension ShopSettings {
         )
     }
 }
+
+@available(iOS 17.0, *)
+extension ShopifyAcceleratedCheckouts.ApplePayConfiguration {
+    static var testConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
+        return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+            merchantIdentifier: "merchant.test.id",
+            supportedNetworks: [.visa],
+            contactFields: [.email, .phone]
+        )
+    }
+
+    static func testConfiguration(
+        merchantIdentifier: String = "merchant.test.id",
+        supportedNetworks: [PKPaymentNetwork] = [.visa]
+    ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
+        return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+            merchantIdentifier: merchantIdentifier,
+            supportedNetworks: supportedNetworks,
+            contactFields: [.email, .phone]
+        )
+    }
+}
+
+@available(iOS 17.0, *)
+extension ApplePayConfigurationWrapper {
+    static var testConfiguration: ApplePayConfigurationWrapper {
+        return ApplePayConfigurationWrapper(
+            common: ShopifyAcceleratedCheckouts.Configuration.testConfiguration,
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration.testConfiguration,
+            shopSettings: ShopSettings.testShopSettings
+        )
+    }
+
+    static func testConfiguration(
+        common: ShopifyAcceleratedCheckouts.Configuration = .testConfiguration,
+        applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration = .testConfiguration,
+        shopSettings: ShopSettings = .testShopSettings
+    ) -> ApplePayConfigurationWrapper {
+        return ApplePayConfigurationWrapper(
+            common: common,
+            applePay: applePay,
+            shopSettings: shopSettings
+        )
+    }
+}
