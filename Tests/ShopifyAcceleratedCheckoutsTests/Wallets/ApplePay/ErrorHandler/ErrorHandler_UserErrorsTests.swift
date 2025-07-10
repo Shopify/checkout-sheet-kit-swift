@@ -36,17 +36,17 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
         let expectedMessageKey: String?
         let testDescription: String
 
+        enum ValidationError {
+            case emailInvalid
+            case phoneNumberInvalid
+            case nameInvalid
+            case deliveryAddressInvalid
+            case addressUnserviceableError
+        }
+
         enum ExpectedAction {
             case showError(ValidationError)
             case interrupt(ErrorHandler.InterruptReason)
-
-            enum ValidationError {
-                case emailInvalid
-                case phoneNumberInvalid
-                case nameInvalid
-                case deliveryAddressInvalid
-                case addressUnserviceableError
-            }
         }
     }
 

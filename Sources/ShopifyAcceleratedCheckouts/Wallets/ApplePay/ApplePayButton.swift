@@ -57,8 +57,6 @@ struct ApplePayButton: View {
         self.eventHandlers = eventHandlers
     }
 
-    // TODO: add conditional rendering from canMakePayments(usingnetworks)
-    // https://developer.apple.com/documentation/passkit/pkpaymentauthorizationviewcontroller/canmakepayments(usingnetworks:)
     var body: some View {
         switch identifier {
         case .invariant:

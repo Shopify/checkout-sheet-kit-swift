@@ -145,11 +145,9 @@ class PKDecoder {
         .postalAddress
     ]
 
+    // https://github.com/shop/world/blob/db694ab60e8e23ad2d1c6e9e1d2491f3d48ecde0/areas/clients/checkout-web/app/utilities/wallets/hooks/index.ts#L106
     var requiredContactFields: Set<PKContactField> {
         var fields: Set<PKContactField> = []
-
-        // https://github.com/shop/world/blob/db694ab60e8e23ad2d1c6e9e1d2491f3d48ecde0/areas/clients/checkout-web/app/utilities/wallets/hooks/index.ts#L106
-        // TODO: These should come from shop configuration or checkout settings
 
         if configuration.applePay.contactFields.contains(.email) {
             fields.insert(.emailAddress)

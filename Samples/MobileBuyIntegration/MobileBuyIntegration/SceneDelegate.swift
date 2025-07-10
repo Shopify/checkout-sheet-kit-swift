@@ -82,7 +82,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     private func setupControllers() {
         /// Branding Logo
-        /// TODO: Fetch this from the Storefront API for the configured storefront
         let logoImageView = UIImageView(image: UIImage(named: "logo"))
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.widthAnchor.constraint(equalToConstant: 90).isActive = true
