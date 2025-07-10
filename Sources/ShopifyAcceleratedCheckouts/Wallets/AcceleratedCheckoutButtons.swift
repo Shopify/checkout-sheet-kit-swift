@@ -126,7 +126,7 @@ extension AcceleratedCheckoutButtons {
     /// - Returns: A view with the checkout success handler set
     public func onComplete(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.eventHandlers.checkoutSuccessHandler = action
+        newView.eventHandlers.checkoutDidComplete = action
         return newView
     }
 
@@ -146,7 +146,7 @@ extension AcceleratedCheckoutButtons {
     /// - Returns: A view with the checkout error handler set
     public func onFail(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.eventHandlers.checkoutErrorHandler = action
+        newView.eventHandlers.checkoutDidFail = action
         return newView
     }
 
@@ -166,7 +166,7 @@ extension AcceleratedCheckoutButtons {
     /// - Returns: A view with the checkout cancel handler set
     public func onCancel(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.eventHandlers.checkoutCancelHandler = action
+        newView.eventHandlers.checkoutDidCancel = action
         return newView
     }
 
@@ -188,7 +188,7 @@ extension AcceleratedCheckoutButtons {
         _ action: @escaping (ShopifyCheckoutSheetKit.CheckoutError) -> Bool
     ) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.eventHandlers.shouldRecoverFromErrorHandler = action
+        newView.eventHandlers.shouldRecoverFromError = action
         return newView
     }
 
@@ -208,7 +208,7 @@ extension AcceleratedCheckoutButtons {
     /// - Returns: A view with the link click handler set
     public func onClickLink(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.eventHandlers.clickLinkHandler = action
+        newView.eventHandlers.checkoutDidClickLink = action
         return newView
     }
 
@@ -230,7 +230,7 @@ extension AcceleratedCheckoutButtons {
         -> AcceleratedCheckoutButtons
     {
         var newView = self
-        newView.eventHandlers.webPixelEventHandler = action
+        newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
         return newView
     }
 }

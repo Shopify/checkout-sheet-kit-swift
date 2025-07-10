@@ -28,36 +28,29 @@ import ShopifyCheckoutSheetKit
 @available(iOS 17.0, *)
 class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     let configuration: ApplePayConfigurationWrapper
-    let abortError = ShopifyAcceleratedCheckouts.Error.invariant(message: "cart is nil")
+    let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
     var controller: PayController
-    var checkoutViewController: CheckoutViewController?
 
+    /// A URL that will render checkout for the cart contents
     var checkoutURL: URL?
-    var redirectURL: URL?
+
+    /// URL to be passed to ShopifyCheckoutSheetKit.present
+    /// Selects the url based on the current State
     var url: URL? {
-        if let redirectURL {
+        if case let .cartSubmittedForCompletion(redirectURL) = state {
             return redirectURL
         }
-        if let checkoutURL {
-            if let interruptUrl = checkoutURL.appendQueryParam(name: interruptReason?.queryParam, value: "true") {
-                return interruptUrl
-            }
 
-            return checkoutURL
-        }
-        return nil
+        guard let checkoutURL else { return nil }
+        guard case let .interrupt(reason) = state else { return checkoutURL }
+
+        return checkoutURL.appendQueryParam(name: reason.queryParam, value: "true")
     }
-
-    var interruptReason: ErrorHandler.InterruptReason?
-
-    var paymentRequest: PKPaymentRequest?
 
     var selectedShippingAddressID: StorefrontAPI.Types.ID?
 
     var pkEncoder: PKEncoder
     var pkDecoder: PKDecoder
-
-    var isFailure = false
 
     init(configuration: ApplePayConfigurationWrapper, controller: PayController) {
         self.configuration = configuration
@@ -67,25 +60,87 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         pkDecoder = PKDecoder(configuration: configuration, cart: { controller.cart })
     }
 
-    func presentPaymentSheet() async throws {
+    private(set) var state: ApplePayState = .idle {
+        didSet {
+            #if DEBUG
+                print(
+                    "ApplePayState: \(String(describing: oldValue)) -> \(String(describing: state))",
+                    terminator: "\n---\n"
+                )
+            #endif
+        }
+    }
+
+    private func startPaymentRequest() async throws {
         guard let cart = controller.cart else { return }
         try setCart(to: cart)
         let paymentRequest = try pkDecoder.createPaymentRequest()
-        self.paymentRequest = paymentRequest
 
         let paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         paymentController.delegate = self
         let presented = await paymentController.present()
-        print("Controller presented: \(presented)")
+
+        await transition(to: presented ? .appleSheetPresented : .reset)
     }
 
-    func reset() {
-        redirectURL = nil
-        interruptReason = nil
-        paymentRequest = nil
-        isFailure = false
-        pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
-        pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
+    func transition(to nextState: ApplePayState) async {
+        let oldValue = state
+
+        // Validate the transition before applying it
+        guard oldValue.canTransition(to: nextState) else {
+            #if DEBUG
+                print("⚠️ Invalid state transition attempted: \(String(describing: oldValue)) -> \(String(describing: nextState))")
+            #endif
+            return
+        }
+
+        state = nextState
+
+        switch state {
+        case .startPaymentRequest:
+            try? await startPaymentRequest()
+
+        case .reset:
+            pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
+            pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
+            selectedShippingAddressID = nil
+            checkoutURL = nil
+            await transition(to: .idle)
+
+        case .interrupt:
+            try? await _Concurrency.Task.retrying {
+                let cartID = try self.pkEncoder.cartID.get()
+                try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
+                    id: cartID
+                )
+            }.value
+
+        case let .presentingCSK(url):
+            guard let url else { return }
+            try? await controller.present(url: url)
+
+        /// As a "terminal" state, acts as a decision point to either:
+        /// - present TYP (redirectUrl)
+        /// - present Checkout to resolve errors (checkoutUrl, possibly with interrupt query params)
+        /// - transition to .reset e.g. if user is dismissing/cancelling the payment sheets
+        case .completed:
+            switch oldValue {
+            case .paymentAuthorizationFailed,
+                 .interrupt,
+                 .unexpectedError,
+                 .paymentAuthorized:
+                await transition(to: .presentingCSK(url: url))
+
+            case let .cartSubmittedForCompletion(redirectURL):
+                await transition(to: .presentingCSK(url: redirectURL))
+
+            default:
+                await transition(to: .reset)
+            }
+
+        default:
+            break
+        }
     }
 
     func setCart(to cart: StorefrontAPI.Types.Cart?) throws {
@@ -143,59 +198,5 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
 
         return cart
-    }
-}
-
-@available(iOS 17.0, *)
-extension ApplePayAuthorizationDelegate: CheckoutDelegate {
-    func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-        if let applePayViewController = controller as? ApplePayViewController {
-            Task { @MainActor in
-                applePayViewController.onComplete?()
-            }
-        }
-    }
-
-    func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
-        if let applePayViewController = controller as? ApplePayViewController {
-            Task { @MainActor in
-                applePayViewController.onFail?()
-            }
-        }
-    }
-
-    func checkoutDidCancel() {
-        /// x right button on CSK doesn't dismiss automatically
-        checkoutViewController?.dismiss(animated: true)
-
-        if let applePayViewController = controller as? ApplePayViewController {
-            Task { @MainActor in
-                applePayViewController.onCancel?()
-            }
-        }
-    }
-
-    func shouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) {
-        if let applePayViewController = controller as? ApplePayViewController {
-            Task { @MainActor in
-                applePayViewController.onShouldRecoverFromError?(error)
-            }
-        }
-    }
-
-    func checkoutDidClickLink(url: URL) {
-        if let applePayViewController = controller as? ApplePayViewController {
-            Task { @MainActor in
-                applePayViewController.onClickLink?(url)
-            }
-        }
-    }
-
-    func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        if let applePayViewController = controller as? ApplePayViewController {
-            Task { @MainActor in
-                applePayViewController.onWebPixelEvent?(event)
-            }
-        }
     }
 }

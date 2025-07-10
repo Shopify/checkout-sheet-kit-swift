@@ -31,6 +31,9 @@ protocol PayController: AnyObject {
     var storefront: StorefrontAPI { get set }
     /// Temporary workaround due to July release changing the validation strategy
     var storefrontJulyRelease: StorefrontAPI { get set }
+
+    /// Opens ShopifyCheckoutSheetKit
+    func present(url: URL) async throws
 }
 
 @available(iOS 17.0, *)
@@ -39,7 +42,7 @@ protocol PayController: AnyObject {
     var storefront: StorefrontAPI
     var storefrontJulyRelease: StorefrontAPI
     var identifier: CheckoutIdentifier
-
+    var checkoutViewController: CheckoutViewController?
     var paymentController: PKPaymentAuthorizationController?
 
     var cart: StorefrontAPI.Types.Cart?
@@ -152,80 +155,112 @@ protocol PayController: AnyObject {
         )
     }
 
-    func startPayment() async throws {
+    func startPayment() async {
         do {
-            if let cart = try await createOrfetchCart() {
-                self.cart = cart
-                try await authorizationDelegate.presentPaymentSheet()
+            cart = try await createOrfetchCart()
+            guard cart != nil else {
+                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
             }
+            await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
-            print(error)
+            print("[startPayment] Failed to setup cart: \(error)")
+            await authorizationDelegate.transition(to: .completed)
         }
     }
 
-    func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart? {
+    func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart {
         do {
             switch identifier {
             case let .cart(id):
-                return try await storefront.cart(by: .init(id))
+                guard let cart = try await storefront.cart(by: .init(id)) else {
+                    throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
+                }
+                return cart
             case let .variant(id, quantity):
                 let items: [StorefrontAPI.Types.ID] = Array(repeating: .init(id), count: quantity)
                 return try await storefront.cartCreate(with: items)
-            default: return nil
+            case .invariant:
+                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "checkoutIdentifier")
+            }
+        } catch let error as StorefrontAPI.Errors {
+            switch error {
+            case let .userError(userErrors, cart):
+                guard let cart else { throw error }
+                let action = ErrorHandler.map(errors: userErrors, shippingCountry: nil, cart: cart)
+                try await handleErrorAction(action: action, cart: cart)
+                return cart
+
+            case let .warning(type, cart):
+                guard let cart else { throw error }
+                let action = ErrorHandler.map(warningType: type, cart: cart)
+                try await handleErrorAction(action: action, cart: cart)
+                return cart
+
+            default:
+                await authorizationDelegate.transition(to: .unexpectedError(error: error))
+                throw error
             }
         } catch {
-            return try await handleError(error)
-        }
-    }
-
-    private func handleError(_ error: Error) async throws -> StorefrontAPI.Types.Cart? {
-        guard let apiError = error as? StorefrontAPI.Errors else {
-            throw error
-        }
-
-        switch apiError {
-        case let .userError(userErrors, cart):
-            let action = ErrorHandler.map(errors: userErrors, shippingCountry: nil, cart: cart)
-            return try await handleErrorAction(action: action, cart: cart)
-        case let .warning(type, cart):
-            let action = ErrorHandler.map(warningType: type, cart: cart)
-            return try await handleErrorAction(action: action, cart: cart)
-        default:
+            await authorizationDelegate.transition(to: .terminalError(error: error))
+            await onFail?()
             throw error
         }
     }
 
     private func handleErrorAction(
+        /// showError action is not handled uniqely and will present the apple pay sheet with errors
         action: ErrorHandler.PaymentSheetAction,
-        cart: StorefrontAPI.Types.Cart?
-    ) async throws -> StorefrontAPI.Types.Cart? {
-        switch action {
-        case let .interrupt(reason, _):
-            /// Continue with checkout sheet
+        cart: StorefrontAPI.Types.Cart
+    ) async throws {
+        if case let .interrupt(reason, _) = action {
             try authorizationDelegate.setCart(to: cart)
-            authorizationDelegate.interruptReason = reason
-
-            try await presentCheckoutSheet()
-            return nil
-        case .showError:
-            /// User errors/warnings that can be addressed in the payment sheet can be ignored
-            return cart
+            await authorizationDelegate.transition(to: .interrupt(reason: reason))
         }
     }
 
-    private func presentCheckoutSheet() async throws {
-        guard let url = authorizationDelegate.url else {
-            throw StorefrontAPI.Errors.invariant(message: "Missing checkout URL for presenting checkout sheet")
-        }
-
+    func present(url: URL) async throws {
         let topViewController = await MainActor.run { authorizationDelegate.getTopViewController() }
 
         guard let topViewController else {
-            throw StorefrontAPI.Errors.invariant(message: "Unable to get top view controller")
+            throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "topViewController")
         }
 
         _ = await MainActor.run {
-            ShopifyCheckoutSheetKit.present(checkout: url, from: topViewController)
+            self.checkoutViewController = ShopifyCheckoutSheetKit.present(
+                checkout: url,
+                from: topViewController,
+                delegate: self
+            )
         }
+    }
+}
+
+@available(iOS 17.0, *)
+extension ApplePayViewController: @preconcurrency CheckoutDelegate {
+    @MainActor func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+        onComplete?()
+    }
+
+    @MainActor func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
+        onFail?()
+    }
+
+    @MainActor func checkoutDidCancel() {
+        /// x right button on CSK doesn't dismiss automatically
+        checkoutViewController?.dismiss(animated: true)
+
+        onCancel?()
+    }
+
+    @MainActor func shouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
+        return onShouldRecoverFromError?(error) ?? false
+    }
+
+    @MainActor func checkoutDidClickLink(url: URL) {
+        onClickLink?(url)
+    }
+
+    @MainActor func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
+        onWebPixelEvent?(event)
     }
 }

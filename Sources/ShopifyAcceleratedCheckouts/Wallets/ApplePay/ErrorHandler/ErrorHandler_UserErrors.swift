@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 import Foundation
 import PassKit
 
@@ -45,7 +46,7 @@ extension ErrorHandler {
         let field = mapField(field: error.field)
 
         switch error.code {
-        /// Field missing or invalid
+        // Field missing or invalid
         case .addressFieldContainsEmojis:
             switch field {
             case "addresses.0.address.deliveryAddress.firstName":
@@ -264,7 +265,7 @@ extension ErrorHandler {
                         message: "errors.invalid.email".localizedString)
                 ])
             case "input.lines.0.quantity":
-                /// Stock problem, decelerate
+                // Stock problem, decelerate
                 return PaymentSheetAction.interrupt(
                     reason: .outOfStock, checkoutURL: cart?.checkoutUrl.url
                 )
@@ -282,7 +283,7 @@ extension ErrorHandler {
              .invalidDeliveryOption,
              .unspecifiedAddressError,
              .zipCodeNotSupported:
-            /// Cannot deliver to address
+            // Cannot deliver to address
             return PaymentSheetAction.showError(errors: [
                 ApplePayAuthorizationDelegate.ValidationErrors.addressUnserviceableError
             ])
@@ -303,7 +304,7 @@ extension ErrorHandler {
                 )
             }
         case .invalidPaymentEmptyCart:
-            /// No-op: Should have caught the problem earlier
+            // No-op: Should have caught the problem earlier
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
@@ -319,7 +320,7 @@ extension ErrorHandler {
              .lessThan,
              .maximumExceeded,
              .minimumNotMet:
-            /// No-op: Problems related to quantity rules
+            // No-op: Problems related to quantity rules
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
@@ -328,13 +329,13 @@ extension ErrorHandler {
              .missingDiscountCode,
              .missingNote,
              .noteTooLong:
-            /// No-op: These are not handled within the Apple Pay flow
+            // No-op: These are not handled within the Apple Pay flow
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
         case .onlyOneDeliveryAddressCanBeSelected,
              .tooManyDeliveryAddresses:
-            /// No-op: We never try to select multiple addresses within Apple Pay
+            // No-op: We never try to select multiple addresses within Apple Pay
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
@@ -348,7 +349,7 @@ extension ErrorHandler {
              .paymentsCreditCardVerificationValueInvalidForCardType,
              .paymentsCreditCardYearExpired,
              .paymentsCreditCardYearInvalidExpiryYear:
-            /// No-op: These are specific to direct payment methods, not Apple Pay
+            // No-op: These are specific to direct payment methods, not Apple Pay
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
@@ -364,7 +365,7 @@ extension ErrorHandler {
                 )
             }
         case .pendingDeliveryGroups:
-            /// No-op: We are not using the defer directive
+            // No-op: We are not using the defer directive
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
@@ -385,17 +386,17 @@ extension ErrorHandler {
                 )
             ])
         case .invalidCompanyLocation:
-            /// No-op: Not possible to get company field from Apple Pay
+            // No-op: Not possible to get company field from Apple Pay
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
         case .invalidDeliveryAddressId:
-            /// Should not happen if the wrapper is working correctly
+            // Should not happen if the wrapper is working correctly
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
         case .validationCustom:
-            /// Custom validations from functions are not handled
+            // Custom validations from functions are not handled
             return PaymentSheetAction.interrupt(reason: .other, checkoutURL: cart?.checkoutUrl.url)
         case .variantRequiresSellingPlan,
              .sellingPlanNotApplicable:
@@ -404,11 +405,11 @@ extension ErrorHandler {
             )
         case .cartTooLarge,
              .serviceUnavailable:
-            /// Problems with storing the cart
+            // Problems with storing the cart
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
-        /// Legacy/compatibility cases
+        // Legacy/compatibility cases
         case .tooManyLineItems:
             return PaymentSheetAction.interrupt(
                 reason: .outOfStock, checkoutURL: cart?.checkoutUrl.url
@@ -433,7 +434,7 @@ extension ErrorHandler {
             return PaymentSheetAction.interrupt(
                 reason: .other, checkoutURL: cart?.checkoutUrl.url
             )
-        /// Generic Errors
+        // Generic Errors
         case .unknownValue,
              nil:
             return PaymentSheetAction.interrupt(

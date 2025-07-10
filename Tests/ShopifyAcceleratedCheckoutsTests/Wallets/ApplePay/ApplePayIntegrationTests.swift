@@ -1,3 +1,27 @@
+/*
+ MIT License
+
+ Copyright 2023 - Present, Shopify Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+
 import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
@@ -6,16 +30,20 @@ import XCTest
 
 @available(iOS 17.0, *)
 final class ApplePayIntegrationTests: XCTestCase {
+    // MARK: - Properties
+
     var mockConfiguration: ApplePayConfigurationWrapper!
     var mockCommonConfiguration: ShopifyAcceleratedCheckouts.Configuration!
     var mockApplePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration!
     var mockShopSettings: ShopSettings!
 
+    // MARK: - Setup
+
     override func setUp() {
         super.setUp()
 
         mockCommonConfiguration = ShopifyAcceleratedCheckouts.Configuration(
-            shopDomain: "test-shop.myshopify.com",
+            storefrontDomain: "test-shop.myshopify.com",
             storefrontAccessToken: "test-token"
         )
 
@@ -49,6 +77,8 @@ final class ApplePayIntegrationTests: XCTestCase {
         super.tearDown()
     }
 
+    // MARK: - Integration Tests
+
     func testViewModifierWithButtonIntegration() async {
         var callbackInvoked = false
 
@@ -69,6 +99,7 @@ final class ApplePayIntegrationTests: XCTestCase {
 
             XCTAssertNotNil(hostingController.view, "View should be created")
 
+            // Test that the view hierarchy is properly established
             XCTAssertNotNil(hostingController.rootView, "Root view should exist")
         }
     }
@@ -108,6 +139,8 @@ final class ApplePayIntegrationTests: XCTestCase {
             XCTAssertFalse(cancelInvoked, "Cancel callback should not be invoked on view creation")
         }
     }
+
+    // MARK: - Edge Case Tests
 
     func testInvariantIdentifierHandling() {
         let identifier = CheckoutIdentifier.invariant
@@ -149,6 +182,8 @@ final class ApplePayIntegrationTests: XCTestCase {
         XCTAssertNotNil(modifiedView, "Modified view should exist")
     }
 
+    // MARK: - Delegate Tests
+
     func testCheckoutDelegateCancelCallback() async {
         var cancelCallbackInvoked = false
 
@@ -163,16 +198,16 @@ final class ApplePayIntegrationTests: XCTestCase {
             }
         }
 
-        let delegate = viewController.authorizationDelegate
-
-        delegate.checkoutDidCancel()
-
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        await MainActor.run {
+            viewController.checkoutDidCancel()
+        }
 
         await MainActor.run {
             XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")
         }
     }
+
+    // MARK: - New Delegate Method Integration Tests
 
     func testCheckoutDidClickLinkDelegateIntegration() async {
         var callbackInvoked = false
@@ -190,12 +225,10 @@ final class ApplePayIntegrationTests: XCTestCase {
             }
         }
 
-        let delegate = viewController.authorizationDelegate
-
         let testURL = URL(string: "https://help.shopify.com/payment-terms")!
-        delegate.checkoutDidClickLink(url: testURL)
-
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        await MainActor.run {
+            viewController.checkoutDidClickLink(url: testURL)
+        }
 
         await MainActor.run {
             XCTAssertTrue(callbackInvoked, "checkoutDidClickLink callback should be invoked")

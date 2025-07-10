@@ -87,7 +87,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
         guard let identifier = shippingMethod.identifier else {
-            print(CartManager.Errors.invariant(message: "Shipping method identifier is nil"))
+            print(CartManager.Errors.invariant(expected: "shippingMethodIdentifier"))
             return PKPaymentRequestShippingMethodUpdate(
                 paymentSummaryItems: PassKitFactory.shared.createPaymentSummaryItems(
                     cart: CartManager.shared.cart,
