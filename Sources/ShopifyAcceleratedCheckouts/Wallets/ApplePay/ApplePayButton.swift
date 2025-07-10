@@ -28,7 +28,7 @@ import SwiftUI
 /// A view that displays an Apple Pay button for checkout
 @available(iOS 17.0, *)
 @available(macOS, unavailable)
-struct ApplePayButton: View {
+internal struct ApplePayButton: View {
     /// The configuration for Apple Pay
     @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
     private var configuration
@@ -87,7 +87,7 @@ struct ApplePayButton: View {
 /// This is an internal view to allow Environment injection of the shared configuration app wide
 @available(iOS 17.0, *)
 @available(macOS, unavailable)
-struct Internal_ApplePayButton: View {
+internal struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style
     private var label: PayWithApplePayButtonLabel = .plain
 
