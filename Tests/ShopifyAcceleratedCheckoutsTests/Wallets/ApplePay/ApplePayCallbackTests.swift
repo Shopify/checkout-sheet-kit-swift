@@ -297,7 +297,10 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .unknown), recoverable: true)
-        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
+        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
+            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
+            return
+        }
         delegate.shouldRecoverFromError(error: testError)
 
         await fulfillment(of: [expectation], timeout: 1.0)
@@ -315,7 +318,10 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test", code: .clientError(code: .unknown), recoverable: true)
-        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
+        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
+            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
+            return
+        }
         delegate.shouldRecoverFromError(error: testError)
 
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
@@ -334,7 +340,10 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testURL = URL(string: "https://test-shop.myshopify.com/products/test")!
-        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
+        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
+            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
+            return
+        }
         delegate.checkoutDidClickLink(url: testURL)
 
         await fulfillment(of: [expectation], timeout: 1.0)
@@ -347,7 +356,10 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         let testURL = URL(string: "https://test-shop.myshopify.com")!
-        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
+        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
+            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
+            return
+        }
         delegate.checkoutDidClickLink(url: testURL) // Should not crash
 
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
@@ -369,7 +381,10 @@ final class ApplePayCallbackTests: XCTestCase {
             }
         }
 
-        let delegate = viewController.authorizationDelegate as! ApplePayAuthorizationDelegate
+        guard let delegate = viewController.authorizationDelegate as? ApplePayAuthorizationDelegate else {
+            XCTFail("Expected authorizationDelegate to be ApplePayAuthorizationDelegate")
+            return
+        }
         for url in testURLs {
             delegate.checkoutDidClickLink(url: url)
         }
