@@ -1,4 +1,3 @@
-
 import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
@@ -29,7 +28,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
 
     func testMap_allUserErrorCodes() {
         let testCases: [TestCase] = [
-
             TestCase(
                 errorCode: .addressFieldContainsEmojis,
                 field: ["addresses", "0", "address", "deliveryAddress", "firstName"],
@@ -85,7 +83,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 testDescription: "returns unhandled interrupt when unsupported field contains emojis"
             ),
 
-
             TestCase(
                 errorCode: .addressFieldContainsHtmlTags,
                 field: ["addresses", "0", "address", "deliveryAddress", "firstName"],
@@ -104,7 +101,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 expectedMessageKey: "errors.html_tags.address1",
                 testDescription: "returns deliveryAddressInvalid error when address1 contains HTML tags"
             ),
-
 
             TestCase(
                 errorCode: .addressFieldContainsUrl,
@@ -125,7 +121,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 testDescription: "returns unhandled interrupt when address1 contains URL"
             ),
 
-
             TestCase(
                 errorCode: .addressFieldIsRequired,
                 field: ["addresses", "0", "address", "deliveryAddress", "firstName"],
@@ -144,7 +139,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 expectedMessageKey: "errors.missing.address1",
                 testDescription: "returns deliveryAddressInvalid error when address1 is required"
             ),
-
 
             TestCase(
                 errorCode: .invalid,
@@ -174,7 +168,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 testDescription: "returns phoneNumberInvalid error when phone is invalid"
             ),
 
-
             TestCase(
                 errorCode: .zipCodeNotSupported,
                 field: nil,
@@ -185,7 +178,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 testDescription: "returns addressUnserviceableError when zip code not supported"
             ),
 
-
             TestCase(
                 errorCode: .invalidZipCodeForCountry,
                 field: nil,
@@ -195,7 +187,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 expectedMessageKey: "errors.invalid.postal_code",
                 testDescription: "returns deliveryAddressInvalid error when zip code invalid for country"
             ),
-
 
             TestCase(
                 errorCode: .provinceNotFound,
@@ -216,7 +207,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 testDescription: "returns deliveryAddressInvalid error for zone when province not found in non-UAE country"
             ),
 
-
             TestCase(
                 errorCode: .paymentMethodNotSupported,
                 field: ["payment", "walletPaymentMethod", "applePayWalletContent"],
@@ -227,7 +217,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 testDescription: "returns other interrupt when Apple Pay not supported"
             ),
 
-
             TestCase(
                 errorCode: .validationCustom,
                 field: nil,
@@ -237,7 +226,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 expectedMessageKey: nil,
                 testDescription: "returns other interrupt for custom validation errors"
             ),
-
 
             TestCase(
                 errorCode: .unknownValue,
@@ -284,7 +272,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
         }
     }
 
-
     func testMap_withEmptyErrors_returnsOtherInterrupt() {
         let result = ErrorHandler.map(errors: [], shippingCountry: "US", cart: nil)
 
@@ -325,7 +312,6 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
         }
     }
 }
-
 
 private func createCartUserError(code: StorefrontAPI.CartErrorCode?, field: [String]?) -> StorefrontAPI.CartUserError {
     return StorefrontAPI.CartUserError(

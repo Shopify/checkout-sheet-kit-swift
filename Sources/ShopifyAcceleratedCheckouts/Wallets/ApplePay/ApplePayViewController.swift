@@ -201,14 +201,14 @@ protocol PayController: AnyObject {
     ) async throws -> StorefrontAPI.Types.Cart? {
         switch action {
         case let .interrupt(reason, _):
-            // Continue with checkout sheet
+            /// Continue with checkout sheet
             try authorizationDelegate.setCart(to: cart)
             authorizationDelegate.interruptReason = reason
 
             try await presentCheckoutSheet()
             return nil
         case .showError:
-            // User errors/warnings that can be addressed in the payment sheet can be ignored
+            /// User errors/warnings that can be addressed in the payment sheet can be ignored
             return cart
         }
     }

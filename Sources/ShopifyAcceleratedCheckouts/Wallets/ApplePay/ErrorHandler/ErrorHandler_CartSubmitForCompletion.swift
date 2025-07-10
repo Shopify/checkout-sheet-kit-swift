@@ -42,8 +42,8 @@ extension ErrorHandler {
         case .throttled:
             return PaymentSheetAction.interrupt(reason: .cartThrottled)
         case .success:
-            // No-op: error handler not called for success result
-            // Other response type are not possible
+            /// No-op: error handler not called for success result
+            /// Other response type are not possible
             print("ErrorHandler: map: received unexpected result type from Cart API on submit")
             return PaymentSheetAction.interrupt(reason: .other)
         }
@@ -55,7 +55,7 @@ extension ErrorHandler {
         switch error.code {
         // --- Contact information ---
 
-        // Email
+        /// Email
         case .buyerIdentityEmailRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.emailInvalid(
                 message: "errors.missing.email".localizedString)])
@@ -64,7 +64,7 @@ extension ErrorHandler {
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.emailInvalid(
                 message: "errors.invalid.email".localizedString)])
 
-        // Phone number
+        /// Phone number
         case .deliveryPhoneNumberRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
                 message: "errors.missing.phone".localizedString)])
@@ -73,7 +73,7 @@ extension ErrorHandler {
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
                 message: "errors.invalid.phone".localizedString)])
 
-        // First name
+        /// First name
         case .deliveryFirstNameRequired, .paymentsFirstNameRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
                 message: "errors.missing.first_name".localizedString)])
@@ -86,7 +86,7 @@ extension ErrorHandler {
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
                 message: "errors.too_long.first_name".localizedString)])
 
-        // Last name
+        /// Last name
         case .deliveryLastNameRequired, .paymentsLastNameRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
                 message: "errors.missing.last_name".localizedString)])
@@ -139,7 +139,7 @@ extension ErrorHandler {
                 message: "errors.too_long.address2".localizedString
             )])
 
-        // Postal code
+        /// Postal code
         case .deliveryPostalCodeRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.deliveryAddressInvalid(
                 field: CNPostalAddressPostalCodeKey,
@@ -159,7 +159,7 @@ extension ErrorHandler {
                 message: "errors.invalid.postal_code".localizedString
             )])
 
-        // City
+        /// City
         case .deliveryCityRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.deliveryAddressInvalid(
                 field: CNPostalAddressCityKey,
@@ -178,7 +178,7 @@ extension ErrorHandler {
                 message: "errors.too_long.city".localizedString
             )])
 
-        // Zone
+        /// Zone
         case .deliveryZoneNotFound:
             if useEmirate(shippingCountry: shippingCountry) {
                 return PaymentSheetAction.showError(errors: [
@@ -209,14 +209,14 @@ extension ErrorHandler {
                 message: "errors.missing.zone".localizedString
             )])
 
-        // Country
+        /// Country
         case .deliveryCountryRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.deliveryAddressInvalid(
                 field: CNPostalAddressCountryKey,
                 message: "errors.missing.country".localizedString
             )])
 
-        // No delivery method available for the provided address
+        /// No delivery method available for the provided address
         case .deliveryNoDeliveryAvailable,
              .noDeliveryGroupSelected:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.addressUnserviceableError])
@@ -261,7 +261,7 @@ extension ErrorHandler {
                 message: "errors.too_long.address2".localizedString
             )])
 
-        // Postal code
+        /// Postal code
         case .paymentsPostalCodeRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.billingAddressInvalid(
                 field: CNPostalAddressPostalCodeKey,
@@ -281,7 +281,7 @@ extension ErrorHandler {
                 message: "errors.invalid.postal_code".localizedString
             )])
 
-        // City
+        /// City
         case .paymentsCityRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.billingAddressInvalid(
                 field: CNPostalAddressCityKey,
@@ -300,7 +300,7 @@ extension ErrorHandler {
                 message: "errors.too_long.city".localizedString
             )])
 
-        // Zone
+        /// Zone
         case .paymentsBillingAddressZoneNotFound:
             if useEmirate(shippingCountry: shippingCountry) {
                 return PaymentSheetAction.showError(errors: [
@@ -331,7 +331,7 @@ extension ErrorHandler {
                 message: "errors.missing.zone".localizedString
             )])
 
-        // Country
+        /// Country
         case .paymentsCountryRequired:
             return PaymentSheetAction.showError(errors: [ApplePayAuthorizationDelegate.ValidationErrors.billingAddressInvalid(
                 field: CNPostalAddressCountryKey,
@@ -340,28 +340,28 @@ extension ErrorHandler {
 
         // --- Errors that lead to deceleration ---
 
-        // Address missing
+        /// Address missing
         case .deliveryAddressRequired:
-            // No-op: We should not have called SubmitForCompletion with empty address
+            /// No-op: We should not have called SubmitForCompletion with empty address
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
-        // Phone number
+        /// Phone number
         case .buyerIdentityPhoneIsInvalid,
              .deliveryOptionsPhoneNumberInvalid,
              .deliveryOptionsPhoneNumberRequired,
              .paymentsPhoneNumberInvalid,
              .paymentsPhoneNumberRequired:
-            // No-op: We save the phone number on delivery address, not buyer identity, billing address or delivery options
+            /// No-op: We save the phone number on delivery address, not buyer identity, billing address or delivery options
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
-        // Company
+        /// Company
         case .deliveryCompanyRequired,
              .deliveryCompanyInvalid,
              .deliveryCompanyTooLong,
              .paymentsCompanyRequired,
              .paymentsCompanyInvalid,
              .paymentsCompanyTooLong:
-            // No-op: Not possible to get company field from Apple Pay
+            /// No-op: Not possible to get company field from Apple Pay
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
         case .paymentsCreditCardBaseExpired,
@@ -380,22 +380,22 @@ extension ErrorHandler {
              .paymentsCreditCardVerificationValueInvalidForCardType,
              .paymentsCreditCardYearExpired,
              .paymentsCreditCardYearInvalidExpiryYear:
-            // No-op: These are specific to direct payment methods, not Apple Pay
+            /// No-op: These are specific to direct payment methods, not Apple Pay
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
-        // Payment Method Errors
+        /// Payment Method Errors
         case .paymentsMethodRequired,
              .paymentsMethodUnavailable,
              .paymentsShopifyPaymentsRequired,
              .paymentsWalletContentMissing,
              .paymentCardDeclined:
-            // Payment method issues - not fixable by user input validation
+            /// Payment method issues - not fixable by user input validation
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
         case .paymentsUnacceptablePaymentAmount:
             return PaymentSheetAction.interrupt(reason: .dynamicTax, checkoutURL: checkoutURL)
 
-        // Inventory issues
+        /// Inventory issues
         case .merchandiseNotEnoughStockAvailable:
             return PaymentSheetAction.interrupt(reason: .notEnoughStock, checkoutURL: checkoutURL)
 
@@ -406,17 +406,17 @@ extension ErrorHandler {
              .deliveryNoDeliveryAvailableForMerchandiseLine:
             return PaymentSheetAction.interrupt(reason: .outOfStock, checkoutURL: checkoutURL)
 
-        // Tax Errors
+        /// Tax Errors
         case .taxesDeliveryGroupIdNotFound,
              .taxesLineIdNotFound,
              .taxesMustBeDefined:
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
-        // Custom validations from functions
+        /// Custom validations from functions
         case .validationCustom:
             return PaymentSheetAction.interrupt(reason: .other, checkoutURL: checkoutURL)
 
-        // Generic Errors
+        /// Generic Errors
         case .error,
              .redirectToCheckoutRequired,
              .unknownValue:
@@ -425,11 +425,11 @@ extension ErrorHandler {
     }
 
     private static func filterGenericViolations(errors: [StorefrontAPI.SubmissionError]) -> [StorefrontAPI.SubmissionError] {
-        // If the only error is paymentsUnacceptablePaymentAmount, return it
+        /// If the only error is paymentsUnacceptablePaymentAmount, return it
         if errors.count == 1, errors.first?.code == .paymentsUnacceptablePaymentAmount {
             return errors
         }
-        // Otherwise, filter out paymentsUnacceptablePaymentAmount
+        /// Otherwise, filter out paymentsUnacceptablePaymentAmount
         return errors.filter { $0.code != .paymentsUnacceptablePaymentAmount }
     }
 }

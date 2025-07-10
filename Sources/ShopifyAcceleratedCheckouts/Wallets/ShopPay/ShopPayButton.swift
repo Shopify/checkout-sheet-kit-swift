@@ -86,7 +86,7 @@ internal struct Internal_ShopPayButton: View {
                         .frame(maxWidth: .infinity)
                 }
                 .frame(height: 48)
-                // This ensures that the blue background is clickable
+                /// This ensures that the blue background is clickable
                 .background(Color.shopPayBlue)
             }
         )

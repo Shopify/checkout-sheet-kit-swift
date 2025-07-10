@@ -34,7 +34,7 @@ extension ErrorHandler {
         case .throttled:
             return PaymentSheetAction.interrupt(reason: .cartThrottled)
         case .ready:
-            // No-op: error handler not called for success result
+            /// No-op: error handler not called for success result
             print("ErrorHandler: map: received unexpected result type from Cart API on prepare")
             return PaymentSheetAction.interrupt(reason: .other)
         }

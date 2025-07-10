@@ -63,10 +63,10 @@ enum GraphQLDocument {
             return FragmentAnalysis(allFragments: [], directReferences: [])
         }
 
-        // Find direct references in the operation
+        /// Find direct references in the operation
         let directReferences = findFragmentReferences(in: operation, using: regex)
 
-        // Find all fragments including transitive dependencies
+        /// Find all fragments including transitive dependencies
         let allFragments = expandWithDependencies(directReferences, using: regex)
 
         return FragmentAnalysis(
@@ -102,7 +102,7 @@ enum GraphQLDocument {
                 continue
             }
 
-            // Find dependencies in this fragment's definition
+            /// Find dependencies in this fragment's definition
             let dependencies = findFragmentReferences(in: current.rawValue, using: regex)
             toProcess.append(contentsOf: dependencies)
         }
@@ -135,13 +135,13 @@ enum GraphQLDocument {
 
     /// Sorts fragments with direct references first, followed by their dependencies
     private static func sortFragments(_ fragments: Set<Fragments>, directReferences: Set<Fragments>) -> [Fragments] {
-        // Build dependency graph
+        /// Build dependency graph
         let graph = buildDependencyGraph(fragments)
 
-        // Perform topological sort
+        /// Perform topological sort
         let sorted = topologicalSort(fragments, graph: graph)
 
-        // Partition into direct references and dependencies, preserving topological order
+        /// Partition into direct references and dependencies, preserving topological order
         let (direct, deps) = sorted.reduce(into: (direct: [Fragments](), deps: [Fragments]())) { result, fragment in
             if directReferences.contains(fragment) {
                 result.direct.append(fragment)
@@ -150,7 +150,7 @@ enum GraphQLDocument {
             }
         }
 
-        // Direct references first, then dependencies
+        /// Direct references first, then dependencies
         return direct + deps
     }
 
@@ -177,7 +177,7 @@ enum GraphQLDocument {
         var result: [Fragments] = []
         var visited = Set<Fragments>()
 
-        // For stable ordering
+        /// For stable ordering
         let orderedFragments = fragments.sorted { fragment1, fragment2 in
             Fragments.allCases.firstIndex(of: fragment1)! < Fragments.allCases.firstIndex(of: fragment2)!
         }
@@ -186,7 +186,7 @@ enum GraphQLDocument {
             guard !visited.contains(fragment) else { return }
             visited.insert(fragment)
 
-            // Visit dependencies first
+            /// Visit dependencies first
             if let dependencies = graph[fragment] {
                 for dependency in dependencies.sorted(by: { Fragments.allCases.firstIndex(of: $0)! < Fragments.allCases.firstIndex(of: $1)! }) {
                     visit(dependency)

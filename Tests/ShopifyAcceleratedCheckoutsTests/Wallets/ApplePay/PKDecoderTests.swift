@@ -1,4 +1,3 @@
-
 import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
@@ -9,7 +8,6 @@ class PKDecoderTests: XCTestCase {
     private var decoder: PKDecoder {
         return PKDecoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { self.cart() })
     }
-
 
     func testInitializesDecoderCorrectly() {
         let testDecoder = decoder
@@ -23,7 +21,6 @@ class PKDecoderTests: XCTestCase {
         XCTAssertNil(testDecoder.cart())
         XCTAssertNil(testDecoder.selectedShippingMethod)
     }
-
 
     func testReturnsEmptyPaymentSummaryWhenCartIsNil() {
         let testDecoder = decoder
@@ -53,7 +50,6 @@ class PKDecoderTests: XCTestCase {
         XCTAssertTrue(summaryItems.isEmpty)
     }
 
-
     func testReturnsEmptyShippingMethodsWhenCartIsNil() {
         let testDecoder = decoder
         testDecoder.cart = { nil }
@@ -77,7 +73,6 @@ class PKDecoderTests: XCTestCase {
         let shippingMethods = testDecoder.shippingMethods
         XCTAssertTrue(shippingMethods.isEmpty)
     }
-
 
     func testSelectedShippingMethodCanBeSetAndRetrieved() {
         let testDecoder = decoder

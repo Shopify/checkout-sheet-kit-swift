@@ -112,7 +112,7 @@ extension StorefrontAPI {
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            // Handle amount as either String or Number
+            /// Handle amount as either String or Number
             if let amountString = try? container.decode(String.self, forKey: .amount) {
                 guard let decimalAmount = Decimal(string: amountString) else {
                     throw DecodingError.dataCorruptedError(
@@ -123,7 +123,7 @@ extension StorefrontAPI {
                 }
                 amount = decimalAmount
             } else {
-                // Fallback to direct Decimal decoding
+                /// Fallback to direct Decimal decoding
                 amount = try container.decode(Decimal.self, forKey: .amount)
             }
 
@@ -132,7 +132,7 @@ extension StorefrontAPI {
 
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            // Encode amount as string to match GraphQL Decimal scalar format
+            /// Encode amount as string to match GraphQL Decimal scalar format
             try container.encode("\(amount)", forKey: .amount)
             try container.encode(currencyCode, forKey: .currencyCode)
         }
@@ -443,7 +443,7 @@ extension StorefrontAPI {
         case variantRequiresSellingPlan = "VARIANT_REQUIRES_SELLING_PLAN"
         case zipCodeNotSupported = "ZIP_CODE_NOT_SUPPORTED"
 
-        // Legacy/compatibility cases
+        /// Legacy/compatibility cases
         case tooManyLineItems = "TOO_MANY_LINE_ITEMS"
         case notApplicable = "NOT_APPLICABLE"
         case notEnoughStock = "NOT_ENOUGH_STOCK"
@@ -451,7 +451,7 @@ extension StorefrontAPI {
         case deliveryAddressSizeExceeded = "DELIVERY_ADDRESS_SIZE_EXCEEDED"
         case paymentMethodUnavailable = "PAYMENT_METHOD_UNAVAILABLE"
 
-        // Payment-specific errors that might be expected in the error handler
+        /// Payment-specific errors that might be expected in the error handler
         case invalidPayment = "INVALID_PAYMENT"
         case invalidPaymentEmptyCart = "INVALID_PAYMENT_EMPTY_CART"
         case paymentMethodNotSupported = "PAYMENT_METHOD_NOT_SUPPORTED"
@@ -466,7 +466,7 @@ extension StorefrontAPI {
         case paymentsCreditCardYearExpired = "PAYMENTS_CREDIT_CARD_YEAR_EXPIRED"
         case paymentsCreditCardYearInvalidExpiryYear = "PAYMENTS_CREDIT_CARD_YEAR_INVALID_EXPIRY_YEAR"
 
-        // Catch-all for unknown values
+        /// Catch-all for unknown values
         case unknownValue = "UNKNOWN_VALUE"
 
         init(from decoder: Decoder) throws {
@@ -738,12 +738,12 @@ extension StorefrontAPI {
 
     /// Submission error codes for cart submit
     enum SubmissionErrorCode: String, Codable {
-        // Buyer identity errors
+        /// Buyer identity errors
         case buyerIdentityEmailIsInvalid = "BUYER_IDENTITY_EMAIL_IS_INVALID"
         case buyerIdentityEmailRequired = "BUYER_IDENTITY_EMAIL_REQUIRED"
         case buyerIdentityPhoneIsInvalid = "BUYER_IDENTITY_PHONE_IS_INVALID"
 
-        // Delivery address errors
+        /// Delivery address errors
         case deliveryAddressRequired = "DELIVERY_ADDRESS_REQUIRED"
         case deliveryAddress1Invalid = "DELIVERY_ADDRESS1_INVALID"
         case deliveryAddress1Required = "DELIVERY_ADDRESS1_REQUIRED"
@@ -777,23 +777,23 @@ extension StorefrontAPI {
         case deliveryZoneNotFound = "DELIVERY_ZONE_NOT_FOUND"
         case deliveryZoneRequiredForCountry = "DELIVERY_ZONE_REQUIRED_FOR_COUNTRY"
 
-        // General error
+        /// General error
         case error = "ERROR"
 
-        // Payment errors
+        /// Payment errors
         case paymentCardDeclined = "PAYMENT_CARD_DECLINED"
 
-        // Merchandise errors
+        /// Merchandise errors
         case merchandiseLineLimitReached = "MERCHANDISE_LINE_LIMIT_REACHED"
         case merchandiseNotApplicable = "MERCHANDISE_NOT_APPLICABLE"
         case merchandiseNotEnoughStockAvailable = "MERCHANDISE_NOT_ENOUGH_STOCK_AVAILABLE"
         case merchandiseOutOfStock = "MERCHANDISE_OUT_OF_STOCK"
         case merchandiseProductNotPublished = "MERCHANDISE_PRODUCT_NOT_PUBLISHED"
 
-        // Delivery group errors
+        /// Delivery group errors
         case noDeliveryGroupSelected = "NO_DELIVERY_GROUP_SELECTED"
 
-        // Payment address errors
+        /// Payment address errors
         case paymentsAddress1Invalid = "PAYMENTS_ADDRESS1_INVALID"
         case paymentsAddress1Required = "PAYMENTS_ADDRESS1_REQUIRED"
         case paymentsAddress1TooLong = "PAYMENTS_ADDRESS1_TOO_LONG"
@@ -843,16 +843,16 @@ extension StorefrontAPI {
         case paymentsUnacceptablePaymentAmount = "PAYMENTS_UNACCEPTABLE_PAYMENT_AMOUNT"
         case paymentsWalletContentMissing = "PAYMENTS_WALLET_CONTENT_MISSING"
 
-        // Redirect and tax errors
+        /// Redirect and tax errors
         case redirectToCheckoutRequired = "REDIRECT_TO_CHECKOUT_REQUIRED"
         case taxesDeliveryGroupIdNotFound = "TAXES_DELIVERY_GROUP_ID_NOT_FOUND"
         case taxesLineIdNotFound = "TAXES_LINE_ID_NOT_FOUND"
         case taxesMustBeDefined = "TAXES_MUST_BE_DEFINED"
 
-        // Validation errors
+        /// Validation errors
         case validationCustom = "VALIDATION_CUSTOM"
 
-        // Catch-all for unknown values
+        /// Catch-all for unknown values
         case unknownValue = "UNKNOWN_VALUE"
 
         init(from decoder: Decoder) throws {
@@ -959,7 +959,7 @@ extension StorefrontAPI.Address {
 /// https://shopify.dev/docs/api/storefront/2025-07/objects/Shop
 @available(iOS 17.0, *)
 @Observable class ShopSettings {
-    // Static property to store the cached settings
+    /// Static property to store the cached settings
     private static var cachedSettings: ShopSettings?
 
     /// Loads shop settings from the API and caches them
@@ -1002,8 +1002,8 @@ extension StorefrontAPI.Address {
 
     /// Convenience initializer to create from StorefrontAPI.Shop response
     convenience init(from shop: StorefrontAPI.Shop) {
-        // Extract payment settings
-        // Use countryCode from paymentSettings, fallback to first country in shipsToCountries if needed
+        /// Extract payment settings
+        /// Use countryCode from paymentSettings, fallback to first country in shipsToCountries if needed
         let countryCode = shop.paymentSettings.countryCode.isEmpty ?
             (shop.shipsToCountries.first ?? "US") :
             shop.paymentSettings.countryCode
@@ -1012,7 +1012,7 @@ extension StorefrontAPI.Address {
             countryCode: countryCode
         )
 
-        // Extract primary domain
+        /// Extract primary domain
         let primaryDomain = Domain(
             host: shop.primaryDomain.host,
             url: shop.primaryDomain.url.url.absoluteString

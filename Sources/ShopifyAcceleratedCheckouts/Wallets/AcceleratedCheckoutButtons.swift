@@ -25,11 +25,12 @@ import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
-/// Renders a set of accelerated checkout buttons for the given cart or variant
+/// Renders a Checkout buttons for a cart or product variant
 ///
 /// Note:
-/// - The buttons will be rendered in the order of the `withWallets` modifier
-/// - If `withWallets` modifier is not used, the order is not guaranteed
+/// - The `withWallets` modifier can be used to limit the buttons rendered
+/// - The order of the buttons is the same as the order of the `withWallets` modifier
+/// - omission of the `withWallets` modifier will render all buttons
 @available(iOS 17.0, *)
 public struct AcceleratedCheckoutButtons: View {
     @Environment(ShopifyAcceleratedCheckouts.Configuration.self)

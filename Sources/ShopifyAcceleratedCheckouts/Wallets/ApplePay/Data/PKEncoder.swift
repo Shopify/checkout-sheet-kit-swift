@@ -76,9 +76,8 @@ class PKEncoder {
         guard let selectedShippingMethod else {
             return .failure(.invariant(message: .nilShippingMethod))
         }
-        /**
-         * The deliveryOptionHandle is set as the shippingMethodIdentifier in PKDecoder.swift
-         */
+        /// The deliveryOptionHandle is set as the shippingMethodIdentifier in PKDecoder.swift
+        ///
         guard let identifier = selectedShippingMethod.identifier else {
             return .failure(.invariant(message: .nilShippingMethodID))
         }
@@ -164,7 +163,7 @@ class PKEncoder {
             return value
         }
 
-        // Allow the API return an error if the country code is not recognized
+        /// Allow the API return an error if the country code is not recognized
         return countryCode
     }
 
@@ -198,13 +197,12 @@ class PKEncoder {
             .split { $0 == "\n" }
             .map { String($0) }
 
-        /**
-         * Apple Pay forces last & first names to be present on addresses added in the payment sheet (at least it does for
-         *   desktop and >=16.2 iOS), but it's still possible to add addresses without a last name in the Apple Wallet
-         *   settings
-         * This lines up with what we do for Google Pay & Meta Pay when only a single name is provided
-         * See: https://github.com/Shopify/core-issues/issues/53587
-         */
+        /// Apple Pay forces last & first names to be present on addresses added in the payment sheet (at least it does for
+        ///   desktop and >=16.2 iOS), but it's still possible to add addresses without a last name in the Apple Wallet
+        ///   settings
+        /// This lines up with what we do for Google Pay & Meta Pay when only a single name is provided
+        /// See: https://github.com/Shopify/core-issues/issues/53587
+        ///
         let lastName: String? = {
             let familyName = contact?.name?.familyName
             if let familyName, !familyName.isEmpty { return familyName }

@@ -55,7 +55,6 @@ class ApplePayViewControllerTests: XCTestCase {
         super.tearDown()
     }
 
-
     func testOnCheckoutSuccessCallback_defaultsToNil() async {
         await MainActor.run {
             XCTAssertNil(sut.onComplete)
@@ -73,7 +72,6 @@ class ApplePayViewControllerTests: XCTestCase {
             XCTAssertNil(sut.onCancel)
         }
     }
-
 
     func testCheckoutDidCancel_invokesOnCancelCallback() async {
         var cancelCallbackInvoked = false

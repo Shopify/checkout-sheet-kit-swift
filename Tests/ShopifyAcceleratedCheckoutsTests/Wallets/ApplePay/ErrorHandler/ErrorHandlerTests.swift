@@ -154,7 +154,6 @@ class ErrorHandlerTests: XCTestCase {
         }
     }
 
-
     private struct TestError: Error, Equatable {
         let message: String
 
