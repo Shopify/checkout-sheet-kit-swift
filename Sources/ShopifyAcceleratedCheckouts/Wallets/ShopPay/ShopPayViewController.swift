@@ -46,7 +46,7 @@ import SwiftUI
         )
     }
 
-    func action() async throws {
+    func present() async throws {
         guard let redirectUrl = try await buildRedirectUrl() else {
             print("Failed to build redirect url for Shop Pay")
             return
