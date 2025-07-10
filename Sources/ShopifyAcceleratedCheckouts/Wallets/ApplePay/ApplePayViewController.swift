@@ -22,7 +22,7 @@
  */
 
 import PassKit
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 
 @available(iOS 17.0, *)
@@ -236,7 +236,7 @@ protocol PayController: AnyObject {
 }
 
 @available(iOS 17.0, *)
-extension ApplePayViewController: @preconcurrency CheckoutDelegate {
+extension ApplePayViewController: CheckoutDelegate {
     @MainActor func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
         onComplete?()
     }
