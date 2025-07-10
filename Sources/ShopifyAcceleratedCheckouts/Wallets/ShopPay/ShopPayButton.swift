@@ -86,7 +86,7 @@ internal struct Internal_ShopPayButton: View {
                         .frame(maxWidth: .infinity)
                 }
                 .frame(height: 48)
-                // This ensures that the blue background is clickable
+                /// This ensures that the blue background is clickable
                 .background(Color.shopPayBlue)
             }
         )
@@ -96,18 +96,16 @@ internal struct Internal_ShopPayButton: View {
 }
 
 @available(iOS 17.0, *)
-struct ShopPayButton_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockCommonConfiguration = ShopifyAcceleratedCheckouts.Configuration(
-            storefrontDomain: "test-shop.myshopify.com",
-            storefrontAccessToken: "test-token"
-        )
+#Preview {
+    let mockCommonConfiguration = ShopifyAcceleratedCheckouts.Configuration(
+        storefrontDomain: "test-shop.myshopify.com",
+        storefrontAccessToken: "test-token"
+    )
 
-        ShopPayButton(
-            identifier: .variant(variantID: "gid://Shopify/ProductVariant/123", quantity: 1),
-            eventHandlers: EventHandlers()
-        )
-        .padding()
-        .environment(mockCommonConfiguration)
-    }
+    ShopPayButton(
+        identifier: .variant(variantID: "gid://Shopify/ProductVariant/123", quantity: 1),
+        eventHandlers: EventHandlers()
+    )
+    .padding()
+    .environment(mockCommonConfiguration)
 }
