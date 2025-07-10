@@ -26,24 +26,22 @@ import SwiftUI
 @available(iOS 17.0, *)
 extension ShopifyAcceleratedCheckouts {
     @Observable public class Configuration {
-        /**
-         * The domain of the shop without the protocol.
-         *
-         * @example: `my-shop.myshopify.com`
-         * @see: https://shopify.dev/docs/storefronts/themes/getting-started/build-a-theme#get-the-shop-domain
-         */
+        /// The domain of the shop without the protocol.
+        ///
+        /// Example: `my-shop.myshopify.com`
+        ///
+        /// See: https://shopify.dev/docs/storefronts/themes/getting-started/build-a-theme#get-the-shop-domain
         public var shopDomain: String
 
-        /**
-         * The storefront access token.
-         *
-         * @see: https://shopify.dev/docs/storefronts/themes/getting-started/build-a-theme#get-the-storefront-access-token
-         */
+        /// The storefront access token.
+        ///
+        /// See: https://shopify.dev/docs/storefronts/themes/getting-started/build-a-theme#get-the-storefront-access-token
         public var storefrontAccessToken: String
 
-        /*
-          * The customer to use for the checkout.
-         */
+        /// Data to attach to the buyerIdentity during cart creation
+        /// - Apple Pay sheet will skip requesting email/phone number fields if provided here
+        ///
+        /// See: https://shopify.dev/docs/api/storefront/latest/mutations/cartBuyerIdentityUpdate
         public var customer: Customer?
 
         public init(
