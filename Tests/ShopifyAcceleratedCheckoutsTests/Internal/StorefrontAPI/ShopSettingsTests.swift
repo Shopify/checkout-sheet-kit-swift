@@ -68,7 +68,7 @@ class ShopSettingsTests: XCTestCase {
         ShopSettings.clearCache()
 
         // Create a real StorefrontAPI instance (it won't actually make network calls in tests)
-        _ = StorefrontAPI(shopDomain: "test.myshopify.com", storefrontAccessToken: "test-token")
+        _ = StorefrontAPI(storefrontDomain: "test.myshopify.com", storefrontAccessToken: "test-token")
 
         // Note: In a real test environment, you would mock the network layer or use dependency injection
         // For this test, we're just verifying the caching behavior by checking instance equality

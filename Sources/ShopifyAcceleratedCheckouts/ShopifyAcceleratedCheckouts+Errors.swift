@@ -21,8 +21,32 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-public enum ShopifyAcceleratedCheckouts {
-    /// Storefront API version used for cart operations
-    /// Note: We also use `2025-07` for `cartRemovePersonalData` mutations. We are working towards migrating all requests to `2025-07`.
-    static let apiVersion = "2025-04"
+import Foundation
+
+extension ShopifyAcceleratedCheckouts {
+    enum InvariantMessages: String {
+        case nilCart = "cart is nil."
+        case nilDisplayName = "displayName is nil."
+        case nilPayment = "payment is nil."
+        case nilPaymentData = "paymentData is nil."
+        case nilEmail = "email is nil."
+        case nilShippingMethodID = "shippingMethodID is nil."
+        case nilShippingMethod = "shippingMethod is nil."
+        case nilBillingAddress = "billingAddress is nil."
+        case nilLastDigits = "lastDigits is nil."
+        case nilPostalAddress = "postalAddress is nil."
+        case nilBillingContact = "billingContact is nil."
+        case nilShippingContact = "shippingContact is nil."
+    }
+
+    enum Error: LocalizedError {
+        case invariant(message: InvariantMessages)
+
+        func toString() -> String {
+            switch self {
+            case let .invariant(message):
+                return message.rawValue
+            }
+        }
+    }
 }

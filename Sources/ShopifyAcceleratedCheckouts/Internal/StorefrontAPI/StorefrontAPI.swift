@@ -30,19 +30,19 @@ import Foundation
 
     /// Initialize the Storefront API
     /// - Parameters:
-    ///   - shopDomain: The shop domain (e.g., "example.myshopify.com")
+    ///   - storefrontDomain: The shop domain (e.g., "example.myshopify.com")
     ///   - storefrontAccessToken: The storefront access token
     ///   - apiVersion: The API version to use (defaults to "2025-07")
     ///   - countryCode: Optional country code for localization
     ///   - languageCode: Optional language code for localization
     init(
-        shopDomain: String,
+        storefrontDomain: String,
         storefrontAccessToken: String,
         apiVersion: String = ShopifyAcceleratedCheckouts.apiVersion,
         countryCode: CountryCode = .US,
         languageCode: LanguageCode = .EN
     ) {
-        let url = URL(string: "https://\(shopDomain)/api/\(apiVersion)/graphql.json")!
+        let url = URL(string: "https://\(storefrontDomain)/api/\(apiVersion)/graphql.json")!
 
         client = GraphQLClient(
             url: url,
