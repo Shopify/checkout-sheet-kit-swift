@@ -61,7 +61,7 @@ extension StorefrontAPI {
     func cartBuyerIdentityUpdate(id: GraphQLScalars.ID, email: String?, phoneNumber: String?)
         async throws -> Cart
     {
-        var buyerIdentity: [String: Any] = [:]
+        var buyerIdentity: [String: String] = [:]
 
         if let email {
             buyerIdentity["email"] = email
