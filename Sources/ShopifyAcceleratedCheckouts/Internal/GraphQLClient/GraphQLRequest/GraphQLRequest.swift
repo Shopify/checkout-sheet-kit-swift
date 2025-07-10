@@ -87,7 +87,7 @@ struct GraphQLRequest<T: Decodable>: Encodable {
 
         let joined = nonCommentLines.joined(separator: " ")
 
-        /// Replace multiple whitespace characters with a single space
+        // Replace multiple whitespace characters with a single space
         let whitespacePattern = "\\s+"
         guard let regex = try? NSRegularExpression(pattern: whitespacePattern, options: []) else {
             return self

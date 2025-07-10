@@ -370,7 +370,7 @@ extension StorefrontAPI {
 extension StorefrontAPI {
     private func validateUserErrors(_ userErrors: [CartUserError], checkoutURL _: URL?) throws {
         guard userErrors.isEmpty else {
-            /// Always throw the actual CartUserError so the error handler can properly map it
+            // Always throw the actual CartUserError so the error handler can properly map it
             throw userErrors.first!
         }
     }
