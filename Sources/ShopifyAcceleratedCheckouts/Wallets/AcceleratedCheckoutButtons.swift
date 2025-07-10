@@ -234,13 +234,3 @@ extension AcceleratedCheckoutButtons {
         return newView
     }
 }
-
-// MARK: Previews
-
-@available(iOS 17.0, *)
-#Preview {
-    AcceleratedCheckoutButtons(cartID: .init(""))
-        .withWallets([.applepay, .shoppay])
-        .environment(mockCommonConfiguration)
-        .environment(mockController as ApplePayViewController)
-}

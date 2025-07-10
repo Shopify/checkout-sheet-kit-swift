@@ -94,18 +94,3 @@ internal struct Internal_ShopPayButton: View {
         .buttonStyle(ContentFadeButtonStyle())
     }
 }
-
-@available(iOS 17.0, *)
-#Preview {
-    let mockCommonConfiguration = ShopifyAcceleratedCheckouts.Configuration(
-        storefrontDomain: "test-shop.myshopify.com",
-        storefrontAccessToken: "test-token"
-    )
-
-    ShopPayButton(
-        identifier: .variant(variantID: "gid://Shopify/ProductVariant/123", quantity: 1),
-        eventHandlers: EventHandlers()
-    )
-    .padding()
-    .environment(mockCommonConfiguration)
-}
