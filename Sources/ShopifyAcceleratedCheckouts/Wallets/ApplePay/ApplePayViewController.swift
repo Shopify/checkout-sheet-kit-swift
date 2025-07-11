@@ -241,30 +241,43 @@ protocol PayController: AnyObject {
 
 @available(iOS 17.0, *)
 extension ApplePayViewController: CheckoutDelegate {
-    @MainActor func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-        onComplete?()
+    func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+        Task { @MainActor in
+            onComplete?()
+        }
     }
 
-    @MainActor func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
-        onFail?()
+    func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
+        Task { @MainActor in
+            onFail?()
+        }
     }
 
-    @MainActor func checkoutDidCancel() {
-        /// x right button on CSK doesn't dismiss automatically
-        checkoutViewController?.dismiss(animated: true)
-
-        onCancel?()
+    func checkoutDidCancel() {
+        Task { @MainActor in
+            /// x right button on CSK doesn't dismiss automatically
+            checkoutViewController?.dismiss(animated: true)
+            onCancel?()
+        }
     }
 
-    @MainActor func shouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
-        return onShouldRecoverFromError?(error) ?? false
+    func shouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
+        // Since this returns a value synchronously, we need to handle it differently
+        // We'll use MainActor.assumeIsolated to safely access the callback
+        return MainActor.assumeIsolated {
+            return onShouldRecoverFromError?(error) ?? false
+        }
     }
 
-    @MainActor func checkoutDidClickLink(url: URL) {
-        onClickLink?(url)
+    func checkoutDidClickLink(url: URL) {
+        Task { @MainActor in
+            onClickLink?(url)
+        }
     }
 
-    @MainActor func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        onWebPixelEvent?(event)
+    func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
+        Task { @MainActor in
+            onWebPixelEvent?(event)
+        }
     }
 }
