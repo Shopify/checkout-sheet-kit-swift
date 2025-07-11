@@ -37,14 +37,8 @@ struct ShopifyAcceleratedCheckoutsApp: App {
         customer: ShopifyAcceleratedCheckouts.Customer(email: nil, phoneNumber: nil)
     )
 
-    @State var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
-
-    init() {
-        // Initialize with default values
-        _applePayConfiguration = State(
-            wrappedValue: createApplePayConfiguration()
-        )
-    }
+    @State var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration =
+        createApplePayConfiguration()
 
     var body: some Scene {
         WindowGroup {
