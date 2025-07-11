@@ -11,6 +11,7 @@
 		CB10C8E42DD72C080036CDB1 /* Development.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CB10C8E32DD72C080036CDB1 /* Development.xcconfig */; };
 		CB4FD0FD2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CB4FD0FC2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts */; };
 		CBC3DEE62DD360E600376831 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CBC3DEE52DD360E600376831 /* ShopifyAcceleratedCheckouts */; };
+		CBCDA6672E2117AF000463E9 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CBCDA6662E2117AF000463E9 /* ShopifyAcceleratedCheckouts */; };
 		CBD9D6D22E12AE5A00D836A3 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = CBD9D6D12E12AE5A00D836A3 /* Apollo */; };
 		CBD9D70E2E12BF9500D836A3 /* apollo-codegen-config.json in Resources */ = {isa = PBXBuildFile; fileRef = CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */; };
 		CBD9D7BC2E12C27400D836A3 /* schema.2025-07.graphqls in Resources */ = {isa = PBXBuildFile; fileRef = CBD9D7BB2E12C27400D836A3 /* schema.2025-07.graphqls */; };
@@ -81,6 +82,7 @@
 				CBC3DEE62DD360E600376831 /* ShopifyAcceleratedCheckouts in Frameworks */,
 				CBD9D6D22E12AE5A00D836A3 /* Apollo in Frameworks */,
 				CB4FD0FD2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts in Frameworks */,
+				CBCDA6672E2117AF000463E9 /* ShopifyAcceleratedCheckouts in Frameworks */,
 				2E4937132DD494F800604374 /* ShopifyAcceleratedCheckouts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -149,6 +151,7 @@
 				CB4FD0FC2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts */,
 				2E4937122DD494F800604374 /* ShopifyAcceleratedCheckouts */,
 				CBD9D6D12E12AE5A00D836A3 /* Apollo */,
+				CBCDA6662E2117AF000463E9 /* ShopifyAcceleratedCheckouts */,
 			);
 			productName = ShopifyAcceleratedCheckoutsApp;
 			productReference = CBC3DEB52DD3607300376831 /* ShopifyAcceleratedCheckoutsApp.app */;
@@ -235,8 +238,8 @@
 			mainGroup = CBC3DEAC2DD3607300376831;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2E4937112DD494F800604374 /* XCLocalSwiftPackageReference "../../../accelerated-checkouts-ios" */,
 				CBD9D6D02E12AE5A00D836A3 /* XCRemoteSwiftPackageReference "apollo-ios" */,
+				CBCDA6652E2117AF000463E9 /* XCLocalSwiftPackageReference "../../../checkout-sheet-kit-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CBC3DEB62DD3607300376831 /* Products */;
@@ -630,9 +633,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		2E4937112DD494F800604374 /* XCLocalSwiftPackageReference "../../../accelerated-checkouts-ios" */ = {
+		CBCDA6652E2117AF000463E9 /* XCLocalSwiftPackageReference "../../../checkout-sheet-kit-swift" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../accelerated-checkouts-ios";
+			relativePath = "../../../checkout-sheet-kit-swift";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -657,6 +660,10 @@
 			productName = ShopifyAcceleratedCheckouts;
 		};
 		CBC3DEE52DD360E600376831 /* ShopifyAcceleratedCheckouts */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShopifyAcceleratedCheckouts;
+		};
+		CBCDA6662E2117AF000463E9 /* ShopifyAcceleratedCheckouts */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShopifyAcceleratedCheckouts;
 		};
