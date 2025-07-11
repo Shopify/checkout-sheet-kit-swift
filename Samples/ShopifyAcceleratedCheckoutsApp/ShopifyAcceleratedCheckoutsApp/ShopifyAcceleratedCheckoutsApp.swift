@@ -30,7 +30,8 @@ struct ShopifyAcceleratedCheckoutsApp: App {
 
         _applePayConfiguration = State(
             wrappedValue: createApplePayConfiguration(
-                includeEmail: initialIncludeEmail, includePhone: initialIncludePhone))
+                includeEmail: initialIncludeEmail, includePhone: initialIncludePhone
+            ))
     }
 
     var body: some Scene {
@@ -67,7 +68,7 @@ private func createApplePayConfiguration(includeEmail: Bool, includePhone: Bool)
     -> ShopifyAcceleratedCheckouts.ApplePayConfiguration
 {
     var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
-    
+
     if includeEmail { fields.append(.email) }
     if includePhone { fields.append(.phone) }
 
