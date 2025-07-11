@@ -14,7 +14,7 @@ public enum EnvironmentVariables {
 
     private static func getKey(for key: String) -> String {
         guard let value = EnvironmentVariables.infoDictionary[key] as? String else {
-            fatalError("Environment variable \(key) must be set in the Development.xcconfig file")
+            fatalError("Environment variable \(key) must be set in the Storefront.xcconfig file")
         }
         return value
     }

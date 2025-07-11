@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2E4937132DD494F800604374 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = 2E4937122DD494F800604374 /* ShopifyAcceleratedCheckouts */; };
-		CB10C8E42DD72C080036CDB1 /* Development.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CB10C8E32DD72C080036CDB1 /* Development.xcconfig */; };
+		CB10C8E42DD72C080036CDB1 /* Storefront.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CB10C8E32DD72C080036CDB1 /* Storefront.xcconfig */; };
 		CB4FD0FD2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CB4FD0FC2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts */; };
 		CBC3DEE62DD360E600376831 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CBC3DEE52DD360E600376831 /* ShopifyAcceleratedCheckouts */; };
 		CBCDA6672E2117AF000463E9 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CBCDA6662E2117AF000463E9 /* ShopifyAcceleratedCheckouts */; };
@@ -34,7 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CB10C8E32DD72C080036CDB1 /* Development.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Development.xcconfig; sourceTree = "<group>"; };
+		CB10C8E32DD72C080036CDB1 /* Storefront.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Storefront.xcconfig; sourceTree = "<group>"; };
 		CBC3DEB52DD3607300376831 /* ShopifyAcceleratedCheckoutsApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBC3DEC72DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBC3DED12DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,7 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */,
-				CB10C8E32DD72C080036CDB1 /* Development.xcconfig */,
+				CB10C8E32DD72C080036CDB1 /* Storefront.xcconfig */,
 				CBC3DEB72DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */,
 				CBC3DECA2DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */,
 				CBC3DED42DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */,
@@ -255,7 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CB10C8E42DD72C080036CDB1 /* Development.xcconfig in Resources */,
+				CB10C8E42DD72C080036CDB1 /* Storefront.xcconfig in Resources */,
 				CBD9D70E2E12BF9500D836A3 /* apollo-codegen-config.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -316,7 +316,7 @@
 /* Begin XCBuildConfiguration section */
 		CBC3DED92DD3607400376831 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CB10C8E32DD72C080036CDB1 /* Development.xcconfig */;
+			baseConfigurationReference = CB10C8E32DD72C080036CDB1 /* Storefront.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -383,7 +383,7 @@
 		};
 		CBC3DEDA2DD3607400376831 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CB10C8E32DD72C080036CDB1 /* Development.xcconfig */;
+			baseConfigurationReference = CB10C8E32DD72C080036CDB1 /* Storefront.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
