@@ -57,7 +57,7 @@ struct CartBuilderView: View {
                             isLoadingProducts: isLoadingProducts,
                             onRetry: { Task { await onLoad() } }
                         )
-                        
+
                         if let cart {
                             CartDetailsSection(
                                 cart: Binding(get: { cart }, set: { self.cart = $0 })
@@ -174,8 +174,8 @@ struct CartBuilderView: View {
 
 #Preview {
     @Previewable @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
-        storefrontDomain: "my-shop.myshopify.com",
-        storefrontAccessToken: "asdb"
+        storefrontDomain: EnvironmentVariables.storefrontDomain,
+        storefrontAccessToken: EnvironmentVariables.storefrontAccessToken
     )
 
     CartBuilderView(configuration: $configuration)
