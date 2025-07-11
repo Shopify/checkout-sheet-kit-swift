@@ -14,7 +14,6 @@
 		CBCDA6672E2117AF000463E9 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CBCDA6662E2117AF000463E9 /* ShopifyAcceleratedCheckouts */; };
 		CBD9D6D22E12AE5A00D836A3 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = CBD9D6D12E12AE5A00D836A3 /* Apollo */; };
 		CBD9D70E2E12BF9500D836A3 /* apollo-codegen-config.json in Resources */ = {isa = PBXBuildFile; fileRef = CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */; };
-		CBD9D7BC2E12C27400D836A3 /* schema.2025-07.graphqls in Resources */ = {isa = PBXBuildFile; fileRef = CBD9D7BB2E12C27400D836A3 /* schema.2025-07.graphqls */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,7 +39,6 @@
 		CBC3DEC72DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBC3DED12DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "apollo-codegen-config.json"; sourceTree = "<group>"; };
-		CBD9D7BB2E12C27400D836A3 /* schema.2025-07.graphqls */ = {isa = PBXFileReference; lastKnownFileType = text; path = "schema.2025-07.graphqls"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -107,7 +105,6 @@
 		CBC3DEAC2DD3607300376831 = {
 			isa = PBXGroup;
 			children = (
-				CBD9D7BB2E12C27400D836A3 /* schema.2025-07.graphqls */,
 				CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */,
 				CB10C8E32DD72C080036CDB1 /* Development.xcconfig */,
 				CBC3DEB72DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */,
@@ -258,7 +255,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBD9D7BC2E12C27400D836A3 /* schema.2025-07.graphqls in Resources */,
 				CB10C8E42DD72C080036CDB1 /* Development.xcconfig in Resources */,
 				CBD9D70E2E12BF9500D836A3 /* apollo-codegen-config.json in Resources */,
 			);
