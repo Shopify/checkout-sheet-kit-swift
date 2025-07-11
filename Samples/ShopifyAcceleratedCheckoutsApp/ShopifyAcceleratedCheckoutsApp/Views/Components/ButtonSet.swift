@@ -26,7 +26,7 @@ import ShopifyAcceleratedCheckouts
 import SwiftUI
 
 struct ButtonSet: View {
-    let cart: Cart?
+    @Binding var cart: Cart?
     let firstVariantQuantity: Int
 
     var body: some View {

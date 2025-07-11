@@ -59,11 +59,13 @@ struct CartBuilderView: View {
                         )
                         
                         if let cart {
-                            CartDetailsSection(cart: cart)
-                                .id("cart-details")  // Add ID for scrolling to cart
+                            CartDetailsSection(
+                                cart: Binding(get: { cart }, set: { self.cart = $0 })
+                            )
+                            .id("cart-details")  // Add ID for scrolling to cart
 
                             ButtonSet(
-                                cart: cart,
+                                cart: $cart,
                                 firstVariantQuantity: cart.lines.nodes.first?.quantity ?? 1
                             )
                         }

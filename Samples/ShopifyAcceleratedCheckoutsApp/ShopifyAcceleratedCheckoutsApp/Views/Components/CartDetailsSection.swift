@@ -25,7 +25,7 @@ import Apollo
 import SwiftUI
 
 struct CartDetailsSection: View {
-    let cart: Cart
+    @Binding var cart: Cart
 
     var cartTypeTitle: String {
         let variants = cart.lines.nodes.compactMap { $0.merchandise.asProductVariant }
