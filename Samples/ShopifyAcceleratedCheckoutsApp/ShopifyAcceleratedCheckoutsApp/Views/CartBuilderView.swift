@@ -62,7 +62,7 @@ struct CartBuilderView: View {
                             CartDetailsSection(
                                 cart: Binding(get: { cart }, set: { self.cart = $0 })
                             )
-                            .id("cart-details")  // Add ID for scrolling to cart
+                            .id("cart-details") // Add ID for scrolling to cart
 
                             ButtonSet(
                                 cart: $cart,

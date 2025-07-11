@@ -73,7 +73,7 @@ struct SettingsView: View {
     }
 }
 
-enum AppStorageKeys:String {
+enum AppStorageKeys: String {
     case requireEmail
     case requirePhone
     case locale
