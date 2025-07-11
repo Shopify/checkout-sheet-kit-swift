@@ -1,0 +1,10 @@
+// --- Storefront
+// --- Find your Storefront API access token under:
+// ----- https://admin.shopify.com/store/{STOREFRONT}/settings/apps/development/{APP_ID}/api_credentials
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+STOREFRONT_DOMAIN = shopify.my-shopify.com
+STOREFRONT_ACCESS_TOKEN = 123456
+API_VERSION = 2025-07

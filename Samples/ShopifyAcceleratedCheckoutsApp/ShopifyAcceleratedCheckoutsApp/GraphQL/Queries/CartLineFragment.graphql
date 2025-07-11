@@ -1,0 +1,31 @@
+fragment CartLineFragment on BaseCartLine {
+  id
+  quantity
+  merchandise {
+    ... on ProductVariant {
+      id
+      title
+      image {
+        url
+      }
+      price {
+        amount
+        currencyCode
+      }
+      product {
+        title
+        vendor
+        featuredImage {
+          url
+        }
+      }
+      requiresShipping
+    }
+  }
+  cost {
+    totalAmount {
+      amount
+      currencyCode
+    }
+  }
+} 

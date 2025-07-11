@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>STOREFRONT_ACCESS_TOKEN</key>
+	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
+	<key>STOREFRONT_DOMAIN</key>
+	<string>$(STOREFRONT_DOMAIN)</string>
+	<key>API_VERSION</key>
+	<string>$(API_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

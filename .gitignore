@@ -8,3 +8,7 @@ xcuserdata
 .claude/
 CLAUDE.md
 
+# ShopifyAcceleratedCheckoutsApp
+*.graphqls
+apollo-ios-cli
+

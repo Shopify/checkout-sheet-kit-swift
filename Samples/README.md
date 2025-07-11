@@ -15,3 +15,17 @@ To get started you will first need to generate an `entitlements` file for the ap
 ```sh
 ./Scripts/setup_entitlements
 ```
+
+---
+
+## ShopifyAcceleratedCheckoutsApp
+
+This project demonstrates integrating Shopify's Accelerated Checkouts, an all in one solution to accelerated checkouts via Apple Pay and Shop Pay. 
+
+To get started:
+
+1. Copy the settings file:
+```sh
+cp Samples/ShopifyAcceleratedCheckouts/Storefront.xcconfig.example Samples/ShopifyAcceleratedCheckouts/Storefront.xcconfig
+```
+2. Modify each of the keys in `Storefront.xcconfig` to match the value in your store settings.
