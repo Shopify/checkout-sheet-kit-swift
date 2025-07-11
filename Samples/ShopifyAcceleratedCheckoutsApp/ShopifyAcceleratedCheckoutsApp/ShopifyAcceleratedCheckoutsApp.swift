@@ -68,8 +68,8 @@ struct ShopifyAcceleratedCheckoutsApp: App {
 }
 
 private func createApplePayConfiguration(
-    requireEmail: Bool = UserDefaults.standard.object(forKey: "includeEmail") as? Bool ?? true,
-    requirePhone: Bool = UserDefaults.standard.object(forKey: "includePhone") as? Bool ?? true
+    requireEmail: Bool = UserDefaults.standard.object(forKey: AppStorageKeys.requireEmail.rawValue) as? Bool ?? true,
+    requirePhone: Bool = UserDefaults.standard.object(forKey: AppStorageKeys.requirePhone.rawValue) as? Bool ?? true
 ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
 
