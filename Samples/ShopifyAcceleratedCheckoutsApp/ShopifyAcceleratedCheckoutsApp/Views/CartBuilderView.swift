@@ -161,7 +161,7 @@ struct CartBuilderView: View {
 
 #Preview {
     @Previewable @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
-        shopDomain: "my-shop.myshopify.com",
+        storefrontDomain: "my-shop.myshopify.com",
         storefrontAccessToken: "asdb"
     )
 
