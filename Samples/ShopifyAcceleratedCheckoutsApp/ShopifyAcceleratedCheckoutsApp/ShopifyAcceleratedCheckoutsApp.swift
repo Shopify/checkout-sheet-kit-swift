@@ -27,9 +27,9 @@ import SwiftUI
 
 @main
 struct ShopifyAcceleratedCheckoutsApp: App {
-    @AppStorage("locale") var locale: String = "en"
-    @AppStorage("requireEmail") var requireEmail: Bool = true
-    @AppStorage("requirePhone") var requirePhone: Bool = true
+    @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true
+    @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
+    @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
 
     @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,

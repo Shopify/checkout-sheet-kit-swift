@@ -25,10 +25,9 @@ import ShopifyAcceleratedCheckouts
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("requireEmail") var requireEmail: Bool = true
-    @AppStorage("requirePhone") var requirePhone: Bool = true
-    @AppStorage("locale") var locale: String = "en"
-    @Binding var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
+    @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true
+    @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
+    @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
 
     private let availableLocales: [(name: String, isoCode: String)] = [
         ("English", "en"),
@@ -72,4 +71,10 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+enum AppStorageKeys:String {
+    case requireEmail
+    case requirePhone
+    case locale
 }
