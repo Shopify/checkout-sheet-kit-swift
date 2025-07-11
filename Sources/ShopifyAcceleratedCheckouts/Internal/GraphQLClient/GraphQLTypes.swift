@@ -30,6 +30,7 @@ enum GraphQLError: LocalizedError {
     case decodingError(Error)
     case graphQLErrors([GraphQLResponseError])
     case invalidResponse
+    case invalidVariables
 
     var errorDescription: String? {
         switch self {
@@ -41,9 +42,11 @@ enum GraphQLError: LocalizedError {
         case let .decodingError(error):
             return "Decoding error: \(error.localizedDescription)"
         case let .graphQLErrors(errors):
-            return "GraphQL errors: \(errors.map(\.message).joined(separator: ", "))"
+            return "GraphQL errors: \(errors.map { $0.message }.joined(separator: ", "))"
         case .invalidResponse:
             return "Invalid response from server"
+        case .invalidVariables:
+            return "Invalid variables provided to the GraphQL query"
         }
     }
 }
@@ -70,7 +73,7 @@ struct AnyCodable: Codable {
         } else if let value = try? container.decode([String: AnyCodable].self) {
             self.value = value.mapValues { $0.value }
         } else if let value = try? container.decode([AnyCodable].self) {
-            self.value = value.map(\.value)
+            self.value = value.map { $0.value }
         } else if container.decodeNil() {
             value = NSNull()
         } else {

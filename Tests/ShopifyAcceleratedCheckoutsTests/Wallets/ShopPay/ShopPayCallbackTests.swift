@@ -66,21 +66,23 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Success Callback Tests
 
+    @MainActor
     func testSuccessCallbackInvoked() async {
         successExpectation = expectation(description: "Success callback should be invoked")
-        var callbackInvoked = false
+        let callbackInvokedExpectation = expectation(description: "Callback invoked")
 
-        viewController.eventHandlers = EventHandlers(
-            checkoutDidComplete: { [weak self] in
-                callbackInvoked = true
-                self?.successExpectation.fulfill()
-            }
-        )
+        await MainActor.run {
+            viewController.eventHandlers = EventHandlers(
+                checkoutDidComplete: { [weak self] in
+                    callbackInvokedExpectation.fulfill()
+                    self?.successExpectation.fulfill()
+                }
+            )
 
-        viewController.eventHandlers.checkoutDidComplete?()
+            viewController.eventHandlers.checkoutDidComplete?()
+        }
 
-        await fulfillment(of: [successExpectation], timeout: 1.0)
-        XCTAssertTrue(callbackInvoked, "Success callback should have been invoked")
+        await fulfillment(of: [successExpectation, callbackInvokedExpectation], timeout: 1.0)
     }
 
     func testSuccessCallbackNotInvokedWhenNil() {
@@ -93,21 +95,21 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Error Callback Tests
 
+    @MainActor
     func testErrorCallbackInvoked() async {
         errorExpectation = expectation(description: "Error callback should be invoked")
-        var callbackInvoked = false
+        let callbackInvokedExpectation = expectation(description: "Error callback invoked")
 
         viewController.eventHandlers = EventHandlers(
             checkoutDidFail: { [weak self] in
-                callbackInvoked = true
+                callbackInvokedExpectation.fulfill()
                 self?.errorExpectation.fulfill()
             }
         )
 
         viewController.eventHandlers.checkoutDidFail?()
 
-        await fulfillment(of: [errorExpectation], timeout: 1.0)
-        XCTAssertTrue(callbackInvoked, "Error callback should have been invoked")
+        await fulfillment(of: [errorExpectation, callbackInvokedExpectation], timeout: 1.0)
     }
 
     func testErrorCallbackNotInvokedWhenNil() {
@@ -120,21 +122,21 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Cancel Callback Tests
 
+    @MainActor
     func testCancelCallbackInvoked() async {
         cancelExpectation = expectation(description: "Cancel callback should be invoked")
-        var callbackInvoked = false
+        let callbackInvokedExpectation = expectation(description: "Cancel callback invoked")
 
         viewController.eventHandlers = EventHandlers(
             checkoutDidCancel: { [weak self] in
-                callbackInvoked = true
+                callbackInvokedExpectation.fulfill()
                 self?.cancelExpectation.fulfill()
             }
         )
 
         viewController.eventHandlers.checkoutDidCancel?()
 
-        await fulfillment(of: [cancelExpectation], timeout: 1.0)
-        XCTAssertTrue(callbackInvoked, "Cancel callback should have been invoked")
+        await fulfillment(of: [cancelExpectation, callbackInvokedExpectation], timeout: 1.0)
     }
 
     func testCancelCallbackNotInvokedWhenNil() {
@@ -147,6 +149,7 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Delegate Tests
 
+    @MainActor
     func testCheckoutCompleteCallback() {
         var completeInvoked = false
         viewController.eventHandlers = EventHandlers(
@@ -158,6 +161,7 @@ final class ShopPayCallbackTests: XCTestCase {
         XCTAssertTrue(completeInvoked, "Complete callback should be invoked")
     }
 
+    @MainActor
     func testCheckoutFailCallback() {
         var failInvoked = false
         viewController.eventHandlers = EventHandlers(
@@ -169,6 +173,7 @@ final class ShopPayCallbackTests: XCTestCase {
         XCTAssertTrue(failInvoked, "Fail callback should be invoked")
     }
 
+    @MainActor
     func testCheckoutCancelCallback() {
         var cancelInvoked = false
         viewController.eventHandlers = EventHandlers(
@@ -180,6 +185,7 @@ final class ShopPayCallbackTests: XCTestCase {
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
 
+    @MainActor
     func testCheckoutDidCancelDelegateBehavior() {
         var cancelInvoked = false
         viewController.eventHandlers = EventHandlers(

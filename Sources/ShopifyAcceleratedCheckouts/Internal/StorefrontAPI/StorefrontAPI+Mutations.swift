@@ -56,13 +56,27 @@ extension StorefrontAPI {
     /// - Parameters:
     ///   - id: Cart ID
     ///   - email: Buyer email address
+    ///   - phone: Buyers phone number
     /// - Returns: Updated cart
-    func cartBuyerIdentityUpdate(id: GraphQLScalars.ID, email: String) async throws -> Cart {
+    func cartBuyerIdentityUpdate(id: GraphQLScalars.ID, email: String?, phoneNumber: String?)
+        async throws -> Cart
+    {
+        var buyerIdentity: [String: String] = [:]
+
+        if let email {
+            buyerIdentity["email"] = email
+        }
+        if let phoneNumber {
+            buyerIdentity["phone"] = phoneNumber
+        }
+
+        if buyerIdentity.isEmpty {
+            throw GraphQLError.invalidVariables
+        }
+
         let variables: [String: Any] = [
             "cartId": id.rawValue,
-            "buyerIdentity": [
-                "email": email
-            ]
+            "buyerIdentity": buyerIdentity
         ]
 
         let response = try await client.mutate(

@@ -374,7 +374,8 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
         let cart = try await storefrontAPI.cartBuyerIdentityUpdate(
             id: GraphQLScalars.ID("gid://shopify/Cart/123"),
-            email: "test@example.com"
+            email: "test@example.com",
+            phoneNumber: ""
         )
 
         XCTAssertEqual(cart.buyerIdentity?.email, "test@example.com")
@@ -400,7 +401,8 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         await XCTAssertThrowsGraphQLError(
             try await storefrontAPI.cartBuyerIdentityUpdate(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
-                email: "invalid-email"
+                email: "invalid-email",
+                phoneNumber: ""
             ),
             { if case .invalidResponse = $0 { return true } else { return false } },
             "Expected GraphQLError.invalidResponse to be thrown"
@@ -1284,7 +1286,8 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         do {
             _ = try await storefrontAPI.cartBuyerIdentityUpdate(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
-                email: "bad-email"
+                email: "bad-email",
+                phoneNumber: ""
             )
             XCTFail("Expected error to be thrown")
         } catch let cartError as StorefrontAPI.CartUserError {

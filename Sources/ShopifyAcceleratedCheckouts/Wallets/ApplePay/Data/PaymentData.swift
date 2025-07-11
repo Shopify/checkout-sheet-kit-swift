@@ -21,17 +21,25 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Foundation
+import PassKit
 
-extension ShopifyAcceleratedCheckouts {
-    enum Error: LocalizedError {
-        case invariant(expected: String)
+@available(iOS 17.0, *)
+struct PaymentData: Codable {
+    let data, signature: String
+    let header: Header
+    let version: String
+}
 
-        func toString() -> String {
-            switch self {
-            case let .invariant(expected):
-                return "received nil, expected: \(expected)"
-            }
-        }
-    }
+@available(iOS 17.0, *)
+struct Header: Codable {
+    let transactionId: String
+    let ephemeralPublicKey, publicKeyHash: String
+}
+
+@available(iOS 17.0, *)
+func decodePaymentData(payment: PKPayment) -> PaymentData? {
+    try? JSONDecoder().decode(
+        PaymentData.self,
+        from: payment.token.paymentData
+    )
 }

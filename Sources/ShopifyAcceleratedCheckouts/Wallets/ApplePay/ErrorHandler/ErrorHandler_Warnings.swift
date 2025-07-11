@@ -22,16 +22,19 @@
  */
 
 import Foundation
+import PassKit
 
-extension ShopifyAcceleratedCheckouts {
-    enum Error: LocalizedError {
-        case invariant(expected: String)
-
-        func toString() -> String {
-            switch self {
-            case let .invariant(expected):
-                return "received nil, expected: \(expected)"
-            }
+@available(iOS 17.0, *)
+extension ErrorHandler {
+    static func map(
+        warningType: StorefrontAPI.WarningType,
+        cart: StorefrontAPI.Types.Cart?
+    ) -> PaymentSheetAction {
+        switch warningType {
+        case .outOfStock:
+            return .interrupt(reason: .outOfStock, checkoutURL: cart?.checkoutUrl.url)
+        case .notEnoughStock:
+            return .interrupt(reason: .notEnoughStock, checkoutURL: cart?.checkoutUrl.url)
         }
     }
 }
