@@ -42,7 +42,7 @@ struct CartBuilderView: View {
     @State private var scrollToCart = false
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack {
             ScrollView {
                 ScrollViewReader { scrollProxy in
                     VStack(spacing: 20) {
@@ -95,7 +95,7 @@ struct CartBuilderView: View {
             }
 
             // Sticky Cart Creation Buttons
-            VStack(spacing: 0) {
+            VStack {
                 Divider()
                 CartCreationButtons(
                     customCart: cart,
