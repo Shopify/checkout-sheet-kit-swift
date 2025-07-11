@@ -25,8 +25,8 @@ import ShopifyAcceleratedCheckouts
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("includeEmail") var includeEmail: Bool = true
-    @AppStorage("includePhone") var includePhone: Bool = true
+    @AppStorage("requireEmail") var requireEmail: Bool = true
+    @AppStorage("requirePhone") var requirePhone: Bool = true
     @AppStorage("locale") var locale: String = "en"
     @Binding var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
 
@@ -53,10 +53,10 @@ struct SettingsView: View {
             }
 
             Section("Apple Pay Contact Fields") {
-                Toggle("Request Email", isOn: $includeEmail)
-                Toggle("Request Phone", isOn: $includePhone)
+                Toggle("Request Email", isOn: $requireEmail)
+                Toggle("Request Phone", isOn: $requirePhone)
 
-                if !includeEmail, !includePhone {
+                if !requireEmail, !requirePhone {
                     Text("Note: At least one contact field is recommended for Apple Pay")
                         .font(.caption)
                         .foregroundColor(.orange)
