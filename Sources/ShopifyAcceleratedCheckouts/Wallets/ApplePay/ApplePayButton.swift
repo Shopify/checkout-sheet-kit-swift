@@ -108,12 +108,14 @@ struct Internal_ApplePayButton: View {
             identifier: identifier,
             configuration: configuration
         )
-        controller.onComplete = eventHandlers.checkoutDidComplete
-        controller.onFail = eventHandlers.checkoutDidFail
-        controller.onCancel = eventHandlers.checkoutDidCancel
-        controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
-        controller.onClickLink = eventHandlers.checkoutDidClickLink
-        controller.onWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
+        MainActor.assumeIsolated {
+            controller.onComplete = eventHandlers.checkoutDidComplete
+            controller.onFail = eventHandlers.checkoutDidFail
+            controller.onCancel = eventHandlers.checkoutDidCancel
+            controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
+            controller.onClickLink = eventHandlers.checkoutDidClickLink
+            controller.onWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
+        }
         self.label = label
     }
 
