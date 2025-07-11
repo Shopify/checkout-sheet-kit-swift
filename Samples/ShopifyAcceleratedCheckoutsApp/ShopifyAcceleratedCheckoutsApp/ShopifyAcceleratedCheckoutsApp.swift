@@ -46,7 +46,7 @@ struct ShopifyAcceleratedCheckoutsApp: App {
                 CartBuilderView(configuration: $configuration)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
-                            SettingsButton(applePayConfiguration: $applePayConfiguration)
+                            SettingsButton()
                         }
                     }
                     .id("\(requireEmail)-\(requirePhone)")
