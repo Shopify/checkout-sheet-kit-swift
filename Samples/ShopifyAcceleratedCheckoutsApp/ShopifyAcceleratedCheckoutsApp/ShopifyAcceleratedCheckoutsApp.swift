@@ -14,9 +14,9 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage("includePhone") var includePhone: Bool = true
 
     @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
-        shopDomain: EnvironmentVariables.storefrontDomain,
+        storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
-        customer: ShopifyAcceleratedCheckouts.Customer(email: nil)
+        customer: ShopifyAcceleratedCheckouts.Customer(email: nil, phoneNumber: nil)
     )
 
     @State var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
@@ -28,20 +28,9 @@ struct ShopifyAcceleratedCheckoutsApp: App {
         let initialIncludePhone =
             UserDefaults.standard.object(forKey: "includePhone") as? Bool ?? true
 
-        var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
-        if initialIncludeEmail {
-            fields.append(.email)
-        }
-        if initialIncludePhone {
-            fields.append(.phone)
-        }
-
         _applePayConfiguration = State(
-            initialValue: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.com.shopify.example.ShopifyAcceleratedCheckoutsApp",
-                supportedNetworks: [.amex, .discover, .masterCard, .visa],
-                contactFields: fields
-            ))
+            wrappedValue: createApplePayConfiguration(
+                includeEmail: initialIncludeEmail, includePhone: initialIncludePhone))
     }
 
     var body: some Scene {
@@ -60,26 +49,31 @@ struct ShopifyAcceleratedCheckoutsApp: App {
         .environment(configuration)
         .environment(applePayConfiguration)
         .onChange(of: includeEmail) { _, _ in
-            updateApplePayConfiguration()
+            applePayConfiguration = createApplePayConfiguration(
+                includeEmail: includeEmail,
+                includePhone: includePhone
+            )
         }
         .onChange(of: includePhone) { _, _ in
-            updateApplePayConfiguration()
+            applePayConfiguration = createApplePayConfiguration(
+                includeEmail: includeEmail,
+                includePhone: includePhone
+            )
         }
     }
+}
 
-    private func updateApplePayConfiguration() {
-        var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
-        if includeEmail {
-            fields.append(.email)
-        }
-        if includePhone {
-            fields.append(.phone)
-        }
+private func createApplePayConfiguration(includeEmail: Bool, includePhone: Bool)
+    -> ShopifyAcceleratedCheckouts.ApplePayConfiguration
+{
+    var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
+    
+    if includeEmail { fields.append(.email) }
+    if includePhone { fields.append(.phone) }
 
-        applePayConfiguration = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-            merchantIdentifier: "merchant.com.shopify.example.ShopifyAcceleratedCheckoutsApp",
-            supportedNetworks: [.amex, .discover, .masterCard, .visa],
-            contactFields: fields
-        )
-    }
+    return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+        merchantIdentifier: "merchant.com.shopify.example.ShopifyAcceleratedCheckoutsApp",
+        supportedNetworks: [.amex, .discover, .masterCard, .visa],
+        contactFields: fields
+    )
 }
