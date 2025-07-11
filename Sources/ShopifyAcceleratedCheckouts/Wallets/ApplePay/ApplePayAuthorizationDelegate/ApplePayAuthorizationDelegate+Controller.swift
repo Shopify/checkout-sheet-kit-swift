@@ -103,7 +103,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     email: try? pkEncoder.email.get(),
                     phoneNumber: try? pkEncoder.phoneNumber.get()
                 )
-                var result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
             }
 
