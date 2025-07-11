@@ -57,8 +57,7 @@ struct CartBuilderView: View {
                             isLoadingProducts: isLoadingProducts,
                             onRetry: { Task { await onLoad() } }
                         )
-                        .id("products-section")  // Add ID for scrolling
-
+                        
                         if let cart {
                             CartDetailsSection(cart: cart)
                                 .id("cart-details")  // Add ID for scrolling to cart
@@ -67,7 +66,6 @@ struct CartBuilderView: View {
                                 cart: cart,
                                 firstVariantQuantity: cart.lines.nodes.first?.quantity ?? 1
                             )
-                            .id("\(cart.id)")
                         }
 
                         // Bottom padding to ensure content isn't hidden behind sticky buttons
