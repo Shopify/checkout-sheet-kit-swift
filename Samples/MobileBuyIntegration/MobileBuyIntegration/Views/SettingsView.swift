@@ -55,6 +55,18 @@ struct SettingsView: View {
                     Toggle("Show Checkout with ApplePay button", isOn: $config.applePayEnabled)
                 }
 
+                Section(header: Text("App Authentication")) {
+                    TextField("JWT Token", text: Binding(
+                        get: { config.appAuthenticationToken ?? "" },
+                        set: { config.appAuthenticationToken = $0.isEmpty ? nil : $0 }
+                    ))
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                    Text("Enter a JWT token for app authentication. This token should be generated on a secure server, not on the device. Leave empty to disable app authentication.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
                 Section(header: Text("Theme")) {
                     ForEach(Configuration.ColorScheme.allCases, id: \.self) { scheme in
                         ColorSchemeView(scheme: scheme, isSelected: scheme == selectedColorScheme)
@@ -145,25 +157,27 @@ extension Configuration.ColorScheme {
             return "Dark"
         case .automatic:
             return "Automatic"
-        case .web:
-            return "Web"
         }
     }
 
     var tintColor: UIColor {
         switch self {
-        case .web:
-            return UIColor(red: 0.18, green: 0.16, blue: 0.22, alpha: 1.00)
-        default:
+        case .light:
+            return UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+        case .dark:
+            return UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
+        case .automatic:
             return UIColor(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
         }
     }
 
     var backgroundColor: UIColor {
         switch self {
-        case .web:
-            return ColorPalette.backgroundColor
-        default:
+        case .light:
+            return .systemBackground
+        case .dark:
+            return .systemBackground
+        case .automatic:
             return .systemBackground
         }
     }

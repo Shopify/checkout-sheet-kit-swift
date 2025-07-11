@@ -42,18 +42,21 @@ public enum CheckoutErrorCode: String, Codable {
     }
 }
 
-public enum CheckoutUnavailable {
+public enum CheckoutUnavailable: Equatable {
     case clientError(code: CheckoutErrorCode)
     case httpError(statusCode: Int)
 }
 
 /// A type representing Shopify Checkout specific errors.
 /// "recoverable" indicates that though the request has failed, it should be retried in a fallback browser experience.
-public enum CheckoutError: Swift.Error {
+public enum CheckoutError: Swift.Error, Equatable {
     /// Issued when an internal error within Shopify Checkout SDK
     /// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
     /// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
     case sdkError(underlying: Swift.Error, recoverable: Bool = true)
+
+    /// Issued when the webView is not available for checkout operations
+    case webViewNotAvailable
 
     /// Issued when the storefront configuration has caused an error.
     /// Note that the Checkout Sheet Kit only supports stores migrated for extensibility.
@@ -70,11 +73,31 @@ public enum CheckoutError: Swift.Error {
 
     public var isRecoverable: Bool {
         switch self {
+        case .webViewNotAvailable:
+            return false
         case let .checkoutExpired(_, _, recoverable),
              let .checkoutUnavailable(_, _, recoverable),
              let .configurationError(_, _, recoverable),
              let .sdkError(_, recoverable):
             return recoverable
+        }
+    }
+
+    public static func == (lhs: CheckoutError, rhs: CheckoutError) -> Bool {
+        switch (lhs, rhs) {
+        case (.webViewNotAvailable, .webViewNotAvailable):
+            return true
+        case let (.configurationError(msg1, code1, rec1), .configurationError(msg2, code2, rec2)):
+            return msg1 == msg2 && code1 == code2 && rec1 == rec2
+        case let (.checkoutUnavailable(msg1, code1, rec1), .checkoutUnavailable(msg2, code2, rec2)):
+            return msg1 == msg2 && code1 == code2 && rec1 == rec2
+        case let (.checkoutExpired(msg1, code1, rec1), .checkoutExpired(msg2, code2, rec2)):
+            return msg1 == msg2 && code1 == code2 && rec1 == rec2
+        case let (.sdkError(_, rec1), .sdkError(_, rec2)):
+            // We can't compare Swift.Error instances, so we only compare the recoverable flag
+            return rec1 == rec2
+        default:
+            return false
         }
     }
 }
@@ -111,9 +134,15 @@ struct CheckoutErrorEvent: Codable {
 }
 
 class CheckoutErrorEventDecoder {
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using _: Decoder) -> CheckoutErrorEvent {
+    enum CodingKeys: String, CodingKey {
+        case body
+    }
+
+    func decode(from event: [String: Any]) -> CheckoutErrorEvent {
         do {
-            let messageBody = try container.decode(String.self, forKey: .body)
+            guard let messageBody = event["body"] as? String else {
+                return CheckoutErrorEvent(group: .unsupported, reason: "Missing body in error event.")
+            }
 
             /// Failure to decode will trigger the catch block
             let data = messageBody.data(using: .utf8)

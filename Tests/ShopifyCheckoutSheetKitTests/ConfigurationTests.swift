@@ -22,7 +22,9 @@
  */
 
 @testable import ShopifyCheckoutSheetKit
+#if canImport(UIKit)
 import UIKit
+#endif
 import XCTest
 
 class ConfigurationTests: XCTestCase {

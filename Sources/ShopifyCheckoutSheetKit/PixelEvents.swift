@@ -25,7 +25,7 @@
 
 import Foundation
 
-public enum PixelEvent {
+public enum PixelEvent: Codable {
     case customEvent(CustomEvent)
     case standardEvent(StandardEvent)
 }

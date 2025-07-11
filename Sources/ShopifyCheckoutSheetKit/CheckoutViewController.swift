@@ -22,11 +22,13 @@
  */
 
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public class CheckoutViewController: UINavigationController {
-    public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
+    public init(checkout url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, options: options)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController

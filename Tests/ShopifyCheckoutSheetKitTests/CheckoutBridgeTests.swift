@@ -27,343 +27,172 @@ import XCTest
 
 // swiftlint:disable type_body_length
 class CheckoutBridgeTests: XCTestCase {
-    class WKScriptMessageMock: WKScriptMessage {
-        private let _mockBody: Any
+    private var bridge: CheckoutBridge!
+    private var mockConfiguration: Configuration!
+    private var mockWebView: MockWKWebView!
 
-        override var body: Any {
-            _mockBody
-        }
-
-        init(body: Any = "") {
-            _mockBody = body
-        }
+    override func setUp() {
+        super.setUp()
+        mockConfiguration = Configuration()
+        mockWebView = MockWKWebView()
+        mockConfiguration.webView = mockWebView
+        bridge = DefaultCheckoutBridge(configuration: mockConfiguration)
     }
 
-    func testReturnsStandardUserAgent() {
-        let version = ShopifyCheckoutSheetKit.version
-        let schemaVersion = CheckoutBridge.schemaVersion
-        XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard)")
+    func testUserAgentFormat() {
+        let userAgent = bridge.userAgent
+        XCTAssertTrue(userAgent.contains("CheckoutKit/4.0.0"))
+        XCTAssertTrue(userAgent.contains("(iOS)"))
+        XCTAssertTrue(userAgent.contains("CheckoutSheetProtocol/2025-04"))
+        XCTAssertTrue(userAgent.contains("auto") || userAgent.contains("light") || userAgent.contains("dark"))
     }
 
-    func testReturnsRecoveryUserAgent() {
-        let version = ShopifyCheckoutSheetKit.version
-        XCTAssertEqual(CheckoutBridge.recoveryAgent, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery)")
+    func testColorSchemeNormalization() {
+        // Test automatic -> auto
+        mockConfiguration.colorScheme = .automatic
+        bridge = DefaultCheckoutBridge(configuration: mockConfiguration)
+        XCTAssertEqual(bridge.normalizedColorScheme(), "auto")
+
+        // Test light -> light
+        mockConfiguration.colorScheme = .light
+        bridge = DefaultCheckoutBridge(configuration: mockConfiguration)
+        XCTAssertEqual(bridge.normalizedColorScheme(), "light")
+
+        // Test dark -> dark
+        mockConfiguration.colorScheme = .dark
+        bridge = DefaultCheckoutBridge(configuration: mockConfiguration)
+        XCTAssertEqual(bridge.normalizedColorScheme(), "dark")
     }
 
-    func testReturnsUserAgentWithCustomPlatformSuffix() {
-        let version = ShopifyCheckoutSheetKit.version
-        let schemaVersion = CheckoutBridge.schemaVersion
-        ShopifyCheckoutSheetKit.configuration.platform = Platform.reactNative
-        XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative")
-        XCTAssertEqual(CheckoutBridge.recoveryAgent, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) ReactNative")
-        ShopifyCheckoutSheetKit.configuration.platform = nil
+    func testBridgePropertiesAndMethods() {
+        XCTAssertEqual(bridge.libraryVersion(), "4.0.0")
+        XCTAssertEqual(bridge.protocolVersion(), "2025-04")
+        XCTAssertEqual(bridge.messageHandlerName(), "checkoutSheetProtocol")
+        XCTAssertEqual(bridge.readyEventName(), "checkoutSheetProtocolReady")
+        XCTAssertEqual(bridge.javascriptInterfaceName(), "window.Shopify.CheckoutSheetProtocol")
+        XCTAssertEqual(bridge.dispatchMessage(), "window.Shopify.CheckoutSheetProtocol.postMessage")
     }
 
-    func testDecodeThrowsInvalidBridgeEventWhenNonStringBody() throws {
-        let mock = WKScriptMessageMock(body: 1234)
-
-        XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-            guard case BridgeError.invalidBridgeEvent = error else {
-                return XCTFail("unexpected error thrown: \(error)")
-            }
-        }
-    }
-
-    func testDecodeThrowsInvalidBridgeEventWhenEmptyBody() throws {
-        let mock = WKScriptMessageMock(body: "")
-
-        XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-            guard case BridgeError.invalidBridgeEvent = error else {
-                return XCTFail("unexpected error thrown: \(error)")
-            }
-        }
-    }
-
-    func testDecodeHandlesUnsupportedEventsGracefully() throws {
-        let mock = createEventPayload(name: "unknown", "{}")
-
-        let result = try CheckoutBridge.decode(mock)
-
-        guard case CheckoutBridge.WebEvent.unsupported = result else {
-            return XCTFail("expected CheckoutScriptMessage.unsupportedEvent, got \(result)")
-        }
-    }
-
-    func testDecodeSupportsCheckoutCompletedEvent() throws {
-        let payload = "{\"orderDetails\":{\"id\":\"gid://shopify/OrderIdentity/8\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\": \"fake-token\"},\"billingAddress\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\"}"
-
-        let event = createEventPayload(name: "completed", payload)
-        let result = try CheckoutBridge.decode(event)
-
-        guard case let .checkoutComplete(event) = result else {
-            XCTFail("Expected .checkoutComplete, got \(result)")
-            return
-        }
-
-        XCTAssertEqual("gid://shopify/OrderIdentity/8", event.orderDetails.id)
-        XCTAssertEqual(1, event.orderDetails.cart.lines.count)
-        XCTAssertEqual("gid://shopify/Product/1", event.orderDetails.cart.lines[0].productId)
-        XCTAssertEqual(1, event.orderDetails.paymentMethods?.count)
-        XCTAssertEqual("direct", event.orderDetails.paymentMethods?[0].type)
-    }
-
-    func testFailedDecodeReturnsEmptyEvent() throws {
-        /// Missing orderId, taxes, billingAddress
-        let payload = "{\"orderDetails\":{\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\":\"fake-token\"},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}}}}"
-
-        let event = createEventPayload(name: "completed", payload)
-        let result = try CheckoutBridge.decode(event)
-
-        guard case let .checkoutComplete(event) = result else {
-            XCTFail("Expected .checkoutComplete, got \(result)")
-            return
-        }
-
-        XCTAssertEqual(event.orderDetails.id, "")
-    }
-
-    func testDecodeSupportsCheckoutExpiredEvent() throws {
-        let event = createErrorEventPayload("[{\"group\":\"expired\",\"type\": \"invalidCart\",\"reason\": \"Cart is invalid\", \"flowType\": \"regular\", \"code\": \"null\"}]")
-        let result = try CheckoutBridge.decode(event)
-
-        guard case CheckoutBridge.WebEvent.checkoutExpired = result else {
-            return XCTFail("expected .checkoutExpired error, got \(result)")
-        }
-    }
-
-    func testDecodesBarebonesErrorEvent() throws {
-        let event = createErrorEventPayload("[{\"group\":\"expired\"}]")
-        let result = try CheckoutBridge.decode(event)
-
-        guard case CheckoutBridge.WebEvent.checkoutExpired = result else {
-            return XCTFail("expected .checkoutExpired error, got \(result)")
-        }
-    }
-
-    func testDecodeSupportsUnrecoverableErrorEvent() throws {
-        let event = createErrorEventPayload("[{\"group\":\"unrecoverable\",\"reason\": \"Checkout crashed\", \"code\": \"sdk_not_enabled\"}]")
-
-        let result = try CheckoutBridge.decode(event)
-
-        guard case CheckoutBridge.WebEvent.checkoutUnavailable = result else {
-            return XCTFail("expected .checkoutUnavailable error, got \(result)")
-        }
-    }
-
-    func testDecodeSupportsConfigurationErrorEvent() throws {
-        let event = createErrorEventPayload("[{\"group\":\"configuration\",\"code\":\"storefront_password_required\",\"reason\": \"Storefront password required\"}]")
-
-        let result = try CheckoutBridge.decode(event)
-
-        guard case CheckoutBridge.WebEvent.configurationError = result else {
-            return XCTFail("expected .configurationError error, got \(result)")
-        }
-    }
-
-    func testDecodeSupportsUnsupportedConfigurationErrorEvent() throws {
-        let event = createErrorEventPayload("[{\"group\":\"configuration\",\"code\":\"unsupported\",\"reason\": \"Unsupported\"}]")
-
-        let result = try CheckoutBridge.decode(event)
-
-        guard case CheckoutBridge.WebEvent.configurationError = result else {
-            return XCTFail("expected .configurationError error, got \(result)")
-        }
-    }
-
-    func testDecodeFailsSilentlyWhenErrorIsUnsupported() throws {
-        let event = createErrorEventPayload("[{\"group\":\"checkout\",\"reason\": \"violation\"}]")
-        let result = try CheckoutBridge.decode(event)
-
-        guard case CheckoutBridge.WebEvent.unsupported = result else {
-            return XCTFail("expected .unsupported event, got \(result)")
-        }
-    }
-
-    func testDecodeSupportsCheckoutBlockingEvent() throws {
-        let event = createEventPayload(name: "checkoutBlockingEvent", "true")
-
-        let result = try CheckoutBridge.decode(event)
-
-        guard case CheckoutBridge.WebEvent.checkoutModalToggled = result else {
-            return XCTFail("expected CheckoutScriptMessage.checkoutModalToggled, got \(result)")
-        }
-    }
-
-    func testDecodeSupportsStandardWebPixelsEvent() throws {
-        let event = createEventPayload(name: "webPixels", "{\"name\": \"page_viewed\",\"event\": {\"id\": \"123\",\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": {}, \"context\": {}}}")
-
-        let result = try CheckoutBridge.decode(event)
-
-        guard case let .webPixels(pixelEvent) = result, case let .standardEvent(pageViewedEvent) = pixelEvent else {
-            XCTFail("Expected .webPixels(.pageViewed), got \(result)")
-            return
-        }
-
-        XCTAssertEqual("page_viewed", pageViewedEvent.name)
-        XCTAssertEqual("123", pageViewedEvent.id)
-        XCTAssertEqual("2024-01-04T09:48:53.358Z", pageViewedEvent.timestamp)
-    }
-
-    func testDecodeSupportsCustomWebPixelsEvent() throws {
-        let body = "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"wrapper\": {\"attr\": \"attrVal\", \"attr2\": [1,2,3]}}, \"context\": {}}}"
-            .replacingOccurrences(of: "\"", with: "\\\"")
-            .replacingOccurrences(of: "\n", with: "")
-
-        let mock = WKScriptMessageMock(body: """
-        {
-        	"name": "webPixels",
-        	"body": "\(body)"
-        }
-        """)
-
-        let result = try CheckoutBridge.decode(mock)
-
-        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
-            XCTFail("Expected .webPixels(.pageViewed), got \(result)")
-            return
-        }
-
-        XCTAssertEqual("my_custom_event", customEvent.name)
-
-        let decoder = JSONDecoder()
-        let customData = try decoder.decode(MyCustomData.self, from: customEvent.customData!.data(using: .utf8)!)
-
-        XCTAssertEqual("attrVal", customData.wrapper.attr)
-        XCTAssertEqual([1, 2, 3], customData.wrapper.attr2)
-    }
-
-    func testDecodeSupportsWebPixelsEventWithAdditionalDataAttributes() throws {
-        let body = "{\"name\": \"checkout_completed\",\"event\": {\"id\": \"123\",\"name\": \"checkout_completed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": { \"checkout\": {\"currencyCode\": \"USD\", \"order\": {\"customer\": { \"id\":\"456\",\"isFirstOrder\":true }}}}, \"context\": {}}}"
-            .replacingOccurrences(of: "\"", with: "\\\"")
-            .replacingOccurrences(of: "\n", with: "")
-
-        let mock = WKScriptMessageMock(body: """
-        {
-        	"name": "webPixels",
-        	"body": "\(body)"
-        }
-        """)
-
-        let result = try CheckoutBridge.decode(mock)
-
-        guard case let .webPixels(pixelEvent) = result, case let .standardEvent(pageViewedEvent) = pixelEvent else {
-            XCTFail("Expected .webPixels(.pageViewed), got \(result)")
-            return
-        }
-
-        XCTAssertEqual("checkout_completed", pageViewedEvent.name)
-        XCTAssertEqual("123", pageViewedEvent.id)
-        XCTAssertEqual("USD", pageViewedEvent.data?.checkout?.currencyCode)
-        XCTAssertEqual("456", pageViewedEvent.data?.checkout?.order?.customer?.id)
-        XCTAssertEqual(true, pageViewedEvent.data?.checkout?.order?.customer?.isFirstOrder)
-        XCTAssertEqual("2024-01-04T09:48:53.358Z", pageViewedEvent.timestamp)
-    }
-
-    func testDecoderThrowsBridgeErrorWhenMandatoryAttributesAreMissing() throws {
-        let body = "{\"name\": \"page_viewed\",\"event\": {\"name\": \"page_viewed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\", \"context\": {}}}"
-            .replacingOccurrences(of: "\"", with: "\\\"")
-            .replacingOccurrences(of: "\n", with: "")
-
-        let mock = WKScriptMessageMock(body: """
-        {
-        	"name": "webPixels",
-        	"body": "\(body)"
-        }
-        """)
-
-        XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-            guard case BridgeError.invalidBridgeEvent = error else {
-                return XCTFail("unexpected error thrown: \(error)")
-            }
-        }
-    }
-
-    func testInstrumentationPayloadToBridgeEvent() {
-        let payload = InstrumentationPayload(name: "test", value: 1, type: .histogram)
-        let jsonString = payload.toBridgeEvent()
-        XCTAssertNotNil(jsonString)
-
-        if let jsonData = jsonString?.data(using: .utf8) {
-            let decodedPayload = try? JSONDecoder().decode(SdkToWebEvent<InstrumentationPayload>.self, from: jsonData)
-            XCTAssertNotNil(decodedPayload)
-            XCTAssertEqual(decodedPayload?.detail.name, "test")
-            XCTAssertEqual(decodedPayload?.detail.value, 1)
-            XCTAssertEqual(decodedPayload?.detail.type, .histogram)
-        }
+    func testEmbedParams() {
+        let params = bridge.embedParams()
+        XCTAssertEqual(params["embed"], "mobile_checkout_sdk")
+        XCTAssertEqual(params["version"], "4.0.0")
+        XCTAssertEqual(params["protocol"], "2025-04")
+        XCTAssertEqual(params["theme"], "auto")
     }
 
     func testSendMessageShouldCallEvaluateJavaScriptPresented() {
-        let webView = MockWebView()
-        webView.expectedScript = expectedPresentedScript()
-        let evaluateJavaScriptExpectation = expectation(
-            description: "evaluateJavaScript was called"
-        )
-        webView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+        let evaluateJavaScriptExpectation = expectation(description: "evaluateJavaScript was called")
+        mockWebView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+        mockWebView.expectedScript = "window.Shopify.CheckoutSheetProtocol.postMessage(\"presented\")"
 
-        CheckoutBridge.sendMessage(webView, messageName: "presented", messageBody: nil)
+        bridge.sendMessage(message: "presented", completionHandler: nil)
 
         wait(for: [evaluateJavaScriptExpectation], timeout: 1)
     }
 
     func testSendMessageWithPayloadEvaulatesJavaScript() {
-        let webView = MockWebView()
-        webView.expectedScript = expectedPayloadScript()
-        let evaluateJavaScriptExpectation = expectation(
-            description: "evaluateJavaScript was called"
-        )
-        webView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+        let evaluateJavaScriptExpectation = expectation(description: "evaluateJavaScript was called")
+        mockWebView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+        mockWebView.expectedScript = "window.Shopify.CheckoutSheetProtocol.postMessage(\"payload\", {\"one\":true})"
 
-        CheckoutBridge.sendMessage(webView, messageName: "payload", messageBody: "{\"one\": true}")
+        bridge.sendMessage(message: "payload", payload: ["one": true], completionHandler: nil)
 
         wait(for: [evaluateJavaScriptExpectation], timeout: 1)
     }
 
-    private func expectedPresentedScript() -> String {
-        return """
-        if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-        	window.MobileCheckoutSdk.dispatchMessage('presented');
-        } else {
-        	window.addEventListener('mobileCheckoutBridgeReady', function () {
-        		window.MobileCheckoutSdk.dispatchMessage('presented');
-        	}, {passive: true, once: true});
+    func testDecodeEventFromValidJSON() {
+        let json = """
+        {
+            "name": "completed",
+            "body": {
+                "orderDetails": {
+                    "id": "gid://shopify/Order/123",
+                    "cart": {
+                        "token": "test-token"
+                    }
+                }
+            }
         }
         """
+
+        let result = bridge.decodeEvent(from: json)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?["name"] as? String, "completed")
+        XCTAssertNotNil(result?["body"] as? [String: Any])
     }
 
-    private func expectedPayloadScript() -> String {
-        return """
-        if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-        	window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
-        } else {
-        	window.addEventListener('mobileCheckoutBridgeReady', function () {
-        		window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
-        	}, {passive: true, once: true});
+    func testDecodeEventFromInvalidJSON() {
+        let invalidJSON = "invalid json"
+        let result = bridge.decodeEvent(from: invalidJSON)
+        XCTAssertNil(result)
+    }
+
+    func testSendMessageWithDifferentPayloadTypes() {
+        let evaluateJavaScriptExpectation = expectation(description: "evaluateJavaScript was called")
+        mockWebView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+        mockWebView.expectedScript = "window.Shopify.CheckoutSheetProtocol.postMessage(\"test\", [\"item1\",\"item2\"])"
+
+        bridge.sendMessage(message: "test", payload: ["item1", "item2"], completionHandler: nil)
+
+        wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+    }
+
+    func testSendMessageHandlesJSONSerializationError() {
+        let evaluateJavaScriptExpectation = expectation(description: "evaluateJavaScript was called")
+        let completionExpectation = expectation(description: "Completion handler called with error")
+        mockWebView.evaluateJavaScriptExpectation = evaluateJavaScriptExpectation
+        mockWebView.expectedScript = "window.Shopify.CheckoutSheetProtocol.postMessage(\"test\", {})"
+
+        // Create a payload that can't be serialized to JSON (Date objects aren't valid JSON)
+        let invalidPayload: [String: Any] = ["date": Date()]
+
+        bridge.sendMessage(message: "test", payload: invalidPayload) { result in
+            switch result {
+            case .success:
+                XCTFail("Expected failure due to invalid JSON object")
+            case .failure(let error):
+                XCTAssertNotNil(error)
+                completionExpectation.fulfill()
+            }
         }
-        """
+
+        wait(for: [evaluateJavaScriptExpectation, completionExpectation], timeout: 1)
     }
 
-    private func createPayload(_ jsonString: String) -> String {
-        return jsonString
-            .replacingOccurrences(of: "\"", with: "\\\"")
-            .replacingOccurrences(of: "\n", with: "")
-    }
+    func testSendMessageWithoutWebView() {
+        // Test behavior when webView is nil
+        var configWithoutWebView = Configuration()
+        configWithoutWebView.webView = nil
+        let bridgeWithoutWebView = DefaultCheckoutBridge(configuration: configWithoutWebView)
 
-    private func createErrorEventPayload(_ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
-        return WKScriptMessageMock(body: "{\"name\": \"error\",\"body\": \"\(createPayload(jsonString))\"}")
-    }
+        let expectation = XCTestExpectation(description: "Completion handler called")
+        bridgeWithoutWebView.sendMessage(message: "test") { result in
+            switch result {
+            case .success:
+                XCTFail("Expected failure when webView is nil")
+            case .failure(let error):
+                XCTAssertEqual(error as? CheckoutError, .webViewNotAvailable)
+            }
+            expectation.fulfill()
+        }
 
-    private func createEventPayload(name: String, _ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
-        return WKScriptMessageMock(body: "{\"name\": \"\(name)\",\"body\": \"\(createPayload(jsonString))\"}")
+        wait(for: [expectation], timeout: 1)
     }
 }
 
-struct MyCustomData: Codable {
-    let wrapper: MyCustomDataWrapper
-}
+// Mock WebView for testing
+class MockWKWebView: WKWebView {
+    var expectedScript: String?
+    var evaluateJavaScriptExpectation: XCTestExpectation?
 
-struct MyCustomDataWrapper: Codable {
-    let attr: String
-    let attr2: [Int]
+    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor @Sendable (Any?, (any Error)?) -> Void)? = nil) {
+        if let expected = expectedScript {
+            XCTAssertEqual(javaScriptString, expected)
+        }
+        evaluateJavaScriptExpectation?.fulfill()
+        completionHandler?("success", nil)
+    }
 }
 
 // swiftlint:enable type_body_length

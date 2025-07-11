@@ -73,29 +73,25 @@ struct WebPixelsEventBody: Decodable {
 }
 
 class WebPixelsEventDecoder {
-    enum WebPixelsCodingKeys: String, CodingKey {
-        case name
-        case event
+    enum CodingKeys: String, CodingKey {
+        case body
     }
 
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using _: Decoder) throws -> PixelEvent? {
-        let messageBody = try container.decode(String.self, forKey: .body)
+    func decode(from event: [String: Any]) -> [PixelEvent] {
+        do {
+            guard let messageBody = event["body"] as? String else {
+                return []
+            }
 
-        guard let data = messageBody.data(using: .utf8) else {
-            return nil
-        }
+            guard let data = messageBody.data(using: .utf8) else {
+                return []
+            }
 
-        let webPixelsEvent = try JSONDecoder().decode(WebPixelsEvent.self, from: data)
-
-        switch webPixelsEvent.event.type {
-        case "standard":
-            let standardEvent = StandardEvent(from: webPixelsEvent.event)
-            return .standardEvent(standardEvent)
-        case "custom":
-            let customEvent = CustomEvent(from: webPixelsEvent.event)
-            return .customEvent(customEvent)
-        default:
-            return nil
+            let pixelEvents = try JSONDecoder().decode([PixelEvent].self, from: data)
+            return pixelEvents
+        } catch {
+            OSLogger.shared.error("Error decoding \"pixels\" event - \(error.localizedDescription)")
+            return []
         }
     }
 }

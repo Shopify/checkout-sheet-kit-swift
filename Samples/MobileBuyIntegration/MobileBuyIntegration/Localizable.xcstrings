@@ -19,6 +19,9 @@
     "Adding..." : {
 
     },
+    "App Authentication" : {
+
+    },
     "Apple Pay not available" : {
 
     },
@@ -37,6 +40,9 @@
     "Clear logs" : {
 
     },
+    "Enter a JWT token for app authentication. This token should be generated on a secure server, not on the device. Leave empty to disable app authentication." : {
+
+    },
     "Events" : {
 
     },
@@ -53,6 +59,9 @@
 
     },
     "Handle Product URLs" : {
+
+    },
+    "JWT Token" : {
 
     },
     "Loading products..." : {
