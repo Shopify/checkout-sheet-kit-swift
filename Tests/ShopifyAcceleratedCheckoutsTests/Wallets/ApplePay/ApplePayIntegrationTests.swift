@@ -79,14 +79,12 @@ final class ApplePayIntegrationTests: XCTestCase {
     // MARK: - Integration Tests
 
     func testViewModifierWithButtonIntegration() async {
-        var callbackInvoked = false
-
         await MainActor.run {
             // Create a hosting controller to test SwiftUI integration
             let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart")
                 .withWallets([.applepay])
                 .onComplete {
-                    callbackInvoked = true
+                    // Callback exists but won't be called during view creation
                 }
                 .environment(mockCommonConfiguration)
                 .environment(mockApplePayConfiguration)
@@ -104,22 +102,25 @@ final class ApplePayIntegrationTests: XCTestCase {
     }
 
     func testViewModifierWithButtonIntegrationIncludingCancel() async {
-        var completeInvoked = false
-        var failInvoked = false
-        var cancelInvoked = false
+        let completeExpectation = expectation(description: "Complete callback")
+        completeExpectation.isInverted = true
+        let failExpectation = expectation(description: "Fail callback")
+        failExpectation.isInverted = true
+        let cancelExpectation = expectation(description: "Cancel callback")
+        cancelExpectation.isInverted = true
 
         await MainActor.run {
             // Create a hosting controller to test SwiftUI integration with all callbacks
             let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart")
                 .withWallets([.applepay])
                 .onComplete {
-                    completeInvoked = true
+                    completeExpectation.fulfill()
                 }
                 .onFail {
-                    failInvoked = true
+                    failExpectation.fulfill()
                 }
                 .onCancel {
-                    cancelInvoked = true
+                    cancelExpectation.fulfill()
                 }
                 .environment(mockCommonConfiguration)
                 .environment(mockApplePayConfiguration)
@@ -131,12 +132,10 @@ final class ApplePayIntegrationTests: XCTestCase {
 
             XCTAssertNotNil(hostingController.view, "View should be created with all callbacks")
             XCTAssertNotNil(hostingController.rootView, "Root view should exist")
-
-            // Verify callbacks are not invoked during view creation
-            XCTAssertFalse(completeInvoked, "Complete callback should not be invoked on view creation")
-            XCTAssertFalse(failInvoked, "Fail callback should not be invoked on view creation")
-            XCTAssertFalse(cancelInvoked, "Cancel callback should not be invoked on view creation")
         }
+
+        // Verify callbacks are not invoked during view creation
+        await fulfillment(of: [completeExpectation, failExpectation, cancelExpectation], timeout: 0.2)
     }
 
     // MARK: - Edge Case Tests

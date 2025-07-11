@@ -92,11 +92,11 @@ final class ApplePayCallbackTests: XCTestCase {
 
     func testSuccessCallbackInvoked() async {
         successExpectation = expectation(description: "Success callback should be invoked")
-        var callbackInvoked = false
+        let callbackInvokedExpectation = expectation(description: "Callback invoked")
 
         await MainActor.run {
             viewController.onComplete = { [weak self] in
-                callbackInvoked = true
+                callbackInvokedExpectation.fulfill()
                 self?.successExpectation.fulfill()
             }
         }
@@ -105,8 +105,7 @@ final class ApplePayCallbackTests: XCTestCase {
             viewController.onComplete?()
         }
 
-        await fulfillment(of: [successExpectation], timeout: 1.0)
-        XCTAssertTrue(callbackInvoked, "Success callback should have been invoked")
+        await fulfillment(of: [successExpectation, callbackInvokedExpectation], timeout: 1.0)
     }
 
     func testSuccessCallbackNotInvokedWhenNil() async {
@@ -127,11 +126,11 @@ final class ApplePayCallbackTests: XCTestCase {
 
     func testErrorCallbackInvoked() async {
         errorExpectation = expectation(description: "Error callback should be invoked")
-        var callbackInvoked = false
+        let callbackInvokedExpectation = expectation(description: "Error callback invoked")
 
         await MainActor.run {
             viewController.onFail = { [weak self] in
-                callbackInvoked = true
+                callbackInvokedExpectation.fulfill()
                 self?.errorExpectation.fulfill()
             }
         }
@@ -140,8 +139,7 @@ final class ApplePayCallbackTests: XCTestCase {
             viewController.onFail?()
         }
 
-        await fulfillment(of: [errorExpectation], timeout: 1.0)
-        XCTAssertTrue(callbackInvoked, "Error callback should have been invoked")
+        await fulfillment(of: [errorExpectation, callbackInvokedExpectation], timeout: 1.0)
     }
 
     func testErrorCallbackNotInvokedWhenNil() async {
@@ -161,11 +159,11 @@ final class ApplePayCallbackTests: XCTestCase {
 
     func testCancelCallbackInvoked() async {
         cancelExpectation = expectation(description: "Cancel callback should be invoked")
-        var callbackInvoked = false
+        let callbackInvokedExpectation = expectation(description: "Cancel callback invoked")
 
         await MainActor.run {
             viewController.onCancel = { [weak self] in
-                callbackInvoked = true
+                callbackInvokedExpectation.fulfill()
                 self?.cancelExpectation.fulfill()
             }
         }
@@ -174,8 +172,7 @@ final class ApplePayCallbackTests: XCTestCase {
             viewController.onCancel?()
         }
 
-        await fulfillment(of: [cancelExpectation], timeout: 1.0)
-        XCTAssertTrue(callbackInvoked, "Cancel callback should have been invoked")
+        await fulfillment(of: [cancelExpectation, callbackInvokedExpectation], timeout: 1.0)
     }
 
     func testCancelCallbackNotInvokedWhenNil() async {
@@ -194,26 +191,23 @@ final class ApplePayCallbackTests: XCTestCase {
 
     // MARK: - No Callback Tests
 
+    @MainActor
     func testNoCallbackWhenCheckoutCancelled() async {
         var successInvoked = false
         var errorInvoked = false
         var cancelInvoked = false
 
-        await MainActor.run {
-            viewController.onComplete = {
-                successInvoked = true
-            }
-            viewController.onFail = {
-                errorInvoked = true
-            }
-            viewController.onCancel = {
-                cancelInvoked = true
-            }
+        viewController.onComplete = {
+            successInvoked = true
+        }
+        viewController.onFail = {
+            errorInvoked = true
+        }
+        viewController.onCancel = {
+            cancelInvoked = true
         }
 
-        await MainActor.run {
-            viewController.onCancel?()
-        }
+        viewController.onCancel?()
 
         try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
         XCTAssertFalse(successInvoked, "Success callback should not be invoked")
@@ -223,69 +217,69 @@ final class ApplePayCallbackTests: XCTestCase {
 
     // MARK: - Thread Safety Tests
 
+    @MainActor
     func testCallbackThreadSafety() async {
         let iterations = 12 // Multiple of 3 for even distribution
-        var successCount = 0
-        var errorCount = 0
-        var cancelCount = 0
-        let lock = NSLock()
+        let successExpectations = (0 ..< iterations / 3).map { _ in expectation(description: "Success") }
+        let errorExpectations = (0 ..< iterations / 3).map { _ in expectation(description: "Error") }
+        let cancelExpectations = (0 ..< iterations / 3).map { _ in expectation(description: "Cancel") }
 
-        await MainActor.run {
-            viewController.onComplete = {
-                lock.lock()
-                successCount += 1
-                lock.unlock()
+        var successIndex = 0
+        var errorIndex = 0
+        var cancelIndex = 0
+
+        viewController.onComplete = {
+            if successIndex < successExpectations.count {
+                successExpectations[successIndex].fulfill()
+                successIndex += 1
             }
-            viewController.onFail = {
-                lock.lock()
-                errorCount += 1
-                lock.unlock()
+        }
+        viewController.onFail = {
+            if errorIndex < errorExpectations.count {
+                errorExpectations[errorIndex].fulfill()
+                errorIndex += 1
             }
-            viewController.onCancel = {
-                lock.lock()
-                cancelCount += 1
-                lock.unlock()
+        }
+        viewController.onCancel = {
+            if cancelIndex < cancelExpectations.count {
+                cancelExpectations[cancelIndex].fulfill()
+                cancelIndex += 1
             }
         }
 
         for i in 0 ..< iterations {
-            await MainActor.run {
-                if i % 3 == 0 {
-                    viewController.onComplete?()
-                } else if i % 3 == 1 {
-                    viewController.onFail?()
-                } else {
-                    viewController.onCancel?()
-                }
+            if i % 3 == 0 {
+                viewController.onComplete?()
+            } else if i % 3 == 1 {
+                viewController.onFail?()
+            } else {
+                viewController.onCancel?()
             }
 
             // Give time for callback to execute
             try? await Task.sleep(nanoseconds: 50_000_000) // 0.05 seconds
         }
 
-        try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-
-        // Verify counts
-        XCTAssertEqual(successCount, iterations / 3, "Success callback should be invoked correct number of times")
-        XCTAssertEqual(errorCount, iterations / 3, "Error callback should be invoked correct number of times")
-        XCTAssertEqual(cancelCount, iterations / 3, "Cancel callback should be invoked correct number of times")
+        // Wait for all expectations
+        await fulfillment(of: successExpectations + errorExpectations + cancelExpectations, timeout: 2.0)
     }
 
     // MARK: - Edge Case Tests
 
     func testMultipleCallbackAssignments() async {
-        var firstCallbackInvoked = false
-        var secondCallbackInvoked = false
+        let firstCallbackExpectation = expectation(description: "First callback")
+        firstCallbackExpectation.isInverted = true
+        let secondCallbackExpectation = expectation(description: "Second callback")
 
         await MainActor.run {
             // First assignment
             viewController.onComplete = {
-                firstCallbackInvoked = true
+                firstCallbackExpectation.fulfill()
             }
 
             // Second assignment (should replace first)
             viewController.onComplete = {
-                secondCallbackInvoked = true
+                secondCallbackExpectation.fulfill()
             }
         }
 
@@ -293,24 +287,24 @@ final class ApplePayCallbackTests: XCTestCase {
             viewController.onComplete?()
         }
 
-        try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        XCTAssertFalse(firstCallbackInvoked, "First callback should not be invoked")
-        XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
+        await fulfillment(of: [secondCallbackExpectation], timeout: 1.0)
+        await fulfillment(of: [firstCallbackExpectation], timeout: 0.2)
     }
 
     func testMultipleCancelCallbackAssignments() async {
-        var firstCallbackInvoked = false
-        var secondCallbackInvoked = false
+        let firstCallbackExpectation = expectation(description: "First cancel callback")
+        firstCallbackExpectation.isInverted = true
+        let secondCallbackExpectation = expectation(description: "Second cancel callback")
 
         await MainActor.run {
             // First assignment
             viewController.onCancel = {
-                firstCallbackInvoked = true
+                firstCallbackExpectation.fulfill()
             }
 
             // Second assignment (should replace first)
             viewController.onCancel = {
-                secondCallbackInvoked = true
+                secondCallbackExpectation.fulfill()
             }
         }
 
@@ -318,41 +312,38 @@ final class ApplePayCallbackTests: XCTestCase {
             viewController.onCancel?()
         }
 
-        try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        XCTAssertFalse(firstCallbackInvoked, "First callback should not be invoked")
-        XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
+        await fulfillment(of: [secondCallbackExpectation], timeout: 1.0)
+        await fulfillment(of: [firstCallbackExpectation], timeout: 0.2)
     }
 
     // MARK: - shouldRecoverFromError Callback Tests
 
+    @MainActor
     func testShouldRecoverFromErrorCallbackInvoked() async {
         let expectation = expectation(description: "shouldRecoverFromError callback should be invoked")
-        var passedError: ShopifyCheckoutSheetKit.CheckoutError?
-
-        await MainActor.run {
-            viewController.onShouldRecoverFromError = { error in
-                passedError = error
-                expectation.fulfill()
-                return true
-            }
-        }
 
         let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .unknown), recoverable: true)
-        let result = await MainActor.run {
-            viewController.shouldRecoverFromError(error: testError)
+        var capturedError: ShopifyCheckoutSheetKit.CheckoutError?
+
+        viewController.onShouldRecoverFromError = { error in
+            capturedError = error
+            expectation.fulfill()
+            return true
         }
 
+        let result = viewController.shouldRecoverFromError(error: testError)
+
         await fulfillment(of: [expectation], timeout: 1.0)
-        XCTAssertNotNil(passedError, "Error should be passed to callback")
+        XCTAssertNotNil(capturedError, "Error should be passed to callback")
         XCTAssertTrue(result, "Should return true as returned by callback")
     }
 
     func testShouldRecoverFromErrorCallbackReturnsCorrectValue() async {
-        var callbackInvoked = false
+        let callbackExpectation = expectation(description: "Callback invoked")
 
         await MainActor.run {
             viewController.onShouldRecoverFromError = { _ in
-                callbackInvoked = true
+                callbackExpectation.fulfill()
                 return true
             }
         }
@@ -362,30 +353,27 @@ final class ApplePayCallbackTests: XCTestCase {
             viewController.shouldRecoverFromError(error: testError)
         }
 
-        XCTAssertTrue(callbackInvoked, "Callback should be invoked")
+        await fulfillment(of: [callbackExpectation], timeout: 1.0)
         XCTAssertTrue(result, "Should return true as specified by callback")
     }
 
     // MARK: - checkoutDidClickLink Callback Tests
 
+    @MainActor
     func testCheckoutDidClickLinkCallbackInvoked() async {
         let expectation = expectation(description: "checkoutDidClickLink callback should be invoked")
-        var passedURL: URL?
-
-        await MainActor.run {
-            viewController.onClickLink = { url in
-                passedURL = url
-                expectation.fulfill()
-            }
-        }
-
         let testURL = URL(string: "https://test-shop.myshopify.com/products/test")!
-        await MainActor.run {
-            viewController.checkoutDidClickLink(url: testURL)
+        var capturedURL: URL?
+
+        viewController.onClickLink = { url in
+            capturedURL = url
+            expectation.fulfill()
         }
+
+        viewController.checkoutDidClickLink(url: testURL)
 
         await fulfillment(of: [expectation], timeout: 1.0)
-        XCTAssertEqual(passedURL, testURL, "URL should be passed to callback")
+        XCTAssertEqual(capturedURL, testURL, "URL should be passed to callback")
     }
 
     func testCheckoutDidClickLinkCallbackNotInvokedWhenNil() async {
@@ -402,8 +390,8 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
 
+    @MainActor
     func testCheckoutDidClickLinkWithVariousURLs() async {
-        var capturedURLs: [URL] = []
         let testURLs = [
             URL(string: "https://test-shop.myshopify.com/products/test")!,
             URL(string: "https://external-site.com/page")!,
@@ -411,20 +399,26 @@ final class ApplePayCallbackTests: XCTestCase {
             URL(string: "tel:+1234567890")!
         ]
 
-        await MainActor.run {
-            viewController.onClickLink = { url in
-                capturedURLs.append(url)
+        let expectations = testURLs.map { _ in
+            expectation(description: "URL callback")
+        }
+
+        var capturedURLs: [URL] = []
+        var currentIndex = 0
+
+        viewController.onClickLink = { url in
+            capturedURLs.append(url)
+            if currentIndex < expectations.count {
+                expectations[currentIndex].fulfill()
+                currentIndex += 1
             }
         }
 
-        await MainActor.run {
-            for url in testURLs {
-                viewController.checkoutDidClickLink(url: url)
-            }
+        for url in testURLs {
+            viewController.checkoutDidClickLink(url: url)
         }
 
-        try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        XCTAssertEqual(capturedURLs.count, testURLs.count, "All URLs should be captured")
+        await fulfillment(of: expectations, timeout: 1.0)
         XCTAssertEqual(capturedURLs, testURLs, "URLs should be captured in order")
     }
 
