@@ -1,0 +1,32 @@
+fragment CartFragment on Cart {
+  id
+  checkoutUrl
+  totalQuantity
+  buyerIdentity {
+    email
+  }
+  deliveryGroups(first: 10) {
+    nodes {
+      ...CartDeliveryGroupFragment
+    }
+  }
+  lines(first: 250) {
+    nodes {
+      ...CartLineFragment
+    }
+  }
+  cost {
+    totalAmount {
+      amount
+      currencyCode
+    }
+    subtotalAmount {
+      amount
+      currencyCode
+    }
+    totalTaxAmount {
+      amount
+      currencyCode
+    }
+  }
+}

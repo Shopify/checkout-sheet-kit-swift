@@ -1,0 +1,671 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2E4937132DD494F800604374 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = 2E4937122DD494F800604374 /* ShopifyAcceleratedCheckouts */; };
+		CB10C8E42DD72C080036CDB1 /* Development.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CB10C8E32DD72C080036CDB1 /* Development.xcconfig */; };
+		CB4FD0FD2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CB4FD0FC2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts */; };
+		CBC3DEE62DD360E600376831 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CBC3DEE52DD360E600376831 /* ShopifyAcceleratedCheckouts */; };
+		CBD9D6D22E12AE5A00D836A3 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = CBD9D6D12E12AE5A00D836A3 /* Apollo */; };
+		CBD9D70E2E12BF9500D836A3 /* apollo-codegen-config.json in Resources */ = {isa = PBXBuildFile; fileRef = CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */; };
+		CBD9D7BC2E12C27400D836A3 /* schema.2025-07.graphqls in Resources */ = {isa = PBXBuildFile; fileRef = CBD9D7BB2E12C27400D836A3 /* schema.2025-07.graphqls */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CBC3DEC82DD3607400376831 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CBC3DEAD2DD3607300376831 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CBC3DEB42DD3607300376831;
+			remoteInfo = ShopifyAcceleratedCheckoutsApp;
+		};
+		CBC3DED22DD3607400376831 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CBC3DEAD2DD3607300376831 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CBC3DEB42DD3607300376831;
+			remoteInfo = ShopifyAcceleratedCheckoutsApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CB10C8E32DD72C080036CDB1 /* Development.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Development.xcconfig; sourceTree = "<group>"; };
+		CBC3DEB52DD3607300376831 /* ShopifyAcceleratedCheckoutsApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CBC3DEC72DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CBC3DED12DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShopifyAcceleratedCheckoutsAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "apollo-codegen-config.json"; sourceTree = "<group>"; };
+		CBD9D7BB2E12C27400D836A3 /* schema.2025-07.graphqls */ = {isa = PBXFileReference; lastKnownFileType = text; path = "schema.2025-07.graphqls"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CB10C8EF2DD7304E0036CDB1 /* Exceptions for "ShopifyAcceleratedCheckoutsApp" folder in "ShopifyAcceleratedCheckoutsApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CBC3DEB42DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CBC3DEB72DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CB10C8EF2DD7304E0036CDB1 /* Exceptions for "ShopifyAcceleratedCheckoutsApp" folder in "ShopifyAcceleratedCheckoutsApp" target */,
+			);
+			path = ShopifyAcceleratedCheckoutsApp;
+			sourceTree = "<group>";
+		};
+		CBC3DECA2DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ShopifyAcceleratedCheckoutsAppTests;
+			sourceTree = "<group>";
+		};
+		CBC3DED42DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ShopifyAcceleratedCheckoutsAppUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CBC3DEB22DD3607300376831 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBC3DEE62DD360E600376831 /* ShopifyAcceleratedCheckouts in Frameworks */,
+				CBD9D6D22E12AE5A00D836A3 /* Apollo in Frameworks */,
+				CB4FD0FD2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts in Frameworks */,
+				2E4937132DD494F800604374 /* ShopifyAcceleratedCheckouts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBC3DEC42DD3607400376831 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBC3DECE2DD3607400376831 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CBC3DEAC2DD3607300376831 = {
+			isa = PBXGroup;
+			children = (
+				CBD9D7BB2E12C27400D836A3 /* schema.2025-07.graphqls */,
+				CBD9D70B2E12BF9500D836A3 /* apollo-codegen-config.json */,
+				CB10C8E32DD72C080036CDB1 /* Development.xcconfig */,
+				CBC3DEB72DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */,
+				CBC3DECA2DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */,
+				CBC3DED42DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */,
+				CBC3DEB62DD3607300376831 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CBC3DEB62DD3607300376831 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CBC3DEB52DD3607300376831 /* ShopifyAcceleratedCheckoutsApp.app */,
+				CBC3DEC72DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests.xctest */,
+				CBC3DED12DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CBC3DEB42DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CBC3DEDB2DD3607400376831 /* Build configuration list for PBXNativeTarget "ShopifyAcceleratedCheckoutsApp" */;
+			buildPhases = (
+				CBC3DEB12DD3607300376831 /* Sources */,
+				CBC3DEB22DD3607300376831 /* Frameworks */,
+				CBC3DEB32DD3607300376831 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CBC3DEB72DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */,
+			);
+			name = ShopifyAcceleratedCheckoutsApp;
+			packageProductDependencies = (
+				CBC3DEE52DD360E600376831 /* ShopifyAcceleratedCheckouts */,
+				CB4FD0FC2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts */,
+				2E4937122DD494F800604374 /* ShopifyAcceleratedCheckouts */,
+				CBD9D6D12E12AE5A00D836A3 /* Apollo */,
+			);
+			productName = ShopifyAcceleratedCheckoutsApp;
+			productReference = CBC3DEB52DD3607300376831 /* ShopifyAcceleratedCheckoutsApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CBC3DEC62DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CBC3DEDE2DD3607400376831 /* Build configuration list for PBXNativeTarget "ShopifyAcceleratedCheckoutsAppTests" */;
+			buildPhases = (
+				CBC3DEC32DD3607400376831 /* Sources */,
+				CBC3DEC42DD3607400376831 /* Frameworks */,
+				CBC3DEC52DD3607400376831 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CBC3DEC92DD3607400376831 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CBC3DECA2DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */,
+			);
+			name = ShopifyAcceleratedCheckoutsAppTests;
+			packageProductDependencies = (
+			);
+			productName = ShopifyAcceleratedCheckoutsAppTests;
+			productReference = CBC3DEC72DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CBC3DED02DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CBC3DEE12DD3607400376831 /* Build configuration list for PBXNativeTarget "ShopifyAcceleratedCheckoutsAppUITests" */;
+			buildPhases = (
+				CBC3DECD2DD3607400376831 /* Sources */,
+				CBC3DECE2DD3607400376831 /* Frameworks */,
+				CBC3DECF2DD3607400376831 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CBC3DED32DD3607400376831 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CBC3DED42DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */,
+			);
+			name = ShopifyAcceleratedCheckoutsAppUITests;
+			packageProductDependencies = (
+			);
+			productName = ShopifyAcceleratedCheckoutsAppUITests;
+			productReference = CBC3DED12DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CBC3DEAD2DD3607300376831 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				KnownAssetTags = (
+					New,
+				);
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					CBC3DEB42DD3607300376831 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					CBC3DEC62DD3607400376831 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					CBC3DED02DD3607400376831 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = CBC3DEB42DD3607300376831;
+					};
+				};
+			};
+			buildConfigurationList = CBC3DEB02DD3607300376831 /* Build configuration list for PBXProject "ShopifyAcceleratedCheckoutsApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CBC3DEAC2DD3607300376831;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2E4937112DD494F800604374 /* XCLocalSwiftPackageReference "../../../accelerated-checkouts-ios" */,
+				CBD9D6D02E12AE5A00D836A3 /* XCRemoteSwiftPackageReference "apollo-ios" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CBC3DEB62DD3607300376831 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CBC3DEB42DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */,
+				CBC3DEC62DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */,
+				CBC3DED02DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CBC3DEB32DD3607300376831 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBD9D7BC2E12C27400D836A3 /* schema.2025-07.graphqls in Resources */,
+				CB10C8E42DD72C080036CDB1 /* Development.xcconfig in Resources */,
+				CBD9D70E2E12BF9500D836A3 /* apollo-codegen-config.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBC3DEC52DD3607400376831 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBC3DECF2DD3607400376831 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CBC3DEB12DD3607300376831 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBC3DEC32DD3607400376831 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBC3DECD2DD3607400376831 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CBC3DEC92DD3607400376831 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CBC3DEB42DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */;
+			targetProxy = CBC3DEC82DD3607400376831 /* PBXContainerItemProxy */;
+		};
+		CBC3DED32DD3607400376831 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CBC3DEB42DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */;
+			targetProxy = CBC3DED22DD3607400376831 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CBC3DED92DD3607400376831 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB10C8E32DD72C080036CDB1 /* Development.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_INCLUDE_INFOPLIST_LOCALIZATIONS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_WKWatchOnly = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				LOCALIZED_STRING_SWIFTUI_SUPPORT = NO;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CBC3DEDA2DD3607400376831 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB10C8E32DD72C080036CDB1 /* Development.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_INCLUDE_INFOPLIST_LOCALIZATIONS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_WKWatchOnly = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				LOCALIZED_STRING_SWIFTUI_SUPPORT = NO;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CBC3DEDC2DD3607400376831 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = ShopifyAcceleratedCheckoutsApp/ShopifyAcceleratedCheckoutsApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ShopifyAcceleratedCheckoutsApp/Preview Content\"";
+				DEVELOPMENT_TEAM = A7XGC83MZE;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShopifyAcceleratedCheckoutsApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Accelerated Checkouts";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_WKWatchOnly = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shopify.example.ShopifyAcceleratedCheckoutsApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CBC3DEDD2DD3607400376831 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = ShopifyAcceleratedCheckoutsApp/ShopifyAcceleratedCheckoutsApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ShopifyAcceleratedCheckoutsApp/Preview Content\"";
+				DEVELOPMENT_TEAM = A7XGC83MZE;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShopifyAcceleratedCheckoutsApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Accelerated Checkouts";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_WKWatchOnly = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shopify.example.ShopifyAcceleratedCheckoutsApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CBC3DEDF2DD3607400376831 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A7XGC83MZE;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shopify.example.ShopifyAcceleratedCheckoutsAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CBC3DEE02DD3607400376831 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A7XGC83MZE;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shopify.example.ShopifyAcceleratedCheckoutsAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CBC3DEE22DD3607400376831 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A7XGC83MZE;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shopify.example.ShopifyAcceleratedCheckoutsAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ShopifyAcceleratedCheckoutsApp;
+			};
+			name = Debug;
+		};
+		CBC3DEE32DD3607400376831 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A7XGC83MZE;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shopify.example.ShopifyAcceleratedCheckoutsAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ShopifyAcceleratedCheckoutsApp;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CBC3DEB02DD3607300376831 /* Build configuration list for PBXProject "ShopifyAcceleratedCheckoutsApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CBC3DED92DD3607400376831 /* Debug */,
+				CBC3DEDA2DD3607400376831 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CBC3DEDB2DD3607400376831 /* Build configuration list for PBXNativeTarget "ShopifyAcceleratedCheckoutsApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CBC3DEDC2DD3607400376831 /* Debug */,
+				CBC3DEDD2DD3607400376831 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CBC3DEDE2DD3607400376831 /* Build configuration list for PBXNativeTarget "ShopifyAcceleratedCheckoutsAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CBC3DEDF2DD3607400376831 /* Debug */,
+				CBC3DEE02DD3607400376831 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CBC3DEE12DD3607400376831 /* Build configuration list for PBXNativeTarget "ShopifyAcceleratedCheckoutsAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CBC3DEE22DD3607400376831 /* Debug */,
+				CBC3DEE32DD3607400376831 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		2E4937112DD494F800604374 /* XCLocalSwiftPackageReference "../../../accelerated-checkouts-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../accelerated-checkouts-ios";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CBD9D6D02E12AE5A00D836A3 /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apollographql/apollo-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.23.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2E4937122DD494F800604374 /* ShopifyAcceleratedCheckouts */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShopifyAcceleratedCheckouts;
+		};
+		CB4FD0FC2DD492CB00D70D74 /* ShopifyAcceleratedCheckouts */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShopifyAcceleratedCheckouts;
+		};
+		CBC3DEE52DD360E600376831 /* ShopifyAcceleratedCheckouts */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShopifyAcceleratedCheckouts;
+		};
+		CBD9D6D12E12AE5A00D836A3 /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CBD9D6D02E12AE5A00D836A3 /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = Apollo;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = CBC3DEAD2DD3607300376831 /* Project object */;
+}

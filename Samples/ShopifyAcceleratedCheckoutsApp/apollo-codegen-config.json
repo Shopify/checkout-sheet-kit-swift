@@ -1,0 +1,29 @@
+{
+  "schemaNamespace" : "Storefront",
+  "input" : {
+    "operationSearchPaths" : [
+      "**/*.graphql"
+    ],
+    "schemaSearchPaths" : [
+      "**/*.graphqls"
+    ]
+  },
+  "output" : {
+    "testMocks" : {
+      "none" : {
+      }
+    },
+    "schemaTypes" : {
+      "path" : "./ShopifyAcceleratedCheckoutsApp/Generated",
+      "moduleType" : {
+        "embeddedInTarget" : {
+          "name" : "ShopifyAcceleratedCheckoutsApp"
+        }
+      }
+    },
+    "operations" : {
+      "inSchemaModule" : {
+      }
+    }
+  }
+}

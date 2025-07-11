@@ -1,0 +1,35 @@
+fragment CartDeliveryGroupFragment on CartDeliveryGroup {
+  id
+  groupType
+  deliveryAddress {
+    address1
+    address2
+    city
+    countryCodeV2
+    firstName
+    lastName
+    phone
+    province
+    zip
+  }
+  deliveryOptions {
+    handle
+    title
+    code
+    deliveryMethodType
+    description
+    estimatedCost {
+      amount
+      currencyCode
+    }
+  }
+  selectedDeliveryOption {
+    description
+    title
+    handle
+    estimatedCost {
+      amount
+      currencyCode
+    }
+  }
+}

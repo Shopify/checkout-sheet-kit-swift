@@ -1,0 +1,24 @@
+{
+  "originHash" : "fd9348004c4f52112ea01e75b8ea30ff2d731685a04ab6b938b4bdfa37a3bb16",
+  "pins" : [
+    {
+      "identity" : "apollo-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apollographql/apollo-ios.git",
+      "state" : {
+        "revision" : "d591c1dd55824867877cff4f6551fe32983d7f51",
+        "version" : "1.23.0"
+      }
+    },
+    {
+      "identity" : "checkout-sheet-kit-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Shopify/checkout-sheet-kit-swift",
+      "state" : {
+        "revision" : "054485a9399d610d596e079c36dbd190891def34",
+        "version" : "3.1.2"
+      }
+    }
+  ],
+  "version" : 3
+}
