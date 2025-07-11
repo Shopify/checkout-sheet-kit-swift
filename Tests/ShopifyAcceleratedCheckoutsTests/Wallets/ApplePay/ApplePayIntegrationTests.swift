@@ -183,6 +183,7 @@ final class ApplePayIntegrationTests: XCTestCase {
 
     // MARK: - Delegate Tests
 
+    @MainActor
     func testCheckoutDelegateCancelCallback() async {
         var cancelCallbackInvoked = false
 
@@ -191,23 +192,18 @@ final class ApplePayIntegrationTests: XCTestCase {
             configuration: mockConfiguration
         )
 
-        await MainActor.run {
-            viewController.onCancel = {
-                cancelCallbackInvoked = true
-            }
+        viewController.onCancel = {
+            cancelCallbackInvoked = true
         }
 
-        await MainActor.run {
-            viewController.checkoutDidCancel()
-        }
+        viewController.checkoutDidCancel()
 
-        await MainActor.run {
-            XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")
-        }
+        XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")
     }
 
     // MARK: - New Delegate Method Integration Tests
 
+    @MainActor
     func testCheckoutDidClickLinkDelegateIntegration() async {
         var callbackInvoked = false
         var receivedURL: URL?
@@ -217,24 +213,19 @@ final class ApplePayIntegrationTests: XCTestCase {
             configuration: mockConfiguration
         )
 
-        await MainActor.run {
-            viewController.onClickLink = { url in
-                callbackInvoked = true
-                receivedURL = url
-            }
+        viewController.onClickLink = { url in
+            callbackInvoked = true
+            receivedURL = url
         }
 
         let testURL = URL(string: "https://help.shopify.com/payment-terms")!
-        await MainActor.run {
-            viewController.checkoutDidClickLink(url: testURL)
-        }
+        viewController.checkoutDidClickLink(url: testURL)
 
-        await MainActor.run {
-            XCTAssertTrue(callbackInvoked, "checkoutDidClickLink callback should be invoked")
-            XCTAssertEqual(receivedURL, testURL, "URL should be passed to callback")
-        }
+        XCTAssertTrue(callbackInvoked, "checkoutDidClickLink callback should be invoked")
+        XCTAssertEqual(receivedURL, testURL, "URL should be passed to callback")
     }
 
+    @MainActor
     func testCheckoutDidEmitWebPixelEventDelegateIntegration() async {
         let viewController = ApplePayViewController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart"),
@@ -243,14 +234,10 @@ final class ApplePayIntegrationTests: XCTestCase {
 
         var callbackSet = false
 
-        await MainActor.run {
-            viewController.onWebPixelEvent = { _ in
-                callbackSet = true
-            }
+        viewController.onWebPixelEvent = { _ in
+            callbackSet = true
         }
 
-        await MainActor.run {
-            XCTAssertNotNil(viewController.onWebPixelEvent, "Web pixel event callback should be set")
-        }
+        XCTAssertNotNil(viewController.onWebPixelEvent, "Web pixel event callback should be set")
     }
 }

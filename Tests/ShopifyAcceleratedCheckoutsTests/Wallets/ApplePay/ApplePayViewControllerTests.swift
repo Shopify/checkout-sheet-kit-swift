@@ -100,20 +100,17 @@ class ApplePayViewControllerTests: XCTestCase {
 
     // MARK: - Delegate Tests
 
+    @MainActor
     func testCheckoutDidCancel_invokesOnCancelCallback() async {
         var cancelCallbackInvoked = false
         let expectation = XCTestExpectation(description: "Cancel callback should be invoked")
 
-        await MainActor.run {
-            viewController.onCancel = {
-                cancelCallbackInvoked = true
-                expectation.fulfill()
-            }
+        viewController.onCancel = {
+            cancelCallbackInvoked = true
+            expectation.fulfill()
         }
 
-        await MainActor.run {
-            viewController.checkoutDidCancel()
-        }
+        viewController.checkoutDidCancel()
 
         await fulfillment(of: [expectation], timeout: 1.0)
         XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")

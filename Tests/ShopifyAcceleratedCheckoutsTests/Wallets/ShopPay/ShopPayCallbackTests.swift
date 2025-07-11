@@ -66,6 +66,7 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Success Callback Tests
 
+    @MainActor
     func testSuccessCallbackInvoked() async {
         successExpectation = expectation(description: "Success callback should be invoked")
         var callbackInvoked = false
@@ -93,6 +94,7 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Error Callback Tests
 
+    @MainActor
     func testErrorCallbackInvoked() async {
         errorExpectation = expectation(description: "Error callback should be invoked")
         var callbackInvoked = false
@@ -120,6 +122,7 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Cancel Callback Tests
 
+    @MainActor
     func testCancelCallbackInvoked() async {
         cancelExpectation = expectation(description: "Cancel callback should be invoked")
         var callbackInvoked = false
@@ -147,6 +150,7 @@ final class ShopPayCallbackTests: XCTestCase {
 
     // MARK: - Delegate Tests
 
+    @MainActor
     func testCheckoutCompleteCallback() {
         var completeInvoked = false
         viewController.eventHandlers = EventHandlers(
@@ -158,6 +162,7 @@ final class ShopPayCallbackTests: XCTestCase {
         XCTAssertTrue(completeInvoked, "Complete callback should be invoked")
     }
 
+    @MainActor
     func testCheckoutFailCallback() {
         var failInvoked = false
         viewController.eventHandlers = EventHandlers(
@@ -169,6 +174,7 @@ final class ShopPayCallbackTests: XCTestCase {
         XCTAssertTrue(failInvoked, "Fail callback should be invoked")
     }
 
+    @MainActor
     func testCheckoutCancelCallback() {
         var cancelInvoked = false
         viewController.eventHandlers = EventHandlers(
@@ -180,6 +186,7 @@ final class ShopPayCallbackTests: XCTestCase {
         XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
     }
 
+    @MainActor
     func testCheckoutDidCancelDelegateBehavior() {
         var cancelInvoked = false
         viewController.eventHandlers = EventHandlers(
