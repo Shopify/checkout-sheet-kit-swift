@@ -37,7 +37,6 @@ struct CartBuilderView: View {
     @State var selectedVariants: [MerchandiseID: Quantity] = [:]
     @State var isLoadingProducts: Bool = false
     @State var isCreatingCart: Bool = false
-    @State private var refreshID = UUID()
     @State private var scrollToTop = false
     @State private var scrollToCart = false
 
@@ -58,17 +57,17 @@ struct CartBuilderView: View {
                             isLoadingProducts: isLoadingProducts,
                             onRetry: { Task { await onLoad() } }
                         )
-                        .id("products-section") // Add ID for scrolling
+                        .id("products-section")  // Add ID for scrolling
 
                         if let cart {
                             CartDetailsSection(cart: cart)
-                                .id("cart-details") // Add ID for scrolling to cart
+                                .id("cart-details")  // Add ID for scrolling to cart
 
                             ButtonSet(
                                 cart: cart,
                                 firstVariantQuantity: cart.lines.nodes.first?.quantity ?? 1
                             )
-                            .id("\(cart.id)-\(refreshID)")
+                            .id("\(cart.id)")
                         }
 
                         // Bottom padding to ensure content isn't hidden behind sticky buttons
@@ -120,10 +119,6 @@ struct CartBuilderView: View {
         }
         .task {
             await onLoad()
-        }
-        .onAppear {
-            // Force refresh when view appears (e.g., returning from settings)
-            refreshID = UUID()
         }
     }
 
