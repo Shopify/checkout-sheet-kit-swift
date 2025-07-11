@@ -22,7 +22,9 @@
  */
 
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /// A delegate protocol for managing checkout lifecycle events.
 public protocol CheckoutDelegate: AnyObject {
@@ -64,8 +66,10 @@ extension CheckoutDelegate {
     }
 
     private func handleUrl(_ url: URL) {
+        #if canImport(UIKit)
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         }
+        #endif
     }
 }

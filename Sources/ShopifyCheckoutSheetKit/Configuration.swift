@@ -21,7 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if canImport(UIKit)
 import UIKit
+#endif
+import WebKit
 
 public enum Platform: String {
     case reactNative = "ReactNative"
@@ -34,10 +37,12 @@ public struct Configuration {
     /// `UITraitCollection.userInterfaceStyle`. To force a
     /// particular idiomatic color scheme, use the corresponding `.light`
     /// or `.dark` values.
-    ///
-    /// Alternatively you can use `.web` to match the look and feel of what your
-    /// buyers will see when performing a checkout via a desktop or mobile browser.
     public var colorScheme = ColorScheme.automatic
+
+    /// Determines the branding used when checkout is presented.
+    ///
+    /// By default, shop branding is used. Set to `.app` to use app branding instead.
+    public var branding = Branding.shop
 
     public var confetti = Configuration.Confetti()
 
@@ -63,6 +68,9 @@ public struct Configuration {
     /// Levels: all, debug, error, none
     /// Default: .error - which will emit "error" and "fault" logs
     public var logLevel: LogLevel = .error
+
+    /// The webView instance used for checkout, set internally by the SDK
+    internal var webView: WKWebView?
 }
 
 extension Configuration {
@@ -73,8 +81,13 @@ extension Configuration {
         case dark
         /// Infers either `.light` or `.dark` based on the current `UIUserInterfaceStyle`.
         case automatic
-        /// The color scheme presented to buyers using a desktop or mobile browser.
-        case web = "web_default"
+    }
+
+    public enum Branding: String, CaseIterable {
+        /// Uses app branding for the checkout experience.
+        case app
+        /// Uses shop branding for the checkout experience.
+        case shop
     }
 }
 

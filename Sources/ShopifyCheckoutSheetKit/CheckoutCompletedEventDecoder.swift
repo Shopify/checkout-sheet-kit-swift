@@ -24,15 +24,24 @@
 import Foundation
 
 class CheckoutCompletedEventDecoder {
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using _: Decoder) -> CheckoutCompletedEvent {
+    enum CodingKeys: String, CodingKey {
+        case body
+    }
+
+    func decode(from event: [String: Any]) -> CheckoutCompletedEvent {
         do {
-            let messageBody = try container.decode(String.self, forKey: .body)
+            guard let messageBody = event["body"] as? String else {
+                return createEmptyCheckoutCompletedEvent()
+            }
 
             guard let data = messageBody.data(using: .utf8) else {
                 return createEmptyCheckoutCompletedEvent()
             }
 
-            return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)
+            let decoder = JSONDecoder()
+            let completedCheckout = try decoder.decode(CheckoutCompletedEvent.self, from: data)
+
+            return completedCheckout
         } catch {
             OSLogger.shared.error("Error decoding \"completed\" event - \(error.localizedDescription)")
             return createEmptyCheckoutCompletedEvent()

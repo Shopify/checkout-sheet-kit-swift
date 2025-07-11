@@ -37,7 +37,6 @@ class CheckoutWebViewTests: XCTestCase {
         view = CheckoutWebView.for(checkout: url)
         mockDelegate = MockCheckoutWebViewDelegate()
         view.viewDelegate = mockDelegate
-        view.checkoutBridge = MockCheckoutBridge.self
     }
 
     private func createRecoveryAgent() -> CheckoutWebView {
@@ -48,8 +47,8 @@ class CheckoutWebViewTests: XCTestCase {
     }
 
     func testCorrectlyConfiguresWebview() {
-        XCTAssertEqual(view.configuration.applicationNameForUserAgent, CheckoutBridge.applicationName)
         XCTAssertTrue(view.configuration.allowsInlineMediaPlayback)
+        XCTAssertTrue(view.configuration.applicationNameForUserAgent?.contains("CheckoutKit/4.0.0") ?? false)
     }
 
     func testUsesRecoveryAgent() {
@@ -61,8 +60,8 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertTrue(recovery.isRecovery)
         XCTAssertFalse(recovery.isBridgeAttached)
         XCTAssertFalse(recovery.isPreloadingAvailable)
-        XCTAssertEqual(recovery.configuration.applicationNameForUserAgent, "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (noconnect;automatic;standard_recovery)")
         XCTAssertTrue(recovery.configuration.allowsInlineMediaPlayback)
+        XCTAssertTrue(recovery.configuration.applicationNameForUserAgent?.contains("MobileCheckoutSDK/4.0.0") ?? false)
         XCTAssertEqual(recovery.backgroundColor, backgroundColor)
         XCTAssertFalse(recovery.isOpaque)
     }
@@ -482,6 +481,91 @@ class CheckoutWebViewTests: XCTestCase {
 
         XCTAssertNil(mockDelegate.errorReceived)
     }
+
+    func testAppAuthenticationHeaderIsAddedWithConfig() {
+        let webView = LoadedRequestObservableWebView()
+        let options = CheckoutOptions(appAuthentication: .token("test-token"))
+        webView.checkoutOptions = options
+
+        webView.load(
+            checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+            isPreload: false
+        )
+
+        // Check that the embed query parameter is added with authentication
+        guard let loadedURL = webView.lastLoadedURLRequest?.url,
+              let components = URLComponents(url: loadedURL, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems
+        else {
+            XCTFail("Expected URL with query parameters")
+            return
+        }
+
+        let embedQueryItem = queryItems.first { $0.name == "embed" }
+        XCTAssertNotNil(embedQueryItem, "Expected embed query parameter")
+
+        guard let embedValue = embedQueryItem?.value else {
+            XCTFail("Expected embed query parameter value")
+            return
+        }
+
+        XCTAssertTrue(embedValue.contains("authentication=test-token"), "Expected authentication in embed parameter")
+        XCTAssertTrue(embedValue.contains("branding=shop"), "Expected branding in embed parameter")
+        XCTAssertTrue(embedValue.contains("embed=mobile_checkout_sdk"), "Expected embed in embed parameter")
+        XCTAssertTrue(embedValue.contains("version=4.0.0"), "Expected version in embed parameter")
+        XCTAssertTrue(embedValue.contains("protocol=2025-04"), "Expected protocol in embed parameter")
+    }
+
+    func testAppAuthenticationHeaderNotAddedWithoutConfig() {
+        let webView = LoadedRequestObservableWebView()
+
+        webView.load(
+            checkout: URL(string: "https://checkout-sdk.myshopify.io")!,
+            isPreload: false
+        )
+
+        // Check that the embed query parameter is added but without authentication
+        guard let loadedURL = webView.lastLoadedURLRequest?.url,
+              let components = URLComponents(url: loadedURL, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems
+        else {
+            XCTFail("Expected URL with query parameters")
+            return
+        }
+
+        let embedQueryItem = queryItems.first { $0.name == "embed" }
+        XCTAssertNotNil(embedQueryItem, "Expected embed query parameter")
+
+        guard let embedValue = embedQueryItem?.value else {
+            XCTFail("Expected embed query parameter value")
+            return
+        }
+
+        XCTAssertFalse(embedValue.contains("authentication="), "Expected no authentication in embed parameter")
+        XCTAssertTrue(embedValue.contains("branding=shop"), "Expected branding in embed parameter")
+        XCTAssertTrue(embedValue.contains("color-scheme="), "Expected color-scheme in embed parameter")
+        XCTAssertTrue(embedValue.contains("library=CheckoutKit/"), "Expected library in embed parameter")
+        XCTAssertTrue(embedValue.contains("protocol=2025-04"), "Expected protocol in embed parameter")
+    }
+
+    func testCheckoutKitAPIWithAppAuthentication() {
+        // Test that the desired API notation works correctly
+        let url = URL(string: "https://checkout-sdk.myshopify.io")!
+        let mockViewController = UIViewController()
+
+        // This should compile and work with the desired API notation
+        let viewController = CheckoutKit.present(
+            checkout: url,
+            from: mockViewController,
+            options: CheckoutOptions(appAuthentication: .token("jwt-token-example"))
+        )
+
+        XCTAssertNotNil(viewController)
+        XCTAssertTrue(viewController is CheckoutViewController)
+
+        // Clean up - dismiss the presented view controller
+        viewController.dismiss(animated: false)
+    }
 }
 
 class LoadedRequestObservableWebView: CheckoutWebView {
@@ -495,19 +579,6 @@ class LoadedRequestObservableWebView: CheckoutWebView {
 
     override func instrument(_ payload: InstrumentationPayload) {
         lastInstrumentationPayload = payload
-    }
-}
-
-class MockCheckoutBridge: CheckoutBridgeProtocol {
-    static var instrumentCalled = false
-    static var sendMessageCalled = false
-
-    static func instrument(_: WKWebView, _: InstrumentationPayload) {
-        instrumentCalled = true
-    }
-
-    static func sendMessage(_: WKWebView, messageName _: String, messageBody _: String?) {
-        sendMessageCalled = true
     }
 }
 

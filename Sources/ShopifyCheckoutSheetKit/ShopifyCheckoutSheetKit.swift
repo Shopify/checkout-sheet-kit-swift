@@ -21,10 +21,14 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /// The version of the `ShopifyCheckoutSheetKit` library.
-public let version = "3.2.0"
+public var version: String {
+    return "4.0.0"
+}
 
 var invalidateOnConfigurationChange = true
 
@@ -37,19 +41,43 @@ public var configuration = Configuration() {
     }
 }
 
-/// A convienence function for configuring the `ShopifyCheckoutSheetKit` library.
+/// A convenience function for configuring the `ShopifyCheckoutSheetKit` library.
 public func configure(_ block: (inout Configuration) -> Void) {
     block(&configuration)
 }
 
+/// Configuration for partner authentication.
+public struct CheckoutOptions {
+    public enum AppAuthentication {
+        case token(String)
+
+        public var token: String {
+            switch self {
+            case let .token(tokenValue):
+                return tokenValue
+            }
+        }
+    }
+
+    /// App authentication configuration for partner identification.
+    public let appAuthentication: AppAuthentication?
+
+    /// Initialize with app authentication configuration.
+    public init(appAuthentication: AppAuthentication? = nil) {
+        self.appAuthentication = appAuthentication
+    }
+}
+
 /// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
+public func preload(checkout url: URL, options: CheckoutOptions? = nil) {
     guard configuration.preloading.enabled else {
         return
     }
 
     CheckoutWebView.preloadingActivatedByClient = true
-    CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
+    let webView = CheckoutWebView.for(checkout: url)
+    webView.checkoutOptions = options
+    webView.load(checkout: url, isPreload: true)
 }
 
 /// Invalidate the checkout cache from preload calls
@@ -59,8 +87,27 @@ public func invalidate() {
 
 /// Presents the checkout from a given `UIViewController`.
 @discardableResult
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, delegate: delegate)
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) -> CheckoutViewController {
+    let viewController = CheckoutViewController(checkout: url, delegate: delegate, options: options)
     from.present(viewController, animated: true)
     return viewController
+}
+
+/// Shorter namespace alias for ShopifyCheckoutSheetKit functions.
+public enum CheckoutKit {
+    /// Presents the checkout from a given `UIViewController`.
+    @discardableResult
+    public static func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) -> CheckoutViewController {
+        return ShopifyCheckoutSheetKit.present(checkout: url, from: from, delegate: delegate, options: options)
+    }
+
+    /// Preloads the checkout for faster presentation.
+    public static func preload(checkout url: URL, options: CheckoutOptions? = nil) {
+        ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
+    }
+
+    /// Invalidate the checkout cache from preload calls
+    public static func invalidate() {
+        ShopifyCheckoutSheetKit.invalidate()
+    }
 }
