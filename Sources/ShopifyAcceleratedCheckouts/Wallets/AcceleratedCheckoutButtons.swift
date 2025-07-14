@@ -136,15 +136,15 @@ extension AcceleratedCheckoutButtons {
     ///
     /// ```swift
     /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onComplete {
-    ///         // Navigate to success screen
-    ///         showSuccessView = true
+    ///     .onComplete { event in
+    ///         // Navigate to success screen with order ID
+    ///         showSuccessView(orderId: event.orderId)
     ///     }
     /// ```
     ///
     /// - Parameter action: The action to perform when checkout succeeds
     /// - Returns: A view with the checkout success handler set
-    public func onComplete(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
+    public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.checkoutDidComplete = action
         return newView
@@ -156,15 +156,15 @@ extension AcceleratedCheckoutButtons {
     ///
     /// ```swift
     /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onFail {
-    ///         // Show error alert
-    ///         showErrorAlert = true
+    ///     .onFail { error in
+    ///         // Show error alert with details
+    ///         showErrorAlert(error: error)
     ///     }
     /// ```
     ///
     /// - Parameter action: The action to perform when checkout fails
     /// - Returns: A view with the checkout error handler set
-    public func onFail(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
+    public func onFail(_ action: @escaping (CheckoutError) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.checkoutDidFail = action
         return newView
@@ -205,7 +205,7 @@ extension AcceleratedCheckoutButtons {
     /// - Parameter action: The action to determine if recovery should be attempted
     /// - Returns: A view with the error recovery handler set
     public func onShouldRecoverFromError(
-        _ action: @escaping (ShopifyCheckoutSheetKit.CheckoutError) -> Bool
+        _ action: @escaping (CheckoutError) -> Bool
     ) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.shouldRecoverFromError = action
@@ -246,7 +246,7 @@ extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when a pixel event is emitted
     /// - Returns: A view with the web pixel event handler set
-    public func onWebPixelEvent(_ action: @escaping (ShopifyCheckoutSheetKit.PixelEvent) -> Void)
+    public func onWebPixelEvent(_ action: @escaping (PixelEvent) -> Void)
         -> AcceleratedCheckoutButtons
     {
         var newView = self

@@ -83,7 +83,7 @@ final class ApplePayIntegrationTests: XCTestCase {
             // Create a hosting controller to test SwiftUI integration
             let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart")
                 .withWallets([.applepay])
-                .onComplete {
+                .onComplete { _ in
                     // Callback exists but won't be called during view creation
                 }
                 .environment(mockCommonConfiguration)
@@ -113,10 +113,10 @@ final class ApplePayIntegrationTests: XCTestCase {
             // Create a hosting controller to test SwiftUI integration with all callbacks
             let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart")
                 .withWallets([.applepay])
-                .onComplete {
+                .onComplete { _ in
                     completeExpectation.fulfill()
                 }
-                .onFail {
+                .onFail { _ in
                     failExpectation.fulfill()
                 }
                 .onCancel {
@@ -159,7 +159,7 @@ final class ApplePayIntegrationTests: XCTestCase {
 
     func testCallbackPersistenceAcrossViewUpdates() async {
         var successCount = 0
-        let successHandler = {
+        let successHandler = { (_: CheckoutCompletedEvent) in
             successCount += 1
         }
 
@@ -192,11 +192,14 @@ final class ApplePayIntegrationTests: XCTestCase {
             configuration: mockConfiguration
         )
 
-        viewController.onCancel = {
+        viewController.onCheckoutCancel = {
             cancelCallbackInvoked = true
         }
 
         viewController.checkoutDidCancel()
+
+        // Wait for the async callback to complete
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")
     }
@@ -213,13 +216,16 @@ final class ApplePayIntegrationTests: XCTestCase {
             configuration: mockConfiguration
         )
 
-        viewController.onClickLink = { url in
+        viewController.onCheckoutClickLink = { url in
             callbackInvoked = true
             receivedURL = url
         }
 
         let testURL = URL(string: "https://help.shopify.com/payment-terms")!
         viewController.checkoutDidClickLink(url: testURL)
+
+        // Wait for the async callback to complete
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         XCTAssertTrue(callbackInvoked, "checkoutDidClickLink callback should be invoked")
         XCTAssertEqual(receivedURL, testURL, "URL should be passed to callback")
@@ -234,10 +240,10 @@ final class ApplePayIntegrationTests: XCTestCase {
 
         var callbackSet = false
 
-        viewController.onWebPixelEvent = { _ in
+        viewController.onCheckoutWebPixelEvent = { _ in
             callbackSet = true
         }
 
-        XCTAssertNotNil(viewController.onWebPixelEvent, "Web pixel event callback should be set")
+        XCTAssertNotNil(viewController.onCheckoutWebPixelEvent, "Web pixel event callback should be set")
     }
 }
