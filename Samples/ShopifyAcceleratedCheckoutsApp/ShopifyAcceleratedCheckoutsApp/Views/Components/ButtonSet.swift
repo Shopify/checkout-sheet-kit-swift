@@ -23,6 +23,7 @@
 
 import Apollo
 import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
 import SwiftUI
 
 struct ButtonSet: View {
@@ -35,11 +36,12 @@ struct ButtonSet: View {
                 CheckoutSection(title: "AcceleratedCheckoutButtons(cartID:)") {
                     // Cart-based checkout example with event handlers
                     AcceleratedCheckoutButtons(cartID: cartID)
-                        .onComplete {
+                        .onComplete { event in
                             print("✅ Checkout completed successfully")
+                            print("   Order ID: \(event.orderDetails.id)")
                         }
-                        .onFail {
-                            print("❌ Checkout failed")
+                        .onFail { error in
+                            print("❌ Checkout failed: \(error)")
                         }
                         .onCancel {
                             print("🚫 Checkout cancelled")
@@ -52,8 +54,16 @@ struct ButtonSet: View {
                         .onClickLink { url in
                             print("🔗 Link clicked: \(url)")
                         }
-                        .onWebPixelEvent { _ in
-                            print("📊 Web pixel event received")
+                        .onWebPixelEvent { event in
+                            let eventName: String = {
+                                switch event {
+                                case let .customEvent(customEvent):
+                                    return customEvent.name ?? "Unknown custom event"
+                                case let .standardEvent(standardEvent):
+                                    return standardEvent.name ?? "Unknown standard event"
+                                }
+                            }()
+                            print("📊 Web pixel event: \(eventName)")
                         }
                 }
             }
@@ -69,11 +79,12 @@ struct ButtonSet: View {
                     )
                     .cornerRadius(24)
                     .withWallets([.applepay, .shoppay])
-                    .onComplete {
+                    .onComplete { event in
                         print("✅ Variant checkout completed")
+                        print("   Order ID: \(event.orderDetails.id)")
                     }
-                    .onFail {
-                        print("❌ Variant checkout failed")
+                    .onFail { error in
+                        print("❌ Variant checkout failed: \(error)")
                     }
                     .onCancel {
                         print("🚫 Variant checkout cancelled")
@@ -85,8 +96,16 @@ struct ButtonSet: View {
                     .onClickLink { url in
                         print("🔗 Variant - Link clicked: \(url)")
                     }
-                    .onWebPixelEvent { _ in
-                        print("📊 Variant - Web pixel event received")
+                    .onWebPixelEvent { event in
+                        let eventName: String = {
+                            switch event {
+                            case let .customEvent(customEvent):
+                                return customEvent.name ?? "Unknown custom event"
+                            case let .standardEvent(standardEvent):
+                                return standardEvent.name ?? "Unknown standard event"
+                            }
+                        }()
+                        print("📊 Variant - Web pixel event: \(eventName)")
                     }
                 }
             }
