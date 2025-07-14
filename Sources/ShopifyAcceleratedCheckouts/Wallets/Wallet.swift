@@ -32,20 +32,20 @@ public enum Wallet {
 
 /// Event handlers for wallet buttons
 public struct EventHandlers {
-    public var checkoutDidComplete: (() -> Void)?
-    public var checkoutDidFail: (() -> Void)?
+    public var checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)?
+    public var checkoutDidFail: ((CheckoutError) -> Void)?
     public var checkoutDidCancel: (() -> Void)?
-    public var shouldRecoverFromError: ((ShopifyCheckoutSheetKit.CheckoutError) -> Bool)?
+    public var shouldRecoverFromError: ((CheckoutError) -> Bool)?
     public var checkoutDidClickLink: ((URL) -> Void)?
-    public var checkoutDidEmitWebPixelEvent: ((ShopifyCheckoutSheetKit.PixelEvent) -> Void)?
+    public var checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)?
 
     public init(
-        checkoutDidComplete: (() -> Void)? = nil,
-        checkoutDidFail: (() -> Void)? = nil,
+        checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)? = nil,
+        checkoutDidFail: ((CheckoutError) -> Void)? = nil,
         checkoutDidCancel: (() -> Void)? = nil,
-        shouldRecoverFromError: ((ShopifyCheckoutSheetKit.CheckoutError) -> Bool)? = nil,
+        shouldRecoverFromError: ((CheckoutError) -> Bool)? = nil,
         checkoutDidClickLink: ((URL) -> Void)? = nil,
-        checkoutDidEmitWebPixelEvent: ((ShopifyCheckoutSheetKit.PixelEvent) -> Void)? = nil
+        checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)? = nil
     ) {
         self.checkoutDidComplete = checkoutDidComplete
         self.checkoutDidFail = checkoutDidFail

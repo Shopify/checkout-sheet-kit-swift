@@ -22,7 +22,7 @@
  */
 
 @testable import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+@testable import ShopifyCheckoutSheetKit
 import XCTest
 
 @available(iOS 17.0, *)
@@ -73,13 +73,14 @@ final class ShopPayCallbackTests: XCTestCase {
 
         await MainActor.run {
             viewController.eventHandlers = EventHandlers(
-                checkoutDidComplete: { [weak self] in
+                checkoutDidComplete: { [weak self] _ in
                     callbackInvokedExpectation.fulfill()
                     self?.successExpectation.fulfill()
                 }
             )
 
-            viewController.eventHandlers.checkoutDidComplete?()
+            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+            viewController.eventHandlers.checkoutDidComplete?(mockEvent)
         }
 
         await fulfillment(of: [successExpectation, callbackInvokedExpectation], timeout: 1.0)
@@ -88,7 +89,8 @@ final class ShopPayCallbackTests: XCTestCase {
     func testSuccessCallbackNotInvokedWhenNil() {
         XCTAssertNil(viewController.eventHandlers.checkoutDidComplete)
 
-        viewController.eventHandlers.checkoutDidComplete?() // Should not crash
+        let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+        viewController.eventHandlers.checkoutDidComplete?(mockEvent) // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -101,13 +103,14 @@ final class ShopPayCallbackTests: XCTestCase {
         let callbackInvokedExpectation = expectation(description: "Error callback invoked")
 
         viewController.eventHandlers = EventHandlers(
-            checkoutDidFail: { [weak self] in
+            checkoutDidFail: { [weak self] _ in
                 callbackInvokedExpectation.fulfill()
                 self?.errorExpectation.fulfill()
             }
         )
 
-        viewController.eventHandlers.checkoutDidFail?()
+        let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+        viewController.eventHandlers.checkoutDidFail?(mockError)
 
         await fulfillment(of: [errorExpectation, callbackInvokedExpectation], timeout: 1.0)
     }
@@ -115,7 +118,8 @@ final class ShopPayCallbackTests: XCTestCase {
     func testErrorCallbackNotInvokedWhenNil() {
         XCTAssertNil(viewController.eventHandlers.checkoutDidFail)
 
-        viewController.eventHandlers.checkoutDidFail?() // Should not crash
+        let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+        viewController.eventHandlers.checkoutDidFail?(mockError) // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
     }
@@ -153,10 +157,11 @@ final class ShopPayCallbackTests: XCTestCase {
     func testCheckoutCompleteCallback() {
         var completeInvoked = false
         viewController.eventHandlers = EventHandlers(
-            checkoutDidComplete: { completeInvoked = true }
+            checkoutDidComplete: { _ in completeInvoked = true }
         )
 
-        viewController.eventHandlers.checkoutDidComplete?()
+        let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+        viewController.eventHandlers.checkoutDidComplete?(mockEvent)
 
         XCTAssertTrue(completeInvoked, "Complete callback should be invoked")
     }
@@ -165,10 +170,11 @@ final class ShopPayCallbackTests: XCTestCase {
     func testCheckoutFailCallback() {
         var failInvoked = false
         viewController.eventHandlers = EventHandlers(
-            checkoutDidFail: { failInvoked = true }
+            checkoutDidFail: { _ in failInvoked = true }
         )
 
-        viewController.eventHandlers.checkoutDidFail?()
+        let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+        viewController.eventHandlers.checkoutDidFail?(mockError)
 
         XCTAssertTrue(failInvoked, "Fail callback should be invoked")
     }

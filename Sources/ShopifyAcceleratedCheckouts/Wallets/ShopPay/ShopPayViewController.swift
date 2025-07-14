@@ -107,13 +107,13 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 extension ShopPayViewController: CheckoutDelegate {
-    func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-        eventHandlers.checkoutDidComplete?()
+    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+        eventHandlers.checkoutDidComplete?(event)
     }
 
-    func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
+    func checkoutDidFail(error: CheckoutError) {
         checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutDidFail?()
+        eventHandlers.checkoutDidFail?(error)
     }
 
     func checkoutDidCancel() {
@@ -122,7 +122,7 @@ extension ShopPayViewController: CheckoutDelegate {
         eventHandlers.checkoutDidCancel?()
     }
 
-    func checkoutShouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
+    func shouldRecoverFromError(error: CheckoutError) -> Bool {
         return eventHandlers.shouldRecoverFromError?(error) ?? false
     }
 
@@ -130,7 +130,7 @@ extension ShopPayViewController: CheckoutDelegate {
         eventHandlers.checkoutDidClickLink?(url)
     }
 
-    func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
+    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
         eventHandlers.checkoutDidEmitWebPixelEvent?(event)
     }
 }
