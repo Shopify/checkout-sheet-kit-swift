@@ -103,12 +103,8 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         case .reset:
             await onReset()
 
-        case .interrupt:
-            await onInterrupt()
-
         case let .presentingCSK(url):
-            guard let url else { return }
-            try? await controller.present(url: url)
+            await onPresentingCSK(to: url, previousState: previousState)
 
         /// As a "terminal" state, acts as a decision point to either:
         /// - present TYP (redirectUrl)
@@ -130,21 +126,27 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         await transition(to: .idle)
     }
 
-    private func onInterrupt() async {
-        try? await _Concurrency.Task.retrying {
-            let cartID = try self.pkEncoder.cartID.get()
-            try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
-                id: cartID
-            )
-        }.value
+    private func onPresentingCSK(to url: URL?, previousState: ApplePayState) async {
+        guard let url else { return }
+
+        if case let .cartSubmittedForCompletion(redirectURL) = previousState {
+        } else {
+            try? await _Concurrency.Task.retrying {
+                let cartID = try self.pkEncoder.cartID.get()
+                try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
+                    id: cartID
+                )
+            }.value
+        }
+
+        try? await controller.present(url: url)
     }
 
     private func onCompleted(previousState: ApplePayState) async {
         switch previousState {
         case .paymentAuthorizationFailed,
-             .interrupt,
-             .unexpectedError,
-             .paymentAuthorized:
+            .unexpectedError,
+            .interrupt:
             await transition(to: .presentingCSK(url: url))
 
         case let .cartSubmittedForCompletion(redirectURL):
@@ -175,7 +177,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     func getTopViewController() -> UIViewController? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first
+            let window = windowScene.windows.first
         else {
             return nil
         }
