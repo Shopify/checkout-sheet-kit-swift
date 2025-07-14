@@ -243,6 +243,7 @@ protocol PayController: AnyObject {
 extension ApplePayViewController: CheckoutDelegate {
     @MainActor func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
         onComplete?()
+        Task { await authorizationDelegate.transition(to: .completed) }
     }
 
     @MainActor func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
@@ -254,6 +255,7 @@ extension ApplePayViewController: CheckoutDelegate {
         checkoutViewController?.dismiss(animated: true)
 
         onCancel?()
+        Task { await authorizationDelegate.transition(to: .completed) }
     }
 
     @MainActor func shouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
