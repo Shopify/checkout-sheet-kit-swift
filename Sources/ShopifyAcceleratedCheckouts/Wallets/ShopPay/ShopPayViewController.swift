@@ -108,7 +108,6 @@ import SwiftUI
 @available(iOS 17.0, *)
 extension ShopPayViewController: CheckoutDelegate {
     func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-        checkoutViewController?.dismiss(animated: true)
         eventHandlers.checkoutDidComplete?()
     }
 
