@@ -62,11 +62,12 @@ struct ButtonSet: View {
                let productVariant = merchandise.asProductVariant
             {
                 CheckoutSection(title: "AcceleratedCheckoutButtons(variantID: quantity:)") {
-                    // Variant-based checkout with separate handlers
+                    // Variant-based checkout with separate handlers and custom corner radius
                     AcceleratedCheckoutButtons(
                         variantID: productVariant.id,
                         quantity: firstVariantQuantity
                     )
+                    .withCornerRadius(24)
                     .withWallets([.applepay, .shoppay])
                     .onComplete {
                         print("✅ Variant checkout completed")

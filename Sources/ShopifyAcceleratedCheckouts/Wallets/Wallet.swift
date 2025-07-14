@@ -57,10 +57,12 @@ public struct EventHandlers {
 }
 
 extension View {
-    func walletButtonStyle(bg: Color = Color.black) -> some View {
-        frame(height: 48)
+    func walletButtonStyle(bg: Color = Color.black, cornerRadius: CGFloat? = nil) -> some View {
+        let defaultCornerRadius: CGFloat = 8
+        let radius = cornerRadius ?? defaultCornerRadius
+        return frame(height: 48)
             .background(bg)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: radius >= 0 ? radius : defaultCornerRadius))
     }
 }
 
