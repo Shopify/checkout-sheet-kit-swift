@@ -67,7 +67,7 @@ struct ButtonSet: View {
                         variantID: productVariant.id,
                         quantity: firstVariantQuantity
                     )
-                    .withCornerRadius(24)
+                    .cornerRadius(24)
                     .withWallets([.applepay, .shoppay])
                     .onComplete {
                         print("✅ Variant checkout completed")

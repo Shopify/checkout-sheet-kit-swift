@@ -305,9 +305,9 @@ final class ApplePayViewModifierTests: XCTestCase {
 
     // MARK: - Corner Radius Modifier Tests
 
-    func testWithCornerRadiusModifier() {
+    func testCornerRadiusModifier() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-            .withCornerRadius(16)
+            .cornerRadius(16)
             .environment(mockConfiguration)
             .environment(mockApplePayConfiguration)
             .environment(mockShopSettings)
@@ -315,9 +315,9 @@ final class ApplePayViewModifierTests: XCTestCase {
         XCTAssertNotNil(view, "View should be created successfully with corner radius modifier")
     }
 
-    func testWithCornerRadiusZeroValue() {
+    func testCornerRadiusZeroValue() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-            .withCornerRadius(0)
+            .cornerRadius(0)
             .environment(mockConfiguration)
             .environment(mockApplePayConfiguration)
             .environment(mockShopSettings)
@@ -325,9 +325,9 @@ final class ApplePayViewModifierTests: XCTestCase {
         XCTAssertNotNil(view, "View should be created successfully with zero corner radius")
     }
 
-    func testWithCornerRadiusNegativeValue() {
+    func testCornerRadiusNegativeValue() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-            .withCornerRadius(-10)
+            .cornerRadius(-10)
             .environment(mockConfiguration)
             .environment(mockApplePayConfiguration)
             .environment(mockShopSettings)

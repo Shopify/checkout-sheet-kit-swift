@@ -119,12 +119,12 @@ extension AcceleratedCheckoutButtons {
     ///
     /// ```swift
     /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .withCornerRadius(12)
+    ///     .cornerRadius(12)
     /// ```
     ///
     /// - Parameter radius: The corner radius to apply to all buttons (default: 8). Negative values will use the default.
     /// - Returns: A view with the custom corner radius applied
-    public func withCornerRadius(_ radius: CGFloat) -> AcceleratedCheckoutButtons {
+    public func cornerRadius(_ radius: CGFloat) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.cornerRadius = radius
         return newView
