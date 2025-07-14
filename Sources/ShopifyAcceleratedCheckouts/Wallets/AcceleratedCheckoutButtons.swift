@@ -39,6 +39,7 @@ public struct AcceleratedCheckoutButtons: View {
     let identifier: CheckoutIdentifier
     var wallets: [Wallet] = [.shoppay, .applepay]
     var eventHandlers: EventHandlers = .init()
+    var cornerRadius: CGFloat?
 
     @State private var shopSettings: ShopSettings?
 
@@ -69,12 +70,14 @@ public struct AcceleratedCheckoutButtons: View {
                             case .applepay:
                                 ApplePayButton(
                                     identifier: identifier,
-                                    eventHandlers: eventHandlers
+                                    eventHandlers: eventHandlers,
+                                    cornerRadius: cornerRadius
                                 )
                             case .shoppay:
                                 ShopPayButton(
                                     identifier: identifier,
-                                    eventHandlers: eventHandlers
+                                    eventHandlers: eventHandlers,
+                                    cornerRadius: cornerRadius
                                 )
                             }
                         }
@@ -107,6 +110,23 @@ extension AcceleratedCheckoutButtons {
     public func withWallets(_ wallets: [Wallet]) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.wallets = wallets
+        return newView
+    }
+
+    /// Sets the corner radius for all checkout buttons
+    ///
+    /// Use this modifier to customize the corner radius of the buttons:
+    ///
+    /// ```swift
+    /// AcceleratedCheckoutButtons(cartID: cartId)
+    ///     .cornerRadius(12)
+    /// ```
+    ///
+    /// - Parameter radius: The corner radius to apply to all buttons (default: 8). Negative values will use the default.
+    /// - Returns: A view with the custom corner radius applied
+    public func cornerRadius(_ radius: CGFloat) -> AcceleratedCheckoutButtons {
+        var newView = self
+        newView.cornerRadius = radius
         return newView
     }
 
