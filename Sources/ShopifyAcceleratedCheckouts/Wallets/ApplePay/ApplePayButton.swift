@@ -49,12 +49,17 @@ struct ApplePayButton: View {
     /// The Apple Pay button label style
     private var label: PayWithApplePayButtonLabel = .plain
 
+    /// The corner radius for the button
+    private let cornerRadius: CGFloat?
+
     public init(
         identifier: CheckoutIdentifier,
-        eventHandlers: EventHandlers = EventHandlers()
+        eventHandlers: EventHandlers = EventHandlers(),
+        cornerRadius: CGFloat?
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
+        self.cornerRadius = cornerRadius
     }
 
     var body: some View {
@@ -69,7 +74,8 @@ struct ApplePayButton: View {
                     common: configuration, applePay: applePayConfiguration,
                     shopSettings: shopSettings
                 ),
-                eventHandlers: eventHandlers
+                eventHandlers: eventHandlers,
+                cornerRadius: cornerRadius
             )
         }
     }
@@ -92,6 +98,9 @@ struct Internal_ApplePayButton: View {
     /// The view controller for the Apple Pay button
     private var controller: ApplePayViewController
 
+    /// The corner radius for the button
+    private let cornerRadius: CGFloat?
+
     /// Initializes an Apple Pay button
     /// - Parameters:
     ///   - identifier: The identifier to use for checkout
@@ -102,12 +111,15 @@ struct Internal_ApplePayButton: View {
         identifier: CheckoutIdentifier,
         label: PayWithApplePayButtonLabel,
         configuration: ApplePayConfigurationWrapper,
-        eventHandlers: EventHandlers = EventHandlers()
+        eventHandlers: EventHandlers = EventHandlers(),
+        cornerRadius: CGFloat?
     ) {
         controller = ApplePayViewController(
             identifier: identifier,
             configuration: configuration
         )
+        self.label = label
+        self.cornerRadius = cornerRadius
         MainActor.assumeIsolated {
             controller.onComplete = eventHandlers.checkoutDidComplete
             controller.onFail = eventHandlers.checkoutDidFail
@@ -116,7 +128,6 @@ struct Internal_ApplePayButton: View {
             controller.onClickLink = eventHandlers.checkoutDidClickLink
             controller.onWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
         }
-        self.label = label
     }
 
     var body: some View {
@@ -130,6 +141,6 @@ struct Internal_ApplePayButton: View {
                 Text("errors.applepay.unsupported".localizedString)
             }
         )
-        .walletButtonStyle()
+        .walletButtonStyle(cornerRadius: cornerRadius)
     }
 }
