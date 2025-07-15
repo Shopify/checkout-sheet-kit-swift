@@ -145,8 +145,8 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     private func onCompleted(previousState: ApplePayState) async {
         switch previousState {
         case .paymentAuthorizationFailed,
-            .unexpectedError,
-            .interrupt:
+             .unexpectedError,
+             .interrupt:
             await transition(to: .presentingCSK(url: url))
 
         case let .cartSubmittedForCompletion(redirectURL):
@@ -177,7 +177,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     func getTopViewController() -> UIViewController? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-            let window = windowScene.windows.first
+              let window = windowScene.windows.first
         else {
             return nil
         }

@@ -25,7 +25,11 @@ import Foundation
 import PassKit
 
 @available(iOS 17.0, *)
-enum ApplePayState {
+enum ApplePayState: Equatable {
+    static func == (lhs: ApplePayState, rhs: ApplePayState) -> Bool {
+        return String(describing: lhs.self) == String(describing: rhs.self)
+    }
+
     /// Initial state - Ready to start a payment request
     /// The delegate is idle and waiting for a payment request to be initiated
     case idle
