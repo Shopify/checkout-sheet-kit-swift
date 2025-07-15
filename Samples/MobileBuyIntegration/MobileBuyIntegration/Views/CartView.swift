@@ -30,6 +30,7 @@ import SwiftUI
 struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
+    @State var showCheckoutSheet: Bool = false
 
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
@@ -41,15 +42,15 @@ struct CartView: View {
                     VStack {
                         CartLines(lines: lines, isBusy: $isBusy)
                     }
-                    .padding(.bottom, 80)
+                    .padding(.bottom, 130)
                 }
 
-                VStack {
+                VStack(spacing: 10) {
                     Button(
                         action: presentCheckout,
                         label: {
                             HStack {
-                                Text("Checkout")
+                                Text("Check out with present")
                                     .fontWeight(.bold)
                                 Spacer()
                                 if let amount = cartManager.cart?.cost.totalAmount,
@@ -70,6 +71,31 @@ struct CartView: View {
                     .accessibilityIdentifier("checkoutButton")
                     .padding(.horizontal, 20)
 
+                    Button(
+                        action: { showCheckoutSheet = true },
+                        label: {
+                            HStack {
+                                Text("Check out with sheet")
+                                    .fontWeight(.bold)
+                                Spacer()
+                                if let amount = cartManager.cart?.cost.totalAmount,
+                                   let total = amount.formattedString()
+                                {
+                                    Text(total)
+                                        .fontWeight(.bold)
+                                }
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
+                            .cornerRadius(10)
+                        }
+                    )
+                    .disabled(isBusy)
+                    .foregroundColor(.white)
+                    .accessibilityIdentifier("checkoutSheetButton")
+                    .padding(.horizontal, 20)
+
                     if config.applePayEnabled {
                         PayWithApplePayButton(
                             .checkout,
@@ -86,6 +112,26 @@ struct CartView: View {
             }
             .onAppear {
                 preloadCheckout()
+            }
+            .sheet(isPresented: $showCheckoutSheet) {
+                if let url = cartManager.cart?.checkoutUrl {
+                    CheckoutSheet(checkout: url)
+                        .title("Checkout Sheet")
+                        .colorScheme(.automatic)
+                        .onCancel {
+                            showCheckoutSheet = false
+                        }
+                        .onComplete { event in
+                            showCheckoutSheet = false
+                            // Handle checkout completion
+                            print("Checkout completed with order ID: \(event.orderDetails.id)")
+                        }
+                        .onFail { error in
+                            showCheckoutSheet = false
+                            // Handle checkout failure
+                            print("Checkout failed: \(error)")
+                        }
+                }
             }
         } else {
             EmptyState()
