@@ -24,9 +24,42 @@
 import SwiftUI
 import UIKit
 
+/// Event handlers for checkout lifecycle events
+public struct EventHandlers {
+    public var checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)?
+    public var checkoutDidFail: ((CheckoutError) -> Void)?
+    public var checkoutDidCancel: (() -> Void)?
+    public var shouldRecoverFromError: ((CheckoutError) -> Bool)?
+    public var checkoutDidClickLink: ((URL) -> Void)?
+    public var checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)?
+
+    public init(
+        checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)? = nil,
+        checkoutDidFail: ((CheckoutError) -> Void)? = nil,
+        checkoutDidCancel: (() -> Void)? = nil,
+        shouldRecoverFromError: ((CheckoutError) -> Bool)? = nil,
+        checkoutDidClickLink: ((URL) -> Void)? = nil,
+        checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)? = nil
+    ) {
+        self.checkoutDidComplete = checkoutDidComplete
+        self.checkoutDidFail = checkoutDidFail
+        self.checkoutDidCancel = checkoutDidCancel
+        self.shouldRecoverFromError = shouldRecoverFromError
+        self.checkoutDidClickLink = checkoutDidClickLink
+        self.checkoutDidEmitWebPixelEvent = checkoutDidEmitWebPixelEvent
+    }
+}
+
 public class CheckoutViewController: UINavigationController {
     public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
         let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
+        rootViewController.notifyPresented()
+        super.init(rootViewController: rootViewController)
+        presentationController?.delegate = rootViewController
+    }
+
+    init(checkout url: URL, eventHandlers: EventHandlers) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, eventHandlers: eventHandlers)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
@@ -63,7 +96,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     public typealias UIViewControllerType = CheckoutViewController
 
     var checkoutURL: URL
-    var delegate = CheckoutDelegateWrapper()
+    var eventHandlers = EventHandlers()
 
     public init(checkout url: URL) {
         checkoutURL = url
@@ -74,7 +107,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     }
 
     public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-        return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+        return CheckoutViewController(checkout: checkoutURL, eventHandlers: eventHandlers)
     }
 
     public func updateUIViewController(_ uiViewController: CheckoutViewController, context _: Self.Context) {
@@ -84,68 +117,79 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
             .compactMap({ $0 as? CheckoutWebViewController })
             .first
         else {
+            OSLogger.shared.debug(
+                "[CheckoutViewController#updateUIViewController]: No ViewControllers matching CheckoutWebViewController \(uiViewController.viewControllers.map { String(describing: $0.self) }.joined(separator: ""))"
+            )
             return
         }
-        OSLogger.shared.debug(
-            "[CheckoutViewController#updateUIViewController]: No ViewControllers matching CheckoutWebViewController \(uiViewController.viewControllers.map { String(describing: $0.self) }.joined(separator: ""))"
-        )
 
-        webViewController.delegate = delegate
+        webViewController.updateEventHandlers(eventHandlers)
     }
 
     /// Lifecycle methods
 
     @discardableResult public func onCancel(_ action: @escaping () -> Void) -> Self {
-        delegate.onCancel = action
-        return self
+        var newView = self
+        newView.eventHandlers.checkoutDidCancel = action
+        return newView
     }
 
     @discardableResult public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> Self {
-        delegate.onComplete = action
-        return self
+        var newView = self
+        newView.eventHandlers.checkoutDidComplete = action
+        return newView
     }
 
     @discardableResult public func onFail(_ action: @escaping (CheckoutError) -> Void) -> Self {
-        delegate.onFail = action
-        return self
+        var newView = self
+        newView.eventHandlers.checkoutDidFail = action
+        return newView
     }
 
     @discardableResult public func onPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> Self {
-        delegate.onPixelEvent = action
-        return self
+        var newView = self
+        newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
+        return newView
     }
 
     @discardableResult public func onLinkClick(_ action: @escaping (URL) -> Void) -> Self {
-        delegate.onLinkClick = action
-        return self
+        var newView = self
+        newView.eventHandlers.checkoutDidClickLink = action
+        return newView
+    }
+
+    @discardableResult public func onShouldRecoverFromError(_ action: @escaping (CheckoutError) -> Bool) -> Self {
+        var newView = self
+        newView.eventHandlers.shouldRecoverFromError = action
+        return newView
     }
 }
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
-    var onComplete: ((CheckoutCompletedEvent) -> Void)?
-    var onCancel: (() -> Void)?
-    var onFail: ((CheckoutError) -> Void)?
-    var onPixelEvent: ((PixelEvent) -> Void)?
-    var onLinkClick: ((URL) -> Void)?
+    var eventHandlers: EventHandlers
+
+    init(eventHandlers: EventHandlers = EventHandlers()) {
+        self.eventHandlers = eventHandlers
+    }
 
     public func checkoutDidFail(error: CheckoutError) {
-        onFail?(error)
+        eventHandlers.checkoutDidFail?(error)
     }
 
     public func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        onPixelEvent?(event)
+        eventHandlers.checkoutDidEmitWebPixelEvent?(event)
     }
 
     public func checkoutDidComplete(event: CheckoutCompletedEvent) {
-        onComplete?(event)
+        eventHandlers.checkoutDidComplete?(event)
     }
 
     public func checkoutDidCancel() {
-        onCancel?()
+        eventHandlers.checkoutDidCancel?()
     }
 
     public func checkoutDidClickLink(url: URL) {
-        if let onLinkClick {
+        if let onLinkClick = eventHandlers.checkoutDidClickLink {
             onLinkClick(url)
             return
         }
@@ -154,6 +198,10 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         }
+    }
+
+    public func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        return eventHandlers.shouldRecoverFromError?(error) ?? error.isRecoverable
     }
 }
 

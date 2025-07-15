@@ -56,10 +56,10 @@ class CheckoutSheetTests: XCTestCase {
     func testOnCancel() {
         var cancelActionCalled = false
 
-        checkoutSheet.onCancel {
+        checkoutSheet = checkoutSheet.onCancel {
             cancelActionCalled = true
         }
-        checkoutSheet.delegate.checkoutDidCancel()
+        checkoutSheet.eventHandlers.checkoutDidCancel?()
         XCTAssertTrue(cancelActionCalled)
     }
 
@@ -68,11 +68,11 @@ class CheckoutSheetTests: XCTestCase {
         var actionData: CheckoutCompletedEvent?
         let event = createEmptyCheckoutCompletedEvent()
 
-        checkoutSheet.onComplete { event in
+        checkoutSheet = checkoutSheet.onComplete { event in
             actionCalled = true
             actionData = event
         }
-        checkoutSheet.delegate.checkoutDidComplete(event: event)
+        checkoutSheet.eventHandlers.checkoutDidComplete?(event)
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
     }
@@ -82,12 +82,12 @@ class CheckoutSheetTests: XCTestCase {
         var actionData: CheckoutError?
         let error: CheckoutError = .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: false)
 
-        checkoutSheet.onFail { failure in
+        checkoutSheet = checkoutSheet.onFail { failure in
             actionCalled = true
             actionData = failure
         }
 
-        checkoutSheet.delegate.checkoutDidFail(error: error)
+        checkoutSheet.eventHandlers.checkoutDidFail?(error)
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
     }
@@ -98,11 +98,11 @@ class CheckoutSheetTests: XCTestCase {
         let standardEvent = StandardEvent(context: nil, id: "testId", name: "checkout_started", timestamp: "2022-01-01T00:00:00Z", data: nil)
         let pixelEvent = PixelEvent.standardEvent(standardEvent)
 
-        checkoutSheet.onPixelEvent { event in
+        checkoutSheet = checkoutSheet.onPixelEvent { event in
             actionCalled = true
             actionData = event
         }
-        checkoutSheet.delegate.checkoutDidEmitWebPixelEvent(event: pixelEvent)
+        checkoutSheet.eventHandlers.checkoutDidEmitWebPixelEvent?(pixelEvent)
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
     }
@@ -111,13 +111,53 @@ class CheckoutSheetTests: XCTestCase {
         var actionCalled = false
         var actionData: URL?
 
-        checkoutSheet.onLinkClick { url in
+        checkoutSheet = checkoutSheet.onLinkClick { url in
             actionCalled = true
             actionData = url
         }
-        checkoutSheet.delegate.checkoutDidClickLink(url: URL(string: "https://shopify.com")!)
+        checkoutSheet.eventHandlers.checkoutDidClickLink?(URL(string: "https://shopify.com")!)
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
+    }
+
+    func testOnShouldRecoverFromError() {
+        var actionCalled = false
+        let recoverableError: CheckoutError = .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: true)
+        
+        checkoutSheet = checkoutSheet.onShouldRecoverFromError { error in
+            actionCalled = true
+            return error.isRecoverable
+        }
+        
+        let shouldRecover = checkoutSheet.eventHandlers.shouldRecoverFromError?(recoverableError) ?? false
+        XCTAssertTrue(actionCalled)
+        XCTAssertTrue(shouldRecover)
+    }
+    
+    func testMixedInitializationPath() {
+        // Create CheckoutWebViewController with delegate API
+        let webViewController = CheckoutWebViewController(checkoutURL: checkoutURL, delegate: nil)
+        
+        // Simulate SwiftUI updating with EventHandlers
+        var eventHandlerCalled = false
+        let eventHandlers = EventHandlers(
+            checkoutDidComplete: { _ in
+                eventHandlerCalled = true
+            }
+        )
+        
+        // Update with new event handlers (simulating SwiftUI update)
+        webViewController.updateEventHandlers(eventHandlers)
+        
+        // Verify the wrapper was created and delegate set
+        XCTAssertNotNil(webViewController.delegate)
+        
+        // Trigger the event through the delegate
+        let event = createEmptyCheckoutCompletedEvent()
+        webViewController.delegate?.checkoutDidComplete(event: event)
+        
+        // Verify event handler was called
+        XCTAssertTrue(eventHandlerCalled)
     }
 }
 

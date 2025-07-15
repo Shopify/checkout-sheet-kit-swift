@@ -30,32 +30,6 @@ public enum Wallet {
     case shoppay
 }
 
-/// Event handlers for wallet buttons
-public struct EventHandlers {
-    public var checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)?
-    public var checkoutDidFail: ((CheckoutError) -> Void)?
-    public var checkoutDidCancel: (() -> Void)?
-    public var shouldRecoverFromError: ((CheckoutError) -> Bool)?
-    public var checkoutDidClickLink: ((URL) -> Void)?
-    public var checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)?
-
-    public init(
-        checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)? = nil,
-        checkoutDidFail: ((CheckoutError) -> Void)? = nil,
-        checkoutDidCancel: (() -> Void)? = nil,
-        shouldRecoverFromError: ((CheckoutError) -> Bool)? = nil,
-        checkoutDidClickLink: ((URL) -> Void)? = nil,
-        checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)? = nil
-    ) {
-        self.checkoutDidComplete = checkoutDidComplete
-        self.checkoutDidFail = checkoutDidFail
-        self.checkoutDidCancel = checkoutDidCancel
-        self.shouldRecoverFromError = shouldRecoverFromError
-        self.checkoutDidClickLink = checkoutDidClickLink
-        self.checkoutDidEmitWebPixelEvent = checkoutDidEmitWebPixelEvent
-    }
-}
-
 extension View {
     func walletButtonStyle(bg: Color = Color.black, cornerRadius: CGFloat? = nil) -> some View {
         let defaultCornerRadius: CGFloat = 8
