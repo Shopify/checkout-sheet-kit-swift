@@ -66,7 +66,8 @@ struct CartBuilderView: View {
 
                             ButtonSet(
                                 cart: $cart,
-                                firstVariantQuantity: cart.lines.nodes.first?.quantity ?? 1
+                                firstVariantQuantity: cart.lines.nodes.first?.quantity ?? 1,
+                                onComplete: clearCart
                             )
                         }
 
@@ -103,14 +104,7 @@ struct CartBuilderView: View {
                     isLoadingProducts: isLoadingProducts,
                     hasProducts: !allProducts.isEmpty,
                     onCreateCart: createCustomCart,
-                    onClearCart: {
-                        withAnimation {
-                            cart = nil
-                            selectedVariants.removeAll()
-                        }
-                        // Trigger scroll using state change
-                        scrollToTop = true
-                    }
+                    onClearCart: clearCart
                 )
                 .padding(.vertical, 12)
                 .background(Color(UIColor.systemBackground))
@@ -137,6 +131,15 @@ struct CartBuilderView: View {
                 scrollToCart = true
             }
         }
+    }
+
+    private func clearCart() {
+        withAnimation {
+            cart = nil
+            selectedVariants.removeAll()
+        }
+        // Trigger scroll using state change
+        scrollToTop = true
     }
 
     func onLoad() async {

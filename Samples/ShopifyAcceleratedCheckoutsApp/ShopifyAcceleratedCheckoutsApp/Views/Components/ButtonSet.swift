@@ -28,6 +28,7 @@ import SwiftUI
 struct ButtonSet: View {
     @Binding var cart: Cart?
     let firstVariantQuantity: Int
+    let onComplete: () -> Void
 
     var body: some View {
         VStack(spacing: 16) {
@@ -37,6 +38,7 @@ struct ButtonSet: View {
                     AcceleratedCheckoutButtons(cartID: cartID)
                         .onComplete {
                             print("✅ Checkout completed successfully")
+                            onComplete()
                         }
                         .onFail {
                             print("❌ Checkout failed")
