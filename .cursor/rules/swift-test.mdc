@@ -1,0 +1,71 @@
+---
+description: Swift testing best practices and requirements
+globs: ["Tests/**/*.swift"]
+alwaysApply: true
+---
+
+# SWIFT TESTING RULES
+
+## Test Structure Requirements
+
+### DO:
+- Create separate test methods for each test case
+- Use `guard` statements with `XCTFail` for unwrapping optionals
+- Write focused tests that test one thing at a time
+- Use descriptive test method names that explain what is being tested
+- catch only one error type per test
+
+### DON'T:
+- Write conditional logic (if/else) inside tests - create separate test methods instead
+- Use typed catches when testing throwing expressions
+- Delete and recreate test files when debugging
+- Add boilerplate comments like "// Given", "// When", "// Then"
+
+## Code Examples
+
+### ✅ CORRECT: Unwrapping optionals
+```swift
+func testSomething() {
+    guard let result = someOptionalValue else {
+        XCTFail("Expected non-nil value")
+        return
+    }
+    XCTAssertEqual(result, expectedValue)
+}
+```
+
+### ❌ INCORRECT: Conditional test logic
+```swift
+// DON'T DO THIS
+func testSomething() {
+    if condition {
+        XCTAssertTrue(something)
+    } else {
+        XCTAssertFalse(something)
+    }
+}
+```
+
+### ✅ CORRECT: Separate test methods
+```swift
+func testSomething_whenConditionTrue() {
+    // Test for true condition
+}
+
+func testSomething_whenConditionFalse() {
+    // Test for false condition
+}
+```
+
+## Error Testing
+
+When testing throwing functions:
+- Test only ONE error type per test method
+- Avoid typed catch blocks that check for specific error types
+- Let unhandled errors fail the test naturally
+
+## Comments
+
+- Use comments ONLY to explain non-obvious side effects or complex reasoning
+- Keep comments minimal and purposeful
+- Focus on WHY something is done, not WHAT is being done
