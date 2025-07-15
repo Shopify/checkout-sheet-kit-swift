@@ -26,6 +26,7 @@ import WebKit
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
     weak var delegate: CheckoutDelegate?
+    private var delegateWrapper: CheckoutDelegateWrapper?
 
     var checkoutView: CheckoutWebView
 
@@ -81,6 +82,29 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
         view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
     }
 
+    init(checkoutURL url: URL, eventHandlers: EventHandlers) {
+        checkoutURL = url
+        
+        let wrapper = CheckoutDelegateWrapper(eventHandlers: eventHandlers)
+        self.delegateWrapper = wrapper
+        self.delegate = wrapper
+
+        let checkoutView = CheckoutWebView.for(checkout: url)
+        checkoutView.translatesAutoresizingMaskIntoConstraints = false
+        checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
+        self.checkoutView = checkoutView
+
+        super.init(nibName: nil, bundle: nil)
+
+        title = ShopifyCheckoutSheetKit.configuration.title
+
+        navigationItem.rightBarButtonItem = closeBarButtonItem
+
+        checkoutView.viewDelegate = self
+
+        view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
+    }
+
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -88,6 +112,17 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     deinit {
         progressObserver?.invalidate()
+    }
+
+    func updateEventHandlers(_ eventHandlers: EventHandlers) {
+        if let wrapper = delegateWrapper {
+            wrapper.eventHandlers = eventHandlers
+        } else {
+            // Create wrapper on-demand for mixed init path
+            let wrapper = CheckoutDelegateWrapper(eventHandlers: eventHandlers)
+            self.delegateWrapper = wrapper
+            self.delegate = wrapper
+        }
     }
 
     // MARK: UIViewController Lifecycle
