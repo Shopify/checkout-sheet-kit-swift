@@ -22,6 +22,7 @@
  */
 
 @testable import ShopifyAcceleratedCheckouts
+@testable import ShopifyCheckoutSheetKit
 import SwiftUI
 import XCTest
 
@@ -70,7 +71,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
     func testOnSuccessModifier() {
         var successCallbackInvoked = false
-        let successAction = {
+        let successAction = { (_: CheckoutCompletedEvent) in
             successCallbackInvoked = true
         }
 
@@ -82,7 +83,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with success modifier")
 
-        successAction()
+        successAction(createEmptyCheckoutCompletedEvent())
         XCTAssertTrue(successCallbackInvoked, "Success callback should be invoked when called")
     }
 
@@ -90,10 +91,10 @@ final class ApplePayViewModifierTests: XCTestCase {
         var firstCallbackInvoked = false
         var secondCallbackInvoked = false
 
-        let firstAction = {
+        let firstAction = { (_: CheckoutCompletedEvent) in
             firstCallbackInvoked = true
         }
-        let secondAction = {
+        let secondAction = { (_: CheckoutCompletedEvent) in
             secondCallbackInvoked = true
         }
 
@@ -105,7 +106,7 @@ final class ApplePayViewModifierTests: XCTestCase {
             .environment(mockShopSettings)
 
         // The second handler should replace the first
-        secondAction()
+        secondAction(createEmptyCheckoutCompletedEvent())
         XCTAssertFalse(firstCallbackInvoked, "First callback should not be invoked")
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
@@ -134,22 +135,22 @@ final class ApplePayViewModifierTests: XCTestCase {
         var firstCallbackInvoked = false
         var secondCallbackInvoked = false
 
-        let firstAction = {
+        let firstAction = { (_: CheckoutCompletedEvent) in
             firstCallbackInvoked = true
         }
-        let secondAction = {
+        let secondAction = { (_: CheckoutCompletedEvent) in
             secondCallbackInvoked = true
         }
 
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-            .onCancel(firstAction)
-            .onCancel(secondAction) // Should replace the first
+            .onCancel { firstCallbackInvoked = true }
+            .onCancel { secondCallbackInvoked = true } // Should replace the first
             .environment(mockConfiguration)
             .environment(mockApplePayConfiguration)
             .environment(mockShopSettings)
 
         // The second handler should replace the first
-        secondAction()
+        secondAction(createEmptyCheckoutCompletedEvent())
         XCTAssertFalse(firstCallbackInvoked, "First callback should not be invoked")
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
@@ -158,7 +159,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
     func testOnErrorModifier() {
         var errorCallbackInvoked = false
-        let errorAction = {
+        let errorAction = { (_: CheckoutError) in
             errorCallbackInvoked = true
         }
 
@@ -170,7 +171,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with error modifier")
 
-        errorAction()
+        errorAction(CheckoutError.sdkError(underlying: NSError(domain: "Test", code: 0)))
         XCTAssertTrue(errorCallbackInvoked, "Error callback should be invoked when called")
     }
 
@@ -180,10 +181,10 @@ final class ApplePayViewModifierTests: XCTestCase {
         var successInvoked = false
         var errorInvoked = false
 
-        let successAction = {
+        let successAction = { (_: CheckoutCompletedEvent) in
             successInvoked = true
         }
-        let errorAction = {
+        let errorAction = { (_: CheckoutError) in
             errorInvoked = true
         }
 
@@ -196,11 +197,11 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with both modifiers")
 
-        successAction()
+        successAction(createEmptyCheckoutCompletedEvent())
         XCTAssertTrue(successInvoked, "Success callback should be invoked")
         XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
 
-        errorAction()
+        errorAction(CheckoutError.sdkError(underlying: NSError(domain: "Test", code: 0)))
         XCTAssertTrue(errorInvoked, "Error callback should be invoked")
     }
 
@@ -212,7 +213,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         // Create a custom container view
         struct TestContainer: View {
-            let childSuccessAction: () -> Void
+            let childSuccessAction: (CheckoutCompletedEvent) -> Void
 
             var body: some View {
                 VStack {
@@ -222,7 +223,7 @@ final class ApplePayViewModifierTests: XCTestCase {
             }
         }
 
-        let containerView = TestContainer(childSuccessAction: { childSuccessInvoked = true })
+        let containerView = TestContainer(childSuccessAction: { _ in childSuccessInvoked = true })
 
         XCTAssertNotNil(containerView, "Container view should be created successfully")
     }
@@ -243,8 +244,8 @@ final class ApplePayViewModifierTests: XCTestCase {
         var errorInvoked = false
         var cancelInvoked = false
 
-        let successAction = { successInvoked = true }
-        let errorAction = { errorInvoked = true }
+        let successAction = { (_: CheckoutCompletedEvent) in successInvoked = true }
+        let errorAction = { (_: CheckoutError) in errorInvoked = true }
         let cancelAction = { cancelInvoked = true }
 
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
@@ -257,14 +258,14 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with all modifiers")
 
-        successAction()
+        successAction(createEmptyCheckoutCompletedEvent())
         XCTAssertTrue(successInvoked, "Success callback should be invoked")
         XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
         XCTAssertFalse(cancelInvoked, "Cancel callback should not be invoked")
 
         // Reset
         successInvoked = false
-        errorAction()
+        errorAction(CheckoutError.sdkError(underlying: NSError(domain: "Test", code: 0)))
         XCTAssertFalse(successInvoked, "Success callback should not be invoked")
         XCTAssertTrue(errorInvoked, "Error callback should be invoked")
         XCTAssertFalse(cancelInvoked, "Cancel callback should not be invoked")
@@ -286,8 +287,8 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         let view = VStack {
             AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-                .onComplete { successCount += 1 }
-                .onFail { errorCount += 1 }
+                .onComplete { _ in successCount += 1 }
+                .onFail { _ in errorCount += 1 }
                 .onAppear { viewAppeared = true }
         }
         .environment(mockConfiguration)

@@ -54,39 +54,39 @@ protocol PayController: AnyObject {
     ///
     /// Example usage:
     /// ```swift
-    /// applePayViewController.onComplete = { [weak self] in
+    /// applePayViewController.onCheckoutComplete = { [weak self] event in
     ///     self?.presentSuccessScreen()
-    ///     self?.logAnalyticsEvent(.checkoutCompleted)
+    ///     self?.logAnalyticsEvent(.checkoutCompleted, orderId: event.orderId)
     /// }
     /// ```
     @MainActor
-    public var onComplete: (() -> Void)?
+    public var onCheckoutComplete: ((CheckoutCompletedEvent) -> Void)?
 
     /// Callback invoked when an error occurs during the checkout process.
-    /// This closure is called on the main thread when the payment fails or is cancelled.
+    /// This closure is called on the main thread when the payment fails.
     ///
     /// Example usage:
     /// ```swift
-    /// applePayViewController.onFail = { [weak self] in
-    ///     self?.showErrorAlert()
-    ///     self?.logAnalyticsEvent(.checkoutFailed)
+    /// applePayViewController.onCheckoutFail = { [weak self] error in
+    ///     self?.showErrorAlert(for: error)
+    ///     self?.logAnalyticsEvent(.checkoutFailed, error: error)
     /// }
     /// ```
     @MainActor
-    public var onFail: (() -> Void)?
+    public var onCheckoutFail: ((CheckoutError) -> Void)?
 
     /// Callback invoked when the checkout process is cancelled by the user.
     /// This closure is called on the main thread when the user dismisses the checkout.
     ///
     /// Example usage:
     /// ```swift
-    /// applePayViewController.onCancel = { [weak self] in
+    /// applePayViewController.onCheckoutCancel = { [weak self] in
     ///     self?.resetCheckoutState()
     ///     self?.logAnalyticsEvent(.checkoutCancelled)
     /// }
     /// ```
     @MainActor
-    public var onCancel: (() -> Void)?
+    public var onCheckoutCancel: (() -> Void)?
 
     /// Callback invoked to determine if checkout should recover from an error.
     /// This closure is called on the main thread when an error occurs.
@@ -100,33 +100,33 @@ protocol PayController: AnyObject {
     /// }
     /// ```
     @MainActor
-    public var onShouldRecoverFromError: ((ShopifyCheckoutSheetKit.CheckoutError) -> Bool)?
+    public var onShouldRecoverFromError: ((CheckoutError) -> Bool)?
 
     /// Callback invoked when the user clicks a link during checkout.
     /// This closure is called on the main thread when a link is clicked.
     ///
     /// Example usage:
     /// ```swift
-    /// applePayViewController.onClickLink = { [weak self] url in
+    /// applePayViewController.onCheckoutClickLink = { [weak self] url in
     ///     self?.handleExternalLink(url)
     ///     self?.logAnalyticsEvent(.linkClicked, url: url)
     /// }
     /// ```
     @MainActor
-    public var onClickLink: ((URL) -> Void)?
+    public var onCheckoutClickLink: ((URL) -> Void)?
 
     /// Callback invoked when a web pixel event is emitted during checkout.
     /// This closure is called on the main thread when pixel events occur.
     ///
     /// Example usage:
     /// ```swift
-    /// applePayViewController.onWebPixelEvent = { [weak self] event in
+    /// applePayViewController.onCheckoutWebPixelEvent = { [weak self] event in
     ///     self?.trackPixelEvent(event)
     ///     self?.logAnalyticsEvent(.pixelFired, event: event)
     /// }
     /// ```
     @MainActor
-    public var onWebPixelEvent: ((ShopifyCheckoutSheetKit.PixelEvent) -> Void)?
+    public var onCheckoutWebPixelEvent: ((PixelEvent) -> Void)?
 
     /// Initialization workaround for passing self to ApplePayAuthorizationDelegate
     private var __authorizationDelegate: ApplePayAuthorizationDelegate!
@@ -186,7 +186,9 @@ protocol PayController: AnyObject {
             return try await handleStorefrontError(error)
         } catch {
             await authorizationDelegate.transition(to: .terminalError(error: error))
-            await onFail?()
+            if let checkoutError = error as? CheckoutError {
+                await onCheckoutFail?(checkoutError)
+            }
             throw error
         }
     }
@@ -241,30 +243,41 @@ protocol PayController: AnyObject {
 
 @available(iOS 17.0, *)
 extension ApplePayViewController: CheckoutDelegate {
-    @MainActor func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-        onComplete?()
+    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+        Task { @MainActor in
+            self.onCheckoutComplete?(event)
+        }
     }
 
-    @MainActor func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {
-        onFail?()
+    func checkoutDidFail(error: CheckoutError) {
+        Task { @MainActor in
+            self.onCheckoutFail?(error)
+        }
     }
 
-    @MainActor func checkoutDidCancel() {
-        /// x right button on CSK doesn't dismiss automatically
-        checkoutViewController?.dismiss(animated: true)
-
-        onCancel?()
+    func checkoutDidCancel() {
+        Task { @MainActor in
+            /// x right button on CSK doesn't dismiss automatically
+            checkoutViewController?.dismiss(animated: true)
+            self.onCheckoutCancel?()
+        }
     }
 
-    @MainActor func shouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
-        return onShouldRecoverFromError?(error) ?? false
+    func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        return MainActor.assumeIsolated {
+            self.onShouldRecoverFromError?(error) ?? false
+        }
     }
 
-    @MainActor func checkoutDidClickLink(url: URL) {
-        onClickLink?(url)
+    func checkoutDidClickLink(url: URL) {
+        Task { @MainActor in
+            self.onCheckoutClickLink?(url)
+        }
     }
 
-    @MainActor func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        onWebPixelEvent?(event)
+    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+        Task { @MainActor in
+            self.onCheckoutWebPixelEvent?(event)
+        }
     }
 }

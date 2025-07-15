@@ -82,19 +82,19 @@ class ApplePayViewControllerTests: XCTestCase {
 
     func testOnCheckoutSuccessCallback_defaultsToNil() async {
         await MainActor.run {
-            XCTAssertNil(viewController.onComplete)
+            XCTAssertNil(viewController.onCheckoutComplete)
         }
     }
 
     func testOnCheckoutErrorCallback_defaultsToNil() async {
         await MainActor.run {
-            XCTAssertNil(viewController.onFail)
+            XCTAssertNil(viewController.onCheckoutFail)
         }
     }
 
     func testOnCheckoutCancelCallback_defaultsToNil() async {
         await MainActor.run {
-            XCTAssertNil(viewController.onCancel)
+            XCTAssertNil(viewController.onCheckoutCancel)
         }
     }
 
@@ -105,7 +105,7 @@ class ApplePayViewControllerTests: XCTestCase {
         var cancelCallbackInvoked = false
         let expectation = XCTestExpectation(description: "Cancel callback should be invoked")
 
-        viewController.onCancel = {
+        viewController.onCheckoutCancel = {
             cancelCallbackInvoked = true
             expectation.fulfill()
         }
@@ -126,7 +126,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
     func testCheckoutDidCancel_worksWithoutOnCancelCallback() async {
         let isNil = await MainActor.run {
-            viewController.onCancel == nil
+            viewController.onCheckoutCancel == nil
         }
         XCTAssertTrue(isNil, "onCancel should be nil")
 

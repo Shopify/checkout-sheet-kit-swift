@@ -121,12 +121,12 @@ struct Internal_ApplePayButton: View {
         self.label = label
         self.cornerRadius = cornerRadius
         MainActor.assumeIsolated {
-            controller.onComplete = eventHandlers.checkoutDidComplete
-            controller.onFail = eventHandlers.checkoutDidFail
-            controller.onCancel = eventHandlers.checkoutDidCancel
+            controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
+            controller.onCheckoutFail = eventHandlers.checkoutDidFail
+            controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
             controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
-            controller.onClickLink = eventHandlers.checkoutDidClickLink
-            controller.onWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
+            controller.onCheckoutClickLink = eventHandlers.checkoutDidClickLink
+            controller.onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
         }
     }
 
