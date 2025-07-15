@@ -13,7 +13,7 @@ alwaysApply: true
 - Use `guard` statements with `XCTFail` for unwrapping optionals
 - Write focused tests that test one thing at a time
 - Use descriptive test method names that explain what is being tested
-- catch only one error type per test
+- Catch only one error type per test
 
 ### DON'T:
 - Write conditional logic (if/else) inside tests - create separate test methods instead
