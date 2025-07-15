@@ -53,8 +53,7 @@ dev apollo codegen         # Generate Apollo client code
 ✅ DO: Run the appropriate dev command to verify
 
 ### After making changes:
-- ALWAYS run `dev lint` before considering your work complete
-- This ensures consistency with CI checks
+- ALWAYS run `dev lint` before considering your work complete. This ensures consistency with CI checks.
 
 ## Example Workflow
 
