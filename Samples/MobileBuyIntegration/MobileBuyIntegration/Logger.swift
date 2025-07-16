@@ -29,7 +29,7 @@ class FileLogger: Logger {
 
     var logFileUrl: URL
 
-    public init(_ filename: String) {
+    init(_ filename: String) {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
 
         logFileUrl = paths[0].appendingPathComponent(filename)
@@ -45,7 +45,7 @@ class FileLogger: Logger {
         }
     }
 
-    public func log(_ message: String) {
+    func log(_ message: String) {
         guard let fileHandle else {
             print("File handle is nil")
             return
@@ -64,7 +64,7 @@ class FileLogger: Logger {
         }
     }
 
-    public func clearLogs() {
+    func clearLogs() {
         do {
             try "".write(toFile: logFileUrl.path, atomically: false, encoding: .utf8)
         } catch let error as NSError {

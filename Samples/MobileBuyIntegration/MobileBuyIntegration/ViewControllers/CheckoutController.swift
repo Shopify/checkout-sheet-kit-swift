@@ -40,20 +40,20 @@ class CheckoutController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public static var shared: CheckoutController?
+    static var shared: CheckoutController?
 
-    public func present(checkout url: URL) {
+    func present(checkout url: URL) {
         if let rootViewController = window?.topMostViewController() {
             ShopifyCheckoutSheetKit.present(checkout: url, from: rootViewController, delegate: self)
             root = rootViewController
         }
     }
 
-    public func preload() {
+    func preload() {
         CartManager.shared.preloadCheckout()
     }
 
-    public func payWithApplePay() {
+    func payWithApplePay() {
         paymentHandler.startApplePayCheckout { success in
             print("success: \(success)")
             if !success, let checkoutUrl = CartManager.shared.cart?.checkoutUrl {

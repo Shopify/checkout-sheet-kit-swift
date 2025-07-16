@@ -190,7 +190,7 @@ class CheckoutWebView: WKWebView {
         isBridgeAttached = true
     }
 
-    public func detachBridge() {
+    func detachBridge() {
         OSLogger.shared.debug("Detaching bridge")
         configuration.userContentController
             .removeScriptMessageHandler(forName: CheckoutBridge.messageHandler)

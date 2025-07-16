@@ -27,7 +27,7 @@ import PassKit
 class PassKitFactory {
     static let shared = PassKitFactory()
 
-    public func createPaymentRequest(
+    func createPaymentRequest(
         paymentSummaryItems: [PKPaymentSummaryItem]
     ) -> PKPaymentRequest {
         let paymentRequest = PKPaymentRequest()
@@ -107,7 +107,7 @@ class PassKitFactory {
         return [shippingCollection]
     }
 
-    public func createShippingMethods(
+    func createShippingMethods(
         /**
          * Default to first delivery group when user changes their delivery contact
          * `nil` for digital products
@@ -133,7 +133,7 @@ class PassKitFactory {
         }
     }
 
-    public func createPaymentSummaryItems(
+    func createPaymentSummaryItems(
         cart: Storefront.Cart?, shippingMethod: PKShippingMethod?
     ) -> [PKPaymentSummaryItem] {
         guard let cart, !cart.lines.nodes.isEmpty else {

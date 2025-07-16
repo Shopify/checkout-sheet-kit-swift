@@ -95,13 +95,13 @@ enum CheckoutErrorGroup: String, Codable {
 }
 
 struct CheckoutErrorEvent: Codable {
-    public let group: CheckoutErrorGroup
-    public let code: String?
-    public let flowType: String?
-    public let reason: String?
-    public let type: String?
+    let group: CheckoutErrorGroup
+    let code: String?
+    let flowType: String?
+    let reason: String?
+    let type: String?
 
-    public init(group: CheckoutErrorGroup, code: String? = nil, flowType: String? = nil, reason: String? = nil, type: String? = nil) {
+    init(group: CheckoutErrorGroup, code: String? = nil, flowType: String? = nil, reason: String? = nil, type: String? = nil) {
         self.group = group
         self.code = code
         self.flowType = flowType

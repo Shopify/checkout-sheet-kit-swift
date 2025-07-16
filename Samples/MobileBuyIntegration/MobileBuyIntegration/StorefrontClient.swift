@@ -150,7 +150,7 @@ class StorefrontInputFactory {
         case invariant(String)
     }
 
-    public func createCartInput(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
+    func createCartInput(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
         if appConfiguration.useVaultedState {
             let deliveryAddress = Storefront.MailingAddressInput.create(
                 address1: Input(orNull: vaultedContactInfo.address1),
@@ -191,7 +191,7 @@ class StorefrontInputFactory {
         }
     }
 
-    public func createCartBuyerIdentityInput(
+    func createCartBuyerIdentityInput(
         email: String?,
         deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
     ) -> Storefront.CartBuyerIdentityInput {
@@ -208,7 +208,7 @@ class StorefrontInputFactory {
         }
     }
 
-    public func createMailingAddressInput(
+    func createMailingAddressInput(
         contact: PKContact, address: CNPostalAddress
     ) -> Storefront.MailingAddressInput {
         return Storefront.MailingAddressInput.create(
@@ -224,7 +224,7 @@ class StorefrontInputFactory {
         )
     }
 
-    public func createPaymentInput(
+    func createPaymentInput(
         payment: PKPayment,
         paymentData: PaymentData,
         totalAmount: Storefront.MoneyV2,

@@ -31,11 +31,11 @@ extension Storefront {
                 #"query GetProducts($first: Int = 10, $country: CountryCode!, $language: LanguageCode!) @inContext(country: $country, language: $language) { products(first: $first) { __typename nodes { __typename id title featuredImage { __typename url } variants(first: 10) { __typename nodes { __typename id title requiresShipping image { __typename url } price { __typename amount currencyCode } } } } } }"#
             ))
 
-        public var first: GraphQLNullable<Int>
-        public var country: GraphQLEnum<CountryCode>
-        public var language: GraphQLEnum<LanguageCode>
+        var first: GraphQLNullable<Int>
+        var country: GraphQLEnum<CountryCode>
+        var language: GraphQLEnum<LanguageCode>
 
-        public init(
+        init(
             first: GraphQLNullable<Int> = 10,
             country: GraphQLEnum<CountryCode>,
             language: GraphQLEnum<LanguageCode>
@@ -45,7 +45,7 @@ extension Storefront {
             self.language = language
         }
 
-        public var __variables: Variables? { [
+        var __variables: Variables? { [
             "first": first,
             "country": country,
             "language": language

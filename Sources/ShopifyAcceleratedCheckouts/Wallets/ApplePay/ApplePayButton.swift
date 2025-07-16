@@ -52,7 +52,7 @@ struct ApplePayButton: View {
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
 
-    public init(
+    init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
@@ -80,7 +80,7 @@ struct ApplePayButton: View {
         }
     }
 
-    public func withLabel(_ label: PayWithApplePayButtonLabel) -> some View {
+    func withLabel(_ label: PayWithApplePayButtonLabel) -> some View {
         var view = self
         view.label = label
         return view

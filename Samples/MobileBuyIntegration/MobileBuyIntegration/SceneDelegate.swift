@@ -118,13 +118,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         settingsController.tabBarItem.title = "Settings"
     }
 
-    @objc public func present() {
+    @objc func present() {
         if let url = CartManager.shared.cart?.checkoutUrl {
             presentCheckout(url)
         }
     }
 
-    @objc public func presentCartSheet() {
+    @objc func presentCartSheet() {
         let cartView = CartView()
         let cartViewController = UIHostingController(rootView: cartView)
 
@@ -208,7 +208,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
 
-    public func presentCheckout(_ url: URL) {
+    func presentCheckout(_ url: URL) {
         CheckoutController.shared?.present(checkout: url)
     }
 

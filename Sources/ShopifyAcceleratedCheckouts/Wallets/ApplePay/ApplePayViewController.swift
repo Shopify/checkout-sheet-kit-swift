@@ -60,7 +60,7 @@ protocol PayController: AnyObject {
     /// }
     /// ```
     @MainActor
-    public var onCheckoutComplete: ((CheckoutCompletedEvent) -> Void)?
+    var onCheckoutComplete: ((CheckoutCompletedEvent) -> Void)?
 
     /// Callback invoked when an error occurs during the checkout process.
     /// This closure is called on the main thread when the payment fails.
@@ -73,7 +73,7 @@ protocol PayController: AnyObject {
     /// }
     /// ```
     @MainActor
-    public var onCheckoutFail: ((CheckoutError) -> Void)?
+    var onCheckoutFail: ((CheckoutError) -> Void)?
 
     /// Callback invoked when the checkout process is cancelled by the user.
     /// This closure is called on the main thread when the user dismisses the checkout.
@@ -86,7 +86,7 @@ protocol PayController: AnyObject {
     /// }
     /// ```
     @MainActor
-    public var onCheckoutCancel: (() -> Void)?
+    var onCheckoutCancel: (() -> Void)?
 
     /// Callback invoked to determine if checkout should recover from an error.
     /// This closure is called on the main thread when an error occurs.
@@ -100,7 +100,7 @@ protocol PayController: AnyObject {
     /// }
     /// ```
     @MainActor
-    public var onShouldRecoverFromError: ((CheckoutError) -> Bool)?
+    var onShouldRecoverFromError: ((CheckoutError) -> Bool)?
 
     /// Callback invoked when the user clicks a link during checkout.
     /// This closure is called on the main thread when a link is clicked.
@@ -113,7 +113,7 @@ protocol PayController: AnyObject {
     /// }
     /// ```
     @MainActor
-    public var onCheckoutClickLink: ((URL) -> Void)?
+    var onCheckoutClickLink: ((URL) -> Void)?
 
     /// Callback invoked when a web pixel event is emitted during checkout.
     /// This closure is called on the main thread when pixel events occur.
@@ -126,7 +126,7 @@ protocol PayController: AnyObject {
     /// }
     /// ```
     @MainActor
-    public var onCheckoutWebPixelEvent: ((PixelEvent) -> Void)?
+    var onCheckoutWebPixelEvent: ((PixelEvent) -> Void)?
 
     /// Initialization workaround for passing self to ApplePayAuthorizationDelegate
     private var __authorizationDelegate: ApplePayAuthorizationDelegate!
@@ -246,6 +246,7 @@ extension ApplePayViewController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         Task { @MainActor in
             self.onCheckoutComplete?(event)
+            await authorizationDelegate.transition(to: .completed)
         }
     }
 
@@ -260,6 +261,7 @@ extension ApplePayViewController: CheckoutDelegate {
             /// x right button on CSK doesn't dismiss automatically
             checkoutViewController?.dismiss(animated: true)
             self.onCheckoutCancel?()
+            await authorizationDelegate.transition(to: .completed)
         }
     }
 

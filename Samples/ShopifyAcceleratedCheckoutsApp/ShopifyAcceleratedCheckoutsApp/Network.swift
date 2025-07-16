@@ -159,7 +159,7 @@ class Network {
 }
 
 class AuthorizationInterceptor: ApolloInterceptor {
-    public var id: String = UUID().uuidString
+    var id: String = UUID().uuidString
 
     func interceptAsync<Operation>(
         chain: RequestChain,

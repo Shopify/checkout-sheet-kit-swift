@@ -32,11 +32,11 @@ extension Storefront {
                 fragments: [CartDeliveryGroupFragment.self, CartFragment.self, CartLineFragment.self]
             ))
 
-        public var id: ID
-        public var country: GraphQLEnum<CountryCode>
-        public var language: GraphQLEnum<LanguageCode>
+        var id: ID
+        var country: GraphQLEnum<CountryCode>
+        var language: GraphQLEnum<LanguageCode>
 
-        public init(
+        init(
             id: ID,
             country: GraphQLEnum<CountryCode>,
             language: GraphQLEnum<LanguageCode>
@@ -46,7 +46,7 @@ extension Storefront {
             self.language = language
         }
 
-        public var __variables: Variables? { [
+        var __variables: Variables? { [
             "id": id,
             "country": country,
             "language": language

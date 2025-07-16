@@ -163,9 +163,9 @@ struct ProductView: View {
 
 class ProductCache: ObservableObject {
     static let shared = ProductCache()
-    @Published public var cachedProduct: Storefront.Product?
-    @Published public var isFetching: Bool = false
-    @Published public var collection: [Storefront.Product]?
+    @Published var cachedProduct: Storefront.Product?
+    @Published var isFetching: Bool = false
+    @Published var collection: [Storefront.Product]?
 
     func getProduct(handle: String?, completion: @escaping (Storefront.Product?) -> Void) {
         if let product = cachedProduct {
@@ -195,7 +195,7 @@ class ProductCache: ObservableObject {
         }
     }
 
-    public func fetchCollection(limit: Int32 = 20) {
+    func fetchCollection(limit: Int32 = 20) {
         let context = Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
         let query = Storefront.buildQuery(inContext: context) { $0
             .products(first: limit) { $0

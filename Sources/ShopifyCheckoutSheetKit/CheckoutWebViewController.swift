@@ -61,7 +61,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
+    init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
         checkoutURL = url
         self.delegate = delegate
 
@@ -92,13 +92,13 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: UIViewController Lifecycle
 
-    override public func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
     }
 
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         view.addSubview(checkoutView)
@@ -155,7 +155,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
         didCancel()
     }
 
-    public func presentationControllerDidDismiss(_: UIPresentationController) {
+    func presentationControllerDidDismiss(_: UIPresentationController) {
         didCancel()
     }
 

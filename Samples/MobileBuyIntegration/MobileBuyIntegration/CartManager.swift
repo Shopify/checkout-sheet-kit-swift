@@ -37,7 +37,7 @@ class CartManager: ObservableObject {
     // MARK: Properties
 
     private let client: StorefrontClient
-    public var redirectUrl: URL?
+    var redirectUrl: URL?
 
     @Published var cart: Storefront.Cart?
     @Published var isDirty: Bool = false
@@ -48,7 +48,7 @@ class CartManager: ObservableObject {
         self.client = client
     }
 
-    public func preloadCheckout() {
+    func preloadCheckout() {
         /// Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
         if let url = cart?.checkoutUrl, isDirty {
             ShopifyCheckoutSheetKit.preload(checkout: url)

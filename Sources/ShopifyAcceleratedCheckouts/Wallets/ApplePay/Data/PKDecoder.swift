@@ -41,7 +41,7 @@ class PKDecoder {
     }
 
     // https:github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/create-payment-request.ts
-    public func createPaymentRequest() throws -> PKPaymentRequest {
+    func createPaymentRequest() throws -> PKPaymentRequest {
         guard let cart = cart() else {
             throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
         }
