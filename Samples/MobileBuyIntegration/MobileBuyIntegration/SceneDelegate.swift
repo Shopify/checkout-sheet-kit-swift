@@ -90,6 +90,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
         productGridController.tabBarItem.title = "Catalog"
         productGridController.navigationItem.titleView = logoImageView
+        productGridController.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "cart"),
+            style: .plain,
+            target: self,
+            action: #selector(presentCartSheet)
+        )
 
         /// Product Gallery
         productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
@@ -99,7 +105,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             image: UIImage(systemName: "cart"),
             style: .plain,
             target: self,
-            action: #selector(present)
+            action: #selector(presentCartSheet)
         )
 
         /// Cart
@@ -116,6 +122,32 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let url = CartManager.shared.cart?.checkoutUrl {
             presentCheckout(url)
         }
+    }
+
+    @objc public func presentCartSheet() {
+        let cartView = CartView()
+        let cartViewController = UIHostingController(rootView: cartView)
+
+        // Wrap in navigation controller for better presentation
+        let navigationController = UINavigationController(rootViewController: cartViewController)
+        navigationController.modalPresentationStyle = .pageSheet
+
+        // Add close button
+        cartViewController.navigationItem.title = "Cart"
+        cartViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .close,
+            target: self,
+            action: #selector(dismissCartSheet)
+        )
+
+        // Present from the top-most view controller
+        if let topViewController = window?.topMostViewController() {
+            topViewController.present(navigationController, animated: true)
+        }
+    }
+
+    @objc private func dismissCartSheet() {
+        window?.topMostViewController()?.dismiss(animated: true)
     }
 
     private func createWindow(windowScene: UIWindowScene, rootViewController: UIViewController) -> UIWindow {
