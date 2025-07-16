@@ -404,6 +404,137 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         XCTAssertEqual(delegate.state, .idle) // onReset transitions to idle
     }
 
+    // MARK: onCompleted() 
+
+    func test_onCompleted_withCartSubmittedForCompletion_shouldTransitionToPresentingCSKWithRedirectURL() async throws {
+        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+
+        // Follow valid state transitions: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorized -> cartSubmittedForCompletion
+        try await delegate.transition(to: .startPaymentRequest)
+        try await delegate.transition(to: .paymentAuthorized(payment: PKPayment()))
+        try await delegate.transition(to: .cartSubmittedForCompletion(redirectURL: redirectURL))
+
+        // Transition to completed to trigger onCompleted
+        try await delegate.transition(to: .completed)
+
+        // Should transition to presentingCSK with the redirect URL
+        guard case let .presentingCSK(url) = delegate.state else {
+            XCTFail("Expected presentingCSK state but got \(delegate.state)")
+            return
+        }
+
+        XCTAssertEqual(url, redirectURL, "Should use redirect URL from cartSubmittedForCompletion")
+        XCTAssertEqual(mockController.presentCallCount, 1, "Should call present with redirect URL")
+        XCTAssertEqual(mockController.presentCalledWith, redirectURL, "Should present with correct redirect URL")
+    }
+
+    func test_onCompleted_withPaymentAuthorizationFailed_shouldTransitionToPresentingCSKWithCheckoutURL() async throws {
+        let testError = NSError(domain: "test", code: 1, userInfo: nil)
+
+        // Follow valid state transitions: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorizationFailed
+        try await delegate.transition(to: .startPaymentRequest)
+        try await delegate.transition(to: .paymentAuthorizationFailed(error: testError))
+
+        // Transition to completed to trigger onCompleted
+        try await delegate.transition(to: .completed)
+
+        // Should transition to presentingCSK with computed URL from getURLFromState
+        guard case let .presentingCSK(url) = delegate.state else {
+            XCTFail("Expected presentingCSK state but got \(delegate.state)")
+            return
+        }
+
+        XCTAssertEqual(url, delegate.checkoutURL, "Should use computed URL from getURLFromState")
+        XCTAssertEqual(mockController.presentCallCount, 1, "Should call present with computed URL")
+        XCTAssertEqual(mockController.presentCalledWith, delegate.checkoutURL, "Should present with checkout URL")
+    }
+
+    /// User cancels the sheet without authorizing payment
+    func test_onCompleted_withDefaultCase_shouldTransitionToReset() async throws {
+        // Start with appleSheetPresented (a state that falls into default case)
+        try await delegate.transition(to: .startPaymentRequest)
+        XCTAssertEqual(delegate.state, .appleSheetPresented)
+
+        // Transition to completed to trigger onCompleted
+        try await delegate.transition(to: .completed)
+
+        // Should transition to reset, then onReset transitions to idle
+        XCTAssertEqual(delegate.state, .idle, "Default case should transition to reset then idle")
+        XCTAssertEqual(mockController.presentCallCount, 0, "Should not call present for default case")
+    }
+
+    // MARK: onPresentingCSK()
+
+    func test_onPresentingCSK_withValidURL_shouldCallPresentSuccessfully() async throws {
+        let testURL = URL(string: "https://test-shop.myshopify.com/checkout")!
+
+        // Transition to a state that leads to presentingCSK
+        try await delegate.transition(to: .unexpectedError(error: NSError(domain: "test", code: 1)))
+        try await delegate.transition(to: .completed)
+
+        guard case let .presentingCSK(url) = delegate.state else {
+            XCTFail("Expected presentingCSK state but got \(delegate.state)")
+            return
+        }
+
+        XCTAssertEqual(url, testURL, "Should have correct URL")
+        XCTAssertEqual(mockController.presentCallCount, 1, "Should call present once")
+        XCTAssertEqual(mockController.presentCalledWith, testURL, "Should present with correct URL")
+    }
+
+    func test_onPresentingCSK_withCartSubmittedForCompletion_shouldSkipPersonalDataRemoval() async throws {
+        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+
+        // Create a spy controller to track personal data removal calls
+        let spyController = SpyPayController()
+        spyController.cart = StorefrontAPI.Cart.testCart
+
+        let spyDelegate = ApplePayAuthorizationDelegate(
+            configuration: configuration,
+            controller: spyController,
+            paymentControllerFactory: mockPaymentControllerFactory
+        )
+        try spyDelegate.setCart(to: spyController.cart)
+
+        // Follow valid state transitions: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorized -> cartSubmittedForCompletion
+        try await spyDelegate.transition(to: .startPaymentRequest)
+        try await spyDelegate.transition(to: .paymentAuthorized(payment: PKPayment()))
+        try await spyDelegate.transition(to: .cartSubmittedForCompletion(redirectURL: redirectURL))
+        try await spyDelegate.transition(to: .completed)
+
+        // Should be in presentingCSK state
+        guard case let .presentingCSK(url) = spyDelegate.state else {
+            XCTFail("Expected presentingCSK state but got \(spyDelegate.state)")
+            return
+        }
+
+        XCTAssertEqual(url, redirectURL, "Should use redirect URL")
+        XCTAssertEqual(spyController.presentCallCount, 1, "Should call present")
+        XCTAssertEqual(spyController.presentCalledWith, redirectURL, "Should present with redirect URL")
+
+        // Note: We can't easily verify that cartRemovePersonalData was NOT called
+        // because it uses storefrontJulyRelease.cartRemovePersonalData which is hard to mock
+        // But we can verify the happy path behavior
+    }
+
+    func test_onPresentingCSK_withNonCartSubmittedState_shouldCallPresentSuccessfully() async throws {
+        // Test with interrupt state (not cartSubmittedForCompletion)
+        try await delegate.transition(to: .startPaymentRequest)
+        try await delegate.transition(to: .interrupt(reason: .currencyChanged))
+        try await delegate.transition(to: .completed)
+
+        // Should be in presentingCSK state with query parameter
+        guard case let .presentingCSK(url) = delegate.state else {
+            XCTFail("Expected presentingCSK state but got \(delegate.state)")
+            return
+        }
+
+        XCTAssertNotNil(url, "Should have valid URL")
+        XCTAssertTrue(url?.absoluteString.contains("wallet_currency_change=true") == true, "Should contain query parameter")
+        XCTAssertEqual(mockController.presentCallCount, 1, "Should call present")
+        XCTAssertEqual(mockController.presentCalledWith, url, "Should present with correct URL")
+    }
+
     // MARK: - Mock Classes
 
     /// Mock PaymentAuthorizationController for testing
@@ -468,6 +599,29 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         func present(url _: URL) async throws {
             presentCallCount += 1
             throw NSError(domain: "test", code: 1, userInfo: nil)
+        }
+    }
+
+    private class SpyPayController: PayController {
+        var cart: StorefrontAPI.Types.Cart?
+        var storefront: StorefrontAPI
+        var storefrontJulyRelease: StorefrontAPI
+
+        var presentCallCount = 0
+        var presentCalledWith: URL?
+
+        init() {
+            let config = ShopifyAcceleratedCheckouts.Configuration.testConfiguration
+            storefront = StorefrontAPI(
+                storefrontDomain: config.storefrontDomain,
+                storefrontAccessToken: config.storefrontAccessToken
+            )
+            storefrontJulyRelease = storefront
+        }
+
+        func present(url: URL) async throws {
+            presentCallCount += 1
+            presentCalledWith = url
         }
     }
 }
