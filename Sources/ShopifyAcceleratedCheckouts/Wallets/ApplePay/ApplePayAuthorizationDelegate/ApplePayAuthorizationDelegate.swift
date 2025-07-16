@@ -35,28 +35,10 @@ protocol PaymentAuthorizationController {
     func dismiss(completion: (() -> Void)?)
 }
 
-/// Make PKPaymentAuthorizationController conform to our protocol
-@available(iOS 17.0, *)
 extension PKPaymentAuthorizationController: PaymentAuthorizationController {}
 
-// MARK: - PaymentAuthorizationControllerFactory
-
-/// Factory to create PaymentAuthorizationController instances
 @available(iOS 17.0, *)
-protocol PaymentAuthorizationControllerFactory {
-    func createPaymentAuthorizationController(paymentRequest: PKPaymentRequest)
-        -> PaymentAuthorizationController
-}
-
-/// Default factory that creates real PKPaymentAuthorizationController instances
-@available(iOS 17.0, *)
-struct DefaultPaymentAuthorizationControllerFactory: PaymentAuthorizationControllerFactory {
-    func createPaymentAuthorizationController(paymentRequest: PKPaymentRequest)
-        -> PaymentAuthorizationController
-    {
-        return PKPaymentAuthorizationController(paymentRequest: paymentRequest)
-    }
-}
+typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthorizationController
 
 @available(iOS 17.0, *)
 class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
@@ -65,19 +47,17 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     var controller: PayController
 
     /// Factory for creating PaymentAuthorizationController instances - injectable for testing
-    var paymentControllerFactory: PaymentAuthorizationControllerFactory
+    var paymentControllerFactory: PKAuthorizationControllerFactory
 
     /// A URL that will render checkout for the cart contents
     var checkoutURL: URL?
 
     /// URL to be passed to ShopifyCheckoutSheetKit.present
     /// Selects the url based on the current State
-    var url: URL? {
-        return computeURL(for: state)
-    }
+    var url: URL? { getURLFromState(for: state) }
 
     /// Computes URL for a given state
-    private func computeURL(for state: ApplePayState) -> URL? {
+    private func getURLFromState(for state: ApplePayState) -> URL? {
         if case let .cartSubmittedForCompletion(redirectURL) = state {
             return redirectURL
         }
@@ -102,9 +82,11 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     var pkDecoder: PKDecoder
 
     init(
-        configuration: ApplePayConfigurationWrapper, controller: PayController,
-        paymentControllerFactory: PaymentAuthorizationControllerFactory =
-            DefaultPaymentAuthorizationControllerFactory()
+        configuration: ApplePayConfigurationWrapper,
+        controller: PayController,
+        paymentControllerFactory: @escaping PKAuthorizationControllerFactory = {
+            PKPaymentAuthorizationController(paymentRequest: $0)
+        }
     ) {
         self.configuration = configuration
         self.controller = controller
@@ -125,14 +107,14 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         }
     }
 
-    func transition(to nextState: ApplePayState) async {
+    func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
             #if DEBUG
                 print(
-                    "⚠️ Invalid state transition attempted: \(String(describing: state)) -> \(String(describing: nextState))"
+                    "⚠️ InvalidStateTransitionError: \(String(describing: state)) -> \(String(describing: nextState))"
                 )
             #endif
-            return
+            throw InvalidStateTransitionError(fromState: state, toState: nextState)
         }
 
         let previousState = state
@@ -143,17 +125,17 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
             try? await startPaymentRequest()
 
         case .reset:
-            await onReset()
+            try await onReset()
 
         case let .presentingCSK(url):
-            await onPresentingCSK(to: url, previousState: previousState)
+            try await onPresentingCSK(to: url, previousState: previousState)
 
         /// As a "terminal" state, acts as a decision point to either:
         /// - present TYP (redirectUrl)
         /// - present Checkout to resolve errors (checkoutUrl, possibly with interrupt query params)
         /// - transition to .reset e.g. if user is dismissing/cancelling the payment sheets
         case .completed:
-            await onCompleted(previousState: previousState)
+            try await onCompleted(previousState: previousState)
 
         default:
             break
@@ -165,25 +147,24 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         try setCart(to: cart)
         let paymentRequest = try pkDecoder.createPaymentRequest()
 
-        var paymentController = paymentControllerFactory.createPaymentAuthorizationController(
-            paymentRequest: paymentRequest)
+        var paymentController = paymentControllerFactory(paymentRequest)
         paymentController.delegate = self
         let presented = await paymentController.present()
 
-        await transition(to: presented ? .appleSheetPresented : .reset)
+        try await transition(to: presented ? .appleSheetPresented : .reset)
     }
 
-    private func onReset() async {
+    private func onReset() async throws {
         pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
         pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
         selectedShippingAddressID = nil
         checkoutURL = nil
-        await transition(to: .idle)
+        try await transition(to: .idle)
     }
 
-    private func onPresentingCSK(to url: URL?, previousState: ApplePayState) async {
+    private func onPresentingCSK(to url: URL?, previousState: ApplePayState) async throws {
         guard let url else {
-            await transition(
+            try await transition(
                 to: .terminalError(
                     error: ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
                 )
@@ -204,18 +185,18 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         try? await controller.present(url: url)
     }
 
-    private func onCompleted(previousState: ApplePayState) async {
+    private func onCompleted(previousState: ApplePayState) async throws {
         switch previousState {
         case .paymentAuthorizationFailed,
-            .unexpectedError,
-            .interrupt:
-            await transition(to: .presentingCSK(url: computeURL(for: previousState)))
+             .unexpectedError,
+             .interrupt:
+            try await transition(to: .presentingCSK(url: getURLFromState(for: previousState)))
 
         case let .cartSubmittedForCompletion(redirectURL):
-            await transition(to: .presentingCSK(url: redirectURL))
+            try await transition(to: .presentingCSK(url: redirectURL))
 
         default:
-            await transition(to: .reset)
+            try await transition(to: .reset)
         }
     }
 
@@ -239,7 +220,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     func getTopViewController() -> UIViewController? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-            let window = windowScene.windows.first
+              let window = windowScene.windows.first
         else {
             return nil
         }
@@ -274,5 +255,19 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
 
         return cart
+    }
+}
+
+// MARK: - InvalidStateTransitionError
+
+/// Error thrown when an invalid state transition is attempted
+@available(iOS 17.0, *)
+struct InvalidStateTransitionError: Error {
+    let fromState: ApplePayState
+    let toState: ApplePayState
+
+    var localizedDescription: String {
+        return
+            "Invalid state transition attempted: \(String(describing: fromState)) -> \(String(describing: toState))"
     }
 }

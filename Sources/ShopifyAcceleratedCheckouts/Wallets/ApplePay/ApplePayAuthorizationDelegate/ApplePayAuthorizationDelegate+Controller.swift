@@ -94,7 +94,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
     ) async -> PKPaymentAuthorizationResult {
         do {
             pkEncoder.payment = payment
-            await transition(to: .paymentAuthorized(payment: payment))
+            try? await transition(to: .paymentAuthorized(payment: payment))
             let cartID = try pkEncoder.cartID.get()
 
             if pkDecoder.requiredContactFields.count > 0 {
@@ -126,7 +126,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             let response = try await controller.storefront.cartSubmitForCompletion(id: cartID)
 
-            await transition(to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url))
+            try? await transition(to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url))
 
             return pkDecoder.paymentAuthorizationResult()
         } catch {
@@ -144,7 +144,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         )
 
         controller.dismiss {
-            Task { await self.transition(to: .completed) }
+            Task { try? await self.transition(to: .completed) }
         }
     }
 
@@ -154,16 +154,16 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         completion: (_: [Error]) -> T
     ) async -> T {
         guard let action = ErrorHandler.map(error: error, cart: controller.cart) else {
-            await transition(to: .unexpectedError(error: abortError))
+            try? await transition(to: .unexpectedError(error: abortError))
             return completion([abortError])
         }
 
         switch action {
         case let .showError(errors):
-            await transition(to: .appleSheetPresented)
+            try? await transition(to: .appleSheetPresented)
             return completion(errors)
         case let .interrupt(reason, checkoutURL):
-            await transition(to: .interrupt(reason: reason))
+            try? await transition(to: .interrupt(reason: reason))
             self.checkoutURL = checkoutURL
             return completion([abortError])
         }
