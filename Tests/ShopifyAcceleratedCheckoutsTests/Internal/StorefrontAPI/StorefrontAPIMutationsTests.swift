@@ -340,6 +340,68 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         XCTAssertEqual(lines?[1]["merchandiseId"] as? String, "gid://shopify/ProductVariant/2")
     }
 
+    func testCartCreateWithBuyerIdentityData() async throws {
+        let json = """
+        {
+            "data": {
+                "cartCreate": {
+                    "cart": {
+                        "id": "gid://shopify/Cart/buyer-123",
+                        "checkoutUrl": "https://test.myshopify.com/checkout/buyer-123",
+                        "totalQuantity": 1,
+                        "buyerIdentity": {
+                            "email": "customer@example.com",
+                            "phone": "+1234567890",
+                            "customerAccessToken": "test-token-123"
+                        },
+                        "deliveryGroups": {"nodes": []},
+                        "delivery": null,
+                        "lines": {"nodes": []},
+                        "cost": {
+                            "totalAmount": {"amount": "19.99", "currencyCode": "USD"},
+                            "subtotalAmount": {"amount": "19.99", "currencyCode": "USD"},
+                            "totalTaxAmount": null
+                        },
+                        "discountCodes": [],
+                        "discountAllocations": []
+                    },
+                    "userErrors": []
+                }
+            }
+        }
+        """
+        mockJSONResponse(json)
+
+        let customer = ShopifyAcceleratedCheckouts.Customer(
+            email: "customer@example.com",
+            phoneNumber: "+1234567890",
+            customerAccessToken: "test-token-123"
+        )
+
+        let variantId = GraphQLScalars.ID("gid://shopify/ProductVariant/1")
+        let cart = try await storefrontAPI.cartCreate(with: [variantId], customer: customer)
+
+        XCTAssertEqual(cart.id.rawValue, "gid://shopify/Cart/buyer-123")
+        XCTAssertEqual(cart.buyerIdentity?.email, "customer@example.com")
+        XCTAssertEqual(cart.buyerIdentity?.phone, "+1234567890")
+
+        XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
+
+        guard let body = MockURLProtocol.capturedRequestBody else {
+            XCTFail("Expected request body to be captured")
+            return
+        }
+
+        let jsonBody = try JSONSerialization.jsonObject(with: body) as? [String: Any]
+        let variables = jsonBody?["variables"] as? [String: Any]
+        let input = variables?["input"] as? [String: Any]
+        let buyerIdentity = input?["buyerIdentity"] as? [String: Any]
+
+        XCTAssertEqual(buyerIdentity?["email"] as? String, "customer@example.com")
+        XCTAssertEqual(buyerIdentity?["phone"] as? String, "+1234567890")
+        XCTAssertEqual(buyerIdentity?["customerAccessToken"] as? String, "test-token-123")
+    }
+
     // MARK: - Buyer Identity Update Tests
 
     func testCartBuyerIdentityUpdateSuccess() async throws {
@@ -407,6 +469,64 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             { if case .invalidResponse = $0 { return true } else { return false } },
             "Expected GraphQLError.invalidResponse to be thrown"
         )
+    }
+
+    func testCartBuyerIdentityUpdateWithAccessToken() async throws {
+        let json = """
+        {
+            "data": {
+                "cartBuyerIdentityUpdate": {
+                    "cart": {
+                        "id": "gid://shopify/Cart/123",
+                        "checkoutUrl": "https://test.myshopify.com/checkout/123",
+                        "totalQuantity": 1,
+                        "buyerIdentity": {
+                            "email": "customer@example.com",
+                            "phone": "+19876543210",
+                            "customerAccessToken": "customer-access-token-456"
+                        },
+                        "deliveryGroups": {"nodes": []},
+                        "delivery": null,
+                        "lines": {"nodes": []},
+                        "cost": {
+                            "totalAmount": {"amount": "29.99", "currencyCode": "USD"},
+                            "subtotalAmount": {"amount": "29.99", "currencyCode": "USD"},
+                            "totalTaxAmount": null
+                        },
+                        "discountCodes": [],
+                        "discountAllocations": []
+                    },
+                    "userErrors": []
+                }
+            }
+        }
+        """
+        mockJSONResponse(json)
+
+        let cart = try await storefrontAPI.cartBuyerIdentityUpdate(
+            id: GraphQLScalars.ID("gid://shopify/Cart/123"),
+            email: "customer@example.com",
+            phoneNumber: "+19876543210",
+            customerAccessToken: "customer-access-token-456"
+        )
+
+        XCTAssertEqual(cart.buyerIdentity?.email, "customer@example.com")
+        XCTAssertEqual(cart.buyerIdentity?.phone, "+19876543210")
+
+        XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
+
+        guard let body = MockURLProtocol.capturedRequestBody else {
+            XCTFail("Expected request body to be captured")
+            return
+        }
+
+        let jsonBody = try JSONSerialization.jsonObject(with: body) as? [String: Any]
+        let variables = jsonBody?["variables"] as? [String: Any]
+        let buyerIdentity = variables?["buyerIdentity"] as? [String: Any]
+
+        XCTAssertEqual(buyerIdentity?["email"] as? String, "customer@example.com")
+        XCTAssertEqual(buyerIdentity?["phone"] as? String, "+19876543210")
+        XCTAssertEqual(buyerIdentity?["customerAccessToken"] as? String, "customer-access-token-456")
     }
 
     // MARK: - Delivery Address Add Tests
