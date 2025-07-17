@@ -189,7 +189,7 @@
         }
       }
     },
-    "errors.applepay.unsupported" : {
+    "errors.applePay.unsupported" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
