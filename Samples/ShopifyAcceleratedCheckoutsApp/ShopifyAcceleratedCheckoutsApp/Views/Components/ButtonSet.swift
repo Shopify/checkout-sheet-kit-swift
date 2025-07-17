@@ -66,6 +66,10 @@ struct ButtonSet: View {
                             }()
                             print("📊 Web pixel event: \(eventName)")
                         }
+                        .onWalletButtonFailToRender { wallet, reason in
+                            print("⚠️ \(wallet) button failed to render: \(reason)")
+                            // You could show an alternative payment method or track analytics here
+                        }
                 }
             }
 

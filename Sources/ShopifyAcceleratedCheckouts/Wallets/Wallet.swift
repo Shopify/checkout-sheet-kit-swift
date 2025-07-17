@@ -38,6 +38,7 @@ public struct EventHandlers {
     public var shouldRecoverFromError: ((CheckoutError) -> Bool)?
     public var checkoutDidClickLink: ((URL) -> Void)?
     public var checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)?
+    public var walletButtonDidFailToRender: ((Wallet, String) -> Void)?
 
     public init(
         checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)? = nil,
@@ -45,7 +46,8 @@ public struct EventHandlers {
         checkoutDidCancel: (() -> Void)? = nil,
         shouldRecoverFromError: ((CheckoutError) -> Bool)? = nil,
         checkoutDidClickLink: ((URL) -> Void)? = nil,
-        checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)? = nil
+        checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)? = nil,
+        walletButtonDidFailToRender: ((Wallet, String) -> Void)? = nil
     ) {
         self.checkoutDidComplete = checkoutDidComplete
         self.checkoutDidFail = checkoutDidFail
@@ -53,6 +55,7 @@ public struct EventHandlers {
         self.shouldRecoverFromError = shouldRecoverFromError
         self.checkoutDidClickLink = checkoutDidClickLink
         self.checkoutDidEmitWebPixelEvent = checkoutDidEmitWebPixelEvent
+        self.walletButtonDidFailToRender = walletButtonDidFailToRender
     }
 }
 

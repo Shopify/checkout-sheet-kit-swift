@@ -253,4 +253,33 @@ extension AcceleratedCheckoutButtons {
         newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
         return newView
     }
+    
+    /// Sets an event handler that's called when a wallet button fails to render.
+    ///
+    /// Use this to detect when a payment method is unavailable and provide alternative options or track analytics.
+    ///
+    /// ## Example
+    /// ```swift
+    /// AcceleratedCheckoutButtons(cartID: cartId)
+    ///     .onWalletButtonFailToRender { wallet, reason in
+    ///         // Handle wallet button rendering failure
+    ///         switch wallet {
+    ///         case .applePay:
+    ///             analytics.track("apple_pay_unavailable", properties: ["reason": reason])
+    ///             // Show alternative payment method
+    ///         case .shopPay:
+    ///             analytics.track("shop_pay_unavailable", properties: ["reason": reason])
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameter action: The action to perform when a wallet button fails to render
+    /// - Returns: A view with the wallet button failure handler set
+    public func onWalletButtonFailToRender(_ action: @escaping (Wallet, String) -> Void)
+        -> AcceleratedCheckoutButtons
+    {
+        var newView = self
+        newView.eventHandlers.walletButtonDidFailToRender = action
+        return newView
+    }
 }
