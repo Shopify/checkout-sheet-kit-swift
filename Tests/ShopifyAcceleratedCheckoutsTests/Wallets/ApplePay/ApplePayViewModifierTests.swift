@@ -46,7 +46,6 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         mockApplePayConfiguration = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
             merchantIdentifier: "test.merchant.id",
-            supportedNetworks: [.visa, .masterCard],
             contactFields: []
         )
 
@@ -56,7 +55,7 @@ final class ApplePayViewModifierTests: XCTestCase {
                 host: "test-shop.myshopify.com",
                 url: "https://test-shop.myshopify.com"
             ),
-            paymentSettings: PaymentSettings(countryCode: "US")
+            paymentSettings: PaymentSettings(countryCode: "US", acceptedCardBrands: [.visa, .mastercard])
         )
     }
 

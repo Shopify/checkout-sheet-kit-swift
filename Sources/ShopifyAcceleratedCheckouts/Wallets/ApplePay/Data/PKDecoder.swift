@@ -49,7 +49,11 @@ class PKDecoder {
         let currencyCode = cart.cost.totalAmount.currencyCode
 
         paymentRequest.merchantIdentifier = configuration.applePay.merchantIdentifier
-        paymentRequest.supportedNetworks = configuration.applePay.supportedNetworks
+
+        // Map accepted card brands from Shopify to PKPaymentNetwork
+        let acceptedCardBrands = configuration.shopSettings.paymentSettings.acceptedCardBrands
+        paymentRequest.supportedNetworks = CardBrandMapper.mapToPKPaymentNetworks(acceptedCardBrands)
+
         paymentRequest.countryCode = configuration.shopSettings.paymentSettings.countryCode
         paymentRequest.currencyCode = currencyCode
         initialCurrencyCode = currencyCode

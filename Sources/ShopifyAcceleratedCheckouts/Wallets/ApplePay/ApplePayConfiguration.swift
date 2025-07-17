@@ -34,7 +34,8 @@ extension ShopifyAcceleratedCheckouts {
     /// Configuration options for Apple Pay integration within Shopify Accelerated Checkouts.
     ///
     /// This class encapsulates all necessary settings for enabling Apple Pay as a payment method,
-    /// including merchant identification, supported payment networks, and required contact information.
+    /// including merchant identification and required contact information. Supported payment networks
+    /// are automatically determined based on the merchant's Shopify configuration.
     @Observable public class ApplePayConfiguration {
         /// The merchant identifier for Apple Pay transactions.
         ///
@@ -43,12 +44,6 @@ extension ShopifyAcceleratedCheckouts {
         ///
         /// - See: [Apple Developer Documentation - merchantIdentifier](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest/1619305-merchantidentifier)
         public let merchantIdentifier: String
-
-        /// Payment card networks supported for Apple Pay transactions.
-        ///
-        /// Only card types included in this array will be displayed as available payment
-        /// options in the Apple Pay payment sheet.
-        public let supportedNetworks: [PKPaymentNetwork]
 
         /// Contact information fields required during the Apple Pay payment flow.
         ///
@@ -65,15 +60,14 @@ extension ShopifyAcceleratedCheckouts {
         ///
         /// - Parameters:
         ///   - merchantIdentifier: The merchant identifier registered with Apple.
-        ///   - supportedNetworks: Array of payment card networks to accept.
         ///   - contactFields: Contact information fields to require from the customer.
+        /// - Note: Supported payment networks are automatically determined based on the
+        ///         merchant's accepted card brands configuration in Shopify.
         public init(
             merchantIdentifier: String,
-            supportedNetworks: [PKPaymentNetwork],
             contactFields: [RequiredContactFields]
         ) {
             self.merchantIdentifier = merchantIdentifier
-            self.supportedNetworks = supportedNetworks
             self.contactFields = contactFields
         }
     }

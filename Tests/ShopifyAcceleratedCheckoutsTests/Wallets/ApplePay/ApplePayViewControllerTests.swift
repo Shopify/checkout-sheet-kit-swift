@@ -21,7 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import UIKit
@@ -36,7 +35,7 @@ class ApplePayViewControllerTests: XCTestCase {
         super.setUp()
 
         // Create mock shop settings
-        let paymentSettings = PaymentSettings(countryCode: "US")
+        let paymentSettings = PaymentSettings(countryCode: "US", acceptedCardBrands: [.visa, .mastercard])
         let primaryDomain = Domain(host: "test-shop.myshopify.com", url: "https://test-shop.myshopify.com")
         let shopSettings = ShopSettings(
             name: "Test Shop",
@@ -53,7 +52,6 @@ class ApplePayViewControllerTests: XCTestCase {
         // Create Apple Pay configuration
         let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
             merchantIdentifier: "test.merchant",
-            supportedNetworks: [.visa, .masterCard],
             contactFields: []
         )
 

@@ -21,7 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import PassKit
 @testable import ShopifyAcceleratedCheckouts
 
 // MARK: - Configuration Helpers
@@ -70,7 +69,8 @@ extension ShopSettings {
                 url: "https://test-shop.myshopify.com"
             ),
             paymentSettings: PaymentSettings(
-                countryCode: "US"
+                countryCode: "US",
+                acceptedCardBrands: [.visa, .mastercard, .americanExpress, .discover]
             )
         )
     }
@@ -82,7 +82,8 @@ extension ShopSettings {
             url: "https://test-shop.myshopify.com"
         ),
         paymentSettings: PaymentSettings = PaymentSettings(
-            countryCode: "US"
+            countryCode: "US",
+            acceptedCardBrands: [.visa, .mastercard, .americanExpress, .discover]
         )
     ) -> ShopSettings {
         return ShopSettings(
@@ -98,18 +99,15 @@ extension ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     static var testConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
         return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
             merchantIdentifier: "merchant.test.id",
-            supportedNetworks: [.visa],
             contactFields: [.email, .phone]
         )
     }
 
     static func testConfiguration(
-        merchantIdentifier: String = "merchant.test.id",
-        supportedNetworks: [PKPaymentNetwork] = [.visa]
+        merchantIdentifier: String = "merchant.test.id"
     ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
         return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
             merchantIdentifier: merchantIdentifier,
-            supportedNetworks: supportedNetworks,
             contactFields: [.email, .phone]
         )
     }

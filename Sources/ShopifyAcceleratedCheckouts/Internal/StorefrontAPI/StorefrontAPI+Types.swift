@@ -37,6 +37,7 @@ extension StorefrontAPI {
         typealias Money = StorefrontAPI.MoneyV2
         typealias Address = StorefrontAPI.Address
         typealias ApplePayPayment = StorefrontAPI.ApplePayPayment
+        typealias CardBrand = StorefrontAPI.CardBrand
     }
 
     /// Represents a cart in the Storefront API
@@ -353,8 +354,18 @@ extension StorefrontAPI {
     /// Shop payment settings
     struct ShopPaymentSettings: Codable {
         let supportedDigitalWallets: [String]
-        let acceptedCardBrands: [String]
+        let acceptedCardBrands: [CardBrand]
         let countryCode: String
+    }
+
+    /// Card brands supported by Shopify's payment system
+    enum CardBrand: String, Codable, CaseIterable {
+        case americanExpress = "AMERICAN_EXPRESS"
+        case dinersClub = "DINERS_CLUB"
+        case discover = "DISCOVER"
+        case jcb = "JCB"
+        case mastercard = "MASTERCARD"
+        case visa = "VISA"
     }
 
     // MARK: - Delivery Groups
@@ -1010,7 +1021,8 @@ extension StorefrontAPI.Address {
             shop.paymentSettings.countryCode
 
         let paymentSettings = PaymentSettings(
-            countryCode: countryCode
+            countryCode: countryCode,
+            acceptedCardBrands: shop.paymentSettings.acceptedCardBrands
         )
 
         // Extract primary domain
@@ -1028,16 +1040,22 @@ extension StorefrontAPI.Address {
 }
 
 /// Payment settings for the shop
+@available(iOS 17.0, *)
 class PaymentSettings {
     /// The shop's country code (e.g., "US", "CA")
     let countryCode: String
 
-    init(countryCode: String) {
+    /// Card brands accepted by the merchant
+    let acceptedCardBrands: [StorefrontAPI.CardBrand]
+
+    init(countryCode: String, acceptedCardBrands: [StorefrontAPI.CardBrand] = []) {
         self.countryCode = countryCode
+        self.acceptedCardBrands = acceptedCardBrands
     }
 }
 
 /// Domain information for the shop
+@available(iOS 17.0, *)
 class Domain {
     /// The host name of the domain (e.g., "example.myshopify.com")
     let host: String
