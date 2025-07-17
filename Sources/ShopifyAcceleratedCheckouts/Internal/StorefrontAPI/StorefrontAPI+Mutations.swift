@@ -28,14 +28,37 @@ import Foundation
 @available(iOS 17.0, *)
 extension StorefrontAPI {
     /// Create a new cart
-    /// - Parameter items: Array of product variant IDs to add to the cart
+    /// - Parameters:
+    ///   - items: Array of product variant IDs to add to the cart
+    ///   - customer: Optional customer information to associate with the cart
     /// - Returns: The created cart
-    func cartCreate(with items: [GraphQLScalars.ID] = []) async throws -> Cart {
-        let variables: [String: Any] = [
-            "input": [
-                "lines": items.map { ["merchandiseId": $0.rawValue] }
-            ]
+    func cartCreate(
+        with items: [GraphQLScalars.ID] = [],
+        customer: ShopifyAcceleratedCheckouts.Customer? = nil
+    ) async throws -> Cart {
+        var input: [String: Any] = [
+            "lines": items.map { ["merchandiseId": $0.rawValue] }
         ]
+
+        if let customer {
+            var buyerIdentity: [String: String] = [:]
+
+            if let email = customer.email {
+                buyerIdentity["email"] = email
+            }
+            if let phoneNumber = customer.phoneNumber {
+                buyerIdentity["phone"] = phoneNumber
+            }
+            if let customerAccessToken = customer.customerAccessToken {
+                buyerIdentity["customerAccessToken"] = customerAccessToken
+            }
+
+            if !buyerIdentity.isEmpty {
+                input["buyerIdentity"] = buyerIdentity
+            }
+        }
+
+        let variables: [String: Any] = ["input": input]
 
         let response = try await client.mutate(
             Operations.cartCreate(variables: variables)
@@ -57,10 +80,14 @@ extension StorefrontAPI {
     ///   - id: Cart ID
     ///   - email: Buyer email address
     ///   - phone: Buyers phone number
+    ///   - customerAccessToken: Customer access token
     /// - Returns: Updated cart
-    func cartBuyerIdentityUpdate(id: GraphQLScalars.ID, email: String?, phoneNumber: String?)
-        async throws -> Cart
-    {
+    func cartBuyerIdentityUpdate(
+        id: GraphQLScalars.ID,
+        email: String? = nil,
+        phoneNumber: String? = nil,
+        customerAccessToken: String? = nil
+    ) async throws -> Cart {
         var buyerIdentity: [String: String] = [:]
 
         if let email {
@@ -68,6 +95,9 @@ extension StorefrontAPI {
         }
         if let phoneNumber {
             buyerIdentity["phone"] = phoneNumber
+        }
+        if let customerAccessToken {
+            buyerIdentity["customerAccessToken"] = customerAccessToken
         }
 
         if buyerIdentity.isEmpty {

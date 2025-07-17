@@ -178,7 +178,7 @@ protocol PayController: AnyObject {
                 return cart
             case let .variant(id, quantity):
                 let items: [StorefrontAPI.Types.ID] = Array(repeating: .init(id), count: quantity)
-                return try await storefront.cartCreate(with: items)
+                return try await storefront.cartCreate(with: items, customer: configuration.common.customer)
             case .invariant:
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "checkoutIdentifier")
             }
