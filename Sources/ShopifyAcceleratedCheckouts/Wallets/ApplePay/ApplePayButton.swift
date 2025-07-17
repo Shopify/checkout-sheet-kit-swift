@@ -137,8 +137,8 @@ struct Internal_ApplePayButton: View {
                 Task { await controller.startPayment() }
             },
             fallback: {
-                // content == nil ? Text("errors.applepay.unsupported") : content
-                Text("errors.applepay.unsupported".localizedString)
+                // content == nil ? Text("errors.applePay.unsupported") : content
+                Text("errors.applePay.unsupported".localizedString)
             }
         )
         .walletButtonStyle(cornerRadius: cornerRadius)

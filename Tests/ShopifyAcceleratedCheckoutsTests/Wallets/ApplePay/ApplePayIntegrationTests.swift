@@ -82,7 +82,7 @@ final class ApplePayIntegrationTests: XCTestCase {
         await MainActor.run {
             // Create a hosting controller to test SwiftUI integration
             let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart")
-                .withWallets([.applepay])
+                .wallets([.applePay])
                 .onComplete { _ in
                     // Callback exists but won't be called during view creation
                 }
@@ -112,7 +112,7 @@ final class ApplePayIntegrationTests: XCTestCase {
         await MainActor.run {
             // Create a hosting controller to test SwiftUI integration with all callbacks
             let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart")
-                .withWallets([.applepay])
+                .wallets([.applePay])
                 .onComplete { _ in
                     completeExpectation.fulfill()
                 }

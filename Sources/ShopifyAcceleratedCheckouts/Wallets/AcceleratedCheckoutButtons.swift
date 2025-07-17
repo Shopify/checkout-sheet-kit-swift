@@ -28,16 +28,16 @@ import SwiftUI
 /// Renders a Checkout buttons for a cart or product variant
 ///
 /// Note:
-/// - The `withWallets` modifier can be used to limit the buttons rendered
-/// - The order of the buttons is the same as the order of the `withWallets` modifier
-/// - omission of the `withWallets` modifier will render all buttons
+/// - The `wallets` modifier can be used to limit the buttons rendered
+/// - The order of the buttons is the same as the order of the `wallets` modifier
+/// - omission of the `wallets` modifier will render all buttons
 @available(iOS 17.0, *)
 public struct AcceleratedCheckoutButtons: View {
     @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
     private var configuration
 
     let identifier: CheckoutIdentifier
-    var wallets: [Wallet] = [.shoppay, .applepay]
+    var wallets: [Wallet] = [.shopPay, .applePay]
     var eventHandlers: EventHandlers = .init()
     var cornerRadius: CGFloat?
 
@@ -67,13 +67,13 @@ public struct AcceleratedCheckoutButtons: View {
                     VStack {
                         ForEach(wallets, id: \.self) {
                             switch $0 {
-                            case .applepay:
+                            case .applePay:
                                 ApplePayButton(
                                     identifier: identifier,
                                     eventHandlers: eventHandlers,
                                     cornerRadius: cornerRadius
                                 )
-                            case .shoppay:
+                            case .shopPay:
                                 ShopPayButton(
                                     identifier: identifier,
                                     eventHandlers: eventHandlers,
@@ -106,8 +106,8 @@ public struct AcceleratedCheckoutButtons: View {
 @available(iOS 17.0, *)
 extension AcceleratedCheckoutButtons {
     /// Modifies the wallet options supported
-    /// Defaults: [.applepay]
-    public func withWallets(_ wallets: [Wallet]) -> AcceleratedCheckoutButtons {
+    /// Defaults: [.applePay]
+    public func wallets(_ wallets: [Wallet]) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.wallets = wallets
         return newView
