@@ -328,7 +328,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftformat >/dev/null; then\n\tswiftformat \"${SRCROOT}\" \nelse  \n\techo \"error: SwiftFormat not installed, download using \\\"brew install swiftformat\\\"\"\nfi\n";
+			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif [ \"$CI\" = \"true\" ]; then\n  echo \"Skipping SwiftFormat in CI environment\"\n  exit 0\nfi\n\nif which swiftformat >/dev/null; then\n\tswiftformat \"${SRCROOT}\" \nelse  \n\techo \"error: SwiftFormat not installed, download using \\\"brew install swiftformat\\\"\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
