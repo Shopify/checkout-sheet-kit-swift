@@ -107,7 +107,7 @@ class ShopSettingsTests: XCTestCase {
             shipsToCountries: ["US", "CA"],
             paymentSettings: StorefrontAPI.ShopPaymentSettings(
                 supportedDigitalWallets: ["APPLE_PAY", "SHOP_PAY"],
-                acceptedCardBrands: ["VISA", "MASTERCARD"],
+                acceptedCardBrands: [.visa, .mastercard],
                 countryCode: countryCode
             ),
             moneyFormat: "${{amount}}"
