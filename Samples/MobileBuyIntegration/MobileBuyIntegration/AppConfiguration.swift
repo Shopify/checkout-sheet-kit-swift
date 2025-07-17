@@ -37,6 +37,10 @@ public final class AppConfiguration: ObservableObject {
 
     // Displays the Checkout with ApplePay button
     @Published var applePayEnabled: Bool = true
+
+    /// Optional app authentication token for partner app identification
+    /// This should be generated on a secure server, not on the device
+    @Published var appAuthenticationToken: String?
 }
 
 public var appConfiguration = AppConfiguration() {

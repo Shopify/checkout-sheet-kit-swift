@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, willFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         ShopifyCheckoutSheetKit.configure {
             /// Checkout color scheme setting
-            $0.colorScheme = .web
+            $0.colorScheme = .automatic
 
             /// Customize progress bar color
             $0.tintColor = ColorPalette.primaryColor

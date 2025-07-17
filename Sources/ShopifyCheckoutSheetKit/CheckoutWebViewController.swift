@@ -21,7 +21,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if canImport(UIKit)
 import UIKit
+#endif
 import WebKit
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
@@ -61,7 +63,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
+    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
         checkoutURL = url
         self.delegate = delegate
 
@@ -69,6 +71,8 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
         self.checkoutView = checkoutView
+
+        checkoutView.checkoutOptions = options
 
         super.init(nibName: nil, bundle: nil)
 
