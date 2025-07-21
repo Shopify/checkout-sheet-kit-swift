@@ -183,7 +183,6 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private func onCompleted(previousState: ApplePayState) async throws {
         switch previousState {
-
         case .paymentAuthorizationFailed,
              .unexpectedError,
              .interrupt:
