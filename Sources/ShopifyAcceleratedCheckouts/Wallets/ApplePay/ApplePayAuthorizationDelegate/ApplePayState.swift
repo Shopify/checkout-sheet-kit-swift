@@ -107,6 +107,8 @@ enum ApplePayState: Equatable {
     func canTransition(to nextState: ApplePayState) -> Bool {
         switch (self, nextState) {
         case (.idle, .startPaymentRequest),
+             /// Occurs when TYP is dismissed, as state will transition to idle before closure
+             (.idle, .completed),
 
              (.startPaymentRequest, .appleSheetPresented),
              /// Failing to construct paymentRequest or present payment sheet
