@@ -52,12 +52,8 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     /// A URL that will render checkout for the cart contents
     var checkoutURL: URL?
 
-    /// URL to be passed to ShopifyCheckoutSheetKit.present
-    /// Selects the url based on the current State
-    var url: URL? { getURLFromState(for: state) }
-
     /// Computes URL for a given state
-    private func getURLFromState(for state: ApplePayState) -> URL? {
+    private func createSheetKitURL(for state: ApplePayState) -> URL? {
         if case let .cartSubmittedForCompletion(redirectURL) = state {
             return redirectURL
         }
@@ -190,7 +186,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         case .paymentAuthorizationFailed,
              .unexpectedError,
              .interrupt:
-            try await transition(to: .presentingCSK(url: getURLFromState(for: previousState)))
+            try await transition(to: .presentingCSK(url: createSheetKitURL(for: previousState)))
 
         case let .cartSubmittedForCompletion(redirectURL):
             try await transition(to: .presentingCSK(url: redirectURL))
