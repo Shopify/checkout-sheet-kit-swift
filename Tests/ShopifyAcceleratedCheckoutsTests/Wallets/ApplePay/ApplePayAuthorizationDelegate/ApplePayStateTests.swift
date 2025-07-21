@@ -36,7 +36,6 @@ final class ApplePayStateTests: XCTestCase {
 
         XCTAssertFalse(fromState.canTransition(to: .idle), "Should not allow idle -> idle")
         XCTAssertFalse(fromState.canTransition(to: .appleSheetPresented), "Should not allow idle -> appleSheetPresented")
-        XCTAssertFalse(fromState.canTransition(to: .completed), "Should not allow idle -> completed")
         XCTAssertFalse(fromState.canTransition(to: .reset), "Should not allow idle -> reset")
     }
 

@@ -53,7 +53,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     var checkoutURL: URL?
 
     /// Computes URL for a given state
-    private func createSheetKitURL(for state: ApplePayState) -> URL? {
+    func createSheetKitURL(for state: ApplePayState) -> URL? {
         if case let .cartSubmittedForCompletion(redirectURL) = state {
             return redirectURL
         }
@@ -183,6 +183,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private func onCompleted(previousState: ApplePayState) async throws {
         switch previousState {
+
         case .paymentAuthorizationFailed,
              .unexpectedError,
              .interrupt:
