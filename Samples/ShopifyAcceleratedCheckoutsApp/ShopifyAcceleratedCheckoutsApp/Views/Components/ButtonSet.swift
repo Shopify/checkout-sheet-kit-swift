@@ -37,8 +37,25 @@ struct ButtonSet: View {
                 CheckoutSection(title: "AcceleratedCheckoutButtons(cartID:)") {
                     // Cart-based checkout example with event handlers
                     AcceleratedCheckoutButtons(cartID: cartID)
+
+                        .onRenderStateChange {
+                            switch $0 {
+                            case .loading:
+                                print("Loading...")
+                            case let .ready(availableWallets):
+                                print("Ready to checkout with: \(availableWallets.map(\.displayName).joined(separator: ", "))")
+                            case let .partiallyReady(availableWallets, unavailableReasons):
+                                print("Partially ready with: \(availableWallets.map(\.displayName).joined(separator: ", "))")
+                                print("Unavailable: \(unavailableReasons.map(\.displayName).joined(separator: ", "))")
+                            case let .fallback(reason):
+                                print("Fallback state: \(reason.displayName)")
+                            }
+                        }
+
                         .onComplete { event in
-                            print("✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)")
+                            print(
+                                "✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)"
+                            )
                             onComplete()
                         }
                         .onFail { error in

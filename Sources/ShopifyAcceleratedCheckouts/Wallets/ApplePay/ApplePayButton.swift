@@ -101,6 +101,9 @@ struct Internal_ApplePayButton: View {
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
 
+    /// The event handlers for the button
+    private let eventHandlers: EventHandlers
+
     /// Initializes an Apple Pay button
     /// - Parameters:
     ///   - identifier: The identifier to use for checkout
@@ -120,6 +123,7 @@ struct Internal_ApplePayButton: View {
         )
         self.label = label
         self.cornerRadius = cornerRadius
+        self.eventHandlers = eventHandlers
         MainActor.assumeIsolated {
             controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
             controller.onCheckoutFail = eventHandlers.checkoutDidFail

@@ -22,6 +22,7 @@
  */
 
 import Foundation
+import PassKit
 
 // MARK: - Cart Models
 
@@ -1010,7 +1011,9 @@ extension StorefrontAPI.Address {
             shop.paymentSettings.countryCode
 
         let paymentSettings = PaymentSettings(
-            countryCode: countryCode
+            countryCode: countryCode,
+            acceptedCardBrands: shop.paymentSettings.acceptedCardBrands,
+            supportedDigitalWallets: shop.paymentSettings.supportedDigitalWallets
         )
 
         // Extract primary domain
@@ -1032,8 +1035,78 @@ class PaymentSettings {
     /// The shop's country code (e.g., "US", "CA")
     let countryCode: String
 
-    init(countryCode: String) {
+    /// The shop's accepted card brands (e.g., ["VISA", "MASTERCARD", "AMERICAN_EXPRESS"])
+    let acceptedCardBrands: [String]
+
+    /// The shop's supported digital wallets (e.g., ["APPLE_PAY", "SHOP_PAY"])
+    let supportedDigitalWallets: [String]
+
+    init(countryCode: String, acceptedCardBrands: [String] = [], supportedDigitalWallets: [String] = []) {
         self.countryCode = countryCode
+        self.acceptedCardBrands = acceptedCardBrands
+        self.supportedDigitalWallets = supportedDigitalWallets
+    }
+
+    /// Maps accepted card brand strings to PKPaymentNetwork values
+    var supportedNetworks: [PKPaymentNetwork] {
+        return acceptedCardBrands.compactMap { cardBrand in
+            switch cardBrand.uppercased() {
+            case "VISA":
+                return .visa
+            case "MASTERCARD", "MASTER_CARD":
+                return .masterCard
+            case "AMERICAN_EXPRESS", "AMEX":
+                return .amex
+            case "DISCOVER":
+                return .discover
+            case "MAESTRO":
+                return .maestro
+            case "JCB":
+                return .JCB
+            case "CARTES_BANCAIRES":
+                if #available(iOS 14.5, *) {
+                    return .cartesBancaires
+                } else {
+                    return nil
+                }
+            case "BANCOMAT_PAY":
+                if #available(iOS 16.0, *) {
+                    return .bancomat
+                } else {
+                    return nil
+                }
+            case "UNION_PAY":
+                if #available(iOS 9.2, *) {
+                    return .chinaUnionPay
+                } else {
+                    return nil
+                }
+            case "INTERAC":
+                return .interac
+            case "EFTPOS":
+                if #available(iOS 12.0, *) {
+                    return .eftpos
+                } else {
+                    return nil
+                }
+            case "ELECTRON":
+                return .electron
+            case "V_PAY":
+                return .vPay
+            default:
+                return nil
+            }
+        }
+    }
+
+    /// Checks if Apple Pay is supported by the shop
+    var isApplePaySupported: Bool {
+        return supportedDigitalWallets.contains { $0.uppercased() == "APPLE_PAY" }
+    }
+
+    /// Checks if Shop Pay is supported by the shop
+    var isShopPaySupported: Bool {
+        return supportedDigitalWallets.contains { $0.uppercased() == "SHOP_PAY" }
     }
 }
 

@@ -49,8 +49,8 @@ enum CheckoutIdentifier {
         }
     }
 
-    /// Checks for valid ID signature,
-    /// Returns .invariant if validation fails
+    /// Checks cartID / variantID is structured as a valid ID
+    /// Doesn't check with a service that it corresponds to a valid ID
     func isValid() -> Bool {
         if case .invariant = parse() {
             return false
