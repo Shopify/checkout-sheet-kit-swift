@@ -103,6 +103,18 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         }
     }
 
+    private func startPaymentRequest() async throws {
+        guard let cart = controller.cart else { return }
+        try setCart(to: cart)
+        let paymentRequest = try pkDecoder.createPaymentRequest()
+
+        var paymentController = paymentControllerFactory(paymentRequest)
+        paymentController.delegate = self
+        let presented = await paymentController.present()
+
+        try await transition(to: presented ? .appleSheetPresented : .reset)
+    }
+
     func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
             #if DEBUG
@@ -136,18 +148,6 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         default:
             break
         }
-    }
-
-    private func startPaymentRequest() async throws {
-        guard let cart = controller.cart else { return }
-        try setCart(to: cart)
-        let paymentRequest = try pkDecoder.createPaymentRequest()
-
-        var paymentController = paymentControllerFactory(paymentRequest)
-        paymentController.delegate = self
-        let presented = await paymentController.present()
-
-        try await transition(to: presented ? .appleSheetPresented : .reset)
     }
 
     private func onReset() async throws {
