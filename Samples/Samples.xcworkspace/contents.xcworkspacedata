@@ -4,4 +4,7 @@
    <FileRef
       location = "group:MobileBuyIntegration/MobileBuyIntegration.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:ShopifyAcceleratedCheckoutsApp/ShopifyAcceleratedCheckoutsApp.xcodeproj">
+   </FileRef>
 </Workspace>

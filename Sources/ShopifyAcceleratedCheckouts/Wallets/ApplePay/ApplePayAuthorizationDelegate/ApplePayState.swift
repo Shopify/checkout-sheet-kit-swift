@@ -25,7 +25,11 @@ import Foundation
 import PassKit
 
 @available(iOS 17.0, *)
-enum ApplePayState {
+enum ApplePayState: Equatable {
+    static func == (lhs: ApplePayState, rhs: ApplePayState) -> Bool {
+        return String(describing: lhs.self) == String(describing: rhs.self)
+    }
+
     /// Initial state - Ready to start a payment request
     /// The delegate is idle and waiting for a payment request to be initiated
     case idle
@@ -103,6 +107,8 @@ enum ApplePayState {
     func canTransition(to nextState: ApplePayState) -> Bool {
         switch (self, nextState) {
         case (.idle, .startPaymentRequest),
+             /// Occurs when TYP is dismissed, as state will transition to idle before closure
+             (.idle, .completed),
 
              (.startPaymentRequest, .appleSheetPresented),
              /// Failing to construct paymentRequest or present payment sheet

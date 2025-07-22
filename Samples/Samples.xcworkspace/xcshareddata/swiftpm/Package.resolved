@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "apollo-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apollographql/apollo-ios.git",
+      "state" : {
+        "revision" : "d591c1dd55824867877cff4f6551fe32983d7f51",
+        "version" : "1.23.0"
+      }
+    },
+    {
       "identity" : "mobile-buy-sdk-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Shopify/mobile-buy-sdk-ios",

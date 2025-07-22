@@ -161,10 +161,10 @@ protocol PayController: AnyObject {
             guard cart != nil else {
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
             }
-            await authorizationDelegate.transition(to: .startPaymentRequest)
+            try? await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
             print("[startPayment] Failed to setup cart: \(error)")
-            await authorizationDelegate.transition(to: .completed)
+            try? await authorizationDelegate.transition(to: .completed)
         }
     }
 
@@ -185,10 +185,10 @@ protocol PayController: AnyObject {
         } catch let error as StorefrontAPI.Errors {
             return try await handleStorefrontError(error)
         } catch {
-            await authorizationDelegate.transition(to: .terminalError(error: error))
             if let checkoutError = error as? CheckoutError {
                 await onCheckoutFail?(checkoutError)
             }
+            try? await authorizationDelegate.transition(to: .terminalError(error: error))
             throw error
         }
     }
@@ -208,7 +208,7 @@ protocol PayController: AnyObject {
             return cart
 
         default:
-            await authorizationDelegate.transition(to: .unexpectedError(error: error))
+            try? await authorizationDelegate.transition(to: .unexpectedError(error: error))
             throw error
         }
     }
@@ -220,7 +220,7 @@ protocol PayController: AnyObject {
     ) async throws {
         if case let .interrupt(reason, _) = action {
             try authorizationDelegate.setCart(to: cart)
-            await authorizationDelegate.transition(to: .interrupt(reason: reason))
+            try? await authorizationDelegate.transition(to: .interrupt(reason: reason))
         }
     }
 
@@ -246,13 +246,13 @@ extension ApplePayViewController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         Task { @MainActor in
             self.onCheckoutComplete?(event)
-            await authorizationDelegate.transition(to: .completed)
+            try await authorizationDelegate.transition(to: .completed)
         }
     }
 
     func checkoutDidFail(error: CheckoutError) {
         Task { @MainActor in
-            self.onCheckoutFail?(error)
+            try self.onCheckoutFail?(error)
         }
     }
 
@@ -261,7 +261,7 @@ extension ApplePayViewController: CheckoutDelegate {
             /// x right button on CSK doesn't dismiss automatically
             checkoutViewController?.dismiss(animated: true)
             self.onCheckoutCancel?()
-            await authorizationDelegate.transition(to: .completed)
+            try await authorizationDelegate.transition(to: .completed)
         }
     }
 

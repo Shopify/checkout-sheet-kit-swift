@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import PassKit
+import Foundation
 @testable import ShopifyAcceleratedCheckouts
 
 // MARK: - Configuration Helpers
@@ -70,7 +70,8 @@ extension ShopSettings {
                 url: "https://test-shop.myshopify.com"
             ),
             paymentSettings: PaymentSettings(
-                countryCode: "US"
+                countryCode: "US",
+                acceptedCardBrands: [.visa, .mastercard, .americanExpress, .discover]
             )
         )
     }
@@ -82,7 +83,8 @@ extension ShopSettings {
             url: "https://test-shop.myshopify.com"
         ),
         paymentSettings: PaymentSettings = PaymentSettings(
-            countryCode: "US"
+            countryCode: "US",
+            acceptedCardBrands: [.visa, .mastercard, .americanExpress, .discover]
         )
     ) -> ShopSettings {
         return ShopSettings(
@@ -98,18 +100,15 @@ extension ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     static var testConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
         return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
             merchantIdentifier: "merchant.test.id",
-            supportedNetworks: [.visa],
             contactFields: [.email, .phone]
         )
     }
 
     static func testConfiguration(
-        merchantIdentifier: String = "merchant.test.id",
-        supportedNetworks: [PKPaymentNetwork] = [.visa]
+        merchantIdentifier: String = "merchant.test.id"
     ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
         return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
             merchantIdentifier: merchantIdentifier,
-            supportedNetworks: supportedNetworks,
             contactFields: [.email, .phone]
         )
     }
@@ -134,6 +133,59 @@ extension ApplePayConfigurationWrapper {
             common: common,
             applePay: applePay,
             shopSettings: shopSettings
+        )
+    }
+}
+
+// MARK: - StorefrontAPI.Cart Helpers
+
+@available(iOS 17.0, *)
+extension StorefrontAPI.Cart {
+    static var testCart: StorefrontAPI.Cart {
+        let checkoutURL = URL(string: "https://test-shop.myshopify.com/checkout")!
+        return StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(checkoutURL),
+            totalQuantity: 1,
+            buyerIdentity: nil,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+    }
+
+    static func testCart(
+        id: String = "gid://Shopify/Cart/test-cart-id",
+        checkoutUrl: URL? = nil,
+        totalQuantity: Int = 1,
+        totalAmount: Double = 100.0,
+        currencyCode: String = "USD"
+    ) -> StorefrontAPI.Cart {
+        let url = checkoutUrl ?? URL(string: "https://test-shop.myshopify.com/checkout")!
+        return StorefrontAPI.Cart(
+            id: GraphQLScalars.ID(id),
+            checkoutUrl: GraphQLScalars.URL(url),
+            totalQuantity: totalQuantity,
+            buyerIdentity: nil,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(totalAmount), currencyCode: currencyCode),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
         )
     }
 }
