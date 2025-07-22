@@ -75,6 +75,36 @@ extension StorefrontAPI {
         return cart
     }
 
+    struct CartBuyerIdentityUpdateInput: Codable {
+        var email: String?
+        var phoneNumber: String?
+        var customerAccessToken: String?
+        var countryCode: String?
+
+        var dictionary: [String: String] {
+            return [
+                "email": email,
+                "phoneNumber": phoneNumber,
+                "customerAccessToken": customerAccessToken,
+                "countryCode": countryCode
+            ].compactMapValues { $0 }
+        }
+
+        var isEmpty: Bool { dictionary.isEmpty }
+
+        init(email: String? = nil, phoneNumber: String? = nil, customerAccessToken: String? = nil) {
+            self.email = email
+            self.phoneNumber = phoneNumber
+            self.customerAccessToken = customerAccessToken
+
+        }
+
+        init(countryCode: String, customerAccessToken: String? = nil) {
+            self.countryCode = countryCode
+            self.customerAccessToken = customerAccessToken
+        }
+    }
+
     /// Update buyer identity on a cart
     /// - Parameters:
     ///   - id: Cart ID
@@ -82,31 +112,17 @@ extension StorefrontAPI {
     ///   - phone: Buyers phone number
     ///   - customerAccessToken: Customer access token
     /// - Returns: Updated cart
-    func cartBuyerIdentityUpdate(
+    @discardableResult func cartBuyerIdentityUpdate(
         id: GraphQLScalars.ID,
-        email: String? = nil,
-        phoneNumber: String? = nil,
-        customerAccessToken: String? = nil
+        input buyerIdentity: CartBuyerIdentityUpdateInput
     ) async throws -> Cart {
-        var buyerIdentity: [String: String] = [:]
-
-        if let email {
-            buyerIdentity["email"] = email
-        }
-        if let phoneNumber {
-            buyerIdentity["phone"] = phoneNumber
-        }
-        if let customerAccessToken {
-            buyerIdentity["customerAccessToken"] = customerAccessToken
-        }
-
         if buyerIdentity.isEmpty {
             throw GraphQLError.invalidVariables
         }
 
         let variables: [String: Any] = [
             "cartId": id.rawValue,
-            "buyerIdentity": buyerIdentity
+            "buyerIdentity": buyerIdentity.dictionary
         ]
 
         let response = try await client.mutate(

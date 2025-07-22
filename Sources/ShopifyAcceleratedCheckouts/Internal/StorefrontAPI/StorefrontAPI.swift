@@ -39,15 +39,18 @@ import Foundation
         storefrontDomain: String,
         storefrontAccessToken: String,
         apiVersion: String = ShopifyAcceleratedCheckouts.apiVersion,
-        countryCode: CountryCode = .US,
-        languageCode: LanguageCode = .EN
+        countryCode: CountryCode? = nil,
+        languageCode: LanguageCode? = nil
     ) {
         let url = URL(string: "https://\(storefrontDomain)/api/\(apiVersion)/graphql.json")!
 
         client = GraphQLClient(
             url: url,
             headers: ["X-Shopify-Storefront-Access-Token": storefrontAccessToken],
-            context: InContextDirective(countryCode: countryCode, languageCode: languageCode)
+            context: InContextDirective(
+                countryCode: countryCode,
+                languageCode: languageCode
+            )
         )
     }
 }
