@@ -24,10 +24,10 @@
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
-/// Possible Wallets `AcceleratedCheckouts` can render via the `.withWallets` modifier.
+/// Possible Wallets `AcceleratedCheckouts` can render via the `.wallets` modifier.
 public enum Wallet {
-    case applepay
-    case shoppay
+    case applePay
+    case shopPay
 }
 
 /// Event handlers for wallet buttons
