@@ -21,7 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import PassKit
 import ShopifyAcceleratedCheckouts
 import SwiftUI
 
@@ -78,7 +77,6 @@ private func createApplePayConfiguration(
 
     return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
         merchantIdentifier: "merchant.com.shopify.example.ShopifyAcceleratedCheckoutsApp",
-        supportedNetworks: [.amex, .discover, .masterCard, .visa],
         contactFields: fields
     )
 }
