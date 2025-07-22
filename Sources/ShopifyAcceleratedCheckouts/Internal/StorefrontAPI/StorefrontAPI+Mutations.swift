@@ -84,7 +84,7 @@ extension StorefrontAPI {
         var dictionary: [String: String] {
             return [
                 "email": email,
-                "phoneNumber": phoneNumber,
+                "phone": phoneNumber,
                 "customerAccessToken": customerAccessToken,
                 "countryCode": countryCode
             ].compactMapValues { $0 }

@@ -436,8 +436,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
         let cart = try await storefrontAPI.cartBuyerIdentityUpdate(
             id: GraphQLScalars.ID("gid://shopify/Cart/123"),
-            email: "test@example.com",
-            phoneNumber: ""
+            input: .init(email: "test@example.com", phoneNumber: "")
         )
 
         XCTAssertEqual(cart.buyerIdentity?.email, "test@example.com")
@@ -463,8 +462,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         await XCTAssertThrowsGraphQLError(
             try await storefrontAPI.cartBuyerIdentityUpdate(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
-                email: "invalid-email",
-                phoneNumber: ""
+                input: .init(email: "invalid-email", phoneNumber: "")
             ),
             { if case .invalidResponse = $0 { return true } else { return false } },
             "Expected GraphQLError.invalidResponse to be thrown"
@@ -482,8 +480,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
                         "totalQuantity": 1,
                         "buyerIdentity": {
                             "email": "customer@example.com",
-                            "phone": "+19876543210",
-                            "customerAccessToken": "customer-access-token-456"
+                            "phone": "+19876543210"
                         },
                         "deliveryGroups": {"nodes": []},
                         "delivery": null,
@@ -505,9 +502,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
         let cart = try await storefrontAPI.cartBuyerIdentityUpdate(
             id: GraphQLScalars.ID("gid://shopify/Cart/123"),
-            email: "customer@example.com",
-            phoneNumber: "+19876543210",
-            customerAccessToken: "customer-access-token-456"
+            input: .init(email: "customer@example.com", phoneNumber: "+19876543210", customerAccessToken: "customer-access-token-456")
         )
 
         XCTAssertEqual(cart.buyerIdentity?.email, "customer@example.com")
@@ -1406,8 +1401,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         do {
             _ = try await storefrontAPI.cartBuyerIdentityUpdate(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
-                email: "bad-email",
-                phoneNumber: ""
+                input: .init(email: "bad-email", phoneNumber: "")
             )
             XCTFail("Expected error to be thrown")
         } catch let cartError as StorefrontAPI.CartUserError {
