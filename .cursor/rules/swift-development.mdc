@@ -16,16 +16,15 @@ alwaysApply: true
 ## Verification Commands
 
 ### Check your work systematically:
-1. **Lint & Format** → `dev lint` (or `dev style`)
-2. **Build Issues** → `dev build`  
-3. **Test Issues** → `dev test`
-4. **All Checks** → `dev check` (runs everything)
+1. **Lint & Format** → `dev lint` (or `dev style`) - Checks for linting and stylistic errors
+2. **Build Issues** → `dev build` - Checks for compilation issues
+3. **Test Issues** → `dev test` - Checks for failing tests 
 
 ### Available dev commands:
 ```bash
 # Code Quality
 dev lint          # Check format & lint issues (alias: dev style)
-dev fix           # Auto-fix format & lint issues
+dev fix           # auto fixes formatting and linting issues
 
 # Building
 dev build packages    # Build ShopifyCheckoutSheetKit & ShopifyAcceleratedCheckouts
@@ -42,33 +41,27 @@ dev apollo codegen         # Generate Apollo client code
 
 ## Workflow Best Practices
 
-### Before committing:
-1. Run `dev lint` to ensure code style compliance
-2. Run `dev build` to verify compilation
-3. Run `dev test` if you've modified functionality
-4. Or just run `dev check` to do all of the above
-
 ### When you see errors:
 ❌ DON'T: Trust language server errors in Xcode/editor
 ✅ DO: Run the appropriate dev command to verify
 
 ### After making changes:
-- ALWAYS run `dev lint` before considering your work complete. This ensures consistency with CI checks.
+- ALWAYS run `dev fix && dev lint` to check your code is formatted and written in our style.
 
 ## Example Workflow
 
 ```bash
 # Make your Swift changes...
 
+# Fix any auto-fixable issues
+dev fix
+
+# Check for any remaining lint issues
+dev lint
+
 # Verify it compiles
 dev build
 
-# Fix any style issues
-dev fix
-
 # Run tests if needed
 dev test packages
-
-# Final check before commit
-dev check
 ```

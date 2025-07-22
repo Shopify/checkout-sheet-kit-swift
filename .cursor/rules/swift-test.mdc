@@ -14,9 +14,9 @@ alwaysApply: true
 - Write focused tests that test one thing at a time
 - Use descriptive test method names that explain what is being tested
 - Catch only one error type per test
+- Create separate test methods instead of conditional logic
 
 ### DON'T:
-- Write conditional logic (if/else) inside tests - create separate test methods instead
 - Use typed catches when testing throwing expressions
 - Delete and recreate test files when debugging
 - Add boilerplate comments like "// Given", "// When", "// Then"
