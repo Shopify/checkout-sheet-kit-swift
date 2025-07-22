@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -42,7 +42,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CB10C8EF2DD7304E0036CDB1 /* Exceptions for "ShopifyAcceleratedCheckoutsApp" folder in "ShopifyAcceleratedCheckoutsApp" target */ = {
+		CB10C8EF2DD7304E0036CDB1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -52,24 +52,9 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		CBC3DEB72DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				CB10C8EF2DD7304E0036CDB1 /* Exceptions for "ShopifyAcceleratedCheckoutsApp" folder in "ShopifyAcceleratedCheckoutsApp" target */,
-			);
-			path = ShopifyAcceleratedCheckoutsApp;
-			sourceTree = "<group>";
-		};
-		CBC3DECA2DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ShopifyAcceleratedCheckoutsAppTests;
-			sourceTree = "<group>";
-		};
-		CBC3DED42DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ShopifyAcceleratedCheckoutsAppUITests;
-			sourceTree = "<group>";
-		};
+		CBC3DEB72DD3607300376831 /* ShopifyAcceleratedCheckoutsApp */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (CB10C8EF2DD7304E0036CDB1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ShopifyAcceleratedCheckoutsApp; sourceTree = "<group>"; };
+		CBC3DECA2DD3607400376831 /* ShopifyAcceleratedCheckoutsAppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ShopifyAcceleratedCheckoutsAppTests; sourceTree = "<group>"; };
+		CBC3DED42DD3607400376831 /* ShopifyAcceleratedCheckoutsAppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ShopifyAcceleratedCheckoutsAppUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +211,7 @@
 				};
 			};
 			buildConfigurationList = CBC3DEB02DD3607300376831 /* Build configuration list for PBXProject "ShopifyAcceleratedCheckoutsApp" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -238,7 +224,6 @@
 				CBD9D6D02E12AE5A00D836A3 /* XCRemoteSwiftPackageReference "apollo-ios" */,
 				CBCDA6652E2117AF000463E9 /* XCLocalSwiftPackageReference "../../../checkout-sheet-kit-swift" */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = CBC3DEB62DD3607300376831 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
