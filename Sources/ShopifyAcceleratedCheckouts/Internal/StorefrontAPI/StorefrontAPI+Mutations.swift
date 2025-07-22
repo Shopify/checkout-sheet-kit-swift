@@ -96,7 +96,6 @@ extension StorefrontAPI {
             self.email = email
             self.phoneNumber = phoneNumber
             self.customerAccessToken = customerAccessToken
-
         }
 
         init(countryCode: String, customerAccessToken: String? = nil) {

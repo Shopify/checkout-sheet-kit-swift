@@ -42,7 +42,7 @@ struct InContextDirective {
     var toString: String {
         let directiveArgs = [
             "country: \(countryCode.rawValue)",
-            "language: \(languageCode.rawValue)",
+            "language: \(languageCode.rawValue)"
         ].joined(separator: ", ")
 
         return "@inContext(\(directiveArgs))"
