@@ -175,10 +175,11 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             )
 
             let response = try await controller.storefront.cartSubmitForCompletion(id: cartID)
-
             try? await transition(
                 to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url)
             )
+
+            return pkDecoder.paymentAuthorizationResult()
         } catch {
             print("didAuthorizePayment error:\n \(error)", terminator: "\n\n")
             return await handleError(error: error, cart: controller.cart) {
