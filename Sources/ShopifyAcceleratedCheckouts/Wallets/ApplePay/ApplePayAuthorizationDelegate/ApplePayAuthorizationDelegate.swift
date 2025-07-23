@@ -25,26 +25,51 @@ import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
+// MARK: - PaymentAuthorizationController Protocol
+
+/// Protocol to abstract PKPaymentAuthorizationController for testing
+@available(iOS 17.0, *)
+protocol PaymentAuthorizationController {
+    var delegate: PKPaymentAuthorizationControllerDelegate? { get set }
+    func present() async -> Bool
+    func dismiss(completion: (() -> Void)?)
+}
+
+extension PKPaymentAuthorizationController: PaymentAuthorizationController {}
+
+@available(iOS 17.0, *)
+typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthorizationController
+
 @available(iOS 17.0, *)
 class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     let configuration: ApplePayConfigurationWrapper
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
     var controller: PayController
 
+    /// Factory for creating PaymentAuthorizationController instances - injectable for testing
+    var paymentControllerFactory: PKAuthorizationControllerFactory
+
     /// A URL that will render checkout for the cart contents
     var checkoutURL: URL?
 
-    /// URL to be passed to ShopifyCheckoutSheetKit.present
-    /// Selects the url based on the current State
-    var url: URL? {
+    /// Computes URL for a given state
+    func createSheetKitURL(for state: ApplePayState) -> URL? {
         if case let .cartSubmittedForCompletion(redirectURL) = state {
             return redirectURL
         }
 
         guard let checkoutURL else { return nil }
-        guard case let .interrupt(reason) = state else { return checkoutURL }
+        guard case let .interrupt(reason) = state else {
+            return checkoutURL
+        }
 
-        return checkoutURL.appendQueryParam(name: reason.queryParam, value: "true")
+        // If there's no query param to add, just return the checkout URL
+        guard let queryParam = reason.queryParam else {
+            return checkoutURL
+        }
+
+        // Try to append the query param, fall back to checkout URL if it fails
+        return checkoutURL.appendQueryParam(name: queryParam, value: "true") ?? checkoutURL
     }
 
     var selectedShippingAddressID: StorefrontAPI.Types.ID?
@@ -52,9 +77,16 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     var pkEncoder: PKEncoder
     var pkDecoder: PKDecoder
 
-    init(configuration: ApplePayConfigurationWrapper, controller: PayController) {
+    init(
+        configuration: ApplePayConfigurationWrapper,
+        controller: PayController,
+        paymentControllerFactory: @escaping PKAuthorizationControllerFactory = {
+            PKPaymentAuthorizationController(paymentRequest: $0)
+        }
+    ) {
         self.configuration = configuration
         self.controller = controller
+        self.paymentControllerFactory = paymentControllerFactory
 
         pkEncoder = PKEncoder(configuration: configuration, cart: { controller.cart })
         pkDecoder = PKDecoder(configuration: configuration, cart: { controller.cart })
@@ -76,21 +108,21 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         try setCart(to: cart)
         let paymentRequest = try pkDecoder.createPaymentRequest()
 
-        let paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
+        var paymentController = paymentControllerFactory(paymentRequest)
         paymentController.delegate = self
         let presented = await paymentController.present()
 
-        await transition(to: presented ? .appleSheetPresented : .reset)
+        try await transition(to: presented ? .appleSheetPresented : .reset)
     }
 
-    func transition(to nextState: ApplePayState) async {
+    func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
             #if DEBUG
                 print(
-                    "⚠️ Invalid state transition attempted: \(String(describing: state)) -> \(String(describing: nextState))"
+                    "⚠️ InvalidStateTransitionError: \(String(describing: state)) -> \(String(describing: nextState))"
                 )
             #endif
-            return
+            throw InvalidStateTransitionError(fromState: state, toState: nextState)
         }
 
         let previousState = state
@@ -101,57 +133,68 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
             try? await startPaymentRequest()
 
         case .reset:
-            await onReset()
-
-        case .interrupt:
-            await onInterrupt()
+            try await onReset()
 
         case let .presentingCSK(url):
-            guard let url else { return }
-            try? await controller.present(url: url)
+            try await onPresentingCSK(to: url, previousState: previousState)
 
         /// As a "terminal" state, acts as a decision point to either:
         /// - present TYP (redirectUrl)
         /// - present Checkout to resolve errors (checkoutUrl, possibly with interrupt query params)
         /// - transition to .reset e.g. if user is dismissing/cancelling the payment sheets
         case .completed:
-            await onCompleted(previousState: previousState)
+            try await onCompleted(previousState: previousState)
 
         default:
             break
         }
     }
 
-    private func onReset() async {
+    private func onReset() async throws {
         pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
         pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
         selectedShippingAddressID = nil
         checkoutURL = nil
-        await transition(to: .idle)
+        try await transition(to: .idle)
     }
 
-    private func onInterrupt() async {
-        try? await _Concurrency.Task.retrying {
-            let cartID = try self.pkEncoder.cartID.get()
-            try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
-                id: cartID
+    private func onPresentingCSK(to url: URL?, previousState: ApplePayState) async throws {
+        guard let url else {
+            try await transition(
+                to: .terminalError(
+                    error: ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
+                )
             )
-        }.value
+            return
+        }
+
+        switch previousState {
+        case .cartSubmittedForCompletion:
+            break
+        default:
+            try? await _Concurrency.Task.retrying {
+                let cartID = try self.pkEncoder.cartID.get()
+                try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
+                    id: cartID
+                )
+            }.value
+        }
+
+        try? await controller.present(url: url)
     }
 
-    private func onCompleted(previousState: ApplePayState) async {
+    private func onCompleted(previousState: ApplePayState) async throws {
         switch previousState {
         case .paymentAuthorizationFailed,
-             .interrupt,
              .unexpectedError,
-             .paymentAuthorized:
-            await transition(to: .presentingCSK(url: url))
+             .interrupt:
+            try await transition(to: .presentingCSK(url: createSheetKitURL(for: previousState)))
 
         case let .cartSubmittedForCompletion(redirectURL):
-            await transition(to: .presentingCSK(url: redirectURL))
+            try await transition(to: .presentingCSK(url: redirectURL))
 
         default:
-            await transition(to: .reset)
+            try await transition(to: .reset)
         }
     }
 
@@ -210,5 +253,19 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
 
         return cart
+    }
+}
+
+// MARK: - InvalidStateTransitionError
+
+/// Error thrown when an invalid state transition is attempted
+@available(iOS 17.0, *)
+struct InvalidStateTransitionError: Error {
+    let fromState: ApplePayState
+    let toState: ApplePayState
+
+    var localizedDescription: String {
+        return
+            "Invalid state transition attempted: \(String(describing: fromState)) -> \(String(describing: toState))"
     }
 }
