@@ -35,9 +35,9 @@ extension Locale {
     /// Returns the device's current country code mapped to CountryCode enum
     static var deviceCountryCode: CountryCode {
         guard let regionCode = Locale.current.region?.identifier,
-            let countryCode = CountryCode(rawValue: regionCode)
+              let countryCode = CountryCode(rawValue: regionCode)
         else {
-            return defaultCountryCode 
+            return defaultCountryCode
         }
         return countryCode
     }
@@ -45,7 +45,7 @@ extension Locale {
     /// Returns the device's current language code mapped to LanguageCode enum
     static var deviceLanguageCode: ShopifyLanguageCode {
         guard let languageCode = Locale.current.language.languageCode?.identifier else {
-            return defaultLanguageCode 
+            return defaultLanguageCode
         }
 
         // Handle special cases for language codes that need mapping
@@ -70,7 +70,7 @@ extension Locale {
                 return mappedCode
             }
 
-            return defaultLanguageCode 
+            return defaultLanguageCode
         }
     }
 }
