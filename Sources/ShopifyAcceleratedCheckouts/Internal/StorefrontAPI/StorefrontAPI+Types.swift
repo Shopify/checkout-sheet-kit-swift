@@ -1106,7 +1106,7 @@ class PaymentSettings {
 
     /// Checks if Shop Pay is supported by the shop
     var isShopPaySupported: Bool {
-        return supportedDigitalWallets.contains { $0.uppercased() == "SHOP_PAY" }
+        return supportedDigitalWallets.contains { $0.uppercased() == "SHOPIFY_PAY" }
     }
 }
 
