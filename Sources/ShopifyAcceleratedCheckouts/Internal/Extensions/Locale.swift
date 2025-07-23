@@ -29,12 +29,15 @@ typealias ShopifyLanguageCode = LanguageCode
 /// Extension to detect device locale and map to Shopify types
 @available(iOS 17.0, *)
 extension Locale {
+    private static let defaultCountryCode: CountryCode = .US
+    private static let defaultLanguageCode: ShopifyLanguageCode = .EN
+
     /// Returns the device's current country code mapped to CountryCode enum
     static var deviceCountryCode: CountryCode {
         guard let regionCode = Locale.current.region?.identifier,
-              let countryCode = CountryCode(rawValue: regionCode)
+            let countryCode = CountryCode(rawValue: regionCode)
         else {
-            return .US // Default fallback
+            return defaultCountryCode 
         }
         return countryCode
     }
@@ -42,7 +45,7 @@ extension Locale {
     /// Returns the device's current language code mapped to LanguageCode enum
     static var deviceLanguageCode: ShopifyLanguageCode {
         guard let languageCode = Locale.current.language.languageCode?.identifier else {
-            return ShopifyLanguageCode.EN // Default fallback
+            return defaultLanguageCode 
         }
 
         // Handle special cases for language codes that need mapping
@@ -67,7 +70,7 @@ extension Locale {
                 return mappedCode
             }
 
-            return ShopifyLanguageCode.EN // Default fallback
+            return defaultLanguageCode 
         }
     }
 }
