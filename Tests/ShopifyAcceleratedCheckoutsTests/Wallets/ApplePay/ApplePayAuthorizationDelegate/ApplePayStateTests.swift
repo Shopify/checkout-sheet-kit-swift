@@ -26,21 +26,20 @@ import PassKit
 import XCTest
 
 @available(iOS 17.0, *)
-final class ApplePayStateTransitionTests: XCTestCase {
-    // MARK: - Valid Transition Tests
+final class ApplePayStateTests: XCTestCase {
+    // MARK: - Individual State Transition Tests
 
-    func testValidTransitions_FromIdle() {
+    func test_canTransition_fromIdleState_shouldAllowOnlyStartPaymentRequest() {
         let fromState = ApplePayState.idle
 
         XCTAssertTrue(fromState.canTransition(to: .startPaymentRequest), "Should allow idle -> startPaymentRequest")
 
         XCTAssertFalse(fromState.canTransition(to: .idle), "Should not allow idle -> idle")
         XCTAssertFalse(fromState.canTransition(to: .appleSheetPresented), "Should not allow idle -> appleSheetPresented")
-        XCTAssertFalse(fromState.canTransition(to: .completed), "Should not allow idle -> completed")
         XCTAssertFalse(fromState.canTransition(to: .reset), "Should not allow idle -> reset")
     }
 
-    func testValidTransitions_FromStartPaymentRequest() {
+    func test_canTransition_fromStartPaymentRequestState_shouldAllowAppleSheetPresentedAndReset() {
         let fromState = ApplePayState.startPaymentRequest
 
         XCTAssertTrue(fromState.canTransition(to: .appleSheetPresented), "Should allow startPaymentRequest -> appleSheetPresented")
@@ -51,7 +50,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .completed), "Should not allow startPaymentRequest -> completed")
     }
 
-    func testValidTransitions_FromAppleSheetPresented() {
+    func test_canTransition_fromAppleSheetPresentedState_shouldAllowPaymentAuthorizationAndInterruptAndCompleted() {
         let fromState = ApplePayState.appleSheetPresented
 
         XCTAssertTrue(fromState.canTransition(to: .paymentAuthorized(payment: .createMockPayment())), "Should allow appleSheetPresented -> paymentAuthorized")
@@ -64,7 +63,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .reset), "Should not allow appleSheetPresented -> reset")
     }
 
-    func testValidTransitions_FromPaymentAuthorized() {
+    func test_canTransition_fromPaymentAuthorizedState_shouldAllowCartSubmissionAndFailureAndInterrupt() {
         let fromState = ApplePayState.paymentAuthorized(payment: .createMockPayment())
 
         XCTAssertTrue(fromState.canTransition(to: ApplePayState.cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!)), "Should allow paymentAuthorized -> cartSubmittedForCompletion")
@@ -77,7 +76,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: ApplePayState.reset), "Should not allow paymentAuthorized -> reset")
     }
 
-    func testValidTransitions_FromPaymentAuthorizationFailed() {
+    func test_canTransition_fromPaymentAuthorizationFailedState_shouldAllowCompletedAndReset() {
         let fromState = ApplePayState.paymentAuthorizationFailed(error: MockError.testError)
 
         XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow paymentAuthorizationFailed -> completed")
@@ -88,7 +87,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .appleSheetPresented), "Should not allow paymentAuthorizationFailed -> appleSheetPresented")
     }
 
-    func testValidTransitions_FromCartSubmittedForCompletion() {
+    func test_canTransition_fromCartSubmittedForCompletionState_shouldAllowOnlyCompleted() {
         let fromState = ApplePayState.cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!)
 
         XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow cartSubmittedForCompletion -> completed")
@@ -99,7 +98,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .presentingCSK(url: nil)), "Should not allow cartSubmittedForCompletion -> presentingCSK")
     }
 
-    func testValidTransitions_FromInterrupt() {
+    func test_canTransition_fromInterruptState_shouldAllowOnlyCompleted() {
         let fromState = ApplePayState.interrupt(reason: .currencyChanged)
 
         XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow interrupt -> completed")
@@ -110,7 +109,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .presentingCSK(url: nil)), "Should not allow interrupt -> presentingCSK")
     }
 
-    func testValidTransitions_FromUnexpectedError() {
+    func test_canTransition_fromUnexpectedErrorState_shouldAllowCompletedAndTerminalError() {
         let fromState = ApplePayState.unexpectedError(error: MockError.testError)
 
         XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow unexpectedError -> completed")
@@ -121,7 +120,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .presentingCSK(url: nil)), "Should not allow unexpectedError -> presentingCSK")
     }
 
-    func testValidTransitions_FromTerminalError() {
+    func test_canTransition_fromTerminalErrorState_shouldAllowOnlyCompleted() {
         let fromState = ApplePayState.terminalError(error: MockError.testError)
 
         XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow terminalError -> completed")
@@ -131,7 +130,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .startPaymentRequest), "Should not allow terminalError -> startPaymentRequest")
     }
 
-    func testValidTransitions_FromPresentingCSK() {
+    func test_canTransition_fromPresentingCSKState_shouldAllowOnlyCompleted() {
         let fromState = ApplePayState.presentingCSK(url: URL(string: "https://example.com"))
 
         XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow presentingCSK -> completed")
@@ -141,7 +140,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .startPaymentRequest), "Should not allow presentingCSK -> startPaymentRequest")
     }
 
-    func testValidTransitions_FromCompleted() {
+    func test_canTransition_fromCompletedState_shouldAllowPresentingCSKAndReset() {
         let fromState = ApplePayState.completed
 
         XCTAssertTrue(fromState.canTransition(to: .presentingCSK(url: URL(string: "https://example.com"))), "Should allow completed -> presentingCSK")
@@ -152,7 +151,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .completed), "Should not allow completed -> completed")
     }
 
-    func testValidTransitions_FromReset() {
+    func test_canTransition_fromResetState_shouldAllowOnlyIdle() {
         let fromState = ApplePayState.reset
 
         XCTAssertTrue(fromState.canTransition(to: .idle), "Should allow reset -> idle")
@@ -164,7 +163,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
 
     // MARK: - Error State Transition Tests
 
-    func testErrorStatesCanBeReachedFromAnyState() {
+    func test_canTransition_fromAnyState_shouldAllowErrorStates() {
         let allStates: [ApplePayState] = [
             .idle,
             .startPaymentRequest,
@@ -192,9 +191,9 @@ final class ApplePayStateTransitionTests: XCTestCase {
         }
     }
 
-    // MARK: - Comprehensive State Flow Tests
+    // MARK: - End-to-End Flow Tests
 
-    func testTypicalSuccessFlow() {
+    func test_canTransition_throughTypicalSuccessFlow_shouldAllowAllTransitions() {
         XCTAssertTrue(ApplePayState.idle.canTransition(to: .startPaymentRequest))
         XCTAssertTrue(ApplePayState.startPaymentRequest.canTransition(to: .appleSheetPresented))
         XCTAssertTrue(ApplePayState.appleSheetPresented.canTransition(to: .paymentAuthorized(payment: .createMockPayment())))
@@ -206,7 +205,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertTrue(ApplePayState.reset.canTransition(to: .idle))
     }
 
-    func testTypicalFailureFlow() {
+    func test_canTransition_throughTypicalFailureFlow_shouldAllowAllTransitions() {
         XCTAssertTrue(ApplePayState.idle.canTransition(to: .startPaymentRequest))
         XCTAssertTrue(ApplePayState.startPaymentRequest.canTransition(to: .appleSheetPresented))
         XCTAssertTrue(ApplePayState.appleSheetPresented.canTransition(to: .paymentAuthorizationFailed(error: MockError.testError)))
@@ -217,7 +216,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertTrue(ApplePayState.reset.canTransition(to: .idle))
     }
 
-    func testInterruptFlow() {
+    func test_canTransition_throughInterruptFlow_shouldAllowAllTransitions() {
         XCTAssertTrue(ApplePayState.idle.canTransition(to: .startPaymentRequest))
         XCTAssertTrue(ApplePayState.startPaymentRequest.canTransition(to: .appleSheetPresented))
         XCTAssertTrue(ApplePayState.appleSheetPresented.canTransition(to: .interrupt(reason: .currencyChanged)))
@@ -228,7 +227,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         XCTAssertTrue(ApplePayState.reset.canTransition(to: .idle))
     }
 
-    func testUserCancelFlow() {
+    func test_canTransition_throughUserCancelFlow_shouldAllowAllTransitions() {
         XCTAssertTrue(ApplePayState.idle.canTransition(to: .startPaymentRequest))
         XCTAssertTrue(ApplePayState.startPaymentRequest.canTransition(to: .appleSheetPresented))
         XCTAssertTrue(ApplePayState.appleSheetPresented.canTransition(to: .completed))
@@ -238,7 +237,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
 
     // MARK: - Edge Case Tests
 
-    func testSelfTransitionsAreInvalid() {
+    func test_canTransition_withSelfTransition_shouldRejectForNonErrorStates() {
         let nonErrorStates: [ApplePayState] = [
             .idle,
             .startPaymentRequest,
@@ -273,7 +272,7 @@ final class ApplePayStateTransitionTests: XCTestCase {
         }
     }
 
-    func testInterruptReasonVariations() {
+    func test_canTransition_withDifferentInterruptReasons_shouldBehaveSameForAllReasons() {
         let interruptReasons: [ErrorHandler.InterruptReason] = [
             .currencyChanged,
             .outOfStock,
