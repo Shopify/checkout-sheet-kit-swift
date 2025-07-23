@@ -37,32 +37,14 @@ struct ButtonSet: View {
         VStack(spacing: 16) {
             if let cartID = cart?.id {
                 CheckoutSection(
-                    title: "AcceleratedCheckoutButtons(cartID:)", renderState: $renderState
+                    title: "AcceleratedCheckoutButtons(cartID:)",
+                    renderState: $renderState
                 ) {
                     // Cart-based checkout example with event handlers
                     AcceleratedCheckoutButtons(cartID: cartID)
-                        .onRenderStateChange { newState in
-                            renderState = newState
-                            switch newState {
-                            case .initial:
-                                print("init...")
-                            case .loading:
-                                print("Loading...")
-                            case let .ready(availableWallets):
-                                print(
-                                    "Ready to checkout with: \(availableWallets.map(\.displayName).joined(separator: ", "))"
-                                )
-                            case let .fallback(reason):
-                                print("Fallback state: \(reason.localizedDescription)")
-                            }
-                        }
+                        .onRenderStateChange { renderState = $0 }
                         .onComplete { event in
-                            print(
-                                """
-                                ✅ Checkout completed successfully!
-                                   Order ID: \(event.orderDetails.id)
-                                """
-                            )
+                            print("✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)")
                             onComplete()
                         }
                         .onFail { error in
@@ -73,7 +55,8 @@ struct ButtonSet: View {
                         }
                         .onShouldRecoverFromError { error in
                             print("🔄 Should recover from error: \(error)")
-                            return true  // Example: always attempt recovery
+                            // Return true to attempt recovery, false to fail
+                            return true
                         }
                         .onClickLink { url in
                             print("🔗 Link clicked: \(url)")
@@ -118,7 +101,7 @@ struct ButtonSet: View {
                     }
                     .onShouldRecoverFromError { error in
                         print("🔄 Variant - Should recover from error: \(error)")
-                        return false  // Example: don't recover for variant checkout
+                        return false // Example: don't recover for variant checkout
                     }
                     .onClickLink { url in
                         print("🔗 Variant - Link clicked: \(url)")
@@ -164,7 +147,7 @@ private struct CheckoutSection<Content: View>: View {
 
                 if case .fallback = renderState {
                     VStack(spacing: 8) {
-                        Text("Theres been an error loading Checkouts.")
+                        Text("Theres been an error loading AcceleratedCheckouts.")
                     }
                 }
                 content()
@@ -177,65 +160,3 @@ private struct CheckoutSection<Content: View>: View {
     }
 }
 
-// MARK: - Sample App Skeleton UI
-
-private struct SkeletonButton: View {
-    @State private var isAnimating = false
-
-    var body: some View {
-        Rectangle()
-            .fill(Color.gray.opacity(0.3))
-            .frame(height: 48)
-            .cornerRadius(8)
-            .overlay(
-                HStack {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.5))
-                        .frame(width: 100, height: 16)
-                        .cornerRadius(8)
-                    Spacer()
-                }
-                .padding(.horizontal, 16)
-            )
-            .shimmer()
-    }
-}
-
-private struct ShimmerModifier: ViewModifier {
-    @State private var isAnimating = false
-
-    func body(content: Content) -> some View {
-        content
-            .overlay(
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.clear,
-                                Color.white.opacity(0.3),
-                                Color.clear,
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .rotationEffect(.degrees(30))
-                    .offset(x: isAnimating ? 300 : -300)
-                    .animation(
-                        .easeInOut(duration: 1.5).repeatForever(autoreverses: false),
-                        value: isAnimating
-                    )
-                    .onAppear {
-                        isAnimating = true
-                    }
-                    .clipped()
-            )
-            .clipped()
-    }
-}
-
-extension View {
-    fileprivate func shimmer() -> some View {
-        modifier(ShimmerModifier())
-    }
-}
