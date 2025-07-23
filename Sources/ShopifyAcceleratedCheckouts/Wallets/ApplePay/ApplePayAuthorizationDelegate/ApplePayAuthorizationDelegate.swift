@@ -168,8 +168,10 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
             return
         }
 
-        if case .cartSubmittedForCompletion = previousState {
-        } else {
+        switch previousState {
+        case .cartSubmittedForCompletion:
+            break
+        default:
             try? await _Concurrency.Task.retrying {
                 let cartID = try self.pkEncoder.cartID.get()
                 try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
