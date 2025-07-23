@@ -25,6 +25,7 @@ import Apollo
 import ApolloAPI
 import Foundation
 
+typealias ID = Storefront.ID
 typealias Cart = Storefront.CartCreateMutation.Data.CartCreate.Cart
 typealias CartLine = Storefront.CartCreateMutation.Data.CartCreate.Cart.Lines.Node
 typealias CartProductVariant = Storefront.CartCreateMutation.Data.CartCreate.Cart.Lines.Node

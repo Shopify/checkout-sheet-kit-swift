@@ -36,13 +36,26 @@ public struct AcceleratedCheckoutButtons: View {
     @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
     private var configuration
 
+    // Use shared shop settings manager instead of individual state
+    @Bindable private var settingsManager = ShopSettingsManager.shared
+
     let identifier: CheckoutIdentifier
-    var wallets: [WalletType] = [.shopPay, .applePay]
+    var wallets: Set<WalletType> = [.shopPay, .applePay]
+    var supportedWallets: Set<WalletType> {
+        guard let supportedDigitalWallets = settingsManager.shopSettings?.paymentSettings.supportedDigitalWallets
+        else { return Set() }
+
+        return Set(supportedDigitalWallets.compactMap { WalletType(rawValue: $0) })
+    }
+
     var eventHandlers: EventHandlers = .init()
     var cornerRadius: CGFloat?
 
-    @State private var shopSettings: ShopSettings?
-    @State private var currentState: RenderState = .loading
+    @State private var currentState: RenderState = .loading {
+        didSet {
+            eventHandlers.stateDidChange?(currentState)
+        }
+    }
 
     /// Initializes an Apple Pay button with a cart ID
     /// - Parameters:
@@ -60,7 +73,10 @@ public struct AcceleratedCheckoutButtons: View {
     public init(variantID: String, quantity: Int) {
         identifier = .variant(variantID: variantID, quantity: quantity).parse()
         if identifier.isValid() == false {
-            let error = NSError(domain: "AcceleratedCheckoutButtons", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid variant ID"])
+            let error = NSError(
+                domain: "AcceleratedCheckoutButtons", code: 1001,
+                userInfo: [NSLocalizedDescriptionKey: "Invalid variant ID"]
+            )
             _currentState = State(initialValue: .fallback(reason: .configurationError(error)))
         }
     }
@@ -68,9 +84,9 @@ public struct AcceleratedCheckoutButtons: View {
     public var body: some View {
         if identifier.isValid() {
             VStack {
-                if let shopSettings {
+                if let shopSettings = settingsManager.shopSettings {
                     VStack {
-                        ForEach(wallets, id: \.self) {
+                        ForEach(Array(wallets.intersection(supportedWallets)), id: \.self) {
                             switch $0 {
                             case .applePay:
                                 ApplePayButton(
@@ -90,36 +106,37 @@ public struct AcceleratedCheckoutButtons: View {
                         .onAppear {
                             updateRenderState()
                         }
+                } else {
+                    // No shop settings yet - component reports loading state via callback
+                    EmptyView()
+                        .onAppear {
+                            eventHandlers.stateDidChange?(.loading)
+                        }
                 }
             }
             .task { await loadShopSettings() }
+            .onChange(of: settingsManager.shopSettings != nil) { _, _ in
+                updateRenderState()
+            }
+            .onChange(of: settingsManager.error != nil) { _, hasError in
+                if hasError, let error = settingsManager.error {
+                    currentState = .fallback(reason: .unexpectedError(error))
+                }
+            }
+        } else {
+            EmptyView()
+                .onAppear {
+                    eventHandlers.stateDidChange?(.fallback(reason: .invalidConfiguration))
+                }
         }
     }
 
     private func loadShopSettings() async {
-        // Start in loading state
-        await MainActor.run {
-            currentState = .loading
-            eventHandlers.stateDidChange?(currentState)
-        }
-
         do {
-            shopSettings = try await ShopSettings.load(
-                storefront: StorefrontAPI(
-                    storefrontDomain: configuration.storefrontDomain,
-                    storefrontAccessToken: configuration.storefrontAccessToken
-                ))
-
-            // Once shop settings are loaded, update the render state
-            await MainActor.run {
-                updateRenderState()
-            }
+            _ = try await ShopSettingsManager.shared.getSettings(for: configuration)
+            // Settings will be automatically available via @StateObject observation
         } catch {
-            print("Error loading shop settings: \(error)")
-            await MainActor.run {
-                currentState = .fallback(reason: .unexpectedError(error))
-                eventHandlers.stateDidChange?(currentState)
-            }
+            // Error will be automatically available via @StateObject observation
         }
     }
 
@@ -128,34 +145,25 @@ public struct AcceleratedCheckoutButtons: View {
             var availableWallets: [WalletType] = []
             var unavailableReasons: [UnavailableReason] = []
 
-            // Check each wallet's availability
             for walletType in wallets {
-                let isAvailable = await checkWalletAvailability(walletType)
-                if isAvailable {
+                if await checkWalletAvailability(walletType) {
                     availableWallets.append(walletType)
-                } else {
-                    if let reason = await getUnavailableReason(for: walletType) {
-                        unavailableReasons.append(reason)
-                    }
+                } else if let reason = await getUnavailableReason(for: walletType) {
+                    unavailableReasons.append(reason)
                 }
             }
 
-            // Determine the render state
-            let newState: RenderState
-            if availableWallets.count == wallets.count {
-                // All wallets are available
-                newState = .ready(availableWallets: availableWallets)
-            } else if availableWallets.isEmpty {
-                // No wallets are available
-                newState = .fallback(reason: .noWalletsAvailable)
-            } else {
-                // Some wallets are available
-                newState = .partiallyReady(availableWallets: availableWallets, unavailableReasons: unavailableReasons)
-            }
-
             await MainActor.run {
-                currentState = newState
-                eventHandlers.stateDidChange?(newState)
+                if availableWallets.isEmpty {
+                    currentState = .fallback(reason: .noWalletsAvailable)
+                } else if unavailableReasons.isEmpty {
+                    currentState = .ready(availableWallets: availableWallets)
+                } else {
+                    currentState = .partiallyReady(
+                        availableWallets: availableWallets,
+                        unavailableReasons: unavailableReasons
+                    )
+                }
             }
         }
     }
@@ -164,7 +172,7 @@ public struct AcceleratedCheckoutButtons: View {
         switch walletType {
         case .applePay:
             // First check if Apple Pay is supported by the shop
-            guard let shopSettings,
+            guard let shopSettings = settingsManager.shopSettings,
                   shopSettings.paymentSettings.isApplePaySupported
             else {
                 return false
@@ -173,7 +181,8 @@ public struct AcceleratedCheckoutButtons: View {
             // Check if Apple Pay is available on the device with shop's supported networks
             let supportedNetworks = shopSettings.paymentSettings.supportedNetworks
             if !supportedNetworks.isEmpty {
-                return PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
+                return PKPaymentAuthorizationController.canMakePayments(
+                    usingNetworks: supportedNetworks)
             } else {
                 // Fallback to general Apple Pay check if no specific networks
                 return PKPaymentAuthorizationController.canMakePayments()
@@ -181,7 +190,7 @@ public struct AcceleratedCheckoutButtons: View {
 
         case .shopPay:
             // Check if Shop Pay is supported by the shop
-            guard let shopSettings else {
+            guard let shopSettings = settingsManager.shopSettings else {
                 return false
             }
             return shopSettings.paymentSettings.isShopPaySupported
@@ -192,7 +201,7 @@ public struct AcceleratedCheckoutButtons: View {
         switch walletType {
         case .applePay:
             // Check shop support first
-            guard let shopSettings else {
+            guard let shopSettings = settingsManager.shopSettings else {
                 return .networkUnavailable
             }
 
@@ -207,14 +216,16 @@ public struct AcceleratedCheckoutButtons: View {
 
             // Check for specific card networks
             let supportedNetworks = shopSettings.paymentSettings.supportedNetworks
-            if !supportedNetworks.isEmpty, !PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks) {
+            if !supportedNetworks.isEmpty,
+               !PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
+            {
                 return .applePayNotSetUp
             }
 
             return nil
 
         case .shopPay:
-            guard let shopSettings else {
+            guard let shopSettings = settingsManager.shopSettings else {
                 return .networkUnavailable
             }
 
@@ -233,7 +244,7 @@ public struct AcceleratedCheckoutButtons: View {
 extension AcceleratedCheckoutButtons {
     /// Modifies the wallet options supported
     /// Defaults: [.applePay]
-    public func wallets(_ wallets: [WalletType]) -> AcceleratedCheckoutButtons {
+    public func wallets(_ wallets: Set<WalletType>) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.wallets = wallets
         return newView
@@ -353,7 +364,7 @@ extension AcceleratedCheckoutButtons {
     /// ```
     ///
     /// - Parameter action: The action to perform when a link is clicked
-    /// - Returns: A view with the link click handler set
+    /// - Returns: A view with the render state change handler set
     public func onClickLink(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.checkoutDidClickLink = action
@@ -400,11 +411,11 @@ extension AcceleratedCheckoutButtons {
     ///             hideLoadingIndicator()
     ///             analytics.track("accelerated_checkout_partial", properties: [
     ///                 "available": available.map(\.displayName),
-    ///                 "unavailable": unavailable.map(\.displayName)
+    ///                 "unavailable": unavailable.map(\.localizedDescription)
     ///             ])
     ///         case .fallback(let reason):
     ///             showFallbackUI()
-    ///             analytics.track("accelerated_checkout_fallback", properties: ["reason": reason.displayName])
+    ///             analytics.track("accelerated_checkout_fallback", properties: ["reason": reason.localizedDescription])
     ///         }
     ///     }
     /// ```

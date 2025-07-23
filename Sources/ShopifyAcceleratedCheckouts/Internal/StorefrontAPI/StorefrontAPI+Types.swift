@@ -957,32 +957,118 @@ extension StorefrontAPI.Address {
     }
 }
 
+/// Singleton manager for shop settings that provides shared state across all AcceleratedCheckoutButtons
+@available(iOS 17.0, *)
+@Observable class ShopSettingsManager {
+    static let shared = ShopSettingsManager()
+
+    private(set) var shopSettings: ShopSettings?
+    private(set) var isLoading = false
+    private(set) var error: Error?
+
+    // Store ongoing tasks to prevent duplicate requests
+    private var currentLoadTask: Task<ShopSettings, Error>?
+
+    // Use a serial queue to ensure atomic access to currentLoadTask
+    private let taskQueue = DispatchQueue(label: "com.shopify.ShopSettingsManager.taskQueue")
+
+    private init() {}
+
+    /// Load shop settings with proper concurrency handling
+    /// Multiple simultaneous calls will share the same network request
+    func loadSettings(for storefront: StorefrontAPI) async throws -> ShopSettings {
+        // If we already have settings, return them immediately
+        if let existingSettings = shopSettings {
+            return existingSettings
+        }
+
+        // Use the serial queue to atomically check and create the task
+        let task: Task<ShopSettings, Error> = await withCheckedContinuation { continuation in
+            taskQueue.async {
+                // If there's already a loading task, return it
+                if let existingTask = self.currentLoadTask {
+                    continuation.resume(returning: existingTask)
+                    return
+                }
+
+                // Create new task and store it atomically
+                let newTask = Task<ShopSettings, Error> {
+                    await MainActor.run {
+                        self.isLoading = true
+                        self.error = nil
+                    }
+
+                    do {
+                        let shop = try await storefront.shop()
+                        let settings = ShopSettings(from: shop)
+
+                        await MainActor.run {
+                            self.shopSettings = settings
+                            self.isLoading = false
+                        }
+
+                        // Clear the task on the queue
+                        await withCheckedContinuation { taskContinuation in
+                            self.taskQueue.async {
+                                self.currentLoadTask = nil
+                                taskContinuation.resume()
+                            }
+                        }
+
+                        return settings
+                    } catch {
+                        await MainActor.run {
+                            self.error = error
+                            self.isLoading = false
+                        }
+
+                        // Clear the task on the queue
+                        await withCheckedContinuation { taskContinuation in
+                            self.taskQueue.async {
+                                self.currentLoadTask = nil
+                                taskContinuation.resume()
+                            }
+                        }
+
+                        throw error
+                    }
+                }
+
+                self.currentLoadTask = newTask
+                continuation.resume(returning: newTask)
+            }
+        }
+
+        return try await task.value
+    }
+
+    /// Clear cached settings and reset state
+    func clearCache() {
+        taskQueue.sync {
+            shopSettings = nil
+            isLoading = false
+            error = nil
+            currentLoadTask?.cancel()
+            currentLoadTask = nil
+        }
+    }
+
+    /// Get settings for a specific storefront configuration
+    /// Returns cached settings if available for the same domain/token combination
+    func getSettings(for configuration: ShopifyAcceleratedCheckouts.Configuration) async throws -> ShopSettings {
+        let storefront = StorefrontAPI(
+            storefrontDomain: configuration.storefrontDomain,
+            storefrontAccessToken: configuration.storefrontAccessToken
+        )
+
+        return try await loadSettings(for: storefront)
+    }
+}
+
 /// Represents shop settings data fetched from the Storefront API
 /// https://shopify.dev/docs/api/storefront/2025-07/objects/Shop
 @available(iOS 17.0, *)
-@Observable class ShopSettings {
-    // Static property to store the cached settings
-    private static var cachedSettings: ShopSettings?
-
-    /// Loads shop settings from the API and caches them
-    static func load(storefront: StorefrontAPI) async throws -> ShopSettings {
-        if let cachedSettings {
-            return cachedSettings
-        }
-
-        let shop = try await storefront.shop()
-        let shopSettings = ShopSettings(from: shop)
-
-        cachedSettings = shopSettings
-
-        return shopSettings
-    }
-
-    /// Clear cached settings
-    static func clearCache() {
-        cachedSettings = nil
-    }
-
+@Observable class ShopSettings: Equatable {
     /// The shop's name (merchant name for display)
     let name: String
 
@@ -1027,6 +1113,17 @@ extension StorefrontAPI.Address {
             primaryDomain: primaryDomain,
             paymentSettings: paymentSettings
         )
+    }
+
+    // MARK: - Equatable
+
+    static func == (lhs: ShopSettings, rhs: ShopSettings) -> Bool {
+        return lhs.name == rhs.name &&
+            lhs.primaryDomain.host == rhs.primaryDomain.host &&
+            lhs.primaryDomain.url == rhs.primaryDomain.url &&
+            lhs.paymentSettings.countryCode == rhs.paymentSettings.countryCode &&
+            lhs.paymentSettings.acceptedCardBrands == rhs.paymentSettings.acceptedCardBrands &&
+            lhs.paymentSettings.supportedDigitalWallets == rhs.paymentSettings.supportedDigitalWallets
     }
 }
 

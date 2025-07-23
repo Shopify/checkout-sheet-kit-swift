@@ -33,16 +33,18 @@ public protocol Wallet {
 
 // MARK: - Render State Types
 
-public enum RenderState {
+/// Represents the various states that AcceleratedCheckoutButtons can be in
+public enum RenderState: Equatable {
     case loading
     case ready(availableWallets: [WalletType])
     case partiallyReady(availableWallets: [WalletType], unavailableReasons: [UnavailableReason])
     case fallback(reason: FallbackReason)
 }
 
-public enum WalletType: CaseIterable {
-    case applePay
-    case shopPay
+/// Available wallet types for accelerated checkout
+public enum WalletType: String, CaseIterable, Equatable {
+    case applePay = "APPLE_PAY"
+    case shopPay = "SHOPIFY_PAY"
 
     public var displayName: String {
         switch self {
@@ -52,59 +54,62 @@ public enum WalletType: CaseIterable {
     }
 }
 
-public enum UnavailableReason {
+/// Reasons why a wallet might be unavailable
+public enum UnavailableReason: Equatable {
     case applePayNotSetUp
     case applePayNotSupported
     case applePayUnsupportedRegion
     case shopPayNotEnabled
-    case shopPayUnsupportedRegion
-    case unsupportedCartCurrency
     case networkUnavailable
 
-    public var displayName: String {
+    public var localizedDescription: String {
         switch self {
         case .applePayNotSetUp:
             return "Apple Pay is not set up on this device"
         case .applePayNotSupported:
             return "Apple Pay is not supported on this device"
         case .applePayUnsupportedRegion:
-            return "Apple Pay is not available in this region"
+            return "Apple Pay is not supported in this region"
         case .shopPayNotEnabled:
             return "Shop Pay is not enabled for this shop"
-        case .shopPayUnsupportedRegion:
-            return "Shop Pay is not available in this region"
-        case .unsupportedCartCurrency:
-            return "Cart currency is not supported"
         case .networkUnavailable:
-            return "Network connection is not available"
-        }
-    }
-
-    public var wallet: WalletType? {
-        switch self {
-        case .applePayNotSetUp, .applePayNotSupported, .applePayUnsupportedRegion:
-            return .applePay
-        case .shopPayNotEnabled, .shopPayUnsupportedRegion:
-            return .shopPay
-        case .unsupportedCartCurrency, .networkUnavailable:
-            return nil // Affects all wallets
+            return "Network unavailable"
         }
     }
 }
 
-public enum FallbackReason {
+/// Reasons why the component should fall back to standard checkout
+public enum FallbackReason: Equatable {
     case noWalletsAvailable
+    case invalidConfiguration
     case configurationError(Error)
     case unexpectedError(Error)
 
-    public var displayName: String {
+    public var localizedDescription: String {
         switch self {
         case .noWalletsAvailable:
-            return "No accelerated checkout options are available"
-        case .configurationError:
-            return "Configuration error occurred"
-        case .unexpectedError:
-            return "An unexpected error occurred"
+            return "No payment methods available"
+        case .invalidConfiguration:
+            return "Invalid configuration"
+        case let .configurationError(error):
+            return "Configuration error: \(error.localizedDescription)"
+        case let .unexpectedError(error):
+            return "Unexpected error: \(error.localizedDescription)"
+        }
+    }
+
+    public static func == (lhs: FallbackReason, rhs: FallbackReason) -> Bool {
+        switch (lhs, rhs) {
+        case (.noWalletsAvailable, .noWalletsAvailable):
+            return true
+        case (.invalidConfiguration, .invalidConfiguration):
+            return true
+        case let (.configurationError(lhsError), .configurationError(rhsError)):
+            return lhsError.localizedDescription == rhsError.localizedDescription
+        case let (.unexpectedError(lhsError), .unexpectedError(rhsError)):
+            return lhsError.localizedDescription == rhsError.localizedDescription
+        default:
+            return false
         }
     }
 }

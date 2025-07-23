@@ -31,30 +31,34 @@ struct ButtonSet: View {
     let firstVariantQuantity: Int
     let onComplete: () -> Void
 
+    @State private var renderState: RenderState = .loading
+
     var body: some View {
         VStack(spacing: 16) {
             if let cartID = cart?.id {
-                CheckoutSection(title: "AcceleratedCheckoutButtons(cartID:)") {
+                CheckoutSection(title: "AcceleratedCheckoutButtons(cartID:)", renderState: $renderState) {
                     // Cart-based checkout example with event handlers
                     AcceleratedCheckoutButtons(cartID: cartID)
-
-                        .onRenderStateChange {
-                            switch $0 {
+                        .onRenderStateChange { newState in
+                            renderState = newState
+                            switch newState {
                             case .loading:
                                 print("Loading...")
                             case let .ready(availableWallets):
                                 print("Ready to checkout with: \(availableWallets.map(\.displayName).joined(separator: ", "))")
                             case let .partiallyReady(availableWallets, unavailableReasons):
                                 print("Partially ready with: \(availableWallets.map(\.displayName).joined(separator: ", "))")
-                                print("Unavailable: \(unavailableReasons.map(\.displayName).joined(separator: ", "))")
+                                print("Unavailable: \(unavailableReasons.map(\.localizedDescription).joined(separator: ", "))")
                             case let .fallback(reason):
-                                print("Fallback state: \(reason.displayName)")
+                                print("Fallback state: \(reason.localizedDescription)")
                             }
                         }
-
                         .onComplete { event in
                             print(
-                                "✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)"
+                                """
+                                ✅ Checkout completed successfully!
+                                   Order ID: \(event.orderDetails.id)
+                                """
                             )
                             onComplete()
                         }
@@ -66,8 +70,7 @@ struct ButtonSet: View {
                         }
                         .onShouldRecoverFromError { error in
                             print("🔄 Should recover from error: \(error)")
-                            // Return true to attempt recovery, false to fail
-                            return true
+                            return true // Example: always attempt recovery
                         }
                         .onClickLink { url in
                             print("🔗 Link clicked: \(url)")
@@ -89,7 +92,7 @@ struct ButtonSet: View {
             if let merchandise = cart?.lines.nodes.first?.merchandise,
                let productVariant = merchandise.asProductVariant
             {
-                CheckoutSection(title: "AcceleratedCheckoutButtons(variantID: quantity:)") {
+                CheckoutSection(title: "AcceleratedCheckoutButtons(variantID: quantity:)", renderState: $renderState) {
                     // Variant-based checkout with separate handlers and custom corner radius
                     AcceleratedCheckoutButtons(
                         variantID: productVariant.id,
@@ -135,6 +138,7 @@ struct ButtonSet: View {
 
 private struct CheckoutSection<Content: View>: View {
     let title: String
+    @Binding var renderState: RenderState
     @ViewBuilder let content: () -> Content
 
     var body: some View {
@@ -145,6 +149,18 @@ private struct CheckoutSection<Content: View>: View {
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
 
+                if case .loading = renderState {
+                    VStack(spacing: 8) {
+                        SkeletonButton()
+                        SkeletonButton()
+                    }
+                }
+
+                if case .fallback = renderState {
+                    VStack(spacing: 8) {
+                        Text("Theres been an error loading Checkouts.")
+                    }
+                }
                 content()
             }
         }
@@ -152,5 +168,68 @@ private struct CheckoutSection<Content: View>: View {
         .background(Color.gray.opacity(0.1))
         .cornerRadius(8)
         .padding(.horizontal)
+    }
+}
+
+// MARK: - Sample App Skeleton UI
+
+private struct SkeletonButton: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        Rectangle()
+            .fill(Color.gray.opacity(0.3))
+            .frame(height: 48)
+            .cornerRadius(8)
+            .overlay(
+                HStack {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.5))
+                        .frame(width: 100, height: 16)
+                        .cornerRadius(8)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+            )
+            .shimmer()
+    }
+}
+
+private struct ShimmerModifier: ViewModifier {
+    @State private var isAnimating = false
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.clear,
+                                Color.white.opacity(0.3),
+                                Color.clear
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .rotationEffect(.degrees(30))
+                    .offset(x: isAnimating ? 300 : -300)
+                    .animation(
+                        .easeInOut(duration: 1.5).repeatForever(autoreverses: false),
+                        value: isAnimating
+                    )
+                    .onAppear {
+                        isAnimating = true
+                    }
+                    .clipped()
+            )
+            .clipped()
+    }
+}
+
+extension View {
+    fileprivate func shimmer() -> some View {
+        modifier(ShimmerModifier())
     }
 }
