@@ -29,3 +29,4 @@ build_app() {
 }
 
 build_app MobileBuyIntegration
+build_app ShopifyAcceleratedCheckoutsApp
