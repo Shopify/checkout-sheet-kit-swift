@@ -26,8 +26,10 @@ import ShopifyCheckoutSheetKit
 
 @available(iOS 17.0, *)
 extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegate {
-    /// First called on payment sheet presentation, is re-called every time a user changes their
-    /// shipping address, only applies if the cart contains shippable products
+    /// Triggers on payment sheet presentation, and if user changes shipping address
+    ///
+    /// Only triggered if the PKPaymentRequest has `requiredShippingContactFields` set
+    /// see: `createPaymentRequest`
     func paymentAuthorizationController(
         _: PKPaymentAuthorizationController,
         didSelectShippingContact contact: PKContact
@@ -50,6 +52,51 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             print("ApplePay: didSelectShippingContact error:\n \(error)", terminator: "\n\n")
             return await handleError(error: error, cart: controller.cart) {
                 pkDecoder.paymentRequestShippingContactUpdate(errors: $0)
+            }
+        }
+    }
+
+    /// Triggers on payment sheet presentation with default card, and if user changes payment method
+    /// NOTE: If the user changes the card, the billingContact field will be nil when this fires again
+    ///
+    /// This event is necessary in 'digital' (non-shippable) products flow.
+    /// Allows access to country so cart can determine taxes prior to `didAuthorizePayment`,
+    /// minimizing payment.amount discrepancies.
+    func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController,
+        didSelectPaymentMethod paymentMethod: PKPaymentMethod
+    ) async -> PKPaymentRequestPaymentMethodUpdate {
+        pkEncoder.selectedPaymentMethod = paymentMethod
+
+        do {
+            /// PassKit populates `paymentMethod.billingAddress` conditionally:
+            /// 1. This is the first call to `didSelectPaymentMethod`
+            ///    (users default card)
+            /// 2. The PKPaymentRequest doesn't request shipping info
+            ///    (we rely on country from `didSelectShippingContact` for calculating taxes)
+            guard try pkDecoder.isShippingRequired() == false,
+                  let billingCountryCode = try? pkEncoder.billingCountryCode.get()
+            else {
+                return pkDecoder.paymentRequestPaymentMethodUpdate()
+            }
+            let cartID = try pkEncoder.cartID.get()
+            try await controller.storefront.cartBuyerIdentityUpdate(
+                id: cartID,
+                input: .init(
+                    countryCode: billingCountryCode,
+                    customerAccessToken: configuration.common.customer?.customerAccessToken
+                )
+            )
+
+            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+            try setCart(to: result.cart)
+
+            return pkDecoder.paymentRequestPaymentMethodUpdate()
+        } catch {
+            print("ApplePay: didSelectPaymentMethod error:\n \(error)", terminator: "\n\n")
+
+            return await handleError(error: error, cart: controller.cart) {
+                pkDecoder.paymentRequestPaymentMethodUpdate(errors: $0)
             }
         }
     }
@@ -98,10 +145,13 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let cartID = try pkEncoder.cartID.get()
 
             if pkDecoder.requiredContactFields.count > 0 {
-                _ = try await controller.storefront.cartBuyerIdentityUpdate(
+                try await controller.storefront.cartBuyerIdentityUpdate(
                     id: cartID,
-                    email: try? pkEncoder.email.get(),
-                    phoneNumber: try? pkEncoder.phoneNumber.get()
+                    input: .init(
+                        email: try? pkEncoder.email.get(),
+                        phoneNumber: try? pkEncoder.phoneNumber.get(),
+                        customerAccessToken: configuration.common.customer?.customerAccessToken
+                    )
                 )
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
@@ -125,8 +175,9 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             )
 
             let response = try await controller.storefront.cartSubmitForCompletion(id: cartID)
-
-            try? await transition(to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url))
+            try? await transition(
+                to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url)
+            )
 
             return pkDecoder.paymentAuthorizationResult()
         } catch {

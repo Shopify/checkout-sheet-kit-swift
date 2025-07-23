@@ -23,6 +23,17 @@
 
 import PassKit
 
+// MARK: - Protocol for PaymentKit types that can be updated with errors
+
+protocol PKPaymentRequestUpdatable {
+    var status: PKPaymentAuthorizationStatus { get set }
+    var errors: [any Error]! { get set }
+}
+
+extension PKPaymentRequestShippingContactUpdate: PKPaymentRequestUpdatable {}
+extension PKPaymentRequestPaymentMethodUpdate: PKPaymentRequestUpdatable {}
+extension PKPaymentAuthorizationResult: PKPaymentRequestUpdatable {}
+
 /// Decodes Storefront -> PassKit
 @available(iOS 17.0, *)
 class PKDecoder {
@@ -105,40 +116,54 @@ class PKDecoder {
         }
     }
 
+    // MARK: - Error handling helpers
+
+    private func setErrorStatus(
+        for request: inout some PKPaymentRequestUpdatable,
+        with errors: [any Error]
+    ) {
+        if errors.compactMap({ $0 as? PKPaymentError }).count != errors.count {
+            request.status = .failure
+        }
+        request.errors = errors
+    }
+
     func paymentRequestShippingContactUpdate(errors: [any Error]? = [])
         -> PKPaymentRequestShippingContactUpdate
     {
-        let update = PKPaymentRequestShippingContactUpdate(
+        var paymentRequestUpdate = PKPaymentRequestShippingContactUpdate(
             errors: errors,
             paymentSummaryItems: paymentSummaryItems,
             shippingMethods: shippingMethods
         )
-
         if let errors {
-            if errors.compactMap({ $0 as? PKPaymentError }).count != errors.count {
-                update.status = .failure
-            }
+            setErrorStatus(for: &paymentRequestUpdate, with: errors)
         }
+        return paymentRequestUpdate
+    }
 
-        return update
+    func paymentRequestPaymentMethodUpdate(errors: [any Error]? = [])
+        -> PKPaymentRequestPaymentMethodUpdate
+    {
+        var paymentRequestUpdate = PKPaymentRequestPaymentMethodUpdate(
+            paymentSummaryItems: paymentSummaryItems
+        )
+        if let errors {
+            setErrorStatus(for: &paymentRequestUpdate, with: errors)
+        }
+        return paymentRequestUpdate
     }
 
     func paymentRequestShippingMethodUpdate() -> PKPaymentRequestShippingMethodUpdate {
-        return PKPaymentRequestShippingMethodUpdate(
-            paymentSummaryItems: paymentSummaryItems
-        )
+        return PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: paymentSummaryItems)
     }
 
     func paymentAuthorizationResult(errors: [any Error]? = []) -> PKPaymentAuthorizationResult {
-        let update = PKPaymentAuthorizationResult(status: .success, errors: [])
+        var paymentAuthorizationResult = PKPaymentAuthorizationResult(status: .success, errors: [])
         if let errors {
-            if errors.compactMap({ $0 as? PKPaymentError }).count != errors.count {
-                update.status = .failure
-            }
-            update.errors = errors
+            setErrorStatus(for: &paymentAuthorizationResult, with: errors)
         }
-
-        return update
+        return paymentAuthorizationResult
     }
 
     /// Required contact fields for all transactions.

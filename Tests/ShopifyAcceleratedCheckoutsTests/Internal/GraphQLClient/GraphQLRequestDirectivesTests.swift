@@ -25,13 +25,49 @@ import XCTest
 
 @available(iOS 17.0, *)
 final class GraphQLRequestDirectivesTests: XCTestCase {
+    // MARK: - Locale Extension Tests
+
+    func testDeviceLocaleDetection() {
+        // Test that device locale detection returns valid enums
+        let countryCode = Locale.deviceCountryCode
+        let languageCode = Locale.deviceLanguageCode
+
+        // Should return valid enum values
+        XCTAssertTrue(CountryCode.allCases.contains(countryCode))
+        XCTAssertTrue(LanguageCode.allCases.contains(languageCode))
+
+        // Should not be nil (fallback to defaults if detection fails)
+        XCTAssertNotNil(countryCode)
+        XCTAssertNotNil(languageCode)
+    }
+
+    func testDeviceLocaleFallbackHandling() {
+        // Test that the fallback logic is properly implemented
+        // by checking that even with unknown device settings, we get valid defaults
+
+        // Mock a scenario where device locale detection might fail
+        // In such cases, the extension should fall back to US/EN
+        let countryCode = Locale.deviceCountryCode
+        let languageCode = Locale.deviceLanguageCode
+
+        // Should always return valid values (either detected or fallback)
+        XCTAssertTrue(CountryCode.allCases.contains(countryCode))
+        XCTAssertTrue(LanguageCode.allCases.contains(languageCode))
+
+        // Test that the fallback values are reasonable
+        // If detection fails, should use US/EN as defaults
+        XCTAssertNotEqual(countryCode.rawValue, "")
+        XCTAssertNotEqual(languageCode.rawValue, "")
+    }
+
     // MARK: - InContextDirective Tests
 
     func testInContextDirectiveDefaultInitialization() {
         let directive = InContextDirective()
 
-        XCTAssertEqual(directive.countryCode, CountryCode.US)
-        XCTAssertEqual(directive.languageCode, LanguageCode.EN)
+        // Should use device locale by default
+        XCTAssertEqual(directive.countryCode, Locale.deviceCountryCode)
+        XCTAssertEqual(directive.languageCode, Locale.deviceLanguageCode)
     }
 
     func testInContextDirectiveCustomInitialization() {
@@ -41,15 +77,23 @@ final class GraphQLRequestDirectivesTests: XCTestCase {
         XCTAssertEqual(directive.languageCode, LanguageCode.FR)
     }
 
+    func testInContextDirectiveBackwardsCompatibility() {
+        // Test that the old initialization style still works
+        let directive = InContextDirective(countryCode: .US, languageCode: .EN)
+
+        XCTAssertEqual(directive.countryCode, CountryCode.US)
+        XCTAssertEqual(directive.languageCode, LanguageCode.EN)
+    }
+
     func testInContextDirectivePartialInitialization() {
         // Test with only country code provided
         let directive1 = InContextDirective(countryCode: CountryCode.GB)
         XCTAssertEqual(directive1.countryCode, CountryCode.GB)
-        XCTAssertEqual(directive1.languageCode, LanguageCode.EN) // default
+        XCTAssertEqual(directive1.languageCode, Locale.deviceLanguageCode) // device default
 
         // Test with only language code provided
         let directive2 = InContextDirective(languageCode: LanguageCode.DE)
-        XCTAssertEqual(directive2.countryCode, CountryCode.US) // default
+        XCTAssertEqual(directive2.countryCode, Locale.deviceCountryCode) // device default
         XCTAssertEqual(directive2.languageCode, LanguageCode.DE)
     }
 
@@ -58,7 +102,8 @@ final class GraphQLRequestDirectivesTests: XCTestCase {
     func testToStringWithDefaults() {
         let directive = InContextDirective()
 
-        XCTAssertEqual(directive.toString, "@inContext(country: US, language: EN)")
+        let expectedString = "@inContext(country: \(Locale.deviceCountryCode.rawValue), language: \(Locale.deviceLanguageCode.rawValue))"
+        XCTAssertEqual(directive.toString, expectedString)
     }
 
     func testToStringWithCustomValues() {

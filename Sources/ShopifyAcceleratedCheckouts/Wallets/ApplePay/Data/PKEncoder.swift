@@ -27,7 +27,13 @@ import PassKit
 @available(iOS 17.0, *)
 class PKEncoder {
     var cart: () -> StorefrontAPI.Types.Cart?
+    /// Set during `didSelectShippingMethod`
     var selectedShippingMethod: PKShippingMethod?
+    /// Set during `didSelectPaymentMethod`
+    /// billingAddress is only set for the default card
+    /// If user changes card the billingContact is nil'd out
+    var selectedPaymentMethod: PKPaymentMethod?
+    /// Set during `didAuthorizePayment`
     var payment: PKPayment?
     var paymentData: PaymentData?
     private var selectedShippingContact: Result<PKContact, ShopifyAcceleratedCheckouts.Error> =
@@ -72,7 +78,9 @@ class PKEncoder {
         return .success(cartID)
     }
 
-    var selectedDeliveryOptionHandle: Result<StorefrontAPI.Types.ID, ShopifyAcceleratedCheckouts.Error> {
+    var selectedDeliveryOptionHandle:
+        Result<StorefrontAPI.Types.ID, ShopifyAcceleratedCheckouts.Error>
+    {
         guard let selectedShippingMethod else {
             return .failure(.invariant(expected: "shippingMethod"))
         }
@@ -102,6 +110,25 @@ class PKEncoder {
     }
 
     // MARK: Contacts
+
+    /// Returns `isoCountryCode` from `didAuthorizePayment` PKPaymentRequest.billingContact
+    /// Otherwise falls back to the `didSelectPaymentMethod` PKPaymentMethod.billingContact
+    var billingCountryCode: Result<String, ShopifyAcceleratedCheckouts.Error> {
+        if let billingContact = try? billingContact.get(),
+           let billingContactCountryCode = billingContact.postalAddress?.isoCountryCode
+        {
+            return .success(billingContactCountryCode)
+        }
+
+        guard
+            let paymentMethodCountryCode =
+            selectedPaymentMethod?.billingAddress?.postalAddresses.first?.value.isoCountryCode
+        else {
+            return .failure(.invariant(expected: "paymentMethod"))
+        }
+
+        return .success(paymentMethodCountryCode)
+    }
 
     var billingContact: Result<PKContact, ShopifyAcceleratedCheckouts.Error> {
         guard let billingContact = payment?.billingContact else {
@@ -277,7 +304,9 @@ class PKEncoder {
         return .success(email)
     }
 
-    var applePayPayment: Result<StorefrontAPI.Types.ApplePayPayment, ShopifyAcceleratedCheckouts.Error> {
+    var applePayPayment:
+        Result<StorefrontAPI.Types.ApplePayPayment, ShopifyAcceleratedCheckouts.Error>
+    {
         guard let payment else {
             return .failure(.invariant(expected: "payment"))
         }

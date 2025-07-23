@@ -25,13 +25,17 @@ import Foundation
 
 /// The country and language context for the API requests
 /// see: https://shopify.dev/changelog/storefront-api-incontext-directive-supports-languages
+@available(iOS 17.0, *)
 struct InContextDirective {
     let countryCode: CountryCode
-    let languageCode: LanguageCode
+    let languageCode: ShopifyLanguageCode
 
-    init(countryCode: CountryCode = .US, languageCode: LanguageCode = .EN) {
-        self.countryCode = countryCode
-        self.languageCode = languageCode
+    init(
+        countryCode: CountryCode? = nil,
+        languageCode: ShopifyLanguageCode? = nil
+    ) {
+        self.countryCode = countryCode ?? Locale.deviceCountryCode
+        self.languageCode = languageCode ?? Locale.deviceLanguageCode
     }
 
     /// Returns the formatted GraphQL directive string
@@ -45,6 +49,7 @@ struct InContextDirective {
     }
 }
 
+@available(iOS 17.0, *)
 extension GraphQLRequest {
     /// Apply the @inContext directive to queries & mutations
     /// We only handle a single query/mutation per request, additional queries/mutations are ignored
