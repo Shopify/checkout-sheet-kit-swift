@@ -25,20 +25,19 @@
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
-public protocol Wallet {
-    static var type: WalletType { get }
-    static func isAvailable() async -> Bool
-    static func unavailableReason() async -> UnavailableReason?
-}
-
 // MARK: - Render State Types
 
 /// Represents the various states that AcceleratedCheckoutButtons can be in
 public enum RenderState: Equatable {
+    case initial
+    /// In this state a loading UI is recommended
     case loading
-    case ready(availableWallets: [WalletType])
-    case partiallyReady(availableWallets: [WalletType], unavailableReasons: [UnavailableReason])
+    
+    /// In this state a fallback UI is recommended
     case fallback(reason: FallbackReason)
+    
+    /// AcceleratedCheckouts is rendering, hide any loading/fallback states
+    case ready(availableWallets: Set<WalletType>)
 }
 
 /// Available wallet types for accelerated checkout
@@ -54,36 +53,13 @@ public enum WalletType: String, CaseIterable, Equatable {
     }
 }
 
-/// Reasons why a wallet might be unavailable
-public enum UnavailableReason: Equatable {
-    case applePayNotSetUp
-    case applePayNotSupported
-    case applePayUnsupportedRegion
-    case shopPayNotEnabled
-    case networkUnavailable
-
-    public var localizedDescription: String {
-        switch self {
-        case .applePayNotSetUp:
-            return "Apple Pay is not set up on this device"
-        case .applePayNotSupported:
-            return "Apple Pay is not supported on this device"
-        case .applePayUnsupportedRegion:
-            return "Apple Pay is not supported in this region"
-        case .shopPayNotEnabled:
-            return "Shop Pay is not enabled for this shop"
-        case .networkUnavailable:
-            return "Network unavailable"
-        }
-    }
-}
-
 /// Reasons why the component should fall back to standard checkout
 public enum FallbackReason: Equatable {
     case noWalletsAvailable
     case invalidConfiguration
-    case configurationError(Error)
-    case unexpectedError(Error)
+    case configurationError
+    case unexpectedError
+    case fetchingShopSettingsFailed
 
     public var localizedDescription: String {
         switch self {
@@ -91,25 +67,12 @@ public enum FallbackReason: Equatable {
             return "No payment methods available"
         case .invalidConfiguration:
             return "Invalid configuration"
-        case let .configurationError(error):
-            return "Configuration error: \(error.localizedDescription)"
-        case let .unexpectedError(error):
-            return "Unexpected error: \(error.localizedDescription)"
-        }
-    }
-
-    public static func == (lhs: FallbackReason, rhs: FallbackReason) -> Bool {
-        switch (lhs, rhs) {
-        case (.noWalletsAvailable, .noWalletsAvailable):
-            return true
-        case (.invalidConfiguration, .invalidConfiguration):
-            return true
-        case let (.configurationError(lhsError), .configurationError(rhsError)):
-            return lhsError.localizedDescription == rhsError.localizedDescription
-        case let (.unexpectedError(lhsError), .unexpectedError(rhsError)):
-            return lhsError.localizedDescription == rhsError.localizedDescription
-        default:
-            return false
+        case let .configurationError:
+            return "Configuration error."
+        case let .unexpectedError:
+            return "Unexpected error"
+        case let .fetchingShopSettingsFailed:
+            return "Check the network logs and ShopConfiguration to verify HTTP requests."
         }
     }
 }

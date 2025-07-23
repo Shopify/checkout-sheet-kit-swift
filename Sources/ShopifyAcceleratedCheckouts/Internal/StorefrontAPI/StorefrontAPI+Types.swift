@@ -1055,7 +1055,7 @@ extension StorefrontAPI.Address {
 
     /// Get settings for a specific storefront configuration
     /// Returns cached settings if available for the same domain/token combination
-    func getSettings(for configuration: ShopifyAcceleratedCheckouts.Configuration) async throws -> ShopSettings {
+    @discardableResult func getSettings(for configuration: ShopifyAcceleratedCheckouts.Configuration) async throws -> ShopSettings {
         let storefront = StorefrontAPI(
             storefrontDomain: configuration.storefrontDomain,
             storefrontAccessToken: configuration.storefrontAccessToken

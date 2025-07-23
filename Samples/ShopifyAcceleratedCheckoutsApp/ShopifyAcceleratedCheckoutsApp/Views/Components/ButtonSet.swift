@@ -36,19 +36,22 @@ struct ButtonSet: View {
     var body: some View {
         VStack(spacing: 16) {
             if let cartID = cart?.id {
-                CheckoutSection(title: "AcceleratedCheckoutButtons(cartID:)", renderState: $renderState) {
+                CheckoutSection(
+                    title: "AcceleratedCheckoutButtons(cartID:)", renderState: $renderState
+                ) {
                     // Cart-based checkout example with event handlers
                     AcceleratedCheckoutButtons(cartID: cartID)
                         .onRenderStateChange { newState in
                             renderState = newState
                             switch newState {
+                            case .initial:
+                                print("init...")
                             case .loading:
                                 print("Loading...")
                             case let .ready(availableWallets):
-                                print("Ready to checkout with: \(availableWallets.map(\.displayName).joined(separator: ", "))")
-                            case let .partiallyReady(availableWallets, unavailableReasons):
-                                print("Partially ready with: \(availableWallets.map(\.displayName).joined(separator: ", "))")
-                                print("Unavailable: \(unavailableReasons.map(\.localizedDescription).joined(separator: ", "))")
+                                print(
+                                    "Ready to checkout with: \(availableWallets.map(\.displayName).joined(separator: ", "))"
+                                )
                             case let .fallback(reason):
                                 print("Fallback state: \(reason.localizedDescription)")
                             }
@@ -70,7 +73,7 @@ struct ButtonSet: View {
                         }
                         .onShouldRecoverFromError { error in
                             print("🔄 Should recover from error: \(error)")
-                            return true // Example: always attempt recovery
+                            return true  // Example: always attempt recovery
                         }
                         .onClickLink { url in
                             print("🔗 Link clicked: \(url)")
@@ -90,9 +93,12 @@ struct ButtonSet: View {
             }
 
             if let merchandise = cart?.lines.nodes.first?.merchandise,
-               let productVariant = merchandise.asProductVariant
+                let productVariant = merchandise.asProductVariant
             {
-                CheckoutSection(title: "AcceleratedCheckoutButtons(variantID: quantity:)", renderState: $renderState) {
+                CheckoutSection(
+                    title: "AcceleratedCheckoutButtons(variantID: quantity:)",
+                    renderState: $renderState
+                ) {
                     // Variant-based checkout with separate handlers and custom corner radius
                     AcceleratedCheckoutButtons(
                         variantID: productVariant.id,
@@ -112,7 +118,7 @@ struct ButtonSet: View {
                     }
                     .onShouldRecoverFromError { error in
                         print("🔄 Variant - Should recover from error: \(error)")
-                        return false // Example: don't recover for variant checkout
+                        return false  // Example: don't recover for variant checkout
                     }
                     .onClickLink { url in
                         print("🔗 Variant - Link clicked: \(url)")
@@ -207,7 +213,7 @@ private struct ShimmerModifier: ViewModifier {
                             colors: [
                                 Color.clear,
                                 Color.white.opacity(0.3),
-                                Color.clear
+                                Color.clear,
                             ],
                             startPoint: .leading,
                             endPoint: .trailing

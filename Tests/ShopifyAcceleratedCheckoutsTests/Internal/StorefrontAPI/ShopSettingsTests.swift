@@ -33,17 +33,18 @@ class ShopSettingsTests: XCTestCase {
 
     /// Verify the ShopSettings object can be created properly from the StorefrontAPI result
     func testShopSettingsFromStorefrontAPI() throws {
-        let response = createMockApiShop(
+        let response = try createMockApiShop(
             name: "Test Shop",
-            domain: "test-shop.myshopify.com",
-            supportedDigitalWallets: ["SHOP_PAY", "APPLE_PAY"]
+            host: "test-shop.myshopify.com",
+            url: "https://test-shop.myshopify.com",
+            countryCode: "US"
         )
 
         let settings = ShopSettings(from: response)
 
         XCTAssertEqual(settings.name, "Test Shop")
         XCTAssertEqual(settings.primaryDomain.host, "test-shop.myshopify.com")
-        XCTAssertEqual(settings.paymentSettings.supportedDigitalWallets, ["SHOP_PAY", "APPLE_PAY"])
+        XCTAssertEqual(settings.paymentSettings.supportedDigitalWallets, ["APPLE_PAY", "SHOP_PAY"])
     }
 
     /// Tests that accessing ShopSettings works without any issues
