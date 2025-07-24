@@ -30,29 +30,29 @@ check:
 commands:
   lint:
     aliases: [style]
-    desc: Check Format & Lint issues
+    desc: Check format and lint issues across all Swift files using SwiftLint and SwiftFormat
     run: scripts/lint
   fix:
-    desc: Autofix Format & Lint issues
+    desc: Automatically fix format and lint issues where possible
     run: scripts/lint fix
   build:
     subcommands:
       packages:
-        desc: Build the Package
+        desc: Build both ShopifyCheckoutSheetKit and ShopifyAcceleratedCheckouts packages
         run: |
           ./scripts/xcode_run build ShopifyCheckoutSheetKit
           ./scripts/xcode_run build ShopifyAcceleratedCheckouts
       samples:
-        desc: Build the Samples
+        desc: Build all sample applications to verify integration
         run: ./scripts/build_samples
   test:
     subcommands:
       packages:
-        desc: Test the Packages
+        desc: Run all unit and integration tests for the packages
         run: |
           ./scripts/xcode_run test ShopifyCheckoutSheetKit-Package
       samples:
-        desc: Test the Samples
+        desc: Run tests for sample applications
         run: ./scripts/test_samples
 
   apollo:
@@ -68,7 +68,7 @@ commands:
           rover graph introspect https://$DOMAIN/api/$API_VERSION/graphql --header="X-Shopify-Storefront-Access-Token: $TOKEN" --output schema.$API_VERSION.graphqls
 
       codegen:
-        desc: Generate Apollo Client
+        desc: Generate Apollo Client models and request functions for sample app
         run: |
           cd ./Samples/ShopifyAcceleratedCheckoutsApp/
           ./apollo-ios-cli generate 

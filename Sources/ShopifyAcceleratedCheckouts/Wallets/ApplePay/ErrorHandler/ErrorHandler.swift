@@ -105,7 +105,7 @@ class ErrorHandler {
             case let .userError(userErrors, cart):
                 return ErrorHandler.map(errors: userErrors, shippingCountry: shippingCountry, cart: cart)
             case .currencyChanged:
-                return .interrupt(reason: .currencyChanged)
+                return .interrupt(reason: .currencyChanged, checkoutURL: cart?.checkoutUrl.url)
             case let .warning(type, cart):
                 return ErrorHandler.map(warningType: type, cart: cart)
             default:
