@@ -153,7 +153,7 @@ private struct CheckoutSection<Content: View>: View {
                     }
                 }
 
-                if case .fallback = renderState {
+                if case .error = renderState {
                     VStack {
                         Image(systemName: "exclamationmark.triangle")
                             .foregroundColor(.orange)

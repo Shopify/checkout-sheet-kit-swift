@@ -29,7 +29,7 @@ import SwiftUI
 public enum RenderState {
     case loading
     case rendered
-    case fallback
+    case error
 }
 
 /// Renders a Checkout buttons for a cart or product variant
@@ -58,7 +58,7 @@ public struct AcceleratedCheckoutButtons: View {
     public init(cartID: String) {
         identifier = .cart(cartID: cartID).parse()
         if case .invariant = identifier {
-            _currentRenderState = State(initialValue: .fallback)
+            _currentRenderState = State(initialValue: .error)
         }
     }
 
@@ -70,7 +70,7 @@ public struct AcceleratedCheckoutButtons: View {
     public init(variantID: String, quantity: Int) {
         identifier = .variant(variantID: variantID, quantity: quantity).parse()
         if case .invariant = identifier {
-            _currentRenderState = State(initialValue: .fallback)
+            _currentRenderState = State(initialValue: .error)
         }
     }
 
@@ -120,7 +120,7 @@ public struct AcceleratedCheckoutButtons: View {
             currentRenderState = .rendered
         } catch {
             print("Error loading shop settings: \(error)")
-            currentRenderState = .fallback
+            currentRenderState = .error
         }
     }
 }
