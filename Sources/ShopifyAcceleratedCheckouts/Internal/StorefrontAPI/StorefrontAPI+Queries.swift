@@ -45,7 +45,7 @@ extension StorefrontAPI {
     /// Get shop information
     /// - Returns: Shop details
     func shop() async throws -> Shop {
-        try await QueryCache.shared.loadCached(
+        try await QueryCache.shared.load(
             cacheKey: "shop",
             url: client.url,
             query: {
@@ -70,7 +70,7 @@ actor QueryCache {
     private init() {}
 
     /// Loads data with deduplication - multiple simultaneous calls will share the same request
-    func loadCached<T>(
+    func load<T>(
         cacheKey: String,
         url: URL,
         query: @escaping () async throws -> T
