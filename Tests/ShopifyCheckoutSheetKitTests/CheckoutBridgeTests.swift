@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 @testable import ShopifyCheckoutSheetKit
 import WebKit
 import XCTest
@@ -41,7 +42,7 @@ class CheckoutBridgeTests: XCTestCase {
 
     func testReturnsStandardUserAgent() {
         let version = ShopifyCheckoutSheetKit.version
-        let schemaVersion = CheckoutBridge.schemaVersion
+        let schemaVersion = UserAgent.schemaVersion
         XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard)")
     }
 
@@ -52,7 +53,7 @@ class CheckoutBridgeTests: XCTestCase {
 
     func testReturnsUserAgentWithCustomPlatformSuffix() {
         let version = ShopifyCheckoutSheetKit.version
-        let schemaVersion = CheckoutBridge.schemaVersion
+        let schemaVersion = UserAgent.schemaVersion
         ShopifyCheckoutSheetKit.configuration.platform = Platform.reactNative
         XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative")
         XCTAssertEqual(CheckoutBridge.recoveryAgent, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) ReactNative")

@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import WebKit
 
 enum BridgeError: Swift.Error {
@@ -34,29 +35,35 @@ protocol CheckoutBridgeProtocol {
 }
 
 enum CheckoutBridge: CheckoutBridgeProtocol {
-    static let schemaVersion = "8.1"
     static let messageHandler = "mobileCheckoutSdk"
-    static let userAgent = "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version)"
 
     static var applicationName: String {
-        let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-        let userAgentString = "\(userAgent) (\(schemaVersion);\(theme);standard)"
+        let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
+        let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
 
-        return userAgentWithOptionalSuffix(userAgentString)
+        return UserAgent.string(
+            type: .standard,
+            colorScheme: colorScheme,
+            platform: platform
+        )
     }
 
     static var recoveryAgent: String {
-        let theme = ShopifyCheckoutSheetKit.configuration.colorScheme.rawValue
-        let userAgentString = "\(userAgent) (noconnect;\(theme);standard_recovery)"
+        let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
+        let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
 
-        return userAgentWithOptionalSuffix(userAgentString)
+        return UserAgent.string(
+            type: .recovery,
+            colorScheme: colorScheme,
+            platform: platform
+        )
     }
 
-    static func userAgentWithOptionalSuffix(_ userAgentString: String) -> String {
-        if let platform = ShopifyCheckoutSheetKit.configuration.platform?.rawValue {
-            return "\(userAgentString) \(platform)"
-        } else {
-            return userAgentString
+    private static func mapPlatform(_ platform: Platform?) -> UserAgent.Platform? {
+        guard let platform else { return nil }
+        switch platform {
+        case .reactNative:
+            return .reactNative
         }
     }
 
