@@ -971,11 +971,6 @@ extension StorefrontAPI.Address {
 /// https://shopify.dev/docs/api/storefront/2025-07/objects/Shop
 @available(iOS 17.0, *)
 @Observable class ShopSettings {
-    /// Clear cached shop settings
-    static func clearCache() {
-        Task { await QueryCache.shared.clearCache() }
-    }
-
     /// The shop's name (merchant name for display)
     let name: String
 

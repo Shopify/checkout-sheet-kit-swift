@@ -119,24 +119,6 @@ actor QueryCache {
         }
     }
 
-    func clearCache(domain: String? = nil, accessToken: String? = nil, cacheKey: String? = nil) {
-        if let domain, let accessToken, let cacheKey {
-            let key = buildCacheKey(domain: domain, accessToken: accessToken, queryKey: cacheKey)
-            cache.removeValue(forKey: key)
-            inflightRequests.removeValue(forKey: key)
-        } else if let domain, let accessToken {
-            let prefix = "\(domain)-\(accessToken.prefix(10))-"
-            let keysToRemove = cache.keys.filter { $0.hasPrefix(prefix) }
-            for key in keysToRemove {
-                cache.removeValue(forKey: key)
-                inflightRequests.removeValue(forKey: key)
-            }
-        } else {
-            cache.removeAll()
-            inflightRequests.removeAll()
-        }
-    }
-
     private func cacheResult(_ result: some Any, for key: String) {
         cache[key] = result
     }
