@@ -21,22 +21,26 @@ alwaysApply: true
 3. **Test Issues** → `dev test` - Checks for failing tests 
 
 ### Available dev commands:
-```bash
-# Code Quality
-dev lint          # Check format & lint issues (alias: dev style)
-dev fix           # auto fixes formatting and linting issues
+**See `dev.yml` in project root for complete list of commands and descriptions.**
 
-# Building
-dev build packages    # Build ShopifyCheckoutSheetKit & ShopifyAcceleratedCheckouts
-dev build samples     # Build sample apps
+Key commands for verification:
+- `dev lint` (alias: `dev style`) - Check format & lint issues
+- `dev fix` - Auto-fix formatting and linting issues  
+- `dev build packages` - Build both packages
+- `dev test packages` - Run all tests
 
-# Testing  
-dev test packages     # Test the packages
-dev test samples      # Test sample apps
+## Concurrency Best Practices
 
-# Apollo/GraphQL
-dev apollo download_schema  # Download GraphQL schema
-dev apollo codegen         # Generate Apollo client code
+### DO: Use actors for thread-safe shared state
+```swift
+actor QueryCache {
+    private var cache: [String: Any] = [:]
+    private var inflightRequests: [String: Any] = [:]
+    
+    func loadCached<T>(...) async throws -> T {
+        // Safe concurrent access to shared state
+    }
+}
 ```
 
 ## Workflow Best Practices

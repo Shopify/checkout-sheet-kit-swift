@@ -11,15 +11,52 @@ alwaysApply: true
 ### DO:
 - Create separate test methods for each test case
 - Use `guard` statements with `XCTFail` for unwrapping optionals
+```swift
+func testSomething() {
+    guard let result = someOptionalValue else {
+        XCTFail("Expected non-nil value")
+        return
+    }
+    XCTAssertEqual(result, expectedValue)
+}
+```
 - Write focused tests that test one thing at a time
-- Use descriptive test method names that explain what is being tested
-- Catch only one error type per test
-- Create separate test methods instead of conditional logic
+- Use descriptive test method names in the format `test_<methodName>_<withCircumstances>_<shouldExpectation>`
+```
+    func test_canTransition_fromAppleSheetPresentedState_shouldAllowPaymentAuthorizationAndInterruptAndCompleted() 
+    func test_ensureCurrencyNotChanged_withNoInitialCurrency_shouldNotThrow() 
+```
 
-### DON'T:
-- Use typed catches when testing throwing expressions
-- Delete and recreate test files when debugging
-- Add boilerplate comments like "// Given", "// When", "// Then"
+- If a function may throw multiple types of errors, write multiple tests to capture them in isolation
+```
+func throwingFunction() {
+    if someCondition {
+        throw Error.foo
+      } else 
+      throw Error.bar
+  }
+
+  func test_throwingFunction_whenSomeConditionTrue_shouldThrowFoo() {
+    do {
+        _ = try await storefront.createCart()
+        XCTFail("Expected error to be thrown")
+    } catch {
+      guard case let error = Error.foo else {
+        XCTFail("Expected .foo")
+      }
+    }
+  }
+  func test_throwingFunction_whenSomeConditionTrue_shouldThrowBar(){
+    do {
+        _ = try await storefront.createCart()
+        XCTFail("Expected error to be thrown")
+    } catch {
+      guard case let error = Error.foo else {
+        XCTFail("Expected .foo")
+      }
+    }
+  }
+```
 
 ## Code Examples
 
@@ -34,35 +71,10 @@ func testSomething() {
 }
 ```
 
-### ❌ INCORRECT: Conditional test logic
-```swift
-// DON'T DO THIS
-func testSomething() {
-    if condition {
-        XCTAssertTrue(something)
-    } else {
-        XCTAssertFalse(something)
-    }
-}
-```
-
-### ✅ CORRECT: Separate test methods
-```swift
-func testSomething_whenConditionTrue() {
-    // Test for true condition
-}
-
-func testSomething_whenConditionFalse() {
-    // Test for false condition
-}
-```
-
-## Error Testing
-
-When testing throwing functions:
-- Test only ONE error type per test method
-- Avoid typed catch blocks that check for specific error types
-- Let unhandled errors fail the test naturally
+### DON'T:
+- Use typed catches when testing throwing expressions
+- Delete and recreate test files when debugging
+- Add boilerplate comments like "// Given", "// When", "// Then"
 
 ## Comments
 
