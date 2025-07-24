@@ -94,8 +94,7 @@ public struct AcceleratedCheckoutButtons: View {
                 storefrontDomain: configuration.storefrontDomain,
                 storefrontAccessToken: configuration.storefrontAccessToken
             )
-            shopSettings = try await SettingsManager.shared.loadSettings(
-                storefront: storefront,
+            shopSettings = try await storefront.shopSettings(
                 domain: configuration.storefrontDomain,
                 accessToken: configuration.storefrontAccessToken
             )

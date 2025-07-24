@@ -23,6 +23,89 @@
 
 import Foundation
 
+/// Generic cache manager for StorefrontAPI queries that handles request deduplication and caching
+@available(iOS 17.0, *)
+actor QueryCache {
+    static let shared = QueryCache()
+
+    private var cache: [String: Any] = [:]
+    private var inflightRequests: [String: Any] = [:]
+
+    private init() {}
+
+    /// Loads data with deduplication - multiple simultaneous calls will share the same request
+    func loadCached<T>(
+        domain: String,
+        accessToken: String,
+        cacheKey: String,
+        query: @escaping () async throws -> T
+    ) async throws -> T {
+        let key = buildCacheKey(domain: domain, accessToken: accessToken, queryKey: cacheKey)
+
+        // Return cached result if available
+        if let cached = cache[key] as? T {
+            return cached
+        }
+
+        // If there's already a request in flight, await its result
+        if let existingTask = inflightRequests[key] as? Task<T, Error> {
+            return try await existingTask.value
+        }
+
+        // Create new request task
+        let task = Task<T, Error> {
+            let result = try await query()
+
+            // Cache the result
+            self.cacheResult(result, for: key)
+
+            return result
+        }
+
+        // Store the inflight request
+        inflightRequests[key] = task
+
+        do {
+            let result = try await task.value
+            // Clean up the inflight request
+            inflightRequests.removeValue(forKey: key)
+            return result
+        } catch {
+            // Clean up the failed request so it can be retried
+            inflightRequests.removeValue(forKey: key)
+            throw error
+        }
+    }
+
+    /// Clear cached data for a specific domain/token/query or all data
+    func clearCache(domain: String? = nil, accessToken: String? = nil, cacheKey: String? = nil) {
+        if let domain, let accessToken, let cacheKey {
+            let key = buildCacheKey(domain: domain, accessToken: accessToken, queryKey: cacheKey)
+            cache.removeValue(forKey: key)
+            inflightRequests.removeValue(forKey: key)
+        } else if let domain, let accessToken {
+            // Clear all entries for a specific domain/accessToken
+            let prefix = "\(domain)-\(accessToken.prefix(10))-"
+            let keysToRemove = cache.keys.filter { $0.hasPrefix(prefix) }
+            for key in keysToRemove {
+                cache.removeValue(forKey: key)
+                inflightRequests.removeValue(forKey: key)
+            }
+        } else {
+            cache.removeAll()
+            inflightRequests.removeAll()
+        }
+    }
+
+    private func cacheResult(_ result: some Any, for key: String) {
+        cache[key] = result
+    }
+
+    private func buildCacheKey(domain: String, accessToken: String, queryKey: String) -> String {
+        return "\(domain)-\(accessToken.prefix(10))-\(queryKey)"
+    }
+}
+
 // MARK: - Query Operations
 
 @available(iOS 17.0, *)
@@ -53,5 +136,21 @@ extension StorefrontAPI {
             throw StorefrontAPI.Errors.payload(propertyName: "shop")
         }
         return shop
+    }
+
+    /// Get shop settings with caching and deduplication
+    /// - Parameters:
+    ///   - domain: The shop domain for cache key generation
+    ///   - accessToken: The access token for cache key generation
+    /// - Returns: Cached or fresh ShopSettings
+    func shopSettings(domain: String, accessToken: String) async throws -> ShopSettings {
+        return try await QueryCache.shared.loadCached(
+            domain: domain,
+            accessToken: accessToken,
+            cacheKey: "shop"
+        ) {
+            let shop = try await self.shop()
+            return ShopSettings(from: shop)
+        }
     }
 }
