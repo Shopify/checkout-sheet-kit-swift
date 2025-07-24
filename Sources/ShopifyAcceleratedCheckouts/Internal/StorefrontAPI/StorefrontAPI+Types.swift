@@ -23,6 +23,77 @@
 
 import Foundation
 
+/// Singleton manager for shop settings that handles request deduplication and caching
+@available(iOS 17.0, *)
+actor SettingsManager {
+    static let shared = SettingsManager()
+
+    private var cache: [String: ShopSettings] = [:]
+    private var inflightRequests: [String: Task<ShopSettings, Error>] = [:]
+
+    private init() {}
+
+    /// Loads shop settings with deduplication - multiple simultaneous calls will share the same request
+    func loadSettings(storefront: StorefrontAPI, domain: String, accessToken: String) async throws -> ShopSettings {
+        let key = cacheKey(domain: domain, accessToken: accessToken)
+
+        // Return cached result if available
+        if let cached = cache[key] {
+            return cached
+        }
+
+        // If there's already a request in flight, await its result
+        if let existingTask = inflightRequests[key] {
+            return try await existingTask.value
+        }
+
+        // Create new request task
+        let task = Task<ShopSettings, Error> {
+            let shop = try await storefront.shop()
+            let settings = ShopSettings(from: shop)
+
+            // Cache the result
+            self.cacheSettings(settings, for: key)
+
+            return settings
+        }
+
+        // Store the inflight request
+        inflightRequests[key] = task
+
+        do {
+            let result = try await task.value
+            // Clean up the inflight request
+            inflightRequests.removeValue(forKey: key)
+            return result
+        } catch {
+            // Clean up the failed request so it can be retried
+            inflightRequests.removeValue(forKey: key)
+            throw error
+        }
+    }
+
+    /// Clear cached settings for a specific domain/token or all settings
+    func clearCache(domain: String? = nil, accessToken: String? = nil) {
+        if let domain = domain, let accessToken = accessToken {
+            let key = cacheKey(domain: domain, accessToken: accessToken)
+            cache.removeValue(forKey: key)
+            inflightRequests.removeValue(forKey: key)
+        } else {
+            cache.removeAll()
+            inflightRequests.removeAll()
+        }
+    }
+
+    private func cacheSettings(_ settings: ShopSettings, for key: String) {
+        cache[key] = settings
+    }
+
+    private func cacheKey(domain: String, accessToken: String) -> String {
+        return "\(domain)-\(accessToken.prefix(10))"
+    }
+}
+
 // MARK: - Cart Models
 
 @available(iOS 17.0, *)
@@ -975,7 +1046,17 @@ extension StorefrontAPI.Address {
     private static var cachedSettings: ShopSettings?
 
     /// Loads shop settings from the API and caches them
+    static func load(storefront: StorefrontAPI, domain: String, accessToken: String) async throws -> ShopSettings {
+        // For backward compatibility, delegate to SettingsManager but also maintain the static cache
+        let settings = try await SettingsManager.shared.loadSettings(storefront: storefront, domain: domain, accessToken: accessToken)
+        cachedSettings = settings
+        return settings
+    }
+
+    /// Loads shop settings from the API and caches them (legacy method)
+    /// Note: This method cannot use request deduplication effectively since domain/token are not available
     static func load(storefront: StorefrontAPI) async throws -> ShopSettings {
+        // Fallback to old behavior for backward compatibility
         if let cachedSettings {
             return cachedSettings
         }
@@ -991,6 +1072,7 @@ extension StorefrontAPI.Address {
     /// Clear cached settings
     static func clearCache() {
         cachedSettings = nil
+        Task { await SettingsManager.shared.clearCache() }
     }
 
     /// The shop's name (merchant name for display)
