@@ -961,107 +961,112 @@ extension StorefrontAPI.Address {
 @available(iOS 17.0, *)
 @Observable class ShopSettingsManager {
     static let shared = ShopSettingsManager()
-
+    
     private(set) var shopSettings: ShopSettings?
     private(set) var isLoading = false
     private(set) var error: Error?
-
-    // Store ongoing tasks to prevent duplicate requests
-    private var currentLoadTask: Task<ShopSettings, Error>?
-
-    // Use a serial queue to ensure atomic access to currentLoadTask
-    private let taskQueue = DispatchQueue(label: "com.shopify.ShopSettingsManager.taskQueue")
-
+    
+    // Single active task to prevent duplicate requests
+    private var activeTask: Task<ShopSettings, Error>?
+    private var cachedConfigKey: String?
+    
     private init() {}
-
-    /// Load shop settings with proper concurrency handling
-    /// Multiple simultaneous calls will share the same network request
-    func loadSettings(for storefront: StorefrontAPI) async throws -> ShopSettings {
-        // If we already have settings, return them immediately
-        if let existingSettings = shopSettings {
-            return existingSettings
+    
+    /// Generate a unique key for the configuration to handle config changes
+    private func configurationKey(for configuration: ShopifyAcceleratedCheckouts.Configuration) -> String {
+        let tokenPrefix = String(configuration.storefrontAccessToken.prefix(8))
+        return "\(configuration.storefrontDomain):\(tokenPrefix)"
+    }
+    
+    @MainActor
+    func getSettings(for configuration: ShopifyAcceleratedCheckouts.Configuration) async throws -> ShopSettings {
+        let configKey = configurationKey(for: configuration)
+        
+        print("🏪 ShopSettingsManager: Request for config \(configKey)")
+        
+        // Return cached settings if available for the same configuration
+        if let existing = shopSettings, cachedConfigKey == configKey {
+            print("🏪 ShopSettingsManager: Returning cached settings for \(configKey)")
+            return existing
         }
-
-        // Use the serial queue to atomically check and create the task
-        let task: Task<ShopSettings, Error> = await withCheckedContinuation { continuation in
-            taskQueue.async {
-                // If there's already a loading task, return it
-                if let existingTask = self.currentLoadTask {
-                    continuation.resume(returning: existingTask)
-                    return
+        
+        // If configuration changed, clear cache
+        if cachedConfigKey != configKey {
+            print("🏪 ShopSettingsManager: Configuration changed from \(cachedConfigKey ?? "nil") to \(configKey), clearing cache")
+            shopSettings = nil
+            activeTask?.cancel()
+            activeTask = nil
+            cachedConfigKey = configKey
+        }
+        
+        // If already loading for this config, await the existing task
+        if let task = activeTask {
+            print("🏪 ShopSettingsManager: Found existing task, awaiting result...")
+            return try await task.value
+        }
+        
+        // Start new loading task
+        print("🏪 ShopSettingsManager: Starting new network request for \(configKey)")
+        isLoading = true
+        error = nil
+        
+        let task = Task<ShopSettings, Error> {
+            defer { 
+                Task { @MainActor in
+                    self.activeTask = nil
+                    print("🏪 ShopSettingsManager: Task completed, clearing activeTask")
                 }
-
-                // Create new task and store it atomically
-                let newTask = Task<ShopSettings, Error> {
-                    await MainActor.run {
-                        self.isLoading = true
-                        self.error = nil
-                    }
-
-                    do {
-                        let shop = try await storefront.shop()
-                        let settings = ShopSettings(from: shop)
-
-                        await MainActor.run {
-                            self.shopSettings = settings
-                            self.isLoading = false
-                        }
-
-                        // Clear the task on the queue
-                        await withCheckedContinuation { taskContinuation in
-                            self.taskQueue.async {
-                                self.currentLoadTask = nil
-                                taskContinuation.resume()
-                            }
-                        }
-
-                        return settings
-                    } catch {
-                        await MainActor.run {
-                            self.error = error
-                            self.isLoading = false
-                        }
-
-                        // Clear the task on the queue
-                        await withCheckedContinuation { taskContinuation in
-                            self.taskQueue.async {
-                                self.currentLoadTask = nil
-                                taskContinuation.resume()
-                            }
-                        }
-
-                        throw error
-                    }
-                }
-
-                self.currentLoadTask = newTask
-                continuation.resume(returning: newTask)
+            }
+            
+            do {
+                print("🏪 ShopSettingsManager: Creating StorefrontAPI for \(configuration.storefrontDomain)")
+                let storefront = StorefrontAPI(
+                    storefrontDomain: configuration.storefrontDomain,
+                    storefrontAccessToken: configuration.storefrontAccessToken
+                )
+                
+                print("🏪 ShopSettingsManager: Making network call to \(configuration.storefrontDomain)")
+                let shop = try await storefront.shop()
+                
+                print("🏪 ShopSettingsManager: Network call successful, creating ShopSettings")
+                let settings = ShopSettings(from: shop)
+                
+                print("🏪 ShopSettingsManager: ShopSettings created with supported wallets: \(settings.paymentSettings.supportedDigitalWallets)")
+                return settings
+                
+            } catch {
+                print("🏪 ShopSettingsManager: Network call failed with error: \(error)")
+                throw error
             }
         }
-
-        return try await task.value
-    }
-
-    /// Clear cached settings and reset state
-    func clearCache() {
-        taskQueue.sync {
-            shopSettings = nil
+        
+        activeTask = task
+        
+        do {
+            let settings = try await task.value
+            shopSettings = settings
             isLoading = false
             error = nil
-            currentLoadTask?.cancel()
-            currentLoadTask = nil
+            print("🏪 ShopSettingsManager: Successfully loaded and cached settings for \(configKey)")
+            return settings
+        } catch {
+            self.error = error
+            isLoading = false
+            shopSettings = nil
+            print("🏪 ShopSettingsManager: Failed to load settings for \(configKey): \(error)")
+            throw error
         }
     }
-
-    /// Get settings for a specific storefront configuration
-    /// Returns cached settings if available for the same domain/token combination
-    @discardableResult func getSettings(for configuration: ShopifyAcceleratedCheckouts.Configuration) async throws -> ShopSettings {
-        let storefront = StorefrontAPI(
-            storefrontDomain: configuration.storefrontDomain,
-            storefrontAccessToken: configuration.storefrontAccessToken
-        )
-
-        return try await loadSettings(for: storefront)
+    
+    /// Clear cached settings and reset state
+    func clearCache() {
+        print("🏪 ShopSettingsManager: Clearing cache")
+        shopSettings = nil
+        isLoading = false
+        error = nil
+        cachedConfigKey = nil
+        activeTask?.cancel()
+        activeTask = nil
     }
 }
 

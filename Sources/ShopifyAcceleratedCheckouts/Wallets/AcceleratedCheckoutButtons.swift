@@ -38,7 +38,7 @@ public struct AcceleratedCheckoutButtons: View {
     @Bindable private var settingsManager = ShopSettingsManager.shared
 
     let identifier: CheckoutIdentifier
-    var wallets: Set<WalletType> = [.shopPay, .applePay]
+    var userOptInWallets: Set<WalletType> = [.shopPay, .applePay]
 
     /// Returns wallets that are both requested via modifier AND supported by the shop
     var availableWallets: Set<WalletType> {
@@ -47,10 +47,10 @@ public struct AcceleratedCheckoutButtons: View {
                 .supportedDigitalWallets
         else { return Set() }
 
-        let shopSupportedWallets = Set(
+        let shopEnabledWallets = Set(
             supportedDigitalWallets.compactMap { WalletType(rawValue: $0) }
         )
-        return wallets.intersection(shopSupportedWallets)
+        return userOptInWallets.intersection(shopEnabledWallets)
     }
 
     var eventHandlers: EventHandlers = .init()
@@ -83,7 +83,7 @@ public struct AcceleratedCheckoutButtons: View {
         switch (identifier.isValid(), currentState) {
         // If identifier isn't valid we can't proceed with rendering any buttons
         case (false, _):
-            EmptyView().onAppear {
+            VStack {}.onAppear {
                 currentState = .fallback(reason: .invalidConfiguration)
             }
 
@@ -126,6 +126,7 @@ public struct AcceleratedCheckoutButtons: View {
     private func loadShopSettings() async {
         do {
             try await ShopSettingsManager.shared.getSettings(for: configuration)
+            
             guard availableWallets.count > 0 else {
                 currentState = .fallback(reason: .noWalletsAvailable)
                 return
@@ -146,7 +147,7 @@ extension AcceleratedCheckoutButtons {
     /// Defaults: [.applePay]
     public func wallets(_ wallets: Set<WalletType>) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.wallets = wallets
+        newView.userOptInWallets = wallets
         return newView
     }
 
