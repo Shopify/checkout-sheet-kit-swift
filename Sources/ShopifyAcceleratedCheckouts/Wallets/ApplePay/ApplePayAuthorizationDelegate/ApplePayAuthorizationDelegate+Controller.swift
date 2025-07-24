@@ -215,7 +215,9 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             return completion(errors)
         case let .interrupt(reason, checkoutURL):
             try? await transition(to: .interrupt(reason: reason))
-            self.checkoutURL = checkoutURL
+            if let checkoutURL {
+                self.checkoutURL = checkoutURL
+            }
             return completion([abortError])
         }
     }

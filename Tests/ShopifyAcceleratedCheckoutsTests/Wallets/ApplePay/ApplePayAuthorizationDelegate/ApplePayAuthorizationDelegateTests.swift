@@ -37,6 +37,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     private var mockPaymentControllerFactory: PKAuthorizationControllerFactory!
     private var delegate: ApplePayAuthorizationDelegate!
     private let initialState = ApplePayState.idle
+    private let mockPaymentController = MockPaymentAuthorizationController()
 
     override func setUp() async throws {
         try await super.setUp()
@@ -558,6 +559,112 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         XCTAssertEqual(mockController.presentCalledWith, url, "Should present with correct URL")
     }
 
+    // MARK: - CheckoutURL Assignment Tests
+
+    func test_handleError_withCurrencyChangedInterrupt_setsCheckoutURLFromCart() async throws {
+        let originalCheckoutURL = delegate.checkoutURL
+        let cartWithDifferentURL = createTestCartWithURL("https://example.com/different-checkout")
+        mockController.cart = cartWithDifferentURL
+
+        let currencyChangedError = StorefrontAPI.Errors.currencyChanged
+
+        // Configure mock to succeed for startPaymentRequest transition
+        mockPaymentController.shouldPresentSuccessfully = true
+        try await delegate.transition(to: .startPaymentRequest)
+        // startPaymentRequest should automatically transition to appleSheetPresented when successful
+
+        let result = await delegate.handleError(error: currencyChangedError, cart: nil) { errors in
+            return errors
+        }
+
+        XCTAssertEqual(result.count, 1, "Should return abort error")
+        XCTAssertEqual(delegate.checkoutURL, cartWithDifferentURL.checkoutUrl.url, "Should update checkoutURL from cart's checkoutURL")
+        XCTAssertNotEqual(delegate.checkoutURL, originalCheckoutURL, "CheckoutURL should have changed")
+    }
+
+    func test_handleError_withCurrencyChangedInterruptAndNilCart_preservesOriginalCheckoutURL() async throws {
+        let originalCheckoutURL = delegate.checkoutURL
+        mockController.cart = nil
+
+        let currencyChangedError = StorefrontAPI.Errors.currencyChanged
+
+        // Configure mock to succeed for startPaymentRequest transition
+        mockPaymentController.shouldPresentSuccessfully = true
+        try await delegate.transition(to: .startPaymentRequest)
+        // startPaymentRequest should automatically transition to appleSheetPresented when successful
+
+        let result = await delegate.handleError(error: currencyChangedError, cart: nil) { errors in
+            return errors
+        }
+
+        XCTAssertEqual(result.count, 1, "Should return abort error")
+        XCTAssertEqual(delegate.checkoutURL, originalCheckoutURL, "Should preserve original checkoutURL when cart is nil")
+    }
+
+    func test_handleError_withUserError_preservesOriginalCheckoutURL() async throws {
+        let originalCheckoutURL = delegate.checkoutURL
+        let userError = StorefrontAPI.CartUserError(
+            code: nil,
+            message: "Test error",
+            field: ["test"]
+        )
+        let userErrors = StorefrontAPI.Errors.userError(userErrors: [userError], cart: mockController.cart)
+
+        // Configure mock to succeed for startPaymentRequest transition
+        mockPaymentController.shouldPresentSuccessfully = true
+        try await delegate.transition(to: .startPaymentRequest)
+        // startPaymentRequest should automatically transition to appleSheetPresented when successful
+
+        let result = await delegate.handleError(error: userErrors, cart: nil) { errors in
+            return errors
+        }
+
+        XCTAssertGreaterThan(result.count, 0, "Should return user errors")
+        XCTAssertEqual(delegate.checkoutURL, originalCheckoutURL, "Should preserve original checkoutURL for user errors")
+    }
+
+    // MARK: - Test Helpers
+
+    private func createTestCartWithURL(_ urlString: String) -> StorefrontAPI.Cart {
+        let address = StorefrontAPI.CartDeliveryAddress(
+            address1: nil,
+            address2: nil,
+            city: nil,
+            countryCode: "US",
+            firstName: nil,
+            lastName: nil,
+            phone: nil,
+            provinceCode: nil,
+            zip: nil
+        )
+
+        let selectableAddress = StorefrontAPI.CartSelectableAddress(
+            id: GraphQLScalars.ID("test-address-id"),
+            selected: true,
+            address: address
+        )
+
+        let delivery = StorefrontAPI.CartDelivery(addresses: [selectableAddress])
+
+        return StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: urlString)!),
+            totalQuantity: 1,
+            buyerIdentity: nil,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: delivery,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: 100.0, currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+    }
+
     // MARK: - Mock Classes
 
     /// Mock PaymentAuthorizationController for testing
@@ -577,8 +684,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
             completion?()
         }
     }
-
-    private let mockPaymentController = MockPaymentAuthorizationController()
 
     private class MockPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?

@@ -173,6 +173,20 @@ class ErrorHandlerTests: XCTestCase {
         switch result {
         case let .interrupt(reason, checkoutURL):
             XCTAssertEqual(reason, .currencyChanged)
+            XCTAssertEqual(checkoutURL, cart.checkoutUrl.url)
+        default:
+            XCTFail("Expected interrupt action with currencyChanged reason")
+        }
+    }
+
+    func testMap_whenApiErrorIsCurrencyChangedWithNilCart_returnsInterruptWithNilCheckoutURL() {
+        let error = StorefrontAPI.Errors.currencyChanged
+        let cart: StorefrontAPI.Cart? = nil
+        let result = ErrorHandler.map(error: error, cart: cart)
+
+        switch result {
+        case let .interrupt(reason, checkoutURL):
+            XCTAssertEqual(reason, .currencyChanged)
             XCTAssertNil(checkoutURL)
         default:
             XCTFail("Expected interrupt action with currencyChanged reason")
