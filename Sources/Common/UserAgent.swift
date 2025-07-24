@@ -25,14 +25,12 @@ import Foundation
 import UIKit
 
 public enum UserAgent {
-    /// Internal API - Do not use directly. For ShopifyCheckoutSheetKit and ShopifyAcceleratedCheckouts use only.
-    public enum EntryPoint: String {
+    package enum EntryPoint: String {
         case acceleratedCheckouts = "AcceleratedCheckouts"
         case checkoutSheetKit = "CheckoutSheetKit"
     }
 
-    /// Internal API - Do not use directly. For ShopifyCheckoutSheetKit and ShopifyAcceleratedCheckouts use only.
-    public enum Platform: String {
+    package enum Platform: String {
         case iOS
         case reactNative = "ReactNative"
     }
@@ -48,22 +46,17 @@ public enum UserAgent {
         case web = "web_default"
     }
 
-    /// Internal API - Do not use directly. For ShopifyCheckoutSheetKit and ShopifyAcceleratedCheckouts use only.
-    public enum CheckoutType {
+    package enum CheckoutType {
         case standard
         case recovery
     }
 
     private static let version = "3.2.0"
-
-    /// Internal API - Do not use directly. For ShopifyCheckoutSheetKit and ShopifyAcceleratedCheckouts use only.
-    public static let schemaVersion = "8.1"
-
+    package static let schemaVersion = "8.1"
     private static let baseUserAgent = "ShopifyCheckoutSDK/\(version)"
 
-    /// Internal API - Do not use directly. For ShopifyCheckoutSheetKit and ShopifyAcceleratedCheckouts use only.
-    /// Shared format for CheckoutSheetKit and AcceleratedCheckouts
-    public static func string(
+    // Shared format for CheckoutSheetKit and AcceleratedCheckouts
+    package static func string(
         type: CheckoutType,
         colorScheme: ColorScheme,
         platform: Platform? = nil,
