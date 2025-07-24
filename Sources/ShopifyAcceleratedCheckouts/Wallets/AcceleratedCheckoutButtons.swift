@@ -94,10 +94,8 @@ public struct AcceleratedCheckoutButtons: View {
                 storefrontDomain: configuration.storefrontDomain,
                 storefrontAccessToken: configuration.storefrontAccessToken
             )
-            shopSettings = try await storefront.shopSettings(
-                domain: configuration.storefrontDomain,
-                accessToken: configuration.storefrontAccessToken
-            )
+            let shop = try await storefront.shop()
+            shopSettings = ShopSettings(from: shop)
         } catch {
             print("Error loading shop settings: \(error)")
         }

@@ -57,16 +57,6 @@ extension StorefrontAPI {
             }
         )
     }
-
-    /// Get shop settings with caching and deduplication
-    /// - Parameters:
-    ///   - domain: The shop domain for cache key generation
-    ///   - accessToken: The access token for cache key generation
-    /// - Returns: Cached or fresh ShopSettings
-    func shopSettings(domain: String, accessToken: String) async throws -> ShopSettings {
-        let shop = try await self.shop()
-        return ShopSettings(from: shop)
-    }
 }
 
 /// Generic cache manager for StorefrontAPI queries that handles request deduplication and caching
