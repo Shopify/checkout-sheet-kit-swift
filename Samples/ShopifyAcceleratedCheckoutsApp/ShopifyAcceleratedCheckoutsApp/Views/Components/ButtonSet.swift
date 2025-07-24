@@ -31,14 +31,22 @@ struct ButtonSet: View {
     let firstVariantQuantity: Int
     let onComplete: () -> Void
 
+    @State private var cartRenderState: RenderState = .loading
+    @State private var variantRenderState: RenderState = .loading
+
     var body: some View {
         VStack(spacing: 16) {
             if let cartID = cart?.id {
-                CheckoutSection(title: "AcceleratedCheckoutButtons(cartID:)") {
+                CheckoutSection(
+                    title: "AcceleratedCheckoutButtons(cartID:)",
+                    renderState: $cartRenderState
+                ) {
                     // Cart-based checkout example with event handlers
                     AcceleratedCheckoutButtons(cartID: cartID)
                         .onComplete { event in
-                            print("✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)")
+                            print(
+                                "✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)"
+                            )
                             onComplete()
                         }
                         .onFail { error in
@@ -66,13 +74,19 @@ struct ButtonSet: View {
                             }()
                             print("📊 Web pixel event: \(eventName)")
                         }
+                        .onRenderStateChange {
+                            cartRenderState = $0
+                        }
                 }
             }
 
             if let merchandise = cart?.lines.nodes.first?.merchandise,
                let productVariant = merchandise.asProductVariant
             {
-                CheckoutSection(title: "AcceleratedCheckoutButtons(variantID: quantity:)") {
+                CheckoutSection(
+                    title: "AcceleratedCheckoutButtons(variantID: quantity:)",
+                    renderState: $variantRenderState
+                ) {
                     // Variant-based checkout with separate handlers and custom corner radius
                     AcceleratedCheckoutButtons(
                         variantID: productVariant.id,
@@ -108,6 +122,9 @@ struct ButtonSet: View {
                         }()
                         print("📊 Variant - Web pixel event: \(eventName)")
                     }
+                    .onRenderStateChange {
+                        variantRenderState = $0
+                    }
                 }
             }
         }
@@ -118,6 +135,7 @@ struct ButtonSet: View {
 
 private struct CheckoutSection<Content: View>: View {
     let title: String
+    @Binding var renderState: RenderState
     @ViewBuilder let content: () -> Content
 
     var body: some View {
@@ -127,6 +145,25 @@ private struct CheckoutSection<Content: View>: View {
                     .font(.headline)
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
+
+                if case .loading = renderState {
+                    VStack(spacing: 12) {
+                        SkeletonButton(cornerRadius: 8)
+                        SkeletonButton(cornerRadius: 8)
+                    }
+                }
+
+                if case .fallback = renderState {
+                    VStack {
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundColor(.orange)
+                            .font(.title2)
+                        Text("Unable to load checkout buttons")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(height: 44)
+                }
 
                 content()
             }
