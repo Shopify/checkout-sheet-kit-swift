@@ -61,10 +61,10 @@ extension StorefrontAPI {
     ///   - accessToken: The access token for cache key generation
     /// - Returns: Cached or fresh ShopSettings
     func shopSettings(domain: String, accessToken: String) async throws -> ShopSettings {
+        
         return try await QueryCache.shared.loadCached(
-            domain: domain,
-            accessToken: accessToken,
-            cacheKey: "shop"
+            cacheKey: "shop",
+            url: client.url
         ) {
             let shop = try await self.shop()
             return ShopSettings(from: shop)
@@ -84,12 +84,11 @@ actor QueryCache {
 
     /// Loads data with deduplication - multiple simultaneous calls will share the same request
     func loadCached<T>(
-        domain: String,
-        accessToken: String,
         cacheKey: String,
+        url: URL,
         query: @escaping () async throws -> T
     ) async throws -> T {
-        let key = buildCacheKey(domain: domain, accessToken: accessToken, queryKey: cacheKey)
+        let key = buildCacheKey(queryKey: cacheKey, url: url)
 
         if let cached = cache[key] as? T {
             return cached
@@ -101,9 +100,7 @@ actor QueryCache {
 
         let task = Task<T, Error> {
             let result = try await query()
-
-            self.cacheResult(result, for: key)
-
+            self.cache(result, for: key)
             return result
         }
 
@@ -119,11 +116,11 @@ actor QueryCache {
         }
     }
 
-    private func cacheResult(_ result: some Any, for key: String) {
+    private func cache(_ result: some Any, for key: String) {
         cache[key] = result
     }
 
-    private func buildCacheKey(domain: String, accessToken: String, queryKey: String) -> String {
-        return "\(domain)-\(accessToken.prefix(10))-\(queryKey)"
+    private func buildCacheKey(queryKey: String, url: URL) -> String {
+        return "\(queryKey)-\(url.absoluteString)"
     }
 }
