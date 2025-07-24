@@ -45,14 +45,17 @@ extension StorefrontAPI {
     /// Get shop information
     /// - Returns: Shop details
     func shop() async throws -> Shop {
-        let response = try await client.query(
-            Operations.getShop()
+        try await QueryCache.shared.loadCached(
+            cacheKey: "shop",
+            url: client.url,
+            query: {
+                let response = try await self.client.query(Operations.getShop())
+                guard let shop = response.data?.shop else {
+                    throw StorefrontAPI.Errors.payload(propertyName: "shop")
+                }
+                return shop
+            }
         )
-
-        guard let shop = response.data?.shop else {
-            throw StorefrontAPI.Errors.payload(propertyName: "shop")
-        }
-        return shop
     }
 
     /// Get shop settings with caching and deduplication
@@ -61,14 +64,8 @@ extension StorefrontAPI {
     ///   - accessToken: The access token for cache key generation
     /// - Returns: Cached or fresh ShopSettings
     func shopSettings(domain: String, accessToken: String) async throws -> ShopSettings {
-        
-        return try await QueryCache.shared.loadCached(
-            cacheKey: "shop",
-            url: client.url
-        ) {
-            let shop = try await self.shop()
-            return ShopSettings(from: shop)
-        }
+        let shop = try await self.shop()
+        return ShopSettings(from: shop)
     }
 }
 
