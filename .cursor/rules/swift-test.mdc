@@ -1,0 +1,83 @@
+---
+description: Swift testing best practices and requirements
+globs: ["Tests/**/*.swift"]
+alwaysApply: true
+---
+
+# SWIFT TESTING RULES
+
+## Test Structure Requirements
+
+### DO:
+- Create separate test methods for each test case
+- Use `guard` statements with `XCTFail` for unwrapping optionals
+```swift
+func testSomething() {
+    guard let result = someOptionalValue else {
+        XCTFail("Expected non-nil value")
+        return
+    }
+    XCTAssertEqual(result, expectedValue)
+}
+```
+- Write focused tests that test one thing at a time
+- Use descriptive test method names in the format `test_<methodName>_<withCircumstances>_<shouldExpectation>`
+```
+    func test_canTransition_fromAppleSheetPresentedState_shouldAllowPaymentAuthorizationAndInterruptAndCompleted() 
+    func test_ensureCurrencyNotChanged_withNoInitialCurrency_shouldNotThrow() 
+```
+
+- If a function may throw multiple types of errors, write multiple tests to capture them in isolation
+```
+func throwingFunction() {
+    if someCondition {
+        throw Error.foo
+      } else 
+      throw Error.bar
+  }
+
+  func test_throwingFunction_whenSomeConditionTrue_shouldThrowFoo() {
+    do {
+        _ = try await storefront.createCart()
+        XCTFail("Expected error to be thrown")
+    } catch {
+      guard case let error = Error.foo else {
+        XCTFail("Expected .foo")
+      }
+    }
+  }
+  func test_throwingFunction_whenSomeConditionTrue_shouldThrowBar(){
+    do {
+        _ = try await storefront.createCart()
+        XCTFail("Expected error to be thrown")
+    } catch {
+      guard case let error = Error.foo else {
+        XCTFail("Expected .foo")
+      }
+    }
+  }
+```
+
+## Code Examples
+
+### ✅ CORRECT: Unwrapping optionals
+```swift
+func testSomething() {
+    guard let result = someOptionalValue else {
+        XCTFail("Expected non-nil value")
+        return
+    }
+    XCTAssertEqual(result, expectedValue)
+}
+```
+
+### DON'T:
+- Use typed catches when testing throwing expressions
+- Delete and recreate test files when debugging
+- Add boilerplate comments like "// Given", "// When", "// Then"
+
+## Comments
+
+- Use comments ONLY to explain non-obvious side effects or complex reasoning
+- Keep comments minimal and purposeful
+- Focus on WHY something is done, not WHAT is being done
