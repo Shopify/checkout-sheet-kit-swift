@@ -75,7 +75,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             /// 2. The PKPaymentRequest doesn't request shipping info
             ///    (we rely on country from `didSelectShippingContact` for calculating taxes)
             guard try pkDecoder.isShippingRequired() == false,
-                  let billingCountryCode = try? pkEncoder.billingCountryCode.get()
+                let billingPostalAddress = try? pkEncoder.billingPostalAddress.get(),
+                let country = billingPostalAddress.country
             else {
                 return pkDecoder.paymentRequestPaymentMethodUpdate()
             }
@@ -83,10 +84,13 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             try await controller.storefront.cartBuyerIdentityUpdate(
                 id: cartID,
                 input: .init(
-                    countryCode: billingCountryCode,
+                    countryCode: country,
                     customerAccessToken: configuration.common.customer?.customerAccessToken
                 )
             )
+
+            try await controller.storefront
+                .cartBillingAddressUpdate(id: cartID, billingAddress: billingPostalAddress)
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
             try setCart(to: result.cart)
@@ -163,16 +167,35 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
+            } else {
+
+                guard
+                    let billingPostalAddress = try? pkEncoder.billingPostalAddress.get()
+                else {
+                    return pkDecoder.paymentAuthorizationResult()
+                }
+
+                try await controller.storefront.cartBillingAddressUpdate(
+                    id: cartID,
+                    billingAddress: billingPostalAddress
+                )
+
+                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+                try setCart(to: result.cart)
             }
 
             let totalAmount = try pkEncoder.totalAmount.get()
             let applePayPayment = try pkEncoder.applePayPayment.get()
 
-            _ = try await controller.storefront.cartPaymentUpdate(
-                id: cartID,
-                totalAmount: totalAmount,
-                applePayPayment: applePayPayment
-            )
+            /// Taxes may become pending again fail to resolve despite updating within the didUpdatePaymentMethod
+            /// So we retry one time to see if the error clears on retry
+            _ = try await Task.retrying(priority: nil, maxRetryCount: 1) {
+                try await self.controller.storefront.cartPaymentUpdate(
+                    id: cartID,
+                    totalAmount: totalAmount,
+                    applePayPayment: applePayPayment
+                )
+            }.value
 
             let response = try await controller.storefront.cartSubmitForCompletion(id: cartID)
             try? await transition(

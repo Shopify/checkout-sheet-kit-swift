@@ -58,7 +58,7 @@ class PKEncoder {
         "GU": "US",
         "MP": "US",
         "PR": "US",
-        "VI": "US"
+        "VI": "US",
     ]
 
     /// Provides valid, corresponding CountryCode for known but invalid country codes
@@ -66,7 +66,7 @@ class PKEncoder {
     static let FallbackCountryCodes: [String: String] = [
         "UK": "GB",
         "JA": "JP",
-        "US": "US"
+        "US": "US",
     ]
 
     // MARK: Identifiers
@@ -113,21 +113,32 @@ class PKEncoder {
 
     /// Returns `isoCountryCode` from `didAuthorizePayment` PKPaymentRequest.billingContact
     /// Otherwise falls back to the `didSelectPaymentMethod` PKPaymentMethod.billingContact
-    var billingCountryCode: Result<String, ShopifyAcceleratedCheckouts.Error> {
+    var billingPostalAddress: Result<StorefrontAPI.Address, ShopifyAcceleratedCheckouts.Error> {
         if let billingContact = try? billingContact.get(),
-           let billingContactCountryCode = billingContact.postalAddress?.isoCountryCode
+            let billingPostalAddress = billingContact.postalAddress
         {
-            return .success(billingContactCountryCode)
+            let contact = cnPostalAddressToPkContact(address: billingPostalAddress)
+            guard let address = try? pkContactToAddress(contact: contact).get() else {
+                return .failure(.invariant(expected: "billingPostalAddress.pkContactToAddress"))
+            }
+            return .success(address)
         }
 
         guard
-            let paymentMethodCountryCode =
-            selectedPaymentMethod?.billingAddress?.postalAddresses.first?.value.isoCountryCode
+            let selectedBillingPostalAddress =
+                selectedPaymentMethod?.billingAddress?.postalAddresses.first?.value
         else {
-            return .failure(.invariant(expected: "paymentMethod"))
+            return .failure(.invariant(expected: "selectedPaymentMethod"))
         }
+        let address = StorefrontAPI.Address(
+            address1: "",
+            city: selectedBillingPostalAddress.city,
+            country: selectedBillingPostalAddress.isoCountryCode,
+            province: selectedBillingPostalAddress.state,
+            zip: selectedBillingPostalAddress.postalCode
+        )
 
-        return .success(paymentMethodCountryCode)
+        return .success(address)
     }
 
     var billingContact: Result<PKContact, ShopifyAcceleratedCheckouts.Error> {
@@ -160,11 +171,11 @@ class PKEncoder {
         }
         guard
             let digits = payment
-            .token
-            .paymentMethod
-            .displayName?
-            .components(separatedBy: " ")
-            .last
+                .token
+                .paymentMethod
+                .displayName?
+                .components(separatedBy: " ")
+                .last
         else {
             return .failure(.invariant(expected: "displayName"))
         }
@@ -191,6 +202,12 @@ class PKEncoder {
 
         // Allow the API return an error if the country code is not recognized
         return countryCode
+    }
+
+    func cnPostalAddressToPkContact(address: CNPostalAddress) -> PKContact {
+        let contact = PKContact()
+        contact.postalAddress = address
+        return contact
     }
 
     func pkContactToAddress(contact: PKContact?)
