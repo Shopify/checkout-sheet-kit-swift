@@ -18,9 +18,10 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = "13.0"
 
-  s.source_files = "Sources/ShopifyCheckoutSheetKit/**/*.swift"
+  s.source_files = "Sources/**/*.swift"
 
   s.resource_bundles = {
-    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"]
+    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"],
+    "ShopifyAcceleratedCheckouts" => ["Sources/ShopifyAcceleratedCheckouts/Media.xcassets", "Sources/ShopifyAcceleratedCheckouts/Localizable.xcstrings"]
   }
 end
