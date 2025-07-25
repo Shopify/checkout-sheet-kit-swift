@@ -17,11 +17,14 @@ Pod::Spec.new do |s|
   s.swift_version = "5.0"
 
   s.ios.deployment_target = "13.0"
+  
+  s.pod_target_xcconfig = {
+    'OTHER_SWIFT_FLAGS' => '-package-name ShopifyCheckoutSheetKit -module-alias Common=ShopifyCheckoutSheetKit'
+  }
 
-  s.source_files = "Sources/**/*.swift"
+  s.source_files = "Sources/Common/**/*.swift", "Sources/ShopifyCheckoutSheetKit/**/*.swift"
 
   s.resource_bundles = {
-    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"],
-    "ShopifyAcceleratedCheckouts" => ["Sources/ShopifyAcceleratedCheckouts/Media.xcassets", "Sources/ShopifyAcceleratedCheckouts/Localizable.xcstrings"]
+    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"]
   }
 end
