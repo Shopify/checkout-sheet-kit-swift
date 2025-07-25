@@ -405,4 +405,115 @@ class PKEncoderTests: XCTestCase {
         XCTAssertEqual(address.firstName, "John")
         XCTAssertEqual(address.lastName, "John")
     }
+
+    // MARK: - billingPostalAddress Tests
+    //
+    // Testing Strategy for billingPostalAddress:
+    // - Tests comprehensive error handling for all failure paths
+    // - Tests success flow via billingContact (using setValue workaround)
+    // - Cannot easily test selectedPaymentMethod fallback due to PassKit read-only properties
+    // - Core address conversion logic is thoroughly tested via existing pkContactToAddress tests
+
+    func testBillingPostalAddressReturnsErrorWhenNoBillingContactOrPaymentMethod() {
+        let testEncoder = encoder
+
+        let result = testEncoder.billingPostalAddress
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        XCTAssertTrue(error.toString().contains("selectedPaymentMethod"))
+    }
+
+    func testBillingPostalAddressReturnsErrorWhenPaymentIsNil() {
+        var testEncoder = encoder
+        testEncoder.payment = nil
+        testEncoder.selectedPaymentMethod = nil
+
+        let result = testEncoder.billingPostalAddress
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        XCTAssertTrue(error.toString().contains("selectedPaymentMethod"))
+    }
+
+    func testBillingPostalAddressReturnsErrorWhenPaymentHasNoBillingContact() {
+        var testEncoder = encoder
+        let payment = PKPayment()
+        testEncoder.payment = payment
+        testEncoder.selectedPaymentMethod = nil
+
+        let result = testEncoder.billingPostalAddress
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        XCTAssertTrue(error.toString().contains("selectedPaymentMethod"))
+    }
+
+    func testBillingPostalAddressReturnsErrorWhenSelectedPaymentMethodIsNil() {
+        var testEncoder = encoder
+        testEncoder.payment = nil
+        testEncoder.selectedPaymentMethod = nil
+
+        let result = testEncoder.billingPostalAddress
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        XCTAssertTrue(error.toString().contains("selectedPaymentMethod"))
+    }
+
+    func testBillingPostalAddressHandlesComplexNestedNilCases() {
+        var testEncoder = encoder
+
+        let mockPaymentMethod = PKPaymentMethod()
+        testEncoder.selectedPaymentMethod = mockPaymentMethod
+
+        let result = testEncoder.billingPostalAddress
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        XCTAssertTrue(error.toString().contains("selectedPaymentMethod"))
+    }
+
+    func testBillingPostalAddressSuccessViaBillingContact() throws {
+        var testEncoder = encoder
+
+        let billingContact = createMockContact(
+            street: "789 Billing Street\nUnit 456",
+            city: "Billing City",
+            state: "NY",
+            postalCode: "10001",
+            country: "United States",
+            isoCountryCode: "US"
+        )
+
+        let payment = PKPayment()
+        // Note: PKPayment.billingContact is read-only, so we use setValue(forKey:) to set it for testing.
+        // This is a workaround since PassKit objects can only be properly populated by the actual
+        // Apple Pay system during real payment flows.
+        payment.setValue(billingContact, forKey: "billingContact")
+        testEncoder.payment = payment
+
+        let result = testEncoder.billingPostalAddress
+        let address = try result.get()
+
+        // Testing limitation: PKPayment doesn't preserve all contact properties when set via setValue.
+        // Name properties (firstName, lastName) are lost during the PKPayment round-trip, but postal
+        // address properties (street, city, state, zip, country) are correctly preserved.
+        XCTAssertEqual(address.address1, "789 Billing Street")
+        XCTAssertEqual(address.address2, "Unit 456")
+        XCTAssertEqual(address.city, "Billing City")
+        XCTAssertEqual(address.province, "NY")
+        XCTAssertEqual(address.zip, "10001")
+        XCTAssertEqual(address.country, "US")
+    }
 }
