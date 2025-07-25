@@ -33,7 +33,7 @@ public class CheckoutViewController: UINavigationController {
         presentationController?.delegate = rootViewController
     }
 
-    package init(checkout url: URL, delegate: CheckoutDelegate? = nil, entryPoint: UserAgent.EntryPoint? = nil) {
+    package init(checkout url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
         let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: entryPoint)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)

@@ -41,7 +41,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         return applicationName(entryPoint: nil)
     }
 
-    static func applicationName(entryPoint: UserAgent.EntryPoint?) -> String {
+    static func applicationName(entryPoint: MetaData.EntryPoint?) -> String {
         let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
         let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
 
@@ -57,7 +57,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         return recoveryAgent(entryPoint: nil)
     }
 
-    static func recoveryAgent(entryPoint: UserAgent.EntryPoint?) -> String {
+    static func recoveryAgent(entryPoint: MetaData.EntryPoint?) -> String {
         let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
         let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
 
@@ -69,7 +69,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         )
     }
 
-    private static func mapPlatform(_ platform: Platform?) -> UserAgent.Platform? {
+    private static func mapPlatform(_ platform: Platform?) -> MetaData.Platform? {
         guard let platform else { return nil }
         switch platform {
         case .reactNative:

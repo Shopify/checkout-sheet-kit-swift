@@ -63,7 +63,7 @@ class CheckoutWebView: WKWebView {
         return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
     }
 
-    static func `for`(checkout url: URL, recovery: Bool = false, entryPoint: UserAgent.EntryPoint? = nil) -> CheckoutWebView {
+    static func `for`(checkout url: URL, recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) -> CheckoutWebView {
         OSLogger.shared.debug("Creating webview for URL: \(url.absoluteString), recovery: \(recovery)")
 
         if recovery {
@@ -88,7 +88,7 @@ class CheckoutWebView: WKWebView {
         return cache.view
     }
 
-    static func uncacheableView(entryPoint: UserAgent.EntryPoint? = nil) -> CheckoutWebView {
+    static func uncacheableView(entryPoint: MetaData.EntryPoint? = nil) -> CheckoutWebView {
         uncacheableViewRef?.detachBridge()
         let view = CheckoutWebView(entryPoint: entryPoint)
         uncacheableViewRef = view
@@ -129,11 +129,11 @@ class CheckoutWebView: WKWebView {
 
     var isPreloadRequest: Bool = false
 
-    private var entryPoint: UserAgent.EntryPoint?
+    private var entryPoint: MetaData.EntryPoint?
 
     // MARK: Initializers
 
-    init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, entryPoint: UserAgent.EntryPoint? = nil) {
+    init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) {
         OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".

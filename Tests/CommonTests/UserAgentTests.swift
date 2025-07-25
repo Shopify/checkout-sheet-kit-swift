@@ -26,7 +26,7 @@ import XCTest
 
 class UserAgentTests: XCTestCase {
     func test_string_withAcceleratedCheckoutsEntryPoint_shouldReturnCorrectUserAgent() {
-        let schemaVersion = UserAgent.schemaVersion
+        let schemaVersion = MetaData.schemaVersion
         let acceleratedCheckoutsUA = UserAgent.string(
             type: .standard,
             colorScheme: .automatic,
@@ -36,7 +36,7 @@ class UserAgentTests: XCTestCase {
     }
 
     func test_string_withAcceleratedCheckoutsAndReactNativePlatform_shouldReturnUserAgentWithPlatform() {
-        let schemaVersion = UserAgent.schemaVersion
+        let schemaVersion = MetaData.schemaVersion
         let acceleratedCheckoutsUA = UserAgent.string(
             type: .standard,
             colorScheme: .automatic,
@@ -47,7 +47,7 @@ class UserAgentTests: XCTestCase {
     }
 
     func test_string_withoutEntryPoint_shouldReturnBasicUserAgent() {
-        let schemaVersion = UserAgent.schemaVersion
+        let schemaVersion = MetaData.schemaVersion
         let checkoutSheetKitUA = UserAgent.string(
             type: .standard,
             colorScheme: .automatic
@@ -56,7 +56,7 @@ class UserAgentTests: XCTestCase {
     }
 
     func test_string_withRecoveryTypeAndDarkColorScheme_shouldReturnRecoveryUserAgent() {
-        let schemaVersion = UserAgent.schemaVersion
+        let schemaVersion = MetaData.schemaVersion
         let recoveryUA = UserAgent.string(
             type: .recovery,
             colorScheme: .dark,

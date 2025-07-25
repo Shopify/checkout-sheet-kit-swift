@@ -70,7 +70,7 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 /// This is only used by other modules such as ShopifyAcceleratedCheckouts.
 /// Consumers will use the public `present` function, and the UserAgent will *not* contain the entry field.
 @discardableResult
-package func present(checkout url: URL, from: UIViewController, entryPoint: UserAgent.EntryPoint, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
+package func present(checkout url: URL, from: UIViewController, entryPoint: MetaData.EntryPoint, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
     let viewController = CheckoutViewController(checkout: url, delegate: delegate, entryPoint: entryPoint)
     from.present(viewController, animated: true)
     return viewController

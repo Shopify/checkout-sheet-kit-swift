@@ -25,19 +25,6 @@ import Foundation
 import UIKit
 
 public enum UserAgent {
-    /// In time this will be used to track the top level package that is
-    /// making API calls or is the initiator of CSK.
-    /// For now this is exclusive to AcceleratedCheckouts to ensure backwards
-    /// compatibility.
-    package enum EntryPoint: String {
-        case acceleratedCheckouts = "AcceleratedCheckouts"
-    }
-
-    package enum Platform: String {
-        case iOS
-        case reactNative = "ReactNative"
-    }
-
     public enum ColorScheme: String, CaseIterable {
         /// Uses a light, idiomatic color scheme.
         case light
@@ -54,21 +41,19 @@ public enum UserAgent {
         case recovery
     }
 
-    private static let version = "3.2.0"
-    package static let schemaVersion = "8.1"
-    private static let baseUserAgent = "ShopifyCheckoutSDK/\(version)"
+    private static let baseUserAgent = "ShopifyCheckoutSDK/\(MetaData.version)"
 
     // Shared format for CheckoutSheetKit and AcceleratedCheckouts
     package static func string(
         type: CheckoutType,
         colorScheme: ColorScheme,
-        platform: Platform? = nil,
-        entryPoint: EntryPoint? = nil
+        platform: MetaData.Platform? = nil,
+        entryPoint: MetaData.EntryPoint? = nil
     ) -> String {
         var parameters: String
         switch type {
         case .standard:
-            parameters = "\(schemaVersion);\(colorScheme.rawValue);standard"
+            parameters = "\(MetaData.schemaVersion);\(colorScheme.rawValue);standard"
         case .recovery:
             parameters = "noconnect;\(colorScheme.rawValue);standard_recovery"
         }

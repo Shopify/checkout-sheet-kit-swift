@@ -62,7 +62,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: UserAgent.EntryPoint? = nil) {
+    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
         checkoutURL = url
         self.delegate = delegate
 
