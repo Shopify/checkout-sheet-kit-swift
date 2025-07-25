@@ -49,6 +49,9 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     /// Factory for creating PaymentAuthorizationController instances - injectable for testing
     var paymentControllerFactory: PKAuthorizationControllerFactory
 
+    /// Clock dependency for controlling time-based operations - injectable for testing
+    let clock: Clock
+
     /// A URL that will render checkout for the cart contents
     var checkoutURL: URL?
 
@@ -82,11 +85,13 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         controller: PayController,
         paymentControllerFactory: @escaping PKAuthorizationControllerFactory = {
             PKPaymentAuthorizationController(paymentRequest: $0)
-        }
+        },
+        clock: Clock = SystemClock()
     ) {
         self.configuration = configuration
         self.controller = controller
         self.paymentControllerFactory = paymentControllerFactory
+        self.clock = clock
 
         pkEncoder = PKEncoder(configuration: configuration, cart: { controller.cart })
         pkDecoder = PKDecoder(configuration: configuration, cart: { controller.cart })
@@ -172,7 +177,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         case .cartSubmittedForCompletion:
             break
         default:
-            try? await _Concurrency.Task.retrying {
+            try? await _Concurrency.Task.retrying(clock: clock) {
                 let cartID = try self.pkEncoder.cartID.get()
                 try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
                     id: cartID

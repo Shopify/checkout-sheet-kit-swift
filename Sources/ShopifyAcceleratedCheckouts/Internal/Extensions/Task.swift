@@ -46,6 +46,7 @@ extension Task where Failure == Error {
         priority: TaskPriority? = nil,
         maxRetryCount: Int = 3,
         retryDelay: TimeInterval = 1,
+        clock: Clock = SystemClock(),
         operation: @Sendable @escaping () async throws -> Success
     ) -> Task {
         Task(priority: priority) {
@@ -53,7 +54,7 @@ extension Task where Failure == Error {
                 do {
                     return try await operation()
                 } catch {
-                    try await Task<Never, Never>.sleep(
+                    try await clock.sleep(
                         nanoseconds: exponentialDelay(for: attempt, with: retryDelay))
 
                     continue

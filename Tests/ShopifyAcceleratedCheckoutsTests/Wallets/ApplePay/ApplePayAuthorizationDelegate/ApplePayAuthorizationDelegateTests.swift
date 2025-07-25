@@ -49,7 +49,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         delegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
             controller: mockController,
-            paymentControllerFactory: mockPaymentControllerFactory
+            paymentControllerFactory: mockPaymentControllerFactory,
+            clock: MockClock()
         )
 
         do {
@@ -182,7 +183,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
             let testDelegate = ApplePayAuthorizationDelegate(
                 configuration: configuration,
                 controller: mockController,
-                paymentControllerFactory: mockPaymentControllerFactory
+                paymentControllerFactory: mockPaymentControllerFactory,
+                clock: MockClock()
             )
             try testDelegate.setCart(to: mockController.cart)
 
@@ -221,7 +223,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
             let testDelegate = ApplePayAuthorizationDelegate(
                 configuration: configuration,
                 controller: mockController,
-                paymentControllerFactory: mockPaymentControllerFactory
+                paymentControllerFactory: mockPaymentControllerFactory,
+                clock: MockClock()
             )
             try testDelegate.setCart(to: mockController.cart)
 
@@ -255,7 +258,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
         let failingDelegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
-            controller: failingController
+            controller: failingController,
+            clock: MockClock()
         )
         try? failingDelegate.setCart(to: failingController.cart)
 
@@ -511,7 +515,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         let spyDelegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
             controller: spyController,
-            paymentControllerFactory: mockPaymentControllerFactory
+            paymentControllerFactory: mockPaymentControllerFactory,
+            clock: MockClock()
         )
         try spyDelegate.setCart(to: spyController.cart)
 
