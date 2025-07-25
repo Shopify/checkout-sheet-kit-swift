@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import UIKit
 
 /// The version of the `ShopifyCheckoutSheetKit` library.
@@ -61,6 +62,16 @@ public func invalidate() {
 @discardableResult
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
     let viewController = CheckoutViewController(checkout: url, delegate: delegate)
+    from.present(viewController, animated: true)
+    return viewController
+}
+
+/// Internal function that presents the checkout from a given `UIViewController` with a specified entry point.
+/// This is only used by other modules such as ShopifyAcceleratedCheckouts.
+/// Consumers will use the public `present` function, and the UserAgent will *not* contain the entry field.
+@discardableResult
+package func present(checkout url: URL, from: UIViewController, entryPoint: MetaData.EntryPoint, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
+    let viewController = CheckoutViewController(checkout: url, delegate: delegate, entryPoint: entryPoint)
     from.present(viewController, animated: true)
     return viewController
 }

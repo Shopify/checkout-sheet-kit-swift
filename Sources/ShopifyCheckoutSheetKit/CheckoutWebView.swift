@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import UIKit
 import WebKit
 
@@ -62,23 +63,23 @@ class CheckoutWebView: WKWebView {
         return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
     }
 
-    static func `for`(checkout url: URL, recovery: Bool = false) -> CheckoutWebView {
+    static func `for`(checkout url: URL, recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) -> CheckoutWebView {
         OSLogger.shared.debug("Creating webview for URL: \(url.absoluteString), recovery: \(recovery)")
 
         if recovery {
             CheckoutWebView.invalidate()
-            return CheckoutWebView(recovery: true)
+            return CheckoutWebView(recovery: true, entryPoint: entryPoint)
         }
 
-        let cacheKey = url.absoluteString
+        let cacheKey = "\(url.absoluteString)_\(entryPoint?.rawValue ?? "nil")"
 
         guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
             OSLogger.shared.debug("Preloading not enabled")
-            return uncacheableView()
+            return uncacheableView(entryPoint: entryPoint)
         }
 
         guard let cache, cacheKey == cache.key, !cache.isStale else {
-            let view = CheckoutWebView()
+            let view = CheckoutWebView(entryPoint: entryPoint)
             CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
             return view
         }
@@ -87,9 +88,9 @@ class CheckoutWebView: WKWebView {
         return cache.view
     }
 
-    static func uncacheableView() -> CheckoutWebView {
+    static func uncacheableView(entryPoint: MetaData.EntryPoint? = nil) -> CheckoutWebView {
         uncacheableViewRef?.detachBridge()
-        let view = CheckoutWebView()
+        let view = CheckoutWebView(entryPoint: entryPoint)
         uncacheableViewRef = view
         return view
     }
@@ -128,21 +129,24 @@ class CheckoutWebView: WKWebView {
 
     var isPreloadRequest: Bool = false
 
+    private var entryPoint: MetaData.EntryPoint?
+
     // MARK: Initializers
 
-    init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false) {
+    init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) {
         OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".
         configuration.allowsInlineMediaPlayback = true
+        self.entryPoint = entryPoint
 
         if recovery {
             /// Uses a non-persistent, private cookie store to avoid cross-instance pollution
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-            configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent
+            configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent(entryPoint: entryPoint)
         } else {
             /// Set the User-Agent in non-recovery view
-            configuration.applicationNameForUserAgent = CheckoutBridge.applicationName
+            configuration.applicationNameForUserAgent = CheckoutBridge.applicationName(entryPoint: entryPoint)
         }
 
         isRecovery = recovery

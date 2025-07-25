@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 @testable import ShopifyCheckoutSheetKit
 import WebKit
 import XCTest
@@ -41,7 +42,7 @@ class CheckoutBridgeTests: XCTestCase {
 
     func testReturnsStandardUserAgent() {
         let version = ShopifyCheckoutSheetKit.version
-        let schemaVersion = CheckoutBridge.schemaVersion
+        let schemaVersion = MetaData.schemaVersion
         XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard)")
     }
 
@@ -52,10 +53,34 @@ class CheckoutBridgeTests: XCTestCase {
 
     func testReturnsUserAgentWithCustomPlatformSuffix() {
         let version = ShopifyCheckoutSheetKit.version
-        let schemaVersion = CheckoutBridge.schemaVersion
+        let schemaVersion = MetaData.schemaVersion
         ShopifyCheckoutSheetKit.configuration.platform = Platform.reactNative
         XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative")
         XCTAssertEqual(CheckoutBridge.recoveryAgent, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) ReactNative")
+        ShopifyCheckoutSheetKit.configuration.platform = nil
+    }
+
+    func testReturnsUserAgentWithEntryPoint() {
+        let version = ShopifyCheckoutSheetKit.version
+        let schemaVersion = MetaData.schemaVersion
+        let applicationNameWithEntryPoint = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
+        let recoveryAgentWithEntryPoint = CheckoutBridge.recoveryAgent(entryPoint: .acceleratedCheckouts)
+
+        XCTAssertEqual(applicationNameWithEntryPoint, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) AcceleratedCheckouts")
+        XCTAssertEqual(recoveryAgentWithEntryPoint, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) AcceleratedCheckouts")
+    }
+
+    func testReturnsUserAgentWithEntryPointAndPlatform() {
+        let version = ShopifyCheckoutSheetKit.version
+        let schemaVersion = MetaData.schemaVersion
+        ShopifyCheckoutSheetKit.configuration.platform = Platform.reactNative
+
+        let applicationNameWithEntryPoint = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
+        let recoveryAgentWithEntryPoint = CheckoutBridge.recoveryAgent(entryPoint: .acceleratedCheckouts)
+
+        XCTAssertEqual(applicationNameWithEntryPoint, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts")
+        XCTAssertEqual(recoveryAgentWithEntryPoint, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) ReactNative AcceleratedCheckouts")
+
         ShopifyCheckoutSheetKit.configuration.platform = nil
     }
 

@@ -21,12 +21,20 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import SwiftUI
 import UIKit
 
 public class CheckoutViewController: UINavigationController {
     public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: nil)
+        rootViewController.notifyPresented()
+        super.init(rootViewController: rootViewController)
+        presentationController?.delegate = rootViewController
+    }
+
+    package init(checkout url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: entryPoint)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController

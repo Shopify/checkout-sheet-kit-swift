@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import Foundation
 
 /// A lightweight GraphQL client for the Storefront API without external dependencies
@@ -100,6 +101,14 @@ class GraphQLClient {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // Set User-Agent header
+        let userAgent = UserAgent.string(
+            type: .standard,
+            colorScheme: .automatic,
+            entryPoint: .acceleratedCheckouts
+        )
+        urlRequest.setValue(userAgent, forHTTPHeaderField: "User-Agent")
 
         // Add all provided headers
         for (key, value) in headers {

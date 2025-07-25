@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import UIKit
 
 public enum Platform: String {
@@ -66,16 +67,7 @@ public struct Configuration {
 }
 
 extension Configuration {
-    public enum ColorScheme: String, CaseIterable {
-        /// Uses a light, idiomatic color scheme.
-        case light
-        /// Uses a dark, idiomatic color scheme.
-        case dark
-        /// Infers either `.light` or `.dark` based on the current `UIUserInterfaceStyle`.
-        case automatic
-        /// The color scheme presented to buyers using a desktop or mobile browser.
-        case web = "web_default"
-    }
+    public typealias ColorScheme = UserAgent.ColorScheme
 }
 
 extension Configuration {

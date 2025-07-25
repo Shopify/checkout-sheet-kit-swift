@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import UIKit
 import WebKit
 
@@ -61,11 +62,11 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil) {
+    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
         checkoutURL = url
         self.delegate = delegate
 
-        let checkoutView = CheckoutWebView.for(checkout: url)
+        let checkoutView = CheckoutWebView.for(checkout: url, entryPoint: entryPoint)
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
         self.checkoutView = checkoutView
