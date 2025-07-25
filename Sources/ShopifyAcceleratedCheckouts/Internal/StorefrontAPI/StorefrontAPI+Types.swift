@@ -513,6 +513,9 @@ extension StorefrontAPI {
     /// Cart payment update payload
     typealias CartPaymentUpdatePayload = CartPayload
 
+    /// Cart billing address update payload
+    typealias CartBillingAddressUpdatePayload = CartPayload
+
     /// Cart remove personal data payload
     typealias CartRemovePersonalDataPayload = CartPayload
 
@@ -926,6 +929,36 @@ extension StorefrontAPI {
             self.province = province
             self.zip = zip
         }
+
+        /// Convert to dictionary for GraphQL input with countryCode/provinceCode fields
+        var asShippingAddressDict: [String: Any?] {
+            return [
+                "address1": address1,
+                "address2": address2,
+                "city": city,
+                "countryCode": country,
+                "firstName": firstName,
+                "lastName": lastName,
+                "phone": phone,
+                "provinceCode": province,
+                "zip": zip
+            ]
+        }
+
+        /// Convert to dictionary for MailingAddressInput (uses country/province instead of countryCode/provinceCode)
+        var asMailingAddressDict: [String: Any?] {
+            return [
+                "address1": address1,
+                "address2": address2,
+                "city": city,
+                "country": country,
+                "firstName": firstName,
+                "lastName": lastName,
+                "phone": phone,
+                "province": province,
+                "zip": zip
+            ]
+        }
     }
 
     /// Type alias for Apple Pay billing address (uses same structure as Address)
@@ -947,24 +980,6 @@ extension StorefrontAPI {
     }
 
     // MARK: - Address Conversion
-}
-
-@available(iOS 17.0, *)
-extension StorefrontAPI.Address {
-    /// Convert to dictionary for GraphQL input with countryCode/provinceCode fields
-    var graphQLInput: [String: Any?] {
-        return [
-            "address1": address1,
-            "address2": address2,
-            "city": city,
-            "countryCode": country,
-            "firstName": firstName,
-            "lastName": lastName,
-            "phone": phone,
-            "provinceCode": province,
-            "zip": zip
-        ]
-    }
 }
 
 /// Represents shop settings data fetched from the Storefront API

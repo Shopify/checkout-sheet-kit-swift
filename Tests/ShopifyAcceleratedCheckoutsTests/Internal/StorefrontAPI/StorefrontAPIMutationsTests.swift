@@ -900,7 +900,77 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         XCTAssertEqual(applePayContent?["version"] as? String, "EC_v1")
     }
 
-    // MARK: - Cart Remove Personal Data Tests
+    // MARK: - Cart Billing Address Update Tests
+
+    func testCartBillingAddressUpdateSuccess() async throws {
+        let json = """
+        {
+            "data": {
+                "cartBillingAddressUpdate": {
+                    "cart": {
+                        "id": "gid://shopify/Cart/123",
+                        "checkoutUrl": "https://test.myshopify.com/checkout/123",
+                        "totalQuantity": 1,
+                        "buyerIdentity": null,
+                        "deliveryGroups": {"nodes": []},
+                        "delivery": null,
+                        "lines": {"nodes": []},
+                        "cost": {
+                            "totalAmount": {"amount": "29.99", "currencyCode": "USD"},
+                            "subtotalAmount": {"amount": "19.99", "currencyCode": "USD"},
+                            "totalTaxAmount": {"amount": "3.00", "currencyCode": "USD"}
+                        },
+                        "discountCodes": [],
+                        "discountAllocations": []
+                    },
+                    "userErrors": []
+                }
+            }
+        }
+        """
+        mockJSONResponse(json)
+
+        // Test with partial billing address (like the user's example)
+        let billingAddress = StorefrontAPI.Address(
+            address1: "", // Empty but present
+            city: "Denver",
+            country: "US",
+            province: "CO",
+            zip: "80204"
+        )
+
+        let cart = try await storefrontAPI.cartBillingAddressUpdate(
+            id: GraphQLScalars.ID("gid://shopify/Cart/123"),
+            billingAddress: billingAddress
+        )
+
+        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "29.99")!)
+        XCTAssertNotNil(cart.cost.totalTaxAmount)
+
+        // Verify that the request was made with correct field names (country/province, not countryCode/provinceCode)
+        XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
+
+        guard let body = MockURLProtocol.capturedRequestBody else {
+            XCTFail("Expected request body to be captured")
+            return
+        }
+
+        let jsonBody = try JSONSerialization.jsonObject(with: body) as? [String: Any]
+        let variables = jsonBody?["variables"] as? [String: Any]
+        let requestBillingAddress = variables?["billingAddress"] as? [String: Any]
+
+        // Verify correct field names for MailingAddressInput
+        XCTAssertEqual(requestBillingAddress?["country"] as? String, "US")
+        XCTAssertEqual(requestBillingAddress?["province"] as? String, "CO")
+        XCTAssertEqual(requestBillingAddress?["city"] as? String, "Denver")
+        XCTAssertEqual(requestBillingAddress?["zip"] as? String, "80204")
+        XCTAssertEqual(requestBillingAddress?["address1"] as? String, "")
+        // Verify that nil fields are not present
+        XCTAssertNil(requestBillingAddress?["firstName"])
+        XCTAssertNil(requestBillingAddress?["lastName"])
+        XCTAssertNil(requestBillingAddress?["address2"])
+        XCTAssertNil(requestBillingAddress?["phone"])
+    }
 
     func testCartRemovePersonalDataSuccess() async throws {
         let json = """

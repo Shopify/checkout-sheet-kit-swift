@@ -101,6 +101,19 @@ extension GraphQLDocument {
         }
         """
 
+        case cartBillingAddressUpdate = """
+        mutation CartBillingAddressUpdate($cartId: ID!, $billingAddress: MailingAddressInput!) {
+          cartBillingAddressUpdate(cartId: $cartId, billingAddress: $billingAddress) {
+            cart {
+              ...CartFragment
+            }
+            userErrors {
+              ...CartUserErrorFragment
+            }
+          }
+        }
+        """
+
         case cartRemovePersonalData = """
         mutation CartRemovePersonalData($cartId: ID!) {
           cartRemovePersonalData(cartId: $cartId) {
