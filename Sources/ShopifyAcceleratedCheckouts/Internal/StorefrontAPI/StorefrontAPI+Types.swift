@@ -971,28 +971,6 @@ extension StorefrontAPI.Address {
 /// https://shopify.dev/docs/api/storefront/2025-07/objects/Shop
 @available(iOS 17.0, *)
 @Observable class ShopSettings {
-    // Static property to store the cached settings
-    private static var cachedSettings: ShopSettings?
-
-    /// Loads shop settings from the API and caches them
-    static func load(storefront: StorefrontAPI) async throws -> ShopSettings {
-        if let cachedSettings {
-            return cachedSettings
-        }
-
-        let shop = try await storefront.shop()
-        let shopSettings = ShopSettings(from: shop)
-
-        cachedSettings = shopSettings
-
-        return shopSettings
-    }
-
-    /// Clear cached settings
-    static func clearCache() {
-        cachedSettings = nil
-    }
-
     /// The shop's name (merchant name for display)
     let name: String
 

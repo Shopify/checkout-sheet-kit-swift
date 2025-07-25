@@ -44,7 +44,7 @@ class TaskTests: XCTestCase {
         let actor = CountActor()
 
         do {
-            _ = try await Task.retrying(maxRetryCount: 3) {
+            _ = try await Task.retrying(maxRetryCount: 3, clock: MockClock()) {
                 await actor.addAttempt()
                 throw TestError.expected
             }.value
@@ -63,7 +63,7 @@ class TaskTests: XCTestCase {
     func testTaskSucceedsOnFirstAttempt() async throws {
         let actor = CountActor()
 
-        let result = try await Task.retrying {
+        let result = try await Task.retrying(clock: MockClock()) {
             await actor.addAttempt()
             return "success"
         }.value
@@ -76,7 +76,7 @@ class TaskTests: XCTestCase {
     func testTaskSucceedsOnSecondAttempt() async throws {
         let actor = CountActor()
 
-        let result = try await Task.retrying {
+        let result = try await Task.retrying(clock: MockClock()) {
             await actor.addAttempt()
             let currentAttempts = await actor.attempts
             if currentAttempts == 1 {
@@ -94,7 +94,7 @@ class TaskTests: XCTestCase {
         let actor = CountActor()
 
         do {
-            _ = try await Task.retrying(maxRetryCount: 2) {
+            _ = try await Task.retrying(maxRetryCount: 2, clock: MockClock()) {
                 await actor.addAttempt()
                 throw TestError.expected
             }.value
@@ -114,7 +114,7 @@ class TaskTests: XCTestCase {
         let actor = CountActor()
 
         do {
-            _ = try await Task.retrying(maxRetryCount: 0) {
+            _ = try await Task.retrying(maxRetryCount: 0, clock: MockClock()) {
                 await actor.addAttempt()
                 throw TestError.expected
             }.value
@@ -130,12 +130,12 @@ class TaskTests: XCTestCase {
         XCTAssertEqual(attempts, 1)
     }
 
-    func testTaskRetryDelayWorks() async throws {
+    func testTaskRetryDelayWorksWithRealClock() async throws {
         let startTime = Date()
         let actor = CountActor()
 
         do {
-            _ = try await Task.retrying(maxRetryCount: 2, retryDelay: 0.1) {
+            _ = try await Task.retrying(maxRetryCount: 2, retryDelay: 0.01, clock: SystemClock()) {
                 await actor.addAttempt()
                 throw TestError.expected
             }.value
@@ -148,8 +148,35 @@ class TaskTests: XCTestCase {
         // Ensure all actor updates have completed by yielding
         await Task.yield()
 
-        // Should have waited at least 0.2 seconds (2 delays of 0.1 each)
-        XCTAssertGreaterThanOrEqual(elapsed, 0.2)
+        // With exponential backoff using 0.01 second base delay:
+        // Delay 1: 0.01 * 2^1 = 0.02 seconds
+        // Delay 2: 0.01 * 2^2 = 0.04 seconds
+        // Total expected: ~0.06 seconds (but system timing can vary)
+        XCTAssertGreaterThanOrEqual(elapsed, 0.03)
+        let attempts = await actor.attempts
+        XCTAssertEqual(attempts, 3)
+    }
+
+    func testTaskRetryWithMockClockIsFast() async throws {
+        let startTime = Date()
+        let actor = CountActor()
+
+        do {
+            _ = try await Task.retrying(maxRetryCount: 2, retryDelay: 1.0, clock: MockClock()) {
+                await actor.addAttempt()
+                throw TestError.expected
+            }.value
+        } catch {
+            // Expected to throw
+        }
+
+        let elapsed = Date().timeIntervalSince(startTime)
+
+        // Ensure all actor updates have completed by yielding
+        await Task.yield()
+
+        // With MockClock, this should complete almost instantly even with large delays
+        XCTAssertLessThan(elapsed, 0.1)
         let attempts = await actor.attempts
         XCTAssertEqual(attempts, 3)
     }
@@ -157,7 +184,7 @@ class TaskTests: XCTestCase {
     // Flaky
     func testTaskPropagatesCorrectError() async throws {
         do {
-            _ = try await Task.retrying {
+            _ = try await Task.retrying(clock: MockClock()) {
                 throw TestError.different
             }.value
 

@@ -111,12 +111,12 @@ public struct AcceleratedCheckoutButtons: View {
 
         do {
             currentRenderState = .loading
-            shopSettings = try await ShopSettings.load(
-                storefront: StorefrontAPI(
-                    storefrontDomain: configuration.storefrontDomain,
-                    storefrontAccessToken: configuration.storefrontAccessToken
-                )
+            let storefront = StorefrontAPI(
+                storefrontDomain: configuration.storefrontDomain,
+                storefrontAccessToken: configuration.storefrontAccessToken
             )
+            let shop = try await storefront.shop()
+            shopSettings = ShopSettings(from: shop)
             currentRenderState = .rendered
         } catch {
             print("Error loading shop settings: \(error)")
