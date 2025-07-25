@@ -931,7 +931,7 @@ extension StorefrontAPI {
         }
 
         /// Convert to dictionary for GraphQL input with countryCode/provinceCode fields
-        var dictionary: [String: Any?] {
+        var asShippingAddressDict: [String: Any?] {
             return [
                 "address1": address1,
                 "address2": address2,
@@ -946,7 +946,7 @@ extension StorefrontAPI {
         }
 
         /// Convert to dictionary for MailingAddressInput (uses country/province instead of countryCode/provinceCode)
-        var mailingAddressDictionary: [String: Any?] {
+        var asMailingAddressDict: [String: Any?] {
             return [
                 "address1": address1,
                 "address2": address2,

@@ -155,7 +155,7 @@ extension StorefrontAPI {
             "addresses": [
                 [
                     "address": [
-                        "deliveryAddress": address.dictionary.compactMapValues { $0 }
+                        "deliveryAddress": address.asShippingAddressDict.compactMapValues { $0 }
                     ],
                     "selected": true,
                     "validationStrategy": validate ? "STRICT" : "COUNTRY_CODE_ONLY"
@@ -197,7 +197,7 @@ extension StorefrontAPI {
                 [
                     "id": addressId.rawValue,
                     "address": [
-                        "deliveryAddress": address.dictionary.compactMapValues { $0 }
+                        "deliveryAddress": address.asShippingAddressDict.compactMapValues { $0 }
                     ],
                     "selected": true,
                     "validationStrategy": validate ? "STRICT" : "COUNTRY_CODE_ONLY"
@@ -336,7 +336,7 @@ extension StorefrontAPI {
         id: GraphQLScalars.ID,
         billingAddress: Address
     ) async throws -> Cart {
-        let billingAddressDict = billingAddress.mailingAddressDictionary.compactMapValues { $0 }
+        let billingAddressDict = billingAddress.asMailingAddressDict.compactMapValues { $0 }
 
         let variables: [String: Any] = [
             "cartId": id.rawValue,
