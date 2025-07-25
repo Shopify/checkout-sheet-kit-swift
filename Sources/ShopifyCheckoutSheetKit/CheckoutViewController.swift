@@ -27,7 +27,14 @@ import UIKit
 
 public class CheckoutViewController: UINavigationController {
     public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate)
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: nil)
+        rootViewController.notifyPresented()
+        super.init(rootViewController: rootViewController)
+        presentationController?.delegate = rootViewController
+    }
+
+    package init(checkout url: URL, delegate: CheckoutDelegate? = nil, entryPoint: UserAgent.EntryPoint? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: entryPoint)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
@@ -36,13 +43,6 @@ public class CheckoutViewController: UINavigationController {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    package func setEntryPoint(_ entryPoint: UserAgent.EntryPoint) {
-        guard let checkoutWebViewController = viewControllers.first as? CheckoutWebViewController else {
-            return
-        }
-        checkoutWebViewController.checkoutView.setEntryPoint(entryPoint)
     }
 }
 

@@ -69,8 +69,7 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 /// Presents the checkout from a given `UIViewController` with a specified entry point.
 @discardableResult
 package func present(checkout url: URL, from: UIViewController, entryPoint: UserAgent.EntryPoint, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, delegate: delegate)
-    viewController.setEntryPoint(entryPoint)
+    let viewController = CheckoutViewController(checkout: url, delegate: delegate, entryPoint: entryPoint)
     from.present(viewController, animated: true)
     return viewController
 }

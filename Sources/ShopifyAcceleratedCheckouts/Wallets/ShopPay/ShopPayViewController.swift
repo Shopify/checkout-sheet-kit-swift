@@ -62,6 +62,7 @@ import SwiftUI
             self.checkoutViewController = ShopifyCheckoutSheetKit.present(
                 checkout: redirectUrl,
                 from: topViewController,
+                entryPoint: .acceleratedCheckouts,
                 delegate: self
             )
         }

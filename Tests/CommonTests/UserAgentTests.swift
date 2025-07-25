@@ -64,5 +64,4 @@ class UserAgentTests: XCTestCase {
         )
         XCTAssertEqual(recoveryUA, "ShopifyCheckoutSDK/3.2.0 (noconnect;dark;standard_recovery) AcceleratedCheckouts")
     }
-
 }

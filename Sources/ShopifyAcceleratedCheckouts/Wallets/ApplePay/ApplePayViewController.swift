@@ -235,6 +235,7 @@ protocol PayController: AnyObject {
             self.checkoutViewController = ShopifyCheckoutSheetKit.present(
                 checkout: url,
                 from: topViewController,
+                entryPoint: .acceleratedCheckouts,
                 delegate: self
             )
         }
