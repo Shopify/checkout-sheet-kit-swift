@@ -46,14 +46,10 @@ commands:
         desc: Build all sample applications to verify integration
         run: ./scripts/build_samples
   test:
-    subcommands:
-      packages:
-        desc: Run all unit and integration tests for the packages
-        run: |
-          ./scripts/xcode_run test ShopifyCheckoutSheetKit-Package
-      samples:
-        desc: Run tests for sample applications
-        run: ./scripts/test_samples
+    desc: |
+      `dev test` - Run all tests for the ShopifyCheckoutSheetKit-Package.
+      `dev test <test_class_name>` - Run only the specified test class.
+    run: ./scripts/xcode_run test ShopifyCheckoutSheetKit-Package "$1"
 
   apollo:
     subcommands:
