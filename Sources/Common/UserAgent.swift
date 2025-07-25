@@ -25,9 +25,12 @@ import Foundation
 import UIKit
 
 public enum UserAgent {
+    /// In time this will be used to track the top level package that is
+    /// making API calls or is the initiator of CSK.
+    /// For now this is exclusive to AcceleratedCheckouts to ensure backwards
+    /// compatibility.
     package enum EntryPoint: String {
         case acceleratedCheckouts = "AcceleratedCheckouts"
-        case checkoutSheetKit = "CheckoutSheetKit"
     }
 
     package enum Platform: String {
@@ -70,14 +73,14 @@ public enum UserAgent {
             parameters = "noconnect;\(colorScheme.rawValue);standard_recovery"
         }
 
-        if let entryPoint {
-            parameters.append(";entry:\(entryPoint.rawValue)")
-        }
-
         var userAgentString = "\(baseUserAgent) (\(parameters))"
 
         if let platform {
             userAgentString.append(" \(platform.rawValue)")
+        }
+
+        if let entryPoint {
+            userAgentString.append(" \(entryPoint.rawValue)")
         }
 
         return userAgentString

@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import SwiftUI
 import UIKit
 
@@ -35,6 +36,13 @@ public class CheckoutViewController: UINavigationController {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    package func setEntryPoint(_ entryPoint: UserAgent.EntryPoint) {
+        guard let checkoutWebViewController = viewControllers.first as? CheckoutWebViewController else {
+            return
+        }
+        checkoutWebViewController.checkoutView.setEntryPoint(entryPoint)
     }
 }
 

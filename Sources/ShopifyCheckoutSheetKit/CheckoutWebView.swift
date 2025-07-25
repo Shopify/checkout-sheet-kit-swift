@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Common
 import UIKit
 import WebKit
 
@@ -127,6 +128,8 @@ class CheckoutWebView: WKWebView {
     }
 
     var isPreloadRequest: Bool = false
+
+    private var entryPoint: UserAgent.EntryPoint?
 
     // MARK: Initializers
 
@@ -236,6 +239,19 @@ class CheckoutWebView: WKWebView {
         }
 
         load(request)
+    }
+
+    package func setEntryPoint(_ entryPoint: UserAgent.EntryPoint) {
+        self.entryPoint = entryPoint
+        updateUserAgent()
+    }
+
+    private func updateUserAgent() {
+        if isRecovery {
+            configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent(entryPoint: entryPoint)
+        } else {
+            configuration.applicationNameForUserAgent = CheckoutBridge.applicationName(entryPoint: entryPoint)
+        }
     }
 
     private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {

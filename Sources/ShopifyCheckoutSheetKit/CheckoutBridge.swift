@@ -38,24 +38,34 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
     static let messageHandler = "mobileCheckoutSdk"
 
     static var applicationName: String {
+        return applicationName(entryPoint: nil)
+    }
+
+    static func applicationName(entryPoint: UserAgent.EntryPoint?) -> String {
         let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
         let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
 
         return UserAgent.string(
             type: .standard,
             colorScheme: colorScheme,
-            platform: platform
+            platform: platform,
+            entryPoint: entryPoint
         )
     }
 
     static var recoveryAgent: String {
+        return recoveryAgent(entryPoint: nil)
+    }
+
+    static func recoveryAgent(entryPoint: UserAgent.EntryPoint?) -> String {
         let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
         let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
 
         return UserAgent.string(
             type: .recovery,
             colorScheme: colorScheme,
-            platform: platform
+            platform: platform,
+            entryPoint: entryPoint
         )
     }
 

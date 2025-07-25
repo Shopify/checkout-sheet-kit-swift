@@ -32,7 +32,7 @@ class UserAgentTests: XCTestCase {
             colorScheme: .automatic,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.2.0 (\(schemaVersion);automatic;standard;entry:AcceleratedCheckouts)")
+        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.2.0 (\(schemaVersion);automatic;standard) AcceleratedCheckouts")
     }
 
     func test_string_withAcceleratedCheckoutsAndReactNativePlatform_shouldReturnUserAgentWithPlatform() {
@@ -43,7 +43,7 @@ class UserAgentTests: XCTestCase {
             platform: .reactNative,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.2.0 (\(schemaVersion);automatic;standard;entry:AcceleratedCheckouts) ReactNative")
+        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.2.0 (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts")
     }
 
     func test_string_withoutEntryPoint_shouldReturnBasicUserAgent() {
@@ -62,17 +62,7 @@ class UserAgentTests: XCTestCase {
             colorScheme: .dark,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(recoveryUA, "ShopifyCheckoutSDK/3.2.0 (noconnect;dark;standard_recovery;entry:AcceleratedCheckouts)")
+        XCTAssertEqual(recoveryUA, "ShopifyCheckoutSDK/3.2.0 (noconnect;dark;standard_recovery) AcceleratedCheckouts")
     }
 
-    func test_string_withAllParameters_shouldReturnCompleteUserAgent() {
-        let schemaVersion = UserAgent.schemaVersion
-        let fullUA = UserAgent.string(
-            type: .standard,
-            colorScheme: .light,
-            platform: .reactNative,
-            entryPoint: .checkoutSheetKit
-        )
-        XCTAssertEqual(fullUA, "ShopifyCheckoutSDK/3.2.0 (\(schemaVersion);light;standard;entry:CheckoutSheetKit) ReactNative")
-    }
 }
