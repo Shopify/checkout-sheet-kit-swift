@@ -168,7 +168,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
             } else {
-
+                /// If the cart is entirely digital updating with a complete billingAddress
+                /// allows us to resolve pending terms on taxes prior to cartPaymentUpdate
                 guard
                     let billingPostalAddress = try? pkEncoder.billingPostalAddress.get()
                 else {
