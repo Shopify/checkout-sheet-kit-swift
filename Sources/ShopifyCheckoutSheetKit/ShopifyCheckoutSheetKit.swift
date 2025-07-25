@@ -66,7 +66,9 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
     return viewController
 }
 
-/// Presents the checkout from a given `UIViewController` with a specified entry point.
+/// Internal function that presents the checkout from a given `UIViewController` with a specified entry point.
+/// This is only used by other modules such as ShopifyAcceleratedCheckouts.
+/// Consumers will use the public `present` function, and the UserAgent will *not* contain the entry field.
 @discardableResult
 package func present(checkout url: URL, from: UIViewController, entryPoint: UserAgent.EntryPoint, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
     let viewController = CheckoutViewController(checkout: url, delegate: delegate, entryPoint: entryPoint)
