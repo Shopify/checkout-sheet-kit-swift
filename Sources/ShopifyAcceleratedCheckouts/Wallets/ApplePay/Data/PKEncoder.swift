@@ -114,7 +114,8 @@ class PKEncoder {
     private func mapCNPostalAddressToAddress(
         address: CNPostalAddress
     ) -> Result<StorefrontAPI.Address, ShopifyAcceleratedCheckouts.Error> {
-        let contact = cnPostalAddressToPkContact(address: address)
+        let contact = PKContact()
+        contact.postalAddress = address
         guard let address = try? pkContactToAddress(contact: contact).get() else {
             return .failure(.invariant(expected: "address.pkContactToAddress"))
         }
@@ -201,12 +202,6 @@ class PKEncoder {
 
         // Allow the API return an error if the country code is not recognized
         return countryCode
-    }
-
-    func cnPostalAddressToPkContact(address: CNPostalAddress) -> PKContact {
-        let contact = PKContact()
-        contact.postalAddress = address
-        return contact
     }
 
     func pkContactToAddress(contact: PKContact?)
