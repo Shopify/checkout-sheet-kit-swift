@@ -75,8 +75,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             /// 2. The PKPaymentRequest doesn't request shipping info
             ///    (we rely on country from `didSelectShippingContact` for calculating taxes)
             guard try pkDecoder.isShippingRequired() == false,
-                  let billingPostalAddress = try? pkEncoder.billingPostalAddress.get(),
-                  let country = billingPostalAddress.country
+                let billingPostalAddress = try? pkEncoder.billingPostalAddress.get(),
+                let country = billingPostalAddress.country
             else {
                 return pkDecoder.paymentRequestPaymentMethodUpdate()
             }
@@ -157,16 +157,11 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                         customerAccessToken: configuration.common.customer?.customerAccessToken
                     )
                 )
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
             }
 
             if try pkDecoder.isShippingRequired() {
                 let shippingAddress = try pkEncoder.shippingAddress.get()
                 _ = try await upsertShippingAddress(to: shippingAddress, validate: true)
-
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
             } else {
                 /// If the cart is entirely digital updating with a complete billingAddress
                 /// allows us to resolve pending terms on taxes prior to cartPaymentUpdate
@@ -180,10 +175,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     id: cartID,
                     billingAddress: billingPostalAddress
                 )
-
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
             }
+
+            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+            try setCart(to: result.cart)
 
             let totalAmount = try pkEncoder.totalAmount.get()
             let applePayPayment = try pkEncoder.applePayPayment.get()
