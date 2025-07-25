@@ -58,7 +58,7 @@ class PKEncoder {
         "GU": "US",
         "MP": "US",
         "PR": "US",
-        "VI": "US",
+        "VI": "US"
     ]
 
     /// Provides valid, corresponding CountryCode for known but invalid country codes
@@ -66,7 +66,7 @@ class PKEncoder {
     static let FallbackCountryCodes: [String: String] = [
         "UK": "GB",
         "JA": "JP",
-        "US": "US",
+        "US": "US"
     ]
 
     // MARK: Identifiers
@@ -125,14 +125,14 @@ class PKEncoder {
     /// Otherwise falls back to the `didSelectPaymentMethod` PKPaymentMethod.billingContact
     var billingPostalAddress: Result<StorefrontAPI.Address, ShopifyAcceleratedCheckouts.Error> {
         if let billingContact = try? billingContact.get(),
-            let billingPostalAddress = billingContact.postalAddress
+           let billingPostalAddress = billingContact.postalAddress
         {
             return mapCNPostalAddressToAddress(address: billingPostalAddress)
         }
 
         guard
             let selectedBillingPostalAddress =
-                selectedPaymentMethod?.billingAddress?.postalAddresses.first?.value
+            selectedPaymentMethod?.billingAddress?.postalAddresses.first?.value
         else {
             return .failure(.invariant(expected: "selectedPaymentMethod"))
         }
@@ -170,11 +170,11 @@ class PKEncoder {
         }
         guard
             let digits = payment
-                .token
-                .paymentMethod
-                .displayName?
-                .components(separatedBy: " ")
-                .last
+            .token
+            .paymentMethod
+            .displayName?
+            .components(separatedBy: " ")
+            .last
         else {
             return .failure(.invariant(expected: "displayName"))
         }

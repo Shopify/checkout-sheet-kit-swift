@@ -75,8 +75,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             /// 2. The PKPaymentRequest doesn't request shipping info
             ///    (we rely on country from `didSelectShippingContact` for calculating taxes)
             guard try pkDecoder.isShippingRequired() == false,
-                let billingPostalAddress = try? pkEncoder.billingPostalAddress.get(),
-                let country = billingPostalAddress.country
+                  let billingPostalAddress = try? pkEncoder.billingPostalAddress.get(),
+                  let country = billingPostalAddress.country
             else {
                 return pkDecoder.paymentRequestPaymentMethodUpdate()
             }

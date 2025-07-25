@@ -935,7 +935,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             address1: "", // Empty but present
             city: "Denver",
             country: "US",
-            province: "CO", 
+            province: "CO",
             zip: "80204"
         )
 
@@ -946,10 +946,10 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
         XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "29.99")!)
         XCTAssertNotNil(cart.cost.totalTaxAmount)
-        
+
         // Verify that the request was made with correct field names (country/province, not countryCode/provinceCode)
         XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
-        
+
         guard let body = MockURLProtocol.capturedRequestBody else {
             XCTFail("Expected request body to be captured")
             return
