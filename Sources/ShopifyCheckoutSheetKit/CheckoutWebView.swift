@@ -71,7 +71,7 @@ class CheckoutWebView: WKWebView {
             return CheckoutWebView(recovery: true, entryPoint: entryPoint)
         }
 
-        let cacheKey = url.absoluteString
+        let cacheKey = "\(url.absoluteString)_\(entryPoint?.rawValue ?? "nil")"
 
         guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
             OSLogger.shared.debug("Preloading not enabled")
