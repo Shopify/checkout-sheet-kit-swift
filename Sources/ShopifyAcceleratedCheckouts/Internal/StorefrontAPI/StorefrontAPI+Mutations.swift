@@ -155,7 +155,7 @@ extension StorefrontAPI {
             "addresses": [
                 [
                     "address": [
-                        "deliveryAddress": address.graphQLInput.compactMapValues { $0 }
+                        "deliveryAddress": address.asShippingAddressDict.compactMapValues { $0 }
                     ],
                     "selected": true,
                     "validationStrategy": validate ? "STRICT" : "COUNTRY_CODE_ONLY"
@@ -197,7 +197,7 @@ extension StorefrontAPI {
                 [
                     "id": addressId.rawValue,
                     "address": [
-                        "deliveryAddress": address.graphQLInput.compactMapValues { $0 }
+                        "deliveryAddress": address.asShippingAddressDict.compactMapValues { $0 }
                     ],
                     "selected": true,
                     "validationStrategy": validate ? "STRICT" : "COUNTRY_CODE_ONLY"
@@ -262,7 +262,7 @@ extension StorefrontAPI {
     ///   - totalAmount: Total payment amount
     ///   - applePayPayment: Apple Pay payment data
     /// - Returns: Updated cart
-    func cartPaymentUpdate(
+    @discardableResult func cartPaymentUpdate(
         id: GraphQLScalars.ID,
         totalAmount: MoneyV2,
         applePayPayment: ApplePayPayment
@@ -321,6 +321,37 @@ extension StorefrontAPI {
         }
 
         let cart = try validateCart(payload.cart, requestName: "cartPaymentUpdate")
+
+        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+
+        return cart
+    }
+
+    /// Update billing address on cart
+    /// - Parameters:
+    ///   - id: Cart ID
+    ///   - billingAddress: Billing address to set
+    /// - Returns: Updated cart
+    @discardableResult func cartBillingAddressUpdate(
+        id: GraphQLScalars.ID,
+        billingAddress: Address
+    ) async throws -> Cart {
+        let billingAddressDict = billingAddress.asMailingAddressDict.compactMapValues { $0 }
+
+        let variables: [String: Any] = [
+            "cartId": id.rawValue,
+            "billingAddress": billingAddressDict
+        ]
+
+        let response = try await client.mutate(
+            Operations.cartBillingAddressUpdate(variables: variables)
+        )
+
+        guard let payload = response.data?.cartBillingAddressUpdate else {
+            throw GraphQLError.invalidResponse
+        }
+
+        let cart = try validateCart(payload.cart, requestName: "cartBillingAddressUpdate")
 
         try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
 
@@ -468,6 +499,10 @@ extension StorefrontAPI {
 
     struct CartPaymentUpdateResponse: Codable {
         let cartPaymentUpdate: CartPaymentUpdatePayload
+    }
+
+    struct CartBillingAddressUpdateResponse: Codable {
+        let cartBillingAddressUpdate: CartBillingAddressUpdatePayload
     }
 
     struct CartRemovePersonalDataResponse: Codable {

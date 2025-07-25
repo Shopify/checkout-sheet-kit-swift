@@ -1,0 +1,71 @@
+---
+description: Swift development workflow and language server workarounds
+globs: ["**/*.swift"]
+alwaysApply: true
+---
+
+# SWIFT DEVELOPMENT WORKFLOW
+
+## ⚠️ IMPORTANT: Language Server Issues
+
+**IGNORE ALL LANGUAGE SERVER ERRORS IN SWIFT FILES**
+- The language server reports errors erroneously while code compiles fine
+- Do NOT trust red squiggles or inline error messages
+- Always verify issues using the commands below instead
+
+## Verification Commands
+
+### Check your work systematically:
+1. **Lint & Format** → `dev lint` (or `dev style`) - Checks for linting and stylistic errors
+2. **Build Issues** → `dev build` - Checks for compilation issues
+3. **Test Issues** → `dev test` - Checks for failing tests 
+
+### Available dev commands:
+**See `dev.yml` in project root for complete list of commands and descriptions.**
+
+Key commands for verification:
+- `dev lint` (alias: `dev style`) - Check format & lint issues
+- `dev fix` - Auto-fix formatting and linting issues  
+- `dev build packages` - Build both packages
+- `dev test packages` - Run all tests
+
+## Concurrency Best Practices
+
+### DO: Use actors for thread-safe shared state
+```swift
+actor QueryCache {
+    private var cache: [String: Any] = [:]
+    private var inflightRequests: [String: Any] = [:]
+    
+    func loadCached<T>(...) async throws -> T {
+        // Safe concurrent access to shared state
+    }
+}
+```
+
+## Workflow Best Practices
+
+### When you see errors:
+❌ DON'T: Trust language server errors in Xcode/editor
+✅ DO: Run the appropriate dev command to verify
+
+### After making changes:
+- ALWAYS run `dev fix && dev lint` to check your code is formatted and written in our style.
+
+## Example Workflow
+
+```bash
+# Make your Swift changes...
+
+# Fix any auto-fixable issues
+dev fix
+
+# Check for any remaining lint issues
+dev lint
+
+# Verify it compiles
+dev build
+
+# Run tests if needed
+dev test packages
+```

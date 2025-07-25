@@ -111,23 +111,34 @@ class PKEncoder {
 
     // MARK: Contacts
 
+    private func mapCNPostalAddressToAddress(
+        address: CNPostalAddress
+    ) -> Result<StorefrontAPI.Address, ShopifyAcceleratedCheckouts.Error> {
+        let contact = PKContact()
+        contact.postalAddress = address
+        guard let address = try? pkContactToAddress(contact: contact).get() else {
+            return .failure(.invariant(expected: "address.pkContactToAddress"))
+        }
+        return .success(address)
+    }
+
     /// Returns `isoCountryCode` from `didAuthorizePayment` PKPaymentRequest.billingContact
     /// Otherwise falls back to the `didSelectPaymentMethod` PKPaymentMethod.billingContact
-    var billingCountryCode: Result<String, ShopifyAcceleratedCheckouts.Error> {
+    var billingPostalAddress: Result<StorefrontAPI.Address, ShopifyAcceleratedCheckouts.Error> {
         if let billingContact = try? billingContact.get(),
-           let billingContactCountryCode = billingContact.postalAddress?.isoCountryCode
+           let billingPostalAddress = billingContact.postalAddress
         {
-            return .success(billingContactCountryCode)
+            return mapCNPostalAddressToAddress(address: billingPostalAddress)
         }
 
         guard
-            let paymentMethodCountryCode =
-            selectedPaymentMethod?.billingAddress?.postalAddresses.first?.value.isoCountryCode
+            let selectedBillingPostalAddress =
+            selectedPaymentMethod?.billingAddress?.postalAddresses.first?.value
         else {
-            return .failure(.invariant(expected: "paymentMethod"))
+            return .failure(.invariant(expected: "selectedPaymentMethod"))
         }
 
-        return .success(paymentMethodCountryCode)
+        return mapCNPostalAddressToAddress(address: selectedBillingPostalAddress)
     }
 
     var billingContact: Result<PKContact, ShopifyAcceleratedCheckouts.Error> {

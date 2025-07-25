@@ -25,6 +25,13 @@ import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
+/// Render state for AcceleratedCheckoutButtons
+public enum RenderState {
+    case loading
+    case rendered
+    case error
+}
+
 /// Renders a Checkout buttons for a cart or product variant
 ///
 /// Note:
@@ -42,6 +49,7 @@ public struct AcceleratedCheckoutButtons: View {
     var cornerRadius: CGFloat?
 
     @State private var shopSettings: ShopSettings?
+    @State private var currentRenderState: RenderState = .loading
 
     /// Initializes an Apple Pay button with a cart ID
     /// - Parameters:
@@ -49,6 +57,9 @@ public struct AcceleratedCheckoutButtons: View {
     ///   - label: The label to display on the Apple Pay button
     public init(cartID: String) {
         identifier = .cart(cartID: cartID).parse()
+        if case .invariant = identifier {
+            _currentRenderState = State(initialValue: .error)
+        }
     }
 
     /// Initializes an Apple Pay button with a variant ID
@@ -58,45 +69,58 @@ public struct AcceleratedCheckoutButtons: View {
     ///  - label: The label to display on the Apple Pay button
     public init(variantID: String, quantity: Int) {
         identifier = .variant(variantID: variantID, quantity: quantity).parse()
+        if case .invariant = identifier {
+            _currentRenderState = State(initialValue: .error)
+        }
     }
 
     public var body: some View {
-        if identifier.isValid() {
-            VStack {
-                if let shopSettings {
-                    VStack {
-                        ForEach(wallets, id: \.self) {
-                            switch $0 {
-                            case .applePay:
-                                ApplePayButton(
-                                    identifier: identifier,
-                                    eventHandlers: eventHandlers,
-                                    cornerRadius: cornerRadius
-                                )
-                            case .shopPay:
-                                ShopPayButton(
-                                    identifier: identifier,
-                                    eventHandlers: eventHandlers,
-                                    cornerRadius: cornerRadius
-                                )
-                            }
+        VStack {
+            if let shopSettings {
+                VStack {
+                    ForEach(wallets, id: \.self) {
+                        switch $0 {
+                        case .applePay:
+                            ApplePayButton(
+                                identifier: identifier,
+                                eventHandlers: eventHandlers,
+                                cornerRadius: cornerRadius
+                            )
+                        case .shopPay:
+                            ShopPayButton(
+                                identifier: identifier,
+                                eventHandlers: eventHandlers,
+                                cornerRadius: cornerRadius
+                            )
                         }
-                    }.environment(shopSettings)
-                }
+                    }
+                }.environment(shopSettings)
             }
-            .task { await loadShopSettings() }
+        }
+        .task { await loadShopSettings() }
+        .onChange(of: currentRenderState) { _, newValue in
+            eventHandlers.renderStateDidChange?(newValue)
+        }
+        .onAppear {
+            eventHandlers.renderStateDidChange?(currentRenderState)
         }
     }
 
     private func loadShopSettings() async {
+        guard identifier.isValid() else { return }
+
         do {
-            shopSettings = try await ShopSettings.load(
-                storefront: StorefrontAPI(
-                    storefrontDomain: configuration.storefrontDomain,
-                    storefrontAccessToken: configuration.storefrontAccessToken
-                ))
+            currentRenderState = .loading
+            let storefront = StorefrontAPI(
+                storefrontDomain: configuration.storefrontDomain,
+                storefrontAccessToken: configuration.storefrontAccessToken
+            )
+            let shop = try await storefront.shop()
+            shopSettings = ShopSettings(from: shop)
+            currentRenderState = .rendered
         } catch {
             print("Error loading shop settings: \(error)")
+            currentRenderState = .error
         }
     }
 }
@@ -144,7 +168,9 @@ extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when checkout succeeds
     /// - Returns: A view with the checkout success handler set
-    public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> AcceleratedCheckoutButtons {
+    public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void)
+        -> AcceleratedCheckoutButtons
+    {
         var newView = self
         newView.eventHandlers.checkoutDidComplete = action
         return newView
@@ -251,6 +277,34 @@ extension AcceleratedCheckoutButtons {
     {
         var newView = self
         newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
+        return newView
+    }
+
+    /// Adds an action to perform when the render state changes.
+    ///
+    /// Use this modifier to handle render state changes:
+    ///
+    /// ```swift
+    /// AcceleratedCheckoutButtons(cartID: cartId)
+    ///     .onRenderStateChange { state in
+    ///         switch state {
+    ///         case .loading:
+    ///             // Show skeleton loading state
+    ///         case .rendered:
+    ///             // Show rendered buttons
+    ///         case .fallback:
+    ///             // Show error fallback state
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameter action: The action to perform when render state changes
+    /// - Returns: A view with the render state change handler set
+    public func onRenderStateChange(_ action: @escaping (RenderState) -> Void)
+        -> AcceleratedCheckoutButtons
+    {
+        var newView = self
+        newView.eventHandlers.renderStateDidChange = action
         return newView
     }
 }

@@ -253,7 +253,7 @@ extension ApplePayViewController: CheckoutDelegate {
 
     func checkoutDidFail(error: CheckoutError) {
         Task { @MainActor in
-            try self.onCheckoutFail?(error)
+            self.onCheckoutFail?(error)
         }
     }
 

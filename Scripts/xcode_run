@@ -6,7 +6,10 @@ set -eo pipefail
 ACTION="${1:-build}"
 
 # Get scheme name from second argument, default to ShopifyCheckoutSheetKit
-SCHEME="${2:-ShopifyCheckoutSheetKit}"
+SCHEME="${2:-ShopifyCheckoutSheetKit-Package}"
+
+# Get optional test filter from third argument
+TEST_FILTER="${3:-}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -25,6 +28,37 @@ else
 fi
 
 xcodebuild_cmd="xcodebuild $ACTION -scheme $SCHEME -sdk iphonesimulator -destination \"$dest\" -skipPackagePluginValidation"
+
+# Add test filtering if specified
+if [[ "$ACTION" == *"test"* && -n "$TEST_FILTER" ]]; then
+    # If TEST_FILTER already contains a slash, use it as-is (e.g., "ShopifyAcceleratedCheckoutsTests/PKEncoderTests")
+    # Otherwise, find which target contains the test class
+    if [[ "$TEST_FILTER" == *"/"* ]]; then
+        xcodebuild_cmd="$xcodebuild_cmd -only-testing:$TEST_FILTER"
+    else
+        # Find which test target contains this test class (search all test targets automatically)
+        project_root="$(cd "$SCRIPT_DIR/.." && pwd)"
+        test_target=""
+        
+        # Discover all test targets by looking for *Tests directories
+        for test_dir in "$project_root/Tests"/*Tests; do
+            if [[ -d "$test_dir" ]]; then
+                target_name=$(basename "$test_dir")
+                if find "$test_dir" -name "$TEST_FILTER.swift" -type f | grep -q .; then
+                    test_target="$target_name"
+                    break
+                fi
+            fi
+        done
+        
+        if [[ -n "$test_target" ]]; then
+            xcodebuild_cmd="$xcodebuild_cmd -only-testing:$test_target/$TEST_FILTER"
+        else
+            echo "Error: Test class '$TEST_FILTER' not found in any test target"
+            exit 1
+        fi
+    fi
+fi
 
 if command -v xcbeautify >/dev/null 2>&1; then
     eval "$xcodebuild_cmd" | xcbeautify

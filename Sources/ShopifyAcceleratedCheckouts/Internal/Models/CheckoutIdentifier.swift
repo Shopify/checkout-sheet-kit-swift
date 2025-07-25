@@ -66,7 +66,7 @@ enum CheckoutIdentifier {
         case let .cart(cartID):
             guard cartID.lowercased().hasPrefix(Self.cartPrefix.lowercased()) else {
                 print(
-                    "[invariant_violation] Invalid 'cartID' format. Expected to start with '\(Self.cartPrefix)', received: \(cartID)"
+                    "[invariant_violation] Invalid 'cartID' format. Expected to start with '\(Self.cartPrefix)', received: '\(cartID)'"
                 )
                 return .invariant
             }
@@ -75,7 +75,7 @@ enum CheckoutIdentifier {
         case let .variant(variantID, quantity):
             guard variantID.lowercased().hasPrefix(Self.variantPrefix.lowercased()) else {
                 print(
-                    "[invariant_violation] Invalid 'variantID' format. Expected to start with '\(Self.variantPrefix)', received: \(variantID)"
+                    "[invariant_violation] Invalid 'variantID' format. Expected to start with '\(Self.variantPrefix)', received: '\(variantID)'"
                 )
                 return .invariant
             }
