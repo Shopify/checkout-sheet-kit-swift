@@ -310,7 +310,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Remove .pcm binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -name \"*.pcm\" -type f -delete\n\n# Remove Swiftlint binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -iname \"swiftlint*\" -type f -delete\n\n\n\n";
+			shellScript = "# Remove .pcm binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -name \"*.pcm\" -type f -delete\n\n# Remove Swiftlint binaries from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -iname \"swiftlint*\" -type f -delete\n\n# Remove .dev directory from build\nfind \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" -name \".dev\" -type d -exec rm -rf {} +\n\n\n\n";
 		};
 		6A9124C62CF6114E0076C21C /* Run Swiftformat over sample code */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -416,6 +416,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXCLUDED_SOURCE_FILE_NAMES = .dev/;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -478,6 +479,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXCLUDED_SOURCE_FILE_NAMES = .dev/;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
