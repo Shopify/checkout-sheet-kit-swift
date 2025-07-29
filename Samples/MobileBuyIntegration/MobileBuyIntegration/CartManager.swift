@@ -100,6 +100,7 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                self.isDirty = true
             }
 
             return cart
@@ -143,6 +144,7 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                self.isDirty = true
             }
 
             return cart
@@ -210,6 +212,7 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                self.isDirty = true
             }
 
             return cart
@@ -244,6 +247,7 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                self.isDirty = true
             }
 
             return cart
@@ -301,6 +305,7 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                self.isDirty = true
             }
 
             return cart
@@ -368,6 +373,7 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                self.isDirty = true
             }
 
             return cart
@@ -418,6 +424,7 @@ class CartManager: ObservableObject {
 
             DispatchQueue.main.async {
                 self.cart = cart
+                self.isDirty = true
             }
 
             return cart

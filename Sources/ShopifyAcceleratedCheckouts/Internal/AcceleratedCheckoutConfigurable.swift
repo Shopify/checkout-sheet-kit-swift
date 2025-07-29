@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
- import Foundation
+import Foundation
 
 /// A protocol that enables fluent configuration of accelerated checkout components.
 /// This protocol allows both programmatic and SwiftUI components to share configuration methods.
@@ -40,7 +40,7 @@ extension AcceleratedCheckoutViewController: AcceleratedCheckoutConfigurable {
     /// Sets the corner radius for checkout buttons
     /// - Parameter cornerRadius: The corner radius to apply (negative values will use default)
     /// - Returns: Self for method chaining
-    public func cornerRadius(_ cornerRadius: CGFloat) -> Self {
+    public func cornerRadius(_: CGFloat) -> Self {
         // For the programmatic interface, corner radius would need to be stored and applied
         // when the wallet buttons are actually presented. This could be enhanced in the future.
         return self

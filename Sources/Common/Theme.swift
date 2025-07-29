@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import UIKit
 import Foundation
+import UIKit
 
 package enum Theme {
     // Shop Pay Accelerated Checkout Button

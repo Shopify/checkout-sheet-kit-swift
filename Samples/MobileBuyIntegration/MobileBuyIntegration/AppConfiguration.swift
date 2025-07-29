@@ -22,8 +22,8 @@
  */
 
 import Foundation
-import ShopifyCheckoutSheetKit
 import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
 
 public final class AppConfiguration: ObservableObject {
     public var storefrontDomain: String = InfoDictionary.shared.domain
@@ -38,6 +38,22 @@ public final class AppConfiguration: ObservableObject {
 
     // Displays the Checkout with ApplePay button
     @Published var applePayEnabled: Bool = true
+
+    /// AcceleratedCheckouts configuration
+    var acceleratedCheckoutsConfiguration: ShopifyAcceleratedCheckouts.Configuration {
+        ShopifyAcceleratedCheckouts.Configuration(
+            storefrontDomain: storefrontDomain,
+            storefrontAccessToken: InfoDictionary.shared.accessToken
+        )
+    }
+
+    /// ApplePay configuration for AcceleratedCheckouts
+    var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
+        ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+            merchantIdentifier: "merchant.com.shopify.example.MobileBuyIntegration.ApplePay",
+            contactFields: [.email, .phone]
+        )
+    }
 }
 
 public var appConfiguration = AppConfiguration() {

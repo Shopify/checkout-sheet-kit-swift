@@ -21,16 +21,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import PassKit
-import UIKit
-import ShopifyCheckoutSheetKit
 import Common
+import PassKit
+import ShopifyCheckoutSheetKit
+import UIKit
 
 /// A button component that renders wallet-specific checkout buttons and handles checkout presentation.
 /// This is the main public API that merchants should use for programmatic accelerated checkouts.
 @available(iOS 17.0, *)
 public class AcceleratedCheckoutButton: UIView {
-
     // MARK: - Public Properties
 
     public weak var delegate: AcceleratedCheckoutDelegate?
@@ -41,7 +40,7 @@ public class AcceleratedCheckoutButton: UIView {
         }
     }
 
-    public override var isUserInteractionEnabled: Bool {
+    override public var isUserInteractionEnabled: Bool {
         didSet {
             updateButtonAppearance()
         }
@@ -111,7 +110,8 @@ public class AcceleratedCheckoutButton: UIView {
         checkAvailability()
     }
 
-    required init?(coder: NSCoder) {
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented. Use factory methods like AcceleratedCheckoutButton.applePay(cartID:)")
     }
 
@@ -176,7 +176,7 @@ public class AcceleratedCheckoutButton: UIView {
         // Create a simple Apple Pay text image - in a real implementation,
         // you might want to use the official Apple Pay button assets
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 30))
-        return renderer.image { context in
+        return renderer.image { _ in
             let text = "Apple Pay"
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: 16, weight: .medium),
@@ -240,7 +240,8 @@ public class AcceleratedCheckoutButton: UIView {
         guard let presentingViewController = findViewController() else {
             let error = CheckoutError.checkoutUnavailable(
                 message: "Unable to find presenting view controller",
-                underlyingError: nil
+                code: .clientError(code: .unknown),
+                recoverable: false
             )
             delegate?.checkoutDidFail(error: error)
             return
@@ -270,7 +271,8 @@ public class AcceleratedCheckoutButton: UIView {
         case .invariant:
             let error = CheckoutError.checkoutUnavailable(
                 message: "Invalid checkout identifier",
-                underlyingError: nil
+                code: .clientError(code: .invalidCart),
+                recoverable: false
             )
             delegate?.checkoutDidFail(error: error)
             return

@@ -119,7 +119,6 @@ public struct AcceleratedCheckoutButtons: View {
             shopSettings = ShopSettings(from: shop)
             currentRenderState = .rendered
         } catch {
-            print("Error loading shop settings: \(error)")
             currentRenderState = .error
         }
     }

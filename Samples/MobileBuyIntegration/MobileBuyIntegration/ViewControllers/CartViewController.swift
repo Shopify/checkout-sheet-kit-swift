@@ -23,6 +23,7 @@
 
 import Buy
 import Combine
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import UIKit
 
@@ -140,6 +141,44 @@ class CartItemCell: UITableViewCell {
     }
 }
 
+class AcceleratedCheckoutDelegateImpl: AcceleratedCheckoutDelegate {
+    weak var parent: CartViewController?
+
+    init(parent: CartViewController) {
+        self.parent = parent
+    }
+
+    func renderStateDidChange(state: RenderState) {
+        print("UIKit Accelerated checkout render state: \(state)")
+    }
+
+    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+        print("UIKit Accelerated checkout completed with order ID: \(event.orderDetails.id)")
+        CartManager.shared.resetCart()
+    }
+
+    func checkoutDidCancel() {
+        print("UIKit Accelerated checkout cancelled")
+    }
+
+    func checkoutDidFail(error: CheckoutError) {
+        print("UIKit Accelerated checkout failed: \(error)")
+        parent?.handleUnrecoverableError("Accelerated checkout failed: \(error.localizedDescription)")
+    }
+
+    func checkoutDidClickContactLink(url: URL) {
+        parent?.checkoutDidClickContactLink(url: url)
+    }
+
+    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+        parent?.checkoutDidEmitWebPixelEvent(event: event)
+    }
+
+    func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        return parent?.shouldRecoverFromError(error: error) ?? false
+    }
+}
+
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     // MARK: Properties
 
@@ -152,6 +191,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet private var footerView: UIView!
 
     @IBOutlet private var checkoutButton: UIButton!
+
+    // Accelerated checkout buttons (UIKit)
+    private var acceleratedCheckoutContainer: UIStackView?
+    private var shopPayButton: AcceleratedCheckoutButton?
+    private var applePayButton: AcceleratedCheckoutButton?
+    private var acceleratedDelegate: AcceleratedCheckoutDelegateImpl?
 
     // MARK: Initializers
 
@@ -186,6 +231,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.allowsSelection = false
         tableView.rowHeight = 80
 
+        setupAcceleratedCheckoutButtons()
         cartDidUpdate()
     }
 
@@ -245,6 +291,94 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     // MARK: Private
 
+    private func setupAcceleratedCheckoutButtons() {
+        // Configure ShopifyAcceleratedCheckouts
+        ShopifyAcceleratedCheckouts.configure(appConfiguration.acceleratedCheckoutsConfiguration)
+
+        // Create container stack view
+        let container = UIStackView()
+        container.axis = .vertical
+        container.spacing = 12
+        container.distribution = .fillEqually
+        container.translatesAutoresizingMaskIntoConstraints = false
+
+        // Create section label
+        let sectionLabel = UILabel()
+        sectionLabel.text = "Accelerated Checkout (UIKit)"
+        sectionLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        sectionLabel.textColor = .secondaryLabel
+        sectionLabel.textAlignment = .center
+
+        container.addArrangedSubview(sectionLabel)
+
+        // Create button stack
+        let buttonStack = UIStackView()
+        buttonStack.axis = .vertical
+        buttonStack.spacing = 8
+        buttonStack.distribution = .fillEqually
+
+        container.addArrangedSubview(buttonStack)
+
+        // Add to footer view
+        footerView.addSubview(container)
+        acceleratedCheckoutContainer = container
+
+        // Set up constraints
+        NSLayoutConstraint.activate([
+            container.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 20),
+            container.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -20),
+            container.bottomAnchor.constraint(equalTo: checkoutButton.topAnchor, constant: -16),
+            container.heightAnchor.constraint(equalToConstant: 120)
+        ])
+
+        acceleratedCheckoutContainer = container
+    }
+
+    private func updateAcceleratedCheckoutButtons() {
+        guard let container = acceleratedCheckoutContainer,
+              let buttonStack = container.arrangedSubviews.last as? UIStackView,
+              let cart = CartManager.shared.cart
+        else {
+            return
+        }
+
+        // Remove existing buttons
+        shopPayButton?.removeFromSuperview()
+        applePayButton?.removeFromSuperview()
+
+        // Create new buttons for current cart
+        let shopPay = AcceleratedCheckoutButton.shopPay(cartID: cart.id.rawValue)
+        let applePay = AcceleratedCheckoutButton.applePay(cartID: cart.id.rawValue)
+
+        // Configure delegates
+        if acceleratedDelegate == nil {
+            acceleratedDelegate = AcceleratedCheckoutDelegateImpl(parent: self)
+        }
+        shopPay.delegate = acceleratedDelegate
+        applePay.delegate = acceleratedDelegate
+
+        // Configure appearance
+        shopPay.cornerRadius = 10
+        applePay.cornerRadius = 10
+
+        // Set height constraints
+        shopPay.translatesAutoresizingMaskIntoConstraints = false
+        applePay.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            shopPay.heightAnchor.constraint(equalToConstant: 48),
+            applePay.heightAnchor.constraint(equalToConstant: 48)
+        ])
+
+        // Add to stack
+        buttonStack.addArrangedSubview(shopPay)
+        buttonStack.addArrangedSubview(applePay)
+
+        // Store references
+        shopPayButton = shopPay
+        applePayButton = applePay
+    }
+
     private func cartDidUpdate() {
         let cart = CartManager.shared.cart
         let totalQuantity = cart?.totalQuantity ?? 0
@@ -256,6 +390,14 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             tableView.reloadData()
             tableView.isHidden = totalQuantity <= 0
             checkoutButton.isHidden = totalQuantity <= 0
+
+            // Update accelerated checkout buttons visibility
+            acceleratedCheckoutContainer?.isHidden = totalQuantity <= 0
+
+            // Update buttons with new cart
+            if totalQuantity > 0 {
+                updateAcceleratedCheckoutButtons()
+            }
 
             if #available(iOS 15.0, *) {
                 checkoutButton.configuration?
@@ -362,7 +504,11 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    private func handleUnrecoverableError(_ message: String = "Checkout unavailable") {
+    func shouldRecoverFromError(error: ShopifyCheckoutSheetKit.CheckoutError) -> Bool {
+        return error.isRecoverable
+    }
+
+    func handleUnrecoverableError(_ message: String = "Checkout unavailable") {
         DispatchQueue.main.async {
             self.resetCart()
             self.showAlert(message: message)
