@@ -21,13 +21,14 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Buy
+@preconcurrency import Buy
 import Combine
 import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
 // swiftlint:disable type_body_length
+@MainActor
 class CartManager: ObservableObject {
     static let shared = CartManager(client: .shared)
     private static let ContextDirective = Storefront.InContextDirective(
@@ -98,9 +99,7 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            DispatchQueue.main.async {
-                self.cart = cart
-            }
+            self.cart = cart
 
             return cart
         } catch {
@@ -141,9 +140,7 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            DispatchQueue.main.async {
-                self.cart = cart
-            }
+            self.cart = cart
 
             return cart
         } catch {
@@ -208,9 +205,7 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "returned cart is nil")
             }
 
-            DispatchQueue.main.async {
-                self.cart = cart
-            }
+            self.cart = cart
 
             return cart
         } catch {
@@ -242,9 +237,7 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            DispatchQueue.main.async {
-                self.cart = cart
-            }
+            self.cart = cart
 
             return cart
         } catch {
@@ -299,9 +292,7 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            DispatchQueue.main.async {
-                self.cart = cart
-            }
+            self.cart = cart
 
             return cart
         } catch {
@@ -366,9 +357,7 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            DispatchQueue.main.async {
-                self.cart = cart
-            }
+            self.cart = cart
 
             return cart
         } catch {
@@ -416,9 +405,7 @@ class CartManager: ObservableObject {
                     message: "CartPrepareForCompletionResult is not CartStatusReady")
             }
 
-            DispatchQueue.main.async {
-                self.cart = cart
-            }
+            self.cart = cart
 
             return cart
         } catch {
@@ -459,9 +446,7 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "submit result is not of type SubmitSuccess")
             }
 
-            DispatchQueue.main.async {
-                self.cart = nil
-            }
+            cart = nil
 
             return submissionResult
         } catch {

@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Buy
+@preconcurrency import Buy
 import PassKit
 
 class PassKitFactory {
@@ -29,7 +29,7 @@ class PassKitFactory {
 
     public func createPaymentRequest(
         paymentSummaryItems: [PKPaymentSummaryItem]
-    ) -> PKPaymentRequest {
+    ) async -> PKPaymentRequest {
         let paymentRequest = PKPaymentRequest()
 
         paymentRequest.merchantIdentifier = ApplePayHandler.MerchantId
@@ -40,7 +40,7 @@ class PassKitFactory {
         paymentRequest.merchantCapabilities = .capability3DS
 
         paymentRequest.shippingType = .delivery
-        paymentRequest.shippingMethods = createDefaultShippingMethod()
+        paymentRequest.shippingMethods = await createDefaultShippingMethod()
 
         paymentRequest.requiredShippingContactFields = [.name, .postalAddress, .emailAddress]
         paymentRequest.requiredBillingContactFields = [.name, .postalAddress, .emailAddress]
@@ -50,8 +50,8 @@ class PassKitFactory {
         return paymentRequest
     }
 
-    func createPaymentSummaryItems() -> [PKPaymentSummaryItem] {
-        guard let cart = CartManager.shared.cart else { return [] }
+	func createPaymentSummaryItems() async -> [PKPaymentSummaryItem] {
+        guard let cart = await CartManager.shared.cart else { return [] }
 
         var paymentSummaryItems: [PKPaymentSummaryItem] = []
 
@@ -69,13 +69,6 @@ class PassKitFactory {
             )
         }
 
-        paymentSummaryItems.append(
-            .init(
-                label: "Tax",
-                amount: NSDecimalNumber(decimal: cart.cost.totalTaxAmount?.amount ?? 0),
-                type: .final
-            )
-        )
 
         paymentSummaryItems.append(
             .init(
@@ -88,10 +81,10 @@ class PassKitFactory {
         return paymentSummaryItems
     }
 
-    func createDefaultShippingMethod() -> [PKShippingMethod] {
+	func createDefaultShippingMethod() async -> [PKShippingMethod] {
         #warning("Missing selectedDeliveryOption will throw out of this guard")
         guard
-            let selectedDeliveryOption = CartManager.shared.cart?.deliveryGroups
+            let selectedDeliveryOption = await CartManager.shared.cart?.deliveryGroups
             .nodes.first?.selectedDeliveryOption,
             let title = selectedDeliveryOption.title
         else { return [] }
@@ -164,16 +157,6 @@ class PassKitFactory {
             )
         }
 
-        // Null and 0 mean different things
-        if let amount = cart.cost.totalTaxAmount?.amount {
-            paymentSummaryItems.append(
-                .init(
-                    label: "Tax",
-                    amount: NSDecimalNumber(decimal: amount),
-                    type: .final
-                )
-            )
-        }
 
         paymentSummaryItems.append(
             .init(

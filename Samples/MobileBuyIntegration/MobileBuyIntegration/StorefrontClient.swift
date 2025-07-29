@@ -21,11 +21,11 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Buy
+@preconcurrency import Buy
 import Foundation
 import PassKit
 
-class StorefrontClient {
+class StorefrontClient: @unchecked Sendable {
     static let shared = StorefrontClient()
 
     private let client: Graph.Client
