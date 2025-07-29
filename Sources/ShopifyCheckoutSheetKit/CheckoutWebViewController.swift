@@ -62,7 +62,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil, options: CheckoutOptions? = nil) {
         checkoutURL = url
         self.delegate = delegate
 
@@ -70,6 +70,9 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
         self.checkoutView = checkoutView
+
+        // Set checkout options for embedded checkout support
+        checkoutView.checkoutOptions = options
 
         super.init(nibName: nil, bundle: nil)
 
@@ -245,6 +248,39 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
         delegate?.checkoutDidEmitWebPixelEvent(event: event)
+    }
+    
+    // MARK: - Embedded Checkout Delegate Methods
+    
+    func checkoutViewDidChangeState(state: CheckoutStatePayload) {
+        delegate?.checkoutDidChangeState(state: state)
+    }
+
+    func checkoutViewDidComplete(payload: CheckoutCompletePayload) {
+        ConfettiCannon.fire(in: view)
+        CheckoutWebView.invalidate(disconnect: false)
+        delegate?.checkoutDidComplete(payload: payload)
+    }
+
+    func checkoutViewDidFail(errors: [ErrorPayload]) {
+        CheckoutWebView.invalidate()
+        delegate?.checkoutDidFail(errors: errors)
+
+        // For embedded checkout errors, attempt recovery based on error group and URL type
+        let shouldAttemptRecovery = errors.contains { error in
+            // Only recover from specific recoverable network errors (5xx server errors)
+            return error.group == "network" && error.type == "server_error" && (error.code?.hasPrefix("5") == true)
+        } && !CheckoutURL(from: checkoutURL).isMultipassURL()
+
+        if shouldAttemptRecovery {
+            presentFallbackViewController(url: checkoutURL)
+        } else {
+            dismiss(animated: true)
+        }
+    }
+
+    func checkoutViewDidEmitWebPixelEvent(payload: WebPixelsPayload) {
+        delegate?.checkoutDidEmitWebPixelEvent(payload: payload)
     }
 
     private func canRecoverFromError(_: CheckoutError) -> Bool {
