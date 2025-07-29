@@ -44,6 +44,8 @@ public struct Configuration {
 
     public var preloading = Configuration.Preloading()
 
+    public var privacyConsent: Configuration.PrivacyConsent?
+
     public var tintColor: UIColor = .init(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
     @available(*, renamed: "tintColor", message: "spinnerColor has been superseded by tintColor")
@@ -84,6 +86,58 @@ extension Configuration {
             didSet {
                 CheckoutWebView.preloadingActivatedByClient = false
             }
+        }
+    }
+}
+
+extension Configuration {
+    public struct PrivacyConsent: OptionSet {
+        public let rawValue: Int
+
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+
+        public static let marketing = PrivacyConsent(rawValue: 1 << 0)
+        public static let analytics = PrivacyConsent(rawValue: 1 << 1)
+        public static let preferences = PrivacyConsent(rawValue: 1 << 2)
+        public static let saleOfData = PrivacyConsent(rawValue: 1 << 3)
+
+        public static let all: PrivacyConsent = [.marketing, .analytics, .preferences, .saleOfData]
+        public static let none: PrivacyConsent = []
+
+        private static let purposeAbbreviations: [(PrivacyConsent, String)] = [
+            (.marketing, "m"),
+            (.analytics, "a"),
+            (.preferences, "p"),
+            (.saleOfData, "s")
+        ]
+
+        public var encoded: String {
+            let consentedPurposes = Self.purposeAbbreviations.compactMap { purpose, abbrev in
+                contains(purpose) ? abbrev : nil
+            }
+
+            let nonConsentedPurposes = Self.purposeAbbreviations.compactMap { purpose, abbrev in
+                contains(purpose) ? nil : abbrev
+            }
+
+            var purposesField = consentedPurposes.joined() + "." + nonConsentedPurposes.joined()
+
+            if contains(.analytics) {
+                purposesField = purposesField.replacingOccurrences(of: "a", with: "A")
+            }
+            if contains(.preferences) {
+                purposesField = purposesField.replacingOccurrences(of: "p", with: "P")
+            }
+            if contains(.marketing) {
+                purposesField = purposesField.replacingOccurrences(of: "m", with: "M")
+            }
+            if contains(.saleOfData) {
+                purposesField = purposesField.replacingOccurrences(of: "s", with: "S")
+            }
+
+            return "3\(purposesField)"
         }
     }
 }

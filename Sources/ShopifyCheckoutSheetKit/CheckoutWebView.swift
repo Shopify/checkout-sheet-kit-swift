@@ -234,6 +234,10 @@ class CheckoutWebView: WKWebView {
         OSLogger.shared.info("Loading checkout URL: \(url.absoluteString), isPreload: \(isPreload)")
         var request = URLRequest(url: url)
 
+        if let consent = ShopifyCheckoutSheetKit.configuration.privacyConsent {
+            request.setValue(consent.encoded, forHTTPHeaderField: "X-Shopify-Tracking-Consent")
+        }
+
         if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
             request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")

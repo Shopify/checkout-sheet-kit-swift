@@ -70,6 +70,13 @@ struct SettingsView: View {
                     }
                 }
 
+                Section(header: Text("Privacy Consent Signals")) {
+                    Toggle("Marketing", isOn: consentBinding(for: .marketing))
+                    Toggle("Analytics", isOn: consentBinding(for: .analytics))
+                    Toggle("Preferences", isOn: consentBinding(for: .preferences))
+                    Toggle("Sale of Data", isOn: consentBinding(for: .saleOfData))
+                }
+
                 Section(header: Text("Logs")) {
                     NavigationLink(destination: WebPixelsEventsView()) {
                         Text("Web pixel events")
@@ -114,6 +121,25 @@ struct SettingsView: View {
                 colorScheme = .light
             }
         }
+    }
+
+    private func consentBinding(for consentType: Configuration.PrivacyConsent) -> Binding<Bool> {
+        Binding(
+            get: {
+                ShopifyCheckoutSheetKit.configuration.privacyConsent?.contains(consentType) ?? false
+            },
+            set: { newValue in
+                if ShopifyCheckoutSheetKit.configuration.privacyConsent == nil {
+                    ShopifyCheckoutSheetKit.configuration.privacyConsent = Configuration.PrivacyConsent.none
+                }
+
+                if newValue {
+                    ShopifyCheckoutSheetKit.configuration.privacyConsent?.insert(consentType)
+                } else {
+                    ShopifyCheckoutSheetKit.configuration.privacyConsent?.remove(consentType)
+                }
+            }
+        )
     }
 
     private func currentVersion() -> String {
