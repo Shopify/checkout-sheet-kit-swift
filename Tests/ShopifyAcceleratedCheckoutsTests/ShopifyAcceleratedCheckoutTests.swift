@@ -24,6 +24,7 @@
 @testable import ShopifyAcceleratedCheckouts
 import XCTest
 
+@available(iOS 17.0, *)
 class ShopifyAcceleratedCheckoutsTests: XCTestCase {
     func testVersionIsPublic() {
         XCTAssertEqual(ShopifyAcceleratedCheckouts.apiVersion, "2025-04")

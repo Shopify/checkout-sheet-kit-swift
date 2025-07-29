@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import ShopifyCheckoutSheetKit
 
 /// A wrapper that converts delegate method calls to SwiftUI closure-based modifiers.

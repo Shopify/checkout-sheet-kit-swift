@@ -23,6 +23,7 @@
 
 import Foundation
 import ShopifyCheckoutSheetKit
+import ShopifyAcceleratedCheckouts
 
 public final class AppConfiguration: ObservableObject {
     public var storefrontDomain: String = InfoDictionary.shared.domain

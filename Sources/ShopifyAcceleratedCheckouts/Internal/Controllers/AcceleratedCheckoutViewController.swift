@@ -233,7 +233,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
                     if let checkoutError = error as? CheckoutError {
                         self.delegate?.checkoutDidFail(error: checkoutError)
                     } else {
-                        let checkoutError = CheckoutError.checkoutUnavailable(message: error.localizedDescription, underlyingError: error)
+                        let checkoutError = CheckoutError.checkoutUnavailable(message: error.localizedDescription, code: .httpError(statusCode: 500), recoverable: false)
                         self.delegate?.checkoutDidFail(error: checkoutError)
                     }
                 }

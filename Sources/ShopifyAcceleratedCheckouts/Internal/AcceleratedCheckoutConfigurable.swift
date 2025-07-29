@@ -21,6 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+ import Foundation
+
 /// A protocol that enables fluent configuration of accelerated checkout components.
 /// This protocol allows both programmatic and SwiftUI components to share configuration methods.
 @available(iOS 17.0, *)

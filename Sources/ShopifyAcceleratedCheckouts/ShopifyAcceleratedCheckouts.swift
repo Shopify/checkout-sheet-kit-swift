@@ -23,6 +23,7 @@
 
 import UIKit
 
+@available(iOS 17.0, *)
 public enum ShopifyAcceleratedCheckouts {
     /// Storefront API version used for cart operations
     /// Note: We also use `2025-07` for `cartRemovePersonalData` mutations. We are working towards migrating all requests to `2025-07`.

@@ -31,6 +31,9 @@
 		6A34672F2B5FFEFB007314A8 /* WebPixelEventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A34672E2B5FFEFB007314A8 /* WebPixelEventsView.swift */; };
 		6A3467332B600E64007314A8 /* LogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A3467322B600E64007314A8 /* LogsView.swift */; };
 		6A3D7ADC2B8E01460010EB27 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6A3D7ADB2B8E01460010EB27 /* Localizable.xcstrings */; };
+		6A413CFC2E392FE000A0B697 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 6A413CFB2E392FE000A0B697 /* Common */; };
+		6A413CFE2E392FE000A0B697 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = 6A413CFD2E392FE000A0B697 /* ShopifyAcceleratedCheckouts */; };
+		6A413D002E392FE000A0B697 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6A413CFF2E392FE000A0B697 /* ShopifyCheckoutSheetKit */; };
 		6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
 		CB05E6BD2D493B8F00466376 /* ApplePayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BC2D493B8B00466376 /* ApplePayHandler.swift */; };
@@ -82,6 +85,9 @@
 			files = (
 				2147F3E42B502AA9005546F3 /* ShopifyCheckoutSheetKit in Frameworks */,
 				4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */,
+				6A413CFC2E392FE000A0B697 /* Common in Frameworks */,
+				6A413D002E392FE000A0B697 /* ShopifyCheckoutSheetKit in Frameworks */,
+				6A413CFE2E392FE000A0B697 /* ShopifyAcceleratedCheckouts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +241,9 @@
 			packageProductDependencies = (
 				4EBBA7A22A5F0F5600193E19 /* Buy */,
 				2147F3E32B502AA9005546F3 /* ShopifyCheckoutSheetKit */,
+				6A413CFB2E392FE000A0B697 /* Common */,
+				6A413CFD2E392FE000A0B697 /* ShopifyAcceleratedCheckouts */,
+				6A413CFF2E392FE000A0B697 /* ShopifyCheckoutSheetKit */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */;
@@ -268,6 +277,7 @@
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
 				4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
+				6A413CFA2E392FE000A0B697 /* XCRemoteSwiftPackageReference "checkout-sheet-kit-swift" */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -591,6 +601,14 @@
 				version = 2025.1.0;
 			};
 		};
+		6A413CFA2E392FE000A0B697 /* XCRemoteSwiftPackageReference "checkout-sheet-kit-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/shopify/checkout-sheet-kit-swift";
+			requirement = {
+				kind = exactVersion;
+				version = "3.4.0-rc.1";
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -602,6 +620,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
 			productName = Buy;
+		};
+		6A413CFB2E392FE000A0B697 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A413CFA2E392FE000A0B697 /* XCRemoteSwiftPackageReference "checkout-sheet-kit-swift" */;
+			productName = Common;
+		};
+		6A413CFD2E392FE000A0B697 /* ShopifyAcceleratedCheckouts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A413CFA2E392FE000A0B697 /* XCRemoteSwiftPackageReference "checkout-sheet-kit-swift" */;
+			productName = ShopifyAcceleratedCheckouts;
+		};
+		6A413CFF2E392FE000A0B697 /* ShopifyCheckoutSheetKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A413CFA2E392FE000A0B697 /* XCRemoteSwiftPackageReference "checkout-sheet-kit-swift" */;
+			productName = ShopifyCheckoutSheetKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

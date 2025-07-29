@@ -22,8 +22,9 @@
  */
 
 import PassKit
-import ShopifyCheckoutSheetKit
 import UIKit
+import ShopifyCheckoutSheetKit
+import Common
 
 /// A button component that renders wallet-specific checkout buttons and handles checkout presentation.
 /// This is the main public API that merchants should use for programmatic accelerated checkouts.
