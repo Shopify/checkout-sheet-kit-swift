@@ -12,3 +12,4 @@ CLAUDE.md
 *.graphqls
 apollo-ios-cli
 
+.dev/
