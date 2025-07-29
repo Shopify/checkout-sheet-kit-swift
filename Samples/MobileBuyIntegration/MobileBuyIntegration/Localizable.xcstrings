@@ -19,6 +19,9 @@
     "Adding..." : {
 
     },
+    "Analytics" : {
+
+    },
     "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app." : {
 
     },
@@ -58,16 +61,28 @@
     "Logs" : {
 
     },
+    "Marketing" : {
+
+    },
     "No logs available" : {
 
     },
     "OK" : {
       "comment" : "Default action"
     },
+    "Preferences" : {
+
+    },
     "Prefill buyer information" : {
 
     },
     "Preload checkout" : {
+
+    },
+    "Privacy Consent Signals" : {
+
+    },
+    "Sale of Data" : {
 
     },
     "Sample app version" : {

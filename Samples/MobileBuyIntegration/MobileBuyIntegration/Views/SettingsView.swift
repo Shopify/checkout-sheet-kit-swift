@@ -32,6 +32,7 @@ struct SettingsView: View {
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
     @State private var colorScheme: ColorScheme = .light
+    @State private var privacyConsent: Configuration.PrivacyConsent = .none
 
     var body: some View {
         NavigationView {
@@ -69,6 +70,13 @@ struct SettingsView: View {
                     }
                 }
 
+                Section(header: Text("Privacy Consent Signals")) {
+                    Toggle("Marketing", isOn: consentBinding(for: .marketing))
+                    Toggle("Analytics", isOn: consentBinding(for: .analytics))
+                    Toggle("Preferences", isOn: consentBinding(for: .preferences))
+                    Toggle("Sale of Data", isOn: consentBinding(for: .saleOfData))
+                }
+
                 Section(header: Text("Logs")) {
                     NavigationLink(destination: WebPixelsEventsView()) {
                         Text("Web pixel events")
@@ -99,6 +107,7 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .onAppear {
                 logs = LogReader.shared.readLogs() ?? []
+                privacyConsent = ShopifyCheckoutSheetKit.configuration.privacyConsent ?? .none
             }
         }
         .navigationBarHidden(true)
@@ -113,6 +122,22 @@ struct SettingsView: View {
                 colorScheme = .light
             }
         }
+    }
+
+    private func consentBinding(for consentType: Configuration.PrivacyConsent) -> Binding<Bool> {
+        Binding(
+            get: {
+                privacyConsent.contains(consentType)
+            },
+            set: { newValue in
+                if newValue {
+                    privacyConsent.insert(consentType)
+                } else {
+                    privacyConsent.remove(consentType)
+                }
+                ShopifyCheckoutSheetKit.configuration.privacyConsent = privacyConsent
+            }
+        )
     }
 
     private func currentVersion() -> String {

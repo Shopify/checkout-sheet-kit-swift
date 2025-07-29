@@ -44,6 +44,8 @@ public struct Configuration {
 
     public var preloading = Configuration.Preloading()
 
+    public var privacyConsent: Configuration.PrivacyConsent?
+
     public var tintColor: UIColor = .init(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
     @available(*, renamed: "tintColor", message: "spinnerColor has been superseded by tintColor")
@@ -85,5 +87,26 @@ extension Configuration {
                 CheckoutWebView.preloadingActivatedByClient = false
             }
         }
+    }
+}
+
+extension Configuration {
+    public struct PrivacyConsent: OptionSet {
+        public let rawValue: Int
+
+        /// Creates a PrivacyConsent from a raw value.
+        /// - Warning: Do not use this initializer directly. Use the provided static properties instead.
+        /// - Parameter rawValue: The raw integer value
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+
+        public static let marketing = PrivacyConsent(rawValue: 1 << 0)
+        public static let analytics = PrivacyConsent(rawValue: 1 << 1)
+        public static let preferences = PrivacyConsent(rawValue: 1 << 2)
+        public static let saleOfData = PrivacyConsent(rawValue: 1 << 3)
+
+        public static let all: PrivacyConsent = [.marketing, .analytics, .preferences, .saleOfData]
+        public static let none: PrivacyConsent = []
     }
 }
