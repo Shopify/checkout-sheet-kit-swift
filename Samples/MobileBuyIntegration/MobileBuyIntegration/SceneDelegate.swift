@@ -188,6 +188,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         badgeLabel.clipsToBounds = true
         badgeLabel.frame = CGRect(x: 25, y: 5, width: 20, height: 20)
         badgeLabel.isHidden = true
+        badgeLabel.tag = 999
 
         containerView.addSubview(button)
         containerView.addSubview(badgeLabel)
