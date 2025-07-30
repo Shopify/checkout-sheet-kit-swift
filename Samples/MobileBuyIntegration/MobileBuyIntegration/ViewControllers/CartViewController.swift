@@ -142,6 +142,7 @@ class CartItemCell: UITableViewCell {
     }
 }
 
+@MainActor
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     // MARK: Properties
 
@@ -281,38 +282,24 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     private func setupAcceleratedCheckoutButtons() {
         guard let cartId = CartManager.shared.cart?.id else { return }
-
-        // Configure ShopifyAcceleratedCheckouts
-        let configuration = ShopifyAcceleratedCheckouts.Configuration(
-            storefrontDomain: InfoDictionary.shared.domain,
-            storefrontAccessToken: InfoDictionary.shared.accessToken
-        )
-
-        let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-            merchantIdentifier: "merchant.com.shopify.example.MobileBuyIntegration.ApplePay",
-            contactFields: [.email]
-        )
+        
 
         // Create accelerated checkout buttons
         let acceleratedCheckoutButtonsView = AcceleratedCheckoutButtons(cartID: cartId.rawValue)
             .wallets([.shopPay, .applePay])
             .cornerRadius(8)
             .onComplete { _ in
-                DispatchQueue.main.async {
-                    // Reset cart on successful checkout
-                    CartManager.shared.resetCart()
-                }
+				// Reset cart on successful checkout
+				CartManager.shared.resetCart()
             }
             .onFail { error in
-                DispatchQueue.main.async {
-                    print("Accelerated checkout failed: \(error)")
-                }
+				print("Accelerated checkout failed: \(error)")
             }
             .onCancel {
                 print("Accelerated checkout cancelled")
             }
-            .environment(configuration)
-            .environment(applePayConfig)
+            .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+            .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
 
         // Wrap in AnyView and create hosting controller
         let acceleratedCheckoutsController = UIHostingController(rootView: AnyView(acceleratedCheckoutButtonsView))

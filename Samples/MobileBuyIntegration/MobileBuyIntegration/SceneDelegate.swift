@@ -38,8 +38,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var cancellables: Set<AnyCancellable> = []
 
-//    let cartController = UIHostingController(rootView: CartView())
-    let cartController = CartViewController()
+    let uiKitCartController = CartViewController()
+    let swiftUICartController = UIHostingController(rootView: CartView())
     let productGridController = UIHostingController(rootView: ProductGridView())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
     let settingsController = UIHostingController(rootView: SettingsView())
@@ -62,7 +62,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         viewControllers[Screen.products.rawValue] = UINavigationController(rootViewController: productGalleryController)
 
         /// Cart screen
-        viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: cartController)
+        viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: swiftUICartController)
 
         /// Settings screen
         viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
@@ -95,7 +95,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             image: UIImage(systemName: "cart"),
             style: .plain,
             target: self,
-            action: #selector(presentCartSheet)
+            action: #selector(presentUIKitCartInSheet)
         )
 
         /// Product Gallery
@@ -106,13 +106,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             image: UIImage(systemName: "cart"),
             style: .plain,
             target: self,
-            action: #selector(presentCartSheet)
+            action: #selector(presentUIKitCartInSheet)
         )
 
-        /// Cart
-        cartController.tabBarItem.image = UIImage(systemName: "cart")
-        cartController.tabBarItem.title = "Cart"
-        cartController.navigationItem.title = "Cart"
+        /// Cart (UI Kit)
+        swiftUICartController.tabBarItem.image = UIImage(systemName: "cart")
+        swiftUICartController.tabBarItem.title = "Cart"
+        swiftUICartController.navigationItem.title = "Cart (SwiftUI)"
 
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
@@ -125,17 +125,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
 
-    @objc public func presentCartSheet() {
-        let cartView = CartView()
-        let cartViewController = UIHostingController(rootView: cartView)
-
+    @objc public func presentUIKitCartInSheet() {
         // Wrap in navigation controller for better presentation
-        let navigationController = UINavigationController(rootViewController: cartViewController)
+        let navigationController = UINavigationController(rootViewController: uiKitCartController)
         navigationController.modalPresentationStyle = .pageSheet
 
         // Add close button
-        cartViewController.navigationItem.title = "Cart"
-        cartViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(
+        uiKitCartController.navigationItem.title = "Cart (UIKit)"
+        uiKitCartController.navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .close,
             target: self,
             action: #selector(dismissCartSheet)
@@ -165,10 +162,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             .sink { cart in
                 if let cart, cart.lines.nodes.count > 0 {
                     DispatchQueue.main.async {
-                        self.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
+                        self.swiftUICartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
                     }
                 } else {
-                    self.cartController.tabBarItem.badgeValue = nil
+                    self.swiftUICartController.tabBarItem.badgeValue = nil
                 }
             }
             .store(in: &cancellables)
