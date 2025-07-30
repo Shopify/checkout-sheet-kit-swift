@@ -22,90 +22,81 @@
  */
 
 import Buy
-import PassKit
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
-// swiftlint:disable opening_brace
+// SwiftLint:disable opening_brace
 struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
     @State var showCheckoutSheet: Bool = false
+    @State var acceleratedCheckoutRenderState: RenderState = .loading
 
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
 
     var body: some View {
         if let lines = cartManager.cart?.lines.nodes {
-            ZStack(alignment: .bottom) {
-                ScrollView {
-                    VStack {
-                        CartLines(lines: lines, isBusy: $isBusy)
-                    }
-                    .padding(.bottom, 130)
-                }
+            ScrollView {
+                VStack(spacing: 20) {
+                    CartLines(lines: lines, isBusy: $isBusy)
 
-                VStack(spacing: 10) {
-                    Button(
-                        action: presentCheckout,
-                        label: {
-                            HStack {
-                                Text("Check out with present")
-                                    .fontWeight(.bold)
-                                Spacer()
-                                if let amount = cartManager.cart?.cost.totalAmount,
-                                   let total = amount.formattedString()
-                                {
-                                    Text(total)
+                    VStack(spacing: 10) {
+                        Button(
+                            action: { showCheckoutSheet = true },
+                            label: {
+                                HStack {
+                                    Text("Check out")
                                         .fontWeight(.bold)
-                                }
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
-                            .cornerRadius(10)
-                        }
-                    )
-                    .disabled(isBusy)
-                    .foregroundColor(.white)
-                    .accessibilityIdentifier("checkoutButton")
-                    .padding(.horizontal, 20)
 
-                    Button(
-                        action: { showCheckoutSheet = true },
-                        label: {
-                            HStack {
-                                Text("Check out with sheet")
-                                    .fontWeight(.bold)
-                                Spacer()
-                                if let amount = cartManager.cart?.cost.totalAmount,
-                                   let total = amount.formattedString()
-                                {
-                                    Text(total)
-                                        .fontWeight(.bold)
-                                }
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
-                            .cornerRadius(10)
-                        }
-                    )
-                    .disabled(isBusy)
-                    .foregroundColor(.white)
-                    .accessibilityIdentifier("checkoutSheetButton")
-                    .padding(.horizontal, 20)
+                                    Spacer()
 
-                    if config.applePayEnabled {
-                        PayWithApplePayButton(
-                            .checkout,
-                            action: handleApplePayPress,
-                            fallback: { Text("Apple Pay not available") }
+                                    if let amount = cartManager.cart?.cost.totalAmount,
+                                       let total = amount.formattedString()
+                                    {
+                                        Text(total)
+                                            .fontWeight(.bold)
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity, minHeight: 48)
+                                .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
+                                .cornerRadius(10)
+                            }
                         )
-                        .cornerRadius(10)
                         .disabled(isBusy)
-                        .frame(maxWidth: .infinity, maxHeight: 50)
+                        .foregroundColor(.white)
+                        .accessibilityIdentifier("checkoutSheetButton")
                         .padding(.horizontal, 20)
+
+                        if let cart = cartManager.cart {
+                            AcceleratedCheckoutButtons(cartID: cart.id.rawValue)
+                                .wallets([.shopPay, .applePay])
+                                .cornerRadius(10)
+                                .onComplete { event in
+                                    print("SwiftUI Accelerated checkout completed with order ID: \(event.orderDetails.id)")
+                                }
+                                .onFail { error in
+                                    print("SwiftUI Accelerated checkout failed: \(error)")
+                                    print("Error details: \(error.localizedDescription)")
+                                }
+                                .onCancel {
+                                    print("SwiftUI Accelerated checkout cancelled")
+                                }
+                                .onRenderStateChange { state in
+                                    acceleratedCheckoutRenderState = state
+                                }
+                                .environment(config.acceleratedCheckoutsConfiguration)
+                                .environment(config.applePayConfiguration)
+                                .padding(.horizontal, 20)
+                        } else {
+                            Text("No cart available")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.horizontal, 20)
+                        }
                     }
                 }
                 .padding(.bottom, 20)
@@ -116,7 +107,6 @@ struct CartView: View {
             .sheet(isPresented: $showCheckoutSheet) {
                 if let url = cartManager.cart?.checkoutUrl {
                     CheckoutSheet(checkout: url)
-                        .title("Checkout Sheet")
                         .colorScheme(.automatic)
                         .onCancel {
                             showCheckoutSheet = false
@@ -141,21 +131,9 @@ struct CartView: View {
     private func preloadCheckout() {
         CheckoutController.shared?.preload()
     }
-
-    private func presentCheckout() {
-        guard let url = CartManager.shared.cart?.checkoutUrl else {
-            return
-        }
-
-        CheckoutController.shared?.present(checkout: url)
-    }
-
-    private func handleApplePayPress() {
-        CheckoutController.shared?.payWithApplePay()
-    }
 }
 
-// swiftlint:enable opening_brace
+// SwiftLint:enable opening_brace
 
 struct EmptyState: View {
     var body: some View {
@@ -229,7 +207,7 @@ struct CartLines: View {
 
                             HStack(spacing: 20) {
                                 Button(action: {
-                                    /// Prevent multiple simulataneous calls
+                                    /// Prevent multiple simultaneous calls
                                     guard node.quantity > 1, updating != node.id else {
                                         return
                                     }
@@ -266,7 +244,7 @@ struct CartLines: View {
 
                                 Button(
                                     action: {
-                                        /// Prevent multiple simulataneous calls
+                                        /// Prevent multiple simultaneous calls
                                         guard updating != node.id else {
                                             return
                                         }

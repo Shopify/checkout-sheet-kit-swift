@@ -34,7 +34,8 @@ internal class AcceleratedCheckoutViewController: UIViewController {
     private let identifier: CheckoutIdentifier
     private let configuration: ShopifyAcceleratedCheckouts.Configuration
     private weak var delegate: AcceleratedCheckoutDelegate?
-    
+    private weak var customPresentingViewController: UIViewController?
+
     private var applePayViewController: ApplePayViewController?
     private var shopPayViewController: ShopPayViewController?
     private var currentRenderState: RenderState = .loading {
@@ -42,7 +43,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
             delegate?.renderStateDidChange(state: currentRenderState)
         }
     }
-    
+
     /// Internal initializer for accelerated checkout view controller with a cart ID
     /// - Parameters:
     ///   - wallet: The wallet type to present (ApplePay or ShopPay)
@@ -50,21 +51,21 @@ internal class AcceleratedCheckoutViewController: UIViewController {
     ///   - delegate: The delegate to handle checkout events
     internal init(wallet: Wallet, cartID: String, delegate: AcceleratedCheckoutDelegate? = nil) {
         self.wallet = wallet
-        self.identifier = CheckoutIdentifier.cart(cartID: cartID).parse()
+        identifier = CheckoutIdentifier.cart(cartID: cartID).parse()
         self.delegate = delegate
-        
-        guard let configuration = ShopifyAcceleratedCheckouts.currentConfiguration else {
+
+        guard let configuration = ShopifyAcceleratedCheckouts.configuration else {
             fatalError("ShopifyAcceleratedCheckouts must be configured before use. Call ShopifyAcceleratedCheckouts.configure() first.")
         }
         self.configuration = configuration
-        
+
         super.init(nibName: nil, bundle: nil)
-        
+
         if case .invariant = identifier {
             currentRenderState = .error
         }
     }
-    
+
     /// Internal initializer for accelerated checkout view controller with a variant ID
     /// - Parameters:
     ///   - wallet: The wallet type to present (ApplePay or ShopPay)
@@ -73,43 +74,49 @@ internal class AcceleratedCheckoutViewController: UIViewController {
     ///   - delegate: The delegate to handle checkout events
     internal init(wallet: Wallet, variantID: String, quantity: Int, delegate: AcceleratedCheckoutDelegate? = nil) {
         self.wallet = wallet
-        self.identifier = CheckoutIdentifier.variant(variantID: variantID, quantity: quantity).parse()
+        identifier = CheckoutIdentifier.variant(variantID: variantID, quantity: quantity).parse()
         self.delegate = delegate
-        
-        guard let configuration = ShopifyAcceleratedCheckouts.currentConfiguration else {
+
+        guard let configuration = ShopifyAcceleratedCheckouts.configuration else {
             fatalError("ShopifyAcceleratedCheckouts must be configured before use. Call ShopifyAcceleratedCheckouts.configure() first.")
         }
         self.configuration = configuration
-        
+
         super.init(nibName: nil, bundle: nil)
-        
+
         if case .invariant = identifier {
             currentRenderState = .error
         }
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    internal override func viewDidLoad() {
+
+    /// Set the presenting view controller that will be used for Shop Pay presentation
+    internal func setPresentingViewController(_ viewController: UIViewController) {
+        customPresentingViewController = viewController
+    }
+
+    override internal func viewDidLoad() {
         super.viewDidLoad()
         setupWalletController()
     }
-    
-    internal override func viewDidAppear(_ animated: Bool) {
+
+    override internal func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         startCheckout()
     }
-    
+
     private func setupWalletController() {
         guard identifier.isValid() else {
             currentRenderState = .error
             return
         }
-        
+
         currentRenderState = .loading
-        
+
         switch wallet {
         case .applePay:
             setupApplePayController()
@@ -117,7 +124,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
             setupShopPayController()
         }
     }
-    
+
     private func setupApplePayController() {
         Task {
             do {
@@ -128,50 +135,50 @@ internal class AcceleratedCheckoutViewController: UIViewController {
                 )
                 let shop = try await storefront.shop()
                 let shopSettings = ShopSettings(from: shop)
-                
+
                 // Create Apple Pay configuration with default settings
                 let applePayConfiguration = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
                     merchantIdentifier: "merchant.com.shopify.accelerated-checkout", // Default, should be configurable
                     contactFields: [.email]
                 )
-                
+
                 let applePayConfig = ApplePayConfigurationWrapper(
                     common: configuration,
                     applePay: applePayConfiguration,
                     shopSettings: shopSettings
                 )
-                
+
                 await MainActor.run {
                     let controller = ApplePayViewController(
                         identifier: identifier,
                         configuration: applePayConfig
                     )
-                    
+
                     // Bridge Apple Pay callbacks to our delegate
                     controller.onCheckoutComplete = { [weak self] event in
                         self?.delegate?.checkoutDidComplete(event: event)
                     }
-                    
+
                     controller.onCheckoutFail = { [weak self] error in
                         self?.delegate?.checkoutDidFail(error: error)
                     }
-                    
+
                     controller.onCheckoutCancel = { [weak self] in
                         self?.delegate?.checkoutDidCancel()
                     }
-                    
+
                     controller.onShouldRecoverFromError = { [weak self] error in
                         return self?.delegate?.shouldRecoverFromError(error: error) ?? false
                     }
-                    
+
                     controller.onCheckoutClickLink = { [weak self] url in
                         self?.delegate?.checkoutDidClickLink(url: url)
                     }
-                    
+
                     controller.onCheckoutWebPixelEvent = { [weak self] event in
                         self?.delegate?.checkoutDidEmitWebPixelEvent(event: event)
                     }
-                    
+
                     self.applePayViewController = controller
                     self.currentRenderState = .rendered
                 }
@@ -183,7 +190,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
             }
         }
     }
-    
+
     private func setupShopPayController() {
         let eventHandlers = EventHandlers(
             checkoutDidComplete: { [weak self] event in
@@ -205,27 +212,27 @@ internal class AcceleratedCheckoutViewController: UIViewController {
                 self?.delegate?.checkoutDidEmitWebPixelEvent(event: event)
             }
         )
-        
+
         let controller = ShopPayViewController(
             identifier: identifier,
             configuration: configuration,
             eventHandlers: eventHandlers
         )
-        
-        self.shopPayViewController = controller
+
+        shopPayViewController = controller
         currentRenderState = .rendered
     }
-    
+
     private func startCheckout() {
         guard currentRenderState == .rendered else { return }
-        
+
         Task {
             do {
                 switch wallet {
                 case .applePay:
                     await applePayViewController?.startPayment()
                 case .shopPay:
-                    try await shopPayViewController?.present()
+                    try await shopPayViewController?.present(from: self)
                 }
             } catch {
                 await MainActor.run {

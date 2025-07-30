@@ -47,39 +47,42 @@ struct ProductView: View {
         ScrollView {
             VStack(spacing: 16) {
                 if let imageURL = product.featuredImage?.url {
-                    ZStack {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
-
-                        AsyncImage(url: imageURL) { phase in
-                            switch phase {
-                            case .empty:
-                                EmptyView()
-                            case let .success(image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(height: 400)
-                                    .clipped()
-                                    .opacity(imageLoaded ? 1 : 0)
-                                    .onAppear {
-                                        withAnimation(.easeIn(duration: 0.5)) {
-                                            imageLoaded = true
-                                        }
+                    AsyncImage(url: imageURL.thumbnail(size: 600)) { phase in
+                        switch phase {
+                        case .empty:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(height: 400)
+                        case let .success(image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: 400)
+                                .clipped()
+                                .opacity(imageLoaded ? 1 : 0)
+                                .onAppear {
+                                    withAnimation(.easeIn(duration: 0.5)) {
+                                        imageLoaded = true
                                     }
-                            case .failure:
-                                Image(systemName: "photo")
-                                    .resizable()
-                                    .frame(width: 100, height: 100)
-                                    .foregroundColor(.gray)
-                            @unknown default:
-                                EmptyView()
-                            }
+                                }
+                        case .failure:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(height: 400)
+                                .overlay(
+                                    Image(systemName: "photo")
+                                        .resizable()
+                                        .frame(width: 100, height: 100)
+                                        .foregroundColor(.gray)
+                                )
+                        @unknown default:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(height: 400)
                         }
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: UIScreen.main.bounds.width)
-                        .clipped()
                     }
+                    .frame(width: UIScreen.main.bounds.width, height: 400)
+                    .clipped()
                 }
 
                 VStack(alignment: .leading, spacing: 8) {

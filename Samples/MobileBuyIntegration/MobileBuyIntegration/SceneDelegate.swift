@@ -37,8 +37,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     var cancellables: Set<AnyCancellable> = []
+    private var catalogCartButton: CartBarButtonView?
+    private var productsCartButton: CartBarButtonView?
 
-    let cartController = UIHostingController(rootView: CartView())
+    let swiftuiCartController = UIHostingController(rootView: CartView())
     let productGridController = UIHostingController(rootView: ProductGridView())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
     let settingsController = UIHostingController(rootView: SettingsView())
@@ -60,8 +62,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         /// Product gallery screen
         viewControllers[Screen.products.rawValue] = UINavigationController(rootViewController: productGalleryController)
 
-        /// Cart screen
-        viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: cartController)
+        /// Cart screen (SwiftUI)
+        viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: swiftuiCartController)
 
         /// Settings screen
         viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
@@ -90,28 +92,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
         productGridController.tabBarItem.title = "Catalog"
         productGridController.navigationItem.titleView = logoImageView
-        productGridController.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "cart"),
-            style: .plain,
-            target: self,
-            action: #selector(presentCartSheet)
-        )
+        catalogCartButton = CartBarButtonView()
+        catalogCartButton?.addTarget(self, action: #selector(presentCartSheet), for: .touchUpInside)
+        productGridController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: catalogCartButton!)
 
         /// Product Gallery
         productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
         productGalleryController.tabBarItem.title = "Products"
         productGalleryController.navigationItem.titleView = logoImageView
-        productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "cart"),
-            style: .plain,
-            target: self,
-            action: #selector(presentCartSheet)
-        )
+        productsCartButton = CartBarButtonView()
+        productsCartButton?.addTarget(self, action: #selector(presentCartSheet), for: .touchUpInside)
+        productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: productsCartButton!)
 
-        /// Cart
-        cartController.tabBarItem.image = UIImage(systemName: "cart")
-        cartController.tabBarItem.title = "Cart"
-        cartController.navigationItem.title = "Cart"
+        /// Cart (SwiftUI)
+        swiftuiCartController.tabBarItem.image = UIImage(systemName: "cart")
+        swiftuiCartController.tabBarItem.title = "Cart"
+        swiftuiCartController.navigationItem.title = "Cart (SwiftUI)"
 
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
@@ -125,15 +121,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     @objc public func presentCartSheet() {
-        let cartView = CartView()
-        let cartViewController = UIHostingController(rootView: cartView)
+        let cartViewController = CartViewController()
 
         // Wrap in navigation controller for better presentation
         let navigationController = UINavigationController(rootViewController: cartViewController)
         navigationController.modalPresentationStyle = .pageSheet
 
         // Add close button
-        cartViewController.navigationItem.title = "Cart"
+        cartViewController.navigationItem.title = "Cart (UIKit)"
         cartViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .close,
             target: self,
@@ -142,6 +137,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Present from the top-most view controller
         if let topViewController = window?.topMostViewController() {
+            print("🟦 SceneDelegate presenting CartViewController navigation controller from: \(topViewController)")
             topViewController.present(navigationController, animated: true)
         }
     }
@@ -162,12 +158,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func subscribeToCartUpdates() {
         CartManager.shared.$cart
             .sink { cart in
-                if let cart, cart.lines.nodes.count > 0 {
-                    DispatchQueue.main.async {
-                        self.cartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
-                    }
-                } else {
-                    self.cartController.tabBarItem.badgeValue = nil
+                let badgeValue: String? = (cart?.lines.nodes.count ?? 0) > 0 ? "\(cart?.totalQuantity ?? 0)" : nil
+
+                DispatchQueue.main.async {
+                    // Update tab bar badge
+                    self.swiftuiCartController.tabBarItem.badgeValue = badgeValue
+
+                    // Update navigation bar badges
+                    self.catalogCartButton?.setBadgeValue(badgeValue)
+                    self.productsCartButton?.setBadgeValue(badgeValue)
                 }
             }
             .store(in: &cancellables)
@@ -268,5 +267,55 @@ extension UIWindow {
         }
 
         return topController
+    }
+}
+
+class CartBarButtonView: UIButton {
+    private var badgeLabel: UILabel?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupButton()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupButton()
+    }
+
+    private func setupButton() {
+        setImage(UIImage(systemName: "cart"), for: .normal)
+        frame = CGRect(x: 0, y: 0, width: 34, height: 34)
+
+        // Create badge label
+        badgeLabel = UILabel()
+        badgeLabel?.backgroundColor = .systemRed
+        badgeLabel?.textColor = .white
+        badgeLabel?.alpha = 0.8
+        badgeLabel?.font = .systemFont(ofSize: 10, weight: .medium)
+        badgeLabel?.textAlignment = .center
+        badgeLabel?.layer.cornerRadius = 10
+        badgeLabel?.layer.masksToBounds = true
+        badgeLabel?.isHidden = true
+        badgeLabel?.translatesAutoresizingMaskIntoConstraints = false
+
+        addSubview(badgeLabel!)
+
+        // Position badge in top-right corner
+        NSLayoutConstraint.activate([
+            badgeLabel!.topAnchor.constraint(equalTo: topAnchor, constant: -10),
+            badgeLabel!.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 10),
+            badgeLabel!.widthAnchor.constraint(greaterThanOrEqualToConstant: 20),
+            badgeLabel!.heightAnchor.constraint(equalToConstant: 20)
+        ])
+    }
+
+    func setBadgeValue(_ value: String?) {
+        if let value, !value.isEmpty {
+            badgeLabel?.text = value
+            badgeLabel?.isHidden = false
+        } else {
+            badgeLabel?.isHidden = true
+        }
     }
 }

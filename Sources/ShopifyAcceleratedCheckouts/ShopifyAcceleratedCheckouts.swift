@@ -30,7 +30,7 @@ public enum ShopifyAcceleratedCheckouts {
     static let apiVersion = "2025-04"
 
     /// The current configuration for accelerated checkouts
-    internal static var currentConfiguration: Configuration?
+    internal static var configuration: Configuration?
 }
 
 // MARK: - Global Configuration
@@ -40,15 +40,15 @@ extension ShopifyAcceleratedCheckouts {
     /// Configures the ShopifyAcceleratedCheckouts module with storefront settings
     /// - Parameter configuration: The configuration containing storefront domain and access token
     public static func configure(_ configuration: Configuration) {
-        currentConfiguration = configuration
+        self.configuration = configuration
     }
 
     /// A convenience function for configuring the ShopifyAcceleratedCheckouts module
     /// - Parameter block: A closure that receives a mutable configuration to modify
     public static func configure(_ block: (inout Configuration) -> Void) {
-        var config = currentConfiguration ?? Configuration(storefrontDomain: "", storefrontAccessToken: "")
+        var config = configuration ?? Configuration(storefrontDomain: "", storefrontAccessToken: "")
         block(&config)
-        currentConfiguration = config
+        configuration = config
     }
 }
 

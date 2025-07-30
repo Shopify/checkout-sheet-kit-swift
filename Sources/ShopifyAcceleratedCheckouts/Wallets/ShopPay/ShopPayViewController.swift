@@ -46,22 +46,27 @@ import SwiftUI
         )
     }
 
-    func present() async throws {
+    func present(from presentingViewController: UIViewController? = nil) async throws {
         guard let redirectUrl = try await buildRedirectUrl() else {
             print("Failed to build redirect url for Shop Pay")
             return
         }
 
-        let topViewController = await MainActor.run { getTopViewController() }
-        guard let topViewController else {
-            print("Failed to get top view controller for Shop Pay")
+        let viewController: UIViewController?
+        if let presentingViewController {
+            viewController = presentingViewController
+        } else {
+            viewController = await MainActor.run { getTopViewController() }
+        }
+
+        guard let viewController else {
             return
         }
 
         await MainActor.run {
             self.checkoutViewController = ShopifyCheckoutSheetKit.present(
                 checkout: redirectUrl,
-                from: topViewController,
+                from: viewController,
                 entryPoint: .acceleratedCheckouts,
                 delegate: self
             )

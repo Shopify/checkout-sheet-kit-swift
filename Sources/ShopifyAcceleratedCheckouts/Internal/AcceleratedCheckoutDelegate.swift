@@ -31,7 +31,7 @@ public protocol AcceleratedCheckoutDelegate: CheckoutDelegate {
 }
 
 extension AcceleratedCheckoutDelegate {
-    public func renderStateDidChange(state: RenderState) {
+    public func renderStateDidChange(state _: RenderState) {
         // No-op by default
     }
 }

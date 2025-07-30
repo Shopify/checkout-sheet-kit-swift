@@ -24,6 +24,26 @@
 import Buy
 import SwiftUI
 
+extension URL {
+    /// Creates a thumbnail version of a Shopify image URL by appending size parameters
+    /// - Parameter size: The maximum size for the thumbnail (e.g., 300 for 300x300)
+    /// - Returns: URL with thumbnail transformation applied
+    func thumbnail(size: Int) -> URL {
+        guard absoluteString.contains("cdn.shopify.com") else { return self }
+
+        let urlString = absoluteString
+
+        // Remove any existing file extension and size parameters
+        let baseUrl = urlString.components(separatedBy: ".").dropLast().joined(separator: ".")
+        let fileExtension = urlString.components(separatedBy: ".").last?.components(separatedBy: "?").first ?? "jpg"
+
+        // Add the thumbnail size parameter
+        let thumbnailUrl = "\(baseUrl)_\(size)x\(size).\(fileExtension)"
+
+        return URL(string: thumbnailUrl) ?? self
+    }
+}
+
 struct ProductGridView: View {
     @StateObject private var productCache = ProductCache.shared
     @State private var selectedProduct: Storefront.Product?
@@ -101,7 +121,7 @@ struct ProductGridItem: View {
         VStack {
             ZStack {
                 if let imageURL = product.featuredImage?.url {
-                    AsyncImage(url: imageURL) { image in
+                    AsyncImage(url: imageURL.thumbnail(size: 300)) { image in
                         image
                             .resizable()
                             .scaledToFill()

@@ -30,39 +30,39 @@ import ShopifyCheckoutSheetKit
 @available(iOS 17.0, *)
 internal class AcceleratedCheckoutDelegateWrapper: AcceleratedCheckoutDelegate {
     private let eventHandlers: EventHandlers
-    
+
     init(eventHandlers: EventHandlers) {
         self.eventHandlers = eventHandlers
     }
-    
+
     // MARK: - AcceleratedCheckoutDelegate
-    
+
     func renderStateDidChange(state: RenderState) {
         eventHandlers.renderStateDidChange?(state)
     }
-    
+
     // MARK: - CheckoutDelegate
-    
+
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         eventHandlers.checkoutDidComplete?(event)
     }
-    
+
     func checkoutDidCancel() {
         eventHandlers.checkoutDidCancel?()
     }
-    
+
     func checkoutDidFail(error: CheckoutError) {
         eventHandlers.checkoutDidFail?(error)
     }
-    
+
     func shouldRecoverFromError(error: CheckoutError) -> Bool {
         return eventHandlers.shouldRecoverFromError?(error) ?? error.isRecoverable
     }
-    
+
     func checkoutDidClickLink(url: URL) {
         eventHandlers.checkoutDidClickLink?(url)
     }
-    
+
     func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
         eventHandlers.checkoutDidEmitWebPixelEvent?(event)
     }
