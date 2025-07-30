@@ -44,49 +44,11 @@ struct CartView: View {
 
                     VStack(spacing: 10) {
                         Button(
-                            action: presentCheckout,
-                            label: {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Check out with present")
-                                            .fontWeight(.bold)
-                                        Text("UIKit")
-                                            .font(.caption2)
-                                            .opacity(0.7)
-                                    }
-
-                                    Spacer()
-
-                                    if let amount = cartManager.cart?.cost.totalAmount,
-                                       let total = amount.formattedString()
-                                    {
-                                        Text(total)
-                                            .fontWeight(.bold)
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .frame(maxWidth: .infinity, minHeight: 48)
-                                .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
-                                .cornerRadius(10)
-                            }
-                        )
-                        .disabled(isBusy)
-                        .foregroundColor(.white)
-                        .accessibilityIdentifier("checkoutButton")
-                        .padding(.horizontal, 20)
-
-                        Button(
                             action: { showCheckoutSheet = true },
                             label: {
                                 HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Check out with sheet")
-                                            .fontWeight(.bold)
-                                        Text("SwiftUI")
-                                            .font(.caption2)
-                                            .opacity(0.7)
-                                    }
+                                    Text("Check out")
+                                        .fontWeight(.bold)
 
                                     Spacer()
 
@@ -168,14 +130,6 @@ struct CartView: View {
 
     private func preloadCheckout() {
         CheckoutController.shared?.preload()
-    }
-
-    private func presentCheckout() {
-        guard let url = CartManager.shared.cart?.checkoutUrl else {
-            return
-        }
-
-        CheckoutController.shared?.present(checkout: url)
     }
 }
 

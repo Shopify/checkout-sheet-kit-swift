@@ -34,6 +34,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
     private let identifier: CheckoutIdentifier
     private let configuration: ShopifyAcceleratedCheckouts.Configuration
     private weak var delegate: AcceleratedCheckoutDelegate?
+    private weak var customPresentingViewController: UIViewController?
 
     private var applePayViewController: ApplePayViewController?
     private var shopPayViewController: ShopPayViewController?
@@ -91,6 +92,11 @@ internal class AcceleratedCheckoutViewController: UIViewController {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    /// Set the presenting view controller that will be used for Shop Pay presentation
+    internal func setPresentingViewController(_ viewController: UIViewController) {
+        customPresentingViewController = viewController
     }
 
     override internal func viewDidLoad() {
@@ -226,7 +232,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
                 case .applePay:
                     await applePayViewController?.startPayment()
                 case .shopPay:
-                    try await shopPayViewController?.present()
+                    try await shopPayViewController?.present(from: self)
                 }
             } catch {
                 await MainActor.run {

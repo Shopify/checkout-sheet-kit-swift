@@ -24,7 +24,17 @@
 import Common
 import PassKit
 import ShopifyCheckoutSheetKit
+import SwiftUI
 import UIKit
+
+/// Protocol for handling custom presentation of accelerated checkout flows
+public protocol AcceleratedCheckoutPresentationDelegate: AnyObject {
+    /// Called when the accelerated checkout needs to present a view controller
+    /// - Parameters:
+    ///   - viewController: The checkout view controller to present
+    ///   - animated: Whether the presentation should be animated
+    func present(_ viewController: UIViewController, animated: Bool)
+}
 
 /// A button component that renders wallet-specific checkout buttons and handles checkout presentation.
 /// This is the main public API that merchants should use for programmatic accelerated checkouts.
@@ -33,6 +43,14 @@ public class AcceleratedCheckoutButton: UIView {
     // MARK: - Public Properties
 
     public weak var delegate: AcceleratedCheckoutDelegate?
+
+    /// Delegate for handling custom presentation behavior
+    public weak var presentationDelegate: AcceleratedCheckoutPresentationDelegate?
+
+    // Override intrinsic content size to ensure consistent 48pt height
+    override public var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height: 48)
+    }
 
     public var cornerRadius: CGFloat = Theme.acceleratedCheckoutButtonCornerRadius {
         didSet {
@@ -130,12 +148,20 @@ public class AcceleratedCheckoutButton: UIView {
             button.topAnchor.constraint(equalTo: topAnchor),
             button.leadingAnchor.constraint(equalTo: leadingAnchor),
             button.trailingAnchor.constraint(equalTo: trailingAnchor),
-            button.bottomAnchor.constraint(equalTo: bottomAnchor),
-            button.heightAnchor.constraint(equalToConstant: 48)
+            button.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
         setupButtonForWallet()
         updateButtonAppearance()
+
+        // Force the AcceleratedCheckoutButton container to have 48pt height
+        // Do this after wallet setup to ensure it applies correctly
+        NSLayoutConstraint.activate([
+            heightAnchor.constraint(equalToConstant: 48)
+        ])
+
+        // Call this to ensure the constraint takes effect
+        invalidateIntrinsicContentSize()
     }
 
     private func setupButtonForWallet() {
@@ -148,54 +174,72 @@ public class AcceleratedCheckoutButton: UIView {
     }
 
     private func setupApplePayButton() {
-        // Configure Apple Pay button appearance
-        button.setTitle("", for: .normal)
-        button.backgroundColor = Theme.applePayButtonColor
+        // Use SwiftUI's PayWithApplePayButton embedded in UIHostingController
+        button.removeFromSuperview()
 
-        // Add Apple Pay logo/text if needed
-        if let applePayImage = createApplePayButtonImage() {
-            button.setImage(applePayImage, for: .normal)
-            button.imageView?.contentMode = .scaleAspectFit
-            button.imageView?.tintColor = Theme.applePayButtonTextColor
-        } else {
-            button.setTitle("Apple Pay", for: .normal)
-            button.setTitleColor(Theme.applePayButtonTextColor, for: .normal)
-            button.titleLabel?.font = Theme.applePayButtonTextFont
+        // Create SwiftUI view that matches the working SwiftUI implementation
+        let swiftUIButton = PayWithApplePayButton(.plain) {
+            // Trigger the button tap action
+            self.buttonTapped()
         }
+        .frame(height: 48)
+        .background(Color.black)
+        .clipShape(RoundedRectangle(cornerRadius: CGFloat(cornerRadius)))
+
+        // Embed in UIHostingController
+        let hostingController = UIHostingController(rootView: swiftUIButton)
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        hostingController.view.backgroundColor = .clear
+
+        addSubview(hostingController.view)
+
+        // Create a dummy button for the button property (needed for state management)
+        let dummyButton = UIButton()
+        button = dummyButton
+
+        // Pin hosting controller view to fill the AcceleratedCheckoutButton
+        NSLayoutConstraint.activate([
+            hostingController.view.topAnchor.constraint(equalTo: topAnchor),
+            hostingController.view.leadingAnchor.constraint(equalTo: leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: trailingAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 
     private func setupShopPayButton() {
-        // Configure Shop Pay button appearance
+        // Configure Shop Pay button appearance with logo
         button.backgroundColor = Theme.shopPayButtonColor
-        button.setTitle("Shop Pay", for: .normal)
-        button.setTitleColor(Theme.shopPayButtonTextColor, for: .normal)
-        button.titleLabel?.font = Theme.shopPayButtonTextFont
-    }
+        button.setTitle("", for: .normal)
 
-    private func createApplePayButtonImage() -> UIImage? {
-        // Create a simple Apple Pay text image - in a real implementation,
-        // you might want to use the official Apple Pay button assets
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 30))
-        return renderer.image { _ in
-            let text = "Apple Pay"
-            let attributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 16, weight: .medium),
-                .foregroundColor: UIColor.white
-            ]
-            let attributedText = NSAttributedString(string: text, attributes: attributes)
-            let textSize = attributedText.size()
-            let textRect = CGRect(
-                x: (100 - textSize.width) / 2,
-                y: (30 - textSize.height) / 2,
-                width: textSize.width,
-                height: textSize.height
-            )
-            attributedText.draw(in: textRect)
+        // Use the Shop Pay logo image from the bundle
+        if let shopPayImage = UIImage(named: "shop-pay-logo", in: .module, compatibleWith: nil) {
+            // Resize the image to fit properly in the button (similar to SwiftUI version height: 24)
+            let targetSize = CGSize(width: shopPayImage.size.width * (24.0 / shopPayImage.size.height), height: 24)
+            let resizedImage = shopPayImage.resized(to: targetSize)
+
+            button.setImage(resizedImage, for: .normal)
+            button.imageView?.contentMode = .scaleAspectFit
+            button.imageView?.tintColor = nil // Don't tint the logo, use original colors
+
+            // Center the image in the button
+            button.imageEdgeInsets = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        } else {
+            // Fallback to text if image is not available
+            button.setTitle("Shop Pay", for: .normal)
+            button.setTitleColor(Theme.shopPayButtonTextColor, for: .normal)
+            button.titleLabel?.font = Theme.shopPayButtonTextFont
         }
     }
 
     private func updateButtonAppearance() {
-        button.layer.cornerRadius = Theme.acceleratedCheckoutButtonCornerRadius
+        // Apply corner radius based on button type
+        if button is PKPaymentButton {
+            // For PKPaymentButton, apply corner radius to its container
+            button.superview?.layer.cornerRadius = cornerRadius
+        } else {
+            // For regular buttons, apply directly
+            button.layer.cornerRadius = cornerRadius
+        }
         button.alpha = isUserInteractionEnabled ? 1.0 : 0.6
     }
 
@@ -252,33 +296,113 @@ public class AcceleratedCheckoutButton: UIView {
     }
 
     private func presentCheckout(from viewController: UIViewController) {
-        let checkoutController: AcceleratedCheckoutViewController
+        guard let configuration = ShopifyAcceleratedCheckouts.currentConfiguration else { return }
 
-        switch identifier {
-        case let .cart(cartID):
-            checkoutController = AcceleratedCheckoutViewController(
-                wallet: wallet,
-                cartID: cartID,
-                delegate: delegate
+        let presentingVC = presentationDelegate as? UIViewController ?? viewController
+
+        // Create common event handlers
+        let eventHandlers = EventHandlers(
+            checkoutDidComplete: { [weak self] event in
+                self?.delegate?.checkoutDidComplete(event: event)
+            },
+            checkoutDidFail: { [weak self] error in
+                self?.delegate?.checkoutDidFail(error: error)
+            },
+            checkoutDidCancel: { [weak self] in
+                presentingVC.dismiss(animated: true)
+                self?.delegate?.checkoutDidCancel()
+            },
+            shouldRecoverFromError: { [weak self] error in
+                return self?.delegate?.shouldRecoverFromError(error: error) ?? false
+            },
+            checkoutDidClickLink: { [weak self] url in
+                self?.delegate?.checkoutDidClickLink(url: url)
+            },
+            checkoutDidEmitWebPixelEvent: { [weak self] event in
+                self?.delegate?.checkoutDidEmitWebPixelEvent(event: event)
+            }
+        )
+
+        // Present both wallets directly to avoid visual glitches
+        switch wallet {
+        case .shopPay:
+            let shopPayViewController = ShopPayViewController(
+                identifier: identifier,
+                configuration: configuration,
+                eventHandlers: eventHandlers
             )
-        case let .variant(variantID, quantity):
-            checkoutController = AcceleratedCheckoutViewController(
-                wallet: wallet,
-                variantID: variantID,
-                quantity: quantity,
-                delegate: delegate
-            )
-        case .invariant:
-            let error = CheckoutError.checkoutUnavailable(
-                message: "Invalid checkout identifier",
-                code: .clientError(code: .invalidCart),
-                recoverable: false
-            )
-            delegate?.checkoutDidFail(error: error)
-            return
+
+            Task {
+                do {
+                    try await shopPayViewController.present(from: presentingVC)
+                } catch {
+                    await MainActor.run {
+                        let checkoutError = CheckoutError.checkoutUnavailable(
+                            message: error.localizedDescription,
+                            code: .httpError(statusCode: 500),
+                            recoverable: false
+                        )
+                        self.delegate?.checkoutDidFail(error: checkoutError)
+                    }
+                }
+            }
+
+        case .applePay:
+            presentApplePayDirectly(from: presentingVC, configuration: configuration, eventHandlers: eventHandlers)
         }
+    }
 
-        viewController.present(checkoutController, animated: true)
+    private func presentApplePayDirectly(from _: UIViewController, configuration: ShopifyAcceleratedCheckouts.Configuration, eventHandlers: EventHandlers) {
+        Task {
+            do {
+                // Get shop settings for Apple Pay configuration
+                let storefront = StorefrontAPI(
+                    storefrontDomain: configuration.storefrontDomain,
+                    storefrontAccessToken: configuration.storefrontAccessToken
+                )
+                let shop = try await storefront.shop()
+                let shopSettings = ShopSettings(from: shop)
+
+                let applePayConfiguration = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                    merchantIdentifier: "merchant.com.shopify.accelerated-checkout",
+                    contactFields: [.email]
+                )
+
+                let applePayConfig = ApplePayConfigurationWrapper(
+                    common: configuration,
+                    applePay: applePayConfiguration,
+                    shopSettings: shopSettings
+                )
+
+                let controller = await MainActor.run {
+                    let controller = ApplePayViewController(
+                        identifier: self.identifier,
+                        configuration: applePayConfig
+                    )
+
+                    // Bridge Apple Pay callbacks using reusable event handlers
+                    controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
+                    controller.onCheckoutFail = eventHandlers.checkoutDidFail
+                    controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
+                    controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
+                    controller.onCheckoutClickLink = eventHandlers.checkoutDidClickLink
+                    controller.onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
+
+                    return controller
+                }
+
+                await controller.startPayment()
+            } catch {
+                await MainActor.run {
+                    let checkoutError = CheckoutError.checkoutUnavailable(
+                        message: error.localizedDescription,
+                        code: .httpError(statusCode: 500),
+                        recoverable: false
+                    )
+                    self.delegate?.checkoutDidFail(error: checkoutError)
+                }
+            }
+        }
     }
 
     // MARK: - Utility
@@ -305,5 +429,16 @@ extension AcceleratedCheckoutButton: AcceleratedCheckoutConfigurable {
     public func cornerRadius(_ cornerRadius: CGFloat) -> Self {
         self.cornerRadius = cornerRadius >= 0 ? cornerRadius : Theme.acceleratedCheckoutButtonCornerRadius
         return self
+    }
+}
+
+// MARK: - UIImage Extension
+
+extension UIImage {
+    fileprivate func resized(to size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            self.draw(in: CGRect(origin: .zero, size: size))
+        }
     }
 }
