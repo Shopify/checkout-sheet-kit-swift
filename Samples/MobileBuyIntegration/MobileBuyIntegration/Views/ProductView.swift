@@ -47,38 +47,43 @@ struct ProductView: View {
         ScrollView {
             VStack(spacing: 16) {
                 if let imageURL = product.featuredImage?.url {
-                    ZStack {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
-
-                        AsyncImage(url: imageURL) { phase in
-                            switch phase {
-                            case .empty:
-                                EmptyView()
-                            case let .success(image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(height: 400)
-                                    .clipped()
-                                    .opacity(imageLoaded ? 1 : 0)
-                                    .onAppear {
-                                        withAnimation(.easeIn(duration: 0.5)) {
-                                            imageLoaded = true
-                                        }
+                    AsyncImage(url: imageURL) { phase in
+                        switch phase {
+                        case .empty:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.1))
+                                .frame(width: UIScreen.main.bounds.width, height: 400)
+                                .overlay(
+                                    ProgressView()
+                                        .scaleEffect(1.2)
+                                        .tint(.gray)
+                                )
+                        case let .success(image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: UIScreen.main.bounds.width, height: 400)
+                                .clipped()
+                                .opacity(imageLoaded ? 1 : 0)
+                                .onAppear {
+                                    withAnimation(.easeIn(duration: 0.3)) {
+                                        imageLoaded = true
                                     }
-                            case .failure:
-                                Image(systemName: "photo")
-                                    .resizable()
-                                    .frame(width: 100, height: 100)
-                                    .foregroundColor(.gray)
-                            @unknown default:
-                                EmptyView()
-                            }
+                                }
+                        case .failure:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.1))
+                                .frame(width: UIScreen.main.bounds.width, height: 400)
+                                .overlay(
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 48))
+                                        .foregroundColor(.gray.opacity(0.6))
+                                )
+                        @unknown default:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.1))
+                                .frame(width: UIScreen.main.bounds.width, height: 400)
                         }
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: UIScreen.main.bounds.width)
-                        .clipped()
                     }
                 }
 
