@@ -296,7 +296,7 @@ public class AcceleratedCheckoutButton: UIView {
     }
 
     private func presentCheckout(from viewController: UIViewController) {
-        guard let configuration = ShopifyAcceleratedCheckouts.currentConfiguration else { return }
+        guard let configuration = ShopifyAcceleratedCheckouts.configuration else { return }
 
         let presentingVC = presentationDelegate as? UIViewController ?? viewController
 

@@ -54,7 +54,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
         identifier = CheckoutIdentifier.cart(cartID: cartID).parse()
         self.delegate = delegate
 
-        guard let configuration = ShopifyAcceleratedCheckouts.currentConfiguration else {
+        guard let configuration = ShopifyAcceleratedCheckouts.configuration else {
             fatalError("ShopifyAcceleratedCheckouts must be configured before use. Call ShopifyAcceleratedCheckouts.configure() first.")
         }
         self.configuration = configuration
@@ -77,7 +77,7 @@ internal class AcceleratedCheckoutViewController: UIViewController {
         identifier = CheckoutIdentifier.variant(variantID: variantID, quantity: quantity).parse()
         self.delegate = delegate
 
-        guard let configuration = ShopifyAcceleratedCheckouts.currentConfiguration else {
+        guard let configuration = ShopifyAcceleratedCheckouts.configuration else {
             fatalError("ShopifyAcceleratedCheckouts must be configured before use. Call ShopifyAcceleratedCheckouts.configure() first.")
         }
         self.configuration = configuration

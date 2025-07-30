@@ -45,7 +45,7 @@ final class AcceleratedCheckoutButtonTests: XCTestCase {
     override func tearDown() {
         mockConfiguration = nil
         mockViewController = nil
-        ShopifyAcceleratedCheckouts.currentConfiguration = nil
+        ShopifyAcceleratedCheckouts.configuration = nil
         super.tearDown()
     }
 
@@ -152,8 +152,8 @@ final class AcceleratedCheckoutButtonTests: XCTestCase {
             config.storefrontAccessToken = testToken
         }
 
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.currentConfiguration?.storefrontDomain, testDomain)
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.currentConfiguration?.storefrontAccessToken, testToken)
+        XCTAssertEqual(ShopifyAcceleratedCheckouts.configuration?.storefrontDomain, testDomain)
+        XCTAssertEqual(ShopifyAcceleratedCheckouts.configuration?.storefrontAccessToken, testToken)
     }
 
     func testConfigurationViaObject() {
@@ -164,8 +164,8 @@ final class AcceleratedCheckoutButtonTests: XCTestCase {
 
         ShopifyAcceleratedCheckouts.configure(newConfig)
 
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.currentConfiguration?.storefrontDomain, newConfig.storefrontDomain)
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.currentConfiguration?.storefrontAccessToken, newConfig.storefrontAccessToken)
+        XCTAssertEqual(ShopifyAcceleratedCheckouts.configuration?.storefrontDomain, newConfig.storefrontDomain)
+        XCTAssertEqual(ShopifyAcceleratedCheckouts.configuration?.storefrontAccessToken, newConfig.storefrontAccessToken)
     }
 
     // MARK: - Delegate Tests
