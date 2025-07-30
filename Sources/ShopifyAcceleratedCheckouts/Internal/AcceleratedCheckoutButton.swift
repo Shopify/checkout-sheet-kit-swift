@@ -309,7 +309,6 @@ public class AcceleratedCheckoutButton: UIView {
                 self?.delegate?.checkoutDidFail(error: error)
             },
             checkoutDidCancel: { [weak self] in
-                presentingVC.dismiss(animated: true)
                 self?.delegate?.checkoutDidCancel()
             },
             shouldRecoverFromError: { [weak self] error in

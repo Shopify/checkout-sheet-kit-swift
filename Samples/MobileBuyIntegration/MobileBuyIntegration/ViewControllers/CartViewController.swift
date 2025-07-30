@@ -391,9 +391,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         container.addArrangedSubview(buttonStack)
 
-        // Add checkout button to container
-        container.addArrangedSubview(checkoutButton)
-
         // Add container to footer
         footerContainer.addSubview(container)
         acceleratedCheckoutContainer = container
@@ -444,14 +441,15 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         applePay.presentationDelegate = self
 
         // Configure appearance
-        shopPay.cornerRadius = 10
-        applePay.cornerRadius = 10
+        shopPay.cornerRadius = 12
+        applePay.cornerRadius = 12
 
         // Let buttons use their intrinsic content size
         shopPay.translatesAutoresizingMaskIntoConstraints = false
         applePay.translatesAutoresizingMaskIntoConstraints = false
 
         // Add buttons to stack
+        buttonStack.addArrangedSubview(checkoutButton)
         buttonStack.addArrangedSubview(shopPay)
         buttonStack.addArrangedSubview(applePay)
 
