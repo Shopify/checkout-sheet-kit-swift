@@ -23,7 +23,9 @@
 
 @preconcurrency import Buy
 import Combine
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
+import SwiftUI
 import UIKit
 
 class CartItemCell: UITableViewCell {
@@ -147,8 +149,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     private var emptyView: UIView!
     private var tableView: UITableView!
-    private var footerView: UIView!
+    private var buttonContainerView: UIView!
+    private var buttonStackView: UIStackView!
     private var checkoutButton: UIButton!
+    private var acceleratedCheckoutHostingController: UIHostingController<AnyView>?
 
     // MARK: Initializers
 
@@ -209,10 +213,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.delegate = self
         tableView.dataSource = self
 
-        // Create footer view
-        footerView = UIView()
-        footerView.translatesAutoresizingMaskIntoConstraints = false
-        footerView.backgroundColor = .systemBackground
+        // Create button container view
+        buttonContainerView = UIView()
+        buttonContainerView.backgroundColor = .systemBackground
+
+        // Create button stack view
+        buttonStackView = UIStackView()
+        buttonStackView.translatesAutoresizingMaskIntoConstraints = false
+        buttonStackView.axis = .vertical
+        buttonStackView.spacing = 16
+        buttonStackView.alignment = .fill
+        buttonStackView.distribution = .fill
 
         // Create checkout button
         checkoutButton = UIButton(type: .system)
@@ -221,13 +232,21 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         checkoutButton.backgroundColor = .systemBlue
         checkoutButton.setTitleColor(.white, for: .normal)
         checkoutButton.layer.cornerRadius = 8
+        checkoutButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
         checkoutButton.addTarget(self, action: #selector(presentCheckout), for: .touchUpInside)
+
+        // Add checkout button to stack view
+        buttonStackView.addArrangedSubview(checkoutButton)
+
+        // Add button stack to container view
+        buttonContainerView.addSubview(buttonStackView)
+
+        // Set as table footer view (scrolls with table content)
+        tableView.tableFooterView = buttonContainerView
 
         // Add subviews
         view.addSubview(emptyView)
         view.addSubview(tableView)
-        view.addSubview(footerView)
-        footerView.addSubview(checkoutButton)
 
         // Setup constraints
         NSLayoutConstraint.activate([
@@ -246,18 +265,102 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
 
-            // Footer view constraints
-            footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            footerView.heightAnchor.constraint(equalToConstant: 80),
-
-            // Checkout button constraints
-            checkoutButton.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 16),
-            checkoutButton.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -16),
-            checkoutButton.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 16),
-            checkoutButton.heightAnchor.constraint(equalToConstant: 48)
+            // Button stack view constraints within container view
+            buttonStackView.leadingAnchor.constraint(equalTo: buttonContainerView.leadingAnchor, constant: 16),
+            buttonStackView.trailingAnchor.constraint(equalTo: buttonContainerView.trailingAnchor, constant: -16),
+            buttonStackView.topAnchor.constraint(equalTo: buttonContainerView.topAnchor, constant: 16),
+            buttonStackView.bottomAnchor.constraint(equalTo: buttonContainerView.bottomAnchor, constant: -16)
         ])
+
+        // Add accelerated checkout buttons
+        setupAcceleratedCheckoutButtons()
+
+        // Update button container size
+        updateButtonContainerSize()
+    }
+
+    private func setupAcceleratedCheckoutButtons() {
+        guard let cartId = CartManager.shared.cart?.id else { return }
+
+        // Configure ShopifyAcceleratedCheckouts
+        let configuration = ShopifyAcceleratedCheckouts.Configuration(
+            storefrontDomain: InfoDictionary.shared.domain,
+            storefrontAccessToken: InfoDictionary.shared.accessToken
+        )
+
+        let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+            merchantIdentifier: "merchant.com.shopify.example.MobileBuyIntegration.ApplePay",
+            contactFields: [.email]
+        )
+
+        // Create accelerated checkout buttons
+        let acceleratedCheckoutButtonsView = AcceleratedCheckoutButtons(cartID: cartId.rawValue)
+            .wallets([.shopPay, .applePay])
+            .cornerRadius(8)
+            .onComplete { _ in
+                DispatchQueue.main.async {
+                    // Reset cart on successful checkout
+                    CartManager.shared.resetCart()
+                }
+            }
+            .onFail { error in
+                DispatchQueue.main.async {
+                    print("Accelerated checkout failed: \(error)")
+                }
+            }
+            .onCancel {
+                print("Accelerated checkout cancelled")
+            }
+            .environment(configuration)
+            .environment(applePayConfig)
+
+        // Wrap in AnyView and create hosting controller
+        let acceleratedCheckoutsController = UIHostingController(rootView: AnyView(acceleratedCheckoutButtonsView))
+        acceleratedCheckoutsController.view.translatesAutoresizingMaskIntoConstraints = false
+        acceleratedCheckoutsController.view.backgroundColor = .clear
+        acceleratedCheckoutsController.view.heightAnchor.constraint(equalToConstant: 44).isActive = true
+
+        // Add to button stack view
+        addChild(acceleratedCheckoutsController)
+        buttonStackView.insertArrangedSubview(acceleratedCheckoutsController.view, at: 0)
+        acceleratedCheckoutsController.didMove(toParent: self)
+
+        acceleratedCheckoutHostingController = acceleratedCheckoutsController
+
+        // Update button container size after adding buttons
+        updateButtonContainerSize()
+    }
+
+    private func updateButtonContainerSize() {
+        // Calculate required height for the button container
+        let buttonHeight: CGFloat = 48
+        let acceleratedButtonHeight: CGFloat = acceleratedCheckoutHostingController != nil ? 44 : 0
+        let spacing: CGFloat = acceleratedCheckoutHostingController != nil ? 16 : 0
+        let padding: CGFloat = 32 // 16 top + 16 bottom
+
+        let totalHeight = buttonHeight + acceleratedButtonHeight + spacing + padding
+
+        // Set the frame for the button container
+        buttonContainerView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: totalHeight)
+
+        // Update the table view's footer
+        tableView.tableFooterView = buttonContainerView
+    }
+
+    private func refreshAcceleratedCheckoutButtons() {
+        // Remove existing hosting controller if it exists
+        if let hostingController = acceleratedCheckoutHostingController {
+            buttonStackView.removeArrangedSubview(hostingController.view)
+            hostingController.view.removeFromSuperview()
+            hostingController.removeFromParent()
+            acceleratedCheckoutHostingController = nil
+        }
+
+        // Recreate with current cart
+        setupAcceleratedCheckoutButtons()
+
+        // Update container size
+        updateButtonContainerSize()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -268,12 +371,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         if let url = CartManager.shared.cart?.checkoutUrl {
             ShopifyCheckoutSheetKit.preload(checkout: url)
         }
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
-        tableView.contentInset.bottom = footerView.frame.size.height
     }
 
     // MARK: UITableViewDataSource
@@ -327,6 +424,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             tableView.reloadData()
             tableView.isHidden = totalQuantity <= 0
             checkoutButton.isHidden = totalQuantity <= 0
+
+            // Show/hide accelerated checkout buttons based on cart state
+            acceleratedCheckoutHostingController?.view.isHidden = totalQuantity <= 0
+
+            // Refresh accelerated checkout buttons when cart changes
+            if totalQuantity > 0 {
+                refreshAcceleratedCheckoutButtons()
+            } else {
+                // Update container size when cart is empty
+                updateButtonContainerSize()
+            }
 
             if #available(iOS 15.0, *) {
                 checkoutButton.configuration?
