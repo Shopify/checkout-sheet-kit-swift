@@ -50,7 +50,7 @@ class PassKitFactory {
         return paymentRequest
     }
 
-	func createPaymentSummaryItems() async -> [PKPaymentSummaryItem] {
+    func createPaymentSummaryItems() async -> [PKPaymentSummaryItem] {
         guard let cart = await CartManager.shared.cart else { return [] }
 
         var paymentSummaryItems: [PKPaymentSummaryItem] = []
@@ -69,7 +69,6 @@ class PassKitFactory {
             )
         }
 
-
         paymentSummaryItems.append(
             .init(
                 label: "Total",
@@ -81,7 +80,7 @@ class PassKitFactory {
         return paymentSummaryItems
     }
 
-	func createDefaultShippingMethod() async -> [PKShippingMethod] {
+    func createDefaultShippingMethod() async -> [PKShippingMethod] {
         #warning("Missing selectedDeliveryOption will throw out of this guard")
         guard
             let selectedDeliveryOption = await CartManager.shared.cart?.deliveryGroups
@@ -156,7 +155,6 @@ class PassKitFactory {
                 .init(label: "Shipping", amount: amount, type: .final)
             )
         }
-
 
         paymentSummaryItems.append(
             .init(
