@@ -50,6 +50,7 @@ struct ProductGridView: View {
                 }
             }
             .padding(.horizontal, 5)
+            .padding(.top, 10)
         }
         .onAppear {
             if productCache.collection == nil {
@@ -95,49 +96,91 @@ struct ProductSheetView: View {
 
 struct ProductGridItem: View {
     let product: Storefront.Product
-    let maxWidth = UIScreen.main.bounds.width / 2 - 10
+    let maxWidth = UIScreen.main.bounds.width / 2 - 20
 
     var body: some View {
         VStack {
             ZStack {
                 if let imageURL = product.featuredImage?.url {
-                    AsyncImage(url: imageURL) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    } placeholder: {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
+                    AsyncImage(url: thumbnailURL(from: imageURL)) { phase in
+                        switch phase {
+                        case .empty:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.1))
+                                .overlay(
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                        .tint(.gray)
+                                )
+                        case let .success(image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        case .failure:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.1))
+                                .overlay(
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 32))
+                                        .foregroundColor(.gray.opacity(0.6))
+                                )
+                        @unknown default:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.1))
+                        }
                     }
                 } else {
-                    ZStack {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
-
-                        Image(systemName: "photo.badge.exclamationmark")
-                            .font(.system(size: 40))
-                            .foregroundStyle(.white)
-                    }
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.1))
+                        .overlay(
+                            Image(systemName: "photo.badge.exclamationmark")
+                                .font(.system(size: 40))
+                                .foregroundStyle(.gray.opacity(0.6))
+                        )
                 }
             }
             .frame(maxWidth: maxWidth)
-            .frame(height: 150)
+            .frame(height: 180)
+            .background(Color.gray.opacity(0.05))
+            .cornerRadius(12)
             .clipped()
 
-            VStack {
+            VStack(spacing: 4) {
                 Text(product.title)
                     .font(.headline)
-                    .lineLimit(1)
-                    .padding(.top, 4)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 8)
 
                 if let price = product.variants.nodes.first?.price {
                     Text(price.formattedString()!)
-                        .font(.subheadline)
+                        .font(.footnote)
                         .foregroundColor(.secondary)
                 }
             }
             .frame(alignment: .leading)
+            .padding(.bottom, 16)
         }
+    }
+
+    // Generate thumbnail URL for faster loading in grid view
+    private func thumbnailURL(from originalURL: URL) -> URL {
+        let urlString = originalURL.absoluteString
+
+        // Shopify image transformation: add size parameters for thumbnail
+        // Target size: 300x300 (2x the display size for retina screens)
+        if urlString.contains("cdn.shopify.com") || urlString.contains("shopify.com") {
+            // Insert size parameters before file extension
+            if let lastDotIndex = urlString.lastIndex(of: ".") {
+                let baseURL = String(urlString[..<lastDotIndex])
+                let fileExtension = String(urlString[lastDotIndex...])
+                let thumbnailURLString = "\(baseURL)_300x300\(fileExtension)"
+                return URL(string: thumbnailURLString) ?? originalURL
+            }
+        }
+
+        // Fallback to original URL if transformation fails
+        return originalURL
     }
 }
 

@@ -25,8 +25,8 @@
 import PassKit
 import SwiftUI
 
-import ShopifyCheckoutSheetKit
 import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
 
 // swiftlint:disable opening_brace
 struct CartView: View {
@@ -48,6 +48,24 @@ struct CartView: View {
                 }
 
                 VStack(spacing: 10) {
+                    if let cartId = cartManager.cart?.id.rawValue {
+                        AcceleratedCheckoutButtons(cartID: cartId)
+                            .wallets([.shopPay, .applePay])
+                            .cornerRadius(10)
+                            .onComplete { _ in
+                                // Reset cart on successful checkout
+                                CartManager.shared.resetCart()
+                            }
+                            .onFail { error in
+                                print("Accelerated checkout failed: \(error)")
+                            }
+                            .onCancel {
+                                print("Accelerated checkout cancelled")
+                            }
+                            .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+                            .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+                    }
+
                     Button(
                         action: { showCheckoutSheet = true },
                         label: {
@@ -71,24 +89,6 @@ struct CartView: View {
                     .disabled(isBusy)
                     .foregroundColor(.white)
                     .accessibilityIdentifier("checkoutSheetButton")
-
-					if let cartId = cartManager.cart?.id.rawValue {
-						AcceleratedCheckoutButtons(cartID: cartId)
-							.wallets([.shopPay, .applePay])
-							.cornerRadius(10)
-							.onComplete { _ in
-								// Reset cart on successful checkout
-								CartManager.shared.resetCart()
-							}
-							.onFail { error in
-								print("Accelerated checkout failed: \(error)")
-							}
-							.onCancel {
-								print("Accelerated checkout cancelled")
-							}
-							.environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
-							.environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
-					}
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
@@ -99,7 +99,6 @@ struct CartView: View {
             .sheet(isPresented: $showCheckoutSheet) {
                 if let url = cartManager.cart?.checkoutUrl {
                     CheckoutSheet(checkout: url)
-                        .title("Checkout Sheet")
                         .colorScheme(.automatic)
                         .onCancel {
                             showCheckoutSheet = false

@@ -22,8 +22,8 @@
  */
 
 import Foundation
-import ShopifyCheckoutSheetKit
 import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
 
 public final class AppConfiguration: ObservableObject {
     public var storefrontDomain: String = InfoDictionary.shared.domain
@@ -37,15 +37,15 @@ public final class AppConfiguration: ObservableObject {
     let webPixelsLogger = FileLogger("analytics.txt")
 
     // Configure ShopifyAcceleratedCheckouts
-	let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
-		storefrontDomain: InfoDictionary.shared.domain,
-		storefrontAccessToken: InfoDictionary.shared.accessToken
-	)
+    let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
+        storefrontDomain: InfoDictionary.shared.domain,
+        storefrontAccessToken: InfoDictionary.shared.accessToken
+    )
 
-	let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-		merchantIdentifier: "merchant.com.shopify.example.MobileBuyIntegration.ApplePay",
-		contactFields: [.email]
-	)
+    let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+        merchantIdentifier: "merchant.com.shopify.example.MobileBuyIntegration.ApplePay",
+        contactFields: [.email]
+    )
 }
 
 public var appConfiguration = AppConfiguration() {

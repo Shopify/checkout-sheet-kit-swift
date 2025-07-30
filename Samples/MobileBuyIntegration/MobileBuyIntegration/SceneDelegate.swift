@@ -44,6 +44,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
     let settingsController = UIHostingController(rootView: SettingsView())
 
+    // Store cart button views for badge updates
+    private var catalogCartButton: UIView?
+    private var galleryCartButton: UIView?
+
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
@@ -91,23 +95,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
         productGridController.tabBarItem.title = "Catalog"
         productGridController.navigationItem.titleView = logoImageView
-        productGridController.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "cart"),
-            style: .plain,
-            target: self,
-            action: #selector(presentUIKitCartInSheet)
-        )
+        catalogCartButton = createCartButtonWithBadge()
+        productGridController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: catalogCartButton!)
 
         /// Product Gallery
         productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
         productGalleryController.tabBarItem.title = "Products"
         productGalleryController.navigationItem.titleView = logoImageView
-        productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "cart"),
-            style: .plain,
-            target: self,
-            action: #selector(presentUIKitCartInSheet)
-        )
+        galleryCartButton = createCartButtonWithBadge()
+        productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: galleryCartButton!)
 
         /// Cart (UI Kit)
         swiftUICartController.tabBarItem.image = UIImage(systemName: "cart")
@@ -163,12 +159,61 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 if let cart, cart.lines.nodes.count > 0 {
                     DispatchQueue.main.async {
                         self.swiftUICartController.tabBarItem.badgeValue = "\(cart.totalQuantity)"
+                        self.updateCartButtonBadges(count: Int(cart.totalQuantity))
                     }
                 } else {
                     self.swiftUICartController.tabBarItem.badgeValue = nil
+                    self.updateCartButtonBadges(count: 0)
                 }
             }
             .store(in: &cancellables)
+    }
+
+    private func createCartButtonWithBadge() -> UIView {
+        let containerView = UIView()
+        containerView.frame = CGRect(x: 0, y: 0, width: 44, height: 44)
+
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "cart"), for: .normal)
+        button.tintColor = ColorPalette.primaryColor
+        button.frame = CGRect(x: 0, y: 0, width: 44, height: 44)
+        button.addTarget(self, action: #selector(presentUIKitCartInSheet), for: .touchUpInside)
+
+        let badgeLabel = UILabel()
+        badgeLabel.backgroundColor = .systemRed
+        badgeLabel.textColor = .white
+        badgeLabel.font = UIFont.systemFont(ofSize: 12, weight: .bold)
+        badgeLabel.textAlignment = .center
+        badgeLabel.layer.cornerRadius = 10
+        badgeLabel.clipsToBounds = true
+        badgeLabel.frame = CGRect(x: 25, y: 5, width: 20, height: 20)
+        badgeLabel.isHidden = true
+
+        containerView.addSubview(button)
+        containerView.addSubview(badgeLabel)
+
+        return containerView
+    }
+
+    private func updateCartButtonBadges(count: Int) {
+        let badgeText = count > 0 ? "\(count)" : ""
+        let shouldShow = count > 0
+
+        // Update catalog cart button badge
+        if let catalogButton = catalogCartButton,
+           let badgeLabel = catalogButton.viewWithTag(999) as? UILabel
+        {
+            badgeLabel.text = badgeText
+            badgeLabel.isHidden = !shouldShow
+        }
+
+        // Update gallery cart button badge
+        if let galleryButton = galleryCartButton,
+           let badgeLabel = galleryButton.viewWithTag(999) as? UILabel
+        {
+            badgeLabel.text = badgeText
+            badgeLabel.isHidden = !shouldShow
+        }
     }
 
     func scene(_: UIScene, continue userActivity: NSUserActivity) {
