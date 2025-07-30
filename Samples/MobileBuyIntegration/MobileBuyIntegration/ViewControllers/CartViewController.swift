@@ -222,7 +222,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         buttonStackView = UIStackView()
         buttonStackView.translatesAutoresizingMaskIntoConstraints = false
         buttonStackView.axis = .vertical
-        buttonStackView.spacing = 8 // Spacing between accelerated checkout and main checkout button
+        buttonStackView.spacing = 6 // Spacing between accelerated checkout and main checkout button
         buttonStackView.alignment = .fill
         buttonStackView.distribution = .fill
 
@@ -233,9 +233,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         checkoutButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
         checkoutButton.backgroundColor = ColorPalette.primaryColor
         checkoutButton.setTitleColor(.white, for: .normal)
-        // Handle disabled state background color
-        checkoutButton.setBackgroundColor(.lightGray, for: .disabled)
         checkoutButton.layer.cornerRadius = 10
+        // Ensure corner radius is maintained for all states
+        checkoutButton.layer.masksToBounds = true
         // We'll set up custom layout for text and amount
         checkoutButton.contentHorizontalAlignment = .fill
         checkoutButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
@@ -291,6 +291,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     private func setupCheckoutButtonContent() {
         // Remove any existing custom views
         checkoutButton.subviews.forEach { $0.removeFromSuperview() }
+
+        // Update button background color based on enabled state
+        checkoutButton.backgroundColor = checkoutButton.isEnabled ? ColorPalette.primaryColor : .lightGray
 
         // Create container view
         let containerView = UIView()
@@ -671,17 +674,4 @@ struct AnalyticsEvent: Codable {
 
 struct CustomPixelEventData: Codable {
     var customAttribute = 0.0
-}
-
-extension UIButton {
-    func setBackgroundColor(_ color: UIColor, for state: UIControl.State) {
-        UIGraphicsBeginImageContext(CGSize(width: 1, height: 1))
-        if let context = UIGraphicsGetCurrentContext() {
-            context.setFillColor(color.cgColor)
-            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
-            let colorImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            setBackgroundImage(colorImage, for: state)
-        }
-    }
 }
