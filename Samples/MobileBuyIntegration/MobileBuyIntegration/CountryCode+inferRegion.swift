@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Buy
+@preconcurrency import Buy
 import Foundation
 
 extension Storefront.CountryCode {
@@ -30,7 +30,7 @@ extension Storefront.CountryCode {
             if let regionCode = Locale.current.region?.identifier {
                 return Storefront.CountryCode(rawValue: regionCode) ?? .ca
             }
-        } else if #available(iOS 13, *) {
+        } else {
             if let regionCode = Locale.current.regionCode {
                 return Storefront.CountryCode(rawValue: regionCode) ?? .ca
             }

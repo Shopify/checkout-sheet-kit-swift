@@ -21,14 +21,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Buy
+@preconcurrency import Buy
+import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 import UIKit
 
 typealias PaymentCompletionHandler = (Bool) -> Void
 
-class ApplePayHandler: NSObject {
+class ApplePayHandler: NSObject, @unchecked Sendable {
     // MARK: Properties
 
     /// Starts as nil when no payment status has been made
@@ -63,21 +64,25 @@ class ApplePayHandler: NSObject {
     func startApplePayCheckout(completion: @escaping PaymentCompletionHandler) {
         paymentCompletionHandler = completion
 
-        let paymentSummaryItems = PassKitFactory.shared.createPaymentSummaryItems()
+        _Concurrency.Task {
+            let paymentSummaryItems = await PassKitFactory.shared.createPaymentSummaryItems()
 
-        let paymentRequest = PassKitFactory.shared.createPaymentRequest(
-            paymentSummaryItems: paymentSummaryItems
-        )
+            let paymentRequest = await PassKitFactory.shared.createPaymentRequest(
+                paymentSummaryItems: paymentSummaryItems
+            )
 
-        // Display the payment request.
-        let paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
-        paymentController.delegate = self
-        paymentController.present(completion: { (presented: Bool) in
-            if !presented {
-                debugPrint("Failed to present payment controller, falling back to CSK")
-                self.paymentCompletionHandler?(false)
+            // Display the payment request.
+            await MainActor.run {
+                let paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
+                paymentController.delegate = self
+                paymentController.present(completion: { (presented: Bool) in
+                    if !presented {
+                        debugPrint("Failed to present payment controller, falling back to CSK")
+                        self.paymentCompletionHandler?(false)
+                    }
+                })
             }
-        })
+        }
     }
 }
 

@@ -41,7 +41,9 @@ public final class AppConfiguration: ObservableObject {
 
 public var appConfiguration = AppConfiguration() {
     didSet {
-        CartManager.shared.resetCart()
+        Task { @MainActor in
+            CartManager.shared.resetCart()
+        }
     }
 }
 

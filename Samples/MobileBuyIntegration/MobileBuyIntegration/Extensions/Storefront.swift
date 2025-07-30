@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Buy
+@preconcurrency import Buy
 
 extension Storefront.CartDeliveryGroupQuery {
     @discardableResult
@@ -102,10 +102,6 @@ extension Storefront.CartQuery {
                         .currencyCode()
                 }
                 .subtotalAmount {
-                    $0.amount()
-                        .currencyCode()
-                }
-                .totalTaxAmount {
                     $0.amount()
                         .currencyCode()
                 }
