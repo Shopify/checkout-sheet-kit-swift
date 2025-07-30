@@ -131,10 +131,6 @@ struct CartView: View {
 
         CheckoutController.shared?.present(checkout: url)
     }
-
-    private func handleApplePayPress() {
-        CheckoutController.shared?.payWithApplePay()
-    }
 }
 
 // swiftlint:enable opening_brace
