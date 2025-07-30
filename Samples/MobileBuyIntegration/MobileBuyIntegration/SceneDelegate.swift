@@ -38,7 +38,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var cancellables: Set<AnyCancellable> = []
 
-    let cartController = UIHostingController(rootView: CartView())
+//    let cartController = UIHostingController(rootView: CartView())
+    let cartController = CartViewController()
     let productGridController = UIHostingController(rootView: ProductGridView())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
     let settingsController = UIHostingController(rootView: SettingsView())

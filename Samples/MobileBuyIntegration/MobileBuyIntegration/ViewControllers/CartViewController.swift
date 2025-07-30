@@ -145,13 +145,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     private var bag = Set<AnyCancellable>()
 
-    @IBOutlet private var emptyView: UIView!
-
-    @IBOutlet private var tableView: UITableView!
-
-    @IBOutlet private var footerView: UIView!
-
-    @IBOutlet private var checkoutButton: UIButton!
+    private var emptyView: UIView!
+    private var tableView: UITableView!
+    private var footerView: UIView!
+    private var checkoutButton: UIButton!
 
     // MARK: Initializers
 
@@ -180,6 +177,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupUI()
+
         tableView.register(
             UITableViewCell.self, forCellReuseIdentifier: "CartItemCell"
         )
@@ -187,6 +186,78 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.rowHeight = 80
 
         cartDidUpdate()
+    }
+
+    private func setupUI() {
+        view.backgroundColor = .systemBackground
+
+        // Create empty view
+        emptyView = UIView()
+        emptyView.translatesAutoresizingMaskIntoConstraints = false
+        emptyView.backgroundColor = .systemBackground
+
+        let emptyLabel = UILabel()
+        emptyLabel.text = "Your cart is empty"
+        emptyLabel.textAlignment = .center
+        emptyLabel.textColor = .secondaryLabel
+        emptyLabel.translatesAutoresizingMaskIntoConstraints = false
+        emptyView.addSubview(emptyLabel)
+
+        // Create table view
+        tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.delegate = self
+        tableView.dataSource = self
+
+        // Create footer view
+        footerView = UIView()
+        footerView.translatesAutoresizingMaskIntoConstraints = false
+        footerView.backgroundColor = .systemBackground
+
+        // Create checkout button
+        checkoutButton = UIButton(type: .system)
+        checkoutButton.translatesAutoresizingMaskIntoConstraints = false
+        checkoutButton.setTitle("Checkout", for: .normal)
+        checkoutButton.backgroundColor = .systemBlue
+        checkoutButton.setTitleColor(.white, for: .normal)
+        checkoutButton.layer.cornerRadius = 8
+        checkoutButton.addTarget(self, action: #selector(presentCheckout), for: .touchUpInside)
+
+        // Add subviews
+        view.addSubview(emptyView)
+        view.addSubview(tableView)
+        view.addSubview(footerView)
+        footerView.addSubview(checkoutButton)
+
+        // Setup constraints
+        NSLayoutConstraint.activate([
+            // Empty view constraints
+            emptyView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            emptyView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+
+            emptyLabel.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
+            emptyLabel.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor),
+
+            // Table view constraints
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+
+            // Footer view constraints
+            footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            footerView.heightAnchor.constraint(equalToConstant: 80),
+
+            // Checkout button constraints
+            checkoutButton.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 16),
+            checkoutButton.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -16),
+            checkoutButton.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 16),
+            checkoutButton.heightAnchor.constraint(equalToConstant: 48)
+        ])
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -264,13 +335,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
 
-    @IBAction private func presentCheckout() {
+    @objc private func presentCheckout() {
         guard let url = CartManager.shared.cart?.checkoutUrl else { return }
 
         ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
     }
 
-    @IBAction private func resetCart() {
+    @objc private func resetCart() {
         CartManager.shared.resetCart()
     }
 
