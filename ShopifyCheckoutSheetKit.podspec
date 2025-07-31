@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.version = "3.3.0"
+  s.version = "3.4.0-rc.1"
 
   s.name    = "ShopifyCheckoutSheetKit"
   s.summary = "Enables Swift apps to embed the Shopify's highest converting, customizable, one-page checkout."
@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.swift_version = "5.0"
 
   s.ios.deployment_target = "13.0"
-  
+
   s.pod_target_xcconfig = {
     'OTHER_SWIFT_FLAGS' => '-package-name ShopifyCheckoutSheetKit -module-alias Common=ShopifyCheckoutSheetKit'
   }
