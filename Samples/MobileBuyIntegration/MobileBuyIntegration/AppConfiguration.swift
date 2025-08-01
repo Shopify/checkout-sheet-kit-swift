@@ -22,6 +22,7 @@
  */
 
 import Foundation
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 
 public final class AppConfiguration: ObservableObject {
@@ -35,8 +36,16 @@ public final class AppConfiguration: ObservableObject {
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
 
-    // Displays the Checkout with ApplePay button
-    @Published var applePayEnabled: Bool = true
+    // Configure ShopifyAcceleratedCheckouts
+    let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
+        storefrontDomain: InfoDictionary.shared.domain,
+        storefrontAccessToken: InfoDictionary.shared.accessToken
+    )
+
+    let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+        merchantIdentifier: "merchant.com.shopify.example.MobileBuyIntegration.ApplePay",
+        contactFields: [.email]
+    )
 }
 
 public var appConfiguration = AppConfiguration() {
