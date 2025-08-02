@@ -33,6 +33,12 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
+    
+    // MARK: - Embedded Checkout Events (Schema 2025-04)
+    func checkoutViewDidChangeState(state: CheckoutStatePayload)
+    func checkoutViewDidComplete(payload: CheckoutCompletePayload)
+    func checkoutViewDidFail(errors: [ErrorPayload])
+    func checkoutViewDidEmitWebPixelEvent(payload: WebPixelsPayload)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
@@ -130,6 +136,8 @@ class CheckoutWebView: WKWebView {
     var isPreloadRequest: Bool = false
 
     private var entryPoint: MetaData.EntryPoint?
+    
+    var checkoutOptions: CheckoutOptions?
 
     // MARK: Initializers
 
@@ -232,7 +240,10 @@ class CheckoutWebView: WKWebView {
 
     func load(checkout url: URL, isPreload: Bool = false) {
         OSLogger.shared.info("Loading checkout URL: \(url.absoluteString), isPreload: \(isPreload)")
-        var request = URLRequest(url: url)
+        
+        // Build URL with embed query parameter if needed
+        let finalURL = buildCheckoutURL(from: url, options: checkoutOptions)
+        var request = URLRequest(url: finalURL)
 
         if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
@@ -240,6 +251,33 @@ class CheckoutWebView: WKWebView {
         }
 
         load(request)
+    }
+    
+    private func buildCheckoutURL(from originalURL: URL, options: CheckoutOptions?) -> URL {
+        // Get authentication token if provided
+        var authToken: String?
+        if let appAuth = options?.appAuthentication {
+            switch appAuth {
+            case .token(let token):
+                authToken = token
+            }
+        }
+        
+        // Only add embed parameter if we have options (indicating embedded checkout)
+        guard options != nil else {
+            return originalURL
+        }
+
+        // Get embed params string with authentication token
+        let embedValue = CheckoutBridge.embedParams(authToken: authToken)
+
+        // Add the embed parameter to the URL
+        var components = URLComponents(url: originalURL, resolvingAgainstBaseURL: false)
+        var queryItems = components?.queryItems ?? []
+        queryItems.append(URLQueryItem(name: "embed", value: embedValue))
+        components?.queryItems = queryItems
+
+        return components?.url ?? originalURL
     }
 
     private func dispatchPresentedMessage(_ checkoutDidLoad: Bool, _ checkoutDidPresent: Bool) {
@@ -253,11 +291,52 @@ class CheckoutWebView: WKWebView {
 
 extension CheckoutWebView: WKScriptMessageHandler {
     func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let body = message.body as? String else {
+            OSLogger.shared.error("Invalid script message body")
+            return
+        }
+
+        // Try to decode as JSON first for embedded checkout events
+        if let eventData = try? JSONSerialization.jsonObject(with: Data(body.utf8), options: []) as? [String: Any],
+           let eventName = eventData["name"] as? String {
+            
+            switch eventName {
+            case "stateChange":
+                OSLogger.shared.info("Embedded checkout state change event received")
+                handleStateChangeEvent(eventData)
+                return
+            case "completed":
+                OSLogger.shared.info("Embedded checkout completed event received")  
+                if handleEmbeddedCompletedEvent(eventData) {
+                    return
+                }
+                // Fall through to legacy handling if embedded handling fails
+            case "error":
+                OSLogger.shared.error("Embedded checkout error event received")
+                if handleEmbeddedErrorEvent(eventData) {
+                    return
+                }
+                // Fall through to legacy handling if embedded handling fails
+            case "webPixels":
+                OSLogger.shared.info("Embedded checkout web pixels event received")
+                handleEmbeddedWebPixelEvent(eventData)
+                return
+            case "checkoutBlockingEvent":
+                if let modalVisible = eventData["body"] as? String, let visible = Bool(modalVisible) {
+                    viewDelegate?.checkoutViewDidToggleModal(modalVisible: visible)
+                }
+                return
+            default:
+                break
+            }
+        }
+        
+        // Fall back to legacy CheckoutBridge decoding for existing events
         do {
             switch try CheckoutBridge.decode(message) {
-            /// Completed event
+            /// Completed event  
             case let .checkoutComplete(checkoutCompletedEvent):
-                OSLogger.shared.info("Checkout completed event received")
+                OSLogger.shared.info("Legacy checkout completed event received")
                 viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
             /// Error: Checkout unavailable
             case let .checkoutUnavailable(message, code):
@@ -290,11 +369,103 @@ extension CheckoutWebView: WKScriptMessageHandler {
                     viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
                 }
             default:
-                ()
+                OSLogger.shared.debug("Unsupported legacy event")
             }
         } catch {
             OSLogger.shared.error("Error decoding bridge script message: \(error.localizedDescription)")
             viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+        }
+    }
+    
+    // MARK: - Embedded Checkout Event Handlers
+    
+    private func handleStateChangeEvent(_ event: [String: Any]) {
+        guard let statePayload = decodeStateChangePayload(from: event) else {
+            OSLogger.shared.error("Failed to decode state change payload")
+            return
+        }
+        viewDelegate?.checkoutViewDidChangeState(state: statePayload)
+    }
+    
+    private func handleEmbeddedCompletedEvent(_ event: [String: Any]) -> Bool {
+        guard let embeddedPayload = decodeEmbeddedCompletePayload(from: event) else {
+            return false
+        }
+        viewDelegate?.checkoutViewDidComplete(payload: embeddedPayload)
+        return true
+    }
+    
+    private func handleEmbeddedErrorEvent(_ event: [String: Any]) -> Bool {
+        guard let embeddedErrors = decodeEmbeddedErrorPayload(from: event) else {
+            return false
+        }
+        viewDelegate?.checkoutViewDidFail(errors: embeddedErrors)
+        return true
+    }
+    
+    private func handleEmbeddedWebPixelEvent(_ event: [String: Any]) {
+        guard let embeddedPayload = decodeEmbeddedWebPixelPayload(from: event) else {
+            OSLogger.shared.error("Failed to decode embedded checkout web pixel payload")
+            return
+        }
+        viewDelegate?.checkoutViewDidEmitWebPixelEvent(payload: embeddedPayload)
+    }
+    
+    // MARK: - Embedded Checkout Decoders
+    
+    private func decodeEmbeddedCompletePayload(from event: [String: Any]) -> CheckoutCompletePayload? {
+        guard let messageBody = event["body"] as? String,
+              let data = messageBody.data(using: .utf8) else {
+            return nil
+        }
+
+        do {
+            return try JSONDecoder().decode(CheckoutCompletePayload.self, from: data)
+        } catch {
+            OSLogger.shared.debug("Failed to decode as embedded complete payload: \(error)")
+            return nil
+        }
+    }
+
+    private func decodeEmbeddedWebPixelPayload(from event: [String: Any]) -> WebPixelsPayload? {
+        guard let messageBody = event["body"] as? String,
+              let data = messageBody.data(using: .utf8) else {
+            return nil
+        }
+
+        do {
+            return try JSONDecoder().decode(WebPixelsPayload.self, from: data)
+        } catch {
+            OSLogger.shared.debug("Failed to decode as embedded web pixel payload: \(error)")
+            return nil
+        }
+    }
+
+    private func decodeStateChangePayload(from event: [String: Any]) -> CheckoutStatePayload? {
+        guard let messageBody = event["body"] as? String,
+              let data = messageBody.data(using: .utf8) else {
+            return nil
+        }
+
+        do {
+            return try JSONDecoder().decode(CheckoutStatePayload.self, from: data)
+        } catch {
+            OSLogger.shared.error("Failed to decode state change payload: \(error)")
+            return nil
+        }
+    }
+
+    private func decodeEmbeddedErrorPayload(from event: [String: Any]) -> [ErrorPayload]? {
+        guard let messageBody = event["body"] as? String,
+              let data = messageBody.data(using: .utf8) else {
+            return nil
+        }
+
+        do {
+            return try JSONDecoder().decode([ErrorPayload].self, from: data)
+        } catch {
+            OSLogger.shared.debug("Failed to decode as embedded error payload: \(error)")
+            return nil
         }
     }
 }
