@@ -1,11 +1,13 @@
-# Shopify Checkout Sheet Kit - Swift
+# Shopify Checkout Kit - Swift
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/LICENSE) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-2ebb4e.svg?style=flat)](https://swift.org/package-manager/) ![Tests](https://github.com/shopify/checkout-sheet-kit-swift/actions/workflows/test-sdk.yml/badge.svg?branch=main) [![GitHub Release](https://img.shields.io/github/release/shopify/checkout-sheet-kit-swift.svg?style=flat)]()
 ![image](https://github.com/Shopify/checkout-sheet-kit-swift/assets/2034704/fae4e6e4-0e83-44ab-b65a-c2bceca1afc3)
 
-**Shopify Checkout Sheet Kit** is a Swift Package library that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Sheet Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
+**Shopify Checkout Kit** is a Swift Package library that enables Swift apps to provide the world’s highest converting, customizable, one-page checkout within the app. The presented experience is a fully-featured checkout that preserves all of the store customizations: Checkout UI extensions, Functions, branding, and more. It also provides platform idiomatic defaults such as support for light and dark mode, and convenient developer APIs to embed, customize, and follow the lifecycle of the checkout experience. Check out our blog to [learn how and why we built the Checkout Kit](https://www.shopify.com/partners/blog/mobile-checkout-sdks-for-ios-and-android).
 
-- [Shopify Checkout Sheet Kit - Swift](#shopify-checkout-sheet-kit---swift)
+**Note**: We're in the process of renaming "Checkout Sheet Kit" to "Checkout Kit." The dev docs and README already use the new name, while the package itself will be updated in an upcoming version.
+
+- [Shopify Checkout Kit - Swift](#shopify-checkout-sheet-kit---swift)
   - [Requirements](#requirements)
   - [Getting Started](#getting-started)
     - [Package.swift](#packageswift)
@@ -222,7 +224,7 @@ ShopifyCheckoutSheetKit.configuration.backgroundColor = .systemBackground
 
 ### `title`
 
-By default, the Checkout Sheet Kit will look for a `shopify_checkout_sheet_title` key in a `Localizable.xcstrings` file to set the sheet title, otherwise it will fallback to "Checkout" across all locales.
+By default, the Checkout Kit will look for a `shopify_checkout_sheet_title` key in a `Localizable.xcstrings` file to set the sheet title, otherwise it will fallback to "Checkout" across all locales.
 
 The title of the sheet can be customized by either setting a value for the `shopify_checkout_sheet_title` key in the `Localizable.xcstrings` file for your application or by configuring the `title` property of the `ShopifyCheckoutSheetKit.configuration` object manually.
 
@@ -473,7 +475,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
 
 ## Error handling
 
-In the event of a checkout error occurring, the Checkout Sheet Kit _may_ attempt a retry to recover from the error. Recovery will happen in the background by discarding the failed webview and creating a new "recovery" instance. Recovery will be attempted in the following scenarios:
+In the event of a checkout error occurring, the Checkout Kit _may_ attempt a retry to recover from the error. Recovery will happen in the background by discarding the failed webview and creating a new "recovery" instance. Recovery will be attempted in the following scenarios:
 
 - The webview receives a response with a 5XX status code
 - An internal SDK error is emitted
@@ -499,7 +501,7 @@ func shouldRecoverFromError(error: CheckoutError) {
 | `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                         |
 | `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                      |
 | `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                  |
-| `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Sheet Kit for usage with password protected stores. |
+| `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Kit for usage with password protected stores. |
 | `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                              |
 | `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                    |
 | `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                           |
@@ -572,4 +574,4 @@ We welcome code contributions, feature requests, and reporting of issues. Please
 
 ## License
 
-Shopify's Checkout Sheet Kit is provided under an [MIT License](LICENSE).
+Shopify's Checkout Kit is provided under an [MIT License](LICENSE).
