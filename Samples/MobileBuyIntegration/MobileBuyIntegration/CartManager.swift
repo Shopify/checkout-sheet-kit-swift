@@ -100,6 +100,7 @@ class CartManager: ObservableObject {
             }
 
             self.cart = cart
+            isDirty = true
 
             return cart
         } catch {
@@ -141,6 +142,7 @@ class CartManager: ObservableObject {
             }
 
             self.cart = cart
+            isDirty = true
 
             return cart
         } catch {
@@ -206,6 +208,7 @@ class CartManager: ObservableObject {
             }
 
             self.cart = cart
+            isDirty = true
 
             return cart
         } catch {
@@ -238,219 +241,11 @@ class CartManager: ObservableObject {
             }
 
             self.cart = cart
+            isDirty = true
 
             return cart
         } catch {
             throw Errors.apiErrors(requestName: "cartCreate", message: "\(error)")
-        }
-    }
-
-    func performCartSelectedDeliveryOptionsUpdate(
-        deliveryOptionHandle: String
-    ) async throws -> Storefront.Cart {
-        guard let cartId = cart?.id else {
-            throw Errors.invariant(message: "cart.id should be defined")
-        }
-
-        guard let deliveryGroupId = cart?.deliveryGroups.nodes.first?.id else {
-            throw Errors.invariant(message: "deliveryGroups.length should be greater than zero")
-        }
-
-        let cartSelectedDeliveryOptionInput =
-            Storefront.CartSelectedDeliveryOptionInput(
-                deliveryGroupId: deliveryGroupId,
-                deliveryOptionHandle: deliveryOptionHandle
-            )
-
-        let mutation = Storefront.buildMutation(
-            inContext: CartManager.ContextDirective
-        ) {
-            $0.cartSelectedDeliveryOptionsUpdate(
-                cartId: cartId,
-                selectedDeliveryOptions: [cartSelectedDeliveryOptionInput]
-            ) {
-                $0.cart { $0.cartManagerFragment() }
-                    .userErrors {
-                        $0.code().message()
-                    }
-            }
-        }
-
-        do {
-            guard
-                let payload = try await client.executeAsync(mutation: mutation)
-                .cartSelectedDeliveryOptionsUpdate
-            else { throw CartManager.Errors.payloadUnwrap }
-
-            guard payload.userErrors.isEmpty else {
-                throw CartManager.Errors.invariant(
-                    message: CartManager.userErrorMessage(errors: payload.userErrors)
-                )
-            }
-
-            guard let cart = payload.cart else {
-                throw Errors.invariant(message: "cart returned nil")
-            }
-
-            self.cart = cart
-
-            return cart
-        } catch {
-            throw Errors.apiErrors(
-                requestName: "cartSelectedDeliveryOptionsUpdate",
-                message: "\(error)"
-            )
-        }
-    }
-
-    func performCartPaymentUpdate(
-        payment: PKPayment // REFACTOR: this method should just receive the decoded payment token
-    ) async throws -> Storefront.Cart {
-        guard let cartId = cart?.id else {
-            throw Errors.invariant(message: "cart.id should be defined")
-        }
-
-        guard
-            let billingContact = payment.billingContact,
-            let billingPostalAddress = billingContact.postalAddress
-        else {
-            throw Errors.invariant(message: "billingContact is nil")
-        }
-
-        guard let totalAmount = cart?.cost.totalAmount else {
-            throw Errors.invariant(message: "cart?.cost.totalAmount is nil")
-        }
-
-        guard let paymentData = decodePaymentData(payment: payment) else {
-            throw Errors.invalidPaymentData
-        }
-
-        let paymentInput = StorefrontInputFactory.shared.createPaymentInput(
-            payment: payment,
-            paymentData: paymentData,
-            totalAmount: totalAmount,
-            billingContact: billingContact,
-            billingPostalAddress: billingPostalAddress
-        )
-
-        let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
-            $0.cartPaymentUpdate(cartId: cartId, payment: paymentInput) {
-                $0.cart { $0.cartManagerFragment() }
-                    .userErrors {
-                        $0.code().message()
-                    }
-            }
-        }
-
-        do {
-            guard
-                let payload = try await client.executeAsync(mutation: mutation).cartPaymentUpdate
-            else { throw CartManager.Errors.payloadUnwrap }
-
-            guard payload.userErrors.isEmpty else {
-                throw CartManager.Errors.invariant(
-                    message: CartManager.userErrorMessage(errors: payload.userErrors)
-                )
-            }
-
-            guard let cart = payload.cart else {
-                throw Errors.invariant(message: "cart returned nil")
-            }
-
-            self.cart = cart
-
-            return cart
-        } catch {
-            throw Errors.apiErrors(requestName: "cartPaymentUpdate", message: "\(error)")
-        }
-    }
-
-    func performCartPrepareForCompletion() async throws -> Storefront.Cart {
-        guard let cartId = cart?.id else {
-            throw Errors.invariant(message: "cart.id should be defined")
-        }
-
-        let mutation = Storefront.buildMutation(
-            inContext: CartManager.ContextDirective
-        ) {
-            $0.cartPrepareForCompletion(cartId: cartId) {
-                $0.result {
-                    $0.onCartStatusReady { $0.cart { $0.cartManagerFragment() } }
-                    $0.onCartThrottled { $0.pollAfter() }
-                    $0.onCartStatusNotReady {
-                        $0.cart { $0.cartManagerFragment() }
-                            .errors { $0.code().message() }
-                    }
-                }.userErrors { $0.code().message() }
-            }
-        }
-
-        do {
-            guard
-                let payload = try await client.executeAsync(mutation: mutation)
-                .cartPrepareForCompletion
-            else { throw CartManager.Errors.payloadUnwrap }
-
-            guard payload.userErrors.isEmpty else {
-                throw CartManager.Errors.invariant(
-                    message: CartManager.userErrorMessage(errors: payload.userErrors)
-                )
-            }
-
-            guard
-                let result = payload.result as? Storefront.CartStatusReady,
-                let cart = result.cart
-            else {
-                throw Errors.invariant(
-                    message: "CartPrepareForCompletionResult is not CartStatusReady")
-            }
-
-            self.cart = cart
-
-            return cart
-        } catch {
-            throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
-        }
-    }
-
-    func performCartSubmitForCompletion() async throws -> Storefront.SubmitSuccess {
-        guard let cartId = cart?.id else {
-            throw Errors.invariant(message: "cart.id should be defined")
-        }
-
-        let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
-            $0.cartSubmitForCompletion(cartId: cartId, attemptToken: UUID().uuidString) {
-                $0.result {
-                    $0.onSubmitSuccess { $0.redirectUrl() }
-                    $0.onSubmitFailed { $0.checkoutUrl() }
-                    $0.onSubmitAlreadyAccepted { $0.attemptId() }
-                    $0.onSubmitThrottled { $0.pollAfter() }
-                }
-                .userErrors { $0.code().message() }
-            }
-        }
-
-        do {
-            guard
-                let payload = try await client.executeAsync(mutation: mutation)
-                .cartSubmitForCompletion
-            else { throw CartManager.Errors.payloadUnwrap }
-
-            guard payload.userErrors.isEmpty else {
-                throw CartManager.Errors.invariant(
-                    message: CartManager.userErrorMessage(errors: payload.userErrors)
-                )
-            }
-
-            guard let submissionResult = payload.result as? Storefront.SubmitSuccess else {
-                throw Errors.invariant(message: "submit result is not of type SubmitSuccess")
-            }
-
-            cart = nil
-
-            return submissionResult
-        } catch {
-            throw Errors.apiErrors(requestName: "cartSubmitForCompletion", message: "\(error)")
         }
     }
 
