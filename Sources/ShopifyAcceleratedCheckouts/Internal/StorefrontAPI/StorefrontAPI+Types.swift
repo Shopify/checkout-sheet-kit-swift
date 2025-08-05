@@ -236,7 +236,7 @@ extension StorefrontAPI {
     /// Discount application target type
     enum DiscountApplicationTargetType: String, Codable {
         case lineItem = "LINE_ITEM"
-        case shipping = "SHIPPING"
+        case shippingLine = "SHIPPING_LINE"
     }
 
     /// Pricing value (union type for percentage or fixed amount)
