@@ -43,6 +43,25 @@ class CheckoutController: UIViewController {
 
     public func present(checkout url: URL) {
         if let rootViewController = window?.topMostViewController() {
+            OSLogger.shared.debug("[CheckoutController] Presenting checkout with URL: \(url)")
+            
+            // Log cart attributes before presenting checkout
+            if let cart = CartManager.shared.cart {
+                OSLogger.shared.debug("[CheckoutController] Cart ID before checkout: \(cart.id.rawValue)")
+                let attributes = cart.attributes
+                if !attributes.isEmpty {
+                    OSLogger.shared.debug("[CheckoutController] Cart has \(attributes.count) attributes before checkout")
+                    for attribute in attributes {
+                        OSLogger.shared.debug("[CheckoutController]   - \(attribute.key): \(attribute.value)")
+                    }
+                } else {
+                    OSLogger.shared.debug("[CheckoutController] No cart attributes before checkout")
+                }
+                if let note = cart.note {
+                    OSLogger.shared.debug("[CheckoutController] Cart note before checkout: \(note)")
+                }
+            }
+            
             ShopifyCheckoutSheetKit.present(checkout: url, from: rootViewController, delegate: self)
             root = rootViewController
         }
@@ -57,6 +76,10 @@ extension CheckoutController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         OSLogger.shared.debug(
             "[CheckoutDelegate] Checkout completed. Order ID: \(event.orderDetails.id)")
+        OSLogger.shared.debug(
+            "[CheckoutDelegate] ⚠️ Cart attributes were likely lost during mobile SDK checkout process")
+        OSLogger.shared.debug(
+            "[CheckoutDelegate] ⚠️ This is the known issue where mobile SDK doesn't preserve cart attributes")
         CartManager.shared.resetCart()
     }
 

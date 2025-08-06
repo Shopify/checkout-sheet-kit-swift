@@ -85,6 +85,11 @@ extension Storefront.CartQuery {
         id()
             .checkoutUrl()
             .totalQuantity()
+            .note()
+            .attributes {
+                $0.key()
+                    .value()
+            }
             .deliveryGroups(first: 10) {
                 $0.nodes {
                     $0.deliveryGroupsFragment()

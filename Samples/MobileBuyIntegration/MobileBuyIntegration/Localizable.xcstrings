@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    ":" : {
+
+    },
     "%@" : {
 
     },
@@ -19,7 +22,13 @@
     "Adding..." : {
 
     },
+    "Attributes:" : {
+
+    },
     "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app." : {
+
+    },
+    "Cart Attributes" : {
 
     },
     "Check out" : {
@@ -58,7 +67,13 @@
     "Logs" : {
 
     },
+    "No cart attributes present" : {
+
+    },
     "No logs available" : {
+
+    },
+    "Note:" : {
 
     },
     "OK" : {

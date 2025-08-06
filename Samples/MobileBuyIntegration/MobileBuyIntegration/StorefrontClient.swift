@@ -150,7 +150,22 @@ class StorefrontInputFactory {
         case invariant(String)
     }
 
-    public func createCartInput(_ items: [GraphQL.ID] = []) -> Storefront.CartInput {
+    public func createCartInput(_ items: [GraphQL.ID] = [], includeTestAttributes: Bool = true) -> Storefront.CartInput {
+        // Create test cart attributes to reproduce the issue
+        var attributes: [Storefront.AttributeInput]? = nil
+        var note: String? = nil
+        
+        if includeTestAttributes {
+            attributes = [
+                Storefront.AttributeInput.create(key: "checkout_ship_date", value: "05/22/2025"),
+                Storefront.AttributeInput.create(key: "grow_zone", value: "10b"),
+                Storefront.AttributeInput.create(key: "test_attribute", value: "mobile_sdk_test"),
+                Storefront.AttributeInput.create(key: "Tapcart", value: "1"),
+                Storefront.AttributeInput.create(key: "source", value: "MobileBuyIntegration")
+            ]
+            note = "Test order with cart attributes from MobileBuyIntegration sample app"
+        }
+        
         if appConfiguration.useVaultedState {
             let deliveryAddress = Storefront.MailingAddressInput.create(
                 address1: Input(orNull: vaultedContactInfo.address1),
@@ -171,10 +186,12 @@ class StorefrontInputFactory {
             ]
 
             return Storefront.CartInput.create(
+                attributes: Input(orNull: attributes),
                 lines: Input(
                     orNull: items.map {
                         Storefront.CartLineInput.create(merchandiseId: $0)
                     }),
+                note: Input(orNull: note),
                 buyerIdentity: Input(
                     orNull: Storefront.CartBuyerIdentityInput.create(
                         email: Input(orNull: vaultedContactInfo.email),
@@ -184,9 +201,11 @@ class StorefrontInputFactory {
             )
         } else {
             return Storefront.CartInput.create(
+                attributes: Input(orNull: attributes),
                 lines: Input(
                     orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
-                )
+                ),
+                note: Input(orNull: note)
             )
         }
     }

@@ -29,10 +29,95 @@ import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 
 // swiftlint:disable opening_brace
+
+// Extracted cart attributes view to reduce complexity
+struct CartAttributesSection: View {
+    @Binding var showAttributes: Bool
+    let cart: Storefront.Cart?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Toggle button
+            Button(action: { showAttributes.toggle() }) {
+                HStack {
+                    Text("Cart Attributes")
+                        .font(.headline)
+                    Spacer()
+                    Image(systemName: showAttributes ? "chevron.up" : "chevron.down")
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+            }
+            
+            if showAttributes {
+                cartAttributesContent
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    var cartAttributesContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Cart note
+            if let note = cart?.note {
+                VStack(alignment: .leading) {
+                    Text("Note:")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(note)
+                        .font(.footnote)
+                        .padding(8)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(4)
+                }
+                .padding(.horizontal)
+            }
+            
+            // Cart attributes
+            attributesView
+        }
+    }
+    
+    @ViewBuilder
+    var attributesView: some View {
+        let attributes = cart?.attributes ?? []
+        if !attributes.isEmpty {
+            VStack(alignment: .leading) {
+                Text("Attributes:")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                ForEach(attributes, id: \.key) { attribute in
+                    HStack {
+                        Text(attribute.key)
+                            .font(.footnote)
+                            .fontWeight(.semibold)
+                        Text(":")
+                        Text(attribute.value ?? "")
+                            .font(.footnote)
+                        Spacer()
+                    }
+                    .padding(8)
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(4)
+                }
+            }
+            .padding(.horizontal)
+        } else {
+            Text("No cart attributes present")
+                .font(.footnote)
+                .foregroundColor(.orange)
+                .padding(.horizontal)
+        }
+    }
+}
+
 struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
     @State var showCheckoutSheet: Bool = false
+    @State var showAttributes: Bool = false
 
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
@@ -43,8 +128,14 @@ struct CartView: View {
                 ScrollView {
                     VStack {
                         CartLines(lines: lines, isBusy: $isBusy)
+                        
+                        // Cart Attributes Section (extracted to separate view)
+                        CartAttributesSection(
+                            showAttributes: $showAttributes,
+                            cart: cartManager.cart
+                        )
                     }
-                    .padding(.bottom, 130)
+                    .padding(.bottom, 200)
                 }
 
                 VStack(spacing: DesignSystem.buttonSpacing) {
@@ -67,7 +158,25 @@ struct CartView: View {
                     }
 
                     Button(
-                        action: { showCheckoutSheet = true },
+                        action: { 
+                            print("🛒 [CartView] Checkout button pressed")
+                            if let cart = cartManager.cart {
+                                print("🛒 [CartView] Cart ID: \(cart.id.rawValue)")
+                                let attributes = cart.attributes
+                                if !attributes.isEmpty {
+                                    print("🛒 [CartView] Cart has \(attributes.count) attributes:")
+                                    for attribute in attributes {
+                                        print("🛒 [CartView]   - \(attribute.key): \(attribute.value)")
+                                    }
+                                } else {
+                                    print("🛒 [CartView] ⚠️ No cart attributes present!")
+                                }
+                                if let note = cart.note {
+                                    print("🛒 [CartView] Cart note: \(note)")
+                                }
+                            }
+                            showCheckoutSheet = true 
+                        },
                         label: {
                             HStack {
                                 Text("Check out")

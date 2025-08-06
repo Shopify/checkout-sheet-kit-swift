@@ -24,6 +24,7 @@
 @preconcurrency import Buy
 import Combine
 import Foundation
+import OSLog
 import PassKit
 import ShopifyCheckoutSheetKit
 
@@ -52,6 +53,10 @@ class CartManager: ObservableObject {
     public func preloadCheckout() {
         /// Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
         if let url = cart?.checkoutUrl, isDirty {
+            OSLogger.shared.debug("[CartManager.preloadCheckout] Preloading checkout URL: \(url)")
+            if let cart = cart {
+                logCartAttributes(cart, operation: "preloadCheckout")
+            }
             ShopifyCheckoutSheetKit.preload(checkout: url)
             markCartAsReady()
         }
@@ -101,6 +106,9 @@ class CartManager: ObservableObject {
 
             self.cart = cart
             isDirty = true
+            
+            // Log cart attributes for debugging
+            logCartAttributes(cart, operation: "cartLinesAdd")
 
             return cart
         } catch {
@@ -143,6 +151,9 @@ class CartManager: ObservableObject {
 
             self.cart = cart
             isDirty = true
+            
+            // Log cart attributes for debugging
+            logCartAttributes(cart, operation: "cartLinesUpdate")
 
             return cart
         } catch {
@@ -242,6 +253,9 @@ class CartManager: ObservableObject {
 
             self.cart = cart
             isDirty = true
+            
+            // Log cart attributes for debugging
+            logCartAttributes(cart, operation: "cartCreate")
 
             return cart
         } catch {
@@ -252,6 +266,113 @@ class CartManager: ObservableObject {
     func resetCart() {
         cart = nil
         isDirty = false
+    }
+    
+    private func logCartAttributes(_ cart: Storefront.Cart, operation: String) {
+        OSLogger.shared.debug("[CartManager.\(operation)] Cart ID: \(cart.id.rawValue)")
+        
+        if let note = cart.note {
+            OSLogger.shared.debug("[CartManager.\(operation)] Cart Note: \(note)")
+        } else {
+            OSLogger.shared.debug("[CartManager.\(operation)] Cart Note: nil")
+        }
+        
+        let attributes = cart.attributes
+        if !attributes.isEmpty {
+            OSLogger.shared.debug("[CartManager.\(operation)] Cart Attributes: \(attributes.count) attributes")
+            for attribute in attributes {
+                OSLogger.shared.debug("[CartManager.\(operation)]   - \(attribute.key): \(attribute.value)")
+            }
+        } else {
+            OSLogger.shared.debug("[CartManager.\(operation)] Cart Attributes: empty")
+        }
+        
+        OSLogger.shared.debug("[CartManager.\(operation)] Checkout URL: \(cart.checkoutUrl)")
+    }
+    
+    func performCartAttributesUpdate(
+        attributes: [Storefront.AttributeInput]? = nil,
+        note: String? = nil
+    ) async throws -> Storefront.Cart {
+        guard let cartId = cart?.id else {
+            throw Errors.invariant(message: "cart.id should be defined")
+        }
+        
+        let mutation = Storefront.buildMutation(
+            inContext: CartManager.ContextDirective
+        ) {
+            $0.cartAttributesUpdate(
+                attributes: attributes ?? [],
+                cartId: cartId
+            ) {
+                $0.cart { $0.cartManagerFragment() }
+                    .userErrors { $0.code().message() }
+            }
+        }
+        
+        do {
+            guard
+                let payload = try await client.executeAsync(mutation: mutation).cartAttributesUpdate
+            else { throw CartManager.Errors.payloadUnwrap }
+            
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+            
+            guard let cart = payload.cart else {
+                throw Errors.invariant(message: "cart returned nil")
+            }
+            
+            self.cart = cart
+            isDirty = true
+            
+            return cart
+        } catch {
+            throw Errors.apiErrors(requestName: "cartAttributesUpdate", message: "\(error)")
+        }
+    }
+    
+    func performCartNoteUpdate(note: String?) async throws -> Storefront.Cart {
+        guard let cartId = cart?.id else {
+            throw Errors.invariant(message: "cart.id should be defined")
+        }
+        
+        let mutation = Storefront.buildMutation(
+            inContext: CartManager.ContextDirective
+        ) {
+            $0.cartNoteUpdate(
+                cartId: cartId,
+                note: note ?? ""
+            ) {
+                $0.cart { $0.cartManagerFragment() }
+                    .userErrors { $0.code().message() }
+            }
+        }
+        
+        do {
+            guard
+                let payload = try await client.executeAsync(mutation: mutation).cartNoteUpdate
+            else { throw CartManager.Errors.payloadUnwrap }
+            
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+            
+            guard let cart = payload.cart else {
+                throw Errors.invariant(message: "cart returned nil")
+            }
+            
+            self.cart = cart
+            isDirty = true
+            
+            return cart
+        } catch {
+            throw Errors.apiErrors(requestName: "cartNoteUpdate", message: "\(error)")
+        }
     }
 }
 
