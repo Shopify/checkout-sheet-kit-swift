@@ -33,6 +33,9 @@ struct SettingsView: View {
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
     @State private var colorScheme: ColorScheme = .light
     @State private var privacyConsent: Configuration.PrivacyConsent = .none
+    @State private var isEncodingConsent = false
+    @State private var encodedConsentResult: String?
+    @State private var encodingError: String?
 
     var body: some View {
         NavigationView {
@@ -75,6 +78,45 @@ struct SettingsView: View {
                     Toggle("Analytics", isOn: consentBinding(for: .analytics))
                     Toggle("Preferences", isOn: consentBinding(for: .preferences))
                     Toggle("Sale of Data", isOn: consentBinding(for: .saleOfData))
+
+                    HStack {
+                        Button("Encode Consent") {
+                            Task {
+                                await encodeConsent()
+                            }
+                        }
+                        .foregroundColor(.blue)
+                        .disabled(isEncodingConsent)
+
+                        Spacer()
+                    }
+
+                    if let encoded = encodedConsentResult {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Encoded Consent:")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text(encoded)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundColor(.primary)
+                                    .textSelection(.enabled)
+                            }
+                            .padding(.vertical, 4)
+                            Spacer()
+                            Button("Clear") {
+                                clearEncodedConsent()
+                            }
+                            .foregroundColor(.red)
+                            .font(.caption)
+                        }
+                    }
+
+                    if let error = encodingError {
+                        Text("Error: \(error)")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
                 }
 
                 Section(header: Text("Logs")) {
@@ -108,6 +150,7 @@ struct SettingsView: View {
             .onAppear {
                 logs = LogReader.shared.readLogs() ?? []
                 privacyConsent = ShopifyCheckoutSheetKit.configuration.privacyConsent ?? .none
+                encodedConsentResult = ShopifyCheckoutSheetKit.currentEncodedPrivacyConsent
             }
         }
         .navigationBarHidden(true)
@@ -136,12 +179,43 @@ struct SettingsView: View {
                     privacyConsent.remove(consentType)
                 }
                 ShopifyCheckoutSheetKit.configuration.privacyConsent = privacyConsent
+                ShopifyCheckoutSheetKit.clearEncodedPrivacyConsent()
+                encodedConsentResult = nil
             }
         )
     }
 
     private func currentVersion() -> String {
         return "\(InfoDictionary.shared.version) (\(InfoDictionary.shared.buildNumber))"
+    }
+
+    private func encodeConsent() async {
+        isEncodingConsent = true
+        encodingError = nil
+
+        do {
+            let encoded = try await ShopifyCheckoutSheetKit.encodePrivacyConsent()
+            await MainActor.run {
+                encodedConsentResult = encoded
+                encodingError = nil
+                print("[SettingsView] Privacy consent encoded: \(encoded ?? "nil")")
+            }
+        } catch {
+            await MainActor.run {
+                encodedConsentResult = nil
+                encodingError = error.localizedDescription
+                print("[SettingsView] Failed to encode consent: \(error.localizedDescription)")
+            }
+        }
+
+        isEncodingConsent = false
+    }
+
+    private func clearEncodedConsent() {
+        ShopifyCheckoutSheetKit.clearEncodedPrivacyConsent()
+        encodedConsentResult = nil
+        encodingError = nil
+        print("[SettingsView] Cleared encoded consent")
     }
 }
 

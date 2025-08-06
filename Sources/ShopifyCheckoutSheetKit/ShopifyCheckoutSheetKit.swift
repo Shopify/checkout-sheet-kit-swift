@@ -35,6 +35,37 @@ public var configuration = Configuration() {
         if invalidateOnConfigurationChange {
             CheckoutWebView.invalidate()
         }
+
+        if consentEncoder == nil, let credentials = configuration.shopCredentials {
+            do {
+                consentEncoder = try DefaultConsentEncoder(
+                    shopDomain: credentials.shopDomain,
+                    storefrontAccessToken: credentials.storefrontAccessToken
+                )
+            } catch {
+                OSLogger.shared.error("Failed to create consent encoder: \(error)")
+                consentEncoder = nil
+            }
+        } else {
+            consentEncoder = nil
+        }
+    }
+}
+
+/// Internal consent encoder created from shop credentials.
+private var consentEncoder: ConsentEncoder?
+
+/// Internal storage for encoded privacy consent.
+private var encodedPrivacyConsent: String? {
+    get {
+        UserDefaults.standard.string(forKey: "ShopifyCheckoutSheetKit.encodedPrivacyConsent")
+    }
+    set {
+        if let newValue {
+            UserDefaults.standard.set(newValue, forKey: "ShopifyCheckoutSheetKit.encodedPrivacyConsent")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "ShopifyCheckoutSheetKit.encodedPrivacyConsent")
+        }
     }
 }
 
@@ -43,14 +74,50 @@ public func configure(_ block: (inout Configuration) -> Void) {
     block(&configuration)
 }
 
+/// Returns the currently stored encoded privacy consent, if any.
+/// This value is automatically used for checkout URLs.
+public var currentEncodedPrivacyConsent: String? {
+    return encodedPrivacyConsent
+}
+
+/// Clears the stored encoded privacy consent.
+/// Future checkouts will not include consent parameters until re-encoded.
+public func clearEncodedPrivacyConsent() {
+    encodedPrivacyConsent = nil
+    OSLogger.shared.debug("Cleared stored encoded privacy consent")
+}
+
+/// Encodes the current privacy consent and stores it in user defaults.
+/// - Returns: The encoded consent string that will be used for checkout URLs
+/// - Throws: ConsentEncodingError if encoding fails or shop credentials are missing
+@discardableResult
+public func encodePrivacyConsent() async throws -> String? {
+    guard let consent = configuration.privacyConsent else {
+        throw ConsentEncodingError.invalidResponse("No privacy consent configured")
+    }
+
+    guard let encoder = consentEncoder else {
+        throw ConsentEncodingError.invalidResponse("No consent encoder available. Configure shop credentials first.")
+    }
+
+    let encoded = try await encoder.encode(consent)
+
+    encodedPrivacyConsent = encoded
+
+    OSLogger.shared.debug("Privacy consent encoded and stored: \(encoded ?? "nil")")
+
+    return encoded
+}
+
 /// Preloads the checkout for faster presentation.
 public func preload(checkout url: URL) {
     guard configuration.preloading.enabled else {
         return
     }
 
+    let checkoutURL = addConsentForCheckout(url: url)
     CheckoutWebView.preloadingActivatedByClient = true
-    CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
+    CheckoutWebView.for(checkout: url).load(checkout: checkoutURL, isPreload: true)
 }
 
 /// Invalidate the checkout cache from preload calls
@@ -61,7 +128,8 @@ public func invalidate() {
 /// Presents the checkout from a given `UIViewController`.
 @discardableResult
 public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, delegate: delegate)
+    let checkoutURL = addConsentForCheckout(url: url)
+    let viewController = CheckoutViewController(checkout: checkoutURL, delegate: delegate)
     from.present(viewController, animated: true)
     return viewController
 }
@@ -71,7 +139,27 @@ public func present(checkout url: URL, from: UIViewController, delegate: Checkou
 /// Consumers will use the public `present` function, and the UserAgent will *not* contain the entry field.
 @discardableResult
 package func present(checkout url: URL, from: UIViewController, entryPoint: MetaData.EntryPoint, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, delegate: delegate, entryPoint: entryPoint)
+    let checkoutURL = addConsentForCheckout(url: url)
+    let viewController = CheckoutViewController(checkout: checkoutURL, delegate: delegate, entryPoint: entryPoint)
     from.present(viewController, animated: true)
     return viewController
+}
+
+// MARK: - Internal Consent Processing
+
+/// Appends encoded privacy consent it to the checkout URL if configured
+private func addConsentForCheckout(url: URL) -> URL {
+    guard let encodedConsent = encodedPrivacyConsent else {
+        return url
+    }
+
+    var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+    var queryItems = urlComponents?.queryItems ?? []
+
+    queryItems.removeAll { $0.name == "_cs" }
+
+    queryItems.append(URLQueryItem(name: "_cs", value: encodedConsent))
+    urlComponents?.queryItems = queryItems
+
+    return urlComponents?.url ?? url
 }

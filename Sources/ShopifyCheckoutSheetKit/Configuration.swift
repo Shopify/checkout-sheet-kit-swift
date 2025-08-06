@@ -46,6 +46,10 @@ public struct Configuration {
 
     public var privacyConsent: Configuration.PrivacyConsent?
 
+    /// Shop credentials for Storefront API used for consent encoding.
+    /// When set, privacy consent will be encoded for checkout URLs.
+    public var shopCredentials: Configuration.ShopCredentials?
+
     public var tintColor: UIColor = .init(red: 0.09, green: 0.45, blue: 0.69, alpha: 1.00)
 
     @available(*, renamed: "tintColor", message: "spinnerColor has been superseded by tintColor")
@@ -108,5 +112,29 @@ extension Configuration {
 
         public static let all: PrivacyConsent = [.marketing, .analytics, .preferences, .saleOfData]
         public static let none: PrivacyConsent = []
+    }
+}
+
+extension Configuration {
+    /// Shop credentials for consent encoding
+    public struct ShopCredentials {
+        public let shopDomain: String
+        public let storefrontAccessToken: String
+
+        /// Creates shop credentials for consent encoding
+        /// - Parameters:
+        ///   - shopDomain: The shop domain (e.g., "your-shop.myshopify.com")
+        ///   - storefrontAccessToken: The Storefront API access token
+        public init(shopDomain: String, storefrontAccessToken: String) throws {
+            guard !shopDomain.isEmpty else {
+                throw ConsentEncodingError.invalidShopDomain
+            }
+            guard !storefrontAccessToken.isEmpty else {
+                throw ConsentEncodingError.missingAccessToken
+            }
+
+            self.shopDomain = shopDomain
+            self.storefrontAccessToken = storefrontAccessToken
+        }
     }
 }

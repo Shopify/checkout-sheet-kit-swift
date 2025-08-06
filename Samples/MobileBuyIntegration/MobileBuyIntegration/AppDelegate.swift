@@ -44,6 +44,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             $0.logger = FileLogger("log.txt")
 
             $0.logLevel = .all
+
+            $0.privacyConsent = Configuration.PrivacyConsent.none
+
+            do {
+                $0.shopCredentials = try Configuration.ShopCredentials(
+                    shopDomain: InfoDictionary.shared.domain,
+                    storefrontAccessToken: InfoDictionary.shared.accessToken
+                )
+            } catch {
+                print("[MobileBuyIntegration] Failed to configure consent encoding: \(error)")
+            }
         }
 
         print("[MobileBuyIntegration] Log level set to .all")
