@@ -241,21 +241,16 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         let cartID = try pkEncoder.cartID.get()
 
         if let addressID = selectedShippingAddressID {
-            print("upsertShippingAddress - Trying remove-then-add approach to avoid tax contamination")
             do {
                 // First, remove the existing delivery address to clear any tax policy contamination
-                print("upsertShippingAddress - Removing existing address: \(addressID)")
                 let cartAfterRemove = try await controller.storefront.cartDeliveryAddressesRemove(
                     id: cartID,
                     addressId: addressID
                 )
-                print("upsertShippingAddress - Address removed, delivery groups: \(cartAfterRemove.deliveryGroups.nodes.count)")
 
                 // Clear the selected address ID since we removed it
                 selectedShippingAddressID = nil
 
-                // Now add the new address fresh
-                print("upsertShippingAddress - Adding new address after removal")
                 let cart = try await controller.storefront.cartDeliveryAddressesAdd(
                     id: cartID,
                     address: address,
@@ -263,42 +258,15 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
                 )
 
                 selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
-                print("upsertShippingAddress - New address added, delivery groups: \(cart.deliveryGroups.nodes.count)")
 
                 return cart
             } catch {
-                print("upsertShippingAddress - Remove-then-add approach failed with error: \(error)")
-                print("upsertShippingAddress - Error details: \(String(describing: error))")
                 if let responseError = error as? StorefrontAPI.Errors {
                     print("upsertShippingAddress - Storefront API Error: \(responseError)")
-                }
-
-                // If remove-then-add fails, fall back to the original update approach
-                print("upsertShippingAddress - Falling back to update approach")
-                do {
-                    let updatedCart = try await controller.storefront.cartDeliveryAddressesUpdate(
-                        id: cartID,
-                        addressId: addressID,
-                        address: address,
-                        validate: validate
-                    )
-
-                    // If updating cleared all delivery groups, fall back to adding a new address
-                    if updatedCart.deliveryGroups.nodes.isEmpty {
-                        print("upsertShippingAddress - Update cleared delivery groups, falling back to add new address")
-                        selectedShippingAddressID = nil
-                        return try await upsertShippingAddress(to: address, validate: validate)
-                    }
-
-                    return updatedCart
-                } catch {
-                    print("upsertShippingAddress - Update fallback also failed: \(error)")
-                    throw error
                 }
             }
         }
 
-        print("upsertShippingAddress - Adding new address")
         do {
             let cart = try await controller.storefront.cartDeliveryAddressesAdd(
                 id: cartID,
@@ -310,8 +278,6 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
             return cart
         } catch {
-            print("upsertShippingAddress - cartDeliveryAddressesAdd failed with error: \(error)")
-            print("upsertShippingAddress - Error details: \(String(describing: error))")
             if let responseError = error as? StorefrontAPI.Errors {
                 print("upsertShippingAddress - Storefront API Error: \(responseError)")
             }

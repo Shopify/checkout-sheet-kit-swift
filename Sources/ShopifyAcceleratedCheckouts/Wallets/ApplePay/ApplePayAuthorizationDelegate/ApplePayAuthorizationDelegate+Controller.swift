@@ -44,55 +44,26 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let cartID = try pkEncoder.cartID.get()
 
             let shippingAddress = try pkEncoder.shippingAddress.get()
-            print("didSelectShippingContact: updating address to:", shippingAddress.city ?? "nil", shippingAddress.province ?? "nil", shippingAddress.country)
-            print("didSelectShippingContact: full address:", shippingAddress)
 
             // Store current cart state before attempting address update
             let previousCart = controller.cart
 
             let cart = try await upsertShippingAddress(to: shippingAddress)
-            print("didSelectShippingContact: after upsertShippingAddress - delivery groups:", cart.deliveryGroups.nodes.count)
 
             // If address update cleared delivery groups, revert to previous cart and show error
             if cart.deliveryGroups.nodes.isEmpty, previousCart?.deliveryGroups.nodes.isEmpty == false {
-                print("didSelectShippingContact: Address update failed, reverting to previous cart state")
                 try setCart(to: previousCart)
+
                 let addressError = PKPaymentError(.shippingAddressUnserviceableError)
+
                 return pkDecoder.paymentRequestShippingContactUpdate(errors: [addressError])
             }
 
             try setCart(to: cart)
 
-            let result: StorefrontAPI.CartStatusReady
-            do {
-                result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                print("didSelectShippingContact: after cartPrepareForCompletion - delivery groups:", result.cart?.deliveryGroups.nodes.count ?? 0)
-            } catch {
-                print("didSelectShippingContact: cartPrepareForCompletion failed with error: \(error)")
-                print("didSelectShippingContact: Error details: \(String(describing: error))")
-                if let responseError = error as? StorefrontAPI.Errors {
-                    print("didSelectShippingContact: Storefront API Error: \(responseError)")
-                }
-                throw error
-            }
-
-            print("didSelectShippingContact: cartPrepareForCompletion")
-            print("didSelectShippingContact: subtotalAmount", amount(result.cart?.lines.nodes.first?.cost.subtotalAmount))
-            print("didSelectShippingContact: totalAmount", amount(result.cart?.lines.nodes.first?.cost.totalAmount))
-            print("didSelectShippingContact: totalTaxAmount", amount(result.cart?.cost.totalTaxAmount))
-            print("didSelectShippingContact: delivery groups count:", result.cart?.deliveryGroups.nodes.count ?? 0)
-            print("didSelectShippingContact: delivery options:", result.cart?.deliveryGroups.nodes.flatMap { $0.deliveryOptions.map { "\($0.title): \($0.handle)" } } ?? [])
+            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
             try setCart(to: result.cart)
-
-            print("didSelectShippingContact: available shipping methods:", pkDecoder.shippingMethods.map { "\($0.label): \($0.identifier ?? "nil")" })
-
-            // Check if shipping is required but no methods are available
-            if try pkDecoder.isShippingRequired() && pkDecoder.shippingMethods.isEmpty {
-                print("didSelectShippingContact: No shipping methods available for this address - this may be a temporary issue")
-                // Don't immediately show error - this might be a timing issue where delivery options haven't been populated yet
-                // Instead, return without shipping methods and let the user try again
-            }
 
             return pkDecoder.paymentRequestShippingContactUpdate()
         } catch {
@@ -156,20 +127,17 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        print("didSelectShippingMethod called with identifier: \(shippingMethod.identifier ?? "nil")")
-
         // Check if this shipping method identifier is still valid
         let availableShippingMethods = pkDecoder.shippingMethods
         let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
 
         let methodToUse: PKShippingMethod
+
         if !isValidMethod {
-            print("didSelectShippingMethod: Invalid shipping method identifier")
             guard let firstAvailableMethod = availableShippingMethods.first else {
-                print("didSelectShippingMethod: No shipping methods available")
                 return pkDecoder.paymentRequestShippingMethodUpdate()
             }
-            print("didSelectShippingMethod: Auto-selecting first available method: \(firstAvailableMethod.identifier ?? "nil")")
+
             methodToUse = firstAvailableMethod
         } else {
             methodToUse = shippingMethod
@@ -191,22 +159,11 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 )
             try setCart(to: cart)
 
-			do {
-				let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
-				print("didSelectShippingMethod: cartPrepareForCompletion")
-				print("didSelectShippingMethod: subtotalAmount", amount(result.cart?.lines.nodes.first?.cost.subtotalAmount))
-				print("didSelectShippingMethod: totalAmount", amount(result.cart?.lines.nodes.first?.cost.totalAmount))
-				print("didSelectShippingMethod: totalTaxAmount", amount(result.cart?.cost.totalTaxAmount))
-
-				try setCart(to: result.cart)
-
-			} catch {
-				print("IT IS SPECIFICALLY THE CART PREPARE FOR COMPLETION THROWING", error)
-			}
+            try setCart(to: result.cart)
         } catch {
             print("didSelectShippingMethod error:\n \(error)", terminator: "\n\n")
-            print(error.localizedDescription)
 
             return await handleError(error: error, cart: controller.cart) { _ in
                 pkDecoder.paymentRequestShippingMethodUpdate()
@@ -322,12 +279,4 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             return completion([abortError])
         }
     }
-}
-
-@available(iOS 17.0, *)
-func amount(_ price: StorefrontAPI.MoneyV2?) -> String? {
-    guard let _price = price else {
-        return nil
-    }
-    return String(describing: "\(_price.amount) \(_price.currencyCode)")
 }
