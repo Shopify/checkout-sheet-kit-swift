@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.version = "3.4.0-rc.1"
+  s.version = "3.4.0-rc.2"
 
   s.name    = "ShopifyCheckoutSheetKit"
   s.summary = "Enables Swift apps to embed the Shopify's highest converting, customizable, one-page checkout."
@@ -22,9 +22,10 @@ Pod::Spec.new do |s|
     'OTHER_SWIFT_FLAGS' => '-package-name ShopifyCheckoutSheetKit -module-alias Common=ShopifyCheckoutSheetKit'
   }
 
-  s.source_files = "Sources/Common/**/*.swift", "Sources/ShopifyCheckoutSheetKit/**/*.swift"
+  s.source_files = "Sources/Common/**/*.swift", "Sources/ShopifyCheckoutSheetKit/**/*.swift", "Sources/ShopifyAcceleratedCheckouts/**/*.swift"
 
   s.resource_bundles = {
-    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"]
+    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"],
+    "ShopifyAcceleratedCheckouts" => ["Sources/ShopifyAcceleratedCheckouts/Localizable.xcstrings", "Sources/ShopifyAcceleratedCheckouts/Media.xcassets"]
   }
 end
