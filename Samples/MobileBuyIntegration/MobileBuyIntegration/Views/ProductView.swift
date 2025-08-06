@@ -22,6 +22,7 @@
  */
 
 @preconcurrency import Buy
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
@@ -109,25 +110,40 @@ struct ProductView: View {
                 .padding(.horizontal)
 
                 if let variant = product.variants.nodes.first {
-                    Button(action: addToCart) {
-                        HStack {
-                            Text(loading ? "Adding..." : (addedToCart ? "Added" : "Add to Cart"))
-                                .font(.headline)
+                    VStack(spacing: DesignSystem.buttonSpacing) {
+                        Button(action: addToCart) {
+                            HStack {
+                                Text(loading ? "Adding..." : (addedToCart ? "Added" : "Add to Cart"))
+                                    .font(.headline)
 
-                            if loading {
-                                ProgressView()
-                                    .colorInvert()
-                            }
-                            Spacer()
+                                if loading {
+                                    ProgressView()
+                                        .colorInvert()
+                                }
+                                Spacer()
 
-                            Text((variant.availableForSale ? (addedToCart ? "✓" : (variant.price.formattedString())) : "Out of stock")!)
-                        }.padding()
-                    }
-                    .background(addedToCart ? Color(ColorPalette.successColor) : Color(ColorPalette.primaryColor))
-                    .foregroundStyle(.white)
-                    .cornerRadius(10)
-                    .disabled(!variant.availableForSale || loading)
-                    .padding([.leading, .trailing], 15)
+                                Text((variant.availableForSale ? (addedToCart ? "✓" : (variant.price.formattedString())) : "Out of stock")!)
+                            }.padding()
+                        }
+                        .background(addedToCart ? Color(ColorPalette.successColor) : Color(ColorPalette.primaryColor))
+                        .foregroundStyle(.white)
+                        .cornerRadius(DesignSystem.cornerRadius)
+                        .disabled(!variant.availableForSale || loading)
+
+                        if variant.availableForSale {
+                            AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
+                                .wallets([.applePay])
+                                .cornerRadius(DesignSystem.cornerRadius)
+                                .onFail { error in
+                                    print("Accelerated checkout failed: \(error)")
+                                }
+                                .onCancel {
+                                    print("Accelerated checkout cancelled")
+                                }
+                                .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+                                .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+                        }
+                    }.padding([.leading, .trailing], 15)
                 }
             }
         }
