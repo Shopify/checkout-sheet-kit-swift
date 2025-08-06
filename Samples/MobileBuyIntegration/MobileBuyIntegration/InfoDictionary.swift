@@ -29,8 +29,9 @@ import Foundation
 class InfoDictionary {
     static let shared = InfoDictionary()
 
+    // Required
     let address1, address2, city, country, firstName, lastName, province, zip,
-        email, phone, domain, accessToken, version, buildNumber: String
+        email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
 
     init() {
         guard
@@ -47,6 +48,7 @@ class InfoDictionary {
             let phone = infoPlist["Phone"] as? String,
             let domain = infoPlist["StorefrontDomain"] as? String,
             let accessToken = infoPlist["StorefrontAccessToken"] as? String,
+            let merchantIdentifier = infoPlist["StorefrontMerchantIdentifier"] as? String,
             let version = infoPlist["CFBundleShortVersionString"] as? String,
             let buildNumber = infoPlist["CFBundleVersion"] as? String
         else {
@@ -67,5 +69,6 @@ class InfoDictionary {
         self.accessToken = accessToken
         self.version = version
         self.buildNumber = buildNumber
+        self.merchantIdentifier = merchantIdentifier
     }
 }
