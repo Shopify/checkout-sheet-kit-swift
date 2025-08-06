@@ -1,8 +1,17 @@
 # Changelog
 
+## 3.4.0-rc.2 - August 6, 2025
+
+- Include missing AcceleratedCheckouts source files
+- Fix issue with misconfigured `SHIPPING_LINE` in StorefrontAPI response decoding
+
+## 3.4.0-rc.1 - August 1, 2025
+
+- Include `ShopifyAcceleratedCheckouts` package
+
 ## 3.3.0 - July 3, 2025
 
-Allow customizing the close button tint for the checkout sheet.
+- Allow customizing the close button tint for the checkout sheet.
 
 ## 3.2.0 - 20 June, 2025
 
