@@ -75,6 +75,19 @@ extension GraphQLDocument {
         }
         """
 
+        case cartDeliveryAddressesRemove = """
+        mutation CartDeliveryAddressesRemove($cartId: ID!, $addressIds: [ID!]!) {
+          cartDeliveryAddressesRemove(cartId: $cartId, addressIds: $addressIds) {
+            cart {
+              ...CartFragment
+            }
+            userErrors {
+              ...CartUserErrorFragment
+            }
+          }
+        }
+        """
+
         case cartSelectedDeliveryOptionsUpdate = """
         mutation CartSelectedDeliveryOptionsUpdate($cartId: ID!, $selectedDeliveryOptions: [CartSelectedDeliveryOptionInput!]!) {
           cartSelectedDeliveryOptionsUpdate(cartId: $cartId, selectedDeliveryOptions: $selectedDeliveryOptions) {
