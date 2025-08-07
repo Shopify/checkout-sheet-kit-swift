@@ -113,6 +113,7 @@ struct CartView: View {
                             // Handle checkout failure
                             print("Checkout failed: \(error)")
                         }
+                        .edgesIgnoringSafeArea(.all)
                 }
             }
         } else {
