@@ -21,24 +21,23 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@testable import ShopifyCheckoutSheetKit
-import WebKit
-import XCTest
+import Foundation
 
-class CheckoutWebViewControllerTests: XCTestCase {
-    private let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
-
-    func test_init_withNilEntryPoint_shouldSetCorrectUserAgent() {
-        let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: nil)
-
-        let expectedUserAgent = CheckoutBridge.applicationName(entryPoint: nil)
-        XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
-    }
-
-    func test_init_withAcceleratedCheckoutsEntryPoint_shouldSetCorrectUserAgent() {
-        let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: .acceleratedCheckouts)
-
-        let expectedUserAgent = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
-        XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
+extension Bundle {
+    /// Cross-platform bundle accessor for ShopifyAcceleratedCheckouts resources
+    package static var acceleratedCheckouts: Bundle {
+        #if COCOAPODS
+            // For CocoaPods, look for the resource bundle
+            if let bundlePath = Bundle.main.path(forResource: "ShopifyAcceleratedCheckouts", ofType: "bundle"),
+               let bundle = Bundle(path: bundlePath)
+            {
+                return bundle
+            }
+            // Fallback to main bundle if resource bundle not found
+            return Bundle.main
+        #else
+            // For SPM, use Bundle.module
+            return Bundle.module
+        #endif
     }
 }

@@ -31,6 +31,6 @@ extension Bundle {
 
 extension String {
     var localizedString: String {
-        Bundle.module.localizedString(forKey: self)
+        Bundle.acceleratedCheckouts.localizedString(forKey: self)
     }
 }
