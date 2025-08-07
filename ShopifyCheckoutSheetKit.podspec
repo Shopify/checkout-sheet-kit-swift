@@ -19,13 +19,23 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = "13.0"
 
   s.pod_target_xcconfig = {
-    'OTHER_SWIFT_FLAGS' => '-package-name ShopifyCheckoutSheetKit -module-alias Common=ShopifyCheckoutSheetKit'
+    'OTHER_SWIFT_FLAGS' => '-package-name ShopifyCheckoutSheetKit -DCOCOAPODS'
   }
 
-  s.source_files = "Sources/Common/**/*.swift", "Sources/ShopifyCheckoutSheetKit/**/*.swift", "Sources/ShopifyAcceleratedCheckouts/**/*.swift"
+  s.default_subspecs = 'Core'
 
-  s.resource_bundles = {
-    "ShopifyCheckoutSheetKit" => ["Sources/ShopifyCheckoutSheetKit/Assets.xcassets"],
-    "ShopifyAcceleratedCheckouts" => ["Sources/ShopifyAcceleratedCheckouts/Localizable.xcstrings", "Sources/ShopifyAcceleratedCheckouts/Media.xcassets"]
-  }
+  s.subspec 'Core' do |core|
+    core.source_files = 'Sources/ShopifyCheckoutSheetKit/**/*.swift'
+    core.resource_bundles = {
+      'ShopifyCheckoutSheetKit' => ['Sources/ShopifyCheckoutSheetKit/Assets.xcassets']
+    }
+  end
+
+  s.subspec 'AcceleratedCheckouts' do |accelerated|
+    accelerated.source_files = 'Sources/ShopifyAcceleratedCheckouts/**/*.swift'
+    accelerated.dependency 'ShopifyCheckoutSheetKit/Core'
+    accelerated.resource_bundles = {
+      'ShopifyAcceleratedCheckouts' => ['Sources/ShopifyAcceleratedCheckouts/Localizable.xcstrings', 'Sources/ShopifyAcceleratedCheckouts/Media.xcassets']
+    }
+  end
 end

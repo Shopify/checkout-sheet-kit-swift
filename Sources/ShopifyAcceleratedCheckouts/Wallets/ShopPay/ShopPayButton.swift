@@ -86,7 +86,7 @@ internal struct Internal_ShopPayButton: View {
             },
             label: {
                 HStack {
-                    SwiftUI.Image("shop-pay-logo", bundle: .module)
+                    SwiftUI.Image("shop-pay-logo", bundle: .acceleratedCheckouts)
                         .resizable()
                         .scaledToFit()
                         .frame(height: 24)

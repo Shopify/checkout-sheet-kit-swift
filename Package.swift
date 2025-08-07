@@ -17,10 +17,6 @@ let package = Package(
         .library(
             name: "ShopifyAcceleratedCheckouts",
             targets: ["ShopifyAcceleratedCheckouts"]
-        ),
-        .library(
-            name: "Common",
-            targets: ["Common"]
         )
     ],
     dependencies: [
@@ -32,21 +28,18 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "Common",
-            dependencies: []
-        ),
-        .target(
             name: "ShopifyCheckoutSheetKit",
-            dependencies: ["Common"]
+            dependencies: [],
+            resources: [.process("Assets.xcassets")]
         ),
         .target(
             name: "ShopifyAcceleratedCheckouts",
-            dependencies: ["ShopifyCheckoutSheetKit", "Common"],
-            resources: [.process("Localizable.xcstrings")]
+            dependencies: ["ShopifyCheckoutSheetKit"],
+            resources: [.process("Localizable.xcstrings"), .process("Media.xcassets")]
         ),
         .testTarget(
             name: "CommonTests",
-            dependencies: ["Common"],
+            dependencies: ["ShopifyCheckoutSheetKit"],
             plugins: [
                 .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
             ]

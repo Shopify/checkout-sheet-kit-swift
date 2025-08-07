@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Common
 import Foundation
+import ShopifyCheckoutSheetKit
 
 /// A lightweight GraphQL client for the Storefront API without external dependencies
 @available(iOS 17.0, *)
