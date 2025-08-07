@@ -37,6 +37,7 @@ struct ProductView: View {
     @State private var showingCart = false
     @State private var descriptionExpanded: Bool = false
     @State private var addedToCart: Bool = false
+    @State private var acceleratedCheckoutState: RenderState = .loading
 
     init(product: Storefront.Product) {
         _product = State(initialValue: product)
@@ -131,17 +132,38 @@ struct ProductView: View {
                         .disabled(!variant.availableForSale || loading)
 
                         if variant.availableForSale {
-                            AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
-                                .wallets([.applePay])
-                                .cornerRadius(DesignSystem.cornerRadius)
-                                .onFail { error in
-                                    print("Accelerated checkout failed: \(error)")
+                            VStack {
+                                if case .loading = acceleratedCheckoutState {
+                                    SkeletonButton(cornerRadius: DesignSystem.cornerRadius)
                                 }
-                                .onCancel {
-                                    print("Accelerated checkout cancelled")
+                                
+                                if case .error = acceleratedCheckoutState {
+                                    VStack {
+                                        Image(systemName: "exclamationmark.triangle")
+                                            .foregroundColor(.orange)
+                                            .font(.title2)
+                                        Text("Unable to load checkout buttons")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .frame(height: 44)
                                 }
-                                .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
-                                .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+                                
+                                AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
+                                    .wallets([.applePay])
+                                    .cornerRadius(DesignSystem.cornerRadius)
+                                    .onRenderStateChange { state in
+                                        acceleratedCheckoutState = state
+                                    }
+                                    .onFail { error in
+                                        print("Accelerated checkout failed: \(error)")
+                                    }
+                                    .onCancel {
+                                        print("Accelerated checkout cancelled")
+                                    }
+                                    .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+                                    .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+                            }
                         }
                     }.padding([.leading, .trailing], 15)
                 }

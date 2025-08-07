@@ -33,6 +33,7 @@ struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
     @State var showCheckoutSheet: Bool = false
+    @State var acceleratedCheckoutState: RenderState = .loading
 
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
@@ -49,21 +50,45 @@ struct CartView: View {
 
                 VStack(spacing: DesignSystem.buttonSpacing) {
                     if let cartId = cartManager.cart?.id.rawValue {
-                        AcceleratedCheckoutButtons(cartID: cartId)
-                            .wallets([.shopPay, .applePay])
-                            .cornerRadius(DesignSystem.cornerRadius)
-                            .onComplete { _ in
-                                // Reset cart on successful checkout
-                                CartManager.shared.resetCart()
+                        VStack {
+                            if case .loading = acceleratedCheckoutState {
+                                VStack(spacing: DesignSystem.buttonSpacing) {
+                                    SkeletonButton(cornerRadius: DesignSystem.cornerRadius)
+                                    SkeletonButton(cornerRadius: DesignSystem.cornerRadius)
+                                }
                             }
-                            .onFail { error in
-                                print("Accelerated checkout failed: \(error)")
+                            
+                            if case .error = acceleratedCheckoutState {
+                                VStack {
+                                    Image(systemName: "exclamationmark.triangle")
+                                        .foregroundColor(.orange)
+                                        .font(.title2)
+                                    Text("Unable to load checkout buttons")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .frame(height: 44)
                             }
-                            .onCancel {
-                                print("Accelerated checkout cancelled")
-                            }
-                            .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
-                            .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+                            
+                            AcceleratedCheckoutButtons(cartID: cartId)
+                                .wallets([.shopPay, .applePay])
+                                .cornerRadius(DesignSystem.cornerRadius)
+                                .onRenderStateChange { state in
+                                    acceleratedCheckoutState = state
+                                }
+                                .onComplete { _ in
+                                    // Reset cart on successful checkout
+                                    CartManager.shared.resetCart()
+                                }
+                                .onFail { error in
+                                    print("Accelerated checkout failed: \(error)")
+                                }
+                                .onCancel {
+                                    print("Accelerated checkout cancelled")
+                                }
+                                .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+                                .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+                        }
                     }
 
                     Button(
