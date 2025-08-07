@@ -38,13 +38,6 @@ let package = Package(
             resources: [.process("Localizable.xcstrings"), .process("Media.xcassets")]
         ),
         .testTarget(
-            name: "CommonTests",
-            dependencies: ["ShopifyCheckoutSheetKit"],
-            plugins: [
-                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
-            ]
-        ),
-        .testTarget(
             name: "ShopifyCheckoutSheetKitTests",
             dependencies: ["ShopifyCheckoutSheetKit"],
             plugins: [
