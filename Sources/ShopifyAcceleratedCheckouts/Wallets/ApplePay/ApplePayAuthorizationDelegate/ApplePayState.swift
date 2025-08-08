@@ -24,7 +24,7 @@
 import Foundation
 import PassKit
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 enum ApplePayState: Equatable {
     static func == (lhs: ApplePayState, rhs: ApplePayState) -> Bool {
         return String(describing: lhs.self) == String(describing: rhs.self)

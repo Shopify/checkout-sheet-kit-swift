@@ -23,7 +23,7 @@
 
 import SwiftUI
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 extension ShopifyAcceleratedCheckouts {
     public class Configuration: ObservableObject {
         /// The domain of the shop without the protocol.

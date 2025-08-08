@@ -24,9 +24,12 @@
 import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
+import UIKit
+
+
 
 /// A view that displays an Apple Pay button for checkout
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 @available(macOS, unavailable)
 struct ApplePayButton: View {
     /// The configuration for Apple Pay
@@ -47,7 +50,7 @@ struct ApplePayButton: View {
     private let eventHandlers: EventHandlers
 
     /// The Apple Pay button label style
-    private var label: PayWithApplePayButtonLabel = .plain
+    private var label: PKPaymentButtonType = .plain
 
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
@@ -71,7 +74,8 @@ struct ApplePayButton: View {
                 identifier: identifier,
                 label: label,
                 configuration: ApplePayConfigurationWrapper(
-                    common: configuration, applePay: applePayConfiguration,
+                    common: configuration,
+                    applePay: applePayConfiguration,
                     shopSettings: shopSettings
                 ),
                 eventHandlers: eventHandlers,
@@ -80,7 +84,7 @@ struct ApplePayButton: View {
         }
     }
 
-    public func withLabel(_ label: PayWithApplePayButtonLabel) -> some View {
+    public func label(_ label: PKPaymentButtonType) -> some View {
         var view = self
         view.label = label
         return view
@@ -89,11 +93,11 @@ struct ApplePayButton: View {
 
 /// A view that displays an Apple Pay button for checkout
 /// This is an internal view to allow Environment injection of the shared configuration app wide
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style
-    private var label: PayWithApplePayButtonLabel = .plain
+    private var label: PKPaymentButtonType = .plain
 
     /// The view controller for the Apple Pay button
     private var controller: ApplePayViewController
@@ -109,7 +113,7 @@ struct Internal_ApplePayButton: View {
     ///   - eventHandlers: The event handlers for checkout events (defaults to EventHandlers())
     init(
         identifier: CheckoutIdentifier,
-        label: PayWithApplePayButtonLabel,
+        label: PKPaymentButtonType,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
@@ -131,16 +135,99 @@ struct Internal_ApplePayButton: View {
     }
 
     var body: some View {
-        PayWithApplePayButton(
-            label,
+        ApplePayButtonRepresentable(
+            buttonType: label,
+            buttonStyle: .black,
             action: {
                 Task { await controller.startPayment() }
-            },
-            fallback: {
-                // content == nil ? Text("errors.applePay.unsupported") : content
-                Text("errors.applePay.unsupported".localizedString)
             }
         )
         .walletButtonStyle(cornerRadius: cornerRadius)
+    }
+
+}
+
+/// UIViewRepresentable wrapper for PKPaymentButton to support iOS 15
+@available(iOS 15.0, *)
+struct ApplePayButtonRepresentable: UIViewRepresentable {
+    let buttonType: PKPaymentButtonType
+    let buttonStyle: PKPaymentButtonStyle
+    let action: () -> Void
+
+    typealias UIViewType = PKPaymentButton
+
+    func makeUIView(context: UIViewRepresentableContext<ApplePayButtonRepresentable>)
+        -> PKPaymentButton
+    {
+        let button = PKPaymentButton(paymentButtonType: buttonType, paymentButtonStyle: buttonStyle)
+        button.addTarget(
+            context.coordinator, action: #selector(Coordinator.buttonTapped), for: .touchUpInside)
+        return button
+    }
+
+    func updateUIView(
+        _: PKPaymentButton,
+        context: UIViewRepresentableContext<ApplePayButtonRepresentable>
+    ) {
+        context.coordinator.action = action
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(action: action)
+    }
+
+    class Coordinator: NSObject {
+        var action: () -> Void
+
+        init(action: @escaping () -> Void) {
+            self.action = action
+        }
+
+        @objc func buttonTapped() {
+            action()
+        }
+    }
+}
+
+/// iOS 15 compatibility label
+@available(iOS 15.0, *)
+public enum ApplePayButtonLabel: CaseIterable {
+    case plain
+    case buy
+    case setUp
+    case inStore
+    case donate
+    case checkout
+    case book
+    case subscribe
+    case reload
+    case addMoney
+    case topUp
+    case order
+    case rent
+    case support
+    case contribute
+    case tip
+    
+    func toPKPaymentButtonType() -> PKPaymentButtonType {
+        switch self {
+        case .plain: return .plain
+        case .buy: return .buy
+        case .setUp: return .setUp
+        case .inStore: return .inStore
+        case .checkout: return .checkout
+        case .donate: return .donate
+        case .reload: return .reload
+        case .addMoney: return .addMoney
+        case .topUp: return .topUp
+        case .order: return .order
+        case .book: return .book
+        case .subscribe: return .subscribe
+        case .rent: return .rent
+        case .support: return .support
+        case .contribute: return .contribute
+        case .tip: return .tip
+        default: return .plain
+        }
     }
 }

@@ -38,7 +38,7 @@ public enum RenderState {
 /// - The `wallets` modifier can be used to limit the buttons rendered
 /// - The order of the buttons is the same as the order of the `wallets` modifier
 /// - omission of the `wallets` modifier will render all buttons
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 public struct AcceleratedCheckoutButtons: View {
     @EnvironmentObject
     private var configuration: ShopifyAcceleratedCheckouts.Configuration
@@ -54,6 +54,9 @@ public struct AcceleratedCheckoutButtons: View {
             eventHandlers.renderStateDidChange?(currentRenderState)
         }
     }
+
+    /// The Apple Pay button label style
+    private var label: PKPaymentButtonType = .plain
 
     /// Initializes an Apple Pay button with a cart ID
     /// - Parameters:
@@ -90,6 +93,7 @@ public struct AcceleratedCheckoutButtons: View {
                                 eventHandlers: eventHandlers,
                                 cornerRadius: cornerRadius
                             )
+                            .label(label)
                         case .shopPay:
                             ShopPayButton(
                                 identifier: identifier,
@@ -128,8 +132,14 @@ public struct AcceleratedCheckoutButtons: View {
 
 // MARK: AcceleratedCheckoutButtons Modifiers
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 extension AcceleratedCheckoutButtons {
+    public func label(_ label: ApplePayButtonLabel) -> AcceleratedCheckoutButtons {
+        var view = self
+        view.label = label.toPKPaymentButtonType()
+        return view
+    }
+
     /// Modifies the wallet options supported
     /// Defaults: [.applePay]
     public func wallets(_ wallets: [Wallet]) -> AcceleratedCheckoutButtons {

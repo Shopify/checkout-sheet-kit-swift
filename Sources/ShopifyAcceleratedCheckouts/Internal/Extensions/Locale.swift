@@ -27,25 +27,46 @@ import Foundation
 typealias ShopifyLanguageCode = LanguageCode
 
 /// Extension to detect device locale and map to Shopify types
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 extension Locale {
     private static let defaultCountryCode: CountryCode = .US
     private static let defaultLanguageCode: ShopifyLanguageCode = .EN
 
     /// Returns the device's current country code mapped to CountryCode enum
     static var deviceCountryCode: CountryCode {
-        guard let regionCode = Locale.current.region?.identifier,
-              let countryCode = CountryCode(rawValue: regionCode)
-        else {
-            return defaultCountryCode
+        if #available(iOS 16, *) {
+            guard let regionCode = Locale.current.region?.identifier,
+                  let countryCode = CountryCode(rawValue: regionCode)
+            else {
+                return defaultCountryCode
+            }
+            return countryCode
+        } else {
+            // iOS 15 fallback
+            guard let regionCode = Locale.current.regionCode,
+                  let countryCode = CountryCode(rawValue: regionCode)
+            else {
+                return defaultCountryCode
+            }
+            return countryCode
         }
-        return countryCode
     }
 
     /// Returns the device's current language code mapped to LanguageCode enum
     static var deviceLanguageCode: ShopifyLanguageCode {
-        guard let languageCode = Locale.current.language.languageCode?.identifier else {
-            return defaultLanguageCode
+        let languageCode: String
+
+        if #available(iOS 16, *) {
+            guard let code = Locale.current.language.languageCode?.identifier else {
+                return defaultLanguageCode
+            }
+            languageCode = code
+        } else {
+            // iOS 15 fallback
+            guard let code = Locale.current.languageCode else {
+                return defaultLanguageCode
+            }
+            languageCode = code
         }
 
         // Handle special cases for language codes that need mapping

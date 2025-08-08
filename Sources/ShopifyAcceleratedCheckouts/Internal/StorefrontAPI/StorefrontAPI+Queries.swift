@@ -25,7 +25,7 @@ import Foundation
 
 // MARK: - Query Operations
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 extension StorefrontAPI {
     /// Get a cart by ID
     /// - Parameter id: Cart ID
@@ -60,7 +60,7 @@ extension StorefrontAPI {
 }
 
 /// Generic cache manager for StorefrontAPI queries that handles request deduplication and caching
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 actor QueryCache {
     static let shared = QueryCache()
 

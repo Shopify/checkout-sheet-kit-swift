@@ -24,7 +24,7 @@
 import Foundation
 import PassKit
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 extension ErrorHandler {
     static func map(
         errors: [StorefrontAPI.CartUserError],

@@ -45,18 +45,18 @@ class Network {
 
     /// Get the device's language code mapped to Shopify's LanguageCode enum
     private func getLanguageCode() -> GraphQLEnum<Storefront.LanguageCode> {
-        if let languageCode = Locale.current.language.languageCode?.identifier {
+        if let languageCode = Locale.current.languageCode {
             let code = languageCode.uppercased()
 
             // Handle special cases
             switch code {
             case "ZH":
-                if let scriptCode = Locale.current.language.script?.identifier {
+                if let scriptCode = Locale.current.scriptCode {
                     return GraphQLEnum(scriptCode == "Hans" ? Storefront.LanguageCode.zhCn : Storefront.LanguageCode.zhTw)
                 }
                 return GraphQLEnum(Storefront.LanguageCode.zhCn)
             case "PT":
-                if let regionCode = Locale.current.language.region?.identifier {
+                if let regionCode = Locale.current.regionCode {
                     return GraphQLEnum(regionCode == "BR" ? Storefront.LanguageCode.ptBr : Storefront.LanguageCode.ptPt)
                 }
                 return GraphQLEnum(Storefront.LanguageCode.pt)
@@ -102,7 +102,7 @@ class Network {
         print("Network: Starting product fetch from \(EnvironmentVariables.storefrontDomain)")
 
         // Get device locale for @inContext directive
-        let countryCode = GraphQLEnum(Storefront.CountryCode(rawValue: Locale.current.region?.identifier ?? "US") ?? .us)
+        let countryCode = GraphQLEnum(Storefront.CountryCode(rawValue: Locale.current.regionCode ?? "US") ?? .us)
         let languageCode = getLanguageCode()
 
         Network.shared.apollo.fetch(query: Storefront.GetProductsQuery(
@@ -137,7 +137,7 @@ class Network {
         let input = Storefront.CartInput(lines: .some(lines))
 
         // Get device locale for @inContext directive
-        let countryCode = GraphQLEnum(Storefront.CountryCode(rawValue: Locale.current.region?.identifier ?? "US") ?? .us)
+        let countryCode = GraphQLEnum(Storefront.CountryCode(rawValue: Locale.current.regionCode ?? "US") ?? .us)
         let languageCode = getLanguageCode()
 
         let mutation = Storefront.CartCreateMutation(

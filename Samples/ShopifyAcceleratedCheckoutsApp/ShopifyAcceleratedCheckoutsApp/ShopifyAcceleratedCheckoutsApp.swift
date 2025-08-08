@@ -51,7 +51,7 @@ struct ShopifyAcceleratedCheckoutsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
+            NavigationView {
                 CartBuilderView(configuration: $configuration)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {

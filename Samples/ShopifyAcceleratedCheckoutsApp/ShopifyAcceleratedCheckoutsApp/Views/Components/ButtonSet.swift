@@ -43,6 +43,7 @@ struct ButtonSet: View {
                 ) {
                     // Cart-based checkout example with event handlers
                     AcceleratedCheckoutButtons(cartID: cartID)
+                        .label(.addMoney)
                         .onComplete { event in
                             print(
                                 "✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)"

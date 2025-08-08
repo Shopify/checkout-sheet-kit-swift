@@ -35,7 +35,7 @@ extension PKPaymentRequestPaymentMethodUpdate: PKPaymentRequestUpdatable {}
 extension PKPaymentAuthorizationResult: PKPaymentRequestUpdatable {}
 
 /// Decodes Storefront -> PassKit
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 class PKDecoder {
     var cart: () -> StorefrontAPI.Types.Cart?
 

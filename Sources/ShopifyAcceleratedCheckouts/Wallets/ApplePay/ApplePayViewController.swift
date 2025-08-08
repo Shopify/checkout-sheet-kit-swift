@@ -25,7 +25,7 @@ import PassKit
 @preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 protocol PayController: AnyObject {
     var cart: StorefrontAPI.Types.Cart? { get set }
     var storefront: StorefrontAPI { get set }
@@ -36,7 +36,7 @@ protocol PayController: AnyObject {
     func present(url: URL) async throws
 }
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 class ApplePayViewController: PayController, ObservableObject {
     var configuration: ApplePayConfigurationWrapper
     var storefront: StorefrontAPI
@@ -242,7 +242,7 @@ class ApplePayViewController: PayController, ObservableObject {
     }
 }
 
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 extension ApplePayViewController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         Task { @MainActor in
