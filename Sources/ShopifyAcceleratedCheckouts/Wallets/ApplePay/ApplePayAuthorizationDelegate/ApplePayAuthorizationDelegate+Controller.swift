@@ -36,11 +36,29 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
     ) async -> PKPaymentRequestShippingContactUpdate {
         pkEncoder.shippingContact = .success(contact)
 
+        // Clear selected shipping method to prevent stale identifier errors
+        pkEncoder.selectedShippingMethod = nil
+        pkDecoder.selectedShippingMethod = nil
+
         do {
             let cartID = try pkEncoder.cartID.get()
 
             let shippingAddress = try pkEncoder.shippingAddress.get()
+
+            // Store current cart state before attempting address update
+            let previousCart = controller.cart
+
             let cart = try await upsertShippingAddress(to: shippingAddress)
+
+            // If address update cleared delivery groups, revert to previous cart and show error
+            if cart.deliveryGroups.nodes.isEmpty, previousCart?.deliveryGroups.nodes.isEmpty == false {
+                try setCart(to: previousCart)
+
+                let addressError = PKPaymentError(.shippingAddressUnserviceableError)
+
+                return pkDecoder.paymentRequestShippingContactUpdate(errors: [addressError])
+            }
+
             try setCart(to: cart)
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
@@ -109,8 +127,24 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        pkEncoder.selectedShippingMethod = shippingMethod
-        pkDecoder.selectedShippingMethod = shippingMethod
+        // Check if this shipping method identifier is still valid
+        let availableShippingMethods = pkDecoder.shippingMethods
+        let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
+
+        let methodToUse: PKShippingMethod
+
+        if !isValidMethod {
+            guard let firstAvailableMethod = availableShippingMethods.first else {
+                return pkDecoder.paymentRequestShippingMethodUpdate()
+            }
+
+            methodToUse = firstAvailableMethod
+        } else {
+            methodToUse = shippingMethod
+        }
+
+        pkEncoder.selectedShippingMethod = methodToUse
+        pkDecoder.selectedShippingMethod = methodToUse
 
         do {
             let cartID = try pkEncoder.cartID.get()
@@ -128,8 +162,6 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
             try setCart(to: result.cart)
-
-            return pkDecoder.paymentRequestShippingMethodUpdate()
         } catch {
             print("didSelectShippingMethod error:\n \(error)", terminator: "\n\n")
 
@@ -137,6 +169,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 pkDecoder.paymentRequestShippingMethodUpdate()
             }
         }
+
+        return pkDecoder.paymentRequestShippingMethodUpdate()
     }
 
     func paymentAuthorizationController(

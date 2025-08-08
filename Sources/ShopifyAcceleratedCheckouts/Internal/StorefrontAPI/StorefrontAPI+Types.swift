@@ -507,6 +507,9 @@ extension StorefrontAPI {
     /// Cart delivery addresses update payload
     typealias CartDeliveryAddressesUpdatePayload = CartPayload
 
+    /// Cart delivery addresses remove payload
+    typealias CartDeliveryAddressesRemovePayload = CartPayload
+
     /// Cart selected delivery options update payload
     typealias CartSelectedDeliveryOptionsUpdatePayload = CartPayload
 
