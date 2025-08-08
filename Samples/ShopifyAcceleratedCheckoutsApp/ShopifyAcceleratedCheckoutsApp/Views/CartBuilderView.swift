@@ -37,8 +37,29 @@ struct CartBuilderView: View {
     @State var selectedVariants: [MerchandiseID: Quantity] = [:]
     @State var isLoadingProducts: Bool = false
     @State var isCreatingCart: Bool = false
-    @State private var scrollToTop = false
-    @State private var scrollToCart = false
+    @State private var scrollToTop = false {
+        didSet {
+            if scrollToTop {
+                withAnimation(.easeInOut) {
+                    scrollViewProxy?.scrollTo("top", anchor: .top)
+                }
+                scrollToTop = false
+            }
+        }
+    }
+
+    @State private var scrollToCart = false {
+        didSet {
+            if scrollToCart {
+                withAnimation(.easeInOut) {
+                    scrollViewProxy?.scrollTo("cart-details", anchor: .top)
+                }
+                scrollToCart = false
+            }
+        }
+    }
+
+    @State private var scrollViewProxy: ScrollViewProxy?
 
     var body: some View {
         VStack {
@@ -75,21 +96,8 @@ struct CartBuilderView: View {
                         Spacer()
                             .frame(height: 100)
                     }
-                    .onChange(of: scrollToTop) { _, shouldScroll in
-                        if shouldScroll {
-                            withAnimation(.easeInOut) {
-                                scrollProxy.scrollTo("top", anchor: .top)
-                            }
-                            scrollToTop = false
-                        }
-                    }
-                    .onChange(of: scrollToCart) { _, shouldScroll in
-                        if shouldScroll {
-                            withAnimation(.easeInOut) {
-                                scrollProxy.scrollTo("cart-details", anchor: .top)
-                            }
-                            scrollToCart = false
-                        }
+                    .onAppear {
+                        scrollViewProxy = scrollProxy
                     }
                 }
             }
@@ -176,7 +184,7 @@ struct CartBuilderView: View {
 }
 
 #Preview {
-    @Previewable @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
+    @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken
     )

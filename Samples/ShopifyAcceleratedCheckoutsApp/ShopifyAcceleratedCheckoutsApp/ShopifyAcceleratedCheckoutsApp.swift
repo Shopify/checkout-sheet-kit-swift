@@ -26,8 +26,18 @@ import SwiftUI
 
 @main
 struct ShopifyAcceleratedCheckoutsApp: App {
-    @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true
-    @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
+    @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true {
+        didSet {
+            updateApplePayConfiguration()
+        }
+    }
+
+    @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true {
+        didSet {
+            updateApplePayConfiguration()
+        }
+    }
+
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
 
     @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
@@ -50,12 +60,10 @@ struct ShopifyAcceleratedCheckoutsApp: App {
                     }
                     .id("\(requireEmail)-\(requirePhone)")
             }
+            .environmentObject(configuration)
+            .environmentObject(applePayConfiguration)
         }
         .environment(\.locale, Locale(identifier: locale))
-        .environment(configuration)
-        .environment(applePayConfiguration)
-        .onChange(of: requireEmail) { updateApplePayConfiguration() }
-        .onChange(of: requirePhone) { updateApplePayConfiguration() }
     }
 
     private func updateApplePayConfiguration() {

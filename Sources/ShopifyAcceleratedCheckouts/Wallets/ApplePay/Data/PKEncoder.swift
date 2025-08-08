@@ -24,7 +24,7 @@
 import PassKit
 
 /// Encodes PassKit -> Storefront
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class PKEncoder {
     var cart: () -> StorefrontAPI.Types.Cart?
     /// Set during `didSelectShippingMethod`

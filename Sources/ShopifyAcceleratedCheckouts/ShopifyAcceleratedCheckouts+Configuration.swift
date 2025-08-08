@@ -23,9 +23,9 @@
 
 import SwiftUI
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
-    @Observable public class Configuration {
+    public class Configuration: ObservableObject {
         /// The domain of the shop without the protocol.
         ///
         /// Example: `my-shop.myshopify.com`
@@ -55,7 +55,7 @@ extension ShopifyAcceleratedCheckouts {
         }
     }
 
-    @Observable public class Customer {
+    public class Customer: ObservableObject {
         public var email: String?
         public var phoneNumber: String?
         public var customerAccessToken: String?

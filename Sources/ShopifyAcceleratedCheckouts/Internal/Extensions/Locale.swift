@@ -27,7 +27,7 @@ import Foundation
 typealias ShopifyLanguageCode = LanguageCode
 
 /// Extension to detect device locale and map to Shopify types
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension Locale {
     private static let defaultCountryCode: CountryCode = .US
     private static let defaultLanguageCode: ShopifyLanguageCode = .EN

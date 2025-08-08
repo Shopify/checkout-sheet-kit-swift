@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 enum Operations {
     static func cartCreate(
         variables: [String: Any] = [:]

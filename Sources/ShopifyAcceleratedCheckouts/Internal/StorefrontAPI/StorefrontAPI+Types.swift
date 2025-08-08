@@ -25,7 +25,7 @@ import Foundation
 
 // MARK: - Cart Models
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension StorefrontAPI {
     class Types {
         typealias ID = GraphQLScalars.ID
@@ -984,8 +984,8 @@ extension StorefrontAPI {
 
 /// Represents shop settings data fetched from the Storefront API
 /// https://shopify.dev/docs/api/storefront/2025-07/objects/Shop
-@available(iOS 17.0, *)
-@Observable class ShopSettings {
+@available(iOS 16.0, *)
+class ShopSettings: ObservableObject {
     /// The shop's name (merchant name for display)
     let name: String
 
@@ -1033,7 +1033,7 @@ extension StorefrontAPI {
 }
 
 /// Payment settings for the shop
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class PaymentSettings {
     /// The shop's country code (e.g., "US", "CA")
     let countryCode: String
@@ -1048,7 +1048,7 @@ class PaymentSettings {
 }
 
 /// Domain information for the shop
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class Domain {
     /// The host name of the domain (e.g., "example.myshopify.com")
     let host: String

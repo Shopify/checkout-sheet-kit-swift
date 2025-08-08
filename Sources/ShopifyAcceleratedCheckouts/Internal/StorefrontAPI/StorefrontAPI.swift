@@ -24,8 +24,8 @@
 import Foundation
 
 /// High-level API for Storefront operations using the custom GraphQL client
-@available(iOS 17.0, *)
-@Observable class StorefrontAPI {
+@available(iOS 16.0, *)
+class StorefrontAPI: ObservableObject {
     let client: GraphQLClient
 
     /// Initialize the Storefront API

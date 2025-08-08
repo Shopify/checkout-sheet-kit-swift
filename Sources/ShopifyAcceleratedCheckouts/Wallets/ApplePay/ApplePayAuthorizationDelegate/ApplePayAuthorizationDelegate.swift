@@ -28,7 +28,7 @@ import ShopifyCheckoutSheetKit
 // MARK: - PaymentAuthorizationController Protocol
 
 /// Protocol to abstract PKPaymentAuthorizationController for testing
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 protocol PaymentAuthorizationController {
     var delegate: PKPaymentAuthorizationControllerDelegate? { get set }
     func present() async -> Bool
@@ -37,10 +37,10 @@ protocol PaymentAuthorizationController {
 
 extension PKPaymentAuthorizationController: PaymentAuthorizationController {}
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthorizationController
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     let configuration: ApplePayConfigurationWrapper
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
@@ -264,7 +264,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 // MARK: - InvalidStateTransitionError
 
 /// Error thrown when an invalid state transition is attempted
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 struct InvalidStateTransitionError: Error {
     let fromState: ApplePayState
     let toState: ApplePayState

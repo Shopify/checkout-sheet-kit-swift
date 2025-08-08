@@ -25,7 +25,7 @@ import Foundation
 
 // MARK: - Mutation Operations
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension StorefrontAPI {
     /// Create a new cart
     /// - Parameters:
@@ -456,7 +456,7 @@ extension StorefrontAPI {
 
 // MARK: - Validation Helpers
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension StorefrontAPI {
     private func validateUserErrors(_ userErrors: [CartUserError], checkoutURL _: URL?) throws {
         guard userErrors.isEmpty else {
@@ -475,7 +475,7 @@ extension StorefrontAPI {
 
 // MARK: - Response Wrappers
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension StorefrontAPI {
     struct CartCreateResponse: Codable {
         let cartCreate: CartCreatePayload

@@ -23,7 +23,7 @@
 
 import Foundation
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class ErrorHandler {
     enum InterruptReason {
         case currencyChanged
