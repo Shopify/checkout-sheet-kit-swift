@@ -30,7 +30,7 @@ typealias MerchandiseID = String
 typealias Quantity = Int
 
 struct CartBuilderView: View {
-    @Binding var configuration: ShopifyAcceleratedCheckouts.Configuration
+    var configuration: ShopifyAcceleratedCheckouts.Configuration
     @State var cart: Cart?
     @State var allProducts: [Product] = []
     /// Products picked with the QuantityPicker, prior to Cart creation
@@ -173,10 +173,10 @@ struct CartBuilderView: View {
 }
 
 #Preview {
-    @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
+    var configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken
     )
 
-    CartBuilderView(configuration: $configuration)
+    CartBuilderView(configuration: configuration)
 }

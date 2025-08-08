@@ -38,12 +38,12 @@ protocol PayController: AnyObject {
 
 @available(iOS 16.0, *)
 class ApplePayViewController: PayController, ObservableObject {
-    var configuration: ApplePayConfigurationWrapper
-    var storefront: StorefrontAPI
-    var storefrontJulyRelease: StorefrontAPI
-    var identifier: CheckoutIdentifier
-    var checkoutViewController: CheckoutViewController?
-    var paymentController: PKPaymentAuthorizationController?
+    @Published var configuration: ApplePayConfigurationWrapper
+    @Published var storefront: StorefrontAPI
+    @Published var storefrontJulyRelease: StorefrontAPI
+    @Published var identifier: CheckoutIdentifier
+    @Published var checkoutViewController: CheckoutViewController?
+    @Published var paymentController: PKPaymentAuthorizationController?
 
     var cart: StorefrontAPI.Types.Cart?
 
@@ -178,7 +178,10 @@ class ApplePayViewController: PayController, ObservableObject {
                 return cart
             case let .variant(id, quantity):
                 let items: [StorefrontAPI.Types.ID] = Array(repeating: .init(id), count: quantity)
-                return try await storefront.cartCreate(with: items, customer: configuration.common.customer)
+                return try await storefront.cartCreate(
+                    with: items,
+                    customer: configuration.common.customer
+                )
             case .invariant:
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "checkoutIdentifier")
             }
@@ -193,7 +196,9 @@ class ApplePayViewController: PayController, ObservableObject {
         }
     }
 
-    private func handleStorefrontError(_ error: StorefrontAPI.Errors) async throws -> StorefrontAPI.Types.Cart {
+    private func handleStorefrontError(_ error: StorefrontAPI.Errors) async throws
+        -> StorefrontAPI.Types.Cart
+    {
         switch error {
         case let .userError(userErrors, cart):
             guard let cart else { throw error }

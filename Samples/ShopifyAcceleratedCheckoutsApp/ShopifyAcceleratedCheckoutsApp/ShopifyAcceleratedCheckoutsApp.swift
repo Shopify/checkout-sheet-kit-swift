@@ -26,33 +26,23 @@ import SwiftUI
 
 @main
 struct ShopifyAcceleratedCheckoutsApp: App {
-    @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true {
-        didSet {
-            updateApplePayConfiguration()
-        }
-    }
-
-    @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true {
-        didSet {
-            updateApplePayConfiguration()
-        }
-    }
-
+    @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true
+    @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
 
-    @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
+    @StateObject var configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
         customer: ShopifyAcceleratedCheckouts.Customer(email: nil, phoneNumber: nil)
     )
 
-    @State var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration =
+    @StateObject var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration =
         createApplePayConfiguration()
 
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                CartBuilderView(configuration: $configuration)
+                CartBuilderView(configuration: configuration)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             SettingsButton()
@@ -64,13 +54,6 @@ struct ShopifyAcceleratedCheckoutsApp: App {
             .environmentObject(applePayConfiguration)
         }
         .environment(\.locale, Locale(identifier: locale))
-    }
-
-    private func updateApplePayConfiguration() {
-        applePayConfiguration = createApplePayConfiguration(
-            requireEmail: requireEmail,
-            requirePhone: requirePhone
-        )
     }
 }
 
