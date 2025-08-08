@@ -43,7 +43,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
                     expectation.fulfill()
                 }
             }
-            .environment(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
+            .environmentObject(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
 
         // Render the view to trigger onAppear
         let hostingController = UIHostingController(rootView: testView)
@@ -70,7 +70,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
                     expectation.fulfill()
                 }
             }
-            .environment(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
+            .environmentObject(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
 
         // Render the view to trigger onAppear
         let hostingController = UIHostingController(rootView: testView)
@@ -97,7 +97,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
                     expectation.fulfill()
                 }
             }
-            .environment(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
+            .environmentObject(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
 
         // Render the view to trigger onAppear
         let hostingController = UIHostingController(rootView: testView)
@@ -124,7 +124,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
                     expectation.fulfill()
                 }
             }
-            .environment(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
+            .environmentObject(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
 
         // Render the view to trigger onAppear
         let hostingController = UIHostingController(rootView: testView)
@@ -151,7 +151,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
                     expectation.fulfill()
                 }
             }
-            .environment(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
+            .environmentObject(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
 
         // Render the view to trigger onAppear
         let hostingController = UIHostingController(rootView: testView)
@@ -178,7 +178,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
                     expectation.fulfill()
                 }
             }
-            .environment(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
+            .environmentObject(ShopifyAcceleratedCheckouts.Configuration.testConfiguration)
 
         // Render the view to trigger onAppear
         let hostingController = UIHostingController(rootView: testView)

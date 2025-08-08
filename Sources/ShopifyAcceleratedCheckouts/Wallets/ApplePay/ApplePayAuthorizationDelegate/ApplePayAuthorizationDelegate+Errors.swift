@@ -25,7 +25,7 @@ import PassKit
 
 /// NOTE: localizedDescriptions should be under 128 characters to avoid truncation
 /// https://developer.apple.com/design/human-interface-guidelines/apple-pay/
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ApplePayAuthorizationDelegate {
     enum ValidationErrors {
         static func emailInvalid(message: String) -> Error {

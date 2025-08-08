@@ -24,7 +24,7 @@
 import PassKit
 import ShopifyCheckoutSheetKit
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegate {
     /// Triggers on payment sheet presentation, and if user changes shipping address
     ///

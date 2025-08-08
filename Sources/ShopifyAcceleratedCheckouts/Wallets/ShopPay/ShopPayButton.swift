@@ -24,10 +24,9 @@
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 internal struct ShopPayButton: View {
-    @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
-    private var configuration: ShopifyAcceleratedCheckouts.Configuration
+    @EnvironmentObject private var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     let identifier: CheckoutIdentifier
     let eventHandlers: EventHandlers
@@ -60,7 +59,7 @@ internal struct ShopPayButton: View {
 
 /// Internal_ wrapper component allows `ShopifyAcceleratedCheckouts.Configuration` to be
 /// DI into ShopPayViewController at init, avoiding optionality checks through ViewController
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 internal struct Internal_ShopPayButton: View {
     private var controller: ShopPayViewController
     private let cornerRadius: CGFloat?

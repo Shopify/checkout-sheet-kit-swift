@@ -364,13 +364,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             .onCancel {
                 print("Accelerated checkout cancelled")
             }
-            .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
-            .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+            .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+            .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
 
         // Wrap in AnyView and create hosting controller
         let acceleratedCheckoutsController = UIHostingController(rootView: AnyView(acceleratedCheckoutButtonsView))
         acceleratedCheckoutsController.view.translatesAutoresizingMaskIntoConstraints = false
-        acceleratedCheckoutsController.view.backgroundColor = .clear
+        acceleratedCheckoutsController.view.backgroundColor = UIColor.clear
 
         // Set height constraint for accelerated checkout buttons (2 buttons: Apple Pay + Shop Pay)
         let heightConstraint = acceleratedCheckoutsController.view.heightAnchor.constraint(equalToConstant: 96)

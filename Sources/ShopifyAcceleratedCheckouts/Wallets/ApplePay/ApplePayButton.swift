@@ -26,19 +26,19 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 /// A view that displays an Apple Pay button for checkout
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct ApplePayButton: View {
     /// The configuration for Apple Pay
-    @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
-    private var configuration
+    @EnvironmentObject
+    private var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     /// The shop settings
-    @Environment(ShopSettings.self)
-    private var shopSettings
+    @EnvironmentObject
+    private var shopSettings: ShopSettings
 
-    @Environment(ShopifyAcceleratedCheckouts.ApplePayConfiguration.self)
-    private var applePayConfiguration
+    @EnvironmentObject
+    private var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
 
     /// The identifier to use for checkout
     private let identifier: CheckoutIdentifier
@@ -89,7 +89,7 @@ struct ApplePayButton: View {
 
 /// A view that displays an Apple Pay button for checkout
 /// This is an internal view to allow Environment injection of the shared configuration app wide
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style

@@ -23,7 +23,7 @@
 
 import PassKit
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
     /// Contact field types that can be required during Apple Pay checkout.
     public enum RequiredContactFields {
@@ -36,7 +36,7 @@ extension ShopifyAcceleratedCheckouts {
     /// This class encapsulates all necessary settings for enabling Apple Pay as a payment method,
     /// including merchant identification and required contact information. Supported payment networks
     /// are automatically determined based on the merchant's Shopify configuration.
-    @Observable public class ApplePayConfiguration {
+    public class ApplePayConfiguration: ObservableObject {
         /// The merchant identifier for Apple Pay transactions.
         ///
         /// This value must match one of the merchant identifiers specified by the Merchant IDs
@@ -77,7 +77,7 @@ extension ShopifyAcceleratedCheckouts {
 ///
 /// This class is used internally to bundle the Apple Pay-specific configuration
 /// with the general accelerated checkout configuration and shop settings.
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class ApplePayConfigurationWrapper {
     var common: ShopifyAcceleratedCheckouts.Configuration
     var applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration
