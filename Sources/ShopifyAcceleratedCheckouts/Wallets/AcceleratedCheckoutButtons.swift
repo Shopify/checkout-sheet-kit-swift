@@ -48,6 +48,9 @@ public struct AcceleratedCheckoutButtons: View {
     var eventHandlers: EventHandlers = .init()
     var cornerRadius: CGFloat?
 
+    /// The Apple Pay button label style
+    private var applePayLabel: ApplePayButtonLabel = .plain
+
     @State private var shopSettings: ShopSettings?
     @State private var currentRenderState: RenderState = .loading
 
@@ -86,6 +89,7 @@ public struct AcceleratedCheckoutButtons: View {
                                 eventHandlers: eventHandlers,
                                 cornerRadius: cornerRadius
                             )
+                            .label(applePayLabel)
                         case .shopPay:
                             ShopPayButton(
                                 identifier: identifier,
@@ -129,6 +133,12 @@ public struct AcceleratedCheckoutButtons: View {
 
 @available(iOS 17.0, *)
 extension AcceleratedCheckoutButtons {
+    public func applePayLabel(_ label: ApplePayButtonLabel) -> AcceleratedCheckoutButtons {
+        var view = self
+        view.applePayLabel = label
+        return view
+    }
+
     /// Modifies the wallet options supported
     /// Defaults: [.applePay]
     public func wallets(_ wallets: [Wallet]) -> AcceleratedCheckoutButtons {
