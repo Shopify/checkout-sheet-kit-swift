@@ -145,7 +145,7 @@ struct Internal_ApplePayButton: View {
 }
 
 /// Used to set the label of the Apple Pay button
-/// see `.appleLabel(label:)`
+/// see `.applePayLabel(label:)`
 public enum ApplePayButtonLabel {
     /// A button with the Apple Pay logo only
     case plain
