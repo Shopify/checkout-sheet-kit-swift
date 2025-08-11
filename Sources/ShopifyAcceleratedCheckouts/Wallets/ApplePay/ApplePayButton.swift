@@ -80,7 +80,7 @@ struct ApplePayButton: View {
         }
     }
 
-    public func withLabel(_ label: PayWithApplePayButtonLabel) -> some View {
+    public func label(_ label: PayWithApplePayButtonLabel) -> some View {
         var view = self
         view.label = label
         return view
@@ -137,7 +137,6 @@ struct Internal_ApplePayButton: View {
                 Task { await controller.startPayment() }
             },
             fallback: {
-                // content == nil ? Text("errors.applePay.unsupported") : content
                 Text("errors.applePay.unsupported".localizedString)
             }
         )
