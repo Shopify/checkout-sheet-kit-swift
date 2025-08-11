@@ -146,6 +146,7 @@ struct Internal_ApplePayButton: View {
 
 /// Used to set the label of the Apple Pay button
 /// see `.applePayLabel(label:)`
+@available(iOS 16.0, *)
 public enum ApplePayButtonLabel {
     /// A button with the Apple Pay logo only
     case plain
@@ -182,7 +183,6 @@ public enum ApplePayButtonLabel {
     /// A button that uses the phrase "Top Up with" in conjunction with the Apple Pay logo
     case topUp
 
-    @available(iOS 16.0, *)
     var toPayWithApplePayButtonLabel: PayWithApplePayButtonLabel {
         switch self {
         case .plain: return .plain
