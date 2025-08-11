@@ -25,6 +25,88 @@ import PassKit
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
+/// Used to set the label of the Apple Pay button
+/// see `.appleLabel(label:)`
+public enum ApplePayButtonLabel {
+    /// A button with the Apple Pay logo only
+    case plain
+    /// A button that uses the phrase "Buy with" in conjunction with the Apple Pay logo
+    case buy
+    /// A button that prompts the user to set up Apple Pay
+    case setUp
+    /// A button that uses the phrase "Pay with" in conjunction with the Apple Pay logo
+    case inStore
+    /// A button that uses the phrase "Donate with" in conjunction with the Apple Pay logo
+    case donate
+    /// A button that uses the phrase "Check out with" in conjunction with the Apple Pay logo
+    case checkout
+    /// A button that uses the phrase "Book with" in conjunction with the Apple Pay logo
+    case book
+    /// A button that uses the phrase "Subscribe with" in conjunction with the Apple Pay logo
+    case subscribe
+    /// A button that uses the phrase "Reload with" in conjunction with the Apple Pay logo
+    case reload
+    /// A button that uses the phrase "Add Money with" in conjunction with the Apple Pay logo
+    case addMoney
+    /// A button that uses the phrase "Top Up with" in conjunction with the Apple Pay logo
+    case topUp
+    /// A button that uses the phrase "Order with" in conjunction with the Apple Pay logo
+    case order
+    /// A button that uses the phrase "Rent with" in conjunction with the Apple Pay logo
+    case rent
+    /// A button that uses the phrase "Support with" in conjunction with the Apple Pay logo
+    case support
+    /// A button that uses the phrase "Contribute with" in conjunction with the Apple Pay logo
+    case contribute
+    /// A button that uses the phrase "Tip with" in conjunction with the Apple Pay logo
+    case tip
+
+    /// SwiftUI interop - will be removed when migrating to support iOS 15
+    @available(iOS 17.0, *)
+    var toPayWithApplePayButtonLabel: PayWithApplePayButtonLabel {
+        switch self {
+        case .plain: return .plain
+        case .buy: return .buy
+        case .setUp: return .setUp
+        case .inStore: return .inStore
+        case .donate: return .donate
+        case .checkout: return .checkout
+        case .book: return .book
+        case .subscribe: return .subscribe
+        case .reload: return .reload
+        case .addMoney: return .addMoney
+        case .topUp: return .topUp
+        case .order: return .order
+        case .rent: return .rent
+        case .support: return .support
+        case .contribute: return .contribute
+        case .tip: return .tip
+        }
+    }
+
+    @available(iOS 15.0, *)
+    var toPKPaymentButtonType: PKPaymentButtonType {
+        switch self {
+        case .plain: return .plain
+        case .buy: return .buy
+        case .setUp: return .setUp
+        case .inStore: return .inStore
+        case .checkout: return .checkout
+        case .donate: return .donate
+        case .reload: return .reload
+        case .addMoney: return .addMoney
+        case .topUp: return .topUp
+        case .order: return .order
+        case .book: return .book
+        case .subscribe: return .subscribe
+        case .rent: return .rent
+        case .support: return .support
+        case .contribute: return .contribute
+        case .tip: return .tip
+        }
+    }
+}
+
 /// A view that displays an Apple Pay button for checkout
 @available(iOS 17.0, *)
 @available(macOS, unavailable)
@@ -47,7 +129,7 @@ struct ApplePayButton: View {
     private let eventHandlers: EventHandlers
 
     /// The Apple Pay button label style
-    private var label: PayWithApplePayButtonLabel = .plain
+    private var label: ApplePayButtonLabel = .plain
 
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
@@ -80,7 +162,7 @@ struct ApplePayButton: View {
         }
     }
 
-    public func label(_ label: PayWithApplePayButtonLabel) -> some View {
+    public func label(_ label: ApplePayButtonLabel) -> some View {
         var view = self
         view.label = label
         return view
@@ -93,7 +175,7 @@ struct ApplePayButton: View {
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style
-    private var label: PayWithApplePayButtonLabel = .plain
+    private var label: ApplePayButtonLabel = .plain
 
     /// The view controller for the Apple Pay button
     private var controller: ApplePayViewController
@@ -109,7 +191,7 @@ struct Internal_ApplePayButton: View {
     ///   - eventHandlers: The event handlers for checkout events (defaults to EventHandlers())
     init(
         identifier: CheckoutIdentifier,
-        label: PayWithApplePayButtonLabel,
+        label: ApplePayButtonLabel,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
@@ -132,7 +214,7 @@ struct Internal_ApplePayButton: View {
 
     var body: some View {
         PayWithApplePayButton(
-            label,
+            label.toPayWithApplePayButtonLabel,
             action: {
                 Task { await controller.startPayment() }
             },
