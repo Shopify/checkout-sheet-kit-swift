@@ -54,9 +54,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             if cart.deliveryGroups.nodes.isEmpty, previousCart?.deliveryGroups.nodes.isEmpty == false {
                 try setCart(to: previousCart)
 
-                let addressError = PKPaymentError(.shippingAddressUnserviceableError)
-
-                return pkDecoder.paymentRequestShippingContactUpdate(errors: [addressError])
+                return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.addressUnserviceableError])
             }
 
             try setCart(to: cart)
@@ -130,18 +128,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         // Check if this shipping method identifier is still valid
         let availableShippingMethods = pkDecoder.shippingMethods
         let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
-
-        let methodToUse: PKShippingMethod
-
-        if !isValidMethod {
-            guard let firstAvailableMethod = availableShippingMethods.first else {
-                return pkDecoder.paymentRequestShippingMethodUpdate()
-            }
-
-            methodToUse = firstAvailableMethod
-        } else {
-            methodToUse = shippingMethod
-        }
+        let methodToUse: PKShippingMethod = availableShippingMethods.first ?? shippingMethod
 
         pkEncoder.selectedShippingMethod = methodToUse
         pkDecoder.selectedShippingMethod = methodToUse
@@ -162,6 +149,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
             try setCart(to: result.cart)
+
+            return pkDecoder.paymentRequestShippingMethodUpdate()
         } catch {
             print("didSelectShippingMethod error:\n \(error)", terminator: "\n\n")
 
@@ -169,8 +158,6 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 pkDecoder.paymentRequestShippingMethodUpdate()
             }
         }
-
-        return pkDecoder.paymentRequestShippingMethodUpdate()
     }
 
     func paymentAuthorizationController(

@@ -243,23 +243,13 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         if let addressID = selectedShippingAddressID {
             do {
                 // First, remove the existing delivery address to clear any tax policy contamination
-                let cartAfterRemove = try await controller.storefront.cartDeliveryAddressesRemove(
+                _ = try await controller.storefront.cartDeliveryAddressesRemove(
                     id: cartID,
                     addressId: addressID
                 )
 
                 // Clear the selected address ID since we removed it
                 selectedShippingAddressID = nil
-
-                let cart = try await controller.storefront.cartDeliveryAddressesAdd(
-                    id: cartID,
-                    address: address,
-                    validate: validate
-                )
-
-                selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
-
-                return cart
             } catch {
                 if let responseError = error as? StorefrontAPI.Errors {
                     print("upsertShippingAddress - Storefront API Error: \(responseError)")
