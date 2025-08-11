@@ -204,27 +204,4 @@ public enum ApplePayButtonLabel {
         case .topUp: return .topUp
         }
     }
-
-    @available(iOS 15.0, *)
-    var toPKPaymentButtonType: PKPaymentButtonType {
-        switch self {
-        case .plain: return .plain
-        case .buy: return .buy
-        case .addMoney: return .addMoney
-        case .book: return .book
-        case .checkout: return .checkout
-        case .continue: return .continue
-        case .contribute: return .contribute
-        case .donate: return .donate
-        case .inStore: return .inStore
-        case .order: return .order
-        case .reload: return .reload
-        case .rent: return .rent
-        case .setUp: return .setUp
-        case .subscribe: return .subscribe
-        case .support: return .support
-        case .tip: return .tip
-        case .topUp: return .topUp
-        }
-    }
 }
