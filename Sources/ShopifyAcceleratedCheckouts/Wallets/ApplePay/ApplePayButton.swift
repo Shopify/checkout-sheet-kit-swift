@@ -182,8 +182,7 @@ public enum ApplePayButtonLabel {
     /// A button that uses the phrase "Top Up with" in conjunction with the Apple Pay logo
     case topUp
 
-    /// SwiftUI interop - will be removed when migrating to support iOS 15
-    @available(iOS 17.0, *)
+    @available(iOS 16.0, *)
     var toPayWithApplePayButtonLabel: PayWithApplePayButtonLabel {
         switch self {
         case .plain: return .plain
