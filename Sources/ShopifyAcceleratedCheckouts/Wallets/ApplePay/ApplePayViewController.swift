@@ -271,10 +271,8 @@ extension ApplePayViewController: CheckoutDelegate {
         }
     }
 
-    func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return MainActor.assumeIsolated {
-            self.onShouldRecoverFromError?(error) ?? false
-        }
+    @MainActor func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        return onShouldRecoverFromError?(error) ?? false
     }
 
     func checkoutDidClickLink(url: URL) {

@@ -173,7 +173,7 @@ struct CartBuilderView: View {
 }
 
 #Preview {
-    var configuration = ShopifyAcceleratedCheckouts.Configuration(
+    let configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken
     )

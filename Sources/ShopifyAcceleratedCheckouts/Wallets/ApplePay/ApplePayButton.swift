@@ -120,7 +120,7 @@ struct Internal_ApplePayButton: View {
         )
         self.label = label
         self.cornerRadius = cornerRadius
-        MainActor.assumeIsolated {
+        Task { @MainActor [controller] in
             controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
             controller.onCheckoutFail = eventHandlers.checkoutDidFail
             controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
