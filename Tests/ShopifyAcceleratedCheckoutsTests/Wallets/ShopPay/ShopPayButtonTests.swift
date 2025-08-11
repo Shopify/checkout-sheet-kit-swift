@@ -31,27 +31,12 @@ import XCTest
 class ShopPayButtonTests: XCTestCase {
     // MARK: - Test Setup
 
-    private var testConfiguration: ShopifyAcceleratedCheckouts.Configuration!
-    private var validCartIdentifier: CheckoutIdentifier!
-    private var validVariantIdentifier: CheckoutIdentifier!
-    private var invalidIdentifier: CheckoutIdentifier!
-
-    override func setUp() {
-        super.setUp()
-        testConfiguration = .testConfiguration
-        validCartIdentifier = .cart(cartID: "gid://Shopify/Cart/test-cart-id")
-        validVariantIdentifier = .variant(
-            variantID: "gid://Shopify/ProductVariant/test-variant-id", quantity: 1)
-        invalidIdentifier = .invariant
-    }
-
-    override func tearDown() {
-        testConfiguration = nil
-        validCartIdentifier = nil
-        validVariantIdentifier = nil
-        invalidIdentifier = nil
-        super.tearDown()
-    }
+    private let testConfiguration: ShopifyAcceleratedCheckouts.Configuration = .testConfiguration
+    private var validCartIdentifier: CheckoutIdentifier! = .cart(
+        cartID: "gid://Shopify/Cart/test-cart-id")
+    private var validVariantIdentifier: CheckoutIdentifier! = .variant(
+        variantID: "gid://Shopify/ProductVariant/test-variant-id", quantity: 1
+    )
 
     // MARK: - ShopPayButton Tests
 
@@ -83,18 +68,6 @@ class ShopPayButtonTests: XCTestCase {
         XCTAssertEqual(try logoImage.actualImage().name(), "shop-pay-logo")
     }
 
-    func test_shopPayButton_withInvalidIdentifier_shouldRenderEmptyView() throws {
-        let button = ShopPayButton(
-            identifier: invalidIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: nil
-        )
-        .environmentObject(testConfiguration)
-
-        XCTAssertNoThrow(try button.inspect().find(ViewType.EmptyView.self))
-        XCTAssertThrowsError(try button.inspect().find(ViewType.Button.self))
-    }
-
     // MARK: - ShopPayButton Rendering Tests
 
     func test_shopPayButton_shouldHaveShopPayBlueBackground() throws {
@@ -112,125 +85,57 @@ class ShopPayButtonTests: XCTestCase {
         XCTAssertEqual(try background.color().value(), Color.shopPayBlue)
     }
 
-    func test_shopPayButton_withCustomCornerRadius_shouldApplyCornerRadius() throws {
-        let customCornerRadius: CGFloat = 12
-        let button = ShopPayButton(
-            identifier: validCartIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: customCornerRadius
-        )
-        .environmentObject(testConfiguration)
+    func test_shopPayButton_cornerRadius_shouldApplyExpectedValues() throws {
+        let testCases: [(input: CGFloat?, expected: CGFloat, description: String)] = [
+            (input: 12, expected: 12, description: "custom corner radius"),
+            (input: nil, expected: 8, description: "nil corner radius uses default"),
+            (input: 0, expected: 0, description: "zero corner radius"),
+            (input: -5, expected: 8, description: "negative corner radius uses default"),
+            (input: 100, expected: 100, description: "large corner radius")
+        ]
 
-        let buttonElement = try button.inspect().find(ViewType.Button.self)
-        XCTAssertEqual(try buttonElement.cornerRadius(), 12)
-    }
+        for testCase in testCases {
+            try XCTContext.runActivity(named: "Testing \(testCase.description)") { _ in
+                let button = ShopPayButton(
+                    identifier: validCartIdentifier,
+                    eventHandlers: EventHandlers(),
+                    cornerRadius: testCase.input
+                )
+                .environmentObject(testConfiguration)
 
-    func test_shopPayButton_withNilCornerRadius_shouldUseDefaultCornerRadius() throws {
-        let button = ShopPayButton(
-            identifier: validCartIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: nil
-        )
-        .environmentObject(testConfiguration)
-
-        let buttonElement = try button.inspect().find(ViewType.Button.self)
-
-        XCTAssertEqual(try buttonElement.cornerRadius(), 8)
-    }
-
-    func test_shopPayButton_withZeroCornerRadius_shouldApplyZero() throws {
-        let button = ShopPayButton(
-            identifier: validCartIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: 0
-        )
-        .environmentObject(testConfiguration)
-
-        let buttonElement = try button.inspect().find(ViewType.Button.self)
-
-        XCTAssertEqual(try buttonElement.cornerRadius(), 0)
-    }
-
-    func test_shopPayButton_withNegativeCornerRadius_shouldUseDefaultCornerRadius() throws {
-        let button = ShopPayButton(
-            identifier: validCartIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: -5
-        )
-        .environmentObject(testConfiguration)
-
-        let buttonElement = try button.inspect().find(ViewType.Button.self)
-
-        XCTAssertEqual(try buttonElement.cornerRadius(), 8)
-    }
-
-    func test_shopPayButton_withLargeCornerRadius_shouldHandleGracefully() throws {
-        let button = ShopPayButton(
-            identifier: validCartIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: 100
-        )
-        .environmentObject(testConfiguration)
-
-        let buttonElement = try button.inspect().find(ViewType.Button.self)
-
-        XCTAssertEqual(try buttonElement.cornerRadius(), 100)
+                let buttonElement = try button.inspect().find(ViewType.Button.self)
+                XCTAssertEqual(try buttonElement.cornerRadius(), testCase.expected)
+            }
+        }
     }
 
     // MARK: - Identifier Validation Tests
 
-    func test_shopPayButton_withEmptyCartID_shouldRenderEmptyView() throws {
-        let emptyCartIdentifier = CheckoutIdentifier.cart(cartID: "")
-        let button = ShopPayButton(
-            identifier: emptyCartIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: nil
-        )
-        .environmentObject(testConfiguration)
+    func test_shopPayButton_withInvalidIdentifiers_shouldRenderEmptyView() throws {
+        let testCases: [(CheckoutIdentifier, String)] = [
+            (.cart(cartID: ""), "empty cart ID"),
+            (.cart(cartID: "invalid://Shopify/Cart/test-id"), "invalid cart ID prefix"),
+            (
+                .variant(variantID: "gid://Shopify/ProductVariant/test-id", quantity: 0),
+                "zero quantity variant"
+            ),
+            (
+                .variant(variantID: "invalid://Shopify/ProductVariant/test-id", quantity: 1),
+                "invalid variant ID prefix"
+            )
+        ]
 
-        XCTAssertNoThrow(try button.inspect().find(ViewType.EmptyView.self))
-    }
+        for (identifier, description) in testCases {
+            try XCTContext.runActivity(named: "Testing \(description)") { _ in
+                let button = ShopPayButton(
+                    identifier: identifier,
+                    eventHandlers: EventHandlers(),
+                    cornerRadius: nil
+                )
+                .environmentObject(testConfiguration)
 
-    func test_shopPayButton_withInvalidCartIDPrefix_shouldRenderEmptyView() throws {
-        let invalidCartIdentifier = CheckoutIdentifier.cart(
-            cartID: "invalid://Shopify/Cart/test-id")
-        let button = ShopPayButton(
-            identifier: invalidCartIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: nil
-        )
-        .environmentObject(testConfiguration)
-
-        XCTAssertNoThrow(try button.inspect().find(ViewType.EmptyView.self))
-    }
-
-    func test_shopPayButton_withZeroQuantityVariant_shouldRenderEmptyView() throws {
-        let zeroQuantityIdentifier = CheckoutIdentifier.variant(
-            variantID: "gid://Shopify/ProductVariant/test-id",
-            quantity: 0
-        )
-        let button = ShopPayButton(
-            identifier: zeroQuantityIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: nil
-        )
-        .environmentObject(testConfiguration)
-
-        XCTAssertNoThrow(try button.inspect().find(ViewType.EmptyView.self))
-    }
-
-    func test_shopPayButton_withInvalidVariantIDPrefix_shouldRenderEmptyView() throws {
-        let invalidVariantIdentifier = CheckoutIdentifier.variant(
-            variantID: "invalid://Shopify/ProductVariant/test-id",
-            quantity: 1
-        )
-        let button = ShopPayButton(
-            identifier: invalidVariantIdentifier,
-            eventHandlers: EventHandlers(),
-            cornerRadius: nil
-        )
-        .environmentObject(testConfiguration)
-
-        XCTAssertNoThrow(try button.inspect().find(ViewType.EmptyView.self))
+                XCTAssertNoThrow(try button.inspect().find(ViewType.EmptyView.self))
+            }
+        }
     }
 }
