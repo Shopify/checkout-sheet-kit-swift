@@ -151,34 +151,36 @@ public enum ApplePayButtonLabel {
     case plain
     /// A button that uses the phrase "Buy with" in conjunction with the Apple Pay logo
     case buy
-    /// A button that prompts the user to set up Apple Pay
-    case setUp
-    /// A button that uses the phrase "Pay with" in conjunction with the Apple Pay logo
-    case inStore
-    /// A button that uses the phrase "Donate with" in conjunction with the Apple Pay logo
-    case donate
-    /// A button that uses the phrase "Check out with" in conjunction with the Apple Pay logo
-    case checkout
-    /// A button that uses the phrase "Book with" in conjunction with the Apple Pay logo
-    case book
-    /// A button that uses the phrase "Subscribe with" in conjunction with the Apple Pay logo
-    case subscribe
-    /// A button that uses the phrase "Reload with" in conjunction with the Apple Pay logo
-    case reload
     /// A button that uses the phrase "Add Money with" in conjunction with the Apple Pay logo
     case addMoney
-    /// A button that uses the phrase "Top Up with" in conjunction with the Apple Pay logo
-    case topUp
-    /// A button that uses the phrase "Order with" in conjunction with the Apple Pay logo
-    case order
-    /// A button that uses the phrase "Rent with" in conjunction with the Apple Pay logo
-    case rent
-    /// A button that uses the phrase "Support with" in conjunction with the Apple Pay logo
-    case support
+    /// A button that uses the phrase "Book with" in conjunction with the Apple Pay logo
+    case book
+    /// A button that uses the phrase "Check out with" in conjunction with the Apple Pay logo
+    case checkout
+    /// A button that uses the phrase "Continue with" in conjunction with the Apple Pay logo
+    case `continue`
     /// A button that uses the phrase "Contribute with" in conjunction with the Apple Pay logo
     case contribute
+    /// A button that uses the phrase "Donate with" in conjunction with the Apple Pay logo
+    case donate
+    /// A button that uses the phrase "Pay with" in conjunction with the Apple Pay logo
+    case inStore
+    /// A button that uses the phrase "Order with" in conjunction with the Apple Pay logo
+    case order
+    /// A button that uses the phrase "Reload with" in conjunction with the Apple Pay logo
+    case reload
+    /// A button that uses the phrase "Rent with" in conjunction with the Apple Pay logo
+    case rent
+    /// A button that prompts the user to set up Apple Pay
+    case setUp
+    /// A button that uses the phrase "Subscribe with" in conjunction with the Apple Pay logo
+    case subscribe
+    /// A button that uses the phrase "Support with" in conjunction with the Apple Pay logo
+    case support
     /// A button that uses the phrase "Tip with" in conjunction with the Apple Pay logo
     case tip
+    /// A button that uses the phrase "Top Up with" in conjunction with the Apple Pay logo
+    case topUp
 
     /// SwiftUI interop - will be removed when migrating to support iOS 15
     @available(iOS 17.0, *)
@@ -186,20 +188,21 @@ public enum ApplePayButtonLabel {
         switch self {
         case .plain: return .plain
         case .buy: return .buy
-        case .setUp: return .setUp
-        case .inStore: return .inStore
-        case .donate: return .donate
-        case .checkout: return .checkout
-        case .book: return .book
-        case .subscribe: return .subscribe
-        case .reload: return .reload
         case .addMoney: return .addMoney
-        case .topUp: return .topUp
-        case .order: return .order
-        case .rent: return .rent
-        case .support: return .support
+        case .book: return .book
+        case .checkout: return .checkout
+        case .continue: return .continue
         case .contribute: return .contribute
+        case .donate: return .donate
+        case .inStore: return .inStore
+        case .order: return .order
+        case .reload: return .reload
+        case .rent: return .rent
+        case .setUp: return .setUp
+        case .subscribe: return .subscribe
+        case .support: return .support
         case .tip: return .tip
+        case .topUp: return .topUp
         }
     }
 
@@ -208,20 +211,21 @@ public enum ApplePayButtonLabel {
         switch self {
         case .plain: return .plain
         case .buy: return .buy
-        case .setUp: return .setUp
-        case .inStore: return .inStore
-        case .checkout: return .checkout
-        case .donate: return .donate
-        case .reload: return .reload
         case .addMoney: return .addMoney
-        case .topUp: return .topUp
-        case .order: return .order
         case .book: return .book
-        case .subscribe: return .subscribe
-        case .rent: return .rent
-        case .support: return .support
+        case .checkout: return .checkout
+        case .continue: return .continue
         case .contribute: return .contribute
+        case .donate: return .donate
+        case .inStore: return .inStore
+        case .order: return .order
+        case .reload: return .reload
+        case .rent: return .rent
+        case .setUp: return .setUp
+        case .subscribe: return .subscribe
+        case .support: return .support
         case .tip: return .tip
+        case .topUp: return .topUp
         }
     }
 }
