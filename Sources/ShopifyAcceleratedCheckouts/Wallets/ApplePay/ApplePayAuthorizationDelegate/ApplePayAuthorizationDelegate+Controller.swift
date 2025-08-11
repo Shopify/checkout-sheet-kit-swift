@@ -128,7 +128,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         // Check if this shipping method identifier is still valid
         let availableShippingMethods = pkDecoder.shippingMethods
         let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
-        let methodToUse: PKShippingMethod = availableShippingMethods.first ?? shippingMethod
+        let methodToUse: PKShippingMethod = isValidMethod ? shippingMethod : (availableShippingMethods.first ?? shippingMethod)
 
         pkEncoder.selectedShippingMethod = methodToUse
         pkDecoder.selectedShippingMethod = methodToUse

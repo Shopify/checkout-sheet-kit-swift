@@ -524,6 +524,129 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         XCTAssertEqual(buyerIdentity?["customerAccessToken"] as? String, "customer-access-token-456")
     }
 
+    // MARK: - Delivery Address Remove Tests
+
+    func testCartDeliveryAddressesRemoveSuccess() async throws {
+        let json = """
+        {
+            "data": {
+                "cartDeliveryAddressesRemove": {
+                    "cart": {
+                        "id": "gid://shopify/Cart/123",
+                        "checkoutUrl": "https://test.myshopify.com/checkout/123",
+                        "totalQuantity": 1,
+                        "buyerIdentity": null,
+                        "deliveryGroups": {
+                            "nodes": [{
+                                "id": "gid://shopify/CartDeliveryGroup/1",
+                                "groupType": "ONE_TIME_PURCHASE",
+                                "deliveryOptions": [{
+                                    "handle": "standard",
+                                    "title": "Standard Shipping",
+                                    "code": "STANDARD",
+                                    "deliveryMethodType": "SHIPPING",
+                                    "description": "5-7 business days",
+                                    "estimatedCost": {"amount": "5.00", "currencyCode": "USD"}
+                                }],
+                                "selectedDeliveryOption": null
+                            }]
+                        },
+                        "delivery": {
+                            "addresses": []
+                        },
+                        "lines": {"nodes": []},
+                        "cost": {
+                            "totalAmount": {"amount": "19.99", "currencyCode": "USD"},
+                            "subtotalAmount": {"amount": "19.99", "currencyCode": "USD"},
+                            "totalTaxAmount": null
+                        },
+                        "discountCodes": [],
+                        "discountAllocations": []
+                    },
+                    "userErrors": []
+                }
+            }
+        }
+        """
+        mockJSONResponse(json)
+
+        let cart = try await storefrontAPI.cartDeliveryAddressesRemove(
+            id: GraphQLScalars.ID("gid://shopify/Cart/123"),
+            addressId: GraphQLScalars.ID("gid://shopify/CartSelectableAddress/1")
+        )
+
+        XCTAssertEqual(cart.id.rawValue, "gid://shopify/Cart/123")
+        XCTAssertEqual(cart.delivery?.addresses.count, 0)
+        XCTAssertEqual(cart.deliveryGroups.nodes.first?.deliveryOptions.count, 1)
+    }
+
+    func testCartDeliveryAddressesRemoveWithInvalidAddress() async {
+        let json = """
+        {
+            "data": {
+                "cartDeliveryAddressesRemove": {
+                    "cart": null,
+                    "userErrors": [{
+                        "field": ["addressIds"],
+                        "message": "Address not found",
+                        "code": "NOT_FOUND"
+                    }]
+                }
+            }
+        }
+        """
+        mockJSONResponse(json)
+
+        await XCTAssertThrowsGraphQLError(
+            try await storefrontAPI.cartDeliveryAddressesRemove(
+                id: GraphQLScalars.ID("gid://shopify/Cart/123"),
+                addressId: GraphQLScalars.ID("gid://shopify/CartSelectableAddress/999")
+            ),
+            { if case .invalidResponse = $0 { return true } else { return false } },
+            "Expected GraphQLError.invalidResponse to be thrown"
+        )
+    }
+
+    func testCartDeliveryAddressesRemoveRequestValidation() async throws {
+        let json = """
+        {"data": {"cartDeliveryAddressesRemove": {"cart": null, "userErrors": []}}}
+        """
+        mockJSONResponse(json)
+
+        do {
+            _ = try await storefrontAPI.cartDeliveryAddressesRemove(
+                id: GraphQLScalars.ID("gid://shopify/Cart/123"),
+                addressId: GraphQLScalars.ID("gid://shopify/CartSelectableAddress/456")
+            )
+            XCTFail("Expected error to be thrown")
+        } catch {
+            XCTAssertTrue(
+                error is GraphQLError,
+                "Unexpected error type: \(type(of: error))"
+            )
+
+            guard case .invalidResponse = error as? GraphQLError else {
+                XCTFail("Expected GraphQLError.invalidResponse but got: \(error)")
+                return
+            }
+        }
+
+        XCTAssertNotNil(MockURLProtocol.capturedRequestBody)
+
+        guard let body = MockURLProtocol.capturedRequestBody else {
+            XCTFail("Expected request body to be captured")
+            return
+        }
+
+        let jsonBody = try JSONSerialization.jsonObject(with: body) as? [String: Any]
+        let variables = jsonBody?["variables"] as? [String: Any]
+        let addressIds = variables?["addressIds"] as? [String]
+
+        XCTAssertEqual(variables?["cartId"] as? String, "gid://shopify/Cart/123")
+        XCTAssertEqual(addressIds?.count, 1)
+        XCTAssertEqual(addressIds?.first, "gid://shopify/CartSelectableAddress/456")
+    }
+
     // MARK: - Delivery Address Add Tests
 
     func testCartDeliveryAddressesAddSuccess() async throws {

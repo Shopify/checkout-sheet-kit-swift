@@ -189,3 +189,13 @@ extension StorefrontAPI.Cart {
         )
     }
 }
+
+@available(iOS 17.0, *)
+extension StorefrontAPI.CartStatusReady {
+    static var testResult: StorefrontAPI.CartStatusReady {
+        return StorefrontAPI.CartStatusReady(
+            cart: StorefrontAPI.Cart.testCart,
+            checkoutURL: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout/ready")!)
+        )
+    }
+}
