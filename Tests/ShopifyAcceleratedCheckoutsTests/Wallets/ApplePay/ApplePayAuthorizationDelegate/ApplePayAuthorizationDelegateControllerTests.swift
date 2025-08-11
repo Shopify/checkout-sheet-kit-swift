@@ -38,6 +38,8 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
 
+        URLProtocol.registerClass(MockURLProtocol.self)
+
         mockController = MockPayController()
         mockController.cart = StorefrontAPI.Cart.testCart
 
@@ -53,6 +55,8 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
     override func tearDown() async throws {
         delegate = nil
         mockController = nil
+        URLProtocol.unregisterClass(MockURLProtocol.self)
+        MockURLProtocol.reset()
         try await super.tearDown()
     }
 
@@ -102,25 +106,16 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
     }
 
     func test_didSelectShippingContact_withCartStatePreservation_shouldHandleStateCorrectly() async throws {
-        // This tests the cart state preservation logic in lines 48-58
-        // where it stores the previous cart and potentially reverts it
-
         let contact = PKContact()
         contact.postalAddress = createPostalAddress()
-
-        // Store reference to original cart to test preservation logic
-        _ = mockController.cart
 
         let result = await delegate.paymentAuthorizationController(
             PKPaymentAuthorizationController(),
             didSelectShippingContact: contact
         )
 
-        // The cart state preservation logic should maintain cart integrity
         XCTAssertNotNil(mockController.cart, "Cart should still exist after contact selection")
-
-        // Test passes if no exception is thrown and result is returned
-        XCTAssertNotNil(result, "Should return a result even if cart state changes")
+        XCTAssertNotNil(result)
     }
 
     // MARK: - upsertShippingAddress Strategy Tests
@@ -134,17 +129,13 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
             zip: "90210"
         )
 
-        // Set existing address ID to test the remove-then-add strategy
         let existingAddressID = GraphQLScalars.ID("existing-address-123")
         delegate.selectedShippingAddressID = existingAddressID
 
-        do {
-            let result = try await delegate.upsertShippingAddress(to: address)
-            XCTAssertNotNil(result, "Should return updated cart")
-            // Don't assert specific address ID value since it depends on cart structure
-        } catch {
-            XCTAssertEqual(delegate.selectedShippingAddressID, existingAddressID, "Address ID should remain if remove fails")
-        }
+        let result = try await delegate.upsertShippingAddress(to: address)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(delegate.selectedShippingAddressID, GraphQLScalars.ID("gid://shopify/CartSelectableAddress/1"))
+        XCTAssertNotNil(MockURLProtocol.lastOperation)
     }
 
     func test_upsertShippingAddress_withNoExistingAddressID_shouldOnlyAdd() async throws {
@@ -156,17 +147,12 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
             zip: "90210"
         )
 
-        // No existing address ID - should only do add operation
         delegate.selectedShippingAddressID = nil
 
-        do {
-            let result = try await delegate.upsertShippingAddress(to: address)
-            XCTAssertNotNil(result, "Should return cart from add operation")
-            XCTAssertNil(delegate.selectedShippingAddressID, "Should remain nil when no existing address")
-        } catch {
-            // Test that method handles add-only scenario properly even on failure
-            XCTAssertNil(delegate.selectedShippingAddressID, "Should remain nil even on add failure")
-        }
+        let result = try await delegate.upsertShippingAddress(to: address)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(delegate.selectedShippingAddressID, GraphQLScalars.ID("gid://shopify/CartSelectableAddress/1"))
+        XCTAssertNotNil(MockURLProtocol.lastOperation)
     }
 
     func test_upsertShippingAddress_errorHandlingStrategy_shouldHandleRemoveFailures() async throws {
@@ -180,49 +166,78 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
 
         delegate.selectedShippingAddressID = GraphQLScalars.ID("test-address-id")
 
-        // The upsertShippingAddress method should handle failures gracefully
-        // Per the implementation: address ID is only cleared if remove succeeds (line 252)
-
-        do {
-            _ = try await delegate.upsertShippingAddress(to: address)
-            // If both remove and add succeed, address ID would be set to new value (line 267)
-        } catch {
-            // Expected behavior in test environment - API calls will likely fail
-            // If remove fails, address ID is NOT cleared (caught at lines 253-257)
-            // If add fails, the error is re-thrown (lines 270-275)
-        }
-
-        // The actual behavior: address ID is only cleared if remove succeeds
-        XCTAssertEqual(delegate.selectedShippingAddressID, GraphQLScalars.ID("test-address-id"), "Address ID should remain unchanged when operations fail")
+        MockURLProtocol.failRemove = true
+        MockURLProtocol.lastOperation = nil
+        _ = try? await delegate.upsertShippingAddress(to: address)
+        XCTAssertEqual(delegate.selectedShippingAddressID, GraphQLScalars.ID("gid://shopify/CartSelectableAddress/1"))
+        XCTAssertNotNil(MockURLProtocol.lastOperation)
+        MockURLProtocol.failRemove = false
     }
 
-    // MARK: - Integration Tests
+    // MARK: - Shipping Method Selection – Delegate Validation
 
-    func test_shippingMethodValidationLogic_shouldUseCorrectFallbackStrategy() {
-        let originalMethod = PKShippingMethod()
-        originalMethod.identifier = "original-method"
+    private class TestPKDecoder: PKDecoder {
+        var stubbedShippingMethods: [PKShippingMethod] = []
+        override var shippingMethods: [PKShippingMethod] {
+            stubbedShippingMethods
+        }
+    }
 
-        let fallbackMethod = PKShippingMethod()
-        fallbackMethod.identifier = "fallback-method"
+    private func makeStubDecoder(methods: [PKShippingMethod]) -> TestPKDecoder {
+        let decoder = TestPKDecoder(configuration: configuration, cart: { [weak self] in self?.mockController.cart })
+        decoder.stubbedShippingMethods = methods
+        return decoder
+    }
 
-        // Test 1: When user's selected method is valid, use it
-        let availableMethodsWithOriginal = [originalMethod, fallbackMethod]
-        let isValidMethod = availableMethodsWithOriginal.contains { $0.identifier == originalMethod.identifier }
-        let methodToUse = isValidMethod ? originalMethod : (availableMethodsWithOriginal.first ?? originalMethod)
-        XCTAssertEqual(methodToUse.identifier, "original-method", "Should use user's selected method when valid")
+    func test_didSelectShippingMethod_whenMethodIsValid_shouldRetainSelection() async throws {
+        let valid = PKShippingMethod()
+        valid.identifier = "valid-method"
+        let other = PKShippingMethod()
+        other.identifier = "other-method"
 
-        // Test 2: When user's selected method is invalid, use first available
-        let invalidMethod = PKShippingMethod()
-        invalidMethod.identifier = "invalid-method"
-        let availableMethodsOnly = [fallbackMethod]
-        let isInvalidMethod = availableMethodsOnly.contains { $0.identifier == invalidMethod.identifier }
-        let methodToUseWhenInvalid = isInvalidMethod ? invalidMethod : (availableMethodsOnly.first ?? invalidMethod)
-        XCTAssertEqual(methodToUseWhenInvalid.identifier, "fallback-method", "Should use first available when selected is invalid")
+        delegate.pkDecoder = makeStubDecoder(methods: [valid, other])
+        MockURLProtocol.lastOperation = nil
 
-        // Test 3: When no methods available, fallback to user's selection
-        let emptyMethods: [PKShippingMethod] = []
-        let methodToUseWhenEmpty = emptyMethods.first ?? originalMethod
-        XCTAssertEqual(methodToUseWhenEmpty.identifier, "original-method", "Should fallback to original when no methods available")
+        _ = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(),
+            didSelectShippingMethod: valid
+        )
+
+        XCTAssertEqual(delegate.pkEncoder.selectedShippingMethod?.identifier, "valid-method")
+        XCTAssertFalse(delegate.pkDecoder.paymentSummaryItems.isEmpty)
+    }
+
+    func test_didSelectShippingMethod_whenMethodIsInvalid_shouldFallbackToFirstAvailable() async throws {
+        let firstAvailable = PKShippingMethod()
+        firstAvailable.identifier = "first-available"
+
+        let selected = PKShippingMethod()
+        selected.identifier = "invalid-method"
+
+        delegate.pkDecoder = makeStubDecoder(methods: [firstAvailable])
+        MockURLProtocol.lastOperation = nil
+
+        _ = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(),
+            didSelectShippingMethod: selected
+        )
+
+        XCTAssertEqual(delegate.pkEncoder.selectedShippingMethod?.identifier, "first-available")
+    }
+
+    func test_didSelectShippingMethod_whenNoMethodsAvailable_shouldKeepOriginal() async throws {
+        let selected = PKShippingMethod()
+        selected.identifier = "only-method"
+
+        delegate.pkDecoder = makeStubDecoder(methods: [])
+        MockURLProtocol.lastOperation = nil
+
+        _ = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(),
+            didSelectShippingMethod: selected
+        )
+
+        XCTAssertEqual(delegate.pkEncoder.selectedShippingMethod?.identifier, "only-method")
     }
 
     // MARK: - Helper Methods
@@ -245,16 +260,82 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         var storefrontJulyRelease: StorefrontAPI
 
         init() {
-            let config = ShopifyAcceleratedCheckouts.Configuration.testConfiguration
-            storefront = StorefrontAPI(
-                storefrontDomain: config.storefrontDomain,
-                storefrontAccessToken: config.storefrontAccessToken
-            )
+            let cfg = ShopifyAcceleratedCheckouts.Configuration.testConfiguration
+            storefront = StorefrontAPI(storefrontDomain: cfg.storefrontDomain, storefrontAccessToken: cfg.storefrontAccessToken)
             storefrontJulyRelease = storefront
         }
 
-        func present(url _: URL) async throws {
-            // Mock implementation
+        func present(url _: URL) async throws {}
+    }
+
+    // MARK: - Network Stubbing
+
+    class MockURLProtocol: URLProtocol {
+        static let mockCartResponse: String = "{" +
+            "\"id\":\"gid://shopify/Cart/test\"," +
+            "\"checkoutUrl\":\"https://stub/checkout\"," +
+            "\"totalQuantity\":0," +
+            "\"buyerIdentity\":null," +
+            "\"deliveryGroups\":{\"nodes\":[]}," +
+            "\"delivery\":null," +
+            "\"lines\":{\"nodes\":[]}," +
+            "\"cost\":{\"totalAmount\":{\"amount\":\"0.00\",\"currencyCode\":\"USD\"}}," +
+            "\"discountCodes\":[],\"discountAllocations\":[]}"
+
+        static let mockCartWithAddressResponse: String = "{" +
+            "\"id\":\"gid://shopify/Cart/test\"," +
+            "\"checkoutUrl\":\"https://stub/checkout\"," +
+            "\"totalQuantity\":0," +
+            "\"buyerIdentity\":null," +
+            "\"deliveryGroups\":{\"nodes\":[]}," +
+            "\"delivery\":{\"addresses\":[{\"id\":\"gid://shopify/CartSelectableAddress/1\",\"selected\":true,\"address\":{\"countryCode\":\"US\"}}]}," +
+            "\"lines\":{\"nodes\":[]}," +
+            "\"cost\":{\"totalAmount\":{\"amount\":\"0.00\",\"currencyCode\":\"USD\"}}," +
+            "\"discountCodes\":[],\"discountAllocations\":[]}"
+
+        static var failRemove = false
+        static var failAdd = false
+        static var lastOperation: String?
+
+        static func response(for op: String) -> Data {
+            if op == "cartPrepareForCompletion" {
+                let json = "{" +
+                    "\"data\":{\"cartPrepareForCompletion\":{\"result\":{\"__typename\":\"CartStatusReady\",\"cart\":" + mockCartResponse + "},\"userErrors\":[]}}}"
+                return Data(json.utf8)
+            } else if op == "cartDeliveryAddressesAdd" {
+                let json = "{" +
+                    "\"data\":{\"cartDeliveryAddressesAdd\":{\"cart\":" + mockCartWithAddressResponse + ",\"userErrors\":[]}}}"
+                return Data(json.utf8)
+            } else {
+                let json = "{" +
+                    "\"data\":{\"" + op + "\":{\"cart\":" + mockCartResponse + ",\"userErrors\":[]}}}"
+                return Data(json.utf8)
+            }
         }
+
+        override class func canInit(with _: URLRequest) -> Bool { true }
+        override class func canonicalRequest(for req: URLRequest) -> URLRequest { req }
+        override func startLoading() {
+            let bodyStr = request.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+            let ops = ["cartDeliveryAddressesAdd", "cartDeliveryAddressesRemove", "cartSelectedDeliveryOptionsUpdate", "cartPrepareForCompletion"]
+            let op = ops.first { bodyStr.contains($0) } ?? "cartDeliveryAddressesAdd"
+            Self.lastOperation = op
+            if (op == "cartDeliveryAddressesRemove" && Self.failRemove) || (op == "cartDeliveryAddressesAdd" && Self.failAdd) {
+                let errorJSON = "{\"data\":{\"\(op)\":{\"cart\":null,\"userErrors\":[{\"message\":\"fail\"}]}}}"
+                let data = Data(errorJSON.utf8)
+                let resp = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+                client?.urlProtocol(self, didReceive: resp, cacheStoragePolicy: .notAllowed)
+                client?.urlProtocol(self, didLoad: data)
+            } else {
+                let data = Self.response(for: op)
+                let resp = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+                client?.urlProtocol(self, didReceive: resp, cacheStoragePolicy: .notAllowed)
+                client?.urlProtocol(self, didLoad: data)
+            }
+            client?.urlProtocolDidFinishLoading(self)
+        }
+
+        override func stopLoading() {}
+        static func reset() { lastOperation = nil; failRemove = false; failAdd = false }
     }
 }
