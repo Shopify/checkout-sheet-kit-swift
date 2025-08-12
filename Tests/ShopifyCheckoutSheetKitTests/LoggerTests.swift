@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import XCTest
 import os.log
+import XCTest
 
 @testable import ShopifyCheckoutSheetKit
 
@@ -81,16 +81,20 @@ final class OSLoggerTests: XCTestCase {
 
         XCTAssertEqual(logger.capturedMessages.count, 4)
         XCTAssertEqual(
-            logger.capturedMessages[0].message, "[ShopifyCheckoutSheetKit] (Info) - test info")
+            logger.capturedMessages[0].message, "[ShopifyCheckoutSheetKit] (Info) - test info"
+        )
         XCTAssertEqual(logger.capturedMessages[0].type, OSLogType.info)
         XCTAssertEqual(
-            logger.capturedMessages[1].message, "[ShopifyCheckoutSheetKit] (Debug) - test debug")
+            logger.capturedMessages[1].message, "[ShopifyCheckoutSheetKit] (Debug) - test debug"
+        )
         XCTAssertEqual(logger.capturedMessages[1].type, OSLogType.debug)
         XCTAssertEqual(
-            logger.capturedMessages[2].message, "[ShopifyCheckoutSheetKit] (Error) - test error")
+            logger.capturedMessages[2].message, "[ShopifyCheckoutSheetKit] (Error) - test error"
+        )
         XCTAssertEqual(logger.capturedMessages[2].type, OSLogType.error)
         XCTAssertEqual(
-            logger.capturedMessages[3].message, "[ShopifyCheckoutSheetKit] (Fault) - test fault")
+            logger.capturedMessages[3].message, "[ShopifyCheckoutSheetKit] (Fault) - test fault"
+        )
         XCTAssertEqual(logger.capturedMessages[3].type, OSLogType.fault)
     }
 
@@ -106,9 +110,11 @@ final class OSLoggerTests: XCTestCase {
 
         XCTAssertEqual(logger.capturedMessages.count, 2)
         XCTAssertEqual(
-            logger.capturedMessages[0].message, "[ShopifyCheckoutSheetKit] (Info) - test info")
+            logger.capturedMessages[0].message, "[ShopifyCheckoutSheetKit] (Info) - test info"
+        )
         XCTAssertEqual(
-            logger.capturedMessages[1].message, "[ShopifyCheckoutSheetKit] (Debug) - test debug")
+            logger.capturedMessages[1].message, "[ShopifyCheckoutSheetKit] (Debug) - test debug"
+        )
     }
 
     func testLogLevelErrorAllowsErrorAndFault() {
@@ -123,9 +129,11 @@ final class OSLoggerTests: XCTestCase {
 
         XCTAssertEqual(logger.capturedMessages.count, 2)
         XCTAssertEqual(
-            logger.capturedMessages[0].message, "[ShopifyCheckoutSheetKit] (Error) - test error")
+            logger.capturedMessages[0].message, "[ShopifyCheckoutSheetKit] (Error) - test error"
+        )
         XCTAssertEqual(
-            logger.capturedMessages[1].message, "[ShopifyCheckoutSheetKit] (Fault) - test fault")
+            logger.capturedMessages[1].message, "[ShopifyCheckoutSheetKit] (Fault) - test fault"
+        )
     }
 
     func testSharedLoggerBackwardsCompatibility() {
@@ -146,16 +154,20 @@ final class OSLoggerTests: XCTestCase {
         XCTAssertEqual(logger.capturedMessages.count, 4)
         XCTAssertEqual(
             logger.capturedMessages[0].message,
-            "[ShopifyCheckoutSheetKit] (Info) - user action completed")
+            "[ShopifyCheckoutSheetKit] (Info) - user action completed"
+        )
         XCTAssertEqual(
             logger.capturedMessages[1].message,
-            "[ShopifyCheckoutSheetKit] (Debug) - processing checkout data")
+            "[ShopifyCheckoutSheetKit] (Debug) - processing checkout data"
+        )
         XCTAssertEqual(
             logger.capturedMessages[2].message,
-            "[ShopifyCheckoutSheetKit] (Error) - network request failed")
+            "[ShopifyCheckoutSheetKit] (Error) - network request failed"
+        )
         XCTAssertEqual(
             logger.capturedMessages[3].message,
-            "[ShopifyCheckoutSheetKit] (Fault) - critical system error")
+            "[ShopifyCheckoutSheetKit] (Fault) - critical system error"
+        )
     }
 }
 
