@@ -220,6 +220,35 @@ extension StorefrontAPI {
         return cart
     }
 
+    /// Remove delivery addresses from cart
+    /// - Parameters:
+    ///   - id: Cart ID
+    ///   - addressId: ID of the address to remove
+    /// - Returns: Updated cart
+    func cartDeliveryAddressesRemove(
+        id: GraphQLScalars.ID,
+        addressId: GraphQLScalars.ID
+    ) async throws -> Cart {
+        let variables: [String: Any] = [
+            "cartId": id.rawValue,
+            "addressIds": [addressId.rawValue]
+        ]
+
+        let response = try await client.mutate(
+            Operations.cartDeliveryAddressesRemove(variables: variables)
+        )
+
+        guard let payload = response.data?.cartDeliveryAddressesRemove else {
+            throw GraphQLError.invalidResponse
+        }
+
+        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesRemove")
+
+        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+
+        return cart
+    }
+
     /// Update selected delivery options
     /// - Parameters:
     ///   - id: Cart ID
@@ -491,6 +520,10 @@ extension StorefrontAPI {
 
     struct CartDeliveryAddressesUpdateResponse: Codable {
         let cartDeliveryAddressesUpdate: CartDeliveryAddressesUpdatePayload
+    }
+
+    struct CartDeliveryAddressesRemoveResponse: Codable {
+        let cartDeliveryAddressesRemove: CartDeliveryAddressesRemovePayload
     }
 
     struct CartSelectedDeliveryOptionsUpdateResponse: Codable {

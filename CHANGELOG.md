@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.0-rc.3 - August 12, 2025
+
+- Includes a fix for cart address updates in the Apple Pay sheet of Accelerated Checkouts
+- Exposes a `label(label:)` modifier to customize the Apple Pay button
+
 ## 3.4.0-rc.2 - August 6, 2025
 
 - Include missing AcceleratedCheckouts source files
