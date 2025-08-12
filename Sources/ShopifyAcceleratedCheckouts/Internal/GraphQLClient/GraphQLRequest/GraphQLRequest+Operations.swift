@@ -63,6 +63,16 @@ enum Operations {
         )
     }
 
+    static func cartDeliveryAddressesRemove(
+        variables: [String: Any] = [:]
+    ) -> GraphQLRequest<StorefrontAPI.CartDeliveryAddressesRemoveResponse> {
+        return GraphQLRequest(
+            operation: .cartDeliveryAddressesRemove,
+            responseType: StorefrontAPI.CartDeliveryAddressesRemoveResponse.self,
+            variables: variables
+        )
+    }
+
     static func cartSelectedDeliveryOptionsUpdate(
         variables: [String: Any] = [:]
     ) -> GraphQLRequest<StorefrontAPI.CartSelectedDeliveryOptionsUpdateResponse> {

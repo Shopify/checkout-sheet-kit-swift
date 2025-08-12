@@ -32,7 +32,7 @@ final class GraphQLClientTests: XCTestCase {
         storefrontDomain: String = "test.myshopify.com",
         storefrontAccessToken: String? = "test-token",
         apiVersion: String = "2025-07",
-        context: InContextDirective = InContextDirective()
+        context: InContextDirective = InContextDirective(countryCode: CountryCode.US)
     ) -> GraphQLClient {
         let url = URL(string: "https://\(storefrontDomain)/api/\(apiVersion)/graphql.json")!
         var headers: [String: String] = [:]
@@ -108,7 +108,7 @@ final class GraphQLClientTests: XCTestCase {
 
     func testContextInitialization() {
         // Test default initialization
-        let defaultContext = InContextDirective()
+        let defaultContext = InContextDirective(countryCode: CountryCode.US)
         XCTAssertEqual(defaultContext.countryCode, CountryCode.US)
         XCTAssertEqual(defaultContext.languageCode, LanguageCode.EN)
 
