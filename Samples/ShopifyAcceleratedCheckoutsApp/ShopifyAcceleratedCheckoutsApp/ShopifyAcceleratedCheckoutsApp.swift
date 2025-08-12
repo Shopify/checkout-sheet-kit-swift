@@ -22,6 +22,7 @@
  */
 
 import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
 import SwiftUI
 
 @main
@@ -29,7 +30,8 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true
     @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
-
+    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = LogLevel.all 
+    
     @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
@@ -49,6 +51,9 @@ struct ShopifyAcceleratedCheckoutsApp: App {
                         }
                     }
                     .id("\(requireEmail)-\(requirePhone)")
+            }
+            .onAppear {
+                ShopifyAcceleratedCheckouts.logLevel = logLevel
             }
         }
         .environment(\.locale, Locale(identifier: locale))

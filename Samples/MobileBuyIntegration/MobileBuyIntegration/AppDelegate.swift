@@ -21,12 +21,29 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    func application(_: UIApplication, willFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    func application(
+        _: UIApplication,
+        willFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        let logLevel: LogLevel = {
+            guard
+                let rawLogLevel = UserDefaults.standard.string(
+                    forKey: AppStorageKeys.logLevel.rawValue
+                ),
+                let logLevel = LogLevel(rawValue: rawLogLevel)
+            else { return .all }
+
+            return logLevel
+        }()
+
+        ShopifyAcceleratedCheckouts.logLevel = logLevel
+
         ShopifyCheckoutSheetKit.configure {
             /// Checkout color scheme setting
             $0.colorScheme = .web
@@ -43,17 +60,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             /// Optional logger used for internal purposes
             $0.logger = FileLogger("log.txt")
 
-            $0.logLevel = .all
+            $0.logLevel = logLevel
         }
 
-        print("[MobileBuyIntegration] Log level set to .all")
+        print("[MobileBuyIntegration] Log level set to \(logLevel)")
 
         UIBarButtonItem.appearance().tintColor = ColorPalette.primaryColor
 
         return true
     }
 
-    func application(_: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    func application(
+        _: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
+        options _: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
         return UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
     }
 }

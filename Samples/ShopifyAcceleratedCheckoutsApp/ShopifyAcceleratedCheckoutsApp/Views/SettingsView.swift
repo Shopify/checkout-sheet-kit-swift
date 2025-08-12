@@ -22,21 +22,57 @@
  */
 
 import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
 import SwiftUI
+
+enum AppStorageKeys: String {
+    case requireEmail
+    case requirePhone
+    case locale
+    case logLevel
+}
 
 struct SettingsView: View {
     @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true
     @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
+    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = LogLevel.all {
+        didSet {
+            ShopifyAcceleratedCheckouts.logLevel = logLevel
+        }
+    }
 
     private let availableLocales: [(name: String, isoCode: String)] = [
         ("English", "en"),
         ("English (US)", "en-US"),
-        ("French", "fr-FR")
+        ("French", "fr-FR"),
     ]
 
     var body: some View {
         Form {
+            Section("Logging") {
+                Picker(
+                    "Log Level",
+                    /// Binding used instead of $logLevel due to property observers (didSet)
+                    /// are not called on published values such as @AppStorage
+                    selection: Binding(
+                        get: { logLevel },
+                        set: { logLevel = $0 }
+                    )
+                ) {
+                    ForEach(LogLevel.allCases, id: \.self) { level in
+                        Text(
+                            level.rawValue.capitalized(with: Locale.current)
+                        ).tag(level)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Text("Controls the level of logging for Accelerated Checkouts operations")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
             Section("Language") {
                 Picker("Language", selection: $locale) {
                     ForEach(availableLocales, id: \.isoCode) { localeOption in
@@ -71,10 +107,4 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
     }
-}
-
-enum AppStorageKeys: String {
-    case requireEmail
-    case requirePhone
-    case locale
 }

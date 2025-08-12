@@ -22,12 +22,22 @@
  */
 
 import Combine
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import SwiftUI
+
+enum AppStorageKeys: String {
+    case logLevel
+}
 
 struct SettingsView: View {
     @ObservedObject var config: AppConfiguration = appConfiguration
 
+    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = LogLevel.all {
+        didSet {
+            ShopifyAcceleratedCheckouts.logLevel = logLevel
+        }
+    }
     @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
@@ -69,7 +79,25 @@ struct SettingsView: View {
                     }
                 }
 
-                Section(header: Text("Logs")) {
+                Section(header: Text("Logging")) {
+                    Picker(
+                        "Log Level",
+                        selection: Binding(
+                            get: { logLevel },
+                            set: { logLevel = $0 }
+                        )
+                    ) {
+                        ForEach(LogLevel.allCases, id: \.self) { level in
+                            Text(
+                                level.rawValue.capitalized(with: Locale.current)
+                            ).tag(level)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
+                    Text("Controls the level of logging for Accelerated Checkouts operations")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     NavigationLink(destination: WebPixelsEventsView()) {
                         Text("Web pixel events")
                     }
@@ -104,6 +132,8 @@ struct SettingsView: View {
         .navigationBarHidden(true)
         .preferredColorScheme(.dark)
         .onAppear {
+            ShopifyAcceleratedCheckouts.logLevel = logLevel
+
             switch ShopifyCheckoutSheetKit.configuration.colorScheme {
             case .light:
                 colorScheme = .light
@@ -134,6 +164,7 @@ struct ColorSchemeView: View {
         }
     }
 }
+
 
 extension Configuration.ColorScheme {
     var prettyTitle: String {
