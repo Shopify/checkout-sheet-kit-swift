@@ -48,13 +48,13 @@ import SwiftUI
 
     func present() async throws {
         guard let redirectUrl = try await buildRedirectUrl() else {
-            print("Failed to build redirect url for Shop Pay")
+            ShopifyAcceleratedCheckouts.logger.error("Failed to build redirect url for Shop Pay")
             return
         }
 
         let topViewController = await MainActor.run { getTopViewController() }
         guard let topViewController else {
-            print("Failed to get top view controller for Shop Pay")
+            ShopifyAcceleratedCheckouts.logger.error("Failed to get top view controller for Shop Pay")
             return
         }
 

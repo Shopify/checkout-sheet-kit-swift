@@ -111,7 +111,7 @@ class PKDecoder {
                 cart: cart()
             )
         } catch {
-            print("Error creating discount allocations: \(error)")
+            ShopifyAcceleratedCheckouts.logger.error("Error creating discount allocations: \(error)")
             return []
         }
     }

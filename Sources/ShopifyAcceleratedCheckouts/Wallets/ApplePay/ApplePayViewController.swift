@@ -163,7 +163,7 @@ protocol PayController: AnyObject {
             }
             try? await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
-            print("[startPayment] Failed to setup cart: \(error)")
+            ShopifyAcceleratedCheckouts.logger.error("[startPayment] Failed to setup cart: \(error)")
             try? await authorizationDelegate.transition(to: .completed)
         }
     }
