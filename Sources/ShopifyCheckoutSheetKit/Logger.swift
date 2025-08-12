@@ -38,25 +38,31 @@ public class OSLogger {
     public func info(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        os_log("[ShopifyCheckoutSheetKit] (Info) - %@", log: logger, type: .info, message)
+        sendToOSLog("[ShopifyCheckoutSheetKit] (Info) - \(message)", type: .info)
     }
 
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        os_log("[ShopifyCheckoutSheetKit] (Debug) - %@", log: logger, type: .debug, message)
+        sendToOSLog("[ShopifyCheckoutSheetKit] (Debug) - \(message)", type: .debug)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        os_log("[ShopifyCheckoutSheetKit] (Error) - %@", log: logger, type: .error, message)
+        sendToOSLog("[ShopifyCheckoutSheetKit] (Error) - \(message)", type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        os_log("[ShopifyCheckoutSheetKit] (Fault) - %@", log: logger, type: .fault, message)
+        sendToOSLog("[ShopifyCheckoutSheetKit] (Fault) - \(message)", type: .fault)
+    }
+
+    /// Capturing `os_log` output is not possible
+    /// This indirection lets us capture messages in `LoggerTests.swift`
+    internal func sendToOSLog(_ message: String, type: OSLogType) {
+        os_log("%@", log: logger, type: type, message)
     }
 
     private func shouldEmit(_ choice: LogLevel) -> Bool {
