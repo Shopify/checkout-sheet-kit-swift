@@ -41,18 +41,32 @@ if [[ "$ACTION" == *"test"* && -n "$TEST_FILTER" ]]; then
         test_target=""
         
         # Discover all test targets by looking for *Tests directories
+        test_file=""
         for test_dir in "$project_root/Tests"/*Tests; do
             if [[ -d "$test_dir" ]]; then
                 target_name=$(basename "$test_dir")
+                # Check if TEST_FILTER matches a .swift filename
                 if find "$test_dir" -name "$TEST_FILTER.swift" -type f | grep -q .; then
                     test_target="$target_name"
+                    test_file=$(find "$test_dir" -name "$TEST_FILTER.swift" -type f | head -1)
                     break
                 fi
             fi
         done
         
-        if [[ -n "$test_target" ]]; then
-            xcodebuild_cmd="$xcodebuild_cmd -only-testing:$test_target/$TEST_FILTER"
+        if [[ -n "$test_target" && -n "$test_file" ]]; then
+            # Extract all test class names from the file
+            test_classes=$(grep "class.*XCTestCase" "$test_file" | sed 's/.*class \([^:]*\):.*/\1/')
+            
+            if [[ -n "$test_classes" ]]; then
+                # Add -only-testing for each test class found in the file
+                while IFS= read -r class_name; do
+                    [[ -n "$class_name" ]] && xcodebuild_cmd="$xcodebuild_cmd -only-testing:$test_target/$class_name"
+                done <<< "$test_classes"
+            else
+                # Fall back to original behavior if no test classes found
+                xcodebuild_cmd="$xcodebuild_cmd -only-testing:$test_target/$TEST_FILTER"
+            fi
         else
             echo "Error: Test class '$TEST_FILTER' not found in any test target"
             exit 1
