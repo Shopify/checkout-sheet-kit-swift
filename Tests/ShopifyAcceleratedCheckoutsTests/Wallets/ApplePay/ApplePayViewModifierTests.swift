@@ -206,27 +206,6 @@ final class ApplePayViewModifierTests: XCTestCase {
 
     // MARK: - Environment Propagation Tests
 
-    func testEnvironmentPropagation() {
-        var parentSuccessInvoked = false
-        var childSuccessInvoked = false
-
-        // Create a custom container view
-        struct TestContainer: View {
-            let childSuccessAction: (CheckoutCompletedEvent) -> Void
-
-            var body: some View {
-                VStack {
-                    AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-                        .onComplete(childSuccessAction)
-                }
-            }
-        }
-
-        let containerView = TestContainer(childSuccessAction: { _ in childSuccessInvoked = true })
-
-        XCTAssertNotNil(containerView, "Container view should be created successfully")
-    }
-
     func testEnvironmentValueDefaults() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .environmentObject(mockConfiguration)
