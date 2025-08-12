@@ -26,15 +26,18 @@ import os.log
 
 private let subsystem = "com.shopify.checkoutsheetkit"
 
-public enum LogLevel {
-    case all, debug, error, none
+public enum LogLevel: String, CaseIterable {
+    case all
+    case debug
+    case error
+    case none
 }
 
 public class OSLogger {
     private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
     private var prefix: String
     private var configLevel: LogLevel
-    
+
     public static let shared = OSLogger()
 
     public init() {
@@ -42,7 +45,7 @@ public class OSLogger {
         configLevel = ShopifyCheckoutSheetKit.configuration.logLevel
     }
 
-    init(prefix: String, configLevel: LogLevel) {
+    public init(prefix: String, configLevel: LogLevel) {
         self.prefix = prefix
         self.configLevel = configLevel
     }
