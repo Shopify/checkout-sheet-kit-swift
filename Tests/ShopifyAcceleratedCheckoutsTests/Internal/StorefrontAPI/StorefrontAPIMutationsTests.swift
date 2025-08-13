@@ -281,12 +281,19 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        await XCTAssertThrowsGraphQLError(
-            try await storefrontAPI
-                .cartCreate(with: [GraphQLScalars.ID("gid://shopify/ProductVariant/1")]),
-            { if case .invalidResponse = $0 { return true } else { return false } },
-            "Expected GraphQLError.invalidResponse to be thrown"
-        )
+        do {
+            _ = try await storefrontAPI
+                .cartCreate(with: [GraphQLScalars.ID("gid://shopify/ProductVariant/1")])
+            XCTFail("Expected error to be thrown")
+        } catch let validationError as StorefrontAPI.CartValidationError {
+            // Expected - CartValidationError is thrown with all user errors
+            XCTAssertEqual(validationError.userErrors.count, 1)
+            XCTAssertEqual(validationError.userErrors[0].code, .notEnoughStock)
+            XCTAssertEqual(validationError.userErrors[0].message, "Product variant is out of stock")
+            XCTAssertEqual(validationError.userErrors[0].field, ["lines"])
+        } catch {
+            XCTFail("Expected CartValidationError but got: \(error)")
+        }
     }
 
     func testCartCreateRequestValidation() async throws {
@@ -459,14 +466,21 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        await XCTAssertThrowsGraphQLError(
-            try await storefrontAPI.cartBuyerIdentityUpdate(
+        do {
+            _ = try await storefrontAPI.cartBuyerIdentityUpdate(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
                 input: .init(email: "invalid-email", phoneNumber: "")
-            ),
-            { if case .invalidResponse = $0 { return true } else { return false } },
-            "Expected GraphQLError.invalidResponse to be thrown"
-        )
+            )
+            XCTFail("Expected error to be thrown")
+        } catch let validationError as StorefrontAPI.CartValidationError {
+            // Expected - CartValidationError is thrown with all user errors
+            XCTAssertEqual(validationError.userErrors.count, 1)
+            XCTAssertEqual(validationError.userErrors[0].code, .invalid)
+            XCTAssertEqual(validationError.userErrors[0].message, "Email is invalid")
+            XCTAssertEqual(validationError.userErrors[0].field, ["buyerIdentity", "email"])
+        } catch {
+            XCTFail("Expected CartValidationError but got: \(error)")
+        }
     }
 
     func testCartBuyerIdentityUpdateWithAccessToken() async throws {
@@ -597,14 +611,21 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         """
         mockJSONResponse(json)
 
-        await XCTAssertThrowsGraphQLError(
-            try await storefrontAPI.cartDeliveryAddressesRemove(
+        do {
+            _ = try await storefrontAPI.cartDeliveryAddressesRemove(
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
                 addressId: GraphQLScalars.ID("gid://shopify/CartSelectableAddress/999")
-            ),
-            { if case .invalidResponse = $0 { return true } else { return false } },
-            "Expected GraphQLError.invalidResponse to be thrown"
-        )
+            )
+            XCTFail("Expected error to be thrown")
+        } catch let validationError as StorefrontAPI.CartValidationError {
+            // Expected - CartValidationError is thrown with all user errors
+            XCTAssertEqual(validationError.userErrors.count, 1)
+            XCTAssertEqual(validationError.userErrors[0].code, .unknownValue)
+            XCTAssertEqual(validationError.userErrors[0].message, "Address not found")
+            XCTAssertEqual(validationError.userErrors[0].field, ["addressIds"])
+        } catch {
+            XCTFail("Expected CartValidationError but got: \(error)")
+        }
     }
 
     func testCartDeliveryAddressesRemoveRequestValidation() async throws {
@@ -753,17 +774,14 @@ final class StorefrontAPIMutationsTests: XCTestCase {
                 validate: true
             )
             XCTFail("Expected error to be thrown")
+        } catch let validationError as StorefrontAPI.CartValidationError {
+            // Expected - CartValidationError is thrown with all user errors
+            XCTAssertEqual(validationError.userErrors.count, 1)
+            XCTAssertEqual(validationError.userErrors[0].code, .invalid)
+            XCTAssertEqual(validationError.userErrors[0].message, "Zip code is invalid for country")
+            XCTAssertEqual(validationError.userErrors[0].field, ["addresses", "0", "address", "zip"])
         } catch {
-            // Verify error type
-            XCTAssertTrue(
-                error is GraphQLError,
-                "Unexpected error type: \(type(of: error))"
-            )
-
-            guard case .invalidResponse = error as? GraphQLError else {
-                XCTFail("Expected GraphQLError.invalidResponse but got: \(error)")
-                return
-            }
+            XCTFail("Expected CartValidationError but got: \(error)")
         }
     }
 
@@ -1514,7 +1532,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         }
     }
 
-    func testUserErrorWithCheckoutURLThrowsCartUserError() async {
+    func testUserErrorWithCheckoutURLThrowsCartValidationError() async {
         let json = """
         {
             "data": {
@@ -1549,17 +1567,18 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         do {
             _ = try await storefrontAPI.cartCreate()
             XCTFail("Expected error to be thrown")
-        } catch let cartError as StorefrontAPI.CartUserError {
-            // Expected - CartUserError is thrown directly
-            XCTAssertEqual(cartError.code, .tooManyLineItems)
-            XCTAssertEqual(cartError.message, "Cart limit exceeded")
-            XCTAssertEqual(cartError.field, ["input"])
+        } catch let validationError as StorefrontAPI.CartValidationError {
+            // Expected - CartValidationError is thrown with all user errors
+            XCTAssertEqual(validationError.userErrors.count, 1)
+            XCTAssertEqual(validationError.userErrors[0].code, .tooManyLineItems)
+            XCTAssertEqual(validationError.userErrors[0].message, "Cart limit exceeded")
+            XCTAssertEqual(validationError.userErrors[0].field, ["input"])
         } catch {
-            XCTFail("Expected CartUserError but got: \(error)")
+            XCTFail("Expected CartValidationError but got: \(error)")
         }
     }
 
-    func testUserErrorWithoutCheckoutURLThrowsCartUserError() async {
+    func testUserErrorWithoutCheckoutURLThrowsCartValidationError() async {
         let json = """
         {
             "data": {
@@ -1597,13 +1616,70 @@ final class StorefrontAPIMutationsTests: XCTestCase {
                 input: .init(email: "bad-email", phoneNumber: "")
             )
             XCTFail("Expected error to be thrown")
-        } catch let cartError as StorefrontAPI.CartUserError {
-            // Expected - CartUserError is thrown directly
-            XCTAssertEqual(cartError.code, .invalid)
-            XCTAssertEqual(cartError.message, "Email format is invalid")
-            XCTAssertEqual(cartError.field, ["buyerIdentity", "email"])
+        } catch let validationError as StorefrontAPI.CartValidationError {
+            // Expected - CartValidationError is thrown with all user errors
+            XCTAssertEqual(validationError.userErrors.count, 1)
+            XCTAssertEqual(validationError.userErrors[0].code, .invalid)
+            XCTAssertEqual(validationError.userErrors[0].message, "Email format is invalid")
+            XCTAssertEqual(validationError.userErrors[0].field, ["buyerIdentity", "email"])
         } catch {
-            XCTFail("Expected CartUserError but got: \(error)")
+            XCTFail("Expected CartValidationError but got: \(error)")
+        }
+    }
+
+    func testMultipleUserErrors() async {
+        let json = """
+        {
+            "data": {
+                "cartCreate": {
+                    "cart": null,
+                    "userErrors": [
+                        {
+                            "field": ["lines"],
+                            "message": "Product variant is out of stock",
+                            "code": "NOT_ENOUGH_STOCK"
+                        },
+                        {
+                            "field": ["input", "email"],
+                            "message": "Email is invalid",
+                            "code": "INVALID"
+                        },
+                        {
+                            "field": ["input", "address"],
+                            "message": "Address is required",
+                            "code": "REQUIRED"
+                        }
+                    ]
+                }
+            }
+        }
+        """
+        mockJSONResponse(json)
+
+        do {
+            _ = try await storefrontAPI.cartCreate()
+            XCTFail("Expected error to be thrown")
+        } catch let validationError as StorefrontAPI.CartValidationError {
+            // Expected - CartValidationError contains all user errors
+            XCTAssertEqual(validationError.userErrors.count, 3)
+
+            // Verify all errors are accessible
+            XCTAssertEqual(validationError.userErrors[0].code, .notEnoughStock)
+            XCTAssertEqual(validationError.userErrors[0].message, "Product variant is out of stock")
+            XCTAssertEqual(validationError.userErrors[0].field, ["lines"])
+            XCTAssertEqual(validationError.userErrors[1].code, .invalid)
+            XCTAssertEqual(validationError.userErrors[1].message, "Email is invalid")
+            XCTAssertEqual(validationError.userErrors[2].code, .unknownValue) // REQUIRED maps to unknown
+            XCTAssertEqual(validationError.userErrors[2].message, "Address is required")
+
+            // Verify description includes all errors
+            let description = validationError.description
+            XCTAssertTrue(description.contains("3 validation errors"))
+            XCTAssertTrue(description.contains("Product variant is out of stock"))
+            XCTAssertTrue(description.contains("Email is invalid"))
+            XCTAssertTrue(description.contains("Address is required"))
+        } catch {
+            XCTFail("Expected CartValidationError but got: \(error)")
         }
     }
 

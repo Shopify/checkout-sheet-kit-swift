@@ -31,30 +31,16 @@ public enum Wallet {
 }
 
 /// Event handlers for wallet buttons
+@available(iOS 16.0, *)
 public struct EventHandlers {
-    public var checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)?
-    public var checkoutDidFail: ((CheckoutError) -> Void)?
-    public var checkoutDidCancel: (() -> Void)?
-    public var shouldRecoverFromError: ((CheckoutError) -> Bool)?
-    public var checkoutDidClickLink: ((URL) -> Void)?
-    public var checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)?
+    public var validationDidFail: ((AcceleratedCheckoutError) -> Void)?
     public var renderStateDidChange: ((RenderState) -> Void)?
 
     public init(
-        checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)? = nil,
-        checkoutDidFail: ((CheckoutError) -> Void)? = nil,
-        checkoutDidCancel: (() -> Void)? = nil,
-        shouldRecoverFromError: ((CheckoutError) -> Bool)? = nil,
-        checkoutDidClickLink: ((URL) -> Void)? = nil,
-        checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)? = nil,
+        validationDidFail: ((AcceleratedCheckoutError) -> Void)? = nil,
         renderStateDidChange: ((RenderState) -> Void)? = nil
     ) {
-        self.checkoutDidComplete = checkoutDidComplete
-        self.checkoutDidFail = checkoutDidFail
-        self.checkoutDidCancel = checkoutDidCancel
-        self.shouldRecoverFromError = shouldRecoverFromError
-        self.checkoutDidClickLink = checkoutDidClickLink
-        self.checkoutDidEmitWebPixelEvent = checkoutDidEmitWebPixelEvent
+        self.validationDidFail = validationDidFail
         self.renderStateDidChange = renderStateDidChange
     }
 }
