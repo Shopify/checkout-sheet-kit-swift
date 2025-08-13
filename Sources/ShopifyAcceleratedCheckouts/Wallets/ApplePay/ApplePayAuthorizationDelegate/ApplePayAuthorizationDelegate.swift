@@ -41,7 +41,7 @@ extension PKPaymentAuthorizationController: PaymentAuthorizationController {}
 typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthorizationController
 
 @available(iOS 16.0, *)
-class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
+class ApplePayAuthorizationDelegate: NSObject {
     let configuration: ApplePayConfigurationWrapper
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
     var controller: PayController

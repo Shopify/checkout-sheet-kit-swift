@@ -32,16 +32,17 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage(AppStorageKeys.email.rawValue) var email: String = ""
     @AppStorage(AppStorageKeys.phone.rawValue) var phone: String = ""
 
-    var configuration = ShopifyAcceleratedCheckouts.Configuration(
-        storefrontDomain: EnvironmentVariables.storefrontDomain,
-        storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
-        customer: ShopifyAcceleratedCheckouts.Customer(email: nil, phoneNumber: nil)
-    )
+    var configuration: ShopifyAcceleratedCheckouts.Configuration {
+        .init(
+            storefrontDomain: EnvironmentVariables.storefrontDomain,
+            storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
+            customer: ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: phone)
+        )
+    }
 
     var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
         createApplePayConfiguration(requireEmail: requireEmail, requirePhone: requirePhone)
     }
-    
 
     var body: some Scene {
         WindowGroup {

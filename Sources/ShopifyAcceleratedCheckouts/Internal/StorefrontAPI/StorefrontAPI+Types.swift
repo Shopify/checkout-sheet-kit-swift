@@ -990,13 +990,13 @@ extension StorefrontAPI {
 @available(iOS 16.0, *)
 class ShopSettings: ObservableObject {
     /// The shop's name (merchant name for display)
-    let name: String
+    @Published var name: String
 
     /// The shop's primary domain information
-    let primaryDomain: Domain
+    @Published var primaryDomain: Domain
 
     /// Payment-related settings for the shop
-    let paymentSettings: PaymentSettings
+    @Published var paymentSettings: PaymentSettings
 
     init(
         name: String,

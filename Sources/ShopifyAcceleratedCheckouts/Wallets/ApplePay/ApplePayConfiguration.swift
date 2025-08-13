@@ -43,7 +43,7 @@ extension ShopifyAcceleratedCheckouts {
         /// entitlement key in the app's entitlements.
         ///
         /// - See: [Apple Developer Documentation - merchantIdentifier](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest/1619305-merchantidentifier)
-        public let merchantIdentifier: String
+        @Published public var merchantIdentifier: String
 
         /// Contact information fields required during the Apple Pay payment flow.
         ///
@@ -54,7 +54,7 @@ extension ShopifyAcceleratedCheckouts {
         ///
         /// - Note: Configure this property based on your shop's customer account requirements.
         ///         For shops requiring customer accounts, include `.email` in the array.
-        public let contactFields: [RequiredContactFields]
+        @Published public var contactFields: [RequiredContactFields]
 
         /// Creates a new Apple Pay configuration.
         ///
