@@ -230,8 +230,9 @@ public enum ApplePayButtonLabel: CaseIterable {
     }
 }
 
+/// Creates a label from a string (case-insensitive, ignores non-letters). Returns nil if unknown.
 extension ApplePayButtonLabel {
-    /// Creates a label from a string (case-insensitive, ignores non-letters). Returns nil if unknown.
+    // swiftlint:disable:next cyclomatic_complexity
     public init?(string: String) {
         let normalized = ApplePayButtonLabel.normalize(string)
 

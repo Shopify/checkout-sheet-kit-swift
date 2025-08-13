@@ -26,6 +26,7 @@ import XCTest
 
 @available(iOS 17.0, *)
 final class ApplePayButtonLabelTests: XCTestCase {
+    // swiftlint:disable:next cyclomatic_complexity
     func testAllCasesHaveStringRepresentations() {
         for label in ApplePayButtonLabel.allCases {
             let reconstructedLabel: ApplePayButtonLabel?
