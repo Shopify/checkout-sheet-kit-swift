@@ -172,6 +172,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             if pkDecoder.requiredContactFields.count > 0
                 || configuration.common.customer?.email != nil
                 || configuration.common.customer?.phoneNumber != nil
+                || configuration.common.customer?.customerAccessToken != nil
             {
                 try await controller.storefront.cartBuyerIdentityUpdate(
                     id: cartID,

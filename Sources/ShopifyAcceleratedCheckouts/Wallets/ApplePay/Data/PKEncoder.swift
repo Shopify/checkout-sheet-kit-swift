@@ -287,32 +287,34 @@ class PKEncoder {
     }
 
     var phoneNumber: Result<String, ShopifyAcceleratedCheckouts.Error> {
-        guard
-            let contact = try? shippingContact.get(),
+        if let contact = try? shippingContact.get(),
             let phoneNumber = contact.phoneNumber?.stringValue,
             !phoneNumber.isEmpty
-        else {
-            return .failure(.invariant(expected: "phoneNumber"))
+        {
+            return .success(phoneNumber)
         }
 
-        return .success(phoneNumber)
+        if let phoneNumber = configuration.common.customer?.phoneNumber {
+            return .success(phoneNumber)
+        }
+
+        return .failure(.invariant(expected: "phoneNumber"))
     }
 
     typealias Email = String
     var email: Result<Email, ShopifyAcceleratedCheckouts.Error> {
+        if let contact = try? shippingContact.get(),
+            let email = contact.emailAddress,
+            !email.isEmpty
+        {
+            return .success(email)
+        }
+
         if let email = configuration.common.customer?.email {
             return .success(email)
         }
 
-        guard
-            let contact = try? shippingContact.get(),
-            let email = contact.emailAddress,
-            !email.isEmpty
-        else {
-            return .failure(.invariant(expected: "email"))
-        }
-
-        return .success(email)
+        return .failure(.invariant(expected: "email"))
     }
 
     var applePayPayment:
