@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.0-rc.4 - August 13, 2025
+
+- Extends the `ApplePayButtonLabel` to allow for creation via `String`
+
 ## 3.4.0-rc.3 - August 12, 2025
 
 - Includes a fix for cart address updates in the Apple Pay sheet of Accelerated Checkouts
