@@ -39,12 +39,16 @@ public final class AppConfiguration: ObservableObject {
     // Configure ShopifyAcceleratedCheckouts
     let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: InfoDictionary.shared.domain,
-        storefrontAccessToken: InfoDictionary.shared.accessToken
+        storefrontAccessToken: InfoDictionary.shared.accessToken,
+        customer: ShopifyAcceleratedCheckouts.Customer(
+            email: InfoDictionary.shared.email,
+            phoneNumber: InfoDictionary.shared.phone
+        )
     )
 
     let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
         merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
-        contactFields: [.email]
+        contactFields: [.email, .phone]
     )
 }
 

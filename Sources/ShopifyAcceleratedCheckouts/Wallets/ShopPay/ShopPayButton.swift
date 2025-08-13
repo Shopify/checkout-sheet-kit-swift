@@ -30,15 +30,18 @@ internal struct ShopPayButton: View {
 
     let identifier: CheckoutIdentifier
     let eventHandlers: EventHandlers
+    let checkoutDelegate: CheckoutDelegate?
     let cornerRadius: CGFloat?
 
     init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
+        checkoutDelegate: CheckoutDelegate? = nil,
         cornerRadius: CGFloat?
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
+        self.checkoutDelegate = checkoutDelegate
         self.cornerRadius = cornerRadius
     }
 
@@ -51,6 +54,7 @@ internal struct ShopPayButton: View {
                 identifier: identifier,
                 configuration: configuration,
                 eventHandlers: eventHandlers,
+                checkoutDelegate: checkoutDelegate,
                 cornerRadius: cornerRadius
             )
         }
@@ -68,12 +72,14 @@ internal struct Internal_ShopPayButton: View {
         identifier: CheckoutIdentifier,
         configuration: ShopifyAcceleratedCheckouts.Configuration,
         eventHandlers: EventHandlers = EventHandlers(),
+        checkoutDelegate: CheckoutDelegate? = nil,
         cornerRadius: CGFloat?
     ) {
         controller = ShopPayViewController(
             identifier: identifier,
             configuration: configuration,
-            eventHandlers: eventHandlers
+            eventHandlers: eventHandlers,
+            checkoutDelegate: checkoutDelegate
         )
         self.cornerRadius = cornerRadius
     }

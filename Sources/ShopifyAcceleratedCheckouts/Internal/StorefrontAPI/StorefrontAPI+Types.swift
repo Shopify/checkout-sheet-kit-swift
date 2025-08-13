@@ -418,6 +418,23 @@ extension StorefrontAPI {
         let field: [String]?
     }
 
+    /// Cart validation error that contains all user errors from a GraphQL response
+    struct CartValidationError: Error, CustomStringConvertible {
+        let userErrors: [CartUserError]
+
+        var description: String {
+            if userErrors.count == 1 {
+                return userErrors[0].message
+            } else {
+                let errorMessages = userErrors.map { error in
+                    let fieldInfo = error.field?.isEmpty == false ? " (field: \(error.field!.joined(separator: ".")))" : ""
+                    return error.message + fieldInfo
+                }
+                return "\(userErrors.count) validation errors: " + errorMessages.joined(separator: "; ")
+            }
+        }
+    }
+
     /// Cart error codes
     enum CartErrorCode: String, Codable {
         case addressFieldContainsEmojis = "ADDRESS_FIELD_CONTAINS_EMOJIS"

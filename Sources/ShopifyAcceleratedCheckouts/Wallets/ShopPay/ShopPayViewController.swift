@@ -31,15 +31,18 @@ class ShopPayViewController: ObservableObject {
     var identifier: CheckoutIdentifier
     var checkoutViewController: CheckoutViewController?
     var eventHandlers: EventHandlers
+    private weak var checkoutDelegate: CheckoutDelegate?
 
     init(
         identifier: CheckoutIdentifier,
         configuration: ShopifyAcceleratedCheckouts.Configuration,
-        eventHandlers: EventHandlers = EventHandlers()
+        eventHandlers: EventHandlers = EventHandlers(),
+        checkoutDelegate: CheckoutDelegate? = nil
     ) {
         self.configuration = configuration
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
+        self.checkoutDelegate = checkoutDelegate
         storefront = StorefrontAPI(
             storefrontDomain: configuration.storefrontDomain,
             storefrontAccessToken: configuration.storefrontAccessToken
@@ -109,29 +112,29 @@ class ShopPayViewController: ObservableObject {
 @available(iOS 16.0, *)
 extension ShopPayViewController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
-        eventHandlers.checkoutDidComplete?(event)
+        checkoutDelegate?.checkoutDidComplete(event: event)
     }
 
     func checkoutDidFail(error: CheckoutError) {
         checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutDidFail?(error)
+        checkoutDelegate?.checkoutDidFail(error: error)
     }
 
     func checkoutDidCancel() {
         /// x right button on CSK doesn't dismiss automatically
         checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutDidCancel?()
+        checkoutDelegate?.checkoutDidCancel()
     }
 
     func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return eventHandlers.shouldRecoverFromError?(error) ?? false
+        return checkoutDelegate?.shouldRecoverFromError(error: error) ?? false
     }
 
     func checkoutDidClickLink(url: URL) {
-        eventHandlers.checkoutDidClickLink?(url)
+        checkoutDelegate?.checkoutDidClickLink(url: url)
     }
 
     func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        eventHandlers.checkoutDidEmitWebPixelEvent?(event)
+        checkoutDelegate?.checkoutDidEmitWebPixelEvent(event: event)
     }
 }

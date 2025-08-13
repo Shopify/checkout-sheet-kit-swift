@@ -71,7 +71,6 @@ class ErrorHandler {
 
         switch action {
         case .showError:
-            // We want to surface messages for all errors, not just the first one
             let allErrors = combinedErrors(actions: sortedActions)
             return .showError(errors: allErrors)
         default:
@@ -89,30 +88,38 @@ class ErrorHandler {
     static func map(error: Error, cart: StorefrontAPI.Cart?) -> PaymentSheetAction? {
         let shippingCountry = getShippingCountry(cart: cart)
         switch error {
+        case let cartValidationError as StorefrontAPI.CartValidationError:
+            return ErrorHandler.map(errors: cartValidationError.userErrors, shippingCountry: shippingCountry, cart: nil)
         case let cartUserError as StorefrontAPI.CartUserError:
-            // Handle StorefrontAPI errors directly - we don't have the cart here but the checkout URL
-            // is already captured in the delegate
             return ErrorHandler.map(errors: [cartUserError], shippingCountry: shippingCountry, cart: nil)
         case let apiError as StorefrontAPI.Errors:
-            switch apiError {
-            case let .response(_, _, payload):
-                switch payload {
-                case let .cartSubmitForCompletion(submitPayload):
-                    return ErrorHandler.map(payload: submitPayload, shippingCountry: shippingCountry)
-                case let .cartPrepareForCompletion(preparePayload):
-                    return ErrorHandler.map(payload: preparePayload)
-                }
-            case let .userError(userErrors, cart):
-                return ErrorHandler.map(errors: userErrors, shippingCountry: shippingCountry, cart: cart)
-            case .currencyChanged:
-                return .interrupt(reason: .currencyChanged, checkoutURL: cart?.checkoutUrl.url)
-            case let .warning(type, cart):
-                return ErrorHandler.map(warningType: type, cart: cart)
-            default:
-                return nil
-            }
+            return mapApiError(apiError, shippingCountry: shippingCountry, cart: cart)
         default:
             return nil
+        }
+    }
+
+    private static func mapApiError(_ apiError: StorefrontAPI.Errors, shippingCountry: String?, cart: StorefrontAPI.Cart?) -> PaymentSheetAction? {
+        switch apiError {
+        case let .response(_, _, payload):
+            return mapResponsePayload(payload, shippingCountry: shippingCountry)
+        case let .userError(userErrors, cart):
+            return ErrorHandler.map(errors: userErrors, shippingCountry: shippingCountry, cart: cart)
+        case .currencyChanged:
+            return .interrupt(reason: .currencyChanged, checkoutURL: cart?.checkoutUrl.url)
+        case let .warning(type, cart):
+            return ErrorHandler.map(warningType: type, cart: cart)
+        default:
+            return nil
+        }
+    }
+
+    private static func mapResponsePayload(_ payload: StorefrontAPI.CartApiPayload, shippingCountry: String?) -> PaymentSheetAction? {
+        switch payload {
+        case let .cartSubmitForCompletion(submitPayload):
+            return ErrorHandler.map(payload: submitPayload, shippingCountry: shippingCountry)
+        case let .cartPrepareForCompletion(preparePayload):
+            return ErrorHandler.map(payload: preparePayload)
         }
     }
 

@@ -115,7 +115,7 @@ extension CheckoutCompletedEvent {
     }
 }
 
-func createEmptyCheckoutCompletedEvent(id: String? = "") -> CheckoutCompletedEvent {
+package func createEmptyCheckoutCompletedEvent(id: String? = "") -> CheckoutCompletedEvent {
     return CheckoutCompletedEvent(
         orderDetails: CheckoutCompletedEvent.OrderDetails(
             billingAddress: CheckoutCompletedEvent.Address(
