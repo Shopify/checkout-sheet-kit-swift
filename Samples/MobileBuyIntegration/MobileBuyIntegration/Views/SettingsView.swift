@@ -33,11 +33,12 @@ enum AppStorageKeys: String {
 struct SettingsView: View {
     @ObservedObject var config: AppConfiguration = appConfiguration
 
-    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = LogLevel.all {
+    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = .all {
         didSet {
             ShopifyAcceleratedCheckouts.logLevel = logLevel
         }
     }
+
     @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
@@ -164,7 +165,6 @@ struct ColorSchemeView: View {
         }
     }
 }
-
 
 extension Configuration.ColorScheme {
     var prettyTitle: String {

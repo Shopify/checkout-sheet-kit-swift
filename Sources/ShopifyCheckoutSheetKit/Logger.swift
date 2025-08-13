@@ -47,7 +47,7 @@ open class OSLogger {
 
     public init(prefix: String, configLevel: LogLevel) {
         self.prefix = prefix
-        self.logLevel = configLevel
+        logLevel = configLevel
     }
 
     public func info(_ message: String) {

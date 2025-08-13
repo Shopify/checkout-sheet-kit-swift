@@ -36,7 +36,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.requireEmail.rawValue) var requireEmail: Bool = true
     @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
-    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = LogLevel.all {
+    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = .all {
         didSet {
             ShopifyAcceleratedCheckouts.logLevel = logLevel
         }
@@ -45,7 +45,7 @@ struct SettingsView: View {
     private let availableLocales: [(name: String, isoCode: String)] = [
         ("English", "en"),
         ("English (US)", "en-US"),
-        ("French", "fr-FR"),
+        ("French", "fr-FR")
     ]
 
     var body: some View {
