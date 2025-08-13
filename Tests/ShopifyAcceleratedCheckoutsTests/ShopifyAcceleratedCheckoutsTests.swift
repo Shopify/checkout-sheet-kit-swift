@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import os.log
 import XCTest
+import os.log
 
 @testable import ShopifyAcceleratedCheckouts
 @testable import ShopifyCheckoutSheetKit
@@ -59,28 +59,48 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
         )
     }
 
+    func test_configuration_sameLogLevel_usesExistingInstance() {
+        let originalLogger = ShopifyAcceleratedCheckouts.logger
+        let originalLogLevel = ShopifyAcceleratedCheckouts.logger.logLevel
+
+        ShopifyAcceleratedCheckouts.logLevel = originalLogLevel
+        let newLogger = ShopifyAcceleratedCheckouts.logger
+
+        XCTAssertTrue(
+            originalLogger === newLogger,
+            "Changing log level should create a new logger instance"
+        )
+    }
     func testChangingLogLevelCreatesNewLoggerInstance() {
         let originalLogger = ShopifyAcceleratedCheckouts.logger
 
         ShopifyAcceleratedCheckouts.logLevel = .debug
         let newLogger = ShopifyAcceleratedCheckouts.logger
 
-        XCTAssertFalse(
-            originalLogger === newLogger, "Changing log level should create a new logger instance"
+        XCTAssertTrue(
+            originalLogger !== newLogger,
+            "Changing log level should create a new logger instance"
         )
     }
 
     func testLoggerHasCorrectLogLevel() {
         ShopifyAcceleratedCheckouts.logLevel = .all
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.logger.logLevel, .all, "Logger should have .all log level")
+        XCTAssertEqual(
+            ShopifyAcceleratedCheckouts.logger.logLevel, .all, "Logger should have .all log level")
 
         ShopifyAcceleratedCheckouts.logLevel = .debug
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.logger.logLevel, .debug, "Logger should have .debug log level")
+        XCTAssertEqual(
+            ShopifyAcceleratedCheckouts.logger.logLevel, .debug,
+            "Logger should have .debug log level")
 
         ShopifyAcceleratedCheckouts.logLevel = .error
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.logger.logLevel, .error, "Logger should have .error log level")
+        XCTAssertEqual(
+            ShopifyAcceleratedCheckouts.logger.logLevel, .error,
+            "Logger should have .error log level")
 
         ShopifyAcceleratedCheckouts.logLevel = .none
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.logger.logLevel, .none, "Logger should have .none log level")
+        XCTAssertEqual(
+            ShopifyAcceleratedCheckouts.logger.logLevel, .none, "Logger should have .none log level"
+        )
     }
 }

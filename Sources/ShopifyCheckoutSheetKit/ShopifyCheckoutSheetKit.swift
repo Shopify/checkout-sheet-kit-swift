@@ -34,6 +34,13 @@ public var configuration = Configuration() {
         if invalidateOnConfigurationChange {
             CheckoutWebView.invalidate()
         }
+        
+        if OSLogger.shared.logLevel != configuration.logLevel {
+            OSLogger.shared = OSLogger(
+                prefix: "ShopifyCheckoutSheetKit",
+                logLevel: configuration.logLevel
+            )
+        }
     }
 }
 

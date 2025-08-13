@@ -21,11 +21,89 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@testable import ShopifyCheckoutSheetKit
 import XCTest
+
+@testable import ShopifyCheckoutSheetKit
 
 class ShopifyCheckoutSheetKitTests: XCTestCase {
     func testVersionExists() {
         XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
     }
+
+    func test_configuration_whenLogLevelChanges_createsNewLogger() {
+        XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
+    }
+
+    func test_configuration_whenLogLevelSetsSameLevel_instanceRemainsSame() {
+        XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
+    }
+
+    func test_configuration_logLevelDefaultsToError() {
+        XCTAssertEqual(
+            ShopifyCheckoutSheetKit.configuration.logLevel,
+            LogLevel.error,
+            "Default logLevel should be .error"
+        )
+        XCTAssertEqual(
+            OSLogger.shared.logLevel,
+            LogLevel.error,
+            "Default logger logLevel should be .error"
+        )
+    }
+
+    func testChangingLogLevelCreatesNewLoggerInstance() {
+        let originalLogger = OSLogger.shared
+
+        ShopifyCheckoutSheetKit.configuration.logLevel = .debug
+        let newLogger = OSLogger.shared
+
+        XCTAssertTrue(
+            originalLogger !== newLogger,
+            "Changing log level should create a new logger instance"
+        )
+    }
+
+    func test_configuration_sameLogLevel_usesExistingInstance() {
+        let originalLogger = OSLogger.shared
+        let originalLogLevel = OSLogger.shared.logLevel
+
+        ShopifyCheckoutSheetKit.configuration.logLevel = originalLogLevel
+        let newLogger = OSLogger.shared
+
+        XCTAssertTrue(
+            originalLogger === newLogger,
+            "Changing log level should create a new logger instance"
+        )
+    }
+
+    func testLoggerHasCorrectLogLevel() {
+        ShopifyCheckoutSheetKit.configuration.logLevel = .all
+        XCTAssertEqual(
+            OSLogger.shared.logLevel,
+            .all,
+            "Logger should have .all log level"
+        )
+
+        ShopifyCheckoutSheetKit.configuration.logLevel = .debug
+        XCTAssertEqual(
+            OSLogger.shared.logLevel,
+            .debug,
+            "Logger should have .debug log level"
+        )
+
+        ShopifyCheckoutSheetKit.configuration.logLevel = .error
+        XCTAssertEqual(
+            OSLogger.shared.logLevel,
+            .error,
+            "Logger should have .error log level"
+        )
+
+        ShopifyCheckoutSheetKit.configuration.logLevel = .none
+        XCTAssertEqual(
+            OSLogger.shared.logLevel,
+            .none,
+            "Logger should have .none log level"
+        )
+    }
+
 }

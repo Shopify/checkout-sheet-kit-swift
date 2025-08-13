@@ -34,7 +34,9 @@ public enum ShopifyAcceleratedCheckouts {
     /// Default: .error - which will emit "error" and "fault" logs
     public static var logLevel: LogLevel = .error {
         didSet {
-            logger = OSLogger(prefix: name, logLevel: logLevel)
+            if logLevel != oldValue {
+                logger = OSLogger(prefix: name, logLevel: logLevel)
+            }
         }
     }
 

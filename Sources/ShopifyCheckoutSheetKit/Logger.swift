@@ -38,7 +38,7 @@ public class OSLogger {
     private var prefix: String
     var logLevel: LogLevel
 
-    public static let shared = OSLogger()
+    public static var shared = OSLogger()
 
     public init() {
         prefix = "ShopifyCheckoutSheetKit"
