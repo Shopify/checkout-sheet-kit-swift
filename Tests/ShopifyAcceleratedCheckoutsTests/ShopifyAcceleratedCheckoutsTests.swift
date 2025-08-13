@@ -45,17 +45,17 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
         XCTAssertEqual(ShopifyAcceleratedCheckouts.apiVersion, "2025-04")
     }
 
-    func testLogLevelDefaultsToNone() {
+    func testLogLevelDefaultsToError() {
         XCTAssertEqual(
             ShopifyAcceleratedCheckouts.logLevel,
-            LogLevel.none,
-            "Default logLevel should be .none"
+            LogLevel.error,
+            "Default logLevel should be .error"
         )
         XCTAssertNotNil(ShopifyAcceleratedCheckouts.logger)
         XCTAssertEqual(
             ShopifyAcceleratedCheckouts.logger.logLevel,
-            LogLevel.none,
-            "Default logger logLevel should be .none"
+            LogLevel.error,
+            "Default logger logLevel should be .error"
         )
     }
 
