@@ -101,7 +101,7 @@ struct SettingsView: View {
 
                 Section(header: Text("Logging")) {
                     Picker(
-                        "Accelerated Checkouts Log Level",
+                        "Accelerated Checkouts",
                         selection: Binding(
                             get: { acceleratedCheckoutsLogLevel },
                             set: { acceleratedCheckoutsLogLevel = $0 }
@@ -116,7 +116,7 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
 
                     Picker(
-                        "Checkout Sheet Kit Log Level",
+                        "Checkout Sheet Kit",
                         selection: Binding(
                             get: { checkoutSheetKitLogLevel },
                             set: { checkoutSheetKitLogLevel = $0 }
@@ -171,7 +171,7 @@ struct SettingsView: View {
                 colorScheme = .dark
             default:
                 colorScheme = .light
-            }
+}
         }
     }
 
