@@ -169,7 +169,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             try? await transition(to: .paymentAuthorized(payment: payment))
             let cartID = try pkEncoder.cartID.get()
 
-            if pkDecoder.requiredContactFields.count > 0 {
+            if pkDecoder.requiredContactFields.count > 0
+                || configuration.common.customer?.email != nil
+                || configuration.common.customer?.phoneNumber != nil
+            {
                 try await controller.storefront.cartBuyerIdentityUpdate(
                     id: cartID,
                     input: .init(
