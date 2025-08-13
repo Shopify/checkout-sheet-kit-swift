@@ -51,19 +51,7 @@ class ShopifyCheckoutSheetKitTests: XCTestCase {
         )
     }
 
-    func test_logLevel_whenChanged_shouldCreateNewLoggerInstance() {
-        let originalLogger = OSLogger.shared
-
-        ShopifyCheckoutSheetKit.configuration.logLevel = .debug
-        let newLogger = OSLogger.shared
-
-        XCTAssertTrue(
-            originalLogger !== newLogger,
-            "Changing log level should create a new logger instance"
-        )
-    }
-
-    func test_configuration_sameLogLevel_usesExistingInstance() {
+    func test_configuration_onLogLevelChange_usesExistingInstance() {
         let originalLogger = OSLogger.shared
         let originalLogLevel = OSLogger.shared.logLevel
 

@@ -59,7 +59,7 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
         )
     }
 
-    func test_configuration_sameLogLevel_usesExistingInstance() {
+    func test_configuration_onLogLevelChange_usesExistingInstance() {
         let originalLogger = ShopifyAcceleratedCheckouts.logger
         let originalLogLevel = ShopifyAcceleratedCheckouts.logger.logLevel
 
@@ -71,18 +71,7 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
             "Changing log level should create a new logger instance"
         )
     }
-    func test_logLevel_whenChanged_shouldCreateNewLoggerInstance() {
-        let originalLogger = ShopifyAcceleratedCheckouts.logger
-
-        ShopifyAcceleratedCheckouts.logLevel = .debug
-        let newLogger = ShopifyAcceleratedCheckouts.logger
-
-        XCTAssertTrue(
-            originalLogger !== newLogger,
-            "Changing log level should create a new logger instance"
-        )
-    }
-
+    
     func test_logger_withDifferentLogLevels_shouldHaveCorrectLogLevel() {
         ShopifyAcceleratedCheckouts.logLevel = .all
         XCTAssertEqual(
