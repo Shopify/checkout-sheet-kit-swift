@@ -34,9 +34,9 @@ class TestableOSLogger: OSLogger {
         super.init()
     }
 
-    override init(prefix: String, configLevel: LogLevel) {
+    override init(prefix: String, logLevel: LogLevel) {
         testPrefix = prefix
-        super.init(prefix: prefix, configLevel: configLevel)
+        super.init(prefix: prefix, logLevel: logLevel)
     }
 
     override func sendToOSLog(_ message: String, type: OSLogType) {
@@ -67,7 +67,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testLogLevelNoneBlocksAllLogging() {
-        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", configLevel: .none)
+        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .none)
 
         logger.info("test info")
         logger.debug("test debug")
@@ -78,7 +78,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testLogLevelAllAllowsAllLogging() {
-        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", configLevel: .all)
+        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .all)
 
         logger.info("test info")
         logger.debug("test debug")
@@ -105,7 +105,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testLogLevelDebugAllowsDebugAndInfo() {
-        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", configLevel: .debug)
+        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .debug)
 
         logger.info("test info")
         logger.debug("test debug")
@@ -122,7 +122,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testLogLevelErrorAllowsErrorAndFault() {
-        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", configLevel: .error)
+        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .error)
 
         logger.info("test info")
         logger.debug("test debug")
@@ -144,7 +144,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testExactMessageFormatting() {
-        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", configLevel: .all)
+        let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .all)
 
         logger.info("user action completed")
         logger.debug("processing checkout data")
@@ -171,7 +171,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testCustomPrefixInLogger() {
-        let customLogger = TestableOSLogger(prefix: "CustomModule", configLevel: .all)
+        let customLogger = TestableOSLogger(prefix: "CustomModule", logLevel: .all)
 
         customLogger.info("custom module message")
         customLogger.error("custom error")
@@ -188,7 +188,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testLogLevelNoneBlocksAllMessagesRegardlessOfType() {
-        let logger = TestableOSLogger(prefix: "Test", configLevel: .none)
+        let logger = TestableOSLogger(prefix: "Test", logLevel: .none)
 
         logger.info("should not log")
         logger.debug("should not log")
@@ -199,7 +199,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testLogLevelDebugBlocksInfoButAllowsDebugAndErrors() {
-        let logger = TestableOSLogger(prefix: "Test", configLevel: .debug)
+        let logger = TestableOSLogger(prefix: "Test", logLevel: .debug)
 
         logger.info("info message")
         logger.debug("debug message")
@@ -212,7 +212,7 @@ final class OSLoggerTests: XCTestCase {
     }
 
     func testLogLevelErrorOnlyAllowsErrorAndFault() {
-        let logger = TestableOSLogger(prefix: "Test", configLevel: .error)
+        let logger = TestableOSLogger(prefix: "Test", logLevel: .error)
 
         logger.info("should be blocked")
         logger.debug("should be blocked")

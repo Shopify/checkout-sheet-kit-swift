@@ -42,6 +42,7 @@ struct SettingsView: View {
             }
         }
     }
+
     @AppStorage(AppStorageKeys.acceleratedCheckoutsLogLevel.rawValue)
     var acceleratedCheckoutsLogLevel: LogLevel = .all {
         didSet {
@@ -71,7 +72,8 @@ struct SettingsView: View {
                     Toggle("Handle Product URLs", isOn: $config.universalLinks.products)
                     Toggle(
                         "Handle all Universal Links",
-                        isOn: $config.universalLinks.handleAllURLsInApp)
+                        isOn: $config.universalLinks.handleAllURLsInApp
+                    )
 
                     Text(
                         "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app."
@@ -91,7 +93,8 @@ struct SettingsView: View {
                                 ShopifyCheckoutSheetKit.configuration.backgroundColor =
                                     scheme.backgroundColor
                                 NotificationCenter.default.post(
-                                    name: .colorSchemeChanged, object: nil)
+                                    name: .colorSchemeChanged, object: nil
+                                )
                             }
                     }
                 }

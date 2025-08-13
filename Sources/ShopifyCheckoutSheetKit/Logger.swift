@@ -45,21 +45,21 @@ open class OSLogger {
         logLevel = ShopifyCheckoutSheetKit.configuration.logLevel
     }
 
-    public init(prefix: String, configLevel: LogLevel) {
+    public init(prefix: String, logLevel: LogLevel) {
         self.prefix = prefix
-        logLevel = configLevel
-    }
-
-    public func info(_ message: String) {
-        guard shouldEmit(.debug) else { return }
-
-        sendToOSLog("[\(prefix)] (Info) - \(message)", type: .info)
+        self.logLevel = logLevel
     }
 
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
         sendToOSLog("[\(prefix)] (Debug) - \(message)", type: .debug)
+    }
+
+    public func info(_ message: String) {
+        guard shouldEmit(.debug) else { return }
+
+        sendToOSLog("[\(prefix)] (Info) - \(message)", type: .info)
     }
 
     public func error(_ message: String) {
