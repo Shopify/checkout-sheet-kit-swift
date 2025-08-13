@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import XCTest
 import os.log
+import XCTest
 
 @testable import ShopifyAcceleratedCheckouts
 @testable import ShopifyCheckoutSheetKit
@@ -71,21 +71,24 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
             "Changing log level should create a new logger instance"
         )
     }
-    
+
     func test_logger_withDifferentLogLevels_shouldHaveCorrectLogLevel() {
         ShopifyAcceleratedCheckouts.logLevel = .all
         XCTAssertEqual(
-            ShopifyAcceleratedCheckouts.logger.logLevel, .all, "Logger should have .all log level")
+            ShopifyAcceleratedCheckouts.logger.logLevel, .all, "Logger should have .all log level"
+        )
 
         ShopifyAcceleratedCheckouts.logLevel = .debug
         XCTAssertEqual(
             ShopifyAcceleratedCheckouts.logger.logLevel, .debug,
-            "Logger should have .debug log level")
+            "Logger should have .debug log level"
+        )
 
         ShopifyAcceleratedCheckouts.logLevel = .error
         XCTAssertEqual(
             ShopifyAcceleratedCheckouts.logger.logLevel, .error,
-            "Logger should have .error log level")
+            "Logger should have .error log level"
+        )
 
         ShopifyAcceleratedCheckouts.logLevel = .none
         XCTAssertEqual(

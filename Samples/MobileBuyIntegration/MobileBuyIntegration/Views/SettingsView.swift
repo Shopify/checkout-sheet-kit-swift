@@ -171,7 +171,7 @@ struct SettingsView: View {
                 colorScheme = .dark
             default:
                 colorScheme = .light
-}
+            }
         }
     }
 

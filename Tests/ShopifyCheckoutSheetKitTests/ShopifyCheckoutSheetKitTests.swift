@@ -93,5 +93,4 @@ class ShopifyCheckoutSheetKitTests: XCTestCase {
             "Logger should have .none log level"
         )
     }
-
 }
