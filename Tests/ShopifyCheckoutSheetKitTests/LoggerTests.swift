@@ -40,8 +40,7 @@ class TestableOSLogger: OSLogger {
     }
 
     override func sendToOSLog(_ message: String, type: OSLogType) {
-        let formattedMessage = "[\(testPrefix)] \(message)"
-        capturedMessages.append((message: formattedMessage, type: type))
+        capturedMessages.append((message: message, type: type))
     }
 }
 

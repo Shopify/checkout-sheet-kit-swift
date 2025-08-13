@@ -33,59 +33,59 @@ public enum LogLevel: String, CaseIterable {
     case none
 }
 
-public class OSLogger {
+open class OSLogger {
     private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
     private var prefix: String
-    private var configLevel: LogLevel
+    var logLevel: LogLevel
 
     public static let shared = OSLogger()
 
     public init() {
         prefix = "ShopifyCheckoutSheetKit"
-        configLevel = ShopifyCheckoutSheetKit.configuration.logLevel
+        logLevel = ShopifyCheckoutSheetKit.configuration.logLevel
     }
 
     public init(prefix: String, configLevel: LogLevel) {
         self.prefix = prefix
-        self.configLevel = configLevel
+        self.logLevel = configLevel
     }
 
     public func info(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        sendToOSLog("(Info) - \(message)", type: .info)
+        sendToOSLog("[\(prefix)] (Info) - \(message)", type: .info)
     }
 
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        sendToOSLog("(Debug) - \(message)", type: .debug)
+        sendToOSLog("[\(prefix)] (Debug) - \(message)", type: .debug)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        sendToOSLog("(Error) - \(message)", type: .error)
+        sendToOSLog("[\(prefix)] (Error) - \(message)", type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        sendToOSLog("(Fault) - \(message)", type: .fault)
+        sendToOSLog("[\(prefix)] (Fault) - \(message)", type: .fault)
     }
 
     /// Capturing `os_log` output is not possible
     /// This indirection lets us capture messages in `LoggerTests.swift`
     internal func sendToOSLog(_ message: String, type: OSLogType) {
-        os_log("%@", log: logger, type: type, "[\(prefix)] \(message)")
+        os_log("%@", log: logger, type: type, message)
     }
 
     private func shouldEmit(_ choice: LogLevel) -> Bool {
-        if configLevel == .none {
+        if logLevel == .none {
             return false
         }
 
-        return configLevel == .all || configLevel == choice
+        return logLevel == .all || logLevel == choice
     }
 }
 
