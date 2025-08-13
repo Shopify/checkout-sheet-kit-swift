@@ -133,8 +133,6 @@ struct SettingsView: View {
         .navigationBarHidden(true)
         .preferredColorScheme(.dark)
         .onAppear {
-            ShopifyAcceleratedCheckouts.logLevel = logLevel
-
             switch ShopifyCheckoutSheetKit.configuration.colorScheme {
             case .light:
                 colorScheme = .light
