@@ -146,7 +146,7 @@ struct Internal_ApplePayButton: View {
 
 /// Used to set the label of the Apple Pay button
 /// see `.applePayLabel(label:)`
-public enum ApplePayButtonLabel {
+public enum ApplePayButtonLabel: CaseIterable {
     /// A button with the Apple Pay logo only
     case plain
     /// A button that uses the phrase "Buy with" in conjunction with the Apple Pay logo
@@ -227,5 +227,44 @@ public enum ApplePayButtonLabel {
         case .tip: return .tip
         case .topUp: return .topUp
         }
+    }
+}
+
+extension ApplePayButtonLabel {
+    /// Creates a label from a string (case-insensitive, ignores non-letters). Returns nil if unknown.
+    public init?(string: String) {
+        let normalized = ApplePayButtonLabel.normalize(string)
+
+        switch normalized {
+        case "plain": self = .plain
+        case "buy": self = .buy
+        case "addmoney": self = .addMoney
+        case "book": self = .book
+        case "checkout": self = .checkout
+        case "continue": self = .continue
+        case "contribute": self = .contribute
+        case "donate": self = .donate
+        case "instore": self = .inStore
+        case "order": self = .order
+        case "reload": self = .reload
+        case "rent": self = .rent
+        case "setup": self = .setUp
+        case "subscribe": self = .subscribe
+        case "support": self = .support
+        case "tip": self = .tip
+        case "topup": self = .topUp
+        default: return nil
+        }
+    }
+
+    /// Returns a label or the provided default (defaults to `.plain`) if unknown.
+    public static func from(_ string: String?, default defaultValue: ApplePayButtonLabel = .plain) -> ApplePayButtonLabel {
+        guard let string, let value = ApplePayButtonLabel(string: string) else { return defaultValue }
+        return value
+    }
+
+    private static func normalize(_ string: String) -> String {
+        let lowered = string.lowercased()
+        return lowered.replacingOccurrences(of: "[^a-z]", with: "", options: .regularExpression)
     }
 }
