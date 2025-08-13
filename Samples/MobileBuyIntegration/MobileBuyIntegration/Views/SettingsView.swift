@@ -27,15 +27,25 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 enum AppStorageKeys: String {
-    case logLevel
+    case acceleratedCheckoutsLogLevel
+    case checkoutSheetKitLogLevel
 }
 
 struct SettingsView: View {
     @ObservedObject var config: AppConfiguration = appConfiguration
 
-    @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = .all {
+    @AppStorage(AppStorageKeys.checkoutSheetKitLogLevel.rawValue)
+    var checkoutSheetKitLogLevel: LogLevel = .all {
         didSet {
-            ShopifyAcceleratedCheckouts.logLevel = logLevel
+            ShopifyCheckoutSheetKit.configure {
+                $0.logLevel = checkoutSheetKitLogLevel
+            }
+        }
+    }
+    @AppStorage(AppStorageKeys.acceleratedCheckoutsLogLevel.rawValue)
+    var acceleratedCheckoutsLogLevel: LogLevel = .all {
+        didSet {
+            ShopifyAcceleratedCheckouts.logLevel = acceleratedCheckoutsLogLevel
         }
     }
 
@@ -59,10 +69,14 @@ struct SettingsView: View {
                     Toggle("Handle Checkout URLs", isOn: $config.universalLinks.checkout)
                     Toggle("Handle Cart URLs", isOn: $config.universalLinks.cart)
                     Toggle("Handle Product URLs", isOn: $config.universalLinks.products)
-                    Toggle("Handle all Universal Links", isOn: $config.universalLinks.handleAllURLsInApp)
+                    Toggle(
+                        "Handle all Universal Links",
+                        isOn: $config.universalLinks.handleAllURLsInApp)
 
-                    Text("By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app.")
-                        .font(.caption)
+                    Text(
+                        "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app."
+                    )
+                    .font(.caption)
                 }
 
                 Section(header: Text("Theme")) {
@@ -74,18 +88,20 @@ struct SettingsView: View {
                                 selectedColorScheme = scheme
                                 ShopifyCheckoutSheetKit.configuration.colorScheme = scheme
                                 ShopifyCheckoutSheetKit.configuration.tintColor = scheme.tintColor
-                                ShopifyCheckoutSheetKit.configuration.backgroundColor = scheme.backgroundColor
-                                NotificationCenter.default.post(name: .colorSchemeChanged, object: nil)
+                                ShopifyCheckoutSheetKit.configuration.backgroundColor =
+                                    scheme.backgroundColor
+                                NotificationCenter.default.post(
+                                    name: .colorSchemeChanged, object: nil)
                             }
                     }
                 }
 
                 Section(header: Text("Logging")) {
                     Picker(
-                        "Log Level",
+                        "Accelerated Checkouts Log Level",
                         selection: Binding(
-                            get: { logLevel },
-                            set: { logLevel = $0 }
+                            get: { acceleratedCheckoutsLogLevel },
+                            set: { acceleratedCheckoutsLogLevel = $0 }
                         )
                     ) {
                         ForEach(LogLevel.allCases, id: \.self) { level in
@@ -96,9 +112,21 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
 
-                    Text("Controls the level of logging for Accelerated Checkouts operations")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Picker(
+                        "Checkout Sheet Kit Log Level",
+                        selection: Binding(
+                            get: { checkoutSheetKitLogLevel },
+                            set: { checkoutSheetKitLogLevel = $0 }
+                        )
+                    ) {
+                        ForEach(LogLevel.allCases, id: \.self) { level in
+                            Text(
+                                level.rawValue.capitalized(with: Locale.current)
+                            ).tag(level)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
                     NavigationLink(destination: WebPixelsEventsView()) {
                         Text("Web pixel events")
                     }

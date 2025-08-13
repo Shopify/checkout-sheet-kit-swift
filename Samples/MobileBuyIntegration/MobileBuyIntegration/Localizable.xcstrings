@@ -10,6 +10,9 @@
     "✓" : {
 
     },
+    "Accelerated Checkouts Log Level" : {
+
+    },
     "Add to Cart" : {
 
     },
@@ -25,6 +28,9 @@
     "Check out" : {
 
     },
+    "Checkout Sheet Kit Log Level" : {
+
+    },
     "Checkout Sheet Kit version" : {
 
     },
@@ -32,9 +38,6 @@
 
     },
     "Clear logs" : {
-
-    },
-    "Controls the level of logging for Accelerated Checkouts operations" : {
 
     },
     "Events" : {
@@ -56,9 +59,6 @@
 
     },
     "Loading products..." : {
-
-    },
-    "Log Level" : {
 
     },
     "Logging" : {

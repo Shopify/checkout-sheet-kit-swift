@@ -25,24 +25,31 @@ import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import UIKit
 
+func getLogLevel(key: String) -> LogLevel {
+    guard
+        let rawLogLevel = UserDefaults.standard.string(
+            forKey: key
+        ),
+        let logLevel = LogLevel(rawValue: rawLogLevel)
+    else { return .all }
+
+    return logLevel
+}
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(
         _: UIApplication,
         willFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        let logLevel: LogLevel = {
-            guard
-                let rawLogLevel = UserDefaults.standard.string(
-                    forKey: AppStorageKeys.logLevel.rawValue
-                ),
-                let logLevel = LogLevel(rawValue: rawLogLevel)
-            else { return .all }
+        let acceleratedCheckoutsLogLevel: LogLevel = getLogLevel(
+            key: AppStorageKeys.acceleratedCheckoutsLogLevel.rawValue
+        )
+        let checkoutSheetKitLogLevel: LogLevel = getLogLevel(
+            key: AppStorageKeys.checkoutSheetKitLogLevel.rawValue
+        )
 
-            return logLevel
-        }()
-
-        ShopifyAcceleratedCheckouts.logLevel = logLevel
+        ShopifyAcceleratedCheckouts.logLevel = acceleratedCheckoutsLogLevel
 
         ShopifyCheckoutSheetKit.configure {
             /// Checkout color scheme setting
@@ -60,10 +67,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             /// Optional logger used for internal purposes
             $0.logger = FileLogger("log.txt")
 
-            $0.logLevel = logLevel
+            $0.logLevel = checkoutSheetKitLogLevel
         }
 
-        print("[MobileBuyIntegration] Log level set to \(logLevel)")
+        print("[MobileBuyIntegration] AcceleratedCheckout Log level set to \(acceleratedCheckoutsLogLevel)")
+        print("[MobileBuyIntegration] CheckoutSheetKit Log level set to \(checkoutSheetKitLogLevel)")
 
         UIBarButtonItem.appearance().tintColor = ColorPalette.primaryColor
 
