@@ -30,14 +30,16 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
 
-    @StateObject var configuration = ShopifyAcceleratedCheckouts.Configuration(
+    var configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
         customer: ShopifyAcceleratedCheckouts.Customer(email: nil, phoneNumber: nil)
     )
 
-    @StateObject var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration =
-        createApplePayConfiguration()
+    var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
+        createApplePayConfiguration(requireEmail: requireEmail, requirePhone: requirePhone)
+    }
+    
 
     var body: some Scene {
         WindowGroup {
@@ -58,8 +60,8 @@ struct ShopifyAcceleratedCheckoutsApp: App {
 }
 
 private func createApplePayConfiguration(
-    requireEmail: Bool = UserDefaults.standard.object(forKey: AppStorageKeys.requireEmail.rawValue) as? Bool ?? true,
-    requirePhone: Bool = UserDefaults.standard.object(forKey: AppStorageKeys.requirePhone.rawValue) as? Bool ?? true
+    requireEmail: Bool,
+    requirePhone: Bool
 ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
 
