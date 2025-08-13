@@ -25,7 +25,7 @@ import Foundation
 import ShopifyCheckoutSheetKit
 
 /// A lightweight GraphQL client for the Storefront API without external dependencies
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class GraphQLClient {
     let url: URL
     private let headers: [String: String]

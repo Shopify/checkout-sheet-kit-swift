@@ -26,19 +26,19 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 /// A view that displays an Apple Pay button for checkout
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct ApplePayButton: View {
     /// The configuration for Apple Pay
-    @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
-    private var configuration
+    @EnvironmentObject
+    private var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     /// The shop settings
-    @Environment(ShopSettings.self)
-    private var shopSettings
+    @EnvironmentObject
+    private var shopSettings: ShopSettings
 
-    @Environment(ShopifyAcceleratedCheckouts.ApplePayConfiguration.self)
-    private var applePayConfiguration
+    @EnvironmentObject
+    private var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
 
     /// The identifier to use for checkout
     private let identifier: CheckoutIdentifier
@@ -89,7 +89,7 @@ struct ApplePayButton: View {
 
 /// A view that displays an Apple Pay button for checkout
 /// This is an internal view to allow Environment injection of the shared configuration app wide
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style
@@ -120,7 +120,7 @@ struct Internal_ApplePayButton: View {
         )
         self.label = label
         self.cornerRadius = cornerRadius
-        MainActor.assumeIsolated {
+        Task { @MainActor [controller] in
             controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
             controller.onCheckoutFail = eventHandlers.checkoutDidFail
             controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
@@ -146,6 +146,7 @@ struct Internal_ApplePayButton: View {
 
 /// Used to set the label of the Apple Pay button
 /// see `.applePayLabel(label:)`
+@available(iOS 16.0, *)
 public enum ApplePayButtonLabel {
     /// A button with the Apple Pay logo only
     case plain
@@ -182,32 +183,7 @@ public enum ApplePayButtonLabel {
     /// A button that uses the phrase "Top Up with" in conjunction with the Apple Pay logo
     case topUp
 
-    /// SwiftUI interop - will be removed when migrating to support iOS 15
-    @available(iOS 17.0, *)
     var toPayWithApplePayButtonLabel: PayWithApplePayButtonLabel {
-        switch self {
-        case .plain: return .plain
-        case .buy: return .buy
-        case .addMoney: return .addMoney
-        case .book: return .book
-        case .checkout: return .checkout
-        case .continue: return .continue
-        case .contribute: return .contribute
-        case .donate: return .donate
-        case .inStore: return .inStore
-        case .order: return .order
-        case .reload: return .reload
-        case .rent: return .rent
-        case .setUp: return .setUp
-        case .subscribe: return .subscribe
-        case .support: return .support
-        case .tip: return .tip
-        case .topUp: return .topUp
-        }
-    }
-
-    @available(iOS 15.0, *)
-    var toPKPaymentButtonType: PKPaymentButtonType {
         switch self {
         case .plain: return .plain
         case .buy: return .buy

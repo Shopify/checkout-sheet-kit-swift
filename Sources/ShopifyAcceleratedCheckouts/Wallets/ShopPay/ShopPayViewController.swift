@@ -24,8 +24,8 @@
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
-@available(iOS 17.0, *)
-@Observable class ShopPayViewController {
+@available(iOS 16.0, *)
+class ShopPayViewController: ObservableObject {
     var configuration: ShopifyAcceleratedCheckouts.Configuration
     var storefront: StorefrontAPI
     var identifier: CheckoutIdentifier
@@ -106,7 +106,7 @@ import SwiftUI
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ShopPayViewController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         eventHandlers.checkoutDidComplete?(event)

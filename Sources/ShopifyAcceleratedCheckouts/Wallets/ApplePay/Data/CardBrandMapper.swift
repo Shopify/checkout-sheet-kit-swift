@@ -23,7 +23,7 @@
 
 import PassKit
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 enum CardBrandMapper {
     /// Maps Shopify's CardBrand enum values to Apple Pay's PKPaymentNetwork values
     /// - Parameter shopifyCardBrand: The card brand from Shopify's acceptedCardBrands

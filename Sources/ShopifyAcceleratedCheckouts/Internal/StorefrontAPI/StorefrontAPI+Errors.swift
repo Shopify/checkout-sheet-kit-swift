@@ -23,7 +23,7 @@
 
 import Foundation
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension StorefrontAPI {
     enum CartApiPayload {
         case cartPrepareForCompletion(StorefrontAPI.CartPrepareForCompletionPayload)

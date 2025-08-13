@@ -87,9 +87,9 @@ final class ApplePayIntegrationTests: XCTestCase {
                 .onComplete { _ in
                     // Callback exists but won't be called during view creation
                 }
-                .environment(mockCommonConfiguration)
-                .environment(mockApplePayConfiguration)
-                .environment(mockShopSettings)
+                .environmentObject(mockCommonConfiguration)
+                .environmentObject(mockApplePayConfiguration)
+                .environmentObject(mockShopSettings)
 
             let hostingController = UIHostingController(rootView: view)
 
@@ -123,9 +123,9 @@ final class ApplePayIntegrationTests: XCTestCase {
                 .onCancel {
                     cancelExpectation.fulfill()
                 }
-                .environment(mockCommonConfiguration)
-                .environment(mockApplePayConfiguration)
-                .environment(mockShopSettings)
+                .environmentObject(mockCommonConfiguration)
+                .environmentObject(mockApplePayConfiguration)
+                .environmentObject(mockShopSettings)
 
             let hostingController = UIHostingController(rootView: view)
 
@@ -149,9 +149,9 @@ final class ApplePayIntegrationTests: XCTestCase {
         // Create hosting controller to render the view
         let hostingController = UIHostingController(
             rootView: button
-                .environment(mockCommonConfiguration)
-                .environment(mockApplePayConfiguration)
-                .environment(mockShopSettings)
+                .environmentObject(mockCommonConfiguration)
+                .environmentObject(mockApplePayConfiguration)
+                .environmentObject(mockShopSettings)
         )
 
         XCTAssertNotNil(hostingController.view)

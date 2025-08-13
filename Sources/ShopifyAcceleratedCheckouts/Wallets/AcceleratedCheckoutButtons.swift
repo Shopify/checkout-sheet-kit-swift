@@ -38,10 +38,10 @@ public enum RenderState {
 /// - The `wallets` modifier can be used to limit the buttons rendered
 /// - The order of the buttons is the same as the order of the `wallets` modifier
 /// - omission of the `wallets` modifier will render all buttons
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 public struct AcceleratedCheckoutButtons: View {
-    @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
-    private var configuration
+    @EnvironmentObject
+    private var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     let identifier: CheckoutIdentifier
     var wallets: [Wallet] = [.shopPay, .applePay]
@@ -52,7 +52,11 @@ public struct AcceleratedCheckoutButtons: View {
     private var applePayLabel: ApplePayButtonLabel = .plain
 
     @State private var shopSettings: ShopSettings?
-    @State private var currentRenderState: RenderState = .loading
+    @State private var currentRenderState: RenderState = .loading {
+        didSet {
+            eventHandlers.renderStateDidChange?(currentRenderState)
+        }
+    }
 
     /// Initializes an Apple Pay button with a cart ID
     /// - Parameters:
@@ -98,13 +102,10 @@ public struct AcceleratedCheckoutButtons: View {
                             )
                         }
                     }
-                }.environment(shopSettings)
+                }.environmentObject(shopSettings)
             }
         }
         .task { await loadShopSettings() }
-        .onChange(of: currentRenderState) { _, newValue in
-            eventHandlers.renderStateDidChange?(newValue)
-        }
         .onAppear {
             eventHandlers.renderStateDidChange?(currentRenderState)
         }
@@ -131,7 +132,7 @@ public struct AcceleratedCheckoutButtons: View {
 
 // MARK: AcceleratedCheckoutButtons Modifiers
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension AcceleratedCheckoutButtons {
     public func applePayLabel(_ label: ApplePayButtonLabel) -> AcceleratedCheckoutButtons {
         var view = self
