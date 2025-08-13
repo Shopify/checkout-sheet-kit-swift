@@ -26,7 +26,7 @@ import XCTest
 @testable import ShopifyCheckoutSheetKit
 
 class ShopifyCheckoutSheetKitTests: XCTestCase {
-    func testVersionExists() {
+    func test_version_whenAccessed_shouldExist() {
         XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
     }
 
@@ -51,7 +51,7 @@ class ShopifyCheckoutSheetKitTests: XCTestCase {
         )
     }
 
-    func testChangingLogLevelCreatesNewLoggerInstance() {
+    func test_logLevel_whenChanged_shouldCreateNewLoggerInstance() {
         let originalLogger = OSLogger.shared
 
         ShopifyCheckoutSheetKit.configuration.logLevel = .debug
@@ -76,7 +76,7 @@ class ShopifyCheckoutSheetKitTests: XCTestCase {
         )
     }
 
-    func testLoggerHasCorrectLogLevel() {
+    func test_logger_withDifferentLogLevels_shouldHaveCorrectLogLevel() {
         ShopifyCheckoutSheetKit.configuration.logLevel = .all
         XCTAssertEqual(
             OSLogger.shared.logLevel,

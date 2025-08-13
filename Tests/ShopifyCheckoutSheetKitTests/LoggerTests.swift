@@ -57,16 +57,16 @@ final class OSLoggerTests: XCTestCase {
         super.tearDown()
     }
 
-    func testSharedLoggerExists() {
+    func test_sharedLogger_whenAccessed_shouldExist() {
         XCTAssertNotNil(OSLogger.shared)
     }
 
-    func testDefaultInitializerBackwardsCompatibility() {
+    func test_defaultInitializer_withNoParameters_shouldMaintainBackwardsCompatibility() {
         let logger = OSLogger()
         XCTAssertNotNil(logger)
     }
 
-    func testLogLevelNoneBlocksAllLogging() {
+    func test_logLevelNone_withAllLogCalls_shouldBlockAllLogging() {
         let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .none)
 
         logger.info("test info")
@@ -77,7 +77,7 @@ final class OSLoggerTests: XCTestCase {
         XCTAssertEqual(logger.capturedMessages.count, 0)
     }
 
-    func testLogLevelAllAllowsAllLogging() {
+    func test_logLevelAll_withAllLogCalls_shouldAllowAllLogging() {
         let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .all)
 
         logger.info("test info")
@@ -104,7 +104,7 @@ final class OSLoggerTests: XCTestCase {
         XCTAssertEqual(logger.capturedMessages[3].type, OSLogType.fault)
     }
 
-    func testLogLevelDebugAllowsDebugAndInfo() {
+    func test_logLevelDebug_withAllLogCalls_shouldAllowDebugAndInfo() {
         let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .debug)
 
         logger.info("test info")
@@ -121,7 +121,7 @@ final class OSLoggerTests: XCTestCase {
         )
     }
 
-    func testLogLevelErrorAllowsErrorAndFault() {
+    func test_logLevelError_withAllLogCalls_shouldAllowErrorAndFault() {
         let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .error)
 
         logger.info("test info")
@@ -138,12 +138,12 @@ final class OSLoggerTests: XCTestCase {
         )
     }
 
-    func testSharedLoggerBackwardsCompatibility() {
+    func test_sharedLogger_withConfigurationLogLevel_shouldMaintainBackwardsCompatibility() {
         ShopifyCheckoutSheetKit.configuration.logLevel = .all
         OSLogger.shared.info("test message")
     }
 
-    func testExactMessageFormatting() {
+    func test_messageFormatting_withDifferentLogLevels_shouldFormatExactly() {
         let logger = TestableOSLogger(prefix: "ShopifyCheckoutSheetKit", logLevel: .all)
 
         logger.info("user action completed")
@@ -170,7 +170,7 @@ final class OSLoggerTests: XCTestCase {
         )
     }
 
-    func testCustomPrefixInLogger() {
+    func test_customPrefix_withLoggerInitialization_shouldUseCustomPrefix() {
         let customLogger = TestableOSLogger(prefix: "CustomModule", logLevel: .all)
 
         customLogger.info("custom module message")
@@ -187,7 +187,7 @@ final class OSLoggerTests: XCTestCase {
         )
     }
 
-    func testLogLevelNoneBlocksAllMessagesRegardlessOfType() {
+    func test_logLevelNone_withAllMessageTypes_shouldBlockAllMessagesRegardlessOfType() {
         let logger = TestableOSLogger(prefix: "Test", logLevel: .none)
 
         logger.info("should not log")
@@ -198,7 +198,7 @@ final class OSLoggerTests: XCTestCase {
         XCTAssertEqual(logger.capturedMessages.count, 0, "LogLevel.none should block all messages")
     }
 
-    func testLogLevelDebugBlocksInfoButAllowsDebugAndErrors() {
+    func test_logLevelDebug_withAllMessageTypes_shouldAllowDebugAndInfoOnly() {
         let logger = TestableOSLogger(prefix: "Test", logLevel: .debug)
 
         logger.info("info message")
@@ -211,7 +211,7 @@ final class OSLoggerTests: XCTestCase {
         XCTAssertTrue(logger.capturedMessages[1].message.contains("(Debug) - debug message"))
     }
 
-    func testLogLevelErrorOnlyAllowsErrorAndFault() {
+    func test_logLevelError_withAllMessageTypes_shouldAllowErrorAndFaultOnly() {
         let logger = TestableOSLogger(prefix: "Test", logLevel: .error)
 
         logger.info("should be blocked")
@@ -226,13 +226,13 @@ final class OSLoggerTests: XCTestCase {
 }
 
 final class NoOpLoggerTests: XCTestCase {
-    func testNoOpLoggerImplementsLoggerProtocol() {
+    func test_noOpLogger_whenUsed_shouldImplementLoggerProtocol() {
         let logger: ShopifyCheckoutSheetKit.Logger = NoOpLogger()
         logger.log("test message")
         logger.clearLogs()
     }
 
-    func testNoOpLoggerDoesNotThrow() {
+    func test_noOpLogger_withLogCalls_shouldNotThrow() {
         let logger = NoOpLogger()
 
         XCTAssertNoThrow(logger.log("test message"))
