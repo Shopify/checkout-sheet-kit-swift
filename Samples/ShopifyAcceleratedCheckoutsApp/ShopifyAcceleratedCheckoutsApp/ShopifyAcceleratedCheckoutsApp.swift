@@ -31,15 +31,20 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage(AppStorageKeys.requirePhone.rawValue) var requirePhone: Bool = true
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
     @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = .all
+    @AppStorage(AppStorageKeys.email.rawValue) var email: String = ""
+    @AppStorage(AppStorageKeys.phone.rawValue) var phone: String = ""
 
-    @StateObject var configuration = ShopifyAcceleratedCheckouts.Configuration(
-        storefrontDomain: EnvironmentVariables.storefrontDomain,
-        storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
-        customer: ShopifyAcceleratedCheckouts.Customer(email: nil, phoneNumber: nil)
-    )
+    var configuration: ShopifyAcceleratedCheckouts.Configuration {
+        .init(
+            storefrontDomain: EnvironmentVariables.storefrontDomain,
+            storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
+            customer: ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: phone)
+        )
+    }
 
-    @StateObject var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration =
-        createApplePayConfiguration()
+    var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
+        createApplePayConfiguration(requireEmail: requireEmail, requirePhone: requirePhone)
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -51,6 +56,8 @@ struct ShopifyAcceleratedCheckoutsApp: App {
                         }
                     }
                     .id("\(requireEmail)-\(requirePhone)")
+                    .onChange(of: email) { _ in updateConfiguration() }
+                    .onChange(of: phone) { _ in updateConfiguration() }
             }
             .onAppear {
                 ShopifyAcceleratedCheckouts.logLevel = logLevel
@@ -60,11 +67,18 @@ struct ShopifyAcceleratedCheckoutsApp: App {
         }
         .environment(\.locale, Locale(identifier: locale))
     }
+
+    private func updateConfiguration() {
+        configuration.customer = ShopifyAcceleratedCheckouts.Customer(
+            email: email.isEmpty ? nil : email,
+            phoneNumber: phone.isEmpty ? nil : phone
+        )
+    }
 }
 
 private func createApplePayConfiguration(
-    requireEmail: Bool = UserDefaults.standard.object(forKey: AppStorageKeys.requireEmail.rawValue) as? Bool ?? true,
-    requirePhone: Bool = UserDefaults.standard.object(forKey: AppStorageKeys.requirePhone.rawValue) as? Bool ?? true
+    requireEmail: Bool,
+    requirePhone: Bool
 ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
 

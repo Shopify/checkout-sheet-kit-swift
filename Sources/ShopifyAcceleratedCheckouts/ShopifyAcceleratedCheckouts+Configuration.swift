@@ -56,7 +56,14 @@ extension ShopifyAcceleratedCheckouts {
     }
 
     public class Customer: ObservableObject {
+        /// The email to attribute an order to on `buyerIdentity`
+        ///
+        /// Apple Pay - This property is ignored when `.email` is included in `ApplePayConfiguration.contactFields`
         @Published public var email: String?
+
+        /// The phoneNumber to attribute an order to on `buyerIdentity`
+        ///
+        /// Apple Pay - This property is ignored when `.phone` is included in `ApplePayConfiguration.contactFields`
         @Published public var phoneNumber: String?
         @Published public var customerAccessToken: String?
 
