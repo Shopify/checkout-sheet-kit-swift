@@ -25,7 +25,7 @@ import PassKit
 @preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 protocol PayController: AnyObject {
     var cart: StorefrontAPI.Types.Cart? { get set }
     var storefront: StorefrontAPI { get set }
@@ -36,14 +36,14 @@ protocol PayController: AnyObject {
     func present(url: URL) async throws
 }
 
-@available(iOS 17.0, *)
-@Observable class ApplePayViewController: PayController {
-    var configuration: ApplePayConfigurationWrapper
-    var storefront: StorefrontAPI
-    var storefrontJulyRelease: StorefrontAPI
-    var identifier: CheckoutIdentifier
-    var checkoutViewController: CheckoutViewController?
-    var paymentController: PKPaymentAuthorizationController?
+@available(iOS 16.0, *)
+class ApplePayViewController: PayController, ObservableObject {
+    @Published var configuration: ApplePayConfigurationWrapper
+    @Published var storefront: StorefrontAPI
+    @Published var storefrontJulyRelease: StorefrontAPI
+    @Published var identifier: CheckoutIdentifier
+    @Published var checkoutViewController: CheckoutViewController?
+    @Published var paymentController: PKPaymentAuthorizationController?
 
     var cart: StorefrontAPI.Types.Cart?
 
@@ -178,7 +178,10 @@ protocol PayController: AnyObject {
                 return cart
             case let .variant(id, quantity):
                 let items: [StorefrontAPI.Types.ID] = Array(repeating: .init(id), count: quantity)
-                return try await storefront.cartCreate(with: items, customer: configuration.common.customer)
+                return try await storefront.cartCreate(
+                    with: items,
+                    customer: configuration.common.customer
+                )
             case .invariant:
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "checkoutIdentifier")
             }
@@ -193,7 +196,9 @@ protocol PayController: AnyObject {
         }
     }
 
-    private func handleStorefrontError(_ error: StorefrontAPI.Errors) async throws -> StorefrontAPI.Types.Cart {
+    private func handleStorefrontError(_ error: StorefrontAPI.Errors) async throws
+        -> StorefrontAPI.Types.Cart
+    {
         switch error {
         case let .userError(userErrors, cart):
             guard let cart else { throw error }
@@ -242,7 +247,7 @@ protocol PayController: AnyObject {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ApplePayViewController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         Task { @MainActor in
@@ -266,10 +271,8 @@ extension ApplePayViewController: CheckoutDelegate {
         }
     }
 
-    func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return MainActor.assumeIsolated {
-            self.onShouldRecoverFromError?(error) ?? false
-        }
+    @MainActor func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        return onShouldRecoverFromError?(error) ?? false
     }
 
     func checkoutDidClickLink(url: URL) {

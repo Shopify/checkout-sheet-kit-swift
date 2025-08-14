@@ -30,15 +30,14 @@ typealias MerchandiseID = String
 typealias Quantity = Int
 
 struct CartBuilderView: View {
-    @Binding var configuration: ShopifyAcceleratedCheckouts.Configuration
+    var configuration: ShopifyAcceleratedCheckouts.Configuration
     @State var cart: Cart?
     @State var allProducts: [Product] = []
     /// Products picked with the QuantityPicker, prior to Cart creation
     @State var selectedVariants: [MerchandiseID: Quantity] = [:]
     @State var isLoadingProducts: Bool = false
     @State var isCreatingCart: Bool = false
-    @State private var scrollToTop = false
-    @State private var scrollToCart = false
+    @State private var scrollViewProxy: ScrollViewProxy?
 
     var body: some View {
         VStack {
@@ -48,7 +47,7 @@ struct CartBuilderView: View {
                         // Invisible anchor for scrolling to top
                         Color.clear
                             .frame(height: 1)
-                            .id("top")
+                            .id(ScrollableElement.top)
 
                         // Products Section
                         ProductsSection(
@@ -62,7 +61,7 @@ struct CartBuilderView: View {
                             CartDetailsSection(
                                 cart: Binding(get: { cart }, set: { self.cart = $0 })
                             )
-                            .id("cart-details") // Add ID for scrolling to cart
+                            .id(ScrollableElement.cartDetails) // Add ID for scrolling to cart
 
                             ButtonSet(
                                 cart: $cart,
@@ -75,21 +74,8 @@ struct CartBuilderView: View {
                         Spacer()
                             .frame(height: 100)
                     }
-                    .onChange(of: scrollToTop) { _, shouldScroll in
-                        if shouldScroll {
-                            withAnimation(.easeInOut) {
-                                scrollProxy.scrollTo("top", anchor: .top)
-                            }
-                            scrollToTop = false
-                        }
-                    }
-                    .onChange(of: scrollToCart) { _, shouldScroll in
-                        if shouldScroll {
-                            withAnimation(.easeInOut) {
-                                scrollProxy.scrollTo("cart-details", anchor: .top)
-                            }
-                            scrollToCart = false
-                        }
+                    .onAppear {
+                        scrollViewProxy = scrollProxy
                     }
                 }
             }
@@ -116,6 +102,17 @@ struct CartBuilderView: View {
         }
     }
 
+    private enum ScrollableElement: String {
+        case cartDetails
+        case top
+    }
+
+    private func scrollTo(element: ScrollableElement) {
+        withAnimation(.easeInOut) {
+            scrollViewProxy?.scrollTo(element, anchor: .top)
+        }
+    }
+
     private func createCustomCart() {
         isCreatingCart = true
 
@@ -128,7 +125,7 @@ struct CartBuilderView: View {
             }
             // Trigger scroll to cart after creation
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                scrollToCart = true
+                scrollTo(element: .cartDetails)
             }
         }
     }
@@ -139,7 +136,7 @@ struct CartBuilderView: View {
             selectedVariants.removeAll()
         }
         // Trigger scroll using state change
-        scrollToTop = true
+        scrollTo(element: .top)
     }
 
     func onLoad() async {
@@ -176,10 +173,10 @@ struct CartBuilderView: View {
 }
 
 #Preview {
-    @Previewable @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
+    let configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken
     )
 
-    CartBuilderView(configuration: $configuration)
+    CartBuilderView(configuration: configuration)
 }

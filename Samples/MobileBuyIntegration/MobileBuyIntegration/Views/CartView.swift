@@ -62,8 +62,8 @@ struct CartView: View {
                             .onCancel {
                                 print("Accelerated checkout cancelled")
                             }
-                            .environment(appConfiguration.acceleratedCheckoutsStorefrontConfig)
-                            .environment(appConfiguration.acceleratedCheckoutsApplePayConfig)
+                            .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+                            .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
                     }
 
                     Button(

@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 enum Operations {
     static func cartCreate(
         variables: [String: Any] = [:]
@@ -59,6 +59,16 @@ enum Operations {
         return GraphQLRequest(
             operation: .cartDeliveryAddressesUpdate,
             responseType: StorefrontAPI.CartDeliveryAddressesUpdateResponse.self,
+            variables: variables
+        )
+    }
+
+    static func cartDeliveryAddressesRemove(
+        variables: [String: Any] = [:]
+    ) -> GraphQLRequest<StorefrontAPI.CartDeliveryAddressesRemoveResponse> {
+        return GraphQLRequest(
+            operation: .cartDeliveryAddressesRemove,
+            responseType: StorefrontAPI.CartDeliveryAddressesRemoveResponse.self,
             variables: variables
         )
     }

@@ -26,19 +26,19 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 /// A view that displays an Apple Pay button for checkout
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct ApplePayButton: View {
     /// The configuration for Apple Pay
-    @Environment(ShopifyAcceleratedCheckouts.Configuration.self)
-    private var configuration
+    @EnvironmentObject
+    private var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     /// The shop settings
-    @Environment(ShopSettings.self)
-    private var shopSettings
+    @EnvironmentObject
+    private var shopSettings: ShopSettings
 
-    @Environment(ShopifyAcceleratedCheckouts.ApplePayConfiguration.self)
-    private var applePayConfiguration
+    @EnvironmentObject
+    private var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
 
     /// The identifier to use for checkout
     private let identifier: CheckoutIdentifier
@@ -47,7 +47,7 @@ struct ApplePayButton: View {
     private let eventHandlers: EventHandlers
 
     /// The Apple Pay button label style
-    private var label: ApplePayButtonLabel = .plain
+    private var label: PayWithApplePayButtonLabel = .plain
 
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
@@ -80,7 +80,7 @@ struct ApplePayButton: View {
         }
     }
 
-    public func label(_ label: ApplePayButtonLabel) -> some View {
+    public func label(_ label: PayWithApplePayButtonLabel) -> some View {
         var view = self
         view.label = label
         return view
@@ -89,11 +89,11 @@ struct ApplePayButton: View {
 
 /// A view that displays an Apple Pay button for checkout
 /// This is an internal view to allow Environment injection of the shared configuration app wide
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style
-    private var label: ApplePayButtonLabel = .plain
+    private var label: PayWithApplePayButtonLabel = .plain
 
     /// The view controller for the Apple Pay button
     private var controller: ApplePayViewController
@@ -109,7 +109,7 @@ struct Internal_ApplePayButton: View {
     ///   - eventHandlers: The event handlers for checkout events (defaults to EventHandlers())
     init(
         identifier: CheckoutIdentifier,
-        label: ApplePayButtonLabel,
+        label: PayWithApplePayButtonLabel,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
@@ -120,7 +120,7 @@ struct Internal_ApplePayButton: View {
         )
         self.label = label
         self.cornerRadius = cornerRadius
-        MainActor.assumeIsolated {
+        Task { @MainActor [controller] in
             controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
             controller.onCheckoutFail = eventHandlers.checkoutDidFail
             controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
@@ -132,7 +132,7 @@ struct Internal_ApplePayButton: View {
 
     var body: some View {
         PayWithApplePayButton(
-            label.toPayWithApplePayButtonLabel,
+            label,
             action: {
                 Task { await controller.startPayment() }
             },
@@ -141,91 +141,5 @@ struct Internal_ApplePayButton: View {
             }
         )
         .walletButtonStyle(cornerRadius: cornerRadius)
-    }
-}
-
-/// Used to set the label of the Apple Pay button
-/// see `.applePayLabel(label:)`
-public enum ApplePayButtonLabel {
-    /// A button with the Apple Pay logo only
-    case plain
-    /// A button that uses the phrase "Buy with" in conjunction with the Apple Pay logo
-    case buy
-    /// A button that uses the phrase "Add Money with" in conjunction with the Apple Pay logo
-    case addMoney
-    /// A button that uses the phrase "Book with" in conjunction with the Apple Pay logo
-    case book
-    /// A button that uses the phrase "Check out with" in conjunction with the Apple Pay logo
-    case checkout
-    /// A button that uses the phrase "Continue with" in conjunction with the Apple Pay logo
-    case `continue`
-    /// A button that uses the phrase "Contribute with" in conjunction with the Apple Pay logo
-    case contribute
-    /// A button that uses the phrase "Donate with" in conjunction with the Apple Pay logo
-    case donate
-    /// A button that uses the phrase "Pay with" in conjunction with the Apple Pay logo
-    case inStore
-    /// A button that uses the phrase "Order with" in conjunction with the Apple Pay logo
-    case order
-    /// A button that uses the phrase "Reload with" in conjunction with the Apple Pay logo
-    case reload
-    /// A button that uses the phrase "Rent with" in conjunction with the Apple Pay logo
-    case rent
-    /// A button that prompts the user to set up Apple Pay
-    case setUp
-    /// A button that uses the phrase "Subscribe with" in conjunction with the Apple Pay logo
-    case subscribe
-    /// A button that uses the phrase "Support with" in conjunction with the Apple Pay logo
-    case support
-    /// A button that uses the phrase "Tip with" in conjunction with the Apple Pay logo
-    case tip
-    /// A button that uses the phrase "Top Up with" in conjunction with the Apple Pay logo
-    case topUp
-
-    /// SwiftUI interop - will be removed when migrating to support iOS 15
-    @available(iOS 17.0, *)
-    var toPayWithApplePayButtonLabel: PayWithApplePayButtonLabel {
-        switch self {
-        case .plain: return .plain
-        case .buy: return .buy
-        case .addMoney: return .addMoney
-        case .book: return .book
-        case .checkout: return .checkout
-        case .continue: return .continue
-        case .contribute: return .contribute
-        case .donate: return .donate
-        case .inStore: return .inStore
-        case .order: return .order
-        case .reload: return .reload
-        case .rent: return .rent
-        case .setUp: return .setUp
-        case .subscribe: return .subscribe
-        case .support: return .support
-        case .tip: return .tip
-        case .topUp: return .topUp
-        }
-    }
-
-    @available(iOS 15.0, *)
-    var toPKPaymentButtonType: PKPaymentButtonType {
-        switch self {
-        case .plain: return .plain
-        case .buy: return .buy
-        case .addMoney: return .addMoney
-        case .book: return .book
-        case .checkout: return .checkout
-        case .continue: return .continue
-        case .contribute: return .contribute
-        case .donate: return .donate
-        case .inStore: return .inStore
-        case .order: return .order
-        case .reload: return .reload
-        case .rent: return .rent
-        case .setUp: return .setUp
-        case .subscribe: return .subscribe
-        case .support: return .support
-        case .tip: return .tip
-        case .topUp: return .topUp
-        }
     }
 }

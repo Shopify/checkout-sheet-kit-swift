@@ -32,9 +32,16 @@ commands:
     aliases: [style]
     desc: Check format and lint issues across all Swift files using SwiftLint and SwiftFormat
     run: scripts/lint
+    subcommands:
+      pod:
+        aliases: []
+        desc: Check the build for cocoapods deployement
+        run: bundle exec pod lib lint --allow-warnings
+
   fix:
     desc: Automatically fix format and lint issues where possible
     run: scripts/lint fix
+
   build:
     subcommands:
       packages:
@@ -45,6 +52,7 @@ commands:
       samples:
         desc: Build all sample applications to verify integration
         run: ./scripts/build_samples
+
   test:
     desc: |
       `dev test` - Run all tests for the ShopifyCheckoutSheetKit-Package.

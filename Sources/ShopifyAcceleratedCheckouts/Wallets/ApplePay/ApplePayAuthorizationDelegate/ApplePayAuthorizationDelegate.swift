@@ -28,7 +28,7 @@ import ShopifyCheckoutSheetKit
 // MARK: - PaymentAuthorizationController Protocol
 
 /// Protocol to abstract PKPaymentAuthorizationController for testing
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 protocol PaymentAuthorizationController {
     var delegate: PKPaymentAuthorizationControllerDelegate? { get set }
     func present() async -> Bool
@@ -37,10 +37,10 @@ protocol PaymentAuthorizationController {
 
 extension PKPaymentAuthorizationController: PaymentAuthorizationController {}
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthorizationController
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     let configuration: ApplePayConfigurationWrapper
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
@@ -232,30 +232,45 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         let cartID = try pkEncoder.cartID.get()
 
         if let addressID = selectedShippingAddressID {
-            return try await controller.storefront.cartDeliveryAddressesUpdate(
+            do {
+                // First, remove the existing delivery address to clear any tax policy contamination
+                _ = try await controller.storefront.cartDeliveryAddressesRemove(
+                    id: cartID,
+                    addressId: addressID
+                )
+
+                // Clear the selected address ID since we removed it
+                selectedShippingAddressID = nil
+            } catch {
+                if let responseError = error as? StorefrontAPI.Errors {
+                    print("upsertShippingAddress - Storefront API Error: \(responseError)")
+                }
+            }
+        }
+
+        do {
+            let cart = try await controller.storefront.cartDeliveryAddressesAdd(
                 id: cartID,
-                addressId: addressID,
                 address: address,
                 validate: validate
             )
+
+            selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
+
+            return cart
+        } catch {
+            if let responseError = error as? StorefrontAPI.Errors {
+                print("upsertShippingAddress - Storefront API Error: \(responseError)")
+            }
+            throw error
         }
-
-        let cart = try await controller.storefront.cartDeliveryAddressesAdd(
-            id: cartID,
-            address: address,
-            validate: validate
-        )
-
-        selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
-
-        return cart
     }
 }
 
 // MARK: - InvalidStateTransitionError
 
 /// Error thrown when an invalid state transition is attempted
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 struct InvalidStateTransitionError: Error {
     let fromState: ApplePayState
     let toState: ApplePayState

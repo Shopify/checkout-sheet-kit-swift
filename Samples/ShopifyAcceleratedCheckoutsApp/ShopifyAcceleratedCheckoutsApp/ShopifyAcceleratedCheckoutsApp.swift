@@ -32,19 +32,19 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage(AppStorageKeys.locale.rawValue) var locale: String = "en"
     @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = .all
 
-    @State var configuration = ShopifyAcceleratedCheckouts.Configuration(
+    @StateObject var configuration = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: EnvironmentVariables.storefrontDomain,
         storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
         customer: ShopifyAcceleratedCheckouts.Customer(email: nil, phoneNumber: nil)
     )
 
-    @State var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration =
+    @StateObject var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration =
         createApplePayConfiguration()
 
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                CartBuilderView(configuration: $configuration)
+                CartBuilderView(configuration: configuration)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             SettingsButton()
@@ -55,19 +55,10 @@ struct ShopifyAcceleratedCheckoutsApp: App {
             .onAppear {
                 ShopifyAcceleratedCheckouts.logLevel = logLevel
             }
+            .environmentObject(configuration)
+            .environmentObject(applePayConfiguration)
         }
         .environment(\.locale, Locale(identifier: locale))
-        .environment(configuration)
-        .environment(applePayConfiguration)
-        .onChange(of: requireEmail) { updateApplePayConfiguration() }
-        .onChange(of: requirePhone) { updateApplePayConfiguration() }
-    }
-
-    private func updateApplePayConfiguration() {
-        applePayConfiguration = createApplePayConfiguration(
-            requireEmail: requireEmail,
-            requirePhone: requirePhone
-        )
     }
 }
 
