@@ -13,15 +13,48 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Setup iOS Simulator
+      - name: Switch to Xcode 16.4
         run: |
+          sudo xcode-select --switch /Applications/Xcode_16.4.app
+          echo ""
+
+      - name: Display Current Xcode Path
+        run: |
+          echo "📍 Current Xcode Path:"
           xcode-select -p
+          echo ""
+
+      - name: Display Xcode Version
+        run: |
+          echo "🛠️ Xcode Version Information:"
           xcrun xcodebuild -version
-          xcrun simctl list runtimes
-          xcrun simctl list devicetypes
+          echo ""
+
+      - name: List Available Simulators
+        run: |
+          echo "📱 Available iOS Simulator Runtimes:"
+          echo "=================================="
+          xcrun simctl list runtimes | grep iOS || true
+          echo ""
+          echo "📱 Available Device Types (iPhone only):"
+          echo "========================================"
+          xcrun simctl list devicetypes | grep iPhone || true
+          echo ""
+
+      - name: Clean Up Existing Simulators
+        run: |
+          echo "🧹 Cleaning up existing simulators..."
           xcrun simctl delete all
+          echo "✅ Cleanup complete"
+          echo ""
+
+      - name: Create Test Simulator
+        run: |
+          echo "🔧 Creating new test simulator..."
           CURRENT_SIMULATOR_UUID=$(xcrun simctl create TestDevice "iPhone 16")
+          echo "✅ Created simulator with UUID: $CURRENT_SIMULATOR_UUID"
           echo "CURRENT_SIMULATOR_UUID=$CURRENT_SIMULATOR_UUID" >> $GITHUB_ENV
+          echo ""
 
       - name: Run Tests
         run: ${{ inputs.test-path }}
