@@ -49,7 +49,7 @@ public struct AcceleratedCheckoutButtons: View {
     var cornerRadius: CGFloat?
 
     /// The Apple Pay button label style
-    private var applePayLabel: ApplePayButtonLabel = .plain
+    private var applePayLabel: PayWithApplePayButtonLabel = .plain
 
     @State private var shopSettings: ShopSettings?
     @State private var currentRenderState: RenderState = .loading {
@@ -134,7 +134,7 @@ public struct AcceleratedCheckoutButtons: View {
 
 @available(iOS 16.0, *)
 extension AcceleratedCheckoutButtons {
-    public func applePayLabel(_ label: ApplePayButtonLabel) -> AcceleratedCheckoutButtons {
+    public func applePayLabel(_ label: PayWithApplePayButtonLabel) -> AcceleratedCheckoutButtons {
         var view = self
         view.applePayLabel = label
         return view
