@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.0-rc.4 - August 14, 2025
+
+- [AC]: Widen supported iOS versions to include iOS16 by @kieran-osgood-shopify in https://github.com/Shopify/checkout-sheet-kit-swift/pull/376
+
 ## 3.4.0-rc.3 - August 12, 2025
 
 - Includes a fix for cart address updates in the Apple Pay sheet of Accelerated Checkouts
