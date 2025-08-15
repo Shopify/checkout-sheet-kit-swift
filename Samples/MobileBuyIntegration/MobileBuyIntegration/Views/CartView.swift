@@ -37,6 +37,8 @@ struct CartView: View {
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
 
+    let checkoutDelegate = CustomCheckoutDelegate()
+
     var body: some View {
         if let lines = cartManager.cart?.lines.nodes {
             ZStack(alignment: .bottom) {
@@ -52,16 +54,8 @@ struct CartView: View {
                         AcceleratedCheckoutButtons(cartID: cartId)
                             .wallets([.shopPay, .applePay])
                             .cornerRadius(DesignSystem.cornerRadius)
-                            .onComplete { _ in
-                                // Reset cart on successful checkout
-                                CartManager.shared.resetCart()
-                            }
-                            .onFail { error in
-                                print("Accelerated checkout failed: \(error)")
-                            }
-                            .onCancel {
-                                print("Accelerated checkout cancelled")
-                            }
+                            .checkout(delegate: checkoutDelegate)
+                            .onError(AcceleratedCheckoutHandlers.handleError)
                             .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
                             .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
                     }

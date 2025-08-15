@@ -34,6 +34,15 @@ struct ButtonSet: View {
     @State private var cartRenderState: RenderState = .loading
     @State private var variantRenderState: RenderState = .loading
 
+    // Create CheckoutDelegate implementations
+    private var cartCheckoutDelegate: CheckoutDelegate {
+        CartCheckoutDelegate(onComplete: onComplete)
+    }
+
+    private var variantCheckoutDelegate: CheckoutDelegate {
+        VariantCheckoutDelegate()
+    }
+
     var body: some View {
         VStack(spacing: 16) {
             if let cartID = cart?.id {
@@ -41,42 +50,12 @@ struct ButtonSet: View {
                     title: "AcceleratedCheckoutButtons(cartID:)",
                     renderState: $cartRenderState
                 ) {
-                    // Cart-based checkout example with event handlers
+                    // Cart-based checkout example with CheckoutDelegate
                     AcceleratedCheckoutButtons(cartID: cartID)
                         .applePayLabel(.plain)
-                        .onComplete { event in
-                            print(
-                                "✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)"
-                            )
-                            onComplete()
-                        }
-                        .onFail { error in
-                            print("❌ Checkout failed: \(error)")
-                        }
-                        .onCancel {
-                            print("🚫 Checkout cancelled")
-                        }
-                        .onShouldRecoverFromError { error in
-                            print("🔄 Should recover from error: \(error)")
-                            // Return true to attempt recovery, false to fail
-                            return true
-                        }
-                        .onClickLink { url in
-                            print("🔗 Link clicked: \(url)")
-                        }
-                        .onWebPixelEvent { event in
-                            let eventName: String = {
-                                switch event {
-                                case let .customEvent(customEvent):
-                                    return customEvent.name ?? "Unknown custom event"
-                                case let .standardEvent(standardEvent):
-                                    return standardEvent.name ?? "Unknown standard event"
-                                }
-                            }()
-                            print("📊 Web pixel event: \(eventName)")
-                        }
-                        .onRenderStateChange {
-                            cartRenderState = $0
+                        .checkout(delegate: cartCheckoutDelegate)
+                        .onRenderStateChange { state in
+                            cartRenderState = state
                         }
                 }
             }
@@ -88,7 +67,7 @@ struct ButtonSet: View {
                     title: "AcceleratedCheckoutButtons(variantID: quantity:)",
                     renderState: $variantRenderState
                 ) {
-                    // Variant-based checkout with separate handlers and custom corner radius
+                    // Variant-based checkout with CheckoutDelegate and custom corner radius
                     AcceleratedCheckoutButtons(
                         variantID: productVariant.id,
                         quantity: firstVariantQuantity
@@ -96,40 +75,96 @@ struct ButtonSet: View {
                     .applePayLabel(.buy)
                     .cornerRadius(24)
                     .wallets([.applePay, .shopPay])
-                    .onComplete { event in
-                        print("✅ Variant checkout completed")
-                        print("   Order ID: \(event.orderDetails.id)")
-                    }
-                    .onFail { error in
-                        print("❌ Variant checkout failed: \(error)")
-                    }
-                    .onCancel {
-                        print("🚫 Variant checkout cancelled")
-                    }
-                    .onShouldRecoverFromError { error in
-                        print("🔄 Variant - Should recover from error: \(error)")
-                        return false // Example: don't recover for variant checkout
-                    }
-                    .onClickLink { url in
-                        print("🔗 Variant - Link clicked: \(url)")
-                    }
-                    .onWebPixelEvent { event in
-                        let eventName: String = {
-                            switch event {
-                            case let .customEvent(customEvent):
-                                return customEvent.name ?? "Unknown custom event"
-                            case let .standardEvent(standardEvent):
-                                return standardEvent.name ?? "Unknown standard event"
-                            }
-                        }()
-                        print("📊 Variant - Web pixel event: \(eventName)")
-                    }
-                    .onRenderStateChange {
-                        variantRenderState = $0
+                    .checkout(delegate: variantCheckoutDelegate)
+                    .onRenderStateChange { state in
+                        variantRenderState = state
                     }
                 }
             }
         }
+    }
+}
+
+// MARK: - CheckoutDelegate Implementations
+
+/// CheckoutDelegate implementation for cart-based checkout
+class CartCheckoutDelegate: CheckoutDelegate {
+    private let onComplete: () -> Void
+
+    init(onComplete: @escaping () -> Void) {
+        self.onComplete = onComplete
+    }
+
+    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+        print("✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)")
+        onComplete()
+    }
+
+    func checkoutDidFail(error: CheckoutError) {
+        print("❌ Checkout failed: \(error)")
+    }
+
+    func checkoutDidCancel() {
+        print("🚫 Checkout cancelled")
+    }
+
+    func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        print("🔄 Should recover from error: \(error)")
+        // Return true to attempt recovery, false to fail
+        return true
+    }
+
+    func checkoutDidClickLink(url: URL) {
+        print("🔗 Link clicked: \(url)")
+    }
+
+    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+        let eventName: String = {
+            switch event {
+            case let .customEvent(customEvent):
+                return customEvent.name ?? "Unknown custom event"
+            case let .standardEvent(standardEvent):
+                return standardEvent.name ?? "Unknown standard event"
+            }
+        }()
+        print("📊 Web pixel event: \(eventName)")
+    }
+}
+
+/// CheckoutDelegate implementation for variant-based checkout
+class VariantCheckoutDelegate: CheckoutDelegate {
+    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+        print("✅ Variant checkout completed")
+        print("   Order ID: \(event.orderDetails.id)")
+    }
+
+    func checkoutDidFail(error: CheckoutError) {
+        print("❌ Variant checkout failed: \(error)")
+    }
+
+    func checkoutDidCancel() {
+        print("🚫 Variant checkout cancelled")
+    }
+
+    func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        print("🔄 Variant - Should recover from error: \(error)")
+        return false // Example: don't recover for variant checkout
+    }
+
+    func checkoutDidClickLink(url: URL) {
+        print("🔗 Variant - Link clicked: \(url)")
+    }
+
+    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+        let eventName: String = {
+            switch event {
+            case let .customEvent(customEvent):
+                return customEvent.name ?? "Unknown custom event"
+            case let .standardEvent(standardEvent):
+                return standardEvent.name ?? "Unknown standard event"
+            }
+        }()
+        print("📊 Variant - Web pixel event: \(eventName)")
     }
 }
 

@@ -69,6 +69,10 @@
 		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		6A4895F72E4E069C00D4AE90 /* Common */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Common; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		4EBBA7642A5F0CE200193E19 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -126,6 +130,7 @@
 		4EBBA77F2A5F0DA300193E19 /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				6A4895F72E4E069C00D4AE90 /* Common */,
 				86250DE32AD5521C002E45C2 /* AppConfiguration.swift */,
 				4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */,
 				4EF54F232A6F456B00F5E407 /* CartManager.swift */,
@@ -213,6 +218,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6A4895F72E4E069C00D4AE90 /* Common */,
 			);
 			name = MobileBuyIntegration;
 			packageProductDependencies = (

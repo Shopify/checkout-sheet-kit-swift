@@ -68,9 +68,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartCreate")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartCreate")
 
         return cart
     }
@@ -132,9 +132,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartBuyerIdentityUpdate")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartBuyerIdentityUpdate")
 
         return cart
     }
@@ -171,9 +171,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesAdd")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesAdd")
 
         return cart
     }
@@ -213,9 +213,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesUpdate")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesUpdate")
 
         return cart
     }
@@ -242,9 +242,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesRemove")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesRemove")
 
         return cart
     }
@@ -278,9 +278,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartSelectedDeliveryOptionsUpdate")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartSelectedDeliveryOptionsUpdate")
 
         return cart
     }
@@ -349,9 +349,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartPaymentUpdate")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartPaymentUpdate")
 
         return cart
     }
@@ -380,9 +380,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartBillingAddressUpdate")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartBillingAddressUpdate")
 
         return cart
     }
@@ -403,9 +403,9 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartRemovePersonalData")
+        try validateUserErrors(payload.userErrors)
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        let cart = try validateCart(payload.cart, requestName: "cartRemovePersonalData")
     }
 
     /// Prepare cart for completion
@@ -430,8 +430,8 @@ extension StorefrontAPI {
 
         switch result {
         case let .ready(ready):
+            try validateUserErrors(payload.userErrors)
             let cart = try validateCart(ready.cart, requestName: "cartPrepareForCompletion")
-            try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
             return ready
         case let .throttled(throttled):
             throw GraphQLError.networkError(
@@ -460,7 +460,7 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        try validateUserErrors(payload.userErrors, checkoutURL: nil)
+        try validateUserErrors(payload.userErrors)
 
         guard let result = payload.result else {
             throw GraphQLError.invalidResponse
@@ -487,10 +487,10 @@ extension StorefrontAPI {
 
 @available(iOS 16.0, *)
 extension StorefrontAPI {
-    private func validateUserErrors(_ userErrors: [CartUserError], checkoutURL _: URL?) throws {
+    private func validateUserErrors(_ userErrors: [CartUserError]) throws {
         guard userErrors.isEmpty else {
-            // Always throw the actual CartUserError so the error handler can properly map it
-            throw userErrors.first!
+            // Throw a validation error that contains all user errors for comprehensive debugging
+            throw CartValidationError(userErrors: userErrors)
         }
     }
 

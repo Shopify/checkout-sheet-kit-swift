@@ -46,6 +46,9 @@ struct ApplePayButton: View {
     /// The event handlers for checkout events
     private let eventHandlers: EventHandlers
 
+    /// The checkout delegate for handling checkout flow
+    private let checkoutDelegate: CheckoutDelegate?
+
     /// The Apple Pay button label style
     private var label: PayWithApplePayButtonLabel = .plain
 
@@ -55,10 +58,12 @@ struct ApplePayButton: View {
     public init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
+        checkoutDelegate: CheckoutDelegate? = nil,
         cornerRadius: CGFloat?
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
+        self.checkoutDelegate = checkoutDelegate
         self.cornerRadius = cornerRadius
     }
 
@@ -75,6 +80,7 @@ struct ApplePayButton: View {
                     shopSettings: shopSettings
                 ),
                 eventHandlers: eventHandlers,
+                checkoutDelegate: checkoutDelegate,
                 cornerRadius: cornerRadius
             )
         }
@@ -112,21 +118,18 @@ struct Internal_ApplePayButton: View {
         label: PayWithApplePayButtonLabel,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
+        checkoutDelegate: CheckoutDelegate? = nil,
         cornerRadius: CGFloat?
     ) {
         controller = ApplePayViewController(
             identifier: identifier,
-            configuration: configuration
+            configuration: configuration,
+            checkoutDelegate: checkoutDelegate
         )
         self.label = label
         self.cornerRadius = cornerRadius
         Task { @MainActor [controller] in
-            controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
-            controller.onCheckoutFail = eventHandlers.checkoutDidFail
-            controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
-            controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
-            controller.onCheckoutClickLink = eventHandlers.checkoutDidClickLink
-            controller.onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
+            controller.onValidationFail = eventHandlers.validationDidFail
         }
     }
 
