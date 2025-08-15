@@ -428,7 +428,7 @@ class PKEncoderTests: XCTestCase {
     }
 
     func testBillingPostalAddressReturnsErrorWhenPaymentIsNil() {
-        var testEncoder = encoder
+        let testEncoder = encoder
         testEncoder.payment = nil
         testEncoder.selectedPaymentMethod = nil
 
@@ -442,7 +442,7 @@ class PKEncoderTests: XCTestCase {
     }
 
     func testBillingPostalAddressReturnsErrorWhenPaymentHasNoBillingContact() {
-        var testEncoder = encoder
+        let testEncoder = encoder
         let payment = PKPayment()
         testEncoder.payment = payment
         testEncoder.selectedPaymentMethod = nil
@@ -457,7 +457,7 @@ class PKEncoderTests: XCTestCase {
     }
 
     func testBillingPostalAddressReturnsErrorWhenSelectedPaymentMethodIsNil() {
-        var testEncoder = encoder
+        let testEncoder = encoder
         testEncoder.payment = nil
         testEncoder.selectedPaymentMethod = nil
 
@@ -471,7 +471,7 @@ class PKEncoderTests: XCTestCase {
     }
 
     func testBillingPostalAddressHandlesComplexNestedNilCases() {
-        var testEncoder = encoder
+        let testEncoder = encoder
 
         let mockPaymentMethod = PKPaymentMethod()
         testEncoder.selectedPaymentMethod = mockPaymentMethod
@@ -486,7 +486,7 @@ class PKEncoderTests: XCTestCase {
     }
 
     func testBillingPostalAddressSuccessViaBillingContact() throws {
-        var testEncoder = encoder
+        let testEncoder = encoder
 
         let billingContact = createMockContact(
             street: "789 Billing Street\nUnit 456",
