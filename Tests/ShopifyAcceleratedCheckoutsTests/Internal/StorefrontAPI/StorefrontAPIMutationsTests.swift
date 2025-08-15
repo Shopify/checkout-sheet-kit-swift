@@ -1606,4 +1606,131 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             XCTFail("Expected CartUserError but got: \(error)")
         }
     }
+
+    // MARK: - CartBuyerIdentityUpdateInput Empty String Filtering Tests
+
+    func test_dictionary_withMixedEmptyAndValidStrings_shouldFilterEmptyStrings() {
+        let input = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            email: "",
+            phoneNumber: "123-456-7890",
+            customerAccessToken: ""
+        )
+
+        let dictionary = input.dictionary
+
+        XCTAssertNil(dictionary["email"])
+        XCTAssertEqual(dictionary["phone"], "123-456-7890")
+        XCTAssertNil(dictionary["customerAccessToken"])
+        XCTAssertNil(dictionary["countryCode"])
+    }
+
+    func test_dictionary_withAllEmptyStrings_shouldReturnEmptyDictionary() {
+        let input = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            email: "",
+            phoneNumber: "",
+            customerAccessToken: ""
+        )
+
+        let dictionary = input.dictionary
+
+        XCTAssertTrue(dictionary.isEmpty)
+        XCTAssertTrue(input.isEmpty)
+    }
+
+    func test_dictionary_withNonEmptyValues_shouldIncludeAllValues() {
+        let input = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            email: "test@example.com",
+            phoneNumber: "+1234567890",
+            customerAccessToken: "token123"
+        )
+
+        let dictionary = input.dictionary
+
+        XCTAssertEqual(dictionary["email"], "test@example.com")
+        XCTAssertEqual(dictionary["phone"], "+1234567890")
+        XCTAssertEqual(dictionary["customerAccessToken"], "token123")
+        XCTAssertNil(dictionary["countryCode"])
+        XCTAssertFalse(input.isEmpty)
+    }
+
+    func test_dictionary_withCountryCodeInitializer_shouldFilterEmptyAccessToken() {
+        let input = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            countryCode: "US",
+            customerAccessToken: ""
+        )
+
+        let dictionary = input.dictionary
+
+        XCTAssertEqual(dictionary["countryCode"], "US")
+        XCTAssertNil(dictionary["customerAccessToken"])
+        XCTAssertNil(dictionary["email"])
+        XCTAssertNil(dictionary["phone"])
+        XCTAssertFalse(input.isEmpty)
+    }
+
+    func test_dictionary_withEmptyCountryCode_shouldFilterEmptyCountryCode() {
+        let input = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            countryCode: "",
+            customerAccessToken: "token123"
+        )
+
+        let dictionary = input.dictionary
+
+        XCTAssertNil(dictionary["countryCode"])
+        XCTAssertEqual(dictionary["customerAccessToken"], "token123")
+        XCTAssertFalse(input.isEmpty)
+    }
+
+    func test_dictionary_withMixedEmptyAndNilValues_shouldFilterEmptyAndExcludeNil() {
+        var input = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            email: "test@example.com",
+            phoneNumber: "",
+            customerAccessToken: nil
+        )
+        input.countryCode = ""
+
+        let dictionary = input.dictionary
+
+        XCTAssertEqual(dictionary["email"], "test@example.com")
+        XCTAssertNil(dictionary["phone"])
+        XCTAssertNil(dictionary["customerAccessToken"])
+        XCTAssertNil(dictionary["countryCode"])
+        XCTAssertFalse(input.isEmpty)
+    }
+
+    func test_dictionary_withWhitespaceOnlyStrings_shouldIncludeWhitespaceStrings() {
+        let input = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            email: "   ",
+            phoneNumber: "\t\n",
+            customerAccessToken: "token123"
+        )
+
+        let dictionary = input.dictionary
+
+        XCTAssertEqual(dictionary["email"], "   ")
+        XCTAssertEqual(dictionary["phone"], "\t\n")
+        XCTAssertEqual(dictionary["customerAccessToken"], "token123")
+        XCTAssertFalse(input.isEmpty)
+    }
+
+    func test_cartBuyerIdentityUpdate_withAllEmptyStringInput_shouldThrowInvalidVariables() async {
+        let json = """
+        {"data": {"cartBuyerIdentityUpdate": {"cart": null, "userErrors": []}}}
+        """
+        mockJSONResponse(json)
+
+        let emptyInput = StorefrontAPI.CartBuyerIdentityUpdateInput(
+            email: "",
+            phoneNumber: "",
+            customerAccessToken: ""
+        )
+
+        await XCTAssertThrowsGraphQLError(
+            try await storefrontAPI.cartBuyerIdentityUpdate(
+                id: GraphQLScalars.ID("gid://shopify/Cart/123"),
+                input: emptyInput
+            ),
+            { if case .invalidVariables = $0 { return true } else { return false } }
+        )
+    }
 }
