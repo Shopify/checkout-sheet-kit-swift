@@ -99,12 +99,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private(set) var state: ApplePayState = .idle {
         didSet {
-            #if DEBUG
-                print(
-                    "ApplePayState: \(String(describing: oldValue)) -> \(String(describing: state))",
-                    terminator: "\n---\n"
-                )
-            #endif
+            ShopifyAcceleratedCheckouts.logger.debug("ApplePayState: \(String(describing: oldValue)) -> \(String(describing: state))")
         }
     }
 
@@ -122,11 +117,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
-            #if DEBUG
-                print(
-                    "⚠️ InvalidStateTransitionError: \(String(describing: state)) -> \(String(describing: nextState))"
-                )
-            #endif
+            ShopifyAcceleratedCheckouts.logger.error("InvalidStateTransitionError: \(String(describing: state)) -> \(String(describing: nextState))")
             throw InvalidStateTransitionError(fromState: state, toState: nextState)
         }
 

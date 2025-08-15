@@ -22,11 +22,33 @@
  */
 
 import Combine
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
+enum AppStorageKeys: String {
+    case acceleratedCheckoutsLogLevel
+    case checkoutSheetKitLogLevel
+}
+
 struct SettingsView: View {
     @ObservedObject var config: AppConfiguration = appConfiguration
+
+    @AppStorage(AppStorageKeys.checkoutSheetKitLogLevel.rawValue)
+    var checkoutSheetKitLogLevel: LogLevel = .all {
+        didSet {
+            ShopifyCheckoutSheetKit.configure {
+                $0.logLevel = checkoutSheetKitLogLevel
+            }
+        }
+    }
+
+    @AppStorage(AppStorageKeys.acceleratedCheckoutsLogLevel.rawValue)
+    var acceleratedCheckoutsLogLevel: LogLevel = .all {
+        didSet {
+            ShopifyAcceleratedCheckouts.logLevel = acceleratedCheckoutsLogLevel
+        }
+    }
 
     @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
@@ -48,10 +70,15 @@ struct SettingsView: View {
                     Toggle("Handle Checkout URLs", isOn: $config.universalLinks.checkout)
                     Toggle("Handle Cart URLs", isOn: $config.universalLinks.cart)
                     Toggle("Handle Product URLs", isOn: $config.universalLinks.products)
-                    Toggle("Handle all Universal Links", isOn: $config.universalLinks.handleAllURLsInApp)
+                    Toggle(
+                        "Handle all Universal Links",
+                        isOn: $config.universalLinks.handleAllURLsInApp
+                    )
 
-                    Text("By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app.")
-                        .font(.caption)
+                    Text(
+                        "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app."
+                    )
+                    .font(.caption)
                 }
 
                 Section(header: Text("Theme")) {
@@ -63,13 +90,46 @@ struct SettingsView: View {
                                 selectedColorScheme = scheme
                                 ShopifyCheckoutSheetKit.configuration.colorScheme = scheme
                                 ShopifyCheckoutSheetKit.configuration.tintColor = scheme.tintColor
-                                ShopifyCheckoutSheetKit.configuration.backgroundColor = scheme.backgroundColor
-                                NotificationCenter.default.post(name: .colorSchemeChanged, object: nil)
+                                ShopifyCheckoutSheetKit.configuration.backgroundColor =
+                                    scheme.backgroundColor
+                                NotificationCenter.default.post(
+                                    name: .colorSchemeChanged, object: nil
+                                )
                             }
                     }
                 }
 
-                Section(header: Text("Logs")) {
+                Section(header: Text("Logging")) {
+                    Picker(
+                        "Accelerated Checkouts",
+                        selection: Binding(
+                            get: { acceleratedCheckoutsLogLevel },
+                            set: { acceleratedCheckoutsLogLevel = $0 }
+                        )
+                    ) {
+                        ForEach(LogLevel.allCases, id: \.self) { level in
+                            Text(
+                                level.rawValue.capitalized(with: Locale.current)
+                            ).tag(level)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
+                    Picker(
+                        "Checkout Sheet Kit",
+                        selection: Binding(
+                            get: { checkoutSheetKitLogLevel },
+                            set: { checkoutSheetKitLogLevel = $0 }
+                        )
+                    ) {
+                        ForEach(LogLevel.allCases, id: \.self) { level in
+                            Text(
+                                level.rawValue.capitalized(with: Locale.current)
+                            ).tag(level)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
                     NavigationLink(destination: WebPixelsEventsView()) {
                         Text("Web pixel events")
                     }

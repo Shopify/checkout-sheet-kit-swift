@@ -21,42 +21,50 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import os.log
 import XCTest
 
+@testable import ShopifyAcceleratedCheckouts
 @testable import ShopifyCheckoutSheetKit
 
-class ShopifyCheckoutSheetKitTests: XCTestCase {
-    func test_version_whenAccessed_shouldExist() {
-        XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
+@available(iOS 17.0, *)
+class ShopifyAcceleratedCheckoutsTests: XCTestCase {
+    var originalLogLevel: LogLevel!
+
+    override func setUp() {
+        super.setUp()
+        originalLogLevel = ShopifyAcceleratedCheckouts.logLevel
     }
 
-    func test_configuration_whenLogLevelChanges_createsNewLogger() {
-        XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
+    override func tearDown() {
+        ShopifyAcceleratedCheckouts.logLevel = originalLogLevel
+        super.tearDown()
     }
 
-    func test_configuration_whenLogLevelSetsSameLevel_instanceRemainsSame() {
-        XCTAssertFalse(ShopifyCheckoutSheetKit.version.isEmpty)
+    func test_apiVersion_whenAccessed_shouldBePublic() {
+        XCTAssertEqual(ShopifyAcceleratedCheckouts.apiVersion, "2025-04")
     }
 
-    func test_configuration_logLevelDefaultsToError() {
+    func test_logLevel_withDefaultConfiguration_shouldDefaultToError() {
         XCTAssertEqual(
-            ShopifyCheckoutSheetKit.configuration.logLevel,
+            ShopifyAcceleratedCheckouts.logLevel,
             LogLevel.error,
             "Default logLevel should be .error"
         )
+        XCTAssertNotNil(ShopifyAcceleratedCheckouts.logger)
         XCTAssertEqual(
-            OSLogger.shared.logLevel,
+            ShopifyAcceleratedCheckouts.logger.logLevel,
             LogLevel.error,
             "Default logger logLevel should be .error"
         )
     }
 
     func test_configuration_onLogLevelChange_usesExistingInstance() {
-        let originalLogger = OSLogger.shared
-        let originalLogLevel = OSLogger.shared.logLevel
+        let originalLogger = ShopifyAcceleratedCheckouts.logger
+        let originalLogLevel = ShopifyAcceleratedCheckouts.logger.logLevel
 
-        ShopifyCheckoutSheetKit.configuration.logLevel = originalLogLevel
-        let newLogger = OSLogger.shared
+        ShopifyAcceleratedCheckouts.logLevel = originalLogLevel
+        let newLogger = ShopifyAcceleratedCheckouts.logger
 
         XCTAssertTrue(
             originalLogger === newLogger,
@@ -65,32 +73,26 @@ class ShopifyCheckoutSheetKitTests: XCTestCase {
     }
 
     func test_logger_withDifferentLogLevels_shouldHaveCorrectLogLevel() {
-        ShopifyCheckoutSheetKit.configuration.logLevel = .all
+        ShopifyAcceleratedCheckouts.logLevel = .all
         XCTAssertEqual(
-            OSLogger.shared.logLevel,
-            .all,
-            "Logger should have .all log level"
+            ShopifyAcceleratedCheckouts.logger.logLevel, .all, "Logger should have .all log level"
         )
 
-        ShopifyCheckoutSheetKit.configuration.logLevel = .debug
+        ShopifyAcceleratedCheckouts.logLevel = .debug
         XCTAssertEqual(
-            OSLogger.shared.logLevel,
-            .debug,
+            ShopifyAcceleratedCheckouts.logger.logLevel, .debug,
             "Logger should have .debug log level"
         )
 
-        ShopifyCheckoutSheetKit.configuration.logLevel = .error
+        ShopifyAcceleratedCheckouts.logLevel = .error
         XCTAssertEqual(
-            OSLogger.shared.logLevel,
-            .error,
+            ShopifyAcceleratedCheckouts.logger.logLevel, .error,
             "Logger should have .error log level"
         )
 
-        ShopifyCheckoutSheetKit.configuration.logLevel = .none
+        ShopifyAcceleratedCheckouts.logLevel = .none
         XCTAssertEqual(
-            OSLogger.shared.logLevel,
-            .none,
-            "Logger should have .none log level"
+            ShopifyAcceleratedCheckouts.logger.logLevel, .none, "Logger should have .none log level"
         )
     }
 }

@@ -65,24 +65,18 @@ enum CheckoutIdentifier {
         switch self {
         case let .cart(cartID):
             guard cartID.lowercased().hasPrefix(Self.cartPrefix.lowercased()) else {
-                print(
-                    "[invariant_violation] Invalid 'cartID' format. Expected to start with '\(Self.cartPrefix)', received: '\(cartID)'"
-                )
+                ShopifyAcceleratedCheckouts.logger.error("[invariant_violation] Invalid 'cartID' format. Expected to start with '\(Self.cartPrefix)', received: '\(cartID)'")
                 return .invariant
             }
             return self
 
         case let .variant(variantID, quantity):
             guard variantID.lowercased().hasPrefix(Self.variantPrefix.lowercased()) else {
-                print(
-                    "[invariant_violation] Invalid 'variantID' format. Expected to start with '\(Self.variantPrefix)', received: '\(variantID)'"
-                )
+                ShopifyAcceleratedCheckouts.logger.error("[invariant_violation] Invalid 'variantID' format. Expected to start with '\(Self.variantPrefix)', received: '\(variantID)'")
                 return .invariant
             }
             guard quantity > 0 else {
-                print(
-                    "[invariant_violation] Quantity must be greater than 0, received: \(quantity)"
-                )
+                ShopifyAcceleratedCheckouts.logger.error("[invariant_violation] Quantity must be greater than 0, received: \(quantity)")
                 return .invariant
             }
             return self

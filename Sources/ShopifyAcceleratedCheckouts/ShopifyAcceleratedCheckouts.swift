@@ -21,8 +21,24 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import ShopifyCheckoutSheetKit
+
 public enum ShopifyAcceleratedCheckouts {
     /// Storefront API version used for cart operations
     /// Note: We also use `2025-07` for `cartRemovePersonalData` mutations. We are working towards migrating all requests to `2025-07`.
-    static let apiVersion = "2025-04"
+    internal static let apiVersion = "2025-04"
+
+    internal static let name = "ShopifyAcceleratedCheckouts"
+
+    /// The logging level for Accelerated Checkouts operations
+    /// Default: .error - which will emit "error" and "fault" logs
+    public static var logLevel: LogLevel = .error {
+        didSet {
+            logger.logLevel = logLevel
+        }
+    }
+
+    /// Shared logger for ShopifyAcceleratedCheckouts
+    /// To modify the logLevel
+    internal static var logger = OSLogger(prefix: name, logLevel: logLevel)
 }

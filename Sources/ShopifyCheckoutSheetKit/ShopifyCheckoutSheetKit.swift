@@ -34,6 +34,7 @@ public var configuration = Configuration() {
         if invalidateOnConfigurationChange {
             CheckoutWebView.invalidate()
         }
+        OSLogger.shared.logLevel = configuration.logLevel
     }
 }
 

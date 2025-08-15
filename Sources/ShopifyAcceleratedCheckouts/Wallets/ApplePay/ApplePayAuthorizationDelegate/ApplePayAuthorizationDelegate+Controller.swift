@@ -65,7 +65,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             return pkDecoder.paymentRequestShippingContactUpdate()
         } catch {
-            print("ApplePay: didSelectShippingContact error:\n \(error)", terminator: "\n\n")
+            ShopifyAcceleratedCheckouts.logger.error("ApplePay: didSelectShippingContact error: \(error)")
             return await handleError(error: error, cart: controller.cart) {
                 pkDecoder.paymentRequestShippingContactUpdate(errors: $0)
             }
@@ -113,7 +113,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             return pkDecoder.paymentRequestPaymentMethodUpdate()
         } catch {
-            print("ApplePay: didSelectPaymentMethod error:\n \(error)", terminator: "\n\n")
+            ShopifyAcceleratedCheckouts.logger.error("ApplePay: didSelectPaymentMethod error: \(error)")
 
             return await handleError(error: error, cart: controller.cart) {
                 pkDecoder.paymentRequestPaymentMethodUpdate(errors: $0)
@@ -152,7 +152,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             return pkDecoder.paymentRequestShippingMethodUpdate()
         } catch {
-            print("didSelectShippingMethod error:\n \(error)", terminator: "\n\n")
+            ShopifyAcceleratedCheckouts.logger.error("didSelectShippingMethod error: \(error)")
 
             return await handleError(error: error, cart: controller.cart) { _ in
                 pkDecoder.paymentRequestShippingMethodUpdate()
@@ -226,7 +226,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             return pkDecoder.paymentAuthorizationResult()
         } catch {
-            print("didAuthorizePayment error:\n \(error)", terminator: "\n\n")
+            ShopifyAcceleratedCheckouts.logger.error("didAuthorizePayment error: \(error)")
             return await handleError(error: error, cart: controller.cart) {
                 pkDecoder.paymentAuthorizationResult(errors: $0)
             }
@@ -234,10 +234,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
     }
 
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
-        print(
-            "paymentAuthorizationControllerDidFinish, state: \(state)",
-            terminator: "\n\n"
-        )
+        ShopifyAcceleratedCheckouts.logger.debug("paymentAuthorizationControllerDidFinish, state: \(state)")
 
         controller.dismiss {
             Task { try? await self.transition(to: .completed) }

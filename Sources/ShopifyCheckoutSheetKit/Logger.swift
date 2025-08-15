@@ -26,47 +26,66 @@ import os.log
 
 private let subsystem = "com.shopify.checkoutsheetkit"
 
-public enum LogLevel {
-    case all, debug, error, none
+public enum LogLevel: String, CaseIterable {
+    case all
+    case debug
+    case error
+    case none
 }
 
 public class OSLogger {
     private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
+    private var prefix: String
+    package var logLevel: LogLevel
 
-    public static let shared = OSLogger()
+    public static var shared = OSLogger()
 
-    public func info(_ message: String) {
-        guard shouldEmit(.debug) else { return }
+    public init() {
+        prefix = "ShopifyCheckoutSheetKit"
+        logLevel = ShopifyCheckoutSheetKit.configuration.logLevel
+    }
 
-        os_log("[ShopifyCheckoutSheetKit] (Info) - %@", log: logger, type: .info, message)
+    public init(prefix: String, logLevel: LogLevel) {
+        self.prefix = prefix
+        self.logLevel = logLevel
     }
 
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        os_log("[ShopifyCheckoutSheetKit] (Debug) - %@", log: logger, type: .debug, message)
+        sendToOSLog("[\(prefix)] (Debug) - \(message)", type: .debug)
+    }
+
+    public func info(_ message: String) {
+        guard shouldEmit(.debug) else { return }
+
+        sendToOSLog("[\(prefix)] (Info) - \(message)", type: .info)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        os_log("[ShopifyCheckoutSheetKit] (Error) - %@", log: logger, type: .error, message)
+        sendToOSLog("[\(prefix)] (Error) - \(message)", type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        os_log("[ShopifyCheckoutSheetKit] (Fault) - %@", log: logger, type: .fault, message)
+        sendToOSLog("[\(prefix)] (Fault) - \(message)", type: .fault)
+    }
+
+    /// Capturing `os_log` output is not possible
+    /// This indirection lets us capture messages in `LoggerTests.swift`
+    internal func sendToOSLog(_ message: String, type: OSLogType) {
+        os_log("%@", log: logger, type: type, message)
     }
 
     private func shouldEmit(_ choice: LogLevel) -> Bool {
-        let configLevel = ShopifyCheckoutSheetKit.configuration.logLevel
-
-        if configLevel == .none {
+        if logLevel == .none {
             return false
         }
 
-        return configLevel == .all || configLevel == choice
+        return logLevel == .all || logLevel == choice
     }
 }
 
