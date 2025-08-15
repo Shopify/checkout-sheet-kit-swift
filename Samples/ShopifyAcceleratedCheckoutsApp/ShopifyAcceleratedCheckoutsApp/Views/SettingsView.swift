@@ -54,11 +54,9 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section {
-                Text("These settings will apply to new checkouts and persist between app launches")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            Text("These settings will apply to new checkouts and persist between app launches")
+                .font(.subheadline)
+            
             Section("Logging") {
                 Picker(
                     "Log Level",
@@ -78,6 +76,8 @@ struct SettingsView: View {
                 .pickerStyle(.menu)
 
                 Text("Controls the level of logging for Accelerated Checkouts operations")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
 
             Section("Language") {
