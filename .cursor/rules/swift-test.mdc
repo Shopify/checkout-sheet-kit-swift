@@ -81,3 +81,257 @@ func testSomething() {
 - Use comments ONLY to explain non-obvious side effects or complex reasoning
 - Keep comments minimal and purposeful
 - Focus on WHY something is done, not WHAT is being done
+
+---
+
+# SWIFTUI VIEW TESTING WITH VIEWINSPECTOR
+
+## Setup and Imports
+
+Always import both ViewInspector and your module under test:
+```swift
+import ViewInspector
+import SwiftUI
+@testable import YourModule
+import XCTest
+```
+
+## Basic ViewInspector Patterns
+
+### 1. Simple View Inspection
+```swift
+func test_textView_shouldDisplayExpectedContent() throws {
+    let sut = Text("Hello World")
+    let text = try sut.inspect().text().string()
+    XCTAssertEqual(text, "Hello World")
+}
+```
+
+### 2. Finding Views by Type
+```swift
+func test_buttonExists_shouldFindButton() throws {
+    let sut = VStack {
+        Text("Title")
+        Button("Tap me") { }
+    }
+    
+    XCTAssertNoThrow(try sut.inspect().find(button: "Tap me"))
+}
+```
+
+### 3. Finding Views with Conditions
+```swift
+func test_findAllImages_shouldReturnExpectedCount() throws {
+    let sut = HStack {
+        Image(systemName: "star")
+        Image(systemName: "heart")
+        Text("Label")
+    }
+    
+    let images = try sut.inspect().findAll(ViewType.Image.self)
+    XCTAssertEqual(images.count, 2)
+}
+```
+
+### 4. Accessing Custom View State
+```swift
+func test_customView_shouldHaveExpectedState() throws {
+    let sut = MyCustomView()
+    let customView = try sut.inspect().find(MyCustomView.self).actualView()
+    XCTAssertTrue(customView.someProperty)
+}
+```
+
+### 5. Testing View Modifiers and Attributes
+```swift
+func test_imageAttributes_shouldHaveCorrectFrame() throws {
+    let sut = Image("logo")
+        .resizable()
+        .frame(height: 24)
+    
+    let image = try sut.inspect().image()
+    // Note: ViewInspector may not expose all modifier properties directly
+    // Focus on testing the image name and basic properties
+    XCTAssertEqual(try image.actualImage().name(), "logo")
+    XCTAssertEqual(try image.fixedHeight(), 24)
+}
+```
+
+### 6. Testing Button Actions
+```swift
+func test_buttonTap_shouldTriggerAction() throws {
+    var actionCalled = false
+    let sut = Button("Tap") { actionCalled = true }
+    
+    try sut.inspect().button().tap()
+    XCTAssertTrue(actionCalled)
+}
+```
+
+### 7. Environment and Context Testing
+```swift
+func test_viewWithEnvironment_shouldReceiveCorrectValue() throws {
+    let sut = MyView()
+        .environment(\.colorScheme, .dark)
+    
+    let view = try sut.inspect().find(MyView.self).actualView()
+    // Test that view responds to dark mode
+}
+```
+
+## SwiftUI View Testing Best Practices
+
+### Structure Tests by Component Hierarchy
+- Test leaf components first (basic views like Text, Image, Button)
+- Then test container views that compose those components
+- Finally test full screen views and navigation flows
+
+### Test View State, Not Implementation
+```swift
+// ✅ GOOD: Test what the user sees
+func test_loginButton_whenUserNotLoggedIn_shouldShowLoginText() throws {
+    let sut = LoginView(isLoggedIn: false)
+    let buttonText = try sut.inspect().find(button: "Log In").labelView().text().string()
+    XCTAssertEqual(buttonText, "Log In")
+}
+
+// ❌ BAD: Test internal implementation details
+func test_loginView_shouldHaveLoginButtonProperty() {
+    let sut = LoginView(isLoggedIn: false)
+    XCTAssertNotNil(sut.loginButton) // Don't test internal properties
+}
+```
+
+### Handle View State Changes
+```swift
+func test_toggleButton_shouldChangeState() throws {
+    @State var isOn = false
+    let sut = Toggle("Setting", isOn: $isOn)
+    
+    try sut.inspect().toggle().tap()
+    XCTAssertTrue(isOn)
+}
+```
+
+### Testing Conditional Views
+```swift
+func test_conditionalView_whenConditionTrue_shouldShowContent() throws {
+    let sut = ConditionalView(showContent: true)
+    
+    XCTAssertNoThrow(try sut.inspect().find(text: "Content"))
+}
+
+func test_conditionalView_whenConditionFalse_shouldHideContent() throws {
+    let sut = ConditionalView(showContent: false)
+    
+    XCTAssertThrowsError(try sut.inspect().find(text: "Content"))
+}
+```
+
+## Common ViewInspector Patterns
+
+### Finding Nested Views
+```swift
+func test_nestedView_shouldFindDeepContent() throws {
+    let sut = VStack {
+        HStack {
+            VStack {
+                Text("Deep content")
+            }
+        }
+    }
+    
+    let text = try sut.inspect().vStack().hStack(0).vStack(0).text(0).string()
+    XCTAssertEqual(text, "Deep content")
+}
+```
+
+### Testing Lists and ForEach
+```swift
+func test_list_shouldContainExpectedItems() throws {
+    let items = ["Item 1", "Item 2", "Item 3"]
+    let sut = List(items, id: \.self) { item in
+        Text(item)
+    }
+    
+    let list = try sut.inspect().list()
+    XCTAssertEqual(list.count, 3)
+    
+    for (index, expectedItem) in items.enumerated() {
+        let text = try list[index].text().string()
+        XCTAssertEqual(text, expectedItem)
+    }
+}
+```
+
+### Testing Navigation and Sheets
+```swift
+func test_navigationLink_shouldNavigateToDestination() throws {
+    let sut = NavigationLink("Go to Detail", destination: DetailView())
+    
+    let destination = try sut.inspect().navigationLink().destination()
+    XCTAssertNoThrow(try destination.find(DetailView.self))
+}
+```
+
+## Error Handling in Tests
+
+### Graceful Error Handling
+```swift
+func test_viewInspection_shouldHandleErrors() {
+    let sut = SomeView()
+    
+    do {
+        let result = try sut.inspect().find(text: "Expected Text")
+        // Test passed - continue with assertions
+    } catch {
+        XCTFail("Expected to find text but got error: \(error)")
+    }
+}
+```
+
+### Testing for Expected Failures
+```swift
+func test_hiddenView_shouldNotBeFound() {
+    let sut = VStack {
+        Text("Visible")
+        // Hidden text not included
+    }
+    
+    XCTAssertThrowsError(try sut.inspect().find(text: "Hidden"))
+}
+```
+
+## Performance Considerations
+
+- ViewInspector uses reflection, so tests may be slower than unit tests
+- Use focused searches with specific view types when possible
+- Avoid deep view hierarchy traversal in performance-critical tests
+- Consider grouping related view tests in the same test class for better organization
+
+## Debugging Tips
+
+### Print View Hierarchy
+```swift
+func debugViewHierarchy() throws {
+    let sut = MyComplexView()
+    print(try sut.inspect().description) // Prints the view hierarchy
+}
+```
+
+### Step-by-step Navigation
+```swift
+func test_stepByStepNavigation() throws {
+    let sut = MyView()
+    let container = try sut.inspect().vStack() // Get the container first
+    let button = try container.button(0) // Then get the specific child
+    try button.tap()
+}
+```
+
+## ViewInspector Limitations
+
+- Some SwiftUI modifiers may not be directly inspectable
+- Focus on testing the essential behavior and visible content
+- Use accessibility identifiers when direct property inspection isn't available
+- Some complex view hierarchies may require step-by-step navigation
