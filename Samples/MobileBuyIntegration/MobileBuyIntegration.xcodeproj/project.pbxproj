@@ -271,7 +271,6 @@
 				4EBBA7772A5F0CE200193E19 /* LaunchScreen.storyboard in Resources */,
 				6A3D7ADC2B8E01460010EB27 /* Localizable.xcstrings in Resources */,
 				4EBBA7742A5F0CE200193E19 /* Assets.xcassets in Resources */,
-				2147F3E62B502AFD005546F3 /* checkout-sheet-kit-swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
