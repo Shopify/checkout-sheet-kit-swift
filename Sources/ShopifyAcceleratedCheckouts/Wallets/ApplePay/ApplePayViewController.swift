@@ -135,7 +135,7 @@ class ApplePayViewController: PayController, ObservableObject {
             throw validationError
         } catch {
             if let checkoutError = error as? CheckoutError {
-                await checkoutDelegate?.checkoutDidFail(error: checkoutError)
+                checkoutDelegate?.checkoutDidFail(error: checkoutError)
             }
             try? await authorizationDelegate.transition(to: .terminalError(error: error))
             throw error
@@ -217,7 +217,7 @@ extension ApplePayViewController: CheckoutDelegate {
         }
     }
 
-    @MainActor func shouldRecoverFromError(error: CheckoutError) -> Bool {
+    func shouldRecoverFromError(error: CheckoutError) -> Bool {
         return checkoutDelegate?.shouldRecoverFromError(error: error) ?? false
     }
 
