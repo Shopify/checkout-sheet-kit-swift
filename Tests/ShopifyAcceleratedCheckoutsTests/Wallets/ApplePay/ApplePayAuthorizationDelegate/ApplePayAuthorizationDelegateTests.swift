@@ -196,7 +196,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
             let url = mockController.presentCalledWith
             XCTAssertTrue(
                 url!.absoluteString.contains(expectedParam) == true,
-                "URL should contain \(expectedParam) for \(reason) interrupt, but got: \(url!.absoluteString ?? "nil")"
+                "URL should contain \(expectedParam) for \(reason) interrupt, but got: \(url!.absoluteString)"
             )
 
             XCTAssertEqual(
@@ -327,7 +327,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         try delegate.setCart(to: StorefrontAPI.Cart.testCart)
 
         // Create a cart with different currency
-        let differentCurrencyCart = StorefrontAPI.Cart.testCart
+        _ = StorefrontAPI.Cart.testCart
         // Note: In a real test, we'd need to create a cart with different currency
         // For now, this test demonstrates the structure
 

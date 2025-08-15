@@ -97,7 +97,7 @@ final class ApplePayViewModifierTests: XCTestCase {
             secondCallbackInvoked = true
         }
 
-        let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
+        _ = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .onComplete(firstAction)
             .onComplete(secondAction) // Should replace the first
             .environmentObject(mockConfiguration)
@@ -134,14 +134,14 @@ final class ApplePayViewModifierTests: XCTestCase {
         var firstCallbackInvoked = false
         var secondCallbackInvoked = false
 
-        let firstAction = { (_: CheckoutCompletedEvent) in
+        _ = { (_: CheckoutCompletedEvent) in
             firstCallbackInvoked = true
         }
         let secondAction = { (_: CheckoutCompletedEvent) in
             secondCallbackInvoked = true
         }
 
-        let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
+        _ = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .onCancel { firstCallbackInvoked = true }
             .onCancel { secondCallbackInvoked = true } // Should replace the first
             .environmentObject(mockConfiguration)
@@ -261,13 +261,11 @@ final class ApplePayViewModifierTests: XCTestCase {
     func testCompleteIntegrationWithAllModifiers() {
         var successCount = 0
         var errorCount = 0
-        var viewAppeared = false
 
         let view = VStack {
             AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
                 .onComplete { _ in successCount += 1 }
                 .onFail { _ in errorCount += 1 }
-                .onAppear { viewAppeared = true }
         }
         .environmentObject(mockConfiguration)
         .environmentObject(mockApplePayConfiguration)

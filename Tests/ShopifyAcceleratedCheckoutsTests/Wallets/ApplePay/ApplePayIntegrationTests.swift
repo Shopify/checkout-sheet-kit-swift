@@ -164,7 +164,7 @@ final class ApplePayIntegrationTests: XCTestCase {
             successCount += 1
         }
 
-        let button = ApplePayButton(
+        let button = await ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart"),
             eventHandlers: EventHandlers(checkoutDidComplete: successHandler),
             cornerRadius: nil
@@ -239,10 +239,7 @@ final class ApplePayIntegrationTests: XCTestCase {
             configuration: mockConfiguration
         )
 
-        var callbackSet = false
-
         viewController.onCheckoutWebPixelEvent = { _ in
-            callbackSet = true
         }
 
         XCTAssertNotNil(viewController.onCheckoutWebPixelEvent, "Web pixel event callback should be set")
