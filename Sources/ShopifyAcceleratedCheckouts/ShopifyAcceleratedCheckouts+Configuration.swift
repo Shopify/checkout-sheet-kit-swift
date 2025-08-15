@@ -65,6 +65,8 @@ extension ShopifyAcceleratedCheckouts {
         ///
         /// Apple Pay - This property is ignored when `.phone` is included in `ApplePayConfiguration.contactFields`
         @Published public var phoneNumber: String?
+
+        /// The customer access token to attribute an order to on `buyerIdentity`
         @Published public var customerAccessToken: String?
 
         public init(email: String?, phoneNumber: String?, customerAccessToken: String? = nil) {
