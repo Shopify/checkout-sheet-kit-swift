@@ -66,6 +66,12 @@ struct SettingsView: View {
                     Toggle("Prefill buyer information", isOn: $config.useVaultedState)
                 }
 
+                Section(header: Text("Accelerated Checkouts")) {
+					Toggle("Use authenticated customer", isOn: $config.authenticated)
+					Text("When authenticated, customer information from the environment config will be passed to the Apple Pay sheet. When unauthenticated, Apple will use provide customer information from the device.")
+						.font(.caption)
+				}
+
                 Section(header: Text("Universal Links")) {
                     Toggle("Handle Checkout URLs", isOn: $config.universalLinks.checkout)
                     Toggle("Handle Cart URLs", isOn: $config.universalLinks.cart)

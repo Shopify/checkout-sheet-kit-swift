@@ -29,27 +29,30 @@ public final class AppConfiguration: ObservableObject {
     public var storefrontDomain: String = InfoDictionary.shared.domain
 
     @Published public var universalLinks = UniversalLinks()
-
-    /// Prefill buyer information
     @Published public var useVaultedState: Bool = false
+    @Published public var authenticated: Bool = false
 
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
 
     // Configure ShopifyAcceleratedCheckouts
-    let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
-        storefrontDomain: InfoDictionary.shared.domain,
-        storefrontAccessToken: InfoDictionary.shared.accessToken,
-        customer: ShopifyAcceleratedCheckouts.Customer(
-            email: InfoDictionary.shared.email,
-            phoneNumber: InfoDictionary.shared.phone
-        )
-    )
+    var acceleratedCheckoutsStorefrontConfig: ShopifyAcceleratedCheckouts.Configuration {
+		return ShopifyAcceleratedCheckouts.Configuration(
+			storefrontDomain: InfoDictionary.shared.domain,
+			storefrontAccessToken: InfoDictionary.shared.accessToken,
+			customer: self.authenticated ? ShopifyAcceleratedCheckouts.Customer(
+				email: InfoDictionary.shared.email,
+				phoneNumber: InfoDictionary.shared.phone
+			) : nil
+		)
+	}
 
-    let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-        merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
-        contactFields: [.email, .phone]
-    )
+    var acceleratedCheckoutsApplePayConfig: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
+		return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+			merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
+			contactFields: self.authenticated ? [] : [.email, .phone]
+		)
+	}
 }
 
 public var appConfiguration = AppConfiguration() {

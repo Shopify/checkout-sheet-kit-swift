@@ -115,10 +115,16 @@
     "Universal Links" : {
 
     },
+    "Use authenticated customer" : {
+
+    },
     "Version" : {
 
     },
     "Web pixel events" : {
+
+    },
+    "When authenticated, customer information from the environment config will be passed to the Apple Pay sheet. When unauthenticated, Apple will use provide customer information from the device." : {
 
     },
     "Your cart is empty." : {
