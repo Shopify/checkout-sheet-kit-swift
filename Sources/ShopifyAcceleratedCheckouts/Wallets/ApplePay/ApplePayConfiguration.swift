@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import PassKit
 
 @available(iOS 16.0, *)
@@ -36,7 +37,7 @@ extension ShopifyAcceleratedCheckouts {
     /// This class encapsulates all necessary settings for enabling Apple Pay as a payment method,
     /// including merchant identification and required contact information. Supported payment networks
     /// are automatically determined based on the merchant's Shopify configuration.
-    public class ApplePayConfiguration: ObservableObject {
+    public class ApplePayConfiguration: ObservableObject, NSCopying {
         /// The merchant identifier for Apple Pay transactions.
         ///
         /// This value must match one of the merchant identifiers specified by the Merchant IDs
@@ -73,6 +74,13 @@ extension ShopifyAcceleratedCheckouts {
             self.merchantIdentifier = merchantIdentifier
             self.contactFields = contactFields
         }
+
+        public func copy(with _: NSZone? = nil) -> Any {
+            return ApplePayConfiguration(
+                merchantIdentifier: merchantIdentifier,
+                contactFields: contactFields
+            )
+        }
     }
 }
 
@@ -81,7 +89,7 @@ extension ShopifyAcceleratedCheckouts {
 /// This class is used internally to bundle the Apple Pay-specific configuration
 /// with the general accelerated checkout configuration and shop settings.
 @available(iOS 16.0, *)
-class ApplePayConfigurationWrapper {
+class ApplePayConfigurationWrapper: NSCopying {
     var common: ShopifyAcceleratedCheckouts.Configuration
     var applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration
     var shopSettings: ShopSettings
@@ -94,5 +102,19 @@ class ApplePayConfigurationWrapper {
         self.common = common
         self.applePay = applePay
         self.shopSettings = shopSettings
+    }
+
+    func copy(with _: NSZone? = nil) -> Any {
+        guard let commonCopy = common.copy() as? ShopifyAcceleratedCheckouts.Configuration,
+              let applePayCopy = applePay.copy() as? ShopifyAcceleratedCheckouts.ApplePayConfiguration
+        else {
+            fatalError("Failed to copy configuration objects")
+        }
+
+        return ApplePayConfigurationWrapper(
+            common: commonCopy,
+            applePay: applePayCopy,
+            shopSettings: shopSettings
+        )
     }
 }

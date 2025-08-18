@@ -757,4 +757,67 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
             presentCalledWith = url
         }
     }
+
+    // MARK: - Customer Info Attachment Tests
+
+    func test_onPresentingCSK_fromCartSubmittedForCompletion_shouldNotModifyCustomerInfo() async throws {
+        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+
+        // Follow valid state transition path: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorized -> cartSubmittedForCompletion -> completed
+        // The completed state will automatically transition to presentingCSK
+        try await delegate.transition(to: .startPaymentRequest)
+        try await delegate.transition(to: .paymentAuthorized(payment: PKPayment()))
+        try await delegate.transition(to: .cartSubmittedForCompletion(redirectURL: redirectURL))
+        try await delegate.transition(to: .completed)
+
+        // Should call present with the redirect URL through the completed -> presentingCSK transition
+        XCTAssertEqual(mockController.presentCallCount, 1)
+        XCTAssertEqual(mockController.presentCalledWith, redirectURL)
+    }
+
+    func test_createSheetKitURL_withInterruptReasonHavingQueryParam_shouldAppendQueryParam() {
+        let baseURL = URL(string: "https://shop.example.com/checkout")!
+        delegate.checkoutURL = baseURL
+
+        let interruptState = ApplePayState.interrupt(reason: .dynamicTax)
+        let resultURL = delegate.createSheetKitURL(for: interruptState)
+
+        guard let resultURL else {
+            XCTFail("Expected URL to be created")
+            return
+        }
+
+        XCTAssertTrue(
+            resultURL.absoluteString.contains("wallet_dynamic_tax=true"),
+            "URL should contain interrupt query parameter"
+        )
+    }
+
+    func test_createSheetKitURL_withInterruptReasonWithoutQueryParam_shouldReturnOriginalURL() {
+        let baseURL = URL(string: "https://shop.example.com/checkout")!
+        delegate.checkoutURL = baseURL
+
+        let interruptState = ApplePayState.interrupt(reason: .outOfStock)
+        let resultURL = delegate.createSheetKitURL(for: interruptState)
+
+        XCTAssertEqual(resultURL, baseURL, "URL should remain unchanged when interrupt reason has no query param")
+    }
+
+    func test_createSheetKitURL_withCartSubmittedForCompletion_shouldReturnRedirectURL() {
+        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+        let state = ApplePayState.cartSubmittedForCompletion(redirectURL: redirectURL)
+
+        let resultURL = delegate.createSheetKitURL(for: state)
+
+        XCTAssertEqual(resultURL, redirectURL)
+    }
+
+    func test_createSheetKitURL_withNormalState_shouldReturnCheckoutURL() {
+        let baseURL = URL(string: "https://shop.example.com/checkout")!
+        delegate.checkoutURL = baseURL
+
+        let resultURL = delegate.createSheetKitURL(for: .appleSheetPresented)
+
+        XCTAssertEqual(resultURL, baseURL)
+    }
 }

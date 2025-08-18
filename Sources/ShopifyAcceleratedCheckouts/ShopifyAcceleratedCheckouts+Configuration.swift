@@ -21,11 +21,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import SwiftUI
 
 @available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
-    public class Configuration: ObservableObject {
+    public class Configuration: ObservableObject, NSCopying {
         /// The domain of the shop without the protocol.
         ///
         /// Example: `my-shop.myshopify.com`
@@ -53,9 +54,18 @@ extension ShopifyAcceleratedCheckouts {
             self.storefrontAccessToken = storefrontAccessToken
             self.customer = customer
         }
+
+        public func copy(with _: NSZone? = nil) -> Any {
+            let copy = Configuration(
+                storefrontDomain: storefrontDomain,
+                storefrontAccessToken: storefrontAccessToken,
+                customer: customer?.copy() as? Customer
+            )
+            return copy
+        }
     }
 
-    public class Customer: ObservableObject {
+    public class Customer: ObservableObject, NSCopying {
         /// The email to attribute an order to on `buyerIdentity`
         ///
         /// Apple Pay - This property is ignored when `.email` is included in `ApplePayConfiguration.contactFields`
@@ -73,6 +83,15 @@ extension ShopifyAcceleratedCheckouts {
             self.email = email
             self.phoneNumber = phoneNumber
             self.customerAccessToken = customerAccessToken
+        }
+
+        public func copy(with _: NSZone? = nil) -> Any {
+            let copy = Customer(
+                email: email,
+                phoneNumber: phoneNumber,
+                customerAccessToken: customerAccessToken
+            )
+            return copy
         }
     }
 }
