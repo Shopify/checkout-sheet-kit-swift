@@ -24,9 +24,19 @@
 import Foundation
 import SwiftUI
 
+protocol Copyable {
+    init(copy: Self)
+}
+
+extension Copyable {
+    func copy() -> Self {
+        return Self(copy: self)
+    }
+}
+
 @available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
-    public class Configuration: ObservableObject, NSCopying {
+    public class Configuration: ObservableObject, Copyable {
         /// The domain of the shop without the protocol.
         ///
         /// Example: `my-shop.myshopify.com`
@@ -55,17 +65,14 @@ extension ShopifyAcceleratedCheckouts {
             self.customer = customer
         }
 
-        public func copy(with _: NSZone? = nil) -> Any {
-            let copy = Configuration(
-                storefrontDomain: storefrontDomain,
-                storefrontAccessToken: storefrontAccessToken,
-                customer: customer?.copy() as? Customer
-            )
-            return copy
+        required init(copy: Configuration) {
+            storefrontDomain = copy.storefrontDomain
+            storefrontAccessToken = copy.storefrontAccessToken
+            customer = copy.customer?.copy()
         }
     }
 
-    public class Customer: ObservableObject, NSCopying {
+    public class Customer: ObservableObject, Copyable {
         /// The email to attribute an order to on `buyerIdentity`
         ///
         /// Apple Pay - This property is ignored when `.email` is included in `ApplePayConfiguration.contactFields`
@@ -85,13 +92,10 @@ extension ShopifyAcceleratedCheckouts {
             self.customerAccessToken = customerAccessToken
         }
 
-        public func copy(with _: NSZone? = nil) -> Any {
-            let copy = Customer(
-                email: email,
-                phoneNumber: phoneNumber,
-                customerAccessToken: customerAccessToken
-            )
-            return copy
+        required init(copy: Customer) {
+            email = copy.email
+            phoneNumber = copy.phoneNumber
+            customerAccessToken = copy.customerAccessToken
         }
     }
 }

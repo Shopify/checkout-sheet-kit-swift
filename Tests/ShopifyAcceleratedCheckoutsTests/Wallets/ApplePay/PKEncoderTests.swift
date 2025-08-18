@@ -76,7 +76,9 @@ class PKEncoderTests: XCTestCase {
     }
 
     private var encoder: PKEncoder {
-        return PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { self.cart() })
+        return PKEncoder(
+            configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { self.cart() }
+        )
     }
 
     // MARK: - mapToCountryCode Tests
@@ -101,24 +103,14 @@ class PKEncoderTests: XCTestCase {
 
     func test_email_withContactEmail_shouldReturnContactEmail() {
         // Create encoder without default customer to test contact email priority
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithoutCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithoutCustomer.common.customer = nil
 
-        let encoderWithoutCustomer = PKEncoder(
-            configuration: configWithoutCustomer,
-            cart: cart
-        )
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
 
-        let contact = createMockContact(emailAddress: "contact@example.com")
-        encoderWithoutCustomer.shippingContact = .success(contact)
+        encoderWithoutCustomer.shippingContact = .success(createMockContact(emailAddress: "contact@example.com"))
 
-        let result = encoderWithoutCustomer.email
-
-        guard let email = try? result.get() else {
+        guard let email = try? encoderWithoutCustomer.email.get() else {
             XCTFail("Expected email to be available")
             return
         }
@@ -127,22 +119,12 @@ class PKEncoderTests: XCTestCase {
     }
 
     func test_email_withoutContactEmailButWithCustomerEmail_shouldReturnCustomerEmail() {
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithCustomer.common.customer?.email = "customer@example.com"
-        configWithCustomer.common.customer?.phoneNumber = nil
 
-        let encoderWithCustomer = PKEncoder(
-            configuration: configWithCustomer,
-            cart: cart
-        )
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
 
-        let result = encoderWithCustomer.email
-
-        guard let email = try? result.get() else {
+        guard let email = try? encoderWithCustomer.email.get() else {
             XCTFail("Expected email to be available")
             return
         }
@@ -151,25 +133,14 @@ class PKEncoderTests: XCTestCase {
     }
 
     func test_email_withEmptyContactEmail_shouldFallbackToCustomerEmail() {
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithCustomer.common.customer?.email = "customer@example.com"
-        configWithCustomer.common.customer?.phoneNumber = nil
 
-        let encoderWithCustomer = PKEncoder(
-            configuration: configWithCustomer,
-            cart: cart
-        )
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
 
-        let contact = createMockContact(emailAddress: "")
-        encoderWithCustomer.shippingContact = .success(contact)
+        encoderWithCustomer.shippingContact = .success(createMockContact(emailAddress: ""))
 
-        let result = encoderWithCustomer.email
-
-        guard let email = try? result.get() else {
+        guard let email = try? encoderWithCustomer.email.get() else {
             XCTFail("Expected email to be available")
             return
         }
@@ -179,24 +150,14 @@ class PKEncoderTests: XCTestCase {
 
     func test_email_withoutContactOrCustomerEmail_shouldReturnFailure() {
         // Create encoder without default customer to test failure case
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithoutCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithoutCustomer.common.customer = nil
 
-        let encoderWithoutCustomer = PKEncoder(
-            configuration: configWithoutCustomer,
-            cart: cart
-        )
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
 
-        let contact = createMockContact()
-        encoderWithoutCustomer.shippingContact = .success(contact)
+        encoderWithoutCustomer.shippingContact = .success(createMockContact())
 
-        let result = encoderWithoutCustomer.email
-
-        switch result {
+        switch encoderWithoutCustomer.email {
         case .success:
             XCTFail("Expected email to fail when no email is available")
         case let .failure(error):
@@ -210,24 +171,14 @@ class PKEncoderTests: XCTestCase {
 
     func test_phoneNumber_withContactPhone_shouldReturnContactPhone() {
         // Create encoder without default customer to test contact phone priority
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithoutCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithoutCustomer.common.customer = nil
 
-        let encoderWithoutCustomer = PKEncoder(
-            configuration: configWithoutCustomer,
-            cart: cart
-        )
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
 
-        let contact = createMockContact(phoneNumber: "+1234567890")
-        encoderWithoutCustomer.shippingContact = .success(contact)
+        encoderWithoutCustomer.shippingContact = .success(createMockContact(phoneNumber: "+1234567890"))
 
-        let result = encoderWithoutCustomer.phoneNumber
-
-        guard let phoneNumber = try? result.get() else {
+        guard let phoneNumber = try? encoderWithoutCustomer.phoneNumber.get() else {
             XCTFail("Expected phoneNumber to be available")
             return
         }
@@ -236,22 +187,13 @@ class PKEncoderTests: XCTestCase {
     }
 
     func test_phoneNumber_withoutContactPhoneButWithCustomerPhone_shouldReturnCustomerPhone() {
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithCustomer.common.customer?.email = nil
         configWithCustomer.common.customer?.phoneNumber = "+0987654321"
 
-        let encoderWithCustomer = PKEncoder(
-            configuration: configWithCustomer,
-            cart: cart
-        )
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
 
-        let result = encoderWithCustomer.phoneNumber
-
-        guard let phoneNumber = try? result.get() else {
+        guard let phoneNumber = try? encoderWithCustomer.phoneNumber.get() else {
             XCTFail("Expected phoneNumber to be available")
             return
         }
@@ -260,25 +202,15 @@ class PKEncoderTests: XCTestCase {
     }
 
     func test_phoneNumber_withEmptyContactPhone_shouldFallbackToCustomerPhone() {
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithCustomer.common.customer?.email = nil
         configWithCustomer.common.customer?.phoneNumber = "+0987654321"
 
-        let encoderWithCustomer = PKEncoder(
-            configuration: configWithCustomer,
-            cart: cart
-        )
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
 
-        let contact = createMockContact(phoneNumber: "")
-        encoderWithCustomer.shippingContact = .success(contact)
+        encoderWithCustomer.shippingContact = .success(createMockContact(phoneNumber: ""))
 
-        let result = encoderWithCustomer.phoneNumber
-
-        guard let phoneNumber = try? result.get() else {
+        guard let phoneNumber = try? encoderWithCustomer.phoneNumber.get() else {
             XCTFail("Expected phoneNumber to be available")
             return
         }
@@ -288,24 +220,14 @@ class PKEncoderTests: XCTestCase {
 
     func test_phoneNumber_withoutContactOrCustomerPhone_shouldReturnFailure() {
         // Create encoder without default customer to test failure case
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithoutCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithoutCustomer.common.customer = nil
 
-        let encoderWithoutCustomer = PKEncoder(
-            configuration: configWithoutCustomer,
-            cart: cart
-        )
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
 
-        let contact = createMockContact()
-        encoderWithoutCustomer.shippingContact = .success(contact)
+        encoderWithoutCustomer.shippingContact = .success(createMockContact())
 
-        let result = encoderWithoutCustomer.phoneNumber
-
-        switch result {
+        switch encoderWithoutCustomer.phoneNumber {
         case .success:
             XCTFail("Expected phoneNumber to fail when no phone is available")
         case let .failure(error):
@@ -318,57 +240,43 @@ class PKEncoderTests: XCTestCase {
     }
 
     func test_email_withContactEmailPriority_shouldPreferContactOverCustomer() {
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithCustomer.common.customer?.email = "customer@example.com"
         configWithCustomer.common.customer?.phoneNumber = nil
 
-        let encoderWithCustomer = PKEncoder(
-            configuration: configWithCustomer,
-            cart: cart
-        )
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
 
         let contact = createMockContact(emailAddress: "contact@example.com")
         encoderWithCustomer.shippingContact = .success(contact)
 
-        let result = encoderWithCustomer.email
-
-        guard let email = try? result.get() else {
+        guard let email = try? encoderWithCustomer.email.get() else {
             XCTFail("Expected email to be available")
             return
         }
 
-        XCTAssertEqual(email, "contact@example.com", "Should prefer contact email over customer email")
+        XCTAssertEqual(
+            email, "contact@example.com", "Should prefer contact email over customer email"
+        )
     }
 
     func test_phoneNumber_withContactPhonePriority_shouldPreferContactOverCustomer() {
-        let baseConfig = ApplePayConfigurationWrapper.testConfiguration
-        guard let configWithCustomer = baseConfig.copy() as? ApplePayConfigurationWrapper else {
-            XCTFail("Failed to copy configuration")
-            return
-        }
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
         configWithCustomer.common.customer?.email = nil
         configWithCustomer.common.customer?.phoneNumber = "+0987654321"
 
-        let encoderWithCustomer = PKEncoder(
-            configuration: configWithCustomer,
-            cart: cart
-        )
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
 
         let contact = createMockContact(phoneNumber: "+1234567890")
         encoderWithCustomer.shippingContact = .success(contact)
 
-        let result = encoderWithCustomer.phoneNumber
-
-        guard let phoneNumber = try? result.get() else {
+        guard let phoneNumber = try? encoderWithCustomer.phoneNumber.get() else {
             XCTFail("Expected phoneNumber to be available")
             return
         }
 
-        XCTAssertEqual(phoneNumber, "+1234567890", "Should prefer contact phone over customer phone")
+        XCTAssertEqual(
+            phoneNumber, "+1234567890", "Should prefer contact phone over customer phone"
+        )
     }
 
     func testMapToCountryCodeUSTerritory() {
