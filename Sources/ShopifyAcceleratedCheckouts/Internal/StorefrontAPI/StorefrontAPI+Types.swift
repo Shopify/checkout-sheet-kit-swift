@@ -427,9 +427,12 @@ extension StorefrontAPI {
                 return userErrors[0].message
             } else {
                 let errorMessages = userErrors.map { error in
-                    let fieldInfo = error.field?.isEmpty == false ? " (field: \(error.field!.joined(separator: ".")))" : ""
-                    return error.message + fieldInfo
-                }
+                    guard let field = error.field, field.isEmpty == false else {
+						return error.message
+					}
+
+					return error.message + " (field: \(field.joined(separator: ".")))"
+				}
                 return "\(userErrors.count) validation errors: " + errorMessages.joined(separator: "; ")
             }
         }
