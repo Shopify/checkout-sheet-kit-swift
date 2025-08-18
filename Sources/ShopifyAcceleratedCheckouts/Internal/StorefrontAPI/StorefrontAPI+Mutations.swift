@@ -88,7 +88,8 @@ extension StorefrontAPI {
                 "customerAccessToken": customerAccessToken,
                 "countryCode": countryCode
             ].compactMapValues { value in
-                /// buyerIdentityUpdate will return violations validating on empty strings, these should be nil
+                /// Mapping empty strings to `nil` due to `buyerIdentityUpdate`
+                /// running validations on empty string results in unexpected violations
                 guard let value else { return nil }
                 return value.isEmpty ? nil : value
             }

@@ -179,6 +179,10 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
             ShopifyAcceleratedCheckouts.logger.debug("Cleared PII from cart")
 
             do {
+                /// `cartRemovePersonalData` is used to clear PII collected via ApplePay
+                /// This removes some data potentially provided externally
+                /// e.g. via ShopifyAcceleratedCheckouts.Configuration.Customer
+                /// It is safe for us to re-attach this prior to displaying CSK
                 if let customer = configuration.common.customer,
                    customer.email != nil || customer.phoneNumber != nil
                    || customer.customerAccessToken != nil
@@ -195,6 +199,8 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
                     ShopifyAcceleratedCheckouts.logger.debug("Updated cart with ShopifyAcceleratedCheckouts.Customer")
                 }
             } catch {
+                /// Whilst it would be best to be able to re-attach this, we can still present CSK
+                /// without a successful response on `cartBuyerIdentityUpdate`
                 ShopifyAcceleratedCheckouts.logger.error("Failed to update cart buyer identity: \(error)")
             }
         }
