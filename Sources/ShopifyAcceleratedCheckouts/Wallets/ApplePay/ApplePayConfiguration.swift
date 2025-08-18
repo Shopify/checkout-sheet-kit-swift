@@ -75,7 +75,7 @@ extension ShopifyAcceleratedCheckouts {
             self.contactFields = contactFields
         }
 
-        required init(copy: ApplePayConfiguration) {
+        package required init(copy: ApplePayConfiguration) {
             merchantIdentifier = copy.merchantIdentifier
             contactFields = copy.contactFields
         }
@@ -102,7 +102,7 @@ class ApplePayConfigurationWrapper: Copyable {
         self.shopSettings = shopSettings
     }
 
-    required init(copy: ApplePayConfigurationWrapper) {
+    package required init(copy: ApplePayConfigurationWrapper) {
         common = copy.common.copy()
         applePay = copy.applePay.copy()
         shopSettings = copy.shopSettings

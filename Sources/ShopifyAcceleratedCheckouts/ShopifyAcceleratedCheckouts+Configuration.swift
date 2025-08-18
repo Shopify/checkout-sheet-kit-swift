@@ -24,16 +24,6 @@
 import Foundation
 import SwiftUI
 
-protocol Copyable {
-    init(copy: Self)
-}
-
-extension Copyable {
-    func copy() -> Self {
-        return Self(copy: self)
-    }
-}
-
 @available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
     public class Configuration: ObservableObject, Copyable {
@@ -65,7 +55,7 @@ extension ShopifyAcceleratedCheckouts {
             self.customer = customer
         }
 
-        required init(copy: Configuration) {
+        package required init(copy: Configuration) {
             storefrontDomain = copy.storefrontDomain
             storefrontAccessToken = copy.storefrontAccessToken
             customer = copy.customer?.copy()
@@ -92,7 +82,7 @@ extension ShopifyAcceleratedCheckouts {
             self.customerAccessToken = customerAccessToken
         }
 
-        required init(copy: Customer) {
+        package required init(copy: Customer) {
             email = copy.email
             phoneNumber = copy.phoneNumber
             customerAccessToken = copy.customerAccessToken
