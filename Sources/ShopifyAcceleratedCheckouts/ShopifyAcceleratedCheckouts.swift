@@ -35,6 +35,7 @@ public enum ShopifyAcceleratedCheckouts {
     public static var logLevel: LogLevel = .error {
         didSet {
             logger.logLevel = logLevel
+            logger.debug("Log level changed to: \(logLevel)")
         }
     }
 

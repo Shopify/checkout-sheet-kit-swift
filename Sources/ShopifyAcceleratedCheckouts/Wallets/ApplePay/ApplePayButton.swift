@@ -101,6 +101,7 @@ struct Internal_ApplePayButton: View {
 
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
+    private let logger = ShopifyAcceleratedCheckouts.logger.extend("ApplePayButton")
 
     /// Initializes an Apple Pay button
     /// - Parameters:
@@ -115,6 +116,7 @@ struct Internal_ApplePayButton: View {
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
     ) {
+        logger.debug("Initializing Apple Pay button with identifier: \(identifier)")
         controller = ApplePayViewController(
             identifier: identifier,
             configuration: configuration
@@ -129,6 +131,7 @@ struct Internal_ApplePayButton: View {
             controller.onCheckoutClickLink = eventHandlers.checkoutDidClickLink
             controller.onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
         }
+        logger.debug("Apple Pay button initialized successfully")
     }
 
     var body: some View {
