@@ -42,6 +42,7 @@ class PKDecoder {
     var selectedShippingMethod: PKShippingMethod?
     var configuration: ApplePayConfigurationWrapper
     var initialCurrencyCode: String?
+    private let logger = ShopifyAcceleratedCheckouts.logger.extend("PKDecoder")
 
     init(
         configuration: ApplePayConfigurationWrapper,

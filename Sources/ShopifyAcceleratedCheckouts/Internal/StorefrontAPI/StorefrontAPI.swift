@@ -27,6 +27,7 @@ import Foundation
 @available(iOS 16.0, *)
 class StorefrontAPI: ObservableObject {
     let client: GraphQLClient
+    private let logger = ShopifyAcceleratedCheckouts.logger.extend("StorefrontAPI")
 
     /// Initialize the Storefront API
     /// - Parameters:
@@ -42,6 +43,7 @@ class StorefrontAPI: ObservableObject {
         countryCode: CountryCode? = nil,
         languageCode: LanguageCode? = nil
     ) {
+        logger.debug("Initializing StorefrontAPI for domain: \(storefrontDomain)")
         let url = URL(string: "https://\(storefrontDomain)/api/\(apiVersion)/graphql.json")!
 
         client = GraphQLClient(
@@ -52,5 +54,6 @@ class StorefrontAPI: ObservableObject {
                 languageCode: languageCode
             )
         )
+        logger.debug("StorefrontAPI initialized successfully")
     }
 }
