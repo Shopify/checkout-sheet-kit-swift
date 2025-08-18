@@ -43,6 +43,7 @@ struct SettingsView: View {
             ShopifyAcceleratedCheckouts.logLevel = logLevel
         }
     }
+
     @AppStorage(AppStorageKeys.email.rawValue) var email: String = ""
     @AppStorage(AppStorageKeys.phone.rawValue) var phone: String = ""
 
@@ -56,7 +57,7 @@ struct SettingsView: View {
         Form {
             Text("These settings will apply to new checkouts and persist between app launches")
                 .font(.subheadline)
-            
+
             Section("Logging") {
                 Picker(
                     "Log Level",
@@ -110,7 +111,7 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                
+
                 Toggle("Phone Number", isOn: $requirePhone)
                 if !requirePhone {
                     TextField("(Optional)", text: $phone)
@@ -126,4 +127,3 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-

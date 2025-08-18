@@ -288,8 +288,8 @@ class PKEncoder {
 
     var phoneNumber: Result<String, ShopifyAcceleratedCheckouts.Error> {
         if let contact = try? shippingContact.get(),
-            let phoneNumber = contact.phoneNumber?.stringValue,
-            !phoneNumber.isEmpty
+           let phoneNumber = contact.phoneNumber?.stringValue,
+           !phoneNumber.isEmpty
         {
             return .success(phoneNumber)
         }
@@ -304,8 +304,8 @@ class PKEncoder {
     typealias Email = String
     var email: Result<Email, ShopifyAcceleratedCheckouts.Error> {
         if let contact = try? shippingContact.get(),
-            let email = contact.emailAddress,
-            !email.isEmpty
+           let email = contact.emailAddress,
+           !email.isEmpty
         {
             return .success(email)
         }
