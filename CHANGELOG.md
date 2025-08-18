@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.0-rc.5 - August 18, 2025
+
+- [AC]: Ensure `customer` is attached to cart only when not requested in payment sheet (#385)
+- [AC]: Remove wrapper enum on PayWithApplePayButton by @kieran-osgood-shopify in https://github.com/Shopify/checkout-sheet-kit-swift/pull/390
+- [AC]: Add support for OSLogger by @kieran-osgood-shopify in https://github.com/Shopify/checkout-sheet-kit-swift/pull/383
+
 ## 3.4.0-rc.4 - August 14, 2025
 
 - [AC]: Widen supported iOS versions to include iOS16 by @kieran-osgood-shopify in https://github.com/Shopify/checkout-sheet-kit-swift/pull/376
