@@ -33,6 +33,7 @@ final class ApplePayViewModifierTests: XCTestCase {
     var mockConfiguration: ShopifyAcceleratedCheckouts.Configuration!
     var mockApplePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration!
     var mockShopSettings: ShopSettings!
+    var testDelegate: TestCheckoutDelegate!
 
     // MARK: - Setup
 
@@ -57,12 +58,15 @@ final class ApplePayViewModifierTests: XCTestCase {
             ),
             paymentSettings: PaymentSettings(countryCode: "US", acceptedCardBrands: [.visa, .mastercard])
         )
+
+        testDelegate = TestCheckoutDelegate()
     }
 
     override func tearDown() {
         mockConfiguration = nil
         mockApplePayConfiguration = nil
         mockShopSettings = nil
+        testDelegate = nil
         super.tearDown()
     }
 
@@ -93,33 +97,10 @@ final class ApplePayViewModifierTests: XCTestCase {
     // MARK: - Combined Modifiers Tests
 
     func testCheckoutDelegateModifier() {
-        // Create a mock delegate to test the checkout modifier
-        class MockCheckoutDelegate: CheckoutDelegate {
-            var completionCalled = false
-            var failureCalled = false
-            var cancellationCalled = false
-            var webPixelCalled = false
+        testDelegate.reset()
 
-            func checkoutDidComplete(event _: CheckoutCompletedEvent) {
-                completionCalled = true
-            }
-
-            func checkoutDidFail(error _: CheckoutError) {
-                failureCalled = true
-            }
-
-            func checkoutDidCancel() {
-                cancellationCalled = true
-            }
-
-            func checkoutDidEmitWebPixelEvent(event _: ShopifyCheckoutSheetKit.PixelEvent) {
-                webPixelCalled = true
-            }
-        }
-
-        let delegate = MockCheckoutDelegate()
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-            .checkout(delegate: delegate)
+            .checkout(delegate: testDelegate)
             .environmentObject(mockConfiguration)
             .environmentObject(mockApplePayConfiguration)
             .environmentObject(mockShopSettings)
@@ -129,21 +110,14 @@ final class ApplePayViewModifierTests: XCTestCase {
 
     func testCombinedNewModifiers() {
         var errorInvoked = false
+        testDelegate.reset()
 
-        class MockCheckoutDelegate: CheckoutDelegate {
-            func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
-            func checkoutDidFail(error _: CheckoutError) {}
-            func checkoutDidCancel() {}
-            func checkoutDidEmitWebPixelEvent(event _: ShopifyCheckoutSheetKit.PixelEvent) {}
-        }
-
-        let delegate = MockCheckoutDelegate()
         let errorAction = { (_: AcceleratedCheckoutError) in
             errorInvoked = true
         }
 
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-            .checkout(delegate: delegate)
+            .checkout(delegate: testDelegate)
             .onError(errorAction)
             .environmentObject(mockConfiguration)
             .environmentObject(mockApplePayConfiguration)
@@ -229,37 +203,12 @@ final class ApplePayViewModifierTests: XCTestCase {
 
     func testCompleteIntegrationWithNewAPI() {
         var errorCount = 0
-
-        class TestDelegate: CheckoutDelegate {
-            var completionCalled = false
-            var failureCalled = false
-            var cancellationCalled = false
-            var WebPixelCalled = false
-
-            func checkoutDidComplete(event _: CheckoutCompletedEvent) {
-                completionCalled = true
-            }
-
-            func checkoutDidFail(error _: CheckoutError) {
-                failureCalled = true
-            }
-
-            func checkoutDidCancel() {
-                cancellationCalled = true
-            }
-
-            func checkoutDidEmitWebPixelEvent(event _: ShopifyCheckoutSheetKit.PixelEvent) {
-                WebPixelCalled = true
-            }
-        }
-
-        let delegate = TestDelegate()
+        testDelegate.reset()
 
         let view = VStack {
             AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-                .checkout(delegate: delegate)
+                .checkout(delegate: testDelegate)
                 .onError { _ in errorCount += 1 }
-                .onAppear { viewAppeared = true }
         }
         .environmentObject(mockConfiguration)
         .environmentObject(mockApplePayConfiguration)

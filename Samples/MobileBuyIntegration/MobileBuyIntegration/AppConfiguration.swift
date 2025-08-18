@@ -37,22 +37,22 @@ public final class AppConfiguration: ObservableObject {
 
     // Configure ShopifyAcceleratedCheckouts
     var acceleratedCheckoutsStorefrontConfig: ShopifyAcceleratedCheckouts.Configuration {
-		return ShopifyAcceleratedCheckouts.Configuration(
-			storefrontDomain: InfoDictionary.shared.domain,
-			storefrontAccessToken: InfoDictionary.shared.accessToken,
-			customer: self.authenticated ? ShopifyAcceleratedCheckouts.Customer(
-				email: InfoDictionary.shared.email,
-				phoneNumber: InfoDictionary.shared.phone
-			) : nil
-		)
-	}
+        return ShopifyAcceleratedCheckouts.Configuration(
+            storefrontDomain: InfoDictionary.shared.domain,
+            storefrontAccessToken: InfoDictionary.shared.accessToken,
+            customer: authenticated ? ShopifyAcceleratedCheckouts.Customer(
+                email: InfoDictionary.shared.email,
+                phoneNumber: InfoDictionary.shared.phone
+            ) : nil
+        )
+    }
 
     var acceleratedCheckoutsApplePayConfig: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
-		return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-			merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
-			contactFields: self.authenticated ? [] : [.email, .phone]
-		)
-	}
+        return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+            merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
+            contactFields: authenticated ? [] : [.email, .phone]
+        )
+    }
 }
 
 public var appConfiguration = AppConfiguration() {
