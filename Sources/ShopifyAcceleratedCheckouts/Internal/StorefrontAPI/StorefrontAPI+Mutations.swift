@@ -410,7 +410,7 @@ extension StorefrontAPI {
 
         try validateUserErrors(payload.userErrors)
 
-        let cart = try validateCart(payload.cart, requestName: "cartRemovePersonalData")
+        try validateCart(payload.cart, requestName: "cartRemovePersonalData")
     }
 
     /// Prepare cart for completion
@@ -436,7 +436,7 @@ extension StorefrontAPI {
         switch result {
         case let .ready(ready):
             try validateUserErrors(payload.userErrors)
-            let cart = try validateCart(ready.cart, requestName: "cartPrepareForCompletion")
+            try validateCart(ready.cart, requestName: "cartPrepareForCompletion")
             return ready
         case let .throttled(throttled):
             throw GraphQLError.networkError(
@@ -499,6 +499,7 @@ extension StorefrontAPI {
         }
     }
 
+    @discardableResult
     private func validateCart(_ cart: Cart?, requestName _: String) throws -> Cart {
         guard let cart else {
             throw GraphQLError.invalidResponse

@@ -144,8 +144,6 @@ final class ApplePayViewModifierTests: XCTestCase {
         XCTAssertNotNil(view, "View should be created successfully without handlers")
     }
 
-    // MARK: - Combined Modifier Tests
-
     // MARK: - ValidationError Tests
 
     func testValidationErrorInOnError() {
