@@ -99,7 +99,8 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private(set) var state: ApplePayState = .idle {
         didSet {
-            ShopifyAcceleratedCheckouts.logger.debug("ApplePayState: \(String(describing: oldValue)) -> \(String(describing: state))")
+            ShopifyAcceleratedCheckouts.logger.debug(
+                "ApplePayState: \(String(describing: oldValue)) -> \(String(describing: state))")
         }
     }
 
@@ -117,7 +118,9 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
-            ShopifyAcceleratedCheckouts.logger.error("InvalidStateTransitionError: \(String(describing: state)) -> \(String(describing: nextState))")
+            ShopifyAcceleratedCheckouts.logger.error(
+                "InvalidStateTransitionError: \(String(describing: state)) -> \(String(describing: nextState))"
+            )
             throw InvalidStateTransitionError(fromState: state, toState: nextState)
         }
 
@@ -168,12 +171,38 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         case .cartSubmittedForCompletion:
             break
         default:
+            let cartID = try pkEncoder.cartID.get()
             try? await _Concurrency.Task.retrying(clock: clock) {
-                let cartID = try self.pkEncoder.cartID.get()
-                try await self.controller.storefrontJulyRelease.cartRemovePersonalData(
-                    id: cartID
-                )
+                try await self.controller.storefrontJulyRelease.cartRemovePersonalData(id: cartID)
             }.value
+
+            ShopifyAcceleratedCheckouts.logger.debug("Cleared PII from cart")
+
+            do {
+                /// `cartRemovePersonalData` is used to clear PII collected via ApplePay
+                /// This removes some data potentially provided externally
+                /// e.g. via ShopifyAcceleratedCheckouts.Configuration.Customer
+                /// It is safe for us to re-attach this prior to displaying CSK
+                if let customer = configuration.common.customer,
+                   customer.email != nil || customer.phoneNumber != nil
+                   || customer.customerAccessToken != nil
+                {
+                    try await controller.storefront.cartBuyerIdentityUpdate(
+                        id: cartID,
+                        input: .init(
+                            email: configuration.common.customer?.email,
+                            phoneNumber: configuration.common.customer?.phoneNumber,
+                            customerAccessToken: configuration.common.customer?.customerAccessToken
+                        )
+                    )
+
+                    ShopifyAcceleratedCheckouts.logger.debug("Updated cart with ShopifyAcceleratedCheckouts.Customer")
+                }
+            } catch {
+                /// Whilst it would be best to be able to re-attach this, we can still present CSK
+                /// without a successful response on `cartBuyerIdentityUpdate`
+                ShopifyAcceleratedCheckouts.logger.error("Failed to update cart buyer identity: \(error)")
+            }
         }
 
         try? await controller.present(url: url)

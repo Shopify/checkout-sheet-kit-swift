@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import PassKit
 
 @available(iOS 16.0, *)
@@ -36,7 +37,7 @@ extension ShopifyAcceleratedCheckouts {
     /// This class encapsulates all necessary settings for enabling Apple Pay as a payment method,
     /// including merchant identification and required contact information. Supported payment networks
     /// are automatically determined based on the merchant's Shopify configuration.
-    public class ApplePayConfiguration: ObservableObject {
+    public class ApplePayConfiguration: ObservableObject, Copyable {
         /// The merchant identifier for Apple Pay transactions.
         ///
         /// This value must match one of the merchant identifiers specified by the Merchant IDs
@@ -45,12 +46,15 @@ extension ShopifyAcceleratedCheckouts {
         /// - See: [Apple Developer Documentation - merchantIdentifier](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest/1619305-merchantidentifier)
         public let merchantIdentifier: String
 
-        /// Contact information fields required during the Apple Pay payment flow.
+        /// Fields specified in this array will be marked as required in the Apple Pay sheet.
         ///
-        /// Fields specified in this array will be marked as required in the payment sheet.
-        /// When a user is authenticated and their email or phone number has been provided
-        /// through the `buyerIdentity` mutation, these values will be pre-populated in the
-        /// payment sheet, allowing the required fields to remain empty in this configuration.
+        /// These can be omitted if you already have access to a contact field,
+        /// such as the users email / phone number. Instead you may attach it to a cart via
+        /// the storefront `buyerIdentityUpdate` mutation, or passing it to
+        /// ShopifyAccleratedCheckouts.Configuration.customer.
+        ///
+        /// When `contactFields` is set `ShopifyAccleratedCheckouts.Configuration.customer`
+        /// email / phone are ignored respectively.
         ///
         /// - Note: Configure this property based on your shop's customer account requirements.
         ///         For shops requiring customer accounts, include `.email` in the array.
@@ -70,6 +74,11 @@ extension ShopifyAcceleratedCheckouts {
             self.merchantIdentifier = merchantIdentifier
             self.contactFields = contactFields
         }
+
+        package required init(copy: ApplePayConfiguration) {
+            merchantIdentifier = copy.merchantIdentifier
+            contactFields = copy.contactFields
+        }
     }
 }
 
@@ -78,7 +87,7 @@ extension ShopifyAcceleratedCheckouts {
 /// This class is used internally to bundle the Apple Pay-specific configuration
 /// with the general accelerated checkout configuration and shop settings.
 @available(iOS 16.0, *)
-class ApplePayConfigurationWrapper {
+class ApplePayConfigurationWrapper: Copyable {
     var common: ShopifyAcceleratedCheckouts.Configuration
     var applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration
     var shopSettings: ShopSettings
@@ -91,5 +100,11 @@ class ApplePayConfigurationWrapper {
         self.common = common
         self.applePay = applePay
         self.shopSettings = shopSettings
+    }
+
+    package required init(copy: ApplePayConfigurationWrapper) {
+        common = copy.common.copy()
+        applePay = copy.applePay.copy()
+        shopSettings = copy.shopSettings
     }
 }

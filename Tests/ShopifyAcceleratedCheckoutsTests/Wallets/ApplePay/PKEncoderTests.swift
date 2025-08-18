@@ -76,7 +76,9 @@ class PKEncoderTests: XCTestCase {
     }
 
     private var encoder: PKEncoder {
-        return PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { self.cart() })
+        return PKEncoder(
+            configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { self.cart() }
+        )
     }
 
     // MARK: - mapToCountryCode Tests
@@ -95,6 +97,186 @@ class PKEncoderTests: XCTestCase {
 
     func testMapToCountryCodeJAToJP() {
         XCTAssertEqual(encoder.mapToCountryCode(code: "JA"), "JP")
+    }
+
+    // MARK: - Email and Phone Fallback Tests
+
+    func test_email_withContactEmail_shouldReturnContactEmail() {
+        // Create encoder without default customer to test contact email priority
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithoutCustomer.common.customer = nil
+
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
+
+        encoderWithoutCustomer.shippingContact = .success(createMockContact(emailAddress: "contact@example.com"))
+
+        guard let email = try? encoderWithoutCustomer.email.get() else {
+            XCTFail("Expected email to be available")
+            return
+        }
+
+        XCTAssertEqual(email, "contact@example.com")
+    }
+
+    func test_email_withoutContactEmailButWithCustomerEmail_shouldReturnCustomerEmail() {
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithCustomer.common.customer?.email = "customer@example.com"
+
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
+
+        guard let email = try? encoderWithCustomer.email.get() else {
+            XCTFail("Expected email to be available")
+            return
+        }
+
+        XCTAssertEqual(email, "customer@example.com")
+    }
+
+    func test_email_withEmptyContactEmail_shouldFallbackToCustomerEmail() {
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithCustomer.common.customer?.email = "customer@example.com"
+
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
+
+        encoderWithCustomer.shippingContact = .success(createMockContact(emailAddress: ""))
+
+        guard let email = try? encoderWithCustomer.email.get() else {
+            XCTFail("Expected email to be available")
+            return
+        }
+
+        XCTAssertEqual(email, "customer@example.com")
+    }
+
+    func test_email_withoutContactOrCustomerEmail_shouldReturnFailure() {
+        // Create encoder without default customer to test failure case
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithoutCustomer.common.customer = nil
+
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
+
+        encoderWithoutCustomer.shippingContact = .success(createMockContact())
+
+        switch encoderWithoutCustomer.email {
+        case .success:
+            XCTFail("Expected email to fail when no email is available")
+        case let .failure(error):
+            guard case let .invariant(expected) = error else {
+                XCTFail("Expected invariant error but got: \(error)")
+                return
+            }
+            XCTAssertEqual(expected, "email")
+        }
+    }
+
+    func test_phoneNumber_withContactPhone_shouldReturnContactPhone() {
+        // Create encoder without default customer to test contact phone priority
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithoutCustomer.common.customer = nil
+
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
+
+        encoderWithoutCustomer.shippingContact = .success(createMockContact(phoneNumber: "+1234567890"))
+
+        guard let phoneNumber = try? encoderWithoutCustomer.phoneNumber.get() else {
+            XCTFail("Expected phoneNumber to be available")
+            return
+        }
+
+        XCTAssertEqual(phoneNumber, "+1234567890")
+    }
+
+    func test_phoneNumber_withoutContactPhoneButWithCustomerPhone_shouldReturnCustomerPhone() {
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithCustomer.common.customer?.email = nil
+        configWithCustomer.common.customer?.phoneNumber = "+0987654321"
+
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
+
+        guard let phoneNumber = try? encoderWithCustomer.phoneNumber.get() else {
+            XCTFail("Expected phoneNumber to be available")
+            return
+        }
+
+        XCTAssertEqual(phoneNumber, "+0987654321")
+    }
+
+    func test_phoneNumber_withEmptyContactPhone_shouldFallbackToCustomerPhone() {
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithCustomer.common.customer?.email = nil
+        configWithCustomer.common.customer?.phoneNumber = "+0987654321"
+
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
+
+        encoderWithCustomer.shippingContact = .success(createMockContact(phoneNumber: ""))
+
+        guard let phoneNumber = try? encoderWithCustomer.phoneNumber.get() else {
+            XCTFail("Expected phoneNumber to be available")
+            return
+        }
+
+        XCTAssertEqual(phoneNumber, "+0987654321")
+    }
+
+    func test_phoneNumber_withoutContactOrCustomerPhone_shouldReturnFailure() {
+        // Create encoder without default customer to test failure case
+        let configWithoutCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithoutCustomer.common.customer = nil
+
+        let encoderWithoutCustomer = PKEncoder(configuration: configWithoutCustomer, cart: cart)
+
+        encoderWithoutCustomer.shippingContact = .success(createMockContact())
+
+        switch encoderWithoutCustomer.phoneNumber {
+        case .success:
+            XCTFail("Expected phoneNumber to fail when no phone is available")
+        case let .failure(error):
+            guard case let .invariant(expected) = error else {
+                XCTFail("Expected invariant error but got: \(error)")
+                return
+            }
+            XCTAssertEqual(expected, "phoneNumber")
+        }
+    }
+
+    func test_email_withContactEmailPriority_shouldPreferContactOverCustomer() {
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithCustomer.common.customer?.email = "customer@example.com"
+        configWithCustomer.common.customer?.phoneNumber = nil
+
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
+
+        let contact = createMockContact(emailAddress: "contact@example.com")
+        encoderWithCustomer.shippingContact = .success(contact)
+
+        guard let email = try? encoderWithCustomer.email.get() else {
+            XCTFail("Expected email to be available")
+            return
+        }
+
+        XCTAssertEqual(
+            email, "contact@example.com", "Should prefer contact email over customer email"
+        )
+    }
+
+    func test_phoneNumber_withContactPhonePriority_shouldPreferContactOverCustomer() {
+        let configWithCustomer = ApplePayConfigurationWrapper.testConfiguration.copy()
+        configWithCustomer.common.customer?.email = nil
+        configWithCustomer.common.customer?.phoneNumber = "+0987654321"
+
+        let encoderWithCustomer = PKEncoder(configuration: configWithCustomer, cart: cart)
+
+        let contact = createMockContact(phoneNumber: "+1234567890")
+        encoderWithCustomer.shippingContact = .success(contact)
+
+        guard let phoneNumber = try? encoderWithCustomer.phoneNumber.get() else {
+            XCTFail("Expected phoneNumber to be available")
+            return
+        }
+
+        XCTAssertEqual(
+            phoneNumber, "+1234567890", "Should prefer contact phone over customer phone"
+        )
     }
 
     func testMapToCountryCodeUSTerritory() {

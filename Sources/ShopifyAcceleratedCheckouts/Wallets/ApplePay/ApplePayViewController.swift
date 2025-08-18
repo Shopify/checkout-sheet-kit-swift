@@ -178,10 +178,7 @@ class ApplePayViewController: PayController, ObservableObject {
                 return cart
             case let .variant(id, quantity):
                 let items: [StorefrontAPI.Types.ID] = Array(repeating: .init(id), count: quantity)
-                return try await storefront.cartCreate(
-                    with: items,
-                    customer: configuration.common.customer
-                )
+                return try await storefront.cartCreate(with: items)
             case .invariant:
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "checkoutIdentifier")
             }
