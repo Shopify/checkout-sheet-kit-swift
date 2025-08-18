@@ -31,6 +31,7 @@ class GraphQLClient {
     private let headers: [String: String]
     private let session: URLSession
     let inContextDirective: InContextDirective
+    private let logger = ShopifyAcceleratedCheckouts.logger.extend("GraphQLClient")
 
     /// Initialize a new GraphQL client
     /// - Parameters:
@@ -54,14 +55,30 @@ class GraphQLClient {
     /// - Parameter operation: The GraphQL query operation
     /// - Returns: The decoded response
     func query<T: Decodable>(_ operation: GraphQLRequest<T>) async throws -> GraphQLResponse<T> {
-        return try await execute(operation: operation)
+        logger.debug("GraphQL query started: \(operation.operationName ?? "unknown")")
+        do {
+            let result = try await execute(operation: operation)
+            logger.debug("GraphQL query completed successfully: \(operation.operationName ?? "unknown")")
+            return result
+        } catch {
+            logger.error("GraphQL query failed: \(operation.operationName ?? "unknown")")
+            throw error
+        }
     }
 
     /// Execute a GraphQL mutation
     /// - Parameter operation: The GraphQL mutation operation
     /// - Returns: The decoded response
     func mutate<T: Decodable>(_ operation: GraphQLRequest<T>) async throws -> GraphQLResponse<T> {
-        return try await execute(operation: operation)
+        logger.debug("GraphQL mutation started: \(operation.operationName ?? "unknown")")
+        do {
+            let result = try await execute(operation: operation)
+            logger.debug("GraphQL mutation completed successfully: \(operation.operationName ?? "unknown")")
+            return result
+        } catch {
+            logger.error("GraphQL mutation failed: \(operation.operationName ?? "unknown")")
+            throw error
+        }
     }
 
     /// Execute a raw GraphQL request
@@ -78,10 +95,12 @@ class GraphQLClient {
         let (data, response) = try await session.data(for: urlRequest)
 
         guard let httpResponse = response as? HTTPURLResponse else {
+            logger.error("GraphQL request received invalid HTTP response")
             throw GraphQLError.networkError("Invalid response")
         }
 
         if httpResponse.statusCode != 200 {
+            logger.error("GraphQL request failed with HTTP status code: \(httpResponse.statusCode)")
             throw GraphQLError.httpError(statusCode: httpResponse.statusCode, data: data)
         }
 
@@ -91,6 +110,7 @@ class GraphQLClient {
         let decodedResponse = try decoder.decode(GraphQLResponse<T>.self, from: data)
 
         if let errors = decodedResponse.errors, !errors.isEmpty {
+            logger.error("GraphQL request returned errors: \(errors.count) error(s)")
             throw GraphQLError.graphQLErrors(errors)
         }
 
