@@ -68,8 +68,9 @@ struct SettingsView: View {
 
                 Section(header: Text("Accelerated Checkouts")) {
                     Toggle("Use authenticated customer", isOn: $config.authenticated)
-                    Text("When authenticated, customer information from the environment config will be passed to the Apple Pay sheet. When unauthenticated, Apple will use provide customer information from the device.")
+                    Text("If toggled on, customer information will be attached to cart from your app settings. When toggled off, customer information will be collected from the Apple Pay sheet.")
                         .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section(header: Text("Universal Links")) {
@@ -85,6 +86,7 @@ struct SettingsView: View {
                         "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app."
                     )
                     .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
 
                 Section(header: Text("Theme")) {
