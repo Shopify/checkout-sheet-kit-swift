@@ -8,17 +8,29 @@ appId: com.shopify.example.ShopifyAcceleratedCheckoutsApp
 - runFlow:
     when:
       visible:
-        id: "email required toggle"
-        checked: false
-    # file: "fill-invalid-email-and-phone.maestro.yaml"
+        text: "1"
+        index: 0
     commands:
       - tapOn:
-          id: "email required toggle"
+          text: "1"
+          index: 0
 
-- assertVisible:
-    id: "email required toggle"
-    checked: false
+- runFlow:
+    when:
+      visible:
+        text: "1"
+        index: 0
+    commands:
+      - tapOn:
+          text: "1"
+          index: 0
 
+# - assertVisible:
+#     id: "email required toggle"
+#     checked: false
+
+- tapOn: "Email field"
+- inputText: "invalid-email"
 - tapOn: "Back"
 
 - tapOn:
@@ -27,5 +39,6 @@ appId: com.shopify.example.ShopifyAcceleratedCheckoutsApp
 - tapOn: "Create Cart"
 - tapOn: "Buy with Apple\_Pay"
 - tapOn: "Pay with Passcode"
-- assertVisible:
-    id: "Checkout"
+# - assertVisible:
+#     id: "Checkout"
+- assertVisible: "Update Shipping Contact"

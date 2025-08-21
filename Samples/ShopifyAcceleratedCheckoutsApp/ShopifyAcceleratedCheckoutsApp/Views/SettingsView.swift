@@ -106,6 +106,7 @@ struct SettingsView: View {
                         .textContentType(.emailAddress)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
+                        .accessibilityLabel("Email field")
 
                     Text("Email will be attached to the buyerIdentity during cartCreate.")
                         .font(.caption)
