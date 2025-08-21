@@ -302,7 +302,6 @@ class CheckoutBridgeTests: XCTestCase {
         }
     }
 
-
     func testSendMessageShouldCallEvaluateJavaScriptPresented() {
         let webView = MockWebView()
         webView.expectedScript = expectedPresentedScript()

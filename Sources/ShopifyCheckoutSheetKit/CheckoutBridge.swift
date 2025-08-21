@@ -74,7 +74,6 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         }
     }
 
-
     static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
         let dispatchMessageBody: String
         if let body = messageBody {
@@ -173,7 +172,6 @@ extension CheckoutBridge {
     }
 }
 
-
 struct SdkToWebEvent<T: Codable>: Codable {
     var detail: T
 }
@@ -186,7 +184,5 @@ extension SdkToWebEvent {
         } catch {
             return nil
         }
-
-        return nil
     }
 }

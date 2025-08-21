@@ -375,9 +375,6 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertFalse(webView.isPreloadRequest)
     }
 
-
-
-
     func testDetachBridgeCalledOnInit() {
         ShopifyCheckoutSheetKit.configuration.preloading.enabled = false
         let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")

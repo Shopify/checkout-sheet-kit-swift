@@ -222,7 +222,6 @@ class CheckoutWebView: WKWebView {
         }
     }
 
-
     // MARK: -
 
     func load(checkout url: URL, isPreload: Bool = false) {
@@ -399,10 +398,8 @@ extension CheckoutWebView: WKNavigationDelegate {
             let endTime = Date()
             let diff = endTime.timeIntervalSince(startTime)
             let message = "Loaded checkout in \(String(format: "%.2f", diff))s"
-            let preload = String(isPreloadRequest)
 
             ShopifyCheckoutSheetKit.configuration.logger.log(message)
-
         }
         checkoutDidLoad = true
         timer = nil
