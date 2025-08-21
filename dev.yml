@@ -2,16 +2,13 @@ name: checkout-sheet-kit-swift
 
 type: ios
 
-packages:
-  - xcode
-  - homebrew:
-      - swiftlint
-      - swiftformat
-      - xcbeautify
-      - rover
-      - jq
-
 up:
+  - packages:
+    - swiftlint
+    - swiftformat
+    - xcbeautify
+    - rover
+    - jq
   - ruby
   - custom:
       name: Ensure Storefront.xcconfig file
