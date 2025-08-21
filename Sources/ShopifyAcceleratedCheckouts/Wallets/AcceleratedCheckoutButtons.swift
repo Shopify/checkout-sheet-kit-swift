@@ -26,10 +26,10 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 /// Render state for AcceleratedCheckoutButtons
-public enum RenderState {
+public enum RenderState: Equatable {
     case loading
     case rendered
-    case error
+    case error(reason: String)
 }
 
 /// Renders a Checkout buttons for a cart or product variant
@@ -44,7 +44,7 @@ public struct AcceleratedCheckoutButtons: View {
     private var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     let identifier: CheckoutIdentifier
-    var wallets: [Wallet] = [.shopPay, .applePay]
+    public var wallets: [Wallet] = [.shopPay, .applePay]
     var eventHandlers: EventHandlers = .init()
     var cornerRadius: CGFloat?
 
@@ -64,8 +64,9 @@ public struct AcceleratedCheckoutButtons: View {
     ///   - label: The label to display on the Apple Pay button
     public init(cartID: String) {
         identifier = .cart(cartID: cartID).parse()
-        if case .invariant = identifier {
-            _currentRenderState = State(initialValue: .error)
+        if case let .invariant(reason) = identifier {
+            ShopifyAcceleratedCheckouts.logger.error(reason)
+            _currentRenderState = State(initialValue: .error(reason: reason))
         }
     }
 
@@ -76,8 +77,9 @@ public struct AcceleratedCheckoutButtons: View {
     ///  - label: The label to display on the Apple Pay button
     public init(variantID: String, quantity: Int) {
         identifier = .variant(variantID: variantID, quantity: quantity).parse()
-        if case .invariant = identifier {
-            _currentRenderState = State(initialValue: .error)
+        if case let .invariant(reason) = identifier {
+            _currentRenderState = State(initialValue: .error(reason: reason))
+            ShopifyAcceleratedCheckouts.logger.error(reason)
         }
     }
 
@@ -124,8 +126,9 @@ public struct AcceleratedCheckoutButtons: View {
             shopSettings = ShopSettings(from: shop)
             currentRenderState = .rendered
         } catch {
-            ShopifyAcceleratedCheckouts.logger.error("Error loading shop settings: \(error)")
-            currentRenderState = .error
+            let reason = "Error loading shop settings: \(error)"
+            ShopifyAcceleratedCheckouts.logger.error(reason)
+            currentRenderState = .error(reason: reason)
         }
     }
 }

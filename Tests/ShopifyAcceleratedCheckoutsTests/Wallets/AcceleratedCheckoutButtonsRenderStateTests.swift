@@ -39,7 +39,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
         let testView = AcceleratedCheckoutButtons(cartID: invalidCartID)
             .onRenderStateChange { state in
                 receivedStates.append(state)
-                if state == .error {
+                if case .error = state {
                     expectation.fulfill()
                 }
             }
@@ -53,7 +53,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should eventually be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains(.error), "onRenderStateChange should be called with .error state for invalid cart ID")
+        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for invalid cart ID")
     }
 
     func testOnRenderStateChange_CalledWithErrorStateForEmptyCartID() {
@@ -66,7 +66,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
         let testView = AcceleratedCheckoutButtons(cartID: emptyCartID)
             .onRenderStateChange { state in
                 receivedStates.append(state)
-                if state == .error {
+                if case .error = state {
                     expectation.fulfill()
                 }
             }
@@ -80,7 +80,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains(.error), "onRenderStateChange should be called with .error state for empty cart ID")
+        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for empty cart ID")
     }
 
     func testOnRenderStateChange_CalledWithErrorStateForInvalidVariantID() {
@@ -93,7 +93,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
         let testView = AcceleratedCheckoutButtons(variantID: invalidVariantID, quantity: 1)
             .onRenderStateChange { state in
                 receivedStates.append(state)
-                if state == .error {
+                if case .error = state {
                     expectation.fulfill()
                 }
             }
@@ -107,7 +107,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains(.error), "onRenderStateChange should be called with .error state for invalid variant ID")
+        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for invalid variant ID")
     }
 
     func testOnRenderStateChange_CalledWithErrorStateForZeroQuantity() {
@@ -120,7 +120,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
         let testView = AcceleratedCheckoutButtons(variantID: validVariantID, quantity: 0)
             .onRenderStateChange { state in
                 receivedStates.append(state)
-                if state == .error {
+                if case .error = state {
                     expectation.fulfill()
                 }
             }
@@ -134,7 +134,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains(.error), "onRenderStateChange should be called with .error state for zero quantity")
+        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for zero quantity")
     }
 
     func testOnRenderStateChange_CalledWithLoadingStateForValidCartID() {
@@ -270,7 +270,7 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
         // Test that all expected render states exist and are distinct
         let loadingState: RenderState = .loading
         let renderedState: RenderState = .rendered
-        let errorState: RenderState = .error
+        let errorState: RenderState = .error(reason: "Test error")
 
         XCTAssertNotEqual(loadingState, renderedState)
         XCTAssertNotEqual(loadingState, errorState)
@@ -279,11 +279,12 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
     func testRenderStateEnum_CaseIterable() {
         // Test that we can iterate over all render states
-        let allStates: [RenderState] = [.loading, .rendered, .error]
+        let testErrorReason = "Test error"
+        let allStates: [RenderState] = [.loading, .rendered, .error(reason: testErrorReason)]
 
         XCTAssertEqual(allStates.count, 3, "Should have exactly 3 render states")
         XCTAssertTrue(allStates.contains(.loading), "Should contain .loading state")
         XCTAssertTrue(allStates.contains(.rendered), "Should contain .rendered state")
-        XCTAssertTrue(allStates.contains(.error), "Should contain .error state")
+        XCTAssertTrue(allStates.contains(.error(reason: testErrorReason)), "Should contain .error state")
     }
 }

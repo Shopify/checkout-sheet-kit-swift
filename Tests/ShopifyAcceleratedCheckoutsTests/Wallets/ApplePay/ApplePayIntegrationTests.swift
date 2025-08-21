@@ -142,7 +142,7 @@ final class ApplePayIntegrationTests: XCTestCase {
     // MARK: - Edge Case Tests
 
     func testInvariantIdentifierHandling() {
-        let identifier = CheckoutIdentifier.invariant
+        let identifier = CheckoutIdentifier.invariant(reason: "Test invariant")
 
         let button = ApplePayButton(identifier: identifier, eventHandlers: EventHandlers(), cornerRadius: nil)
 
