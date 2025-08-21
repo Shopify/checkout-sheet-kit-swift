@@ -1,29 +1,23 @@
 {
-  "schemaNamespace" : "Storefront",
-  "input" : {
-    "operationSearchPaths" : [
-      "**/*.graphql"
-    ],
-    "schemaSearchPaths" : [
-      "**/*.graphqls"
-    ]
+  "schemaNamespace": "Storefront",
+  "input": {
+    "operationSearchPaths": ["ShopifyAcceleratedCheckoutsApp/**/*.graphql"],
+    "schemaSearchPaths": ["ShopifyAcceleratedCheckoutsApp/**/*.graphqls"]
   },
-  "output" : {
-    "testMocks" : {
-      "none" : {
-      }
+  "output": {
+    "testMocks": {
+      "none": {}
     },
-    "schemaTypes" : {
-      "path" : "./ShopifyAcceleratedCheckoutsApp/Generated",
-      "moduleType" : {
-        "embeddedInTarget" : {
-          "name" : "ShopifyAcceleratedCheckoutsApp"
+    "schemaTypes": {
+      "path": "./ShopifyAcceleratedCheckoutsApp/Generated",
+      "moduleType": {
+        "embeddedInTarget": {
+          "name": "ShopifyAcceleratedCheckoutsApp"
         }
       }
     },
-    "operations" : {
-      "inSchemaModule" : {
-      }
+    "operations": {
+      "inSchemaModule": {}
     }
   }
 }

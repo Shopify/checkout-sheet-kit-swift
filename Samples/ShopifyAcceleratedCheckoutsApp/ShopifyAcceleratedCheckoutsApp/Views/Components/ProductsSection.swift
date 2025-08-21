@@ -42,7 +42,7 @@ struct ProductsSection: View {
             } else if products.isEmpty {
                 EmptyProducts(onRetry: onRetry)
             } else {
-                ForEach(products, id: \.id) { product in
+                ForEach(products.filter {$0.availableForSale}, id: \.id) { product in
                     ForEach(product.variants.nodes, id: \.id) { variant in
                         ProductRow(
                             product: product,

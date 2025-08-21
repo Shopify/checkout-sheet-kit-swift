@@ -1,25 +1,5 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
 
@@ -28,7 +8,7 @@ extension Storefront {
         static let operationName: String = "GetProducts"
         static let operationDocument: ApolloAPI.OperationDocument = .init(
             definition: .init(
-                #"query GetProducts($first: Int = 10, $country: CountryCode!, $language: LanguageCode!) @inContext(country: $country, language: $language) { products(first: $first) { __typename nodes { __typename id title featuredImage { __typename url } variants(first: 10) { __typename nodes { __typename id title requiresShipping image { __typename url } price { __typename amount currencyCode } } } } } }"#
+                #"query GetProducts($first: Int = 10, $country: CountryCode!, $language: LanguageCode!) @inContext(country: $country, language: $language) { products(first: $first) { __typename nodes { __typename id title availableForSale featuredImage { __typename url } variants(first: 10) { __typename nodes { __typename id title requiresShipping image { __typename url } price { __typename amount currencyCode } } } } } }"#
             ))
 
         public var first: GraphQLNullable<Int>
@@ -91,6 +71,7 @@ extension Storefront {
                         .field("__typename", String.self),
                         .field("id", Storefront.ID.self),
                         .field("title", String.self),
+                        .field("availableForSale", Bool.self),
                         .field("featuredImage", FeaturedImage?.self),
                         .field("variants", Variants.self, arguments: ["first": 10])
                     ] }
@@ -100,6 +81,8 @@ extension Storefront {
                     /// The name for the product that displays to customers. The title is used to construct the product's handle.
                     /// For example, if a product is titled "Black Sunglasses", then the handle is `black-sunglasses`.
                     var title: String { __data["title"] }
+                    /// Indicates if at least one product variant is available for sale.
+                    var availableForSale: Bool { __data["availableForSale"] }
                     /// The featured image for the product.
                     ///
                     /// This field is functionally equivalent to `images(first: 1)`.

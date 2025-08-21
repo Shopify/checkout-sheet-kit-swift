@@ -1,25 +1,5 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 import ApolloAPI
 
@@ -36,6 +16,8 @@ extension Storefront {
         case missingDiscountCode = "MISSING_DISCOUNT_CODE"
         /// Missing note.
         case missingNote = "MISSING_NOTE"
+        /// The note length must be below the specified maximum.
+        case noteTooLong = "NOTE_TOO_LONG"
         /// Delivery group was not found in cart.
         case invalidDeliveryGroup = "INVALID_DELIVERY_GROUP"
         /// Delivery option was not valid.
@@ -60,6 +42,12 @@ extension Storefront {
         case minimumNotMet = "MINIMUM_NOT_MET"
         /// The quantity must be below the specified maximum for the item.
         case maximumExceeded = "MAXIMUM_EXCEEDED"
+        /// Too many delivery addresses on Cart.
+        case tooManyDeliveryAddresses = "TOO_MANY_DELIVERY_ADDRESSES"
+        /// Only one delivery address can be selected.
+        case onlyOneDeliveryAddressCanBeSelected = "ONLY_ONE_DELIVERY_ADDRESS_CAN_BE_SELECTED"
+        /// The delivery address was not found.
+        case invalidDeliveryAddressId = "INVALID_DELIVERY_ADDRESS_ID"
         /// The specified address field is required.
         case addressFieldIsRequired = "ADDRESS_FIELD_IS_REQUIRED"
         /// The specified address field is too long.
@@ -82,5 +70,25 @@ extension Storefront {
         case provinceNotFound = "PROVINCE_NOT_FOUND"
         /// A general error occurred during address validation.
         case unspecifiedAddressError = "UNSPECIFIED_ADDRESS_ERROR"
+        /// Credit card has expired.
+        case paymentsCreditCardBaseExpired = "PAYMENTS_CREDIT_CARD_BASE_EXPIRED"
+        /// Credit card gateway is not supported.
+        case paymentsCreditCardBaseGatewayNotSupported = "PAYMENTS_CREDIT_CARD_BASE_GATEWAY_NOT_SUPPORTED"
+        /// Credit card error.
+        case paymentsCreditCardGeneric = "PAYMENTS_CREDIT_CARD_GENERIC"
+        /// Credit card month is invalid.
+        case paymentsCreditCardMonthInclusion = "PAYMENTS_CREDIT_CARD_MONTH_INCLUSION"
+        /// Credit card number is invalid.
+        case paymentsCreditCardNumberInvalid = "PAYMENTS_CREDIT_CARD_NUMBER_INVALID"
+        /// Credit card number format is invalid.
+        case paymentsCreditCardNumberInvalidFormat = "PAYMENTS_CREDIT_CARD_NUMBER_INVALID_FORMAT"
+        /// Credit card verification value is blank.
+        case paymentsCreditCardVerificationValueBlank = "PAYMENTS_CREDIT_CARD_VERIFICATION_VALUE_BLANK"
+        /// Credit card verification value is invalid for card type.
+        case paymentsCreditCardVerificationValueInvalidForCardType = "PAYMENTS_CREDIT_CARD_VERIFICATION_VALUE_INVALID_FOR_CARD_TYPE"
+        /// Credit card has expired.
+        case paymentsCreditCardYearExpired = "PAYMENTS_CREDIT_CARD_YEAR_EXPIRED"
+        /// Credit card expiry year is invalid.
+        case paymentsCreditCardYearInvalidExpiryYear = "PAYMENTS_CREDIT_CARD_YEAR_INVALID_EXPIRY_YEAR"
     }
 }

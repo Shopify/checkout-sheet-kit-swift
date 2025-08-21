@@ -3,6 +3,7 @@ query GetProducts($first: Int = 10, $country: CountryCode!, $language: LanguageC
     nodes {
       id
       title
+      availableForSale
       featuredImage {
         url
       }
