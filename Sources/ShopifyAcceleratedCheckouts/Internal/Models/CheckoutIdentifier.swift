@@ -29,9 +29,14 @@ enum CheckoutIdentifier {
     case cart(cartID: String)
     case invariant(reason: String)
 
-    static let cartPrefix = "gid://Shopify/Cart/"
-    static let variantPrefix = "gid://Shopify/ProductVariant/"
-
+    var prefix: String {
+        switch self {
+            case .cart: "gid://Shopify/Cart"
+            case .variant: "gid://Shopify/ProductVariant/"
+            default: "invariant"
+        }
+    }
+    
     /// Extracts the final portion of the cartID or variantID
     ///
     /// Example "gid://shopify/Cart/Z2NwLXVzLWV4YW1wbGU6MDEyMzQ1Njc4OTAxMjM0NTY3ODkw?key=examplekey1234567890"
@@ -52,9 +57,7 @@ enum CheckoutIdentifier {
     /// Checks for valid ID signature,
     /// Returns .invariant if validation fails
     func isValid() -> Bool {
-        if case .invariant = parse() {
-            return false
-        }
+        if case .invariant = parse() { return false }
         return true
     }
 
@@ -64,19 +67,19 @@ enum CheckoutIdentifier {
     func parse() -> CheckoutIdentifier {
         switch self {
         case let .cart(cartID):
-            guard cartID.lowercased().hasPrefix(Self.cartPrefix.lowercased()) else {
+            guard cartID.lowercased().hasPrefix(self.prefix.lowercased()) else {
                 return .invariant(
                     reason:
-                    "[invariant_violation] Invalid 'cartID' format. Expected to start with '\(Self.cartPrefix)', received: '\(cartID)'"
+                    "[invariant_violation] Invalid 'cartID' format. Expected to start with '\(self.prefix)', received: '\(cartID)'"
                 )
             }
             return self
 
         case let .variant(variantID, quantity):
-            guard variantID.lowercased().hasPrefix(Self.variantPrefix.lowercased()) else {
+            guard variantID.lowercased().hasPrefix(self.prefix.lowercased()) else {
                 return .invariant(
                     reason:
-                    "[invariant_violation] Invalid 'variantID' format. Expected to start with '\(Self.variantPrefix)', received: '\(variantID)'"
+                    "[invariant_violation] Invalid 'variantID' format. Expected to start with '\(self.prefix)', received: '\(variantID)'"
                 )
             }
             guard quantity > 0 else {
