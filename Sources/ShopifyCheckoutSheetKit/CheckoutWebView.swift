@@ -222,10 +222,6 @@ class CheckoutWebView: WKWebView {
         }
     }
 
-    func instrument(_ payload: InstrumentationPayload) {
-        OSLogger.shared.debug("Emitting instrumentation event with payload: \(payload)")
-        checkoutBridge.instrument(self, payload)
-    }
 
     // MARK: -
 
@@ -407,15 +403,6 @@ extension CheckoutWebView: WKNavigationDelegate {
 
             ShopifyCheckoutSheetKit.configuration.logger.log(message)
 
-            if isBridgeAttached {
-                instrument(
-                    InstrumentationPayload(
-                        name: "checkout_finished_loading",
-                        value: Int(diff * 1000),
-                        type: .histogram,
-                        tags: ["preloading": preload]
-                    ))
-            }
         }
         checkoutDidLoad = true
         timer = nil
