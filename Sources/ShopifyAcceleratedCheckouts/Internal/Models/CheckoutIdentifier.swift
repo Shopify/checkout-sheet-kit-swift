@@ -31,7 +31,7 @@ enum CheckoutIdentifier {
 
     var prefix: String {
         switch self {
-            case .cart: "gid://Shopify/Cart"
+            case .cart: "gid://Shopify/Cart/"
             case .variant: "gid://Shopify/ProductVariant/"
             default: "invariant"
         }
