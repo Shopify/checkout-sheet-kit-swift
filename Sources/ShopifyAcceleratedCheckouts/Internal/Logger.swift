@@ -23,7 +23,6 @@
 
 import ShopifyCheckoutSheetKit
 
-package class ACLogger : OSLogger {
-    
+package class ACLogger: OSLogger {
     override package var logLevel: LogLevel = ShopifyAcceleratedCheckouts.logLevel
 }
