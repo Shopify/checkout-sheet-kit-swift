@@ -23,6 +23,8 @@
 
 import Foundation
 @testable import ShopifyAcceleratedCheckouts
+@testable import ShopifyCheckoutSheetKit
+import XCTest
 
 // MARK: - Configuration Helpers
 
@@ -187,5 +189,123 @@ extension StorefrontAPI.Cart {
             discountCodes: [],
             discountAllocations: []
         )
+    }
+}
+
+// MARK: - Test Delegate Helper
+
+@available(iOS 17.0, *)
+class TestCheckoutDelegate: CheckoutDelegate {
+    var completeCallbackInvoked = false
+    var failCallbackInvoked = false
+    var cancelCallbackInvoked = false
+    var linkCallbackInvoked = false
+    var webPixelCallbackInvoked = false
+    var errorRecoveryAsked = false
+
+    var completeCount = 0
+    var failCount = 0
+    var cancelCount = 0
+    var linkCount = 0
+    var webPixelCount = 0
+
+    var receivedURL: URL?
+    var receivedEvent: PixelEvent?
+    var receivedURLs: [URL] = []
+    var recoveryDecision = true
+
+    var expectation: XCTestExpectation?
+    var completeExpectations: [XCTestExpectation] = []
+    var failExpectations: [XCTestExpectation] = []
+    var cancelExpectations: [XCTestExpectation] = []
+    var expectations: [XCTestExpectation] = []
+    var currentIndex = 0
+
+    func reset() {
+        completeCallbackInvoked = false
+        failCallbackInvoked = false
+        cancelCallbackInvoked = false
+        linkCallbackInvoked = false
+        webPixelCallbackInvoked = false
+        errorRecoveryAsked = false
+
+        completeCount = 0
+        failCount = 0
+        cancelCount = 0
+        linkCount = 0
+        webPixelCount = 0
+
+        receivedURL = nil
+        receivedEvent = nil
+        receivedURLs = []
+        recoveryDecision = true
+
+        expectation = nil
+        completeExpectations = []
+        failExpectations = []
+        cancelExpectations = []
+        expectations = []
+        currentIndex = 0
+    }
+
+    func checkoutDidComplete(event _: CheckoutCompletedEvent) {
+        completeCallbackInvoked = true
+        completeCount += 1
+
+        expectation?.fulfill()
+
+        if completeCount <= completeExpectations.count {
+            completeExpectations[completeCount - 1].fulfill()
+        }
+    }
+
+    func checkoutDidFail(error _: CheckoutError) {
+        failCallbackInvoked = true
+        failCount += 1
+
+        expectation?.fulfill()
+
+        if failCount <= failExpectations.count {
+            failExpectations[failCount - 1].fulfill()
+        }
+    }
+
+    func checkoutDidCancel() {
+        cancelCallbackInvoked = true
+        cancelCount += 1
+
+        expectation?.fulfill()
+
+        if cancelCount <= cancelExpectations.count {
+            cancelExpectations[cancelCount - 1].fulfill()
+        }
+    }
+
+    func checkoutDidClickLink(url: URL) {
+        linkCallbackInvoked = true
+        linkCount += 1
+        receivedURL = url
+        receivedURLs.append(url)
+
+        expectation?.fulfill()
+
+        if currentIndex < expectations.count {
+            expectations[currentIndex].fulfill()
+            currentIndex += 1
+        }
+    }
+
+    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+        webPixelCallbackInvoked = true
+        webPixelCount += 1
+        receivedEvent = event
+
+        expectation?.fulfill()
+    }
+
+    func shouldRecoverFromError(error _: CheckoutError) -> Bool {
+        errorRecoveryAsked = true
+        expectation?.fulfill()
+        return recoveryDecision
     }
 }

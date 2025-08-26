@@ -46,6 +46,7 @@ public struct AcceleratedCheckoutButtons: View {
     let identifier: CheckoutIdentifier
     public var wallets: [Wallet] = [.shopPay, .applePay]
     var eventHandlers: EventHandlers = .init()
+    var checkoutDelegate: CheckoutDelegate?
     var cornerRadius: CGFloat?
 
     /// The Apple Pay button label style
@@ -93,6 +94,7 @@ public struct AcceleratedCheckoutButtons: View {
                             ApplePayButton(
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
+                                checkoutDelegate: checkoutDelegate,
                                 cornerRadius: cornerRadius
                             )
                             .label(applePayLabel)
@@ -100,6 +102,7 @@ public struct AcceleratedCheckoutButtons: View {
                             ShopPayButton(
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
+                                checkoutDelegate: checkoutDelegate,
                                 cornerRadius: cornerRadius
                             )
                         }
@@ -168,129 +171,43 @@ extension AcceleratedCheckoutButtons {
         return newView
     }
 
-    /// Adds an action to perform when the checkout completes successfully.
+    /// Sets the checkout delegate for handling checkout flow events
     ///
-    /// Use this modifier to handle successful checkout events:
+    /// Use this modifier to provide a delegate for checkout completion, failure, and cancellation events:
     ///
     /// ```swift
     /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onComplete { event in
-    ///         // Navigate to success screen with order ID
-    ///         showSuccessView(orderId: event.orderId)
-    ///     }
+    ///     .checkout(delegate: MyCheckoutDelegate())
     /// ```
     ///
-    /// - Parameter action: The action to perform when checkout succeeds
-    /// - Returns: A view with the checkout success handler set
-    public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void)
-        -> AcceleratedCheckoutButtons
-    {
+    /// - Parameter delegate: The checkout delegate to handle checkout flow events
+    /// - Returns: A view with the checkout delegate set
+    public func checkout(delegate: CheckoutDelegate) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.eventHandlers.checkoutDidComplete = action
+        newView.checkoutDelegate = delegate
         return newView
     }
 
-    /// Adds an action to perform when the checkout encounters an error.
+    /// Adds an action to perform when validation or configuration errors occur
     ///
-    /// Use this modifier to handle checkout errors:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onFail { error in
-    ///         // Show error alert with details
-    ///         showErrorAlert(error: error)
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when checkout fails
-    /// - Returns: A view with the checkout error handler set
-    public func onFail(_ action: @escaping (CheckoutError) -> Void) -> AcceleratedCheckoutButtons {
-        var newView = self
-        newView.eventHandlers.checkoutDidFail = action
-        return newView
-    }
-
-    /// Adds an action to perform when the checkout is cancelled by the user.
-    ///
-    /// Use this modifier to handle checkout cancellation:
+    /// Use this modifier to handle validation errors and configuration issues:
     ///
     /// ```swift
     /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onCancel {
-    ///         // Reset checkout state
-    ///         resetCheckoutState()
+    ///     .onError { error in
+    ///         switch error {
+    ///         case .validation(let validationError):
+    ///             // Handle validation errors
+    ///             print("Validation failed: \(validationError.description)")
+    ///         }
     ///     }
     /// ```
     ///
-    /// - Parameter action: The action to perform when checkout is cancelled
-    /// - Returns: A view with the checkout cancel handler set
-    public func onCancel(_ action: @escaping () -> Void) -> AcceleratedCheckoutButtons {
+    /// - Parameter action: The action to perform when errors occur
+    /// - Returns: A view with the error handler set
+    public func onError(_ action: @escaping (AcceleratedCheckoutError) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
-        newView.eventHandlers.checkoutDidCancel = action
-        return newView
-    }
-
-    /// Adds an action to determine if checkout should recover from an error.
-    ///
-    /// Use this modifier to handle error recovery decisions:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onShouldRecoverFromError { error in
-    ///         // Return true to attempt recovery, false to fail
-    ///         return error.isRecoverable
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to determine if recovery should be attempted
-    /// - Returns: A view with the error recovery handler set
-    public func onShouldRecoverFromError(
-        _ action: @escaping (CheckoutError) -> Bool
-    ) -> AcceleratedCheckoutButtons {
-        var newView = self
-        newView.eventHandlers.shouldRecoverFromError = action
-        return newView
-    }
-
-    /// Adds an action to perform when a link is clicked during checkout.
-    ///
-    /// Use this modifier to handle link clicks:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onClickLink { url in
-    ///         // Handle external link
-    ///         UIApplication.shared.open(url)
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when a link is clicked
-    /// - Returns: A view with the link click handler set
-    public func onClickLink(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
-        var newView = self
-        newView.eventHandlers.checkoutDidClickLink = action
-        return newView
-    }
-
-    /// Adds an action to perform when a web pixel event is emitted.
-    ///
-    /// Use this modifier to handle web pixel events:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onWebPixelEvent { event in
-    ///         // Track analytics event
-    ///         Analytics.track(event)
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when a pixel event is emitted
-    /// - Returns: A view with the web pixel event handler set
-    public func onWebPixelEvent(_ action: @escaping (PixelEvent) -> Void)
-        -> AcceleratedCheckoutButtons
-    {
-        var newView = self
-        newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
+        newView.eventHandlers.validationDidFail = action
         return newView
     }
 

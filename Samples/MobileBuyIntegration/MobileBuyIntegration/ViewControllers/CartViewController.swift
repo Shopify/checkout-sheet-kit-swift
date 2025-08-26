@@ -148,6 +148,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     private var bag = Set<AnyCancellable>()
 
+    private var checkoutDelegate = CustomCheckoutDelegate()
+
     private var emptyView: UIView!
     private var tableView: UITableView!
     private var buttonContainerView: UIView!
@@ -354,15 +356,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         let acceleratedCheckoutButtonsView = AcceleratedCheckoutButtons(cartID: cartId.rawValue)
             .wallets([.shopPay, .applePay])
             .cornerRadius(10)
-            .onComplete { _ in
-                // Reset cart on successful checkout
-                CartManager.shared.resetCart()
-            }
-            .onFail { error in
-                print("Accelerated checkout failed: \(error)")
-            }
-            .onCancel {
-                print("Accelerated checkout cancelled")
+            .checkout(delegate: checkoutDelegate)
+            .onError { error in
+                // Handle validation errors
+                switch error {
+                case let .validation(validationError):
+                    print("Validation failed: \(validationError.description)")
+                    // You can access specific validation errors:
+                    for userError in validationError.userErrors {
+                        print("Field: \(userError.field ?? []), Message: \(userError.message)")
+                    }
+                }
             }
             .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
             .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
@@ -508,7 +512,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc private func presentCheckout() {
         guard let url = CartManager.shared.cart?.checkoutUrl else { return }
 
-        ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
+        ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: checkoutDelegate)
     }
 
     @objc private func resetCart() {
@@ -533,24 +537,19 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 }
 
-extension CartViewController: CheckoutDelegate {
-    func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
-        resetCart()
+class CustomDelegate: CustomCheckoutDelegate {
+    override func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+        super.checkoutDidComplete(event: event)
 
+        // Reset cart on successful checkout (for both regular and accelerated checkout)
+        CartManager.shared.resetCart()
         ShopifyCheckoutSheetKit.configuration.logger.log("Order created: \(event.orderDetails.id)")
     }
 
-    func checkoutDidCancel() {
-        dismiss(animated: true)
-    }
+    @MainActor
+    override func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
+        super.checkoutDidFail(error: error)
 
-    func checkoutDidClickContactLink(url: URL) {
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        }
-    }
-
-    func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
         var errorMessage = ""
 
         /// Internal Checkout SDK error
@@ -590,88 +589,33 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        switch event {
-        case let .customEvent(customEvent):
-            print("[PIXEL - Custom]", customEvent.name!)
-            if let genericEvent = mapToGenericEvent(customEvent: customEvent) {
-                recordAnalyticsEvent(genericEvent)
-            }
-        case let .standardEvent(standardEvent):
-            print("[PIXEL - Standard]", standardEvent.name!)
-            recordAnalyticsEvent(mapToGenericEvent(standardEvent: standardEvent))
-        }
-    }
-
     private func handleUnrecoverableError(_ message: String = "Checkout unavailable") {
         DispatchQueue.main.async {
-            self.resetCart()
-            self.showAlert(message: message)
+            CartManager.shared.resetCart()
+            // Find the presenting view controller to show alert
+            if let topViewController = self.findTopViewController() {
+                self.showAlert(on: topViewController, message: message)
+            }
         }
     }
-}
 
-extension CartViewController {
-    func showAlert(message: String) {
-        let alert = UIAlertController(title: "Checkout Failed", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in }))
-
-        present(alert, animated: true, completion: nil)
-    }
-}
-
-// analytics examples
-extension CartViewController {
-    private func mapToGenericEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
-        return AnalyticsEvent(
-            name: standardEvent.name!,
-            userId: getUserId(),
-            timestamp: standardEvent.timestamp!,
-            checkoutTotal: standardEvent.data?.checkout?.totalPrice?.amount ?? 0.0
-        )
-    }
-
-    private func mapToGenericEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
-        guard customEvent.name != nil else {
-            print("Failed to parse custom event", customEvent)
+    private func findTopViewController() -> UIViewController? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first
+        else {
             return nil
         }
-        return AnalyticsEvent(
-            name: customEvent.name!,
-            userId: getUserId(),
-            timestamp: customEvent.timestamp!,
-            checkoutTotal: nil
-        )
+
+        var topController = window.rootViewController
+        while let presentedController = topController?.presentedViewController {
+            topController = presentedController
+        }
+        return topController
     }
 
-    private func decodeAndMap(event: CustomEvent, decoder _: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
-        return AnalyticsEvent(
-            name: event.name!,
-            userId: getUserId(),
-            timestamp: event.timestamp!,
-            checkoutTotal: nil
-        )
+    private func showAlert(on viewController: UIViewController, message: String) {
+        let alert = UIAlertController(title: "Checkout Failed", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in }))
+        viewController.present(alert, animated: true, completion: nil)
     }
-
-    private func getUserId() -> String {
-        // return ID for user used in your existing analytics system
-        return "123"
-    }
-
-    func recordAnalyticsEvent(_ event: AnalyticsEvent) {
-        // send the event to an analytics system, e.g. via an analytics sdk
-        appConfiguration.webPixelsLogger.log(event.name)
-    }
-}
-
-// example type, e.g. that may be defined by an analytics sdk
-struct AnalyticsEvent: Codable {
-    var name = ""
-    var userId = ""
-    var timestamp = ""
-    var checkoutTotal: Double? = 0.0
-}
-
-struct CustomPixelEventData: Codable {
-    var customAttribute = 0.0
 }

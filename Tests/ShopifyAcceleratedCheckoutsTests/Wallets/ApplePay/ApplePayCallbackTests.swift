@@ -32,9 +32,7 @@ final class ApplePayCallbackTests: XCTestCase {
     var viewController: ApplePayViewController!
     var mockConfiguration: ApplePayConfigurationWrapper!
     var mockIdentifier: CheckoutIdentifier!
-    var successExpectation: XCTestExpectation!
-    var errorExpectation: XCTestExpectation!
-    var cancelExpectation: XCTestExpectation!
+    var testDelegate: TestCheckoutDelegate!
 
     // MARK: - Setup
 
@@ -69,334 +67,254 @@ final class ApplePayCallbackTests: XCTestCase {
 
         mockIdentifier = .cart(cartID: "gid://Shopify/Cart/test-cart-id")
 
-        // Create SUT
-        viewController = ApplePayViewController(
-            identifier: mockIdentifier,
-            configuration: mockConfiguration
-        )
+        testDelegate = TestCheckoutDelegate()
     }
 
     override func tearDown() {
         viewController = nil
         mockConfiguration = nil
         mockIdentifier = nil
-        successExpectation = nil
-        errorExpectation = nil
-        cancelExpectation = nil
+        testDelegate = nil
         super.tearDown()
     }
 
-    // MARK: - Success Callback Tests
-
-    func testSuccessCallbackInvoked() async {
-        successExpectation = expectation(description: "Success callback should be invoked")
-        let callbackInvokedExpectation = expectation(description: "Callback invoked")
-
-        await MainActor.run {
-            viewController.onCheckoutComplete = { [weak self] _ in
-                callbackInvokedExpectation.fulfill()
-                self?.successExpectation.fulfill()
-            }
-        }
-
-        await MainActor.run {
-            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
-            viewController.onCheckoutComplete?(mockEvent)
-        }
-
-        await fulfillment(of: [successExpectation, callbackInvokedExpectation], timeout: 1.0)
-    }
-
-    func testSuccessCallbackNotInvokedWhenNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutComplete)
-        }
-
-        await MainActor.run {
-            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
-            viewController.onCheckoutComplete?(mockEvent) // Should not crash
-        }
-
-        // Wait a moment to ensure no crash occurs
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-        XCTAssertTrue(true, "Should not crash when callback is nil")
-    }
-
-    // MARK: - Error Callback Tests
-
-    func testErrorCallbackInvoked() async {
-        errorExpectation = expectation(description: "Error callback should be invoked")
-        let callbackInvokedExpectation = expectation(description: "Error callback invoked")
-
-        await MainActor.run {
-            viewController.onCheckoutFail = { [weak self] _ in
-                callbackInvokedExpectation.fulfill()
-                self?.errorExpectation.fulfill()
-            }
-        }
-
-        await MainActor.run {
-            let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
-            viewController.onCheckoutFail?(mockError)
-        }
-
-        await fulfillment(of: [errorExpectation, callbackInvokedExpectation], timeout: 1.0)
-    }
-
-    func testErrorCallbackNotInvokedWhenNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutFail)
-        }
-
-        await MainActor.run {
-            let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
-            viewController.onCheckoutFail?(mockError) // Should not crash
-        }
-
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-        XCTAssertTrue(true, "Should not crash when callback is nil")
-    }
-
-    // MARK: - Cancel Callback Tests
-
-    func testCancelCallbackInvoked() async {
-        cancelExpectation = expectation(description: "Cancel callback should be invoked")
-        let callbackInvokedExpectation = expectation(description: "Cancel callback invoked")
-
-        await MainActor.run {
-            viewController.onCheckoutCancel = { [weak self] in
-                callbackInvokedExpectation.fulfill()
-                self?.cancelExpectation.fulfill()
-            }
-        }
-
-        await MainActor.run {
-            viewController.onCheckoutCancel?()
-        }
-
-        await fulfillment(of: [cancelExpectation, callbackInvokedExpectation], timeout: 1.0)
-    }
-
-    func testCancelCallbackNotInvokedWhenNil() async {
-        let isNil = await MainActor.run {
-            viewController.onCheckoutCancel == nil
-        }
-        XCTAssertTrue(isNil, "onCancel should be nil")
-
-        await MainActor.run {
-            viewController.onCheckoutCancel?() // Should not crash
-        }
-
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-        XCTAssertTrue(true, "Should not crash when callback is nil")
-    }
-
-    // MARK: - No Callback Tests
+    // MARK: - CheckoutDelegate Tests
 
     @MainActor
-    func testNoCallbackWhenCheckoutCancelled() async {
-        var successInvoked = false
-        var errorInvoked = false
-        var cancelInvoked = false
+    func testCheckoutDidComplete_invokesDelegateMethod() async {
+        let expectation = XCTestExpectation(description: "Complete delegate method should be invoked")
+        testDelegate.expectation = expectation
 
-        viewController.onCheckoutComplete = { _ in
-            successInvoked = true
-        }
-        viewController.onCheckoutFail = { _ in
-            errorInvoked = true
-        }
-        viewController.onCheckoutCancel = {
-            cancelInvoked = true
-        }
+        // Create view controller with delegate
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
 
-        viewController.onCheckoutCancel?()
-
-        try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        XCTAssertFalse(successInvoked, "Success callback should not be invoked")
-        XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
-        XCTAssertTrue(cancelInvoked, "Cancel callback should be invoked")
-    }
-
-    // MARK: - Thread Safety Tests
-
-    @MainActor
-    func testCallbackThreadSafety() async {
-        let iterations = 12 // Multiple of 3 for even distribution
-        let successExpectations = (0 ..< iterations / 3).map { _ in expectation(description: "Success") }
-        let errorExpectations = (0 ..< iterations / 3).map { _ in expectation(description: "Error") }
-        let cancelExpectations = (0 ..< iterations / 3).map { _ in expectation(description: "Cancel") }
-
-        var successIndex = 0
-        var errorIndex = 0
-        var cancelIndex = 0
-
-        viewController.onCheckoutComplete = { _ in
-            if successIndex < successExpectations.count {
-                successExpectations[successIndex].fulfill()
-                successIndex += 1
-            }
-        }
-        viewController.onCheckoutFail = { _ in
-            if errorIndex < errorExpectations.count {
-                errorExpectations[errorIndex].fulfill()
-                errorIndex += 1
-            }
-        }
-        viewController.onCheckoutCancel = {
-            if cancelIndex < cancelExpectations.count {
-                cancelExpectations[cancelIndex].fulfill()
-                cancelIndex += 1
-            }
-        }
-
-        for i in 0 ..< iterations {
-            if i % 3 == 0 {
-                let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
-                viewController.onCheckoutComplete?(mockEvent)
-            } else if i % 3 == 1 {
-                let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
-                viewController.onCheckoutFail?(mockError)
-            } else {
-                viewController.onCheckoutCancel?()
-            }
-
-            // Give time for callback to execute
-            try? await Task.sleep(nanoseconds: 50_000_000) // 0.05 seconds
-        }
-
-        // Wait for all expectations
-        await fulfillment(of: successExpectations + errorExpectations + cancelExpectations, timeout: 2.0)
-    }
-
-    // MARK: - Edge Case Tests
-
-    func testMultipleCallbackAssignments() async {
-        let firstCallbackExpectation = expectation(description: "First callback")
-        firstCallbackExpectation.isInverted = true
-        let secondCallbackExpectation = expectation(description: "Second callback")
-
-        await MainActor.run {
-            // First assignment
-            viewController.onCheckoutComplete = { _ in
-                firstCallbackExpectation.fulfill()
-            }
-
-            // Second assignment (should replace first)
-            viewController.onCheckoutComplete = { _ in
-                secondCallbackExpectation.fulfill()
-            }
-        }
-
-        await MainActor.run {
-            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
-            viewController.onCheckoutComplete?(mockEvent)
-        }
-
-        await fulfillment(of: [secondCallbackExpectation], timeout: 1.0)
-        await fulfillment(of: [firstCallbackExpectation], timeout: 0.2)
-    }
-
-    func testMultipleCancelCallbackAssignments() async {
-        let firstCallbackExpectation = expectation(description: "First cancel callback")
-        firstCallbackExpectation.isInverted = true
-        let secondCallbackExpectation = expectation(description: "Second cancel callback")
-
-        await MainActor.run {
-            // First assignment
-            viewController.onCheckoutCancel = {
-                firstCallbackExpectation.fulfill()
-            }
-
-            // Second assignment (should replace first)
-            viewController.onCheckoutCancel = {
-                secondCallbackExpectation.fulfill()
-            }
-        }
-
-        await MainActor.run {
-            viewController.onCheckoutCancel?()
-        }
-
-        await fulfillment(of: [secondCallbackExpectation], timeout: 1.0)
-        await fulfillment(of: [firstCallbackExpectation], timeout: 0.2)
-    }
-
-    // MARK: - shouldRecoverFromError Callback Tests
-
-    @MainActor
-    func testShouldRecoverFromErrorCallbackInvoked() async {
-        let expectation = expectation(description: "shouldRecoverFromError callback should be invoked")
-
-        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .unknown), recoverable: true)
-        var capturedError: ShopifyCheckoutSheetKit.CheckoutError?
-
-        viewController.onShouldRecoverFromError = { error in
-            capturedError = error
-            expectation.fulfill()
-            return true
-        }
-
-        let result = viewController.shouldRecoverFromError(error: testError)
+        let completedEvent = createEmptyCheckoutCompletedEvent(id: "test-order")
+        viewController.checkoutDidComplete(event: completedEvent)
 
         await fulfillment(of: [expectation], timeout: 1.0)
-        XCTAssertNotNil(capturedError, "Error should be passed to callback")
-        XCTAssertTrue(result, "Should return true as returned by callback")
+        XCTAssertTrue(testDelegate.completeCallbackInvoked, "Complete delegate method should be invoked")
     }
-
-    func testShouldRecoverFromErrorCallbackReturnsCorrectValue() async {
-        let callbackExpectation = expectation(description: "Callback invoked")
-
-        await MainActor.run {
-            viewController.onShouldRecoverFromError = { _ in
-                callbackExpectation.fulfill()
-                return true
-            }
-        }
-
-        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test", code: .clientError(code: .unknown), recoverable: true)
-        let result = await MainActor.run {
-            viewController.shouldRecoverFromError(error: testError)
-        }
-
-        await fulfillment(of: [callbackExpectation], timeout: 1.0)
-        XCTAssertTrue(result, "Should return true as specified by callback")
-    }
-
-    // MARK: - checkoutDidClickLink Callback Tests
 
     @MainActor
-    func testCheckoutDidClickLinkCallbackInvoked() async {
-        let expectation = expectation(description: "checkoutDidClickLink callback should be invoked")
+    func testCheckoutDidFail_invokesDelegateMethod() async {
+        testDelegate.reset()
+        let expectation = XCTestExpectation(description: "Fail delegate method should be invoked")
+        testDelegate.expectation = expectation
+
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
+        let checkoutError = CheckoutError.sdkError(
+            underlying: NSError(domain: "TestError", code: 0, userInfo: nil),
+            recoverable: false
+        )
+        viewController.checkoutDidFail(error: checkoutError)
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+        XCTAssertTrue(testDelegate.failCallbackInvoked, "Fail delegate method should be invoked")
+    }
+
+    @MainActor
+    func testCheckoutDidCancel_invokesDelegateMethod() async {
+        testDelegate.reset()
+        let expectation = XCTestExpectation(description: "Cancel delegate method should be invoked")
+        testDelegate.expectation = expectation
+
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
+        viewController.checkoutDidCancel()
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+        XCTAssertTrue(testDelegate.cancelCallbackInvoked, "Cancel delegate method should be invoked")
+    }
+
+    @MainActor
+    func testCheckoutDidClickLink_invokesDelegateMethod() async {
+        testDelegate.reset()
+        let expectation = XCTestExpectation(description: "Link click delegate method should be invoked")
+        testDelegate.expectation = expectation
+
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
         let testURL = URL(string: "https://test-shop.myshopify.com/products/test")!
-        var capturedURL: URL?
-
-        viewController.onCheckoutClickLink = { url in
-            capturedURL = url
-            expectation.fulfill()
-        }
-
         viewController.checkoutDidClickLink(url: testURL)
 
         await fulfillment(of: [expectation], timeout: 1.0)
-        XCTAssertEqual(capturedURL, testURL, "URL should be passed to callback")
-    }
-
-    func testCheckoutDidClickLinkCallbackNotInvokedWhenNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutClickLink)
-        }
-
-        let testURL = URL(string: "https://test-shop.myshopify.com")!
-        await MainActor.run {
-            viewController.checkoutDidClickLink(url: testURL) // Should not crash
-        }
-
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-        XCTAssertTrue(true, "Should not crash when callback is nil")
+        XCTAssertTrue(testDelegate.linkCallbackInvoked, "Link click delegate method should be invoked")
+        XCTAssertEqual(testDelegate.receivedURL, testURL, "URL should be passed to delegate")
     }
 
     @MainActor
+    func testCheckoutDidEmitWebPixelEvent_invokesDelegateMethod() async {
+        testDelegate.reset()
+        let expectation = XCTestExpectation(description: "Web pixel delegate method should be invoked")
+        testDelegate.expectation = expectation
+
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
+        let customEvent = CustomEvent(context: nil, customData: nil, id: "test-id", name: "page_viewed", timestamp: nil)
+        let testEvent = PixelEvent.customEvent(customEvent)
+        viewController.checkoutDidEmitWebPixelEvent(event: testEvent)
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+        XCTAssertTrue(testDelegate.webPixelCallbackInvoked, "Web pixel delegate method should be invoked")
+        // Extract name from the PixelEvent enum
+        let expectedName: String?
+        switch testEvent {
+        case let .customEvent(customEvent):
+            expectedName = customEvent.name
+        case let .standardEvent(standardEvent):
+            expectedName = standardEvent.name
+        }
+
+        let receivedName: String?
+        if let receivedEvent = testDelegate.receivedEvent {
+            switch receivedEvent {
+            case let .customEvent(customEvent):
+                receivedName = customEvent.name
+            case let .standardEvent(standardEvent):
+                receivedName = standardEvent.name
+            }
+        } else {
+            receivedName = nil
+        }
+
+        XCTAssertEqual(receivedName, expectedName, "Event should be passed to delegate")
+    }
+
+    @MainActor
+    func testShouldRecoverFromError() async {
+        testDelegate.reset()
+        testDelegate.recoveryDecision = false
+        let expectation = XCTestExpectation(description: "Should recovery delegate method should be invoked")
+        testDelegate.expectation = expectation
+
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
+        let checkoutError = CheckoutError.sdkError(
+            underlying: NSError(domain: "TestError", code: 0, userInfo: nil),
+            recoverable: true
+        )
+        let shouldRecover = viewController.shouldRecoverFromError(error: checkoutError)
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+        XCTAssertTrue(testDelegate.errorRecoveryAsked, "Error recovery delegate method should be invoked")
+        XCTAssertFalse(shouldRecover, "Should return delegate's decision")
+    }
+
+    // MARK: - No Delegate Tests
+
+    @MainActor
+    func testDelegateMethodsWorkWithoutDelegate() async {
+        // Create view controller without delegate
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration
+        )
+
+        // These should not crash when called without a delegate
+        let completedEvent = createEmptyCheckoutCompletedEvent(id: "test-order")
+        viewController.checkoutDidComplete(event: completedEvent)
+
+        let checkoutError = CheckoutError.sdkError(
+            underlying: NSError(domain: "TestError", code: 0, userInfo: nil),
+            recoverable: false
+        )
+        viewController.checkoutDidFail(error: checkoutError)
+
+        viewController.checkoutDidCancel()
+
+        let testURL = URL(string: "https://test-shop.myshopify.com")!
+        viewController.checkoutDidClickLink(url: testURL)
+
+        let customEvent = CustomEvent(context: nil, customData: nil, id: "test-id", name: "test_event", timestamp: nil)
+        let testEvent = PixelEvent.customEvent(customEvent)
+        viewController.checkoutDidEmitWebPixelEvent(event: testEvent)
+
+        // Wait a moment to ensure no crash occurs
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        XCTAssertTrue(true, "Should not crash when delegate is nil")
+    }
+
+    // MARK: - Multiple Event Tests
+
+    @MainActor
+    func testMultipleEventsWithSameDelegate() async {
+        testDelegate.reset()
+
+        let completeExpectations = [XCTestExpectation(description: "Complete 1"), XCTestExpectation(description: "Complete 2")]
+        let failExpectations = [XCTestExpectation(description: "Fail 1"), XCTestExpectation(description: "Fail 2")]
+        let cancelExpectations = [XCTestExpectation(description: "Cancel 1"), XCTestExpectation(description: "Cancel 2")]
+
+        testDelegate.completeExpectations = completeExpectations
+        testDelegate.failExpectations = failExpectations
+        testDelegate.cancelExpectations = cancelExpectations
+
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
+        // Trigger multiple events
+        for _ in 0 ..< 2 {
+            let completedEvent = createEmptyCheckoutCompletedEvent(id: "test-order")
+            viewController.checkoutDidComplete(event: completedEvent)
+
+            let checkoutError = CheckoutError.sdkError(
+                underlying: NSError(domain: "TestError", code: 0, userInfo: nil),
+                recoverable: false
+            )
+            viewController.checkoutDidFail(error: checkoutError)
+
+            viewController.checkoutDidCancel()
+
+            let testURL = URL(string: "https://test-shop.myshopify.com")!
+            viewController.checkoutDidClickLink(url: testURL)
+
+            let customEvent = CustomEvent(context: nil, customData: nil, id: "test-id", name: "test_event", timestamp: nil)
+            let testEvent = PixelEvent.customEvent(customEvent)
+            viewController.checkoutDidEmitWebPixelEvent(event: testEvent)
+        }
+
+        await fulfillment(of: completeExpectations + failExpectations + cancelExpectations, timeout: 2.0)
+
+        XCTAssertEqual(testDelegate.completeCount, 2, "Should have received 2 complete events")
+        XCTAssertEqual(testDelegate.failCount, 2, "Should have received 2 fail events")
+        XCTAssertEqual(testDelegate.cancelCount, 2, "Should have received 2 cancel events")
+        XCTAssertEqual(testDelegate.linkCount, 2, "Should have received 2 link events")
+        XCTAssertEqual(testDelegate.webPixelCount, 2, "Should have received 2 web pixel events")
+    }
+
+    // MARK: - URL Variation Tests
+
+    @MainActor
     func testCheckoutDidClickLinkWithVariousURLs() async {
+        testDelegate.reset()
+
         let testURLs = [
             URL(string: "https://test-shop.myshopify.com/products/test")!,
             URL(string: "https://external-site.com/page")!,
@@ -408,28 +326,19 @@ final class ApplePayCallbackTests: XCTestCase {
             expectation(description: "URL callback")
         }
 
-        var capturedURLs: [URL] = []
-        var currentIndex = 0
+        testDelegate.expectations = expectations
 
-        viewController.onCheckoutClickLink = { url in
-            capturedURLs.append(url)
-            if currentIndex < expectations.count {
-                expectations[currentIndex].fulfill()
-                currentIndex += 1
-            }
-        }
+        viewController = ApplePayViewController(
+            identifier: mockIdentifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
 
         for url in testURLs {
             viewController.checkoutDidClickLink(url: url)
         }
 
         await fulfillment(of: expectations, timeout: 1.0)
-        XCTAssertEqual(capturedURLs, testURLs, "URLs should be captured in order")
+        XCTAssertEqual(testDelegate.receivedURLs, testURLs, "URLs should be captured in order")
     }
-
-    // MARK: - checkoutDidEmitWebPixelEvent Callback Tests
-
-    // MARK: - Thread Safety Tests for New Callbacks
 }
-
-// Mock types are no longer needed since we're testing callbacks directly

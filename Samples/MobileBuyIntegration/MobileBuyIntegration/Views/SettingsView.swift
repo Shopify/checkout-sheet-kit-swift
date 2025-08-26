@@ -66,6 +66,13 @@ struct SettingsView: View {
                     Toggle("Prefill buyer information", isOn: $config.useVaultedState)
                 }
 
+                Section(header: Text("Accelerated Checkouts")) {
+                    Toggle("Use authenticated customer", isOn: $config.authenticated)
+                    Text("If toggled on, customer information will be attached to cart from your app settings. When toggled off, customer information will be collected from the Apple Pay sheet.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
                 Section(header: Text("Universal Links")) {
                     Toggle("Handle Checkout URLs", isOn: $config.universalLinks.checkout)
                     Toggle("Handle Cart URLs", isOn: $config.universalLinks.cart)
@@ -79,6 +86,7 @@ struct SettingsView: View {
                         "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app."
                     )
                     .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
 
                 Section(header: Text("Theme")) {

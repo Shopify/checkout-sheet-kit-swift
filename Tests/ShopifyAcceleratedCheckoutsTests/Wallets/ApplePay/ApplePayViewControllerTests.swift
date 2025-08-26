@@ -30,6 +30,7 @@ import XCTest
 class ApplePayViewControllerTests: XCTestCase {
     var viewController: ApplePayViewController!
     var mockConfiguration: ApplePayConfigurationWrapper!
+    var testDelegate: TestCheckoutDelegate!
 
     override func setUp() {
         super.setUp()
@@ -68,68 +69,95 @@ class ApplePayViewControllerTests: XCTestCase {
             identifier: identifier,
             configuration: mockConfiguration
         )
+
+        testDelegate = TestCheckoutDelegate()
     }
 
     override func tearDown() {
         viewController = nil
         mockConfiguration = nil
+        testDelegate = nil
         super.tearDown()
     }
 
-    // MARK: - Callback Properties Tests
-
-    func testOnCheckoutSuccessCallback_defaultsToNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutComplete)
-        }
-    }
-
-    func testOnCheckoutErrorCallback_defaultsToNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutFail)
-        }
-    }
-
-    func testOnCheckoutCancelCallback_defaultsToNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutCancel)
-        }
-    }
-
-    // MARK: - Delegate Tests
+    // MARK: - CheckoutDelegate Tests
 
     @MainActor
-    func testCheckoutDidCancel_invokesOnCancelCallback() async {
-        var cancelCallbackInvoked = false
-        let expectation = XCTestExpectation(description: "Cancel callback should be invoked")
+    func testCheckoutDidCancel_invokesDelegateMethod() async {
+        testDelegate.reset()
+        let expectation = XCTestExpectation(description: "Cancel delegate method should be invoked")
+        testDelegate.expectation = expectation
 
-        viewController.onCheckoutCancel = {
-            cancelCallbackInvoked = true
-            expectation.fulfill()
-        }
+        // Create view controller with delegate
+        let identifier = CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id")
+        let viewControllerWithDelegate = ApplePayViewController(
+            identifier: identifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
 
-        viewController.checkoutDidCancel()
+        viewControllerWithDelegate.checkoutDidCancel()
 
         await fulfillment(of: [expectation], timeout: 1.0)
-        XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")
+        XCTAssertTrue(testDelegate.cancelCallbackInvoked, "Cancel delegate method should be invoked when checkoutDidCancel is called")
     }
 
-    func testCheckoutDidCancel_worksWithoutCheckoutViewController() async {
-        XCTAssertNil(viewController.checkoutViewController)
+    @MainActor
+    func testCheckoutDidComplete_invokesDelegateMethod() async {
+        testDelegate.reset()
+        let expectation = XCTestExpectation(description: "Complete delegate method should be invoked")
+        testDelegate.expectation = expectation
 
+        // Create view controller with delegate
+        let identifier = CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id")
+        let viewControllerWithDelegate = ApplePayViewController(
+            identifier: identifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
+        // Create a mock checkout completed event
+        let completedEvent = createEmptyCheckoutCompletedEvent(id: "test-order")
+
+        viewControllerWithDelegate.checkoutDidComplete(event: completedEvent)
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+        XCTAssertTrue(testDelegate.completeCallbackInvoked, "Complete delegate method should be invoked when checkoutDidComplete is called")
+    }
+
+    @MainActor
+    func testCheckoutDidFail_invokesDelegateMethod() async {
+        testDelegate.reset()
+        let expectation = XCTestExpectation(description: "Fail delegate method should be invoked")
+        testDelegate.expectation = expectation
+
+        // Create view controller with delegate
+        let identifier = CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id")
+        let viewControllerWithDelegate = ApplePayViewController(
+            identifier: identifier,
+            configuration: mockConfiguration,
+            checkoutDelegate: testDelegate
+        )
+
+        // Create a mock checkout error
+        let checkoutError = CheckoutError.configurationError(
+            message: "Test error",
+            code: .unknown,
+            recoverable: false
+        )
+
+        viewControllerWithDelegate.checkoutDidFail(error: checkoutError)
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+        XCTAssertTrue(testDelegate.failCallbackInvoked, "Fail delegate method should be invoked when checkoutDidFail is called")
+    }
+
+    func testCheckoutDidCancel_worksWithoutDelegate() async {
+        // Test that checkoutDidCancel works without a delegate (should not crash)
         await MainActor.run {
             viewController.checkoutDidCancel()
         }
-    }
-
-    func testCheckoutDidCancel_worksWithoutOnCancelCallback() async {
-        let isNil = await MainActor.run {
-            viewController.onCheckoutCancel == nil
-        }
-        XCTAssertTrue(isNil, "onCancel should be nil")
-
-        await MainActor.run {
-            viewController.checkoutDidCancel()
-        }
+        // If we get here without crashing, the test passes
+        XCTAssertTrue(true, "checkoutDidCancel should work without a delegate")
     }
 }

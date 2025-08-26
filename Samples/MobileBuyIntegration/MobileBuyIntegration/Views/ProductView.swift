@@ -38,6 +38,8 @@ struct ProductView: View {
     @State private var descriptionExpanded: Bool = false
     @State private var addedToCart: Bool = false
 
+    let checkoutDelegate = CustomCheckoutDelegate()
+
     init(product: Storefront.Product) {
         _product = State(initialValue: product)
     }
@@ -134,12 +136,8 @@ struct ProductView: View {
                             AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
                                 .wallets([.applePay])
                                 .cornerRadius(DesignSystem.cornerRadius)
-                                .onFail { error in
-                                    print("Accelerated checkout failed: \(error)")
-                                }
-                                .onCancel {
-                                    print("Accelerated checkout cancelled")
-                                }
+                                .checkout(delegate: checkoutDelegate)
+                                .onError(AcceleratedCheckoutHandlers.handleError)
                                 .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
                                 .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
                         }
