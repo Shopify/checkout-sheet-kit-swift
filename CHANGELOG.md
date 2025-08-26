@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.0-rc.6 - August 26, 2025
+
+- AC: Expose CheckoutIdentifier publicly, conform Wallet & RequiredContactFields enums to String to avoid RN mapping functions, include `reason` in RenderState.error by @kieran-osgood-shopify in https://github.com/Shopify/checkout-sheet-kit-swift/pull/402
+- AC: Fix: Move log inside of guard by @kieran-osgood-shopify in https://github.com/Shopify/checkout-sheet-kit-swift/pull/399
+
 ## 3.4.0-rc.5 - August 18, 2025
 
 - [AC]: Ensure `customer` is attached to cart only when not requested in payment sheet (#385)
