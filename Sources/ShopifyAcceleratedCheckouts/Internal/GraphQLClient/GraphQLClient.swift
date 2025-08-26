@@ -55,13 +55,13 @@ class GraphQLClient {
     /// - Parameter operation: The GraphQL query operation
     /// - Returns: The decoded response
     func query<T: Decodable>(_ operation: GraphQLRequest<T>) async throws -> GraphQLResponse<T> {
-        logger.debug("GraphQL query started: \(operation.operationName ?? "unknown")")
+        logger.debug("GraphQL query started")
         do {
             let result = try await execute(operation: operation)
-            logger.debug("GraphQL query completed successfully: \(operation.operationName ?? "unknown")")
+            logger.debug("GraphQL query completed successfully")
             return result
         } catch {
-            logger.error("GraphQL query failed: \(operation.operationName ?? "unknown")")
+            logger.error("GraphQL query failed")
             throw error
         }
     }
@@ -70,13 +70,13 @@ class GraphQLClient {
     /// - Parameter operation: The GraphQL mutation operation
     /// - Returns: The decoded response
     func mutate<T: Decodable>(_ operation: GraphQLRequest<T>) async throws -> GraphQLResponse<T> {
-        logger.debug("GraphQL mutation started: \(operation.operationName ?? "unknown")")
+        logger.debug("GraphQL mutation started")
         do {
             let result = try await execute(operation: operation)
-            logger.debug("GraphQL mutation completed successfully: \(operation.operationName ?? "unknown")")
+            logger.debug("GraphQL mutation completed successfully")
             return result
         } catch {
-            logger.error("GraphQL mutation failed: \(operation.operationName ?? "unknown")")
+            logger.error("GraphQL mutation failed")
             throw error
         }
     }

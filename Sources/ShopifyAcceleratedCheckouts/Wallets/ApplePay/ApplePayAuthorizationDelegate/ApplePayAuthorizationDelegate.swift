@@ -45,7 +45,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     let configuration: ApplePayConfigurationWrapper
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
     var controller: PayController
-    private let logger = ShopifyAcceleratedCheckouts.logger.extend("ApplePayAuthorizationDelegate")
+    internal let logger = ShopifyAcceleratedCheckouts.logger.extend("ApplePayAuthorizationDelegate")
 
     /// Factory for creating PaymentAuthorizationController instances - injectable for testing
     var paymentControllerFactory: PKAuthorizationControllerFactory
