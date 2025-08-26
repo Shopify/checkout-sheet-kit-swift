@@ -144,7 +144,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         let availableShippingMethods = pkDecoder.shippingMethods
         let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
         let methodToUse: PKShippingMethod = isValidMethod ? shippingMethod : (availableShippingMethods.first ?? shippingMethod)
-        
+
         if !isValidMethod {
             logger.debug("Selected shipping method invalid, using fallback method")
         }

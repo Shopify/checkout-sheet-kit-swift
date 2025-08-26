@@ -39,7 +39,7 @@ public class OSLogger {
     private var namespaces: [String] = []
     private weak var parent: OSLogger?
     private var children = NSHashTable<OSLogger>.weakObjects()
-    
+
     package var logLevel: LogLevel {
         didSet {
             propagateLogLevel(logLevel)
@@ -57,49 +57,49 @@ public class OSLogger {
         self.prefix = prefix
         self.logLevel = logLevel
     }
-    
+
     public func extend(_ namespace: String) -> OSLogger {
         let childLogger = OSLogger(prefix: prefix, logLevel: logLevel)
-        childLogger.namespaces = self.namespaces + [namespace]
+        childLogger.namespaces = namespaces + [namespace]
         childLogger.parent = self
         children.add(childLogger)
         return childLogger
     }
-    
+
     private func propagateLogLevel(_ newLevel: LogLevel) {
         for child in children.allObjects {
             child.logLevel = newLevel
         }
     }
-    
+
     private var namespacesString: String {
         namespaces.isEmpty ? "" : "[\(namespaces.joined(separator: "]["))]"
     }
 
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
-        
+
         let fullMessage = "[\(prefix)]\(namespacesString) (Debug) - \(message)"
         sendToOSLog(fullMessage, type: .debug)
     }
 
     public func info(_ message: String) {
         guard shouldEmit(.debug) else { return }
-        
+
         let fullMessage = "[\(prefix)]\(namespacesString) (Info) - \(message)"
         sendToOSLog(fullMessage, type: .info)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
-        
+
         let fullMessage = "[\(prefix)]\(namespacesString) (Error) - \(message)"
         sendToOSLog(fullMessage, type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
-        
+
         let fullMessage = "[\(prefix)]\(namespacesString) (Fault) - \(message)"
         sendToOSLog(fullMessage, type: .fault)
     }
