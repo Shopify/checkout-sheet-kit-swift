@@ -27,7 +27,7 @@ import PassKit
 @available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
     /// Contact field types that can be required during Apple Pay checkout.
-    public enum RequiredContactFields {
+    public enum RequiredContactFields: String {
         case email
         case phone
     }
