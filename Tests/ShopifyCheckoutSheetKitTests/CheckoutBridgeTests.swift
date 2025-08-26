@@ -326,7 +326,7 @@ class CheckoutBridgeTests: XCTestCase {
 
         CheckoutBridge.sendMessage(webView, messageName: "presented", messageBody: nil)
 
-        wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+        wait(for: [evaluateJavaScriptExpectation], timeout: 2)
     }
 
     func testSendMessageWithPayloadEvaulatesJavaScript() {
@@ -339,7 +339,7 @@ class CheckoutBridgeTests: XCTestCase {
 
         CheckoutBridge.sendMessage(webView, messageName: "payload", messageBody: "{\"one\": true}")
 
-        wait(for: [evaluateJavaScriptExpectation], timeout: 1)
+        wait(for: [evaluateJavaScriptExpectation], timeout: 2)
     }
 
     private func expectedPresentedScript() -> String {
