@@ -26,7 +26,7 @@ import WebKit
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
     weak var delegate: CheckoutDelegate?
-
+    var checkoutViewDidFailWithErrorCount = 0
     var checkoutView: CheckoutWebView
 
     lazy var progressBar: ProgressBarView = {
@@ -218,12 +218,15 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         CheckoutWebView.invalidate(disconnect: false)
         delegate?.checkoutDidComplete(event: event)
     }
-
+    
     func checkoutViewDidFailWithError(error: CheckoutError) {
+        checkoutViewDidFailWithErrorCount += 1
         CheckoutWebView.invalidate()
         delegate?.checkoutDidFail(error: error)
-
-        let shouldAttemptRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
+        
+        let shouldAttemptRecovery = checkoutViewDidFailWithErrorCount < 3
+            ? delegate?.shouldRecoverFromError(error: error) ?? false
+            : false
 
         if canRecoverFromError(error), shouldAttemptRecovery {
             presentFallbackViewController(url: checkoutURL)
