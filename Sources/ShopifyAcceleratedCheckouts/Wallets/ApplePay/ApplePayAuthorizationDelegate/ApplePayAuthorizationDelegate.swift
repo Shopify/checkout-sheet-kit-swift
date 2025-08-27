@@ -241,20 +241,6 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         }
     }
 
-    func getTopViewController() -> UIViewController? {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first
-        else {
-            return nil
-        }
-
-        var topController = window.rootViewController
-        while let presentedController = topController?.presentedViewController {
-            topController = presentedController
-        }
-        return topController
-    }
-
     func upsertShippingAddress(to address: StorefrontAPI.Types.Address, validate: Bool = false)
         async throws -> StorefrontAPI.Types.Cart
     {
