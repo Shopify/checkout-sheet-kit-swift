@@ -124,7 +124,7 @@ extension ShopPayViewController: CheckoutDelegate {
     }
 
     func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return eventHandlers.shouldRecoverFromError?(error) ?? false
+        return eventHandlers.shouldRecoverFromError?(error) ?? error.isRecoverable
     }
 
     func checkoutDidClickLink(url: URL) {

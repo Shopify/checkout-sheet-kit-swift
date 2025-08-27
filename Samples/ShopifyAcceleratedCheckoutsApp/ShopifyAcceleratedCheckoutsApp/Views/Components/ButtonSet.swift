@@ -58,8 +58,7 @@ struct ButtonSet: View {
                         }
                         .onShouldRecoverFromError { error in
                             print("🔄 Should recover from error: \(error)")
-                            // Return true to attempt recovery, false to fail
-                            return true
+                            return error.isRecoverable
                         }
                         .onClickLink { url in
                             print("🔗 Link clicked: \(url)")
