@@ -63,7 +63,10 @@ extension ApplePayAuthorizationDelegate {
             )
         }
 
-        static let addressUnserviceableError = PKPaymentError(
-            .shippingAddressUnserviceableError)
+        static var addressUnserviceableError: Error {
+            PKPaymentRequest.paymentShippingAddressUnserviceableError(
+                withLocalizedDescription: "Invalid shipping address"
+            )
+        }
     }
 }
