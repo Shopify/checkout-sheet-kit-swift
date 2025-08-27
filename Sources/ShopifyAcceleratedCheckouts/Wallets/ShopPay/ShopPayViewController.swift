@@ -48,36 +48,13 @@ class ShopPayViewController: WalletController {
 
     func present() async throws {
         do {
-            let cart = try await fetch()
-            guard let url = try? await buildRedirectUrl() else {
+            let cart = try await getCartByCheckoutIdentifier()
+            guard let url = cart.checkoutUrl.url.appendQueryParam(name: "payment", value: "shop_pay") else {
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
             }
             try await present(url: url, delegate: self)
         } catch {
             ShopifyAcceleratedCheckouts.logger.error("[present] Failed to setup cart: \(error)")
-        }
-    }
-
-    private func buildRedirectUrl() async throws -> URL? {
-        guard let checkoutUrl = try await getCheckoutUrl() else {
-            return nil
-        }
-
-        return checkoutUrl.appendQueryParam(name: "payment", value: "shop_pay")
-    }
-
-    private func getCheckoutUrl() async throws -> URL? {
-        switch identifier {
-        case let .cart(id):
-            let cart = try await storefront.cart(by: .init(id))
-            return cart?.checkoutUrl.url
-        case let .variant(_, quantity):
-            return URL(
-                string:
-                    "https://\(configuration.storefrontDomain)/cart/\(identifier.getTokenComponent()):\(quantity)"
-            )
-        case .invariant:
-            return nil
         }
     }
 }

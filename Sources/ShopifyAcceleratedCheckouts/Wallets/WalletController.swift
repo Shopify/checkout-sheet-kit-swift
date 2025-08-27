@@ -35,7 +35,7 @@ class WalletController: ObservableObject {
         self.storefront = storefront
     }
 
-    func fetch() async throws -> StorefrontAPI.Types.Cart {
+    func getCartByCheckoutIdentifier() async throws -> StorefrontAPI.Types.Cart {
         switch identifier {
         case let .cart(id):
             guard let cart = try await storefront.cart(by: .init(id)) else {

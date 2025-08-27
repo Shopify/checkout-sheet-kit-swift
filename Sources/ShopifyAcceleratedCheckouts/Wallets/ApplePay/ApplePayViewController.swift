@@ -166,7 +166,7 @@ class ApplePayViewController: WalletController, PayController {
 
     func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart {
         do {
-            return try await fetch()
+            return try await getCartByCheckoutIdentifier()
         } catch let error as StorefrontAPI.Errors {
             return try await handleStorefrontError(error)
         } catch {
