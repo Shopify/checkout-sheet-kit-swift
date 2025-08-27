@@ -25,8 +25,60 @@
 import WebKit
 import XCTest
 
+class MockCheckoutDelegate: CheckoutDelegate {
+    var shouldRecoverFromErrorResult: Bool = false
+    var checkoutDidFailCalled = false
+    var checkoutDidCancelCalled = false
+    var checkoutDidCompleteCalled = false
+    var checkoutDidClickLinkCalled = false
+    var checkoutDidEmitWebPixelEventCalled = false
+
+    func checkoutDidFail(error _: CheckoutError) {
+        checkoutDidFailCalled = true
+    }
+
+    func checkoutDidCancel() {
+        checkoutDidCancelCalled = true
+    }
+
+    func checkoutDidComplete(event _: CheckoutCompletedEvent) {
+        checkoutDidCompleteCalled = true
+    }
+
+    func checkoutDidClickLink(url _: URL) {
+        checkoutDidClickLinkCalled = true
+    }
+
+    func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {
+        checkoutDidEmitWebPixelEventCalled = true
+    }
+
+    func shouldRecoverFromError(error _: CheckoutError) -> Bool {
+        return shouldRecoverFromErrorResult
+    }
+}
+
+class TestableCheckoutWebViewController: CheckoutWebViewController {
+    var presentFallbackViewControllerCalled = false
+    var dismissCalled = false
+    var presentFallbackViewControllerURL: URL?
+    var dismissAnimated: Bool?
+
+    override func presentFallbackViewController(url: URL) {
+        presentFallbackViewControllerCalled = true
+        presentFallbackViewControllerURL = url
+    }
+
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        dismissCalled = true
+        dismissAnimated = flag
+        completion?()
+    }
+}
+
 class CheckoutWebViewControllerTests: XCTestCase {
     private let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
+    private let multipassURL = URL(string: "http://shopify1.shopify.com/checkouts/cn/123?multipass=token")!
 
     func test_init_withNilEntryPoint_shouldSetCorrectUserAgent() {
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: nil)
@@ -40,5 +92,110 @@ class CheckoutWebViewControllerTests: XCTestCase {
 
         let expectedUserAgent = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
         XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
+    }
+
+    func test_checkoutViewDidFailWithError_incrementsErrorCount() {
+        let mockDelegate = MockCheckoutDelegate()
+        let viewController = CheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 0)
+
+        let error = CheckoutError.checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: false)
+        viewController.checkoutViewDidFailWithError(error: error)
+
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
+        XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
+    }
+
+    func test_checkoutViewDidFailWithError_attemptsRecoveryWhenCountLessThanThreeAndDelegateAllows() {
+        let mockDelegate = MockCheckoutDelegate()
+        mockDelegate.shouldRecoverFromErrorResult = true
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+
+        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
+        viewController.checkoutViewDidFailWithError(error: error)
+
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
+        XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
+        XCTAssertEqual(viewController.presentFallbackViewControllerURL, url)
+        XCTAssertFalse(viewController.dismissCalled)
+    }
+
+    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenCountReachesThree() {
+        let mockDelegate = MockCheckoutDelegate()
+        mockDelegate.shouldRecoverFromErrorResult = true
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+
+        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
+
+        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: error)
+
+        XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
+        XCTAssertFalse(viewController.dismissCalled)
+
+        viewController.checkoutViewDidFailWithError(error: error)
+
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
+        XCTAssertTrue(viewController.dismissCalled)
+        XCTAssertEqual(viewController.dismissAnimated, true)
+    }
+
+    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenDelegateDeclines() {
+        let mockDelegate = MockCheckoutDelegate()
+        mockDelegate.shouldRecoverFromErrorResult = false
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+
+        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
+        viewController.checkoutViewDidFailWithError(error: error)
+
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
+        XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
+        XCTAssertTrue(viewController.dismissCalled)
+        XCTAssertEqual(viewController.dismissAnimated, true)
+        XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
+    }
+
+    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryForMultipassURL() {
+        let mockDelegate = MockCheckoutDelegate()
+        mockDelegate.shouldRecoverFromErrorResult = true
+        let viewController = TestableCheckoutWebViewController(checkoutURL: multipassURL, delegate: mockDelegate, entryPoint: nil)
+
+        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
+        viewController.checkoutViewDidFailWithError(error: error)
+
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
+        XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
+        XCTAssertTrue(viewController.dismissCalled)
+        XCTAssertEqual(viewController.dismissAnimated, true)
+        XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
+    }
+
+    func test_checkoutViewDidFailWithError_attemptsRecoveryForFirstTwoFailuresThenDismisses() {
+        let mockDelegate = MockCheckoutDelegate()
+        mockDelegate.shouldRecoverFromErrorResult = true
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+
+        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
+
+        viewController.checkoutViewDidFailWithError(error: error)
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
+        XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
+        XCTAssertFalse(viewController.dismissCalled)
+
+        viewController.presentFallbackViewControllerCalled = false
+
+        viewController.checkoutViewDidFailWithError(error: error)
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 2)
+        XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
+        XCTAssertFalse(viewController.dismissCalled)
+
+        viewController.presentFallbackViewControllerCalled = false
+
+        viewController.checkoutViewDidFailWithError(error: error)
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
+        XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
+        XCTAssertTrue(viewController.dismissCalled)
+        XCTAssertEqual(viewController.dismissAnimated, true)
     }
 }

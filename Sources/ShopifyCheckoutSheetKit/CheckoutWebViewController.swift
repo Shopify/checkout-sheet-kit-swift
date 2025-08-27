@@ -167,7 +167,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
         delegate?.checkoutDidCancel()
     }
 
-    private func presentFallbackViewController(url: URL) {
+    package func presentFallbackViewController(url: URL) {
         progressObserver?.invalidate()
         checkoutView.removeFromSuperview()
 
@@ -218,12 +218,12 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         CheckoutWebView.invalidate(disconnect: false)
         delegate?.checkoutDidComplete(event: event)
     }
-    
+
     func checkoutViewDidFailWithError(error: CheckoutError) {
         checkoutViewDidFailWithErrorCount += 1
         CheckoutWebView.invalidate()
         delegate?.checkoutDidFail(error: error)
-        
+
         let shouldAttemptRecovery = checkoutViewDidFailWithErrorCount < 3
             ? delegate?.shouldRecoverFromError(error: error) ?? false
             : false
