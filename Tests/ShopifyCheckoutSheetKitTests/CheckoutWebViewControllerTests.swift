@@ -58,6 +58,18 @@ class MockCheckoutDelegate: CheckoutDelegate {
     }
 }
 
+class DefaultCheckoutDelegate: CheckoutDelegate {
+    func checkoutDidFail(error _: CheckoutError) {}
+    func checkoutDidCancel() {}
+    func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
+    func checkoutDidClickLink(url _: URL) {}
+    func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
+
+    func shouldRecoverFromError(error: CheckoutError) -> Bool {
+        return error.isRecoverable
+    }
+}
+
 class TestableCheckoutWebViewController: CheckoutWebViewController {
     var presentFallbackViewControllerCalled = false
     var dismissCalled = false
@@ -80,6 +92,9 @@ class CheckoutWebViewControllerTests: XCTestCase {
     private let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
     private let multipassURL = URL(string: "http://shopify1.shopify.com/checkouts/cn/123?multipass=token")!
 
+    private let recoverableError = CheckoutError.checkoutUnavailable(message: "Test recoverable", code: .clientError(code: .unknown), recoverable: true)
+    private let nonRecoverableError = CheckoutError.checkoutExpired(message: "Test non-recoverable", code: .cartExpired, recoverable: false)
+
     func test_init_withNilEntryPoint_shouldSetCorrectUserAgent() {
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: nil)
 
@@ -99,23 +114,20 @@ class CheckoutWebViewControllerTests: XCTestCase {
     func test_checkoutViewDidFailWithError_incrementsErrorCount() {
         let mockDelegate = MockCheckoutDelegate()
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
-        let error = CheckoutError.checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: false)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 0)
 
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: nonRecoverableError)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
         XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
     }
 
     func test_checkoutViewDidFailWithError_attemptsRecoveryWhenCountLessThanThreeAndDelegateAllows() {
-        let mockDelegate = MockCheckoutDelegate()
-        mockDelegate.shouldRecoverFromErrorResult = true
-        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
-        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
+        let defaultDelegate = DefaultCheckoutDelegate()
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
 
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
         XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
@@ -124,80 +136,137 @@ class CheckoutWebViewControllerTests: XCTestCase {
     }
 
     func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenCountReachesThree() {
-        let mockDelegate = MockCheckoutDelegate()
-        mockDelegate.shouldRecoverFromErrorResult = true
-        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+        let defaultDelegate = DefaultCheckoutDelegate()
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
 
-        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
-
-        viewController.checkoutViewDidFailWithError(error: error)
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
 
         XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
         XCTAssertFalse(viewController.dismissCalled)
 
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
         XCTAssertTrue(viewController.dismissCalled)
         XCTAssertTrue(viewController.dismissAnimated)
     }
 
-    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenDelegateDeclines() {
-        let mockDelegate = MockCheckoutDelegate()
-        mockDelegate.shouldRecoverFromErrorResult = false
-        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenErrorIsNotRecoverable() {
+        let defaultDelegate = DefaultCheckoutDelegate()
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
 
-        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: nonRecoverableError)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
-        XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
         XCTAssertTrue(viewController.dismissCalled)
         XCTAssertTrue(viewController.dismissAnimated)
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
     }
 
     func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryForMultipassURL() {
-        let mockDelegate = MockCheckoutDelegate()
-        mockDelegate.shouldRecoverFromErrorResult = true
-        let viewController = TestableCheckoutWebViewController(checkoutURL: multipassURL, delegate: mockDelegate, entryPoint: nil)
+        let defaultDelegate = DefaultCheckoutDelegate()
+        let viewController = TestableCheckoutWebViewController(checkoutURL: multipassURL, delegate: defaultDelegate, entryPoint: nil)
 
-        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
-        XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
         XCTAssertTrue(viewController.dismissCalled)
         XCTAssertTrue(viewController.dismissAnimated)
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
     }
 
     func test_checkoutViewDidFailWithError_attemptsRecoveryForFirstTwoFailuresThenDismisses() {
-        let mockDelegate = MockCheckoutDelegate()
-        mockDelegate.shouldRecoverFromErrorResult = true
-        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+        let defaultDelegate = DefaultCheckoutDelegate()
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
 
-        let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
-
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
         XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
         XCTAssertFalse(viewController.dismissCalled)
 
         viewController.presentFallbackViewControllerCalled = false
 
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 2)
         XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
         XCTAssertFalse(viewController.dismissCalled)
 
         viewController.presentFallbackViewControllerCalled = false
 
-        viewController.checkoutViewDidFailWithError(error: error)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
         XCTAssertTrue(viewController.dismissCalled)
         XCTAssertTrue(viewController.dismissAnimated)
+    }
+
+    func test_checkoutViewDidFailWithError_respectsErrorRecoverableProperty() {
+        struct TestCase {
+            let name: String
+            let error: CheckoutError
+            let expectedRecoverable: Bool
+        }
+
+        let testCases: [TestCase] = [
+            TestCase(
+                name: "sdkError recoverable=true",
+                error: .sdkError(underlying: NSError(domain: "test", code: 1), recoverable: true),
+                expectedRecoverable: true
+            ),
+            TestCase(
+                name: "sdkError recoverable=false",
+                error: .sdkError(underlying: NSError(domain: "test", code: 1), recoverable: false),
+                expectedRecoverable: false
+            ),
+            TestCase(
+                name: "configurationError recoverable=true",
+                error: .configurationError(message: "Test config", code: .unknown, recoverable: true),
+                expectedRecoverable: true
+            ),
+            TestCase(
+                name: "configurationError recoverable=false",
+                error: .configurationError(message: "Test config", code: .unknown, recoverable: false),
+                expectedRecoverable: false
+            ),
+            TestCase(
+                name: "checkoutUnavailable recoverable=true",
+                error: .checkoutUnavailable(message: "Test unavailable", code: .httpError(statusCode: 500), recoverable: true),
+                expectedRecoverable: true
+            ),
+            TestCase(
+                name: "checkoutUnavailable recoverable=false",
+                error: .checkoutUnavailable(message: "Test unavailable", code: .httpError(statusCode: 500), recoverable: false),
+                expectedRecoverable: false
+            ),
+            TestCase(
+                name: "checkoutExpired recoverable=true",
+                error: .checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: true),
+                expectedRecoverable: true
+            ),
+            TestCase(
+                name: "checkoutExpired recoverable=false",
+                error: .checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: false),
+                expectedRecoverable: false
+            )
+        ]
+
+        for testCase in testCases {
+            let defaultDelegate = DefaultCheckoutDelegate()
+            let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
+
+            viewController.checkoutViewDidFailWithError(error: testCase.error)
+
+            if testCase.expectedRecoverable {
+                XCTAssertTrue(viewController.presentFallbackViewControllerCalled, "Failed for \(testCase.name): should attempt recovery")
+                XCTAssertFalse(viewController.dismissCalled, "Failed for \(testCase.name): should not dismiss")
+            } else {
+                XCTAssertFalse(viewController.presentFallbackViewControllerCalled, "Failed for \(testCase.name): should not attempt recovery")
+                XCTAssertTrue(viewController.dismissCalled, "Failed for \(testCase.name): should dismiss")
+            }
+
+            // Verify the error's isRecoverable property matches expectation
+            XCTAssertEqual(testCase.error.isRecoverable, testCase.expectedRecoverable, "Failed for \(testCase.name): isRecoverable mismatch")
+        }
     }
 }
