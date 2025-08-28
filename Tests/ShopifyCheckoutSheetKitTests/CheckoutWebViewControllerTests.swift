@@ -62,7 +62,7 @@ class TestableCheckoutWebViewController: CheckoutWebViewController {
     var presentFallbackViewControllerCalled = false
     var dismissCalled = false
     var presentFallbackViewControllerURL: URL?
-    var dismissAnimated: Bool?
+    var dismissAnimated: Bool = false
 
     override func presentFallbackViewController(url: URL) {
         presentFallbackViewControllerCalled = true
@@ -84,6 +84,7 @@ class CheckoutWebViewControllerTests: XCTestCase {
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: nil)
 
         let expectedUserAgent = CheckoutBridge.applicationName(entryPoint: nil)
+
         XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
     }
 
@@ -91,16 +92,17 @@ class CheckoutWebViewControllerTests: XCTestCase {
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: .acceleratedCheckouts)
 
         let expectedUserAgent = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
+
         XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
     }
 
     func test_checkoutViewDidFailWithError_incrementsErrorCount() {
         let mockDelegate = MockCheckoutDelegate()
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
+        let error = CheckoutError.checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: false)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 0)
 
-        let error = CheckoutError.checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: false)
         viewController.checkoutViewDidFailWithError(error: error)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
@@ -111,8 +113,8 @@ class CheckoutWebViewControllerTests: XCTestCase {
         let mockDelegate = MockCheckoutDelegate()
         mockDelegate.shouldRecoverFromErrorResult = true
         let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
-
         let error = CheckoutError.checkoutUnavailable(message: "Test unavailable", code: .clientError(code: .unknown), recoverable: true)
+
         viewController.checkoutViewDidFailWithError(error: error)
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
@@ -138,7 +140,7 @@ class CheckoutWebViewControllerTests: XCTestCase {
 
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
         XCTAssertTrue(viewController.dismissCalled)
-        XCTAssertEqual(viewController.dismissAnimated, true)
+        XCTAssertTrue(viewController.dismissAnimated)
     }
 
     func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenDelegateDeclines() {
@@ -152,7 +154,7 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
         XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
         XCTAssertTrue(viewController.dismissCalled)
-        XCTAssertEqual(viewController.dismissAnimated, true)
+        XCTAssertTrue(viewController.dismissAnimated)
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
     }
 
@@ -167,7 +169,7 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
         XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
         XCTAssertTrue(viewController.dismissCalled)
-        XCTAssertEqual(viewController.dismissAnimated, true)
+        XCTAssertTrue(viewController.dismissAnimated)
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
     }
 
@@ -196,6 +198,6 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
         XCTAssertTrue(viewController.dismissCalled)
-        XCTAssertEqual(viewController.dismissAnimated, true)
+        XCTAssertTrue(viewController.dismissAnimated)
     }
 }
