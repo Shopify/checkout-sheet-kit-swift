@@ -224,15 +224,21 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         CheckoutWebView.invalidate()
         delegate?.checkoutDidFail(error: error)
 
-        let shouldAttemptRecovery = checkoutViewDidFailWithErrorCount < 3
-            ? delegate?.shouldRecoverFromError(error: error) ?? false
-            : false
-
-        if canRecoverFromError(error), shouldAttemptRecovery {
+        if shouldAttemptRecovery(for: error) {
             presentFallbackViewController(url: checkoutURL)
         } else {
             dismiss(animated: true)
         }
+    }
+
+    /// When checkout fails to load we attempt to connect via
+    /// recovery mode *once* with CheckoutBridge disabled to avoid
+    /// excessive load on potentially degraded services.
+    func shouldAttemptRecovery(for error: CheckoutError) -> Bool {
+        let isWithinRetryLimit = checkoutViewDidFailWithErrorCount < 2
+        let delegateWantsRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
+
+        return isRecoverableError() && isWithinRetryLimit && delegateWantsRecovery
     }
 
     func checkoutViewDidClickLink(url: URL) {
@@ -249,7 +255,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         delegate?.checkoutDidEmitWebPixelEvent(event: event)
     }
 
-    private func canRecoverFromError(_: CheckoutError) -> Bool {
+    private func isRecoverableError() -> Bool {
         /// Reuse of multipass tokens will cause 422 errors. A new token must be generated
         return !CheckoutURL(from: checkoutURL).isMultipassURL()
     }

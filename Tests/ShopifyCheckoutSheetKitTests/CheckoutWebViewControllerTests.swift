@@ -123,7 +123,7 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertTrue(mockDelegate.checkoutDidFailCalled)
     }
 
-    func test_checkoutViewDidFailWithError_attemptsRecoveryWhenCountLessThanThreeAndDelegateAllows() {
+    func test_checkoutViewDidFailWithError_attemptsRecoveryWhenCountLessThanTwoAndDelegateAllows() {
         let defaultDelegate = DefaultCheckoutDelegate()
         let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
 
@@ -135,11 +135,10 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertFalse(viewController.dismissCalled)
     }
 
-    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenCountReachesThree() {
+    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryWhenCountReachesTwo() {
         let defaultDelegate = DefaultCheckoutDelegate()
         let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
 
-        viewController.checkoutViewDidFailWithError(error: recoverableError)
         viewController.checkoutViewDidFailWithError(error: recoverableError)
 
         XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
@@ -147,7 +146,7 @@ class CheckoutWebViewControllerTests: XCTestCase {
 
         viewController.checkoutViewDidFailWithError(error: recoverableError)
 
-        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 2)
         XCTAssertTrue(viewController.dismissCalled)
         XCTAssertTrue(viewController.dismissAnimated)
     }
@@ -176,7 +175,7 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
     }
 
-    func test_checkoutViewDidFailWithError_attemptsRecoveryForFirstTwoFailuresThenDismisses() {
+    func test_checkoutViewDidFailWithError_attemptsRecoveryForFirstFailureThenDismisses() {
         let defaultDelegate = DefaultCheckoutDelegate()
         let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
 
@@ -189,13 +188,6 @@ class CheckoutWebViewControllerTests: XCTestCase {
 
         viewController.checkoutViewDidFailWithError(error: recoverableError)
         XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 2)
-        XCTAssertTrue(viewController.presentFallbackViewControllerCalled)
-        XCTAssertFalse(viewController.dismissCalled)
-
-        viewController.presentFallbackViewControllerCalled = false
-
-        viewController.checkoutViewDidFailWithError(error: recoverableError)
-        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 3)
         XCTAssertFalse(viewController.presentFallbackViewControllerCalled)
         XCTAssertTrue(viewController.dismissCalled)
         XCTAssertTrue(viewController.dismissAnimated)
