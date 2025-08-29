@@ -30,6 +30,7 @@ import XCTest
 class ApplePayViewControllerTests: XCTestCase {
     var viewController: ApplePayViewController!
     var mockConfiguration: ApplePayConfigurationWrapper!
+    var mockStorefront: TestStorefrontAPI!
 
     override func setUp() {
         super.setUp()
@@ -62,17 +63,24 @@ class ApplePayViewControllerTests: XCTestCase {
             shopSettings: shopSettings
         )
 
+        // Create mock storefront
+        mockStorefront = TestStorefrontAPI()
+
         // Create system under test
         let identifier = CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id")
         viewController = ApplePayViewController(
             identifier: identifier,
             configuration: mockConfiguration
         )
+
+        // Inject mock storefront to prevent real HTTP requests
+        viewController.storefront = mockStorefront
     }
 
     override func tearDown() {
         viewController = nil
         mockConfiguration = nil
+        mockStorefront = nil
         super.tearDown()
     }
 
@@ -131,5 +139,21 @@ class ApplePayViewControllerTests: XCTestCase {
         await MainActor.run {
             viewController.checkoutDidCancel()
         }
+    }
+
+    // MARK: - WalletController Inheritance Tests
+
+    func testUsesCorrectStorefrontConfiguration() {
+        XCTAssertEqual(viewController.configuration.common.storefrontDomain, "test-shop.myshopify.com")
+        XCTAssertEqual(viewController.configuration.common.storefrontAccessToken, "test-token")
+    }
+
+    func testCreateOrFetchCart_UsesFetchCartByCheckoutIdentifier() async throws {
+        let mockCart = StorefrontAPI.Cart.testCart(
+            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
+        )
+        mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(mockCart)
+
+        await XCTAssertNoThrowAsync(try await viewController.createOrfetchCart())
     }
 }

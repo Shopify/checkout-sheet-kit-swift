@@ -48,7 +48,7 @@ class ShopPayViewController: WalletController {
 
     func present() async throws {
         do {
-            let cart = try await getCartByCheckoutIdentifier()
+            let cart = try await fetchCartByCheckoutIdentifier()
             guard let url = cart.checkoutUrl.url.appendQueryParam(name: "payment", value: "shop_pay") else {
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
             }

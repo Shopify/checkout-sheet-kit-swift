@@ -30,7 +30,7 @@ protocol PayController: AnyObject {
     var cart: StorefrontAPI.Types.Cart? { get set }
     var storefront: StorefrontAPIProtocol { get set }
     /// Temporary workaround due to July release changing the validation strategy
-    var storefrontJulyRelease: StorefrontAPI { get set }
+    var storefrontJulyRelease: StorefrontAPIProtocol { get set }
 
     /// Opens ShopifyCheckoutSheetKit
     func present(url: URL) async throws
@@ -39,7 +39,7 @@ protocol PayController: AnyObject {
 @available(iOS 16.0, *)
 class ApplePayViewController: WalletController, PayController {
     @Published var configuration: ApplePayConfigurationWrapper
-    @Published var storefrontJulyRelease: StorefrontAPI
+    @Published var storefrontJulyRelease: StorefrontAPIProtocol
     @Published var paymentController: PKPaymentAuthorizationController?
 
     var cart: StorefrontAPI.Types.Cart?
@@ -164,9 +164,10 @@ class ApplePayViewController: WalletController, PayController {
         }
     }
 
+    // createOrFetchCart delegates to fetchCartByCheckoutIdentifier from WalletController
     func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart {
         do {
-            return try await getCartByCheckoutIdentifier()
+            return try await fetchCartByCheckoutIdentifier()
         } catch let error as StorefrontAPI.Errors {
             return try await handleStorefrontError(error)
         } catch {
@@ -210,9 +211,9 @@ class ApplePayViewController: WalletController, PayController {
             try? await authorizationDelegate.transition(to: .interrupt(reason: reason))
         }
     }
-    
+
     func present(url: URL) async throws {
-        try await self.present(url: url, delegate: self)
+        try await present(url: url, delegate: self)
     }
 }
 

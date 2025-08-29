@@ -30,22 +30,22 @@ class WalletController: ObservableObject {
     @Published var storefront: StorefrontAPIProtocol
     @Published var checkoutViewController: CheckoutViewController?
 
-    init(identifier: CheckoutIdentifier, storefront: StorefrontAPI) {
+    init(identifier: CheckoutIdentifier, storefront: StorefrontAPIProtocol) {
         self.identifier = identifier
         self.storefront = storefront
     }
 
-    func getCartByCheckoutIdentifier() async throws -> StorefrontAPI.Types.Cart {
+    func fetchCartByCheckoutIdentifier() async throws -> StorefrontAPI.Types.Cart {
         switch identifier {
         case let .cart(id):
-            guard let cart = try await storefront.cart(by: .init(id)) else {
+            guard let cart = try await storefront.cart(by: GraphQLScalars.ID(id)) else {
                 throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
             }
             return cart
 
         case let .variant(id, quantity):
-            let items = Array(repeating: StorefrontAPI.Types.ID(id), count: quantity)
-            guard let cart = try? await storefront.cartCreate(with: items) else {
+            let items = Array(repeating: GraphQLScalars.ID(id), count: quantity)
+            guard let cart = try? await storefront.cartCreate(with: items, customer: nil as ShopifyAcceleratedCheckouts.Customer?) else {
                 throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
             }
             return cart
@@ -56,7 +56,7 @@ class WalletController: ObservableObject {
     }
 
     func present(url: URL, delegate: CheckoutDelegate) async throws {
-        let topViewController = await MainActor.run { getTopViewController() }
+        let topViewController = await MainActor.run { self.getTopViewController() }
 
         guard let topViewController else {
             throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "topViewController")
@@ -71,18 +71,18 @@ class WalletController: ObservableObject {
             )
         }
     }
-}
 
-func getTopViewController() -> UIViewController? {
-    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-        let window = windowScene.windows.first
-    else {
-        return nil
-    }
+    func getTopViewController() -> UIViewController? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first
+        else {
+            return nil
+        }
 
-    var topController = window.rootViewController
-    while let presentedController = topController?.presentedViewController {
-        topController = presentedController
+        var topController = window.rootViewController
+        while let presentedController = topController?.presentedViewController {
+            topController = presentedController
+        }
+        return topController
     }
-    return topController
 }
