@@ -25,7 +25,7 @@ import Foundation
 
 /// High-level API for Storefront operations using the custom GraphQL client
 @available(iOS 16.0, *)
-class StorefrontAPI: ObservableObject {
+class StorefrontAPI: ObservableObject, StorefrontAPIProtocol {
     let client: GraphQLClient
 
     /// Initialize the Storefront API
@@ -53,4 +53,65 @@ class StorefrontAPI: ObservableObject {
             )
         )
     }
+}
+
+@available(iOS 16.0, *)
+protocol StorefrontAPIProtocol {
+    // MARK: - Query Methods
+
+    func cart(by id: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart?
+    func shop() async throws -> StorefrontAPI.Shop
+
+    // MARK: - Mutation Methods
+
+    func cartCreate(
+        with items: [GraphQLScalars.ID], customer: ShopifyAcceleratedCheckouts.Customer?
+    ) async throws -> StorefrontAPI.Cart
+
+    @discardableResult func cartBuyerIdentityUpdate(
+        id: GraphQLScalars.ID,
+        input buyerIdentity: StorefrontAPI.CartBuyerIdentityUpdateInput
+    ) async throws -> StorefrontAPI.Cart
+
+    func cartDeliveryAddressesAdd(
+        id: GraphQLScalars.ID,
+        address: StorefrontAPI.Address,
+        validate: Bool
+    ) async throws -> StorefrontAPI.Cart
+
+    func cartDeliveryAddressesUpdate(
+        id: GraphQLScalars.ID,
+        addressId: GraphQLScalars.ID,
+        address: StorefrontAPI.Address,
+        validate: Bool
+    ) async throws -> StorefrontAPI.Cart
+
+    func cartDeliveryAddressesRemove(
+        id: GraphQLScalars.ID,
+        addressId: GraphQLScalars.ID
+    ) async throws -> StorefrontAPI.Cart
+
+    func cartSelectedDeliveryOptionsUpdate(
+        id: GraphQLScalars.ID,
+        deliveryGroupId: GraphQLScalars.ID,
+        deliveryOptionHandle: String
+    ) async throws -> StorefrontAPI.Cart
+
+    @discardableResult func cartPaymentUpdate(
+        id: GraphQLScalars.ID,
+        totalAmount: StorefrontAPI.MoneyV2,
+        applePayPayment: StorefrontAPI.ApplePayPayment
+    ) async throws -> StorefrontAPI.Cart
+
+    @discardableResult func cartBillingAddressUpdate(
+        id: GraphQLScalars.ID,
+        billingAddress: StorefrontAPI.Address
+    ) async throws -> StorefrontAPI.Cart
+
+    func cartRemovePersonalData(id: GraphQLScalars.ID) async throws
+
+    func cartPrepareForCompletion(id: GraphQLScalars.ID) async throws
+        -> StorefrontAPI.CartStatusReady
+
+    func cartSubmitForCompletion(id: GraphQLScalars.ID) async throws -> StorefrontAPI.SubmitSuccess
 }

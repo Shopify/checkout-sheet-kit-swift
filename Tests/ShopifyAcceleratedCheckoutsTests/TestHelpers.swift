@@ -23,10 +23,40 @@
 
 import Foundation
 @testable import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
+import XCTest
 
 // MARK: - Configuration Helpers
 
-@available(iOS 17.0, *)
+func XCTAssertThrowsErrorAsync(
+    _ expression: @autoclosure () async throws -> some Any,
+    _ errorHandler: (Error) -> Void,
+    _ message: @autoclosure () -> String = "Expected error to be thrown",
+    file: StaticString = #filePath,
+    line: UInt = #line
+) async {
+    do {
+        _ = try await expression()
+        XCTFail(message(), file: file, line: line)
+    } catch {
+        errorHandler(error)
+    }
+}
+
+func XCTAssertNoThrowAsync(
+    _ expression: @autoclosure () async throws -> some Any,
+    _ message: @autoclosure () -> String = "Expected no error to be thrown",
+    file: StaticString = #filePath,
+    line: UInt = #line
+) async {
+    do {
+        _ = try await expression()
+    } catch {
+        XCTFail("\(message()): \(error)", file: file, line: line)
+    }
+}
+
+@available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts.Configuration {
     static var testConfiguration: ShopifyAcceleratedCheckouts.Configuration {
         return ShopifyAcceleratedCheckouts.Configuration(
@@ -49,18 +79,22 @@ extension ShopifyAcceleratedCheckouts.Configuration {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts.Customer {
     static var testCustomer: ShopifyAcceleratedCheckouts.Customer {
-        return ShopifyAcceleratedCheckouts.Customer(email: "test@shopify.com", phoneNumber: "+447777777777")
+        return ShopifyAcceleratedCheckouts.Customer(
+            email: "test@shopify.com", phoneNumber: "+447777777777"
+        )
     }
 
-    static func testCustomer(email: String? = "test@shopify.com") -> ShopifyAcceleratedCheckouts.Customer {
+    static func testCustomer(email: String? = "test@shopify.com")
+        -> ShopifyAcceleratedCheckouts.Customer
+    {
         return ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: "+447777777777")
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ShopSettings {
     static var testShopSettings: ShopSettings {
         return ShopSettings(
@@ -95,7 +129,7 @@ extension ShopSettings {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     static var testConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
         return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
@@ -114,7 +148,7 @@ extension ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension ApplePayConfigurationWrapper {
     static var testConfiguration: ApplePayConfigurationWrapper {
         return ApplePayConfigurationWrapper(
@@ -139,7 +173,7 @@ extension ApplePayConfigurationWrapper {
 
 // MARK: - StorefrontAPI.Cart Helpers
 
-@available(iOS 17.0, *)
+@available(iOS 16.0, *)
 extension StorefrontAPI.Cart {
     static var testCart: StorefrontAPI.Cart {
         let checkoutURL = URL(string: "https://test-shop.myshopify.com/checkout")!
@@ -179,7 +213,9 @@ extension StorefrontAPI.Cart {
             delivery: nil,
             lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
             cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(totalAmount), currencyCode: currencyCode),
+                totalAmount: StorefrontAPI.MoneyV2(
+                    amount: Decimal(totalAmount), currencyCode: currencyCode
+                ),
                 subtotalAmount: nil,
                 totalTaxAmount: nil,
                 totalDutyAmount: nil
@@ -188,4 +224,162 @@ extension StorefrontAPI.Cart {
             discountAllocations: []
         )
     }
+}
+
+// MARK: - StorefrontAPI Mock
+
+@available(iOS 16.0, *)
+class MockStorefrontAPI: StorefrontAPIProtocol {
+    func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
+        fatalError("cart(by:) not implemented in test. Override this method in your test class.")
+    }
+
+    func shop() async throws -> StorefrontAPI.Shop {
+        fatalError("shop() not implemented in test. Override this method in your test class.")
+    }
+
+    func cartCreate(with _: [GraphQLScalars.ID], customer _: ShopifyAcceleratedCheckouts.Customer?)
+        async throws -> StorefrontAPI.Cart
+    {
+        fatalError(
+            "cartCreate(with:customer:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    @discardableResult func cartBuyerIdentityUpdate(
+        id _: GraphQLScalars.ID, input _: StorefrontAPI.CartBuyerIdentityUpdateInput
+    ) async throws -> StorefrontAPI.Cart {
+        fatalError(
+            "cartBuyerIdentityUpdate(id:input:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    func cartDeliveryAddressesAdd(
+        id _: GraphQLScalars.ID, address _: StorefrontAPI.Address, validate _: Bool
+    ) async throws -> StorefrontAPI.Cart {
+        fatalError(
+            "cartDeliveryAddressesAdd(id:address:validate:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    func cartDeliveryAddressesUpdate(
+        id _: GraphQLScalars.ID, addressId _: GraphQLScalars.ID, address _: StorefrontAPI.Address,
+        validate _: Bool
+    ) async throws -> StorefrontAPI.Cart {
+        fatalError(
+            "cartDeliveryAddressesUpdate(id:addressId:address:validate:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    func cartDeliveryAddressesRemove(id _: GraphQLScalars.ID, addressId _: GraphQLScalars.ID)
+        async throws -> StorefrontAPI.Cart
+    {
+        fatalError(
+            "cartDeliveryAddressesRemove(id:addressId:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    func cartSelectedDeliveryOptionsUpdate(
+        id _: GraphQLScalars.ID, deliveryGroupId _: GraphQLScalars.ID,
+        deliveryOptionHandle _: String
+    ) async throws -> StorefrontAPI.Cart {
+        fatalError(
+            "cartSelectedDeliveryOptionsUpdate(id:deliveryGroupId:deliveryOptionHandle:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    @discardableResult func cartPaymentUpdate(
+        id _: GraphQLScalars.ID, totalAmount _: StorefrontAPI.MoneyV2,
+        applePayPayment _: StorefrontAPI.ApplePayPayment
+    ) async throws -> StorefrontAPI.Cart {
+        fatalError(
+            "cartPaymentUpdate(id:totalAmount:applePayPayment:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    @discardableResult func cartBillingAddressUpdate(
+        id _: GraphQLScalars.ID, billingAddress _: StorefrontAPI.Address
+    ) async throws -> StorefrontAPI.Cart {
+        fatalError(
+            "cartBillingAddressUpdate(id:billingAddress:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    func cartRemovePersonalData(id _: GraphQLScalars.ID) async throws {
+        fatalError(
+            "cartRemovePersonalData(id:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    func cartPrepareForCompletion(id _: GraphQLScalars.ID) async throws
+        -> StorefrontAPI.CartStatusReady
+    {
+        fatalError(
+            "cartPrepareForCompletion(id:) not implemented in test. Override this method in your test class."
+        )
+    }
+
+    func cartSubmitForCompletion(id _: GraphQLScalars.ID) async throws
+        -> StorefrontAPI.SubmitSuccess
+    {
+        fatalError(
+            "cartSubmitForCompletion(id:) not implemented in test. Override this method in your test class."
+        )
+    }
+}
+
+// MARK: - Test StorefrontAPI
+
+@available(iOS 16.0, *)
+class TestStorefrontAPI: MockStorefrontAPI {
+    var cartResult: Result<StorefrontAPI.Cart?, Error>?
+    var cartCreateResult: Result<StorefrontAPI.Cart, Error>?
+
+    override func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
+        guard let result = cartResult else {
+            fatalError("cartResult not configured for TestStorefrontAPI")
+        }
+        return try result.get()
+    }
+
+    override func cartCreate(with _: [GraphQLScalars.ID], customer _: ShopifyAcceleratedCheckouts.Customer?) async throws -> StorefrontAPI.Cart {
+        guard let result = cartCreateResult else {
+            fatalError("cartCreateResult not configured for TestStorefrontAPI")
+        }
+        return try result.get()
+    }
+}
+
+// MARK: - WalletController Mock
+
+@available(iOS 16.0, *)
+class MockWalletController: WalletController {
+    var mockTopViewController: UIViewController?
+
+    override func getTopViewController() -> UIViewController? {
+        return mockTopViewController
+    }
+}
+
+// MARK: - ShopPayViewController Mock
+
+@available(iOS 16.0, *)
+class MockShopPayViewController: ShopPayViewController {
+    var mockTopViewController: UIViewController?
+
+    override func getTopViewController() -> UIViewController? {
+        return mockTopViewController
+    }
+}
+
+// MARK: - CheckoutDelegate Mock
+
+@available(iOS 16.0, *)
+class MockCheckoutDelegate: CheckoutDelegate {
+    func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
+    func checkoutDidFail(error _: CheckoutError) {}
+    func checkoutDidCancel() {}
+    func shouldRecoverFromError(error _: CheckoutError) -> Bool { return false }
+    func checkoutDidClickLink(url _: URL) {}
+    func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
 }
