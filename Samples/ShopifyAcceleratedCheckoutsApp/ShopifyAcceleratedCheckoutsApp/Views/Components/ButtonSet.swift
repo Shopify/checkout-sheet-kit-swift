@@ -56,11 +56,6 @@ struct ButtonSet: View {
                         .onCancel {
                             print("🚫 Checkout cancelled")
                         }
-                        .onShouldRecoverFromError { error in
-                            print("🔄 Should recover from error: \(error)")
-                            // Return true to attempt recovery, false to fail
-                            return true
-                        }
                         .onClickLink { url in
                             print("🔗 Link clicked: \(url)")
                         }

@@ -269,7 +269,7 @@ extension ApplePayViewController: CheckoutDelegate {
     }
 
     @MainActor func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return onShouldRecoverFromError?(error) ?? false
+        return onShouldRecoverFromError?(error) ?? error.isRecoverable
     }
 
     func checkoutDidClickLink(url: URL) {
