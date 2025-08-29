@@ -39,15 +39,19 @@ class WalletController: ObservableObject {
         switch identifier {
         case let .cart(id):
             guard let cart = try await storefront.cart(by: .init(id)) else {
-                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
+                throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
             }
             return cart
+
         case let .variant(id, quantity):
-            return try await storefront.cartCreate(with: Array(repeating: .init(id), count: quantity))
+            let items = Array(repeating: StorefrontAPI.Types.ID(id), count: quantity)
+            guard let cart = try? await storefront.cartCreate(with: items) else {
+                throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
+            }
+            return cart
+
         case .invariant:
-            throw ShopifyAcceleratedCheckouts.Error.invariant(
-                expected: "checkoutIdentifier"
-            )
+            throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
         }
     }
 
