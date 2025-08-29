@@ -16,7 +16,6 @@
 > _Releasing a new version of the kit?_
 >
 > - [ ] I have bumped the version number in the [`podspec` file](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/ShopifyCheckoutKit.podspec#L2).
-> - [ ] I have added a [Changelog](https://github.com/shopify/checkout-sheet-kit-swift/blob/main/CHANGELOG.md) entry.
 >
 > _Releasing a new major version?_
 >
