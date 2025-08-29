@@ -27,7 +27,7 @@ import SwiftUI
 @available(iOS 16.0, *)
 class WalletController: ObservableObject {
     @Published var identifier: CheckoutIdentifier
-    @Published var storefront: StorefrontAPI
+    @Published var storefront: StorefrontAPIProtocol
     @Published var checkoutViewController: CheckoutViewController?
 
     init(identifier: CheckoutIdentifier, storefront: StorefrontAPI) {

@@ -28,7 +28,7 @@ import SwiftUI
 @available(iOS 16.0, *)
 protocol PayController: AnyObject {
     var cart: StorefrontAPI.Types.Cart? { get set }
-    var storefront: StorefrontAPI { get set }
+    var storefront: StorefrontAPIProtocol { get set }
     /// Temporary workaround due to July release changing the validation strategy
     var storefrontJulyRelease: StorefrontAPI { get set }
 
