@@ -129,7 +129,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
         switch state {
         case .startPaymentRequest:
-            try? await startPaymentRequest()
+            try await startPaymentRequest()
 
         case .reset:
             try await onReset()
