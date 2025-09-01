@@ -68,7 +68,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         let mockViewController = await MainActor.run { UIViewController() }
         viewController.mockTopViewController = mockViewController
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
         XCTAssertNotNil(viewController.checkoutViewController)
     }
 
@@ -82,7 +82,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
         viewController.storefront = mockStorefront
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
     }
 
     // MARK: - present() Tests with Variant Identifier
@@ -103,7 +103,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         let mockViewController = await MainActor.run { UIViewController() }
         viewController.mockTopViewController = mockViewController
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
         XCTAssertNotNil(viewController.checkoutViewController)
     }
 
@@ -118,7 +118,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
         viewController.storefront = mockStorefront
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
     }
 
     func testPresent_VariantIdentifier_ZeroQuantity() async throws {
@@ -137,7 +137,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         let mockViewController = await MainActor.run { UIViewController() }
         viewController.mockTopViewController = mockViewController
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
         // Zero quantity should not create a checkout controller (business logic constraint)
         XCTAssertNil(viewController.checkoutViewController)
     }
@@ -152,7 +152,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
         viewController.storefront = mockStorefront
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
     }
 
     // MARK: - URL Construction Tests
@@ -174,7 +174,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         let mockViewController = await MainActor.run { UIViewController() }
         viewController.mockTopViewController = mockViewController
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
 
         XCTAssertNotNil(viewController.checkoutViewController)
     }
@@ -192,7 +192,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
         viewController.storefront = mockStorefront
 
-        await XCTAssertNoThrowAsync(try await viewController.present())
+        try await viewController.present()
     }
 
     // MARK: - Inheritance Tests
@@ -216,20 +216,5 @@ final class ShopPayViewControllerTests: XCTestCase {
 
         XCTAssertEqual(viewController.configuration.storefrontDomain, "test-shop.myshopify.com")
         XCTAssertEqual(viewController.configuration.storefrontAccessToken, "test-token")
-    }
-
-    // MARK: - Helper for Async Testing
-
-    func XCTAssertNoThrowAsync(
-        _ expression: @autoclosure () async throws -> some Any,
-        _ message: @autoclosure () -> String = "Expected no error to be thrown",
-        file: StaticString = #filePath,
-        line: UInt = #line
-    ) async {
-        do {
-            _ = try await expression()
-        } catch {
-            XCTFail("\(message()): \(error)", file: file, line: line)
-        }
     }
 }

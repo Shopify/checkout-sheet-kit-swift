@@ -43,19 +43,6 @@ func XCTAssertThrowsErrorAsync(
     }
 }
 
-func XCTAssertNoThrowAsync(
-    _ expression: @autoclosure () async throws -> some Any,
-    _ message: @autoclosure () -> String = "Expected no error to be thrown",
-    file: StaticString = #filePath,
-    line: UInt = #line
-) async {
-    do {
-        _ = try await expression()
-    } catch {
-        XCTFail("\(message()): \(error)", file: file, line: line)
-    }
-}
-
 @available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts.Configuration {
     static var testConfiguration: ShopifyAcceleratedCheckouts.Configuration {

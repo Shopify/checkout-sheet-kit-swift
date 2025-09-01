@@ -185,7 +185,7 @@ final class WalletControllerTests: XCTestCase {
 
         let testURL = URL(string: "https://test.myshopify.com/checkout")!
 
-        await XCTAssertNoThrowAsync(try await controller.present(url: testURL, delegate: mockDelegate))
+        try await controller.present(url: testURL, delegate: mockDelegate)
 
         XCTAssertNotNil(controller.checkoutViewController)
     }

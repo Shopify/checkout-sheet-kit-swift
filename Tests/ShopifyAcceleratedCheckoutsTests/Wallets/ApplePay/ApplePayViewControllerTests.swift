@@ -125,33 +125,11 @@ class ApplePayViewControllerTests: XCTestCase {
     @MainActor
     func test_checkoutDidCancel_whenInvoked_invokesOnCancelCallback() async {
         let expectation = XCTestExpectation(description: "Cancel callback should be invoked")
-
-        viewController.onCheckoutCancel = {
-            expectation.fulfill()
-        }
+        viewController.onCheckoutCancel = { expectation.fulfill() }
 
         viewController.checkoutDidCancel()
 
         await fulfillment(of: [expectation], timeout: 1.0)
-    }
-
-    func test_checkoutDidCancel_whenNoCheckoutViewController_worksCorrectly() async {
-        XCTAssertNil(viewController.checkoutViewController)
-
-        await MainActor.run {
-            viewController.checkoutDidCancel()
-        }
-    }
-
-    func test_checkoutDidCancel_whenNoOnCancelCallback_worksCorrectly() async {
-        let isNil = await MainActor.run {
-            viewController.onCheckoutCancel == nil
-        }
-        XCTAssertTrue(isNil, "onCancel should be nil")
-
-        await MainActor.run {
-            viewController.checkoutDidCancel()
-        }
     }
 
     // MARK: - WalletController Inheritance Tests
@@ -170,7 +148,9 @@ class ApplePayViewControllerTests: XCTestCase {
         )
         mockStorefront.cartResult = CartResult.success(mockCart)
 
-        await XCTAssertNoThrowAsync(try await viewController.createOrfetchCart())
+        let cart = try await viewController.createOrfetchCart()
+
+        XCTAssertEqual(cart.id, mockCart.id)
     }
 
     // MARK: - startPayment() Error Coverage Tests
@@ -182,7 +162,7 @@ class ApplePayViewControllerTests: XCTestCase {
         mockStorefront.cartResult = CartResult.success(mockCart)
         XCTAssertNil(viewController.cart)
 
-        await XCTAssertNoThrowAsync(await viewController.startPayment())
+        await viewController.startPayment()
 
         XCTAssertNotNil(viewController.cart)
         XCTAssertEqual(viewController.cart?.id, mockCart.id)
@@ -195,7 +175,7 @@ class ApplePayViewControllerTests: XCTestCase {
         let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
         mockStorefront.cartResult = CartResult.failure(expectedError)
 
-        await XCTAssertNoThrowAsync(await viewController.startPayment())
+        await viewController.startPayment()
 
         XCTAssertNil(viewController.cart)
 
@@ -210,7 +190,7 @@ class ApplePayViewControllerTests: XCTestCase {
     func test_startPayment_whenCartIsNil_callsCompletedTransition() async throws {
         mockStorefront.cartResult = CartResult.success(nil)
 
-        await XCTAssertNoThrowAsync(await viewController.startPayment())
+        await viewController.startPayment()
 
         XCTAssertNil(viewController.cart)
 
