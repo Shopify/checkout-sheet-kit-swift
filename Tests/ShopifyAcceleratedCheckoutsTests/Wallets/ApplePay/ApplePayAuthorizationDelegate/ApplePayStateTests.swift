@@ -44,10 +44,10 @@ final class ApplePayStateTests: XCTestCase {
 
         XCTAssertTrue(fromState.canTransition(to: .appleSheetPresented), "Should allow startPaymentRequest -> appleSheetPresented")
         XCTAssertTrue(fromState.canTransition(to: .reset), "Should allow startPaymentRequest -> reset (failed to present)")
+        XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow startPaymentRequest -> completed")
 
         XCTAssertFalse(fromState.canTransition(to: .idle), "Should not allow startPaymentRequest -> idle")
         XCTAssertFalse(fromState.canTransition(to: .startPaymentRequest), "Should not allow startPaymentRequest -> startPaymentRequest")
-        XCTAssertFalse(fromState.canTransition(to: .completed), "Should not allow startPaymentRequest -> completed")
     }
 
     func test_canTransition_fromAppleSheetPresentedState_shouldAllowPaymentAuthorizationAndInterruptAndCompleted() {
