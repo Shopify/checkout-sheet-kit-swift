@@ -25,10 +25,6 @@ appId: com.shopify.example.ShopifyAcceleratedCheckoutsApp
           text: "1"
           index: 0
 
-# - assertVisible:
-#     id: "email required toggle"
-#     checked: false
-
 - tapOn: "Email field"
 - inputText: "invalid-email"
 - tapOn: "Back"
@@ -39,6 +35,9 @@ appId: com.shopify.example.ShopifyAcceleratedCheckoutsApp
 - tapOn: "Create Cart"
 - tapOn: "Buy with Apple\_Pay"
 - tapOn: "Pay with Passcode"
+
+# This should not happen
+- assertVisible: "Update Shipping Contact"
+# Expected Behaviour
 # - assertVisible:
 #     id: "Checkout"
-- assertVisible: "Update Shipping Contact"
