@@ -124,21 +124,15 @@ class ApplePayViewControllerTests: XCTestCase {
 
     @MainActor
     func test_checkoutDidCancel_whenInvoked_invokesOnCancelCallback() async {
-        var cancelCallbackInvoked = false
         let expectation = XCTestExpectation(description: "Cancel callback should be invoked")
 
         viewController.onCheckoutCancel = {
-            cancelCallbackInvoked = true
             expectation.fulfill()
         }
 
         viewController.checkoutDidCancel()
 
         await fulfillment(of: [expectation], timeout: 1.0)
-        XCTAssertTrue(
-            cancelCallbackInvoked,
-            "Cancel callback should be invoked when checkoutDidCancel is called"
-        )
     }
 
     func test_checkoutDidCancel_whenNoCheckoutViewController_worksCorrectly() async {
@@ -269,14 +263,14 @@ class ApplePayViewControllerTests: XCTestCase {
         )
         mockStorefront.cartResult = CartResult.failure(checkoutSdkError)
 
-        var onCheckoutFailWasCalled = false
-        viewController.onCheckoutFail = { _ in onCheckoutFailWasCalled = true }
+        let expectation = XCTestExpectation(description: "onCheckoutFail callback should be invoked")
+        viewController.onCheckoutFail = { _ in expectation.fulfill() }
 
         await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
             XCTAssertTrue(error is CheckoutError)
         }
 
-        XCTAssertTrue(onCheckoutFailWasCalled, "onCheckoutFail callback should have been invoked")
+        await fulfillment(of: [expectation], timeout: 1.0)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
         XCTAssertEqual(
             mockAuthorizationDelegate.transitionHistory.first,
