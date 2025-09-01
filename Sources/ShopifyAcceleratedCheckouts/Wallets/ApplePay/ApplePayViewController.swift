@@ -127,7 +127,7 @@ class ApplePayViewController: WalletController, PayController {
 
     /// Initialization workaround for passing self to ApplePayAuthorizationDelegate
     private var __authorizationDelegate: ApplePayAuthorizationDelegate!
-    var authorizationDelegate: ApplePayAuthorizationDelegate {
+    package var authorizationDelegate: ApplePayAuthorizationDelegate {
         __authorizationDelegate
     }
 

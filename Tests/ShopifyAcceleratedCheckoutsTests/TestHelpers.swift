@@ -331,9 +331,11 @@ class MockStorefrontAPI: StorefrontAPIProtocol {
 // MARK: - Test StorefrontAPI
 
 @available(iOS 16.0, *)
+typealias CartResult = Result<StorefrontAPI.Cart?, Error>
+
+@available(iOS 16.0, *)
 class TestStorefrontAPI: MockStorefrontAPI {
-    var cartResult: Result<StorefrontAPI.Cart?, Error>?
-    var cartCreateResult: Result<StorefrontAPI.Cart, Error>?
+    var cartResult: CartResult?
 
     override func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
         guard let result = cartResult else {
@@ -342,6 +344,7 @@ class TestStorefrontAPI: MockStorefrontAPI {
         return try result.get()
     }
 
+    var cartCreateResult: Result<StorefrontAPI.Cart, Error>?
     override func cartCreate(with _: [GraphQLScalars.ID], customer _: ShopifyAcceleratedCheckouts.Customer?) async throws -> StorefrontAPI.Cart {
         guard let result = cartCreateResult else {
             fatalError("cartCreateResult not configured for TestStorefrontAPI")
@@ -369,6 +372,62 @@ class MockShopPayViewController: ShopPayViewController {
 
     override func getTopViewController() -> UIViewController? {
         return mockTopViewController
+    }
+}
+
+// MARK: - ApplePayAuthorizationDelegate Mock
+
+@available(iOS 16.0, *)
+class MockApplePayAuthorizationDelegate: ApplePayAuthorizationDelegate {
+    var transitionHistory: [ApplePayState] = []
+    var setCartCalls: [StorefrontAPI.Types.Cart] = []
+    var shouldThrowOnTransition = false
+    var shouldThrowOnSetCart = false
+
+    override func transition(to state: ApplePayState) async throws {
+        transitionHistory.append(state)
+        if shouldThrowOnTransition {
+            throw NSError(domain: "MockError", code: 1, userInfo: nil)
+        }
+        // Don't call super to avoid actual state machine logic
+    }
+
+    override func setCart(to cart: StorefrontAPI.Types.Cart?) throws {
+        if let cart {
+            setCartCalls.append(cart)
+        }
+        if shouldThrowOnSetCart {
+            throw NSError(domain: "MockError", code: 1, userInfo: nil)
+        }
+        // Don't call super to avoid actual cart setting logic
+    }
+
+    func resetMocks() {
+        transitionHistory.removeAll()
+        setCartCalls.removeAll()
+        shouldThrowOnTransition = false
+        shouldThrowOnSetCart = false
+    }
+}
+
+// MARK: - ApplePayViewController Mock
+
+@available(iOS 17.0, *)
+class MockApplePayViewController: ApplePayViewController {
+    var mockAuthorizationDelegate: MockApplePayAuthorizationDelegate!
+    var mockTopViewController: UIViewController?
+
+    override var authorizationDelegate: ApplePayAuthorizationDelegate {
+        return mockAuthorizationDelegate
+    }
+
+    override func getTopViewController() -> UIViewController? {
+        return mockTopViewController
+    }
+
+    // Helper methods for test setup
+    func setMockAuthorizationDelegate(_ mock: MockApplePayAuthorizationDelegate) {
+        mockAuthorizationDelegate = mock
     }
 }
 
