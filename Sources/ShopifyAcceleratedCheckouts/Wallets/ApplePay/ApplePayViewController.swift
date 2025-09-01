@@ -173,7 +173,7 @@ class ApplePayViewController: PayController, ObservableObject {
             return try await authorizationDelegate.transition(to: .completed)
         } catch {
             ShopifyAcceleratedCheckouts.logger.error(
-                "[startPayment] Failed to setup cart: \(error)"
+                "[startPayment] Failed to reset ApplePayState: \(error)"
             )
         }
     }
