@@ -29,8 +29,6 @@ import SwiftUI
 protocol PayController: AnyObject {
     var cart: StorefrontAPI.Types.Cart? { get set }
     var storefront: StorefrontAPI { get set }
-    /// Temporary workaround due to July release changing the validation strategy
-    var storefrontJulyRelease: StorefrontAPI { get set }
 
     /// Opens ShopifyCheckoutSheetKit
     func present(url: URL) async throws
@@ -40,7 +38,6 @@ protocol PayController: AnyObject {
 class ApplePayViewController: PayController, ObservableObject {
     @Published var configuration: ApplePayConfigurationWrapper
     @Published var storefront: StorefrontAPI
-    @Published var storefrontJulyRelease: StorefrontAPI
     @Published var identifier: CheckoutIdentifier
     @Published var checkoutViewController: CheckoutViewController?
     @Published var paymentController: PKPaymentAuthorizationController?
@@ -143,11 +140,6 @@ class ApplePayViewController: PayController, ObservableObject {
         storefront = StorefrontAPI(
             storefrontDomain: configuration.common.storefrontDomain,
             storefrontAccessToken: configuration.common.storefrontAccessToken
-        )
-        storefrontJulyRelease = StorefrontAPI(
-            storefrontDomain: configuration.common.storefrontDomain,
-            storefrontAccessToken: configuration.common.storefrontAccessToken,
-            apiVersion: "2025-07"
         )
         __authorizationDelegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
