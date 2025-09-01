@@ -173,7 +173,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         default:
             let cartID = try pkEncoder.cartID.get()
             try? await _Concurrency.Task.retrying(clock: clock) {
-                try await self.controller.storefrontJulyRelease.cartRemovePersonalData(id: cartID)
+                try await self.controller.storefront.cartRemovePersonalData(id: cartID)
             }.value
 
             ShopifyAcceleratedCheckouts.logger.debug("Cleared PII from cart")

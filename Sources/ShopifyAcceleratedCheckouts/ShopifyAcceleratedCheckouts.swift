@@ -25,8 +25,7 @@ import ShopifyCheckoutSheetKit
 
 public enum ShopifyAcceleratedCheckouts {
     /// Storefront API version used for cart operations
-    /// Note: We also use `2025-07` for `cartRemovePersonalData` mutations. We are working towards migrating all requests to `2025-07`.
-    internal static let apiVersion = "2025-04"
+    internal static let apiVersion = "2025-07"
 
     internal static let name = "ShopifyAcceleratedCheckouts"
 
