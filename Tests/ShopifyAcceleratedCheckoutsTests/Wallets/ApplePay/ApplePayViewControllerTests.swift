@@ -193,10 +193,8 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     func test_createOrfetchCart_whenCalled_usesFetchCartByCheckoutIdentifier() async throws {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
-        )
-        mockStorefront.cartResult = CartResult.success(mockCart)
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
 
         let cart = try await viewController.createOrfetchCart()
 
@@ -206,10 +204,8 @@ class ApplePayViewControllerTests: XCTestCase {
     // MARK: - startPayment()
 
     func test_onPress_whenSuccess_callsCorrectTransition() async throws {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
-        )
-        mockStorefront.cartResult = CartResult.success(mockCart)
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
         XCTAssertNil(viewController.cart)
 
         await viewController.onPress()
@@ -223,7 +219,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
     func test_onPress_whenCreateOrFetchCartFails_callsCompletedTransition() async throws {
         let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
-        mockStorefront.cartResult = CartResult.failure(expectedError)
+        mockStorefront.cartResult = .failure(expectedError)
 
         await viewController.onPress()
 
@@ -238,7 +234,7 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     func test_onPress_whenCartIsNil_callsCompletedTransition() async throws {
-        mockStorefront.cartResult = CartResult.success(nil)
+        mockStorefront.cartResult = .success(nil)
 
         await viewController.onPress()
 
@@ -270,7 +266,7 @@ class ApplePayViewControllerTests: XCTestCase {
                 )
             )
         )
-        mockStorefront.cartResult = CartResult.failure(storefrontError)
+        mockStorefront.cartResult = .failure(storefrontError)
 
         // The actual implementation should handle StorefrontAPI.Errors through handleStorefrontError
         // We're not testing the internal implementation details, just that it eventually throws or handles appropriately
@@ -291,7 +287,7 @@ class ApplePayViewControllerTests: XCTestCase {
         let checkoutSdkError = CheckoutError.sdkError(
             underlying: NSError(domain: "CheckoutError", code: 400, userInfo: nil)
         )
-        mockStorefront.cartResult = CartResult.failure(checkoutSdkError)
+        mockStorefront.cartResult = .failure(checkoutSdkError)
 
         let expectation = XCTestExpectation(description: "onCheckoutFail callback should be invoked")
         viewController.onCheckoutFail = { _ in expectation.fulfill() }
@@ -310,7 +306,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
     func test_createOrfetchCart_whenGenericError_callsTerminalErrorTransition() async throws {
         let genericError = NSError(domain: "GenericError", code: 400, userInfo: nil)
-        mockStorefront.cartResult = CartResult.failure(genericError)
+        mockStorefront.cartResult = .failure(genericError)
 
         await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
             XCTAssertEqual((error as NSError).domain, "GenericError")
@@ -325,10 +321,8 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     func test_createOrfetchCart_whenSuccess_noTransitions() async throws {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
-        )
-        mockStorefront.cartResult = CartResult.success(mockCart)
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
 
         let result = try await viewController.createOrfetchCart()
         XCTAssertEqual(result.id, mockCart.id)
@@ -341,10 +335,8 @@ class ApplePayViewControllerTests: XCTestCase {
     @MainActor
     func test_onPress_whenAuthorizationDelegateNil_handlesGracefully() async {
         // This tests defensive coding when dependencies might be misconfigured
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
-        )
-        mockStorefront.cartResult = CartResult.success(mockCart)
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
 
         await viewController.onPress()
 
@@ -360,7 +352,7 @@ class ApplePayViewControllerTests: XCTestCase {
             field: ["lineItems"]
         )
         let storefrontError = StorefrontAPI.Errors.userError(userErrors: [userError], cart: nil)
-        mockStorefront.cartResult = CartResult.failure(storefrontError)
+        mockStorefront.cartResult = .failure(storefrontError)
 
         await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
             XCTAssertTrue(error is StorefrontAPI.Errors)
@@ -374,7 +366,7 @@ class ApplePayViewControllerTests: XCTestCase {
     @MainActor
     func test_createOrfetchCart_whenStorefrontWarningWithNilCart_throwsAndCallsTerminalError() async {
         let storefrontError = StorefrontAPI.Errors.warning(type: .outOfStock, cart: nil)
-        mockStorefront.cartResult = CartResult.failure(storefrontError)
+        mockStorefront.cartResult = .failure(storefrontError)
 
         await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
             XCTAssertTrue(error is StorefrontAPI.Errors)
@@ -387,9 +379,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
     @MainActor
     func test_createOrfetchCart_whenStorefrontUserErrorWithCart_handlesUnhandledErrorAction() async throws {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
-        )
+        let mockCart = StorefrontAPI.Cart.testCart()
         let userError = StorefrontAPI.CartUserError(
             code: .invalid,
             message: "Test user error",
@@ -399,7 +389,7 @@ class ApplePayViewControllerTests: XCTestCase {
             userErrors: [userError],
             cart: mockCart
         )
-        mockStorefront.cartResult = CartResult.failure(storefrontError)
+        mockStorefront.cartResult = .failure(storefrontError)
 
         let result = try await viewController.createOrfetchCart()
 
@@ -415,9 +405,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
     @MainActor
     func test_createOrfetchCart_whenStorefrontUserErrorWithEmailField_handlesEmailErrorAction() async throws {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
-        )
+        let mockCart = StorefrontAPI.Cart.testCart()
         let userError = StorefrontAPI.CartUserError(
             code: .invalid,
             message: "Invalid email address",
@@ -427,7 +415,7 @@ class ApplePayViewControllerTests: XCTestCase {
             userErrors: [userError],
             cart: mockCart
         )
-        mockStorefront.cartResult = CartResult.failure(storefrontError)
+        mockStorefront.cartResult = .failure(storefrontError)
 
         let result = try await viewController.createOrfetchCart()
 
@@ -441,7 +429,7 @@ class ApplePayViewControllerTests: XCTestCase {
     func test_onPress_whenMultipleErrorScenarios_allHandledCorrectly() async {
         // Test multiple consecutive errors are handled properly
         let genericError = NSError(domain: "TestError", code: 123, userInfo: nil)
-        mockStorefront.cartResult = CartResult.failure(genericError)
+        mockStorefront.cartResult = .failure(genericError)
 
         await viewController.onPress()
         XCTAssertNil(viewController.cart)
@@ -451,7 +439,7 @@ class ApplePayViewControllerTests: XCTestCase {
         let checkoutError = CheckoutError.sdkError(
             underlying: NSError(domain: "CheckoutError", code: 400, userInfo: nil)
         )
-        mockStorefront.cartResult = CartResult.failure(checkoutError)
+        mockStorefront.cartResult = .failure(checkoutError)
 
         await viewController.onPress()
         XCTAssertNil(viewController.cart)

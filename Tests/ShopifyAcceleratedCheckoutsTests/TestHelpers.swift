@@ -320,11 +320,8 @@ class MockStorefrontAPI: StorefrontAPIProtocol {
 // MARK: - Test StorefrontAPI
 
 @available(iOS 16.0, *)
-typealias CartResult = Result<StorefrontAPI.Cart?, Error>
-
-@available(iOS 16.0, *)
 class TestStorefrontAPI: MockStorefrontAPI {
-    var cartResult: CartResult?
+    var cartResult: Result<StorefrontAPI.Cart?, Error>?
 
     override func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
         guard let result = cartResult else {
