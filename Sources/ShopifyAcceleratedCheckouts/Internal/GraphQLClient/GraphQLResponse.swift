@@ -35,7 +35,7 @@ struct GraphQLResponse<T: Decodable>: Decodable {
 
 /// GraphQL error from response
 struct GraphQLResponseError: Decodable, Error {
-    let message: String
+    let message: String?
     let path: [String]?
     let locations: [Location]?
     let extensions: Extensions?

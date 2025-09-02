@@ -48,7 +48,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             // Store current cart state before attempting address update
             let previousCart = controller.cart
 
-            let cart = try await upsertShippingAddress(to: shippingAddress)
+            var cart = try await upsertShippingAddress(to: shippingAddress)
 
             // If address update cleared delivery groups, revert to previous cart and show error
             if cart.deliveryGroups.nodes.isEmpty, previousCart?.deliveryGroups.nodes.isEmpty == false {
@@ -59,9 +59,9 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             try setCart(to: cart)
 
-            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+            cart = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
-            try setCart(to: result.cart)
+            try setCart(to: cart)
 
             return pkDecoder.paymentRequestShippingContactUpdate()
         } catch {
@@ -108,8 +108,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             try await controller.storefront
                 .cartBillingAddressUpdate(id: cartID, billingAddress: billingPostalAddress)
 
-            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-            try setCart(to: result.cart)
+            let cart = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+            try setCart(to: cart)
 
             return pkDecoder.paymentRequestPaymentMethodUpdate()
         } catch {
@@ -138,7 +138,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let selectedDeliveryOptionHandle = try pkEncoder.selectedDeliveryOptionHandle.get()
             let deliveryGroupID = try pkEncoder.deliveryGroupID.get()
 
-            let cart = try await controller.storefront
+            var cart = try await controller.storefront
                 .cartSelectedDeliveryOptionsUpdate(
                     id: cartID,
                     deliveryGroupId: deliveryGroupID,
@@ -146,9 +146,9 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 )
             try setCart(to: cart)
 
-            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+            cart = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
-            try setCart(to: result.cart)
+            try setCart(to: cart)
 
             return pkDecoder.paymentRequestShippingMethodUpdate()
         } catch {
@@ -182,16 +182,16 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                         customerAccessToken: configuration.common.customer?.customerAccessToken
                     )
                 )
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
+                let cart = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+                try setCart(to: cart)
             }
 
             if try pkDecoder.isShippingRequired() {
                 let shippingAddress = try pkEncoder.shippingAddress.get()
                 _ = try await upsertShippingAddress(to: shippingAddress, validate: true)
 
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
+                let cart = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+                try setCart(to: cart)
             } else {
                 /// If the cart is entirely digital updating with a complete billingAddress
                 /// allows us to resolve pending terms on taxes prior to cartPaymentUpdate
@@ -206,8 +206,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     billingAddress: billingPostalAddress
                 )
 
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
+                let cart = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+                try setCart(to: cart)
             }
 
             let totalAmount = try pkEncoder.totalAmount.get()

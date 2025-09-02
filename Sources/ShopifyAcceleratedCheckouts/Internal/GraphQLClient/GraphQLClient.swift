@@ -90,9 +90,9 @@ class GraphQLClient {
 
         let decodedResponse = try decoder.decode(GraphQLResponse<T>.self, from: data)
 
-        if let errors = decodedResponse.errors, !errors.isEmpty {
-            throw GraphQLError.graphQLErrors(errors)
-        }
+       // if let errors = decodedResponse.errors, !errors.isEmpty {
+       //     throw GraphQLError.graphQLErrors(errors)
+       // }
 
         return decodedResponse
     }

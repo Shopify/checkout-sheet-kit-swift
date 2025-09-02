@@ -42,7 +42,7 @@ enum GraphQLError: LocalizedError {
         case let .decodingError(error):
             return "Decoding error: \(error.localizedDescription)"
         case let .graphQLErrors(errors):
-            return "GraphQL errors: \(errors.map { $0.message }.joined(separator: ", "))"
+            return "GraphQL errors: \(errors.map { $0.message ?? "nil" }.joined(separator: ", "))"
         case .invalidResponse:
             return "Invalid response from server"
         case .invalidVariables:
