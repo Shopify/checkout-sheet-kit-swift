@@ -205,14 +205,14 @@ class ApplePayViewControllerTests: XCTestCase {
 
     // MARK: - startPayment()
 
-    func test_startPayment_whenSuccess_callsCorrectTransition() async throws {
+    func test_onPress_whenSuccess_callsCorrectTransition() async throws {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
         )
         mockStorefront.cartResult = CartResult.success(mockCart)
         XCTAssertNil(viewController.cart)
 
-        await viewController.startPayment()
+        await viewController.onPress()
 
         XCTAssertNotNil(viewController.cart)
         XCTAssertEqual(viewController.cart?.id, mockCart.id)
@@ -221,11 +221,11 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.first, .startPaymentRequest)
     }
 
-    func test_startPayment_whenCreateOrFetchCartFails_callsCompletedTransition() async throws {
+    func test_onPress_whenCreateOrFetchCartFails_callsCompletedTransition() async throws {
         let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
         mockStorefront.cartResult = CartResult.failure(expectedError)
 
-        await viewController.startPayment()
+        await viewController.onPress()
 
         XCTAssertNil(viewController.cart)
 
@@ -237,10 +237,10 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
     }
 
-    func test_startPayment_whenCartIsNil_callsCompletedTransition() async throws {
+    func test_onPress_whenCartIsNil_callsCompletedTransition() async throws {
         mockStorefront.cartResult = CartResult.success(nil)
 
-        await viewController.startPayment()
+        await viewController.onPress()
 
         XCTAssertNil(viewController.cart)
 
@@ -339,14 +339,14 @@ class ApplePayViewControllerTests: XCTestCase {
     // MARK: - Error Handling
 
     @MainActor
-    func test_startPayment_whenAuthorizationDelegateNil_handlesGracefully() async {
+    func test_onPress_whenAuthorizationDelegateNil_handlesGracefully() async {
         // This tests defensive coding when dependencies might be misconfigured
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
         )
         mockStorefront.cartResult = CartResult.success(mockCart)
 
-        await viewController.startPayment()
+        await viewController.onPress()
 
         XCTAssertNotNil(viewController.cart)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
@@ -438,12 +438,12 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_startPayment_whenMultipleErrorScenarios_allHandledCorrectly() async {
+    func test_onPress_whenMultipleErrorScenarios_allHandledCorrectly() async {
         // Test multiple consecutive errors are handled properly
         let genericError = NSError(domain: "TestError", code: 123, userInfo: nil)
         mockStorefront.cartResult = CartResult.failure(genericError)
 
-        await viewController.startPayment()
+        await viewController.onPress()
         XCTAssertNil(viewController.cart)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
 
@@ -453,7 +453,7 @@ class ApplePayViewControllerTests: XCTestCase {
         )
         mockStorefront.cartResult = CartResult.failure(checkoutError)
 
-        await viewController.startPayment()
+        await viewController.onPress()
         XCTAssertNil(viewController.cart)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
     }
