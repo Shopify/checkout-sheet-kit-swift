@@ -174,12 +174,12 @@ class ApplePayViewControllerTests: XCTestCase {
 
     @MainActor
     func test_checkoutDidCancel_whenInvoked_invokesOnCancelCallback() async {
-        let expectation = XCTestExpectation(description: "Cancel callback should be invoked")
-        viewController.onCheckoutCancel = { expectation.fulfill() }
+        let cancelCallbackExpectation = XCTestExpectation(description: "Cancel callback should be invoked")
+        viewController.onCheckoutCancel = { cancelCallbackExpectation.fulfill() }
 
         viewController.checkoutDidCancel()
 
-        await fulfillment(of: [expectation], timeout: 1.0)
+        await fulfillment(of: [cancelCallbackExpectation], timeout: 1.0)
     }
 
     // MARK: - WalletController Inheritance
@@ -289,14 +289,14 @@ class ApplePayViewControllerTests: XCTestCase {
         )
         mockStorefront.cartResult = .failure(checkoutSdkError)
 
-        let expectation = XCTestExpectation(description: "onCheckoutFail callback should be invoked")
-        viewController.onCheckoutFail = { _ in expectation.fulfill() }
+        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail callback should be invoked")
+        viewController.onCheckoutFail = { _ in onCheckoutFailExpectation.fulfill() }
 
         await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
             XCTAssertTrue(error is CheckoutError)
         }
 
-        await fulfillment(of: [expectation], timeout: 1.0)
+        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
         XCTAssertEqual(
             mockAuthorizationDelegate.transitionHistory.first,
@@ -333,7 +333,7 @@ class ApplePayViewControllerTests: XCTestCase {
     // MARK: - Error Handling
 
     @MainActor
-    func test_onPress_whenAuthorizationDelegateNil_handlesGracefully() async {
+    func test_onPress_whenAuthorizationDelegateConfigured_shouldCallTransition() async {
         // This tests defensive coding when dependencies might be misconfigured
         let mockCart = StorefrontAPI.Cart.testCart()
         mockStorefront.cartResult = .success(mockCart)
