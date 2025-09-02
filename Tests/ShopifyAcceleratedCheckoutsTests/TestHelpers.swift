@@ -215,6 +215,8 @@ extension StorefrontAPI.Cart {
 
 // MARK: - StorefrontAPI Mock
 
+/// This class conforms to StorefrontAPIProtocol with not implemented errors
+/// Extend this class and override only the methods you need, per test file
 @available(iOS 16.0, *)
 class MockStorefrontAPI: StorefrontAPIProtocol {
     func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {

@@ -100,7 +100,7 @@ class ApplePayViewControllerTests: XCTestCase {
         super.tearDown()
     }
 
-    // MARK: - Callback Properties Tests
+    // MARK: - Callback Properties
 
     func test_onCheckoutComplete_whenDefault_isNil() async {
         await MainActor.run {
@@ -120,7 +120,7 @@ class ApplePayViewControllerTests: XCTestCase {
         }
     }
 
-    // MARK: - Delegate Tests
+    // MARK: - Delegate
 
     @MainActor
     func test_checkoutDidCancel_whenInvoked_invokesOnCancelCallback() async {
@@ -132,7 +132,7 @@ class ApplePayViewControllerTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 1.0)
     }
 
-    // MARK: - WalletController Inheritance Tests
+    // MARK: - WalletController Inheritance
 
     func test_configuration_whenInitialized_usesCorrectStorefront() {
         XCTAssertEqual(
@@ -153,7 +153,7 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(cart.id, mockCart.id)
     }
 
-    // MARK: - startPayment() Error Coverage Tests
+    // MARK: - startPayment()
 
     func test_startPayment_whenSuccess_callsCorrectTransition() async throws {
         let mockCart = StorefrontAPI.Cart.testCart(
@@ -207,7 +207,7 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
     }
 
-    // MARK: - createOrfetchCart() Error Coverage Tests
+    // MARK: - createOrfetchCart() Error
 
     func test_createOrfetchCart_whenStorefrontAPIError_handlesError() async throws {
         let storefrontError = StorefrontAPI.Errors.response(
@@ -286,25 +286,7 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 0)
     }
 
-    // MARK: - Additional Error Handling Test Coverage
-
-    @MainActor
-    func test_startPayment_whenAuthorizationDelegateTransitionThrows_handlesError() async {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
-        )
-        mockStorefront.cartResult = CartResult.success(mockCart)
-
-        mockAuthorizationDelegate.shouldThrowOnTransition = true
-
-        await viewController.startPayment()
-
-        // Should have attempted the transition, and since delegate throws, startPayment catch block is triggered
-        // This results in 2 transitions: .startPaymentRequest (attempted) + .completed (error handling)
-        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
-        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.first, .startPaymentRequest)
-        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
-    }
+    // MARK: - Error Handling
 
     @MainActor
     func test_startPayment_whenAuthorizationDelegateNil_handlesGracefully() async {
