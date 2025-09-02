@@ -55,26 +55,23 @@ class WalletController: ObservableObject {
         }
     }
 
+    @MainActor
     func present(url: URL, delegate: CheckoutDelegate) async throws {
-        let topViewController = await MainActor.run { self.getTopViewController() }
-
+        let topViewController = self.getTopViewController()
         guard let topViewController else {
             throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "topViewController")
         }
-
-        _ = await MainActor.run {
-            self.checkoutViewController = ShopifyCheckoutSheetKit.present(
-                checkout: url,
-                from: topViewController,
-                entryPoint: .acceleratedCheckouts,
-                delegate: delegate
-            )
-        }
+        self.checkoutViewController = ShopifyCheckoutSheetKit.present(
+            checkout: url,
+            from: topViewController,
+            entryPoint: .acceleratedCheckouts,
+            delegate: delegate
+        )
     }
 
     func getTopViewController() -> UIViewController? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first
+            let window = windowScene.windows.first
         else {
             return nil
         }
