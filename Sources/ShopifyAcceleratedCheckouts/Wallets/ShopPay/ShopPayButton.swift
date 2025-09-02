@@ -81,7 +81,7 @@ internal struct Internal_ShopPayButton: View {
     var body: some View {
         Button(
             action: {
-                Task { try? await controller.present() }
+                Task { await controller.onPress() }
             },
             label: {
                 HStack {

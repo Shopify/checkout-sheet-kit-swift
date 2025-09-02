@@ -46,7 +46,7 @@ class ShopPayViewController: WalletController {
         self.identifier = identifier.parse()
     }
 
-    func present() async throws {
+    func onPress() async {
         do {
             let cart = try await fetchCartByCheckoutIdentifier()
             guard let url = cart.checkoutUrl.url.appendQueryParam(name: "payment", value: "shop_pay") else {
@@ -54,7 +54,9 @@ class ShopPayViewController: WalletController {
             }
             try await present(url: url, delegate: self)
         } catch {
+            let error = CheckoutError.sdkError(underlying: error)
             ShopifyAcceleratedCheckouts.logger.error("[present] Failed to setup cart: \(error)")
+            eventHandlers.checkoutDidFail?(error)
         }
     }
 }

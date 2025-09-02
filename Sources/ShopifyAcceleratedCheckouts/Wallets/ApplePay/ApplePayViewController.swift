@@ -151,7 +151,7 @@ class ApplePayViewController: WalletController, PayController {
         )
     }
 
-    func startPayment() async {
+    func onPress() async {
         do {
             cart = try await createOrfetchCart()
             guard cart != nil else {
@@ -164,7 +164,6 @@ class ApplePayViewController: WalletController, PayController {
         }
     }
 
-    // createOrFetchCart delegates to fetchCartByCheckoutIdentifier from WalletController
     func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart {
         do {
             return try await fetchCartByCheckoutIdentifier()
