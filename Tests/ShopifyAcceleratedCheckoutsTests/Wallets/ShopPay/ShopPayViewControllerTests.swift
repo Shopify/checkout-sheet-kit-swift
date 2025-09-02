@@ -65,7 +65,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
         )
-        mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(mockCart)
+        mockStorefront.cartResult = CartResult.success(mockCart)
 
         viewController = MockShopPayViewController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
@@ -82,7 +82,7 @@ final class ShopPayViewControllerTests: XCTestCase {
     }
 
     func test_present_withCartIdentifierCartNotFound_shouldHandleGracefully() async throws {
-        mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(nil)
+        mockStorefront.cartResult = CartResult.success(nil)
 
         viewController = MockShopPayViewController(
             identifier: .cart(cartID: "non-existent-cart-id"),
@@ -171,7 +171,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: baseCheckoutUrl)!
         )
-        mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(mockCart)
+        mockStorefront.cartResult = CartResult.success(mockCart)
 
         viewController = MockShopPayViewController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
@@ -192,7 +192,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "invalid-url")!
         )
-        mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(mockCart)
+        mockStorefront.cartResult = CartResult.success(mockCart)
 
         viewController = MockShopPayViewController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
