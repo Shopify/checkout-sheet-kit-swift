@@ -5,15 +5,8 @@ appId: com.shopify.example.ShopifyAcceleratedCheckoutsApp
     clearState: true
 - tapOn: "Settings"
 
-- runFlow:
-    when:
-      visible:
-        text: "1"
-        index: 0
-    commands:
-      - tapOn:
-          text: "1"
-          index: 0
+# Scroll down if needed to find settings options
+- scroll
 
 - runFlow:
     when:
@@ -25,7 +18,20 @@ appId: com.shopify.example.ShopifyAcceleratedCheckoutsApp
           text: "1"
           index: 0
 
-- tapOn: "Email field"
+# Scroll down if needed to find settings options
+- scroll
+
+- runFlow:
+    when:
+      visible:
+        text: "1"
+        index: 0
+    commands:
+      - tapOn:
+          text: "1"
+          index: 0
+
+- tapOn: "(Optional)"
 - inputText: "invalid-email"
 - tapOn: "Back"
 
