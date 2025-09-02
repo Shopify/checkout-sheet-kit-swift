@@ -37,7 +37,7 @@ extension ErrorHandler {
         return getHighestPriorityAction(actions: actions)
     }
 
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     private static func getErrorAction(
         error: StorefrontAPI.CartUserError,
         shippingCountry: String?,
@@ -442,8 +442,6 @@ extension ErrorHandler {
             )
         }
     }
-
-    // swiftlint:enable cyclomatic_complexity
 
     private static func mapField(field: [String]?) -> String? {
         return field?.joined(separator: ".")
