@@ -100,6 +100,56 @@ class ApplePayViewControllerTests: XCTestCase {
         super.tearDown()
     }
 
+    class MockApplePayAuthorizationDelegate: ApplePayAuthorizationDelegate {
+        var transitionHistory: [ApplePayState] = []
+        var setCartCalls: [StorefrontAPI.Types.Cart] = []
+        var shouldThrowOnTransition = false
+        var shouldThrowOnSetCart = false
+
+        override func transition(to state: ApplePayState) async throws {
+            transitionHistory.append(state)
+            if shouldThrowOnTransition {
+                throw NSError(domain: "MockError", code: 1, userInfo: nil)
+            }
+            // Don't call super to avoid actual state machine logic
+        }
+
+        override func setCart(to cart: StorefrontAPI.Types.Cart?) throws {
+            if let cart {
+                setCartCalls.append(cart)
+            }
+            if shouldThrowOnSetCart {
+                throw NSError(domain: "MockError", code: 1, userInfo: nil)
+            }
+            // Don't call super to avoid actual cart setting logic
+        }
+
+        func resetMocks() {
+            transitionHistory.removeAll()
+            setCartCalls.removeAll()
+            shouldThrowOnTransition = false
+            shouldThrowOnSetCart = false
+        }
+    }
+
+    class MockApplePayViewController: ApplePayViewController {
+        var mockAuthorizationDelegate: MockApplePayAuthorizationDelegate!
+        var mockTopViewController: UIViewController?
+
+        override var authorizationDelegate: ApplePayAuthorizationDelegate {
+            return mockAuthorizationDelegate
+        }
+
+        override func getTopViewController() -> UIViewController? {
+            return mockTopViewController
+        }
+
+        // Helper methods for test setup
+        func setMockAuthorizationDelegate(_ mock: MockApplePayAuthorizationDelegate) {
+            mockAuthorizationDelegate = mock
+        }
+    }
+
     // MARK: - Callback Properties
 
     func test_onCheckoutComplete_whenDefault_isNil() async {

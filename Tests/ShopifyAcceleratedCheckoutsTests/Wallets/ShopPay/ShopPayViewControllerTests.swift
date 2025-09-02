@@ -50,6 +50,15 @@ final class ShopPayViewControllerTests: XCTestCase {
         super.tearDown()
     }
 
+    @available(iOS 16.0, *)
+    class MockShopPayViewController: ShopPayViewController {
+        var mockTopViewController: UIViewController?
+
+        override func getTopViewController() -> UIViewController? {
+            return mockTopViewController
+        }
+    }
+
     // MARK: - present() Tests with Cart Identifier
 
     func testPresent_CartIdentifier_Success() async throws {

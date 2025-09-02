@@ -45,6 +45,23 @@ final class WalletControllerTests: XCTestCase {
         super.tearDown()
     }
 
+    class MockWalletController: WalletController {
+        var mockTopViewController: UIViewController?
+
+        override func getTopViewController() -> UIViewController? {
+            return mockTopViewController
+        }
+    }
+
+    class MockCheckoutDelegate: CheckoutDelegate {
+        func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
+        func checkoutDidFail(error _: CheckoutError) {}
+        func checkoutDidCancel() {}
+        func shouldRecoverFromError(error _: CheckoutError) -> Bool { return false }
+        func checkoutDidClickLink(url _: URL) {}
+        func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
+    }
+
     // MARK: - fetchCartByCheckoutIdentifier Tests - Cart Identifier
 
     func testFetchCartByCheckoutIdentifier_CartIdentifier_Success() async throws {
