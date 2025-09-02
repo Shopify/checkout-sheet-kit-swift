@@ -57,7 +57,7 @@ final class WalletControllerTests: XCTestCase {
         func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
         func checkoutDidFail(error _: CheckoutError) {}
         func checkoutDidCancel() {}
-        func shouldRecoverFromError(error _: CheckoutError) -> Bool { return false }
+        func shouldRecoverFromError(error: CheckoutError) -> Bool { return error.isRecoverable }
         func checkoutDidClickLink(url _: URL) {}
         func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
     }
