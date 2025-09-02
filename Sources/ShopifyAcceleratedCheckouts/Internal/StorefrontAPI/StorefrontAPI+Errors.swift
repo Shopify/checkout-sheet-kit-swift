@@ -74,7 +74,7 @@ extension StorefrontAPI {
             case .invariant: ""
             case let .userError(userErrors, _):
                 userErrors
-                    .map { "[Field: \(String(describing: $0.field))] [Message: \($0.message)]" }
+                    .map { "[Field: \(String(describing: $0.field))] [Message: \($0.message ?? "No message")]" }
                     .joined(separator: "\n")
             case let .nilCart(requestName):
                 "Check the API payload for more details: \(requestName)"

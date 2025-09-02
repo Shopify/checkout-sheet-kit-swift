@@ -1213,9 +1213,9 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
             // Check that it contains the expected error format
             XCTAssertTrue(message.contains("Cart not ready"), "Error message should contain 'Cart not ready': \(message)")
-            // The error codes are converted to camelCase in the error message
-            XCTAssertTrue(message.contains("deliveryAddressRequired"), "Error message should contain 'deliveryAddressRequired': \(message)")
-            XCTAssertTrue(message.contains("paymentMethodRequired"), "Error message should contain 'paymentMethodRequired': \(message)")
+            // The error codes should show their raw string values
+            XCTAssertTrue(message.contains("DELIVERY_ADDRESS_REQUIRED"), "Error message should contain 'DELIVERY_ADDRESS_REQUIRED': \(message)")
+            XCTAssertTrue(message.contains("PAYMENT_METHOD_REQUIRED"), "Error message should contain 'PAYMENT_METHOD_REQUIRED': \(message)")
         }
     }
 
@@ -1317,8 +1317,8 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
             // Check that it contains the expected error format
             XCTAssertTrue(message.contains("Cart submission failed"), "Error message should contain 'Cart submission failed': \(message)")
-            // The error code is converted to camelCase in the error message
-            XCTAssertTrue(message.contains("paymentCardDeclined"), "Error message should contain 'paymentCardDeclined': \(message)")
+            // The error code should show the raw string value
+            XCTAssertTrue(message.contains("PAYMENT_CARD_DECLINED"), "Error message should contain 'PAYMENT_CARD_DECLINED': \(message)")
         }
     }
 
@@ -1732,5 +1732,119 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             ),
             { if case .invalidVariables = $0 { return true } else { return false } }
         )
+    }
+
+    // MARK: - CompletionErrorCode Decoding Tests
+
+    func testCompletionErrorCodeDecodingDeliveryAddress1Required() throws {
+        let json = """
+        {
+            "code": "DELIVERY_ADDRESS1_REQUIRED",
+            "message": "Delivery address line 1 is required"
+        }
+        """
+
+        let data = json.data(using: .utf8)!
+        let completionError = try JSONDecoder().decode(StorefrontAPI.CompletionError.self, from: data)
+
+        XCTAssertEqual(completionError.code, .deliveryAddress1Required)
+        XCTAssertEqual(completionError.message, "Delivery address line 1 is required")
+    }
+
+    func testCompletionErrorCodeDecodingDeliveryFirstNameRequired() throws {
+        let json = """
+        {
+            "code": "DELIVERY_FIRST_NAME_REQUIRED",
+            "message": "Delivery first name is required"
+        }
+        """
+
+        let data = json.data(using: .utf8)!
+        let completionError = try JSONDecoder().decode(StorefrontAPI.CompletionError.self, from: data)
+
+        XCTAssertEqual(completionError.code, .deliveryFirstNameRequired)
+        XCTAssertEqual(completionError.message, "Delivery first name is required")
+    }
+
+    func testCompletionErrorCodeDecodingDeliveryLastNameRequired() throws {
+        let json = """
+        {
+            "code": "DELIVERY_LAST_NAME_REQUIRED",
+            "message": "Delivery last name is required"
+        }
+        """
+
+        let data = json.data(using: .utf8)!
+        let completionError = try JSONDecoder().decode(StorefrontAPI.CompletionError.self, from: data)
+
+        XCTAssertEqual(completionError.code, .deliveryLastNameRequired)
+        XCTAssertEqual(completionError.message, "Delivery last name is required")
+    }
+
+    func testCompletionErrorCodeDecodingDeliveryInvalidPostalCodeForCountry() throws {
+        let json = """
+        {
+            "code": "DELIVERY_INVALID_POSTAL_CODE_FOR_COUNTRY",
+            "message": "Delivery postal code is invalid for country"
+        }
+        """
+
+        let data = json.data(using: .utf8)!
+        let completionError = try JSONDecoder().decode(StorefrontAPI.CompletionError.self, from: data)
+
+        XCTAssertEqual(completionError.code, .deliveryInvalidPostalCodeForCountry)
+        XCTAssertEqual(completionError.message, "Delivery postal code is invalid for country")
+    }
+
+    func testCartPrepareForCompletionNotReadyWithSpecificDeliveryErrors() async {
+        let json = """
+        {
+            "data": {
+                "cartPrepareForCompletion": {
+                    "result": {
+                        "__typename": "CartStatusNotReady",
+                        "cart": null,
+                        "errors": [
+                            {
+                                "code": "DELIVERY_FIRST_NAME_REQUIRED",
+                                "message": null
+                            },
+                            {
+                                "code": "DELIVERY_LAST_NAME_REQUIRED",
+                                "message": null
+                            },
+                            {
+                                "code": "DELIVERY_ADDRESS1_REQUIRED",
+                                "message": null
+                            },
+                            {
+                                "code": "DELIVERY_INVALID_POSTAL_CODE_FOR_COUNTRY",
+                                "message": null
+                            }
+                        ]
+                    },
+                    "userErrors": []
+                }
+            }
+        }
+        """
+        mockJSONResponse(json)
+
+        do {
+            _ = try await storefrontAPI.cartPrepareForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
+            XCTFail("Expected error to be thrown")
+        } catch {
+            guard case let .networkError(message) = error as? GraphQLError else {
+                XCTFail("Expected GraphQLError.networkError but got: \(error)")
+                return
+            }
+
+            // Check that it contains the expected error format with proper raw values
+            XCTAssertTrue(message.contains("Cart not ready"), "Error message should contain 'Cart not ready': \(message)")
+            XCTAssertTrue(message.contains("DELIVERY_FIRST_NAME_REQUIRED: No message"), "Error message should contain 'DELIVERY_FIRST_NAME_REQUIRED: No message': \(message)")
+            XCTAssertTrue(message.contains("DELIVERY_LAST_NAME_REQUIRED: No message"), "Error message should contain 'DELIVERY_LAST_NAME_REQUIRED: No message': \(message)")
+            XCTAssertTrue(message.contains("DELIVERY_ADDRESS1_REQUIRED: No message"), "Error message should contain 'DELIVERY_ADDRESS1_REQUIRED: No message': \(message)")
+            XCTAssertTrue(message.contains("DELIVERY_INVALID_POSTAL_CODE_FOR_COUNTRY: No message"), "Error message should contain 'DELIVERY_INVALID_POSTAL_CODE_FOR_COUNTRY: No message': \(message)")
+        }
     }
 }

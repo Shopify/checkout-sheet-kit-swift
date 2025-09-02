@@ -416,7 +416,7 @@ extension StorefrontAPI {
     /// Prepare cart for completion
     /// - Parameter id: Cart ID
     /// - Returns: Cart status ready result
-    func cartPrepareForCompletion(id: GraphQLScalars.ID) async throws -> CartStatusReady {
+    func cartPrepareForCompletion(id: GraphQLScalars.ID) async throws -> Cart {
         let variables: [String: Any] = [
             "cartId": id.rawValue
         ]
@@ -437,14 +437,17 @@ extension StorefrontAPI {
         case let .ready(ready):
             let cart = try validateCart(ready.cart, requestName: "cartPrepareForCompletion")
             try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
-            return ready
+                return cart
         case let .throttled(throttled):
             throw GraphQLError.networkError(
                 "Cart preparation throttled. Poll after: \(throttled.pollAfter.date)")
         case let .notReady(notReady):
-            let errorMessages = notReady.errors.map { "\($0.code): \($0.message)" }.joined(
-                separator: ", ")
-            throw GraphQLError.networkError("Cart not ready: \(errorMessages)")
+//            let errorMessages = notReady.errors.map { "\($0.code.rawValue): \($0.message ?? "No message")" }.joined(
+//                separator: ", ")
+//            throw GraphQLError.networkError("Cart not ready: \(errorMessages)")
+                let cart = try validateCart(notReady.cart, requestName: "cartPrepareForCompletion")
+                try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+                return cart
         }
     }
 
@@ -475,7 +478,7 @@ extension StorefrontAPI {
         case let .success(success):
             return success
         case let .failed(failed):
-            let errorMessages = failed.errors.map { "\($0.code): \($0.message)" }.joined(
+            let errorMessages = failed.errors.map { "\($0.code.rawValue): \($0.message ?? "No message")" }.joined(
                 separator: ", ")
             throw GraphQLError.networkError("Cart submission failed: \(errorMessages)")
         case let .alreadyAccepted(accepted):

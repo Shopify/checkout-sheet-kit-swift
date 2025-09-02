@@ -414,7 +414,7 @@ extension StorefrontAPI {
     /// Cart user error
     struct CartUserError: Codable, Error {
         let code: CartErrorCode?
-        let message: String
+        let message: String?
         let field: [String]?
     }
 
@@ -593,7 +593,7 @@ extension StorefrontAPI {
     /// Completion error
     struct CompletionError: Codable {
         let code: CompletionErrorCode
-        let message: String
+        let message: String?
     }
 
     /// Completion error codes
@@ -617,6 +617,7 @@ extension StorefrontAPI {
         case colorInvalid = "COLOR_INVALID"
         case deliveryAddress1Invalid = "DELIVERY_ADDRESS1_INVALID"
         case deliveryAddress1Missing = "DELIVERY_ADDRESS1_MISSING"
+        case deliveryAddress1Required = "DELIVERY_ADDRESS1_REQUIRED"
         case deliveryAddress1TooLong = "DELIVERY_ADDRESS1_TOO_LONG"
         case deliveryAddress2Invalid = "DELIVERY_ADDRESS2_INVALID"
         case deliveryAddress2Required = "DELIVERY_ADDRESS2_REQUIRED"
@@ -751,7 +752,7 @@ extension StorefrontAPI {
     /// Submission error
     struct SubmissionError: Codable {
         let code: SubmissionErrorCode
-        let message: String
+        let message: String?
     }
 
     /// Submission error codes for cart submit
