@@ -33,6 +33,13 @@ protocol PKPaymentRequestUpdatable {
 extension PKPaymentRequestShippingContactUpdate: PKPaymentRequestUpdatable {}
 extension PKPaymentRequestPaymentMethodUpdate: PKPaymentRequestUpdatable {}
 extension PKPaymentAuthorizationResult: PKPaymentRequestUpdatable {}
+extension PKPaymentRequestShippingMethodUpdate: PKPaymentRequestUpdatable {
+    var errors: [any Error]! {
+        get { return errors }
+        // swiftlint:disable:next unused_setter_value
+        set {}
+    }
+}
 
 /// Decodes Storefront -> PassKit
 @available(iOS 16.0, *)
@@ -155,9 +162,9 @@ class PKDecoder {
     }
 
     func paymentRequestShippingMethodUpdate(errors: [any Error]? = []) -> PKPaymentRequestShippingMethodUpdate {
-        let paymentRequestUpdate = PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: paymentSummaryItems)
+        var paymentRequestUpdate = PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: paymentSummaryItems)
         if let errors {
-            paymentRequestUpdate.status = .failure
+            setErrorStatus(for: &paymentRequestUpdate, with: errors)
         }
         return paymentRequestUpdate
     }
