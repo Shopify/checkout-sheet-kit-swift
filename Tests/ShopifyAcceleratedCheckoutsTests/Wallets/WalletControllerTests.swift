@@ -64,7 +64,7 @@ final class WalletControllerTests: XCTestCase {
 
     // MARK: - fetchCartByCheckoutIdentifier Tests - Cart Identifier
 
-    func testFetchCartByCheckoutIdentifier_CartIdentifier_Success() async throws {
+    func test_fetchCartByCheckoutIdentifier_withCartIdentifier_shouldSucceed() async throws {
         let expectedCart = StorefrontAPI.Cart.testCart
         mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(expectedCart)
 
@@ -77,7 +77,7 @@ final class WalletControllerTests: XCTestCase {
         XCTAssertEqual(result.id, expectedCart.id)
     }
 
-    func testFetchCartByCheckoutIdentifier_CartIdentifier_ReturnsNil() async throws {
+    func test_fetchCartByCheckoutIdentifier_withCartIdentifierReturningNil_shouldThrowError() async throws {
         mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(nil)
 
         controller = MockWalletController(
@@ -99,7 +99,7 @@ final class WalletControllerTests: XCTestCase {
         }
     }
 
-    func testFetchCartByCheckoutIdentifier_CartIdentifier_StorefrontError() async throws {
+    func test_fetchCartByCheckoutIdentifier_withCartIdentifierStorefrontError_shouldThrowError() async throws {
         let storefrontError = NSError(domain: "StorefrontError", code: 500, userInfo: nil)
         mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.failure(storefrontError)
 
@@ -116,7 +116,7 @@ final class WalletControllerTests: XCTestCase {
 
     // MARK: - fetchCartByCheckoutIdentifier Tests - Variant Identifier
 
-    func testFetchCartByCheckoutIdentifier_VariantIdentifier_Success() async throws {
+    func test_fetchCartByCheckoutIdentifier_withVariantIdentifier_shouldSucceed() async throws {
         let expectedCart = StorefrontAPI.Cart.testCart
         mockStorefront.cartCreateResult = Result<StorefrontAPI.Cart, Error>.success(expectedCart)
 
@@ -129,7 +129,7 @@ final class WalletControllerTests: XCTestCase {
         XCTAssertEqual(result.id, expectedCart.id)
     }
 
-    func testFetchCartByCheckoutIdentifier_VariantIdentifier_ZeroQuantity() async throws {
+    func test_fetchCartByCheckoutIdentifier_withVariantIdentifierZeroQuantity_shouldSucceed() async throws {
         let expectedCart = StorefrontAPI.Cart.testCart
         mockStorefront.cartCreateResult = Result<StorefrontAPI.Cart, Error>.success(expectedCart)
 
@@ -142,7 +142,7 @@ final class WalletControllerTests: XCTestCase {
         XCTAssertEqual(result.id, expectedCart.id)
     }
 
-    func testFetchCartByCheckoutIdentifier_VariantIdentifier_CartCreateFails() async throws {
+    func test_fetchCartByCheckoutIdentifier_withVariantIdentifierCartCreateFails_shouldThrowError() async throws {
         let cartCreateError = NSError(domain: "CartCreateError", code: 400, userInfo: nil)
         mockStorefront.cartCreateResult = Result<StorefrontAPI.Cart, Error>.failure(cartCreateError)
 
@@ -168,7 +168,7 @@ final class WalletControllerTests: XCTestCase {
 
     // MARK: - fetchCartByCheckoutIdentifier Tests - Invariant Identifier
 
-    func testFetchCartByCheckoutIdentifier_InvariantIdentifier_ThrowsError() async throws {
+    func test_fetchCartByCheckoutIdentifier_withInvariantIdentifier_shouldThrowError() async throws {
         controller = MockWalletController(
             identifier: .invariant(reason: "Invalid identifier"),
             storefront: mockStorefront
@@ -190,7 +190,7 @@ final class WalletControllerTests: XCTestCase {
 
     // MARK: - present Tests
 
-    func testPresent_Success() async throws {
+    func test_present_withValidParameters_shouldSucceed() async throws {
         controller = MockWalletController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             storefront: mockStorefront

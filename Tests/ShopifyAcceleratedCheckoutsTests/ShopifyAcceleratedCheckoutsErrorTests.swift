@@ -28,7 +28,7 @@ import XCTest
 final class ShopifyAcceleratedCheckoutsErrorTests: XCTestCase {
     // MARK: - cartAcquisition Error Tests
 
-    func testCartAcquisitionError() {
+    func test_cartAcquisitionError_withAllIdentifierTypes_shouldGenerateCorrectErrorMessages() {
         struct TestCase {
             let identifier: CheckoutIdentifier
             let expectedError: String
@@ -62,7 +62,7 @@ final class ShopifyAcceleratedCheckoutsErrorTests: XCTestCase {
 
     // MARK: - invariant Error Tests
 
-    func testInvariantError() {
+    func test_invariantError_withExpectedValue_shouldGenerateCorrectErrorMessage() {
         let error = ShopifyAcceleratedCheckouts.Error.invariant(expected: "valid cart")
 
         let errorString = error.toString()

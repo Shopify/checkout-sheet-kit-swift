@@ -61,7 +61,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - present() Tests with Cart Identifier
 
-    func testPresent_CartIdentifier_Success() async throws {
+    func test_present_withCartIdentifier_shouldSucceed() async throws {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
         )
@@ -81,7 +81,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         XCTAssertNotNil(viewController.checkoutViewController)
     }
 
-    func testPresent_CartIdentifier_CartNotFound() async throws {
+    func test_present_withCartIdentifierCartNotFound_shouldHandleGracefully() async throws {
         mockStorefront.cartResult = Result<StorefrontAPI.Cart?, Error>.success(nil)
 
         viewController = MockShopPayViewController(
@@ -96,7 +96,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - present() Tests with Variant Identifier
 
-    func testPresent_VariantIdentifier_Success() async throws {
+    func test_present_withVariantIdentifier_shouldSucceed() async throws {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
         )
@@ -116,7 +116,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         XCTAssertNotNil(viewController.checkoutViewController)
     }
 
-    func testPresent_VariantIdentifier_CartCreateFails() async throws {
+    func test_present_withVariantIdentifierCartCreateFails_shouldHandleGracefully() async throws {
         let cartCreateError = NSError(domain: "CartCreateError", code: 400, userInfo: nil)
         mockStorefront.cartCreateResult = Result<StorefrontAPI.Cart, Error>.failure(cartCreateError)
 
@@ -130,7 +130,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         try await viewController.present()
     }
 
-    func testPresent_VariantIdentifier_ZeroQuantity() async throws {
+    func test_present_withVariantIdentifierZeroQuantity_shouldNotCreateCheckoutController() async throws {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
         )
@@ -153,7 +153,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - present() Tests with Invariant Identifier
 
-    func testPresent_InvariantIdentifier_HandlesGracefully() async throws {
+    func test_present_withInvariantIdentifier_shouldHandleGracefully() async throws {
         viewController = MockShopPayViewController(
             identifier: .invariant(reason: "Invalid checkout data"),
             configuration: mockConfiguration
@@ -166,7 +166,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - URL Construction Tests
 
-    func testPresent_ConstructsCorrectShopPayURL() async throws {
+    func test_present_withValidCart_shouldConstructCorrectShopPayURL() async throws {
         let baseCheckoutUrl = "https://test-shop.myshopify.com/checkout"
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: baseCheckoutUrl)!
@@ -188,7 +188,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         XCTAssertNotNil(viewController.checkoutViewController)
     }
 
-    func testPresent_InvalidURL_HandlesGracefully() async throws {
+    func test_present_withInvalidURL_shouldHandleGracefully() async throws {
         let mockCart = StorefrontAPI.Cart.testCart(
             checkoutUrl: URL(string: "invalid-url")!
         )
@@ -206,7 +206,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - Inheritance Tests
 
-    func testInheritsFromWalletController() {
+    func test_initialization_withValidConfiguration_shouldInheritFromWalletController() {
         viewController = MockShopPayViewController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             configuration: mockConfiguration
@@ -217,7 +217,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         XCTAssertNotNil(viewController.storefront)
     }
 
-    func testUsesCorrectStorefrontConfiguration() {
+    func test_initialization_withValidConfiguration_shouldUseCorrectStorefrontConfiguration() {
         viewController = MockShopPayViewController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             configuration: mockConfiguration
