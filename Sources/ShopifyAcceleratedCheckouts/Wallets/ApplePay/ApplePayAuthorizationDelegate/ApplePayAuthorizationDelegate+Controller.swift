@@ -155,7 +155,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             ShopifyAcceleratedCheckouts.logger.error("didSelectShippingMethod error: \(error)")
 
             return await handleError(error: error, cart: controller.cart) {
-                return pkDecoder.paymentRequestShippingMethodUpdate(errors: $0)
+                pkDecoder.paymentRequestShippingMethodUpdate(errors: $0)
             }
         }
     }
