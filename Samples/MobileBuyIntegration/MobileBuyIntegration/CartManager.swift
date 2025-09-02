@@ -27,7 +27,6 @@ import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
-// swiftlint:disable type_body_length
 @MainActor
 class CartManager: ObservableObject {
     static let shared = CartManager(client: .shared)
@@ -254,8 +253,6 @@ class CartManager: ObservableObject {
         isDirty = false
     }
 }
-
-// swiftlint:enable type_body_length
 
 extension CartManager {
     enum Errors: LocalizedError {

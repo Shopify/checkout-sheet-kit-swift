@@ -50,11 +50,9 @@ extension CheckoutCompletedEvent {
 
     public struct CartLineImage: Codable {
         public let altText: String?
-        // swiftlint:disable identifier_name
         public let lg: String
         public let md: String
         public let sm: String
-        // swiftlint:enable identifier_name
     }
 
     public struct CartLine: Codable {

@@ -28,7 +28,6 @@ import SwiftUI
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 
-// swiftlint:disable opening_brace
 struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
@@ -133,8 +132,6 @@ struct CartView: View {
         CheckoutController.shared?.present(checkout: url)
     }
 }
-
-// swiftlint:enable opening_brace
 
 struct EmptyState: View {
     var body: some View {

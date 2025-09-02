@@ -25,7 +25,6 @@
 import WebKit
 import XCTest
 
-// swiftlint:disable type_body_length
 class CheckoutBridgeTests: XCTestCase {
     class WKScriptMessageMock: WKScriptMessage {
         private let _mockBody: Any
@@ -389,5 +388,3 @@ struct MyCustomDataWrapper: Codable {
     let attr: String
     let attr2: [Int]
 }
-
-// swiftlint:enable type_body_length

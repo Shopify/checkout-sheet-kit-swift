@@ -191,9 +191,8 @@ class TaskTests: XCTestCase {
             XCTFail("Task should have thrown")
         } catch {
             XCTAssertTrue(error is TestError)
-            // swiftlint:disable force_cast
+            // swiftlint:disable:next force_cast
             let error = error as! TestError
-            // swiftlint:enable force_cast
             guard case .different = error else {
                 XCTFail("Incorrect error thrown")
                 return

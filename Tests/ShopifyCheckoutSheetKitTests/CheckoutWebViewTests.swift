@@ -25,7 +25,6 @@
 import WebKit
 import XCTest
 
-// swiftlint:disable type_body_length
 class CheckoutWebViewTests: XCTestCase {
     private var view: CheckoutWebView!
     private var recovery: CheckoutWebView!
@@ -510,5 +509,3 @@ class MockCheckoutBridge: CheckoutBridgeProtocol {
         sendMessageCalled = true
     }
 }
-
-// swiftlint:enable type_body_length
