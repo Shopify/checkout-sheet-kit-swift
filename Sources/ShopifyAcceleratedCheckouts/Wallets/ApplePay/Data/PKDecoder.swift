@@ -154,8 +154,12 @@ class PKDecoder {
         return paymentRequestUpdate
     }
 
-    func paymentRequestShippingMethodUpdate() -> PKPaymentRequestShippingMethodUpdate {
-        return PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: paymentSummaryItems)
+    func paymentRequestShippingMethodUpdate(errors: [any Error]? = []) -> PKPaymentRequestShippingMethodUpdate {
+        let paymentRequestUpdate = PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: paymentSummaryItems)
+        if let errors {
+            paymentRequestUpdate.status = .failure
+        }
+        return paymentRequestUpdate
     }
 
     func paymentAuthorizationResult(errors: [any Error]? = []) -> PKPaymentAuthorizationResult {
