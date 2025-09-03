@@ -157,14 +157,24 @@ class ApplePayViewController: PayController, ObservableObject {
 
     func startPayment() async {
         do {
-            cart = try await createOrfetchCart()
-            guard cart != nil else {
-                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
-            }
-            try? await authorizationDelegate.transition(to: .startPaymentRequest)
+            let cart = try await createOrfetchCart()
+
+            self.cart = cart
+
+            return try await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
-            ShopifyAcceleratedCheckouts.logger.error("[startPayment] Failed to setup cart: \(error)")
-            try? await authorizationDelegate.transition(to: .completed)
+            ShopifyAcceleratedCheckouts.logger.error(
+                "[startPayment] Failed to setup cart: \(error)"
+            )
+            await onCheckoutFail?(.sdkError(underlying: error, recoverable: false))
+        }
+
+        do {
+            return try await authorizationDelegate.transition(to: .completed)
+        } catch {
+            ShopifyAcceleratedCheckouts.logger.error(
+                "[startPayment] Failed to reset ApplePayState: \(error)"
+            )
         }
     }
 
@@ -215,8 +225,8 @@ class ApplePayViewController: PayController, ObservableObject {
         }
     }
 
+    /// action.showError will no-op prior to ApplePayState.appleSheetPresented
     private func handleErrorAction(
-        /// showError action is not handled uniqely and will present the apple pay sheet with errors
         action: ErrorHandler.PaymentSheetAction,
         cart: StorefrontAPI.Types.Cart
     ) async throws {
