@@ -34,7 +34,6 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
     private var configuration: ApplePayConfigurationWrapper = .testConfiguration
     private var mockController: MockPayController!
     private var delegate: ApplePayAuthorizationDelegate!
-    private var mockPaymentRequest: PKPaymentRequest!
 
     override func setUp() async throws {
         try await super.setUp()
@@ -51,13 +50,6 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         )
 
         try delegate.setCart(to: mockController.cart)
-
-        mockPaymentRequest = PKPaymentRequest()
-        mockPaymentRequest.countryCode = "US"
-        mockPaymentRequest.currencyCode = "USD"
-        mockPaymentRequest.paymentSummaryItems = [.init(label: "item 1", amount: 22.00, type: .final)]
-        mockPaymentRequest.supportedNetworks = .init([.amex, .masterCard, .visa])
-        mockPaymentRequest.merchantCapabilities = .threeDSecure
     }
 
     override func tearDown() async throws {
@@ -78,7 +70,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         shippingMethod.amount = NSDecimalNumber(string: "5.00")
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -92,7 +84,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         invalidMethod.label = "Invalid Method"
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: invalidMethod
         )
         XCTAssertNotNil(result, "Should handle invalid method with fallback logic")
@@ -106,7 +98,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         shippingMethod.label = "Standard Shipping"
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -121,7 +113,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         contact.postalAddress = createPostalAddress()
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingContact: contact
         )
 
@@ -134,7 +126,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         contact.postalAddress = createPostalAddress()
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingContact: contact
         )
 
@@ -223,7 +215,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         MockURLProtocol.lastOperation = nil
 
         _ = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: valid
         )
 
@@ -242,7 +234,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         MockURLProtocol.lastOperation = nil
 
         _ = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: selected
         )
 
@@ -257,7 +249,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         MockURLProtocol.lastOperation = nil
 
         _ = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: selected
         )
 
@@ -270,7 +262,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         shippingMethod.label = "Method Without ID"
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -284,7 +276,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         shippingMethod.label = "Invalid Delivery Group Method"
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -301,7 +293,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         defer { MockURLProtocol.failDeliveryUpdate = false }
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -318,7 +310,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         defer { MockURLProtocol.failPrepareForCompletion = false }
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -337,7 +329,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         defer { MockURLProtocol.returnMappableCartUserError = false }
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -355,7 +347,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         defer { MockURLProtocol.returnInvalidCart = false }
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(paymentRequest: mockPaymentRequest),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 

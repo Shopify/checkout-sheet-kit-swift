@@ -125,7 +125,6 @@ class PKDecoderTests: XCTestCase {
         XCTAssertEqual(testDecoder.selectedShippingMethod?.identifier, "express")
     }
 
-<<<<<<< HEAD
     // MARK: - requiredContactFields Tests
 
     func testRequiredContactFieldsDefaultsToEmailWhenNoFieldsConfigured() {
