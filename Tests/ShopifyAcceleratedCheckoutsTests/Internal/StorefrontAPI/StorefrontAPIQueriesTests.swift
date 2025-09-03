@@ -194,13 +194,13 @@ final class StorefrontAPIQueriesTests: XCTestCase {
         let cart = try await storefrontAPI.cart(by: GraphQLScalars.ID("gid://shopify/Cart/123"))
 
         XCTAssertNotNil(cart)
-        XCTAssertEqual(cart.id.rawValue, "gid://shopify/Cart/123")
-        XCTAssertEqual(cart.totalQuantity, 2)
-        XCTAssertEqual(cart.buyerIdentity?.email, "test@example.com")
-        XCTAssertEqual(cart.lines.nodes.count, 1)
-        XCTAssertEqual(cart.lines.nodes.first?.quantity, 2)
-        XCTAssertEqual(cart.deliveryGroups.nodes.count, 1)
-        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "39.98")!)
+        XCTAssertEqual(cart?.id.rawValue, "gid://shopify/Cart/123")
+        XCTAssertEqual(cart?.totalQuantity, 2)
+        XCTAssertEqual(cart?.buyerIdentity?.email, "test@example.com")
+        XCTAssertEqual(cart?.lines.nodes.count, 1)
+        XCTAssertEqual(cart?.lines.nodes.first?.quantity, 2)
+        XCTAssertEqual(cart?.deliveryGroups.nodes.count, 1)
+        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "39.98")!)
     }
 
     func testCartQueryNotFound() async throws {
@@ -246,9 +246,9 @@ final class StorefrontAPIQueriesTests: XCTestCase {
         let cart = try await storefrontAPI.cart(by: GraphQLScalars.ID("gid://shopify/Cart/minimal"))
 
         XCTAssertNotNil(cart)
-        XCTAssertEqual(cart.totalQuantity, 0)
-        XCTAssertNil(cart.buyerIdentity)
-        XCTAssertTrue(cart.lines.nodes.isEmpty)
+        XCTAssertEqual(cart?.totalQuantity, 0)
+        XCTAssertNil(cart?.buyerIdentity)
+        XCTAssertTrue(cart?.lines.nodes.isEmpty ?? false)
     }
 
     func testCartQueryWithMalformedJSON() async {
@@ -502,9 +502,9 @@ final class StorefrontAPIQueriesTests: XCTestCase {
         let cart = try await storefrontAPI.cart(by: GraphQLScalars.ID("gid://shopify/Cart/large"))
 
         XCTAssertNotNil(cart)
-        XCTAssertEqual(cart.lines.nodes.count, 100)
-        XCTAssertEqual(cart.totalQuantity, 100)
-        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "1000.00")!)
+        XCTAssertEqual(cart?.lines.nodes.count, 100)
+        XCTAssertEqual(cart?.totalQuantity, 100)
+        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "1000.00")!)
     }
 
     // MARK: - Request Validation Tests

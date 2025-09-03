@@ -36,23 +36,22 @@ class WalletController: ObservableObject {
     }
 
     func fetchCartByCheckoutIdentifier() async throws -> StorefrontAPI.Types.Cart {
-        do {
-            switch identifier {
-            case let .cart(id):
-                return try await storefront.cart(by: GraphQLScalars.ID(id))
-
-            case let .variant(id, quantity):
-                let items = Array(repeating: GraphQLScalars.ID(id), count: quantity)
-                return try await storefront.cartCreate(with: items, customer: nil)
-
-            default:
-                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "identifier")
+        switch identifier {
+        case let .cart(id):
+            guard let cart = try await storefront.cart(by: GraphQLScalars.ID(id)) else {
+                throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
             }
-        } catch {
-            throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(
-                identifier: identifier,
-                error: error
-            )
+            return cart
+
+        case let .variant(id, quantity):
+            let items = Array(repeating: GraphQLScalars.ID(id), count: quantity)
+            guard let cart = try? await storefront.cartCreate(with: items, customer: nil) else {
+                throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
+            }
+            return cart
+
+        case .invariant:
+            throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
         }
     }
 

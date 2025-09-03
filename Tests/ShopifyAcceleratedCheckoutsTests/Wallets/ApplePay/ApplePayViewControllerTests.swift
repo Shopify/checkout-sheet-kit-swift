@@ -233,22 +233,20 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
     }
 
-    func test_onPress_whenCartFetchFails_callsCompletedTransition() async throws {
-        let fetchError = NSError(domain: "CartFetchError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Cart not found"])
-        mockStorefront.cartResult = .failure(fetchError)
+    func test_onPress_whenCartIsNil_callsCompletedTransition() async throws {
+        mockStorefront.cartResult = .success(nil)
 
         await viewController.onPress()
 
         XCTAssertNil(viewController.cart)
 
-        // WalletController.fetchCartByCheckoutIdentifier throws when cart fetch fails
+        // WalletController.fetchCartByCheckoutIdentifier throws when cart is nil
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
         XCTAssertEqual(
             mockAuthorizationDelegate.transitionHistory.first,
             .terminalError(
                 error: ShopifyAcceleratedCheckouts.Error.cartAcquisition(
-                    identifier: CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-                    error: fetchError
+                    identifier: CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id")
                 )
             )
         )

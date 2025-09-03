@@ -77,9 +77,8 @@ final class WalletControllerTests: XCTestCase {
         XCTAssertEqual(result.id, expectedCart.id)
     }
 
-    func test_fetchCartByCheckoutIdentifier_withCartIdentifierError_shouldThrowError() async throws {
-        let storefrontError = NSError(domain: "CartNotFound", code: 404, userInfo: [NSLocalizedDescriptionKey: "Cart not found"])
-        mockStorefront.cartResult = .failure(storefrontError)
+    func test_fetchCartByCheckoutIdentifier_withCartIdentifierReturningNil_shouldThrowError() async throws {
+        mockStorefront.cartResult = .success(nil)
 
         controller = MockWalletController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
@@ -87,7 +86,7 @@ final class WalletControllerTests: XCTestCase {
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
-            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier, errorDetail) = error else {
+            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier) = error else {
                 XCTFail("Expected cartAcquisition error, got: \(error)")
                 return
             }
@@ -97,16 +96,6 @@ final class WalletControllerTests: XCTestCase {
             } else {
                 XCTFail("Expected cart identifier, got: \(identifier)")
             }
-
-            // Verify the error detail is the original storefront error
-            XCTAssertNotNil(errorDetail, "Expected error detail to be present")
-            guard let nsError = errorDetail as? NSError else {
-                XCTFail("Expected NSError, got: \(String(describing: errorDetail))")
-                return
-            }
-            XCTAssertEqual(nsError.domain, "CartNotFound")
-            XCTAssertEqual(nsError.code, 404)
-            XCTAssertEqual(nsError.localizedDescription, "Cart not found")
         }
     }
 
@@ -120,19 +109,8 @@ final class WalletControllerTests: XCTestCase {
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
-            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(_, errorDetail) = error else {
-                XCTFail("Expected cartAcquisition error, got: \(error)")
-                return
-            }
-
-            // Verify the wrapped error details
-            XCTAssertNotNil(errorDetail, "Expected error detail to be present")
-            guard let nsError = errorDetail as? NSError else {
-                XCTFail("Expected NSError, got: \(String(describing: errorDetail))")
-                return
-            }
-            XCTAssertEqual(nsError.domain, "StorefrontError")
-            XCTAssertEqual(nsError.code, 500)
+            XCTAssertEqual((error as NSError).domain, "StorefrontError")
+            XCTAssertEqual((error as NSError).code, 500)
         }
     }
 
@@ -165,7 +143,7 @@ final class WalletControllerTests: XCTestCase {
     }
 
     func test_fetchCartByCheckoutIdentifier_withVariantIdentifierCartCreateFails_shouldThrowError() async throws {
-        let cartCreateError = NSError(domain: "CartCreateError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to create cart"])
+        let cartCreateError = NSError(domain: "CartCreateError", code: 400, userInfo: nil)
         mockStorefront.cartCreateResult = Result<StorefrontAPI.Cart, Error>.failure(cartCreateError)
 
         controller = MockWalletController(
@@ -174,7 +152,7 @@ final class WalletControllerTests: XCTestCase {
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
-            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier, errorDetail) = error else {
+            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier) = error else {
                 XCTFail("Expected cartAcquisition error, got: \(error)")
                 return
             }
@@ -185,16 +163,6 @@ final class WalletControllerTests: XCTestCase {
             } else {
                 XCTFail("Expected variant identifier, got: \(identifier)")
             }
-
-            // Verify the error detail contains the original cart create error
-            XCTAssertNotNil(errorDetail, "Expected error detail to be present")
-            guard let nsError = errorDetail as? NSError else {
-                XCTFail("Expected NSError, got: \(String(describing: errorDetail))")
-                return
-            }
-            XCTAssertEqual(nsError.domain, "CartCreateError")
-            XCTAssertEqual(nsError.code, 400)
-            XCTAssertEqual(nsError.localizedDescription, "Failed to create cart")
         }
     }
 
@@ -207,7 +175,7 @@ final class WalletControllerTests: XCTestCase {
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
-            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier, errorDetail) = error else {
+            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier) = error else {
                 XCTFail("Expected cartAcquisition error, got: \(error)")
                 return
             }
@@ -216,15 +184,6 @@ final class WalletControllerTests: XCTestCase {
                 XCTAssertEqual(reason, "Invalid identifier")
             } else {
                 XCTFail("Expected invariant identifier, got: \(identifier)")
-            }
-
-            // Verify the error detail is the invariant error thrown internally
-            XCTAssertNotNil(errorDetail, "Expected error detail to be present")
-            if let errorDetail = errorDetail as? ShopifyAcceleratedCheckouts.Error,
-               case let .invariant(expected) = errorDetail {
-                XCTAssertEqual(expected, "identifier")
-            } else {
-                XCTFail("Expected invariant error as detail, got: \(String(describing: errorDetail))")
             }
         }
     }
