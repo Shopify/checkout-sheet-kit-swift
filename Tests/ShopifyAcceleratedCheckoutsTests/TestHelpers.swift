@@ -22,6 +22,7 @@
  */
 
 import Foundation
+import PassKit
 @testable import ShopifyAcceleratedCheckouts
 
 // MARK: - Configuration Helpers
@@ -206,5 +207,36 @@ extension StorefrontAPI.Cart {
             discountCodes: [],
             discountAllocations: []
         )
+    }
+}
+
+// MARK: - PKPaymentRequest Helpers
+
+@available(iOS 17.0, *)
+extension PKPaymentRequest {
+    static var testPaymentRequest: PKPaymentRequest {
+        let request = PKPaymentRequest()
+        request.countryCode = "US"
+        request.currencyCode = "USD"
+        request.paymentSummaryItems = [.init(label: "item 1", amount: 22.00, type: .final)]
+        request.supportedNetworks = .init([.amex, .masterCard, .visa])
+        request.merchantCapabilities = .threeDSecure
+        return request
+    }
+
+    static func testPaymentRequest(
+        countryCode: String = "US",
+        currencyCode: String = "USD",
+        label: String = "item 1",
+        amount: NSDecimalNumber = 22.00,
+        supportedNetworks: [PKPaymentNetwork] = [.amex, .masterCard, .visa]
+    ) -> PKPaymentRequest {
+        let request = PKPaymentRequest()
+        request.countryCode = countryCode
+        request.currencyCode = currencyCode
+        request.paymentSummaryItems = [.init(label: label, amount: amount, type: .final)]
+        request.supportedNetworks = .init(supportedNetworks)
+        request.merchantCapabilities = .threeDSecure
+        return request
     }
 }
