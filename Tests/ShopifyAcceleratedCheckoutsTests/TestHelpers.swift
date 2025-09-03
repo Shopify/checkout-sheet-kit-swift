@@ -219,7 +219,7 @@ extension StorefrontAPI.Cart {
 /// Extend this class and override only the methods you need, per test file
 @available(iOS 16.0, *)
 class MockStorefrontAPI: StorefrontAPIProtocol {
-    func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
+    func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart {
         fatalError("cart(by:) not implemented in test. Override this method in your test class.")
     }
 
@@ -321,9 +321,9 @@ class MockStorefrontAPI: StorefrontAPIProtocol {
 
 @available(iOS 16.0, *)
 class TestStorefrontAPI: MockStorefrontAPI {
-    var cartResult: Result<StorefrontAPI.Cart?, Error>?
+    var cartResult: Result<StorefrontAPI.Cart, Error>?
 
-    override func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
+    override func cart(by _: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart {
         guard let result = cartResult else {
             fatalError("cartResult not configured for TestStorefrontAPI")
         }

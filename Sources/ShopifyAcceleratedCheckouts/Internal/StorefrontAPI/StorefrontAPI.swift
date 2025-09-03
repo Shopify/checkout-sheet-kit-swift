@@ -59,7 +59,7 @@ class StorefrontAPI: ObservableObject, StorefrontAPIProtocol {
 protocol StorefrontAPIProtocol {
     // MARK: - Query Methods
 
-    func cart(by id: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart?
+    func cart(by id: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart
     func shop() async throws -> StorefrontAPI.Shop
 
     // MARK: - Mutation Methods

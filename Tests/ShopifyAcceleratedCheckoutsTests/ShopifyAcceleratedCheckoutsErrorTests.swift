@@ -31,32 +31,50 @@ final class ShopifyAcceleratedCheckoutsErrorTests: XCTestCase {
     func test_cartAcquisitionError_withAllIdentifierTypes_shouldGenerateCorrectErrorMessages() {
         struct TestCase {
             let identifier: CheckoutIdentifier
-            let expectedError: String
+            let underlyingError: Error?
+            let expectedErrorPattern: String
             let description: String
         }
+
+        let networkError = NSError(domain: "NetworkError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Network failed"])
 
         let testCases: [TestCase] = [
             TestCase(
                 identifier: .cart(cartID: "gid://Shopify/Cart/test-id"),
-                expectedError: "unable to get cart for CheckoutIdentifier: cart(cartID: \"gid://Shopify/Cart/test-id\")",
-                description: "cart identifier"
+                underlyingError: nil,
+                expectedErrorPattern: "unable to get cart for CheckoutIdentifier: cart(cartID: \"gid://Shopify/Cart/test-id\") error: nil",
+                description: "cart identifier without error"
+            ),
+            TestCase(
+                identifier: .cart(cartID: "gid://Shopify/Cart/test-id"),
+                underlyingError: networkError,
+                expectedErrorPattern: "unable to get cart for CheckoutIdentifier: cart(cartID: \"gid://Shopify/Cart/test-id\") error: Optional(\"Network failed\")",
+                description: "cart identifier with error"
             ),
             TestCase(
                 identifier: .variant(variantID: "gid://Shopify/ProductVariant/test-id", quantity: 2),
-                expectedError: "unable to get cart for CheckoutIdentifier: variant(variantID: \"gid://Shopify/ProductVariant/test-id\", quantity: 2)",
-                description: "variant identifier"
+                underlyingError: nil,
+                expectedErrorPattern: "unable to get cart for CheckoutIdentifier: variant(variantID: \"gid://Shopify/ProductVariant/test-id\", quantity: 2) error: nil",
+                description: "variant identifier without error"
+            ),
+            TestCase(
+                identifier: .variant(variantID: "gid://Shopify/ProductVariant/test-id", quantity: 2),
+                underlyingError: networkError,
+                expectedErrorPattern: "unable to get cart for CheckoutIdentifier: variant(variantID: \"gid://Shopify/ProductVariant/test-id\", quantity: 2) error: Optional(\"Network failed\")",
+                description: "variant identifier with error"
             ),
             TestCase(
                 identifier: .invariant(reason: "Invalid checkout data"),
-                expectedError: "unable to get cart for CheckoutIdentifier: invariant(reason: \"Invalid checkout data\")",
-                description: "invariant identifier"
+                underlyingError: nil,
+                expectedErrorPattern: "unable to get cart for CheckoutIdentifier: invariant(reason: \"Invalid checkout data\") error: nil",
+                description: "invariant identifier without error"
             )
         ]
 
         for testCase in testCases {
-            let error = ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: testCase.identifier)
+            let error = ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: testCase.identifier, error: testCase.underlyingError)
             let errorString = error.toString()
-            XCTAssertEqual(errorString, testCase.expectedError, "Failed for \(testCase.description)")
+            XCTAssertEqual(errorString, testCase.expectedErrorPattern, "Failed for \(testCase.description)")
         }
     }
 

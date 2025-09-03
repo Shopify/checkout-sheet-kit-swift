@@ -110,7 +110,8 @@ final class ShopPayViewControllerTests: XCTestCase {
             configuration: mockConfiguration,
             storefront: mockStorefront
         )
-        viewController.mockStorefront.cartResult = .success(nil)
+        let cartError = NSError(domain: "CartNotFound", code: 404, userInfo: [NSLocalizedDescriptionKey: "Cart not found"])
+        viewController.mockStorefront.cartResult = .failure(cartError)
 
         await viewController.onPress()
 
@@ -211,7 +212,8 @@ final class ShopPayViewControllerTests: XCTestCase {
             ),
             storefront: mockStorefront
         )
-        viewController.mockStorefront.cartResult = .success(nil)
+        let cartError = NSError(domain: "CartNotFound", code: 404, userInfo: [NSLocalizedDescriptionKey: "Cart not found"])
+        viewController.mockStorefront.cartResult = .failure(cartError)
 
         await viewController.onPress()
 
@@ -255,7 +257,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         XCTAssertEqual(
             underlyingError?.localizedDescription,
             ShopifyAcceleratedCheckouts.Error
-                .cartAcquisition(identifier: identifier).localizedDescription
+                .cartAcquisition(identifier: identifier, error: nil).localizedDescription
         )
     }
 

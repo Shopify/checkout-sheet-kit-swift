@@ -30,7 +30,7 @@ extension StorefrontAPI {
     /// Get a cart by ID
     /// - Parameter id: Cart ID
     /// - Returns: The cart or nil if not found
-    func cart(by id: GraphQLScalars.ID) async throws -> Cart? {
+    func cart(by id: GraphQLScalars.ID) async throws -> Cart {
         let variables: [String: Any] = [
             "id": id.rawValue
         ]
@@ -39,7 +39,11 @@ extension StorefrontAPI {
             Operations.getCart(variables: variables)
         )
 
-        return response.data?.cart
+        guard let cart = response.data?.cart else {
+            throw StorefrontAPI.Errors.payload(propertyName: "cart")
+        }
+
+        return cart
     }
 
     /// Get shop information
