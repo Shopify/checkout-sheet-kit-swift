@@ -125,6 +125,7 @@ class PKDecoderTests: XCTestCase {
         XCTAssertEqual(testDecoder.selectedShippingMethod?.identifier, "express")
     }
 
+<<<<<<< HEAD
     // MARK: - requiredContactFields Tests
 
     func testRequiredContactFieldsDefaultsToEmailWhenNoFieldsConfigured() {
@@ -781,5 +782,58 @@ class PKDecoderTests: XCTestCase {
         let fields = testDecoder.requiredContactFields
         // Should not require any fields since customer has both email and phone (customer takes precedence)
         XCTAssertTrue(fields.isEmpty)
+    }
+
+    // MARK: - Error Handling Method Tests
+
+    func test_paymentRequestShippingMethodUpdate_withErrors_shouldReturnValidResponse() {
+        let testDecoder = decoder
+        let testError = PKPaymentError(.shippingAddressUnserviceableError)
+
+        let result = testDecoder.paymentRequestShippingMethodUpdate(errors: [testError])
+
+        XCTAssertEqual(result.status, .success, "Status should remain success")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should always return payment summary items")
+    }
+
+    func test_paymentRequestShippingMethodUpdate_withoutErrors_shouldReturnValidResponse() {
+        let testDecoder = decoder
+
+        let result = testDecoder.paymentRequestShippingMethodUpdate()
+
+        XCTAssertEqual(result.status, .success, "Status should remain success when no errors")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should return payment summary items")
+    }
+
+    func test_paymentRequestShippingContactUpdate_withAllPKPaymentErrors_shouldKeepSuccessStatus() {
+        let testDecoder = decoder
+        let pkPaymentError1 = PKPaymentError(.shippingAddressUnserviceableError)
+        let pkPaymentError2 = PKPaymentError(.shippingContactInvalidError)
+
+        let result = testDecoder.paymentRequestShippingContactUpdate(errors: [pkPaymentError1, pkPaymentError2])
+
+        XCTAssertEqual(result.status, .success, "Status should remain success when all errors are PKPaymentError")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should return payment summary items")
+    }
+
+    func test_paymentRequestShippingContactUpdate_withNonPKPaymentError_shouldSetFailureStatus() {
+        let testDecoder = decoder
+        let nonPKError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "test")
+
+        let result = testDecoder.paymentRequestShippingContactUpdate(errors: [nonPKError])
+
+        XCTAssertEqual(result.status, .failure, "Status should be failure when error is not PKPaymentError")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should return payment summary items")
+    }
+
+    func test_paymentRequestShippingContactUpdate_withMixedErrors_shouldSetFailureStatus() {
+        let testDecoder = decoder
+        let pkPaymentError = PKPaymentError(.shippingAddressUnserviceableError)
+        let nonPKError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "test")
+
+        let result = testDecoder.paymentRequestShippingContactUpdate(errors: [pkPaymentError, nonPKError])
+
+        XCTAssertEqual(result.status, .failure, "Status should be failure when any error is not PKPaymentError")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should return payment summary items")
     }
 }

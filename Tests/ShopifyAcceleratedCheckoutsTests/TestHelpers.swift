@@ -164,12 +164,31 @@ extension ApplePayConfigurationWrapper {
 extension StorefrontAPI.Cart {
     static var testCart: StorefrontAPI.Cart {
         let checkoutURL = URL(string: "https://test-shop.myshopify.com/checkout")!
+
+        // Create delivery option that matches test expectations
+        let deliveryOption = StorefrontAPI.CartDeliveryOption(
+            handle: "standard-shipping",
+            title: "Standard Shipping",
+            code: "STANDARD",
+            deliveryMethodType: .shipping,
+            description: "5-7 business days",
+            estimatedCost: StorefrontAPI.MoneyV2(amount: Decimal(5.00), currencyCode: "USD")
+        )
+
+        // Create delivery group with the delivery option
+        let deliveryGroup = StorefrontAPI.CartDeliveryGroup(
+            id: GraphQLScalars.ID("gid://shopify/CartDeliveryGroup/1"),
+            groupType: .oneTimePurchase,
+            deliveryOptions: [deliveryOption],
+            selectedDeliveryOption: nil
+        )
+
         return StorefrontAPI.Cart(
             id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
             checkoutUrl: GraphQLScalars.URL(checkoutURL),
             totalQuantity: 1,
             buyerIdentity: nil,
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: [deliveryGroup]),
             delivery: nil,
             lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
             cost: StorefrontAPI.CartCost(
