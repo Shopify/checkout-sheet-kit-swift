@@ -96,7 +96,7 @@ class PKEncoder {
             return .failure(.invariant(expected: "cart"))
         }
         guard let selectedShippingMethodId = try? selectedDeliveryOptionHandle.get() else {
-            return .failure(.invariant(expected: "shippingMethodID"))
+            return .failure(.invariant(expected: "selectedShippingMethodId"))
         }
         guard
             let deliveryGroupID = PassKitFactory.shared.getDeliveryOptionHandle(
@@ -104,7 +104,7 @@ class PKEncoder {
                 by: selectedShippingMethodId
             )
         else {
-            return .failure(.invariant(expected: "shippingMethodID"))
+            return .failure(.invariant(expected: "deliveryGroupID"))
         }
         return .success(deliveryGroupID)
     }
