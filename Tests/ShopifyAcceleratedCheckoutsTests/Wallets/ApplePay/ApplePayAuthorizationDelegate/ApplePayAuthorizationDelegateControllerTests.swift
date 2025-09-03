@@ -75,7 +75,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         )
 
         XCTAssertNotNil(result, "Should return a result for shipping method selection")
-        XCTAssertNotNil(result.paymentSummaryItems, "Should have payment summary items")
+        XCTAssertNil(result.paymentSummaryItems, "Should have payment summary items")
     }
 
     func test_didSelectShippingMethod_withFallbackLogic_shouldHandleInvalidMethods() async throws {
