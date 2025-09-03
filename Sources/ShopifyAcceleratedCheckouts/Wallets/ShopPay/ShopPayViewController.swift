@@ -55,7 +55,7 @@ class ShopPayViewController: WalletController {
             try await present(url: url, delegate: self)
         } catch {
             let error = CheckoutError.sdkError(underlying: error)
-            ShopifyAcceleratedCheckouts.logger.error("[present] Failed to setup cart: \(error)")
+            ShopifyAcceleratedCheckouts.logger.error("[present] Failed to create cart: \(error)")
             eventHandlers.checkoutDidFail?(error)
         }
     }
