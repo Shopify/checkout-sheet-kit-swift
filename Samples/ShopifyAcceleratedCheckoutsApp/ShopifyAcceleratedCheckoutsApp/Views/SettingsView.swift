@@ -95,40 +95,32 @@ struct SettingsView: View {
                     .foregroundColor(.secondary)
             }
 
-            Section("Customer Data (Pre-filled)") {
-                Text("Pre-filled values are automatically excluded from Apple Pay payment sheet to avoid overwriting them.")
+            Section("Apple Pay Contact Fields") {
+                Text("At least one contact field should be present to complete a checkout with Apple Pay. If email or phone is toggled off, you may supply a hardcoded value instead.")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                HStack {
-                    Text("Email:")
-                    TextField("customer@example.com", text: $email)
-                        .textContentType(.emailAddress)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                        .accessibilityLabel("Customer email field")
-                }
+                Toggle("Require Email from Apple Pay", isOn: $requireEmail)
 
-                HStack {
-                    Text("Phone:")
-                    TextField("+1234567890", text: $phone)
-                        .textContentType(.telephoneNumber)
-                        .keyboardType(.phonePad)
-                        .accessibilityLabel("Customer phone field")
-                }
+                TextField("Prefill Email (Optional)", text: $email)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                    .accessibilityLabel("Email field")
 
-                Text("Leave both fields empty to test without a Customer object")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            Section("Apple Pay Contact Fields Request") {
-                Text("Toggle these to request fields in Apple Pay. With our fix, if the field is already provided in Customer above, it won't be requested again.")
+                Text("Email will be attached to the buyerIdentity during cartCreate.")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                Toggle("Request Email in Apple Pay", isOn: $requireEmail)
-                Toggle("Request Phone in Apple Pay", isOn: $requirePhone)
+                Toggle("Require Phone from Apple Pay", isOn: $requirePhone)
+
+                TextField("Prefill Phone (Optional)", text: $phone)
+                    .textContentType(.telephoneNumber)
+                    .keyboardType(.phonePad)
+
+                Text("Phone Number will be attached to the buyerIdentity during cartCreate.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
         }
         .navigationTitle("Settings")
