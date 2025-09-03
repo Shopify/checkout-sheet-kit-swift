@@ -24,6 +24,7 @@
 import Apollo
 import ApolloAPI
 import Foundation
+import ShopifyAcceleratedCheckouts
 
 typealias Cart = Storefront.CartCreateMutation.Data.CartCreate.Cart
 typealias CartLine = Storefront.CartCreateMutation.Data.CartCreate.Cart.Lines.Node
@@ -125,6 +126,7 @@ class Network {
 
     func createCart(
         merchandiseQuantities: [MerchandiseID: Quantity],
+        configuration: ShopifyAcceleratedCheckouts.Configuration? = nil,
         completionHandler: @escaping (Cart?) -> Void
     ) {
         let lines = merchandiseQuantities.map { merchandiseId, quantity in
@@ -134,7 +136,22 @@ class Network {
             )
         }
 
-        let input = Storefront.CartInput(lines: .some(lines))
+        // Create buyerIdentity from Customer configuration if available
+        var buyerIdentity: Storefront.CartBuyerIdentityInput?
+        if let customer = configuration?.customer {
+            let emailInput: GraphQLNullable<String> = customer.email.map { .some($0) } ?? .none
+            let phoneInput: GraphQLNullable<String> = customer.phoneNumber.map { .some($0) } ?? .none
+
+            buyerIdentity = Storefront.CartBuyerIdentityInput(
+                email: emailInput,
+                phone: phoneInput
+            )
+        }
+
+        let input = Storefront.CartInput(
+            lines: .some(lines),
+            buyerIdentity: buyerIdentity != nil ? .some(buyerIdentity!) : nil
+        )
 
         // Get device locale for @inContext directive
         let countryCode = GraphQLEnum(Storefront.CountryCode(rawValue: Locale.current.region?.identifier ?? "US") ?? .us)

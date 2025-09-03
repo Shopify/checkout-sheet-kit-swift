@@ -116,7 +116,7 @@ struct CartBuilderView: View {
     private func createCustomCart() {
         isCreatingCart = true
 
-        Network.shared.createCart(merchandiseQuantities: selectedVariants) { cart in
+        Network.shared.createCart(merchandiseQuantities: selectedVariants, configuration: configuration) { cart in
             withAnimation {
                 self.cart = cart
                 isCreatingCart = false

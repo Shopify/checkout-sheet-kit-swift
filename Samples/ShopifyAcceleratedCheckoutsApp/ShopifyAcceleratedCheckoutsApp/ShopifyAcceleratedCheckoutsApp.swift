@@ -35,10 +35,20 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage(AppStorageKeys.phone.rawValue) var phone: String = ""
 
     var configuration: ShopifyAcceleratedCheckouts.Configuration {
-        .init(
+        let customer: ShopifyAcceleratedCheckouts.Customer?
+        if !email.isEmpty || !phone.isEmpty {
+            customer = ShopifyAcceleratedCheckouts.Customer(
+                email: email.isEmpty ? nil : email,
+                phoneNumber: phone.isEmpty ? nil : phone
+            )
+        } else {
+            customer = nil
+        }
+
+        return .init(
             storefrontDomain: EnvironmentVariables.storefrontDomain,
             storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
-            customer: ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: phone)
+            customer: customer
         )
     }
 
@@ -56,8 +66,6 @@ struct ShopifyAcceleratedCheckoutsApp: App {
                         }
                     }
                     .id("\(requireEmail)-\(requirePhone)")
-                    .onChange(of: email) { _ in updateConfiguration() }
-                    .onChange(of: phone) { _ in updateConfiguration() }
             }
             .onAppear {
                 ShopifyAcceleratedCheckouts.logLevel = logLevel
@@ -66,13 +74,6 @@ struct ShopifyAcceleratedCheckoutsApp: App {
             .environmentObject(applePayConfiguration)
         }
         .environment(\.locale, Locale(identifier: locale))
-    }
-
-    private func updateConfiguration() {
-        configuration.customer = ShopifyAcceleratedCheckouts.Customer(
-            email: email.isEmpty ? nil : email,
-            phoneNumber: phone.isEmpty ? nil : phone
-        )
     }
 }
 
