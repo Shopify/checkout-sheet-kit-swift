@@ -243,20 +243,20 @@ final class ShopPayViewControllerTests: XCTestCase {
             ),
             storefront: mockStorefront
         )
-        // Exact failure doesn't matter - just need fetchCartByCheckoutIdentifier to throw .cartAcquisition
-        viewController.mockStorefront.cartCreateResult = .failure(
-            NSError(domain: "CartCreateError", code: 400, userInfo: nil)
-        )
+        // Now cartCreate errors pass through directly instead of being wrapped
+        let cartCreateError = NSError(domain: "CartCreateError", code: 400, userInfo: nil)
+        viewController.mockStorefront.cartCreateResult = .failure(cartCreateError)
 
         await viewController.onPress()
 
         await fulfillment(of: [checkoutDidFailExpectation], timeout: 1.0)
 
-        XCTAssertEqual(
-            underlyingError?.localizedDescription,
-            ShopifyAcceleratedCheckouts.Error
-                .cartAcquisition(identifier: identifier).localizedDescription
-        )
+        guard let nsError = underlyingError as? NSError else {
+            XCTFail("Expected NSError, got: \(String(describing: underlyingError))")
+            return
+        }
+        XCTAssertEqual(nsError.domain, "CartCreateError")
+        XCTAssertEqual(nsError.code, 400)
     }
 
     func test_onPress_withInvariantIdentifier_shouldCallCheckoutDidFail() async throws {

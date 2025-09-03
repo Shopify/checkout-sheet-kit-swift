@@ -45,10 +45,7 @@ class WalletController: ObservableObject {
 
         case let .variant(id, quantity):
             let items = Array(repeating: GraphQLScalars.ID(id), count: quantity)
-            guard let cart = try? await storefront.cartCreate(with: items, customer: nil) else {
-                throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)
-            }
-            return cart
+            return try await storefront.cartCreate(with: items, customer: nil)
 
         case .invariant:
             throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)

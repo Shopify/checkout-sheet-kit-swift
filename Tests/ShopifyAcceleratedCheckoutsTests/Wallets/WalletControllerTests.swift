@@ -152,17 +152,9 @@ final class WalletControllerTests: XCTestCase {
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
-            guard case let ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier) = error else {
-                XCTFail("Expected cartAcquisition error, got: \(error)")
-                return
-            }
-
-            if case let .variant(variantID, quantity) = identifier {
-                XCTAssertEqual(variantID, "gid://Shopify/ProductVariant/test-variant-id")
-                XCTAssertEqual(quantity, 2)
-            } else {
-                XCTFail("Expected variant identifier, got: \(identifier)")
-            }
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "CartCreateError")
+            XCTAssertEqual(nsError.code, 400)
         }
     }
 
