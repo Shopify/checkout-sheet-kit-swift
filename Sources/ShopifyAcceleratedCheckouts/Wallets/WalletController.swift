@@ -69,6 +69,7 @@ class WalletController: ObservableObject {
         )
     }
 
+    @MainActor
     func getTopViewController() -> UIViewController? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first
