@@ -34,8 +34,9 @@ extension PKPaymentRequestShippingContactUpdate: PKPaymentRequestUpdatable {}
 extension PKPaymentRequestPaymentMethodUpdate: PKPaymentRequestUpdatable {}
 extension PKPaymentAuthorizationResult: PKPaymentRequestUpdatable {}
 extension PKPaymentRequestShippingMethodUpdate: PKPaymentRequestUpdatable {
+    // Mocking conformance to enable reuse of `setErrorStatus` - this code is never run/accessed
     var errors: [any Error]! {
-        get { return errors }
+        get { [] }
         // swiftlint:disable:next unused_setter_value
         set {}
     }
