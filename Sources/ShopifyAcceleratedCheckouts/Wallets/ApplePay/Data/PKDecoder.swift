@@ -36,13 +36,11 @@ extension PKPaymentAuthorizationResult: PKPaymentRequestUpdatable {}
 
 /// Decodes Storefront -> PassKit
 @available(iOS 16.0, *)
-class PKDecoder {
+class PKDecoder: Loggable {
     var cart: () -> StorefrontAPI.Types.Cart?
-
     var selectedShippingMethod: PKShippingMethod?
     var configuration: ApplePayConfigurationWrapper
     var initialCurrencyCode: String?
-    private let logger = ShopifyAcceleratedCheckouts.logger.extend("PKDecoder")
 
     init(
         configuration: ApplePayConfigurationWrapper,
@@ -112,7 +110,7 @@ class PKDecoder {
                 cart: cart()
             )
         } catch {
-            ShopifyAcceleratedCheckouts.logger.error("Error creating discount allocations: \(error)")
+            logError("Error creating discount allocations: \(error)")
             return []
         }
     }

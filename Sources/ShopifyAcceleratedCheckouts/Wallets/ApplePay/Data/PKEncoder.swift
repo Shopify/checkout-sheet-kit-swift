@@ -25,7 +25,7 @@ import PassKit
 
 /// Encodes PassKit -> Storefront
 @available(iOS 16.0, *)
-class PKEncoder {
+class PKEncoder: Loggable {
     var cart: () -> StorefrontAPI.Types.Cart?
     /// Set during `didSelectShippingMethod`
     var selectedShippingMethod: PKShippingMethod?
@@ -41,7 +41,6 @@ class PKEncoder {
             .invariant(expected: "shippingContact")
         )
     var configuration: ApplePayConfigurationWrapper
-    private let logger = ShopifyAcceleratedCheckouts.logger.extend("PKEncoder")
 
     init(
         configuration: ApplePayConfigurationWrapper,
@@ -74,7 +73,7 @@ class PKEncoder {
 
     var cartID: Result<StorefrontAPI.Types.ID, ShopifyAcceleratedCheckouts.Error> {
         guard let cartID = cart()?.id else {
-            logger.error("No cart ID available for encoding")
+            logError("No cart ID available for encoding")
             return .failure(.invariant(expected: "cart"))
         }
         return .success(cartID)
@@ -119,7 +118,7 @@ class PKEncoder {
         let contact = PKContact()
         contact.postalAddress = address
         guard let address = try? pkContactToAddress(contact: contact).get() else {
-            logger.error("Failed to convert PKContact to address")
+            logError("Failed to convert PKContact to address")
             return .failure(.invariant(expected: "address.pkContactToAddress"))
         }
         return .success(address)

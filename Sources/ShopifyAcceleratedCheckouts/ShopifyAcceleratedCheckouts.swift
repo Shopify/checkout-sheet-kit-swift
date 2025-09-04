@@ -40,6 +40,6 @@ public enum ShopifyAcceleratedCheckouts {
     }
 
     /// Shared logger for ShopifyAcceleratedCheckouts
-    /// To modify the logLevel
+    /// Use ShopifyAcceleratedCheckouts.logLevel to modify verbosity
     internal static var logger = OSLogger(prefix: name, logLevel: logLevel)
 }

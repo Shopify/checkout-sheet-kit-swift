@@ -36,15 +36,8 @@ public enum LogLevel: String, CaseIterable {
 public class OSLogger {
     private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
     private var prefix: String
-    private var namespaces: [String] = []
-    private weak var parent: OSLogger?
-    private var children = NSHashTable<OSLogger>.weakObjects()
 
-    package var logLevel: LogLevel {
-        didSet {
-            propagateLogLevel(logLevel)
-        }
-    }
+    package var logLevel: LogLevel
 
     public static var shared = OSLogger()
 
@@ -58,49 +51,31 @@ public class OSLogger {
         self.logLevel = logLevel
     }
 
-    public func extend(_ namespace: String) -> OSLogger {
-        let childLogger = OSLogger(prefix: prefix, logLevel: logLevel)
-        childLogger.namespaces = namespaces + [namespace]
-        childLogger.parent = self
-        children.add(childLogger)
-        return childLogger
-    }
-
-    private func propagateLogLevel(_ newLevel: LogLevel) {
-        for child in children.allObjects {
-            child.logLevel = newLevel
-        }
-    }
-
-    private var namespacesString: String {
-        namespaces.isEmpty ? "" : "[\(namespaces.joined(separator: "]["))]"
-    }
-
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        let fullMessage = "[\(prefix)]\(namespacesString) (Debug) - \(message)"
+        let fullMessage = "[\(prefix)] (Debug) - \(message)"
         sendToOSLog(fullMessage, type: .debug)
     }
 
     public func info(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        let fullMessage = "[\(prefix)]\(namespacesString) (Info) - \(message)"
+        let fullMessage = "[\(prefix)] (Info) - \(message)"
         sendToOSLog(fullMessage, type: .info)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        let fullMessage = "[\(prefix)]\(namespacesString) (Error) - \(message)"
+        let fullMessage = "[\(prefix)] (Error) - \(message)"
         sendToOSLog(fullMessage, type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        let fullMessage = "[\(prefix)]\(namespacesString) (Fault) - \(message)"
+        let fullMessage = "[\(prefix)] (Fault) - \(message)"
         sendToOSLog(fullMessage, type: .fault)
     }
 
