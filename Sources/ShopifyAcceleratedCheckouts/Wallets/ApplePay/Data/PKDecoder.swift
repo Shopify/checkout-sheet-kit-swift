@@ -182,16 +182,16 @@ class PKDecoder {
 
         // Only request email if it's not already in buyerIdentity
         if configuration.applePay.contactFields.contains(.email) {
-            let emailAlreadyExists = !(buyerIdentity?.email?.isEmpty ?? true)
-            if !emailAlreadyExists {
+            let isEmailEmpty = buyerIdentity?.email?.isEmpty ?? true
+            if isEmailEmpty {
                 fields.insert(.emailAddress)
             }
         }
 
         // Only request phone if it's not already in buyerIdentity
         if configuration.applePay.contactFields.contains(.phone) {
-            let phoneAlreadyExists = !(buyerIdentity?.phone?.isEmpty ?? true)
-            if !phoneAlreadyExists {
+            let isPhoneEmpty = buyerIdentity?.phone?.isEmpty ?? true
+            if isPhoneEmpty {
                 fields.insert(.phoneNumber)
             }
         }

@@ -139,8 +139,8 @@ class Network {
         // Create buyerIdentity from Customer configuration if available
         var buyerIdentity: Storefront.CartBuyerIdentityInput?
         if let customer = configuration?.customer {
-            let emailInput: GraphQLNullable<String> = customer.email.map { .some($0) } ?? .none
-            let phoneInput: GraphQLNullable<String> = customer.phoneNumber.map { .some($0) } ?? .none
+            let emailInput: GraphQLNullable<String> = customer.email ?? .none
+            let phoneInput: GraphQLNullable<String> = customer.phoneNumber ?? .none
 
             buyerIdentity = Storefront.CartBuyerIdentityInput(
                 email: emailInput,
@@ -150,7 +150,7 @@ class Network {
 
         let input = Storefront.CartInput(
             lines: .some(lines),
-            buyerIdentity: buyerIdentity != nil ? .some(buyerIdentity!) : nil
+            buyerIdentity: buyerIdentity ?? .none
         )
 
         // Get device locale for @inContext directive
