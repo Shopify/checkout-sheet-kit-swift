@@ -152,22 +152,11 @@ class ApplePayViewControllerTests: XCTestCase {
 
     // MARK: - Callback Properties
 
-    func test_onCheckoutComplete_whenDefault_isNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutComplete)
-        }
-    }
-
-    func test_onCheckoutFail_whenDefault_isNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutFail)
-        }
-    }
-
-    func test_onCheckoutCancel_whenDefault_isNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutCancel)
-        }
+    @MainActor
+    func test_checkoutCallbacks_whenDefault_areNil() async {
+        XCTAssertNil(viewController.onCheckoutComplete)
+        XCTAssertNil(viewController.onCheckoutFail)
+        XCTAssertNil(viewController.onCheckoutCancel)
     }
 
     // MARK: - Delegate
@@ -217,13 +206,31 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.first, .startPaymentRequest)
     }
 
-    func test_onPress_whenCreateOrFetchCartFails_callsCompletedTransition() async throws {
+    @MainActor
+    func test_onPress_whenCreateOrFetchCartFails_callsOnCheckoutFailAndCompletedTransition() async throws {
         let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
         mockStorefront.cartResult = .failure(expectedError)
 
+        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail should be called")
+        var receivedError: CheckoutError?
+        viewController.onCheckoutFail = { error in
+            receivedError = error
+            onCheckoutFailExpectation.fulfill()
+        }
+
         await viewController.onPress()
 
+        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
+
         XCTAssertNil(viewController.cart)
+        XCTAssertNotNil(receivedError)
+        guard case let .sdkError(underlying, _) = receivedError else {
+            XCTFail("Expected sdkError, got: \(String(describing: receivedError))")
+            return
+        }
+        let nsError = underlying as NSError
+        XCTAssertEqual(nsError.domain, "TestError")
+        XCTAssertEqual(nsError.code, 500)
 
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
         XCTAssertEqual(
@@ -233,12 +240,28 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
     }
 
-    func test_onPress_whenCartIsNil_callsCompletedTransition() async throws {
+    @MainActor
+    func test_onPress_whenCartIsNil_callsOnCheckoutFailAndCompletedTransition() async throws {
         mockStorefront.cartResult = .success(nil)
+
+        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail should be called")
+        var receivedError: CheckoutError?
+        viewController.onCheckoutFail = { error in
+            receivedError = error
+            onCheckoutFailExpectation.fulfill()
+        }
 
         await viewController.onPress()
 
+        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
+
         XCTAssertNil(viewController.cart)
+        XCTAssertNotNil(receivedError)
+        guard case let .sdkError(underlying, _) = receivedError else {
+            XCTFail("Expected sdkError, got: \(String(describing: receivedError))")
+            return
+        }
+        XCTAssertTrue(underlying is ShopifyAcceleratedCheckouts.Error)
 
         // WalletController.fetchCartByCheckoutIdentifier throws when cart is nil
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
@@ -283,24 +306,20 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_createOrfetchCart_whenCheckoutError_callsTerminalErrorTransition() async throws {
-        let checkoutSdkError = CheckoutError.sdkError(
-            underlying: NSError(domain: "CheckoutError", code: 400, userInfo: nil)
-        )
-        mockStorefront.cartResult = .failure(checkoutSdkError)
-
-        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail callback should be invoked")
-        viewController.onCheckoutFail = { _ in onCheckoutFailExpectation.fulfill() }
+    func test_createOrfetchCart_whenNSError_callsTerminalErrorTransition() async throws {
+        let nsError = NSError(domain: "TestError", code: 400, userInfo: nil)
+        mockStorefront.cartResult = .failure(nsError)
 
         await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
-            XCTAssertTrue(error is CheckoutError)
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "TestError")
+            XCTAssertEqual(nsError.code, 400)
         }
 
-        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
         XCTAssertEqual(
             mockAuthorizationDelegate.transitionHistory.first,
-            .terminalError(error: checkoutSdkError)
+            .terminalError(error: nsError)
         )
     }
 
@@ -431,17 +450,23 @@ class ApplePayViewControllerTests: XCTestCase {
         let genericError = NSError(domain: "TestError", code: 123, userInfo: nil)
         mockStorefront.cartResult = .failure(genericError)
 
+        let firstFailExpectation = XCTestExpectation(description: "First onCheckoutFail call")
+        viewController.onCheckoutFail = { _ in firstFailExpectation.fulfill() }
+
         await viewController.onPress()
+        await fulfillment(of: [firstFailExpectation], timeout: 1.0)
         XCTAssertNil(viewController.cart)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
 
         mockAuthorizationDelegate.resetMocks()
-        let checkoutError = CheckoutError.sdkError(
-            underlying: NSError(domain: "CheckoutError", code: 400, userInfo: nil)
-        )
-        mockStorefront.cartResult = .failure(checkoutError)
+        let anotherError = NSError(domain: "AnotherError", code: 400, userInfo: nil)
+        mockStorefront.cartResult = .failure(anotherError)
+
+        let secondFailExpectation = XCTestExpectation(description: "Second onCheckoutFail call")
+        viewController.onCheckoutFail = { _ in secondFailExpectation.fulfill() }
 
         await viewController.onPress()
+        await fulfillment(of: [secondFailExpectation], timeout: 1.0)
         XCTAssertNil(viewController.cart)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
     }

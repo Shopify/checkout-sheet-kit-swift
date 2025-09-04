@@ -160,6 +160,7 @@ class ApplePayViewController: WalletController, PayController {
             try? await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
             ShopifyAcceleratedCheckouts.logger.error("[startPayment] Failed to setup cart: \(error)")
+            await onCheckoutFail?(.sdkError(underlying: error))
             try? await authorizationDelegate.transition(to: .completed)
         }
     }
@@ -170,9 +171,6 @@ class ApplePayViewController: WalletController, PayController {
         } catch let error as StorefrontAPI.Errors {
             return try await handleStorefrontError(error)
         } catch {
-            if let checkoutError = error as? CheckoutError {
-                await onCheckoutFail?(checkoutError)
-            }
             try? await authorizationDelegate.transition(to: .terminalError(error: error))
             throw error
         }
