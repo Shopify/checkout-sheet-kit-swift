@@ -332,4 +332,79 @@ class PKDecoderTests: XCTestCase {
         // Both email and phone should be requested since empty strings are treated as not present
         XCTAssertEqual(fields, [.emailAddress, .phoneNumber])
     }
+
+    func testRequiredContactFieldsRequestsBothWhenBothNilInBuyerIdentity() {
+        let configuration = ApplePayConfigurationWrapper.testConfiguration(
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: [.email, .phone]
+            )
+        )
+
+        let cartWithNilBuyerIdentity = StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
+                email: nil,
+                phone: nil
+            ),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+
+        let testDecoder = PKDecoder(
+            configuration: configuration,
+            cart: { cartWithNilBuyerIdentity }
+        )
+
+        let fields = testDecoder.requiredContactFields
+        // Both email and phone should be requested since they are nil in buyerIdentity
+        XCTAssertEqual(fields, [.emailAddress, .phoneNumber])
+    }
+
+    func testRequiredContactFieldsRequestsBothWhenBuyerIdentityIsNil() {
+        let configuration = ApplePayConfigurationWrapper.testConfiguration(
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: [.email, .phone]
+            )
+        )
+
+        let cartWithoutBuyerIdentity = StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: nil,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+
+        let testDecoder = PKDecoder(
+            configuration: configuration,
+            cart: { cartWithoutBuyerIdentity }
+        )
+
+        let fields = testDecoder.requiredContactFields
+        // Both email and phone should be requested since buyerIdentity is nil
+        XCTAssertEqual(fields, [.emailAddress, .phoneNumber])
+    }
 }
