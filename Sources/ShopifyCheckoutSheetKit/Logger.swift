@@ -36,6 +36,7 @@ public enum LogLevel: String, CaseIterable {
 public class OSLogger {
     private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
     private var prefix: String
+
     package var logLevel: LogLevel
 
     public static var shared = OSLogger()
@@ -53,25 +54,29 @@ public class OSLogger {
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        sendToOSLog("[\(prefix)] (Debug) - \(message)", type: .debug)
+        let fullMessage = "[\(prefix)] (Debug) - \(message)"
+        sendToOSLog(fullMessage, type: .debug)
     }
 
     public func info(_ message: String) {
         guard shouldEmit(.debug) else { return }
 
-        sendToOSLog("[\(prefix)] (Info) - \(message)", type: .info)
+        let fullMessage = "[\(prefix)] (Info) - \(message)"
+        sendToOSLog(fullMessage, type: .info)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        sendToOSLog("[\(prefix)] (Error) - \(message)", type: .error)
+        let fullMessage = "[\(prefix)] (Error) - \(message)"
+        sendToOSLog(fullMessage, type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
 
-        sendToOSLog("[\(prefix)] (Fault) - \(message)", type: .fault)
+        let fullMessage = "[\(prefix)] (Fault) - \(message)"
+        sendToOSLog(fullMessage, type: .fault)
     }
 
     /// Capturing `os_log` output is not possible

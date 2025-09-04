@@ -35,10 +35,11 @@ public enum ShopifyAcceleratedCheckouts {
     public static var logLevel: LogLevel = .error {
         didSet {
             logger.logLevel = logLevel
+            logger.debug("Log level changed to: \(logLevel)")
         }
     }
 
     /// Shared logger for ShopifyAcceleratedCheckouts
-    /// To modify the logLevel
+    /// Use ShopifyAcceleratedCheckouts.logLevel to modify verbosity
     internal static var logger = OSLogger(prefix: name, logLevel: logLevel)
 }
