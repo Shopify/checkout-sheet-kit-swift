@@ -71,7 +71,7 @@ final class ApplePayStateTests: XCTestCase {
         XCTAssertTrue(fromState.canTransition(to: ApplePayState.interrupt(reason: .currencyChanged)), "Should allow paymentAuthorized -> interrupt")
 
         XCTAssertFalse(fromState.canTransition(to: ApplePayState.idle), "Should not allow paymentAuthorized -> idle")
-        XCTAssertFalse(fromState.canTransition(to: ApplePayState.appleSheetPresented), "Should not allow paymentAuthorized -> appleSheetPresented")
+        XCTAssertTrue(fromState.canTransition(to: ApplePayState.appleSheetPresented), "Should allow paymentAuthorized -> appleSheetPresented (when userErrors require sheet to remain open)")
         XCTAssertFalse(fromState.canTransition(to: ApplePayState.completed), "Should not allow paymentAuthorized -> completed")
         XCTAssertFalse(fromState.canTransition(to: ApplePayState.reset), "Should not allow paymentAuthorized -> reset")
     }

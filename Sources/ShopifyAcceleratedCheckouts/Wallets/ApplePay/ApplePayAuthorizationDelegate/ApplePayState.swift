@@ -123,6 +123,9 @@ enum ApplePayState: Equatable {
              (.paymentAuthorized, .cartSubmittedForCompletion),
              (.paymentAuthorized, .paymentAuthorizationFailed),
              (.paymentAuthorized, .interrupt),
+             /// When userErrors throw in didAuthorizePayment
+             /// (e.g. cartBuyerIdentityUpdate no emojis) sheet should remain open
+             (.paymentAuthorized, .appleSheetPresented),
 
              (.paymentAuthorizationFailed, .completed),
              (.paymentAuthorizationFailed, .reset),
