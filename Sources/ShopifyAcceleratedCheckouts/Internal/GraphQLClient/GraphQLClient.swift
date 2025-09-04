@@ -55,30 +55,14 @@ class GraphQLClient {
     /// - Parameter operation: The GraphQL query operation
     /// - Returns: The decoded response
     func query<T: Decodable>(_ operation: GraphQLRequest<T>) async throws -> GraphQLResponse<T> {
-        logger.debug("GraphQL query started")
-        do {
-            let result = try await execute(operation: operation)
-            logger.debug("GraphQL query completed successfully")
-            return result
-        } catch {
-            logger.error("GraphQL query failed")
-            throw error
-        }
+        return try await execute(operation: operation)
     }
 
     /// Execute a GraphQL mutation
     /// - Parameter operation: The GraphQL mutation operation
     /// - Returns: The decoded response
     func mutate<T: Decodable>(_ operation: GraphQLRequest<T>) async throws -> GraphQLResponse<T> {
-        logger.debug("GraphQL mutation started")
-        do {
-            let result = try await execute(operation: operation)
-            logger.debug("GraphQL mutation completed successfully")
-            return result
-        } catch {
-            logger.error("GraphQL mutation failed")
-            throw error
-        }
+        return try await execute(operation: operation)
     }
 
     /// Execute a raw GraphQL request
@@ -95,12 +79,12 @@ class GraphQLClient {
         let (data, response) = try await session.data(for: urlRequest)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            logger.error("GraphQL request received invalid HTTP response")
+            logger.error("Could not decode response into expected: HTTPURLResponse")
             throw GraphQLError.networkError("Invalid response")
         }
 
         if httpResponse.statusCode != 200 {
-            logger.error("GraphQL request failed with HTTP status code: \(httpResponse.statusCode)")
+            logger.error("Expected statusCode: 200, received: \(httpResponse.statusCode)")
             throw GraphQLError.httpError(statusCode: httpResponse.statusCode, data: data)
         }
 
@@ -110,7 +94,7 @@ class GraphQLClient {
         let decodedResponse = try decoder.decode(GraphQLResponse<T>.self, from: data)
 
         if let errors = decodedResponse.errors, !errors.isEmpty {
-            logger.error("GraphQL request returned errors: \(errors.count) error(s)")
+            logger.error("Reponse contained \(errors.count) error(s)")
             throw GraphQLError.graphQLErrors(errors)
         }
 
