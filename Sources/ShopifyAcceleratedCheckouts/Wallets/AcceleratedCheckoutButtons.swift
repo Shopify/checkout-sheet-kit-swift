@@ -80,7 +80,7 @@ public struct AcceleratedCheckoutButtons: View {
     public init(variantID: String, quantity: Int) {
         identifier = .variant(variantID: variantID, quantity: quantity).parse()
         if case let .invariant(reason) = identifier {
-            ShopifyAcceleratedCheckouts.logger .error(
+            ShopifyAcceleratedCheckouts.logger.error(
                 "AcceleratedCheckoutButtons failed to parse identifier: \(reason)"
             )
             _currentRenderState = State(initialValue: .error(reason: reason))

@@ -41,11 +41,10 @@ extension PKPaymentAuthorizationController: PaymentAuthorizationController {}
 typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthorizationController
 
 @available(iOS 16.0, *)
-class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
+class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
     let configuration: ApplePayConfigurationWrapper
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
     var controller: PayController
-    internal let logger = ShopifyAcceleratedCheckouts.logger.extend("ApplePayAuthorizationDelegate")
 
     /// Factory for creating PaymentAuthorizationController instances - injectable for testing
     var paymentControllerFactory: PKAuthorizationControllerFactory
@@ -100,14 +99,14 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private(set) var state: ApplePayState = .idle {
         didSet {
-            logger.debug("State transition: \(String(describing: oldValue)) -> \(String(describing: state))")
+            logDebug("State transition: \(String(describing: oldValue)) -> \(String(describing: state))")
         }
     }
 
     private func startPaymentRequest() async throws {
-        logger.debug("Starting Apple Pay payment request")
+        logDebug("Starting Apple Pay payment request")
         guard let cart = controller.cart else {
-            logger.error("No cart available for payment request")
+            logError("No cart available for payment request")
             return
         }
         try setCart(to: cart)
@@ -117,13 +116,13 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         paymentController.delegate = self
         let presented = await paymentController.present()
 
-        logger.debug("Apple Pay sheet presented: \(presented)")
+        logDebug("Apple Pay sheet presented: \(presented)")
         try await transition(to: presented ? .appleSheetPresented : .reset)
     }
 
     func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
-            logger.error("Invalid state transition: \(String(describing: state)) -> \(String(describing: nextState))")
+            logError("Invalid state transition: \(String(describing: state)) -> \(String(describing: nextState))")
             throw InvalidStateTransitionError(fromState: state, toState: nextState)
         }
 
@@ -153,7 +152,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     }
 
     private func onReset() async throws {
-        logger.debug("Resetting Apple Pay authorization state")
+        logDebug("Resetting Apple Pay authorization state")
         pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
         pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
         selectedShippingAddressID = nil
@@ -162,9 +161,9 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     }
 
     private func onPresentingCSK(to url: URL?, previousState: ApplePayState) async throws {
-        logger.debug("Presenting checkout sheet")
+        logDebug("Presenting checkout sheet")
         guard let url else {
-            logger.error("No URL available for checkout sheet presentation")
+            logError("No URL available for checkout sheet presentation")
             try await transition(
                 to: .terminalError(
                     error: ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
@@ -264,7 +263,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
                 selectedShippingAddressID = nil
             } catch {
                 if let responseError = error as? StorefrontAPI.Errors {
-                    logger.error("Delivery address remove failed: \(responseError)")
+                    logError("Delivery address remove failed: \(responseError)")
                 }
             }
         }
@@ -281,7 +280,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
             return cart
         } catch {
             if let responseError = error as? StorefrontAPI.Errors {
-                logger.error("Delivery address add failed: \(responseError)")
+                logError("Delivery address add failed: \(responseError)")
             }
             throw error
         }

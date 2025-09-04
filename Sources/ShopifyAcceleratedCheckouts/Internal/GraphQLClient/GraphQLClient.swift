@@ -26,12 +26,11 @@ import ShopifyCheckoutSheetKit
 
 /// A lightweight GraphQL client for the Storefront API without external dependencies
 @available(iOS 16.0, *)
-class GraphQLClient {
+class GraphQLClient: Loggable {
     let url: URL
     private let headers: [String: String]
     private let session: URLSession
     let inContextDirective: InContextDirective
-    private let logger = ShopifyAcceleratedCheckouts.logger.extend("GraphQLClient")
 
     /// Initialize a new GraphQL client
     /// - Parameters:
@@ -79,12 +78,12 @@ class GraphQLClient {
         let (data, response) = try await session.data(for: urlRequest)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            logger.error("Could not decode response into expected: HTTPURLResponse")
+            logError("Could not decode response into expected: HTTPURLResponse")
             throw GraphQLError.networkError("Invalid response")
         }
 
         if httpResponse.statusCode != 200 {
-            logger.error("Expected statusCode: 200, received: \(httpResponse.statusCode)")
+            logError("Expected statusCode: 200, received: \(httpResponse.statusCode)")
             throw GraphQLError.httpError(statusCode: httpResponse.statusCode, data: data)
         }
 
@@ -94,7 +93,7 @@ class GraphQLClient {
         let decodedResponse = try decoder.decode(GraphQLResponse<T>.self, from: data)
 
         if let errors = decodedResponse.errors, !errors.isEmpty {
-            logger.error("Reponse contained \(errors.count) error(s)")
+            logError("Reponse contained \(errors.count) error(s)")
             throw GraphQLError.graphQLErrors(errors)
         }
 
