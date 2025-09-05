@@ -71,7 +71,8 @@ struct ApplePayButton: View {
                 identifier: identifier,
                 label: label,
                 configuration: ApplePayConfigurationWrapper(
-                    common: configuration, applePay: applePayConfiguration,
+                    common: configuration,
+                    applePay: applePayConfiguration,
                     shopSettings: shopSettings
                 ),
                 eventHandlers: eventHandlers,
@@ -134,7 +135,7 @@ struct Internal_ApplePayButton: View {
         PayWithApplePayButton(
             label,
             action: {
-                Task { await controller.startPayment() }
+                Task { await controller.onPress() }
             },
             fallback: {
                 Text("errors.applePay.unsupported".localizedString)

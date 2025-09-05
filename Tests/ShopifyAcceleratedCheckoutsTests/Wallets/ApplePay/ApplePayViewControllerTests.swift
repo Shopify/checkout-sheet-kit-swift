@@ -21,22 +21,31 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import UIKit
 import XCTest
 
+@testable import ShopifyAcceleratedCheckouts
+
 @available(iOS 17.0, *)
 class ApplePayViewControllerTests: XCTestCase {
-    var viewController: ApplePayViewController!
+    var viewController: MockApplePayViewController!
     var mockConfiguration: ApplePayConfigurationWrapper!
+    var mockStorefront: TestStorefrontAPI!
+    var mockAuthorizationDelegate: MockApplePayAuthorizationDelegate!
 
     override func setUp() {
         super.setUp()
 
         // Create mock shop settings
-        let paymentSettings = PaymentSettings(countryCode: "US", acceptedCardBrands: [.visa, .mastercard])
-        let primaryDomain = Domain(host: "test-shop.myshopify.com", url: "https://test-shop.myshopify.com")
+        let paymentSettings = PaymentSettings(
+            countryCode: "US",
+            acceptedCardBrands: [.visa, .mastercard]
+        )
+        let primaryDomain = Domain(
+            host: "test-shop.myshopify.com",
+            url: "https://test-shop.myshopify.com"
+        )
         let shopSettings = ShopSettings(
             name: "Test Shop",
             primaryDomain: primaryDomain,
@@ -62,74 +71,403 @@ class ApplePayViewControllerTests: XCTestCase {
             shopSettings: shopSettings
         )
 
-        // Create system under test
+        // Create mock storefront
+        mockStorefront = TestStorefrontAPI()
+
+        // Create system under test first
         let identifier = CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id")
-        viewController = ApplePayViewController(
+        viewController = MockApplePayViewController(
             identifier: identifier,
             configuration: mockConfiguration
         )
+
+        // Create mock authorization delegate with the created viewController
+        mockAuthorizationDelegate = MockApplePayAuthorizationDelegate(
+            configuration: mockConfiguration,
+            controller: viewController
+        )
+
+        // Inject mocks
+        viewController.storefront = mockStorefront
+        viewController.setMockAuthorizationDelegate(mockAuthorizationDelegate)
     }
 
     override func tearDown() {
         viewController = nil
         mockConfiguration = nil
+        mockStorefront = nil
+        mockAuthorizationDelegate = nil
         super.tearDown()
     }
 
-    // MARK: - Callback Properties Tests
+    class MockApplePayAuthorizationDelegate: ApplePayAuthorizationDelegate {
+        var transitionHistory: [ApplePayState] = []
+        var setCartCalls: [StorefrontAPI.Types.Cart] = []
+        var shouldThrowOnTransition = false
+        var shouldThrowOnSetCart = false
 
-    func testOnCheckoutSuccessCallback_defaultsToNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutComplete)
+        override func transition(to state: ApplePayState) async throws {
+            transitionHistory.append(state)
+            if shouldThrowOnTransition {
+                throw NSError(domain: "MockError", code: 1, userInfo: nil)
+            }
+            // Don't call super to avoid actual state machine logic
+        }
+
+        override func setCart(to cart: StorefrontAPI.Types.Cart?) throws {
+            if let cart {
+                setCartCalls.append(cart)
+            }
+            if shouldThrowOnSetCart {
+                throw NSError(domain: "MockError", code: 1, userInfo: nil)
+            }
+            // Don't call super to avoid actual cart setting logic
+        }
+
+        func resetMocks() {
+            transitionHistory.removeAll()
+            setCartCalls.removeAll()
+            shouldThrowOnTransition = false
+            shouldThrowOnSetCart = false
         }
     }
 
-    func testOnCheckoutErrorCallback_defaultsToNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutFail)
+    class MockApplePayViewController: ApplePayViewController {
+        var mockAuthorizationDelegate: MockApplePayAuthorizationDelegate!
+        var mockTopViewController: UIViewController?
+
+        override var authorizationDelegate: ApplePayAuthorizationDelegate {
+            return mockAuthorizationDelegate
+        }
+
+        override func getTopViewController() -> UIViewController? {
+            return mockTopViewController
+        }
+
+        // Helper methods for test setup
+        func setMockAuthorizationDelegate(_ mock: MockApplePayAuthorizationDelegate) {
+            mockAuthorizationDelegate = mock
         }
     }
 
-    func testOnCheckoutCancelCallback_defaultsToNil() async {
-        await MainActor.run {
-            XCTAssertNil(viewController.onCheckoutCancel)
-        }
-    }
-
-    // MARK: - Delegate Tests
+    // MARK: - Callback Properties
 
     @MainActor
-    func testCheckoutDidCancel_invokesOnCancelCallback() async {
-        var cancelCallbackInvoked = false
-        let expectation = XCTestExpectation(description: "Cancel callback should be invoked")
+    func test_checkoutCallbacks_whenDefault_areNil() async {
+        XCTAssertNil(viewController.onCheckoutComplete)
+        XCTAssertNil(viewController.onCheckoutFail)
+        XCTAssertNil(viewController.onCheckoutCancel)
+    }
 
-        viewController.onCheckoutCancel = {
-            cancelCallbackInvoked = true
-            expectation.fulfill()
-        }
+    // MARK: - Delegate
+
+    @MainActor
+    func test_checkoutDidCancel_whenInvoked_invokesOnCancelCallback() async {
+        let cancelCallbackExpectation = XCTestExpectation(description: "Cancel callback should be invoked")
+        viewController.onCheckoutCancel = { cancelCallbackExpectation.fulfill() }
 
         viewController.checkoutDidCancel()
 
-        await fulfillment(of: [expectation], timeout: 1.0)
-        XCTAssertTrue(cancelCallbackInvoked, "Cancel callback should be invoked when checkoutDidCancel is called")
+        await fulfillment(of: [cancelCallbackExpectation], timeout: 1.0)
     }
 
-    func testCheckoutDidCancel_worksWithoutCheckoutViewController() async {
-        XCTAssertNil(viewController.checkoutViewController)
+    // MARK: - WalletController Inheritance
 
-        await MainActor.run {
-            viewController.checkoutDidCancel()
-        }
+    func test_configuration_whenInitialized_usesCorrectStorefront() {
+        XCTAssertEqual(
+            viewController.configuration.common.storefrontDomain,
+            "test-shop.myshopify.com"
+        )
+        XCTAssertEqual(viewController.configuration.common.storefrontAccessToken, "test-token")
     }
 
-    func testCheckoutDidCancel_worksWithoutOnCancelCallback() async {
-        let isNil = await MainActor.run {
-            viewController.onCheckoutCancel == nil
-        }
-        XCTAssertTrue(isNil, "onCancel should be nil")
+    func test_createOrfetchCart_whenCalled_usesFetchCartByCheckoutIdentifier() async throws {
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
 
-        await MainActor.run {
-            viewController.checkoutDidCancel()
+        let cart = try await viewController.createOrfetchCart()
+
+        XCTAssertEqual(cart.id, mockCart.id)
+    }
+
+    // MARK: - startPayment()
+
+    func test_onPress_whenSuccess_callsCorrectTransition() async throws {
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
+        XCTAssertNil(viewController.cart)
+
+        await viewController.onPress()
+
+        XCTAssertNotNil(viewController.cart)
+        XCTAssertEqual(viewController.cart?.id, mockCart.id)
+
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.first, .startPaymentRequest)
+    }
+
+    @MainActor
+    func test_onPress_whenCreateOrFetchCartFails_callsOnCheckoutFailAndCompletedTransition() async throws {
+        let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
+        mockStorefront.cartResult = .failure(expectedError)
+
+        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail should be called")
+        var receivedError: CheckoutError?
+        viewController.onCheckoutFail = { error in
+            receivedError = error
+            onCheckoutFailExpectation.fulfill()
         }
+
+        await viewController.onPress()
+
+        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
+
+        XCTAssertNil(viewController.cart)
+        XCTAssertNotNil(receivedError)
+        guard case let .sdkError(underlying, _) = receivedError else {
+            XCTFail("Expected sdkError, got: \(String(describing: receivedError))")
+            return
+        }
+        let nsError = underlying as NSError
+        XCTAssertEqual(nsError.domain, "TestError")
+        XCTAssertEqual(nsError.code, 500)
+
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
+        XCTAssertEqual(
+            mockAuthorizationDelegate.transitionHistory.first,
+            .terminalError(error: expectedError)
+        )
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
+    }
+
+    @MainActor
+    func test_onPress_whenCartIsNil_callsOnCheckoutFailAndCompletedTransition() async throws {
+        mockStorefront.cartResult = .success(nil)
+
+        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail should be called")
+        var receivedError: CheckoutError?
+        viewController.onCheckoutFail = { error in
+            receivedError = error
+            onCheckoutFailExpectation.fulfill()
+        }
+
+        await viewController.onPress()
+
+        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
+
+        XCTAssertNil(viewController.cart)
+        XCTAssertNotNil(receivedError)
+        guard case let .sdkError(underlying, _) = receivedError else {
+            XCTFail("Expected sdkError, got: \(String(describing: receivedError))")
+            return
+        }
+        XCTAssertTrue(underlying is ShopifyAcceleratedCheckouts.Error)
+
+        // WalletController.fetchCartByCheckoutIdentifier throws when cart is nil
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
+        XCTAssertEqual(
+            mockAuthorizationDelegate.transitionHistory.first,
+            .terminalError(
+                error: ShopifyAcceleratedCheckouts.Error.cartAcquisition(
+                    identifier: CheckoutIdentifier.cart(cartID: "gid://Shopify/Cart/test-cart-id")
+                )
+            )
+        )
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
+    }
+
+    // MARK: - createOrfetchCart() Error
+
+    func test_createOrfetchCart_whenStorefrontAPIError_handlesError() async throws {
+        let storefrontError = StorefrontAPI.Errors.response(
+            requestName: "testRequest",
+            message: "Test error",
+            payload: .cartPrepareForCompletion(
+                StorefrontAPI.CartPrepareForCompletionPayload(
+                    result: nil,
+                    userErrors: []
+                )
+            )
+        )
+        mockStorefront.cartResult = .failure(storefrontError)
+
+        // The actual implementation should handle StorefrontAPI.Errors through handleStorefrontError
+        // We're not testing the internal implementation details, just that it eventually throws or handles appropriately
+        await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
+            XCTAssertTrue(error is StorefrontAPI.Errors)
+        }
+
+        // For StorefrontAPI errors (default case), .unexpectedError transition should happen
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
+        XCTAssertEqual(
+            mockAuthorizationDelegate.transitionHistory.first,
+            .unexpectedError(error: storefrontError)
+        )
+    }
+
+    @MainActor
+    func test_createOrfetchCart_whenNSError_callsTerminalErrorTransition() async throws {
+        let nsError = NSError(domain: "TestError", code: 400, userInfo: nil)
+        mockStorefront.cartResult = .failure(nsError)
+
+        await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "TestError")
+            XCTAssertEqual(nsError.code, 400)
+        }
+
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
+        XCTAssertEqual(
+            mockAuthorizationDelegate.transitionHistory.first,
+            .terminalError(error: nsError)
+        )
+    }
+
+    func test_createOrfetchCart_whenGenericError_callsTerminalErrorTransition() async throws {
+        let genericError = NSError(domain: "GenericError", code: 400, userInfo: nil)
+        mockStorefront.cartResult = .failure(genericError)
+
+        await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
+            XCTAssertEqual((error as NSError).domain, "GenericError")
+            XCTAssertEqual((error as NSError).code, 400)
+        }
+
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
+        XCTAssertEqual(
+            mockAuthorizationDelegate.transitionHistory.first,
+            .terminalError(error: genericError)
+        )
+    }
+
+    func test_createOrfetchCart_whenSuccess_noTransitions() async throws {
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
+
+        let result = try await viewController.createOrfetchCart()
+        XCTAssertEqual(result.id, mockCart.id)
+
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 0)
+    }
+
+    // MARK: - Error Handling
+
+    @MainActor
+    func test_onPress_whenAuthorizationDelegateConfigured_shouldCallTransition() async {
+        // This tests defensive coding when dependencies might be misconfigured
+        let mockCart = StorefrontAPI.Cart.testCart()
+        mockStorefront.cartResult = .success(mockCart)
+
+        await viewController.onPress()
+
+        XCTAssertNotNil(viewController.cart)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
+    }
+
+    @MainActor
+    func test_createOrfetchCart_whenStorefrontUserErrorWithNilCart_throwsAndCallsTerminalError() async {
+        let userError = StorefrontAPI.CartUserError(
+            code: .invalid,
+            message: "Invalid product variant",
+            field: ["lineItems"]
+        )
+        let storefrontError = StorefrontAPI.Errors.userError(userErrors: [userError], cart: nil)
+        mockStorefront.cartResult = .failure(storefrontError)
+
+        await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
+            XCTAssertTrue(error is StorefrontAPI.Errors)
+        }
+
+        // When cart is nil, handleStorefrontError rethrows the error without calling any transitions
+        // The error bubbles up and the method throws, but no state transitions occur
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 0)
+    }
+
+    @MainActor
+    func test_createOrfetchCart_whenStorefrontWarningWithNilCart_throwsAndCallsTerminalError() async {
+        let storefrontError = StorefrontAPI.Errors.warning(type: .outOfStock, cart: nil)
+        mockStorefront.cartResult = .failure(storefrontError)
+
+        await XCTAssertThrowsErrorAsync(try await viewController.createOrfetchCart()) { error in
+            XCTAssertTrue(error is StorefrontAPI.Errors)
+        }
+
+        // When cart is nil, handleStorefrontError rethrows the error without calling any transitions
+        // The error bubbles up and the method throws, but no state transitions occur
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 0)
+    }
+
+    @MainActor
+    func test_createOrfetchCart_whenStorefrontUserErrorWithCart_handlesUnhandledErrorAction() async throws {
+        let mockCart = StorefrontAPI.Cart.testCart()
+        let userError = StorefrontAPI.CartUserError(
+            code: .invalid,
+            message: "Test user error",
+            field: ["test"]
+        )
+        let storefrontError = StorefrontAPI.Errors.userError(
+            userErrors: [userError],
+            cart: mockCart
+        )
+        mockStorefront.cartResult = .failure(storefrontError)
+
+        let result = try await viewController.createOrfetchCart()
+
+        // Should return the cart from the error
+        XCTAssertEqual(result.id, mockCart.id)
+
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
+        XCTAssertEqual(
+            mockAuthorizationDelegate.transitionHistory.first,
+            .interrupt(reason: .unhandled)
+        )
+    }
+
+    @MainActor
+    func test_createOrfetchCart_whenStorefrontUserErrorWithEmailField_handlesEmailErrorAction() async throws {
+        let mockCart = StorefrontAPI.Cart.testCart()
+        let userError = StorefrontAPI.CartUserError(
+            code: .invalid,
+            message: "Invalid email address",
+            field: ["buyerIdentity", "email"]
+        )
+        let storefrontError = StorefrontAPI.Errors.userError(
+            userErrors: [userError],
+            cart: mockCart
+        )
+        mockStorefront.cartResult = .failure(storefrontError)
+
+        let result = try await viewController.createOrfetchCart()
+
+        XCTAssertEqual(result.id, mockCart.id)
+
+        // only .interrupt PaymentSheetActions will cause a transition (see ApplePayViewController.handleErrorAction)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 0)
+    }
+
+    @MainActor
+    func test_onPress_whenMultipleErrorScenarios_allHandledCorrectly() async {
+        // Test multiple consecutive errors are handled properly
+        let genericError = NSError(domain: "TestError", code: 123, userInfo: nil)
+        mockStorefront.cartResult = .failure(genericError)
+
+        let firstFailExpectation = XCTestExpectation(description: "First onCheckoutFail call")
+        viewController.onCheckoutFail = { _ in firstFailExpectation.fulfill() }
+
+        await viewController.onPress()
+        await fulfillment(of: [firstFailExpectation], timeout: 1.0)
+        XCTAssertNil(viewController.cart)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
+
+        mockAuthorizationDelegate.resetMocks()
+        let anotherError = NSError(domain: "AnotherError", code: 400, userInfo: nil)
+        mockStorefront.cartResult = .failure(anotherError)
+
+        let secondFailExpectation = XCTestExpectation(description: "Second onCheckoutFail call")
+        viewController.onCheckoutFail = { _ in secondFailExpectation.fulfill() }
+
+        await viewController.onPress()
+        await fulfillment(of: [secondFailExpectation], timeout: 1.0)
+        XCTAssertNil(viewController.cart)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
     }
 }

@@ -28,21 +28,18 @@ import SwiftUI
 @available(iOS 16.0, *)
 protocol PayController: AnyObject {
     var cart: StorefrontAPI.Types.Cart? { get set }
-    var storefront: StorefrontAPI { get set }
+    var storefront: StorefrontAPIProtocol { get set }
     /// Temporary workaround due to July release changing the validation strategy
-    var storefrontJulyRelease: StorefrontAPI { get set }
+    var storefrontJulyRelease: StorefrontAPIProtocol { get set }
 
     /// Opens ShopifyCheckoutSheetKit
     func present(url: URL) async throws
 }
 
 @available(iOS 16.0, *)
-class ApplePayViewController: PayController, ObservableObject {
+class ApplePayViewController: WalletController, PayController {
     @Published var configuration: ApplePayConfigurationWrapper
-    @Published var storefront: StorefrontAPI
-    @Published var storefrontJulyRelease: StorefrontAPI
-    @Published var identifier: CheckoutIdentifier
-    @Published var checkoutViewController: CheckoutViewController?
+    @Published var storefrontJulyRelease: StorefrontAPIProtocol
     @Published var paymentController: PKPaymentAuthorizationController?
 
     var cart: StorefrontAPI.Types.Cart?
@@ -139,23 +136,22 @@ class ApplePayViewController: PayController, ObservableObject {
         configuration: ApplePayConfigurationWrapper
     ) {
         self.configuration = configuration
-        self.identifier = identifier.parse()
-        storefront = StorefrontAPI(
-            storefrontDomain: configuration.common.storefrontDomain,
-            storefrontAccessToken: configuration.common.storefrontAccessToken
-        )
         storefrontJulyRelease = StorefrontAPI(
             storefrontDomain: configuration.common.storefrontDomain,
             storefrontAccessToken: configuration.common.storefrontAccessToken,
             apiVersion: "2025-07"
         )
+        super.init(identifier: identifier, storefront: StorefrontAPI(
+            storefrontDomain: configuration.common.storefrontDomain,
+            storefrontAccessToken: configuration.common.storefrontAccessToken
+        ))
         __authorizationDelegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
             controller: self
         )
     }
 
-    func startPayment() async {
+    func onPress() async {
         do {
             cart = try await createOrfetchCart()
             guard cart != nil else {
@@ -164,30 +160,17 @@ class ApplePayViewController: PayController, ObservableObject {
             try? await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
             ShopifyAcceleratedCheckouts.logger.error("[startPayment] Failed to setup cart: \(error)")
+            await onCheckoutFail?(.sdkError(underlying: error))
             try? await authorizationDelegate.transition(to: .completed)
         }
     }
 
     func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart {
         do {
-            switch identifier {
-            case let .cart(id):
-                guard let cart = try await storefront.cart(by: .init(id)) else {
-                    throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
-                }
-                return cart
-            case let .variant(id, quantity):
-                let items: [StorefrontAPI.Types.ID] = Array(repeating: .init(id), count: quantity)
-                return try await storefront.cartCreate(with: items)
-            case .invariant:
-                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "checkoutIdentifier")
-            }
+            return try await fetchCartByCheckoutIdentifier()
         } catch let error as StorefrontAPI.Errors {
             return try await handleStorefrontError(error)
         } catch {
-            if let checkoutError = error as? CheckoutError {
-                await onCheckoutFail?(checkoutError)
-            }
             try? await authorizationDelegate.transition(to: .terminalError(error: error))
             throw error
         }
@@ -227,20 +210,7 @@ class ApplePayViewController: PayController, ObservableObject {
     }
 
     func present(url: URL) async throws {
-        let topViewController = await MainActor.run { authorizationDelegate.getTopViewController() }
-
-        guard let topViewController else {
-            throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "topViewController")
-        }
-
-        _ = await MainActor.run {
-            self.checkoutViewController = ShopifyCheckoutSheetKit.present(
-                checkout: url,
-                from: topViewController,
-                entryPoint: .acceleratedCheckouts,
-                delegate: self
-            )
-        }
+        try await present(url: url, delegate: self)
     }
 }
 

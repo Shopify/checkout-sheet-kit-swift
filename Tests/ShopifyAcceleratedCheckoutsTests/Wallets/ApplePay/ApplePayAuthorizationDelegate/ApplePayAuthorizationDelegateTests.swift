@@ -692,8 +692,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
     private class MockPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
-        var storefront: StorefrontAPI
-        var storefrontJulyRelease: StorefrontAPI
+        var storefront: StorefrontAPIProtocol
+        var storefrontJulyRelease: StorefrontAPIProtocol
 
         var presentCallCount = 0
         var presentCalledWith: URL?
@@ -715,8 +715,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
     private class FailingMockPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
-        var storefront: StorefrontAPI
-        var storefrontJulyRelease: StorefrontAPI
+        var storefront: StorefrontAPIProtocol
+        var storefrontJulyRelease: StorefrontAPIProtocol
 
         var presentCallCount = 0
 
@@ -737,8 +737,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
     private class SpyPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
-        var storefront: StorefrontAPI
-        var storefrontJulyRelease: StorefrontAPI
+        var storefront: StorefrontAPIProtocol
+        var storefrontJulyRelease: StorefrontAPIProtocol
 
         var presentCallCount = 0
         var presentCalledWith: URL?

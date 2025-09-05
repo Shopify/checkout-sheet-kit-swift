@@ -256,8 +256,8 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
 
     private class MockPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
-        var storefront: StorefrontAPI
-        var storefrontJulyRelease: StorefrontAPI
+        var storefront: StorefrontAPIProtocol
+        var storefrontJulyRelease: StorefrontAPIProtocol
 
         init() {
             let cfg = ShopifyAcceleratedCheckouts.Configuration.testConfiguration

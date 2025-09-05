@@ -25,11 +25,8 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 @available(iOS 16.0, *)
-class ShopPayViewController: ObservableObject {
+class ShopPayViewController: WalletController {
     var configuration: ShopifyAcceleratedCheckouts.Configuration
-    var storefront: StorefrontAPI
-    var identifier: CheckoutIdentifier
-    var checkoutViewController: CheckoutViewController?
     var eventHandlers: EventHandlers
 
     init(
@@ -38,71 +35,29 @@ class ShopPayViewController: ObservableObject {
         eventHandlers: EventHandlers = EventHandlers()
     ) {
         self.configuration = configuration
-        self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
-        storefront = StorefrontAPI(
-            storefrontDomain: configuration.storefrontDomain,
-            storefrontAccessToken: configuration.storefrontAccessToken
+        super.init(
+            identifier: identifier,
+            storefront: StorefrontAPI(
+                storefrontDomain: configuration.storefrontDomain,
+                storefrontAccessToken: configuration.storefrontAccessToken
+            )
         )
+        self.identifier = identifier.parse()
     }
 
-    func present() async throws {
-        guard let redirectUrl = try await buildRedirectUrl() else {
-            ShopifyAcceleratedCheckouts.logger.error("Failed to build redirect url for Shop Pay")
-            return
+    func onPress() async {
+        do {
+            let cart = try await fetchCartByCheckoutIdentifier()
+            guard let url = cart.checkoutUrl.url.appendQueryParam(name: "payment", value: "shop_pay") else {
+                throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
+            }
+            try await present(url: url, delegate: self)
+        } catch {
+            let error = CheckoutError.sdkError(underlying: error)
+            ShopifyAcceleratedCheckouts.logger.error("[present] Failed to create cart: \(error)")
+            eventHandlers.checkoutDidFail?(error)
         }
-
-        let topViewController = await MainActor.run { getTopViewController() }
-        guard let topViewController else {
-            ShopifyAcceleratedCheckouts.logger.error("Failed to get top view controller for Shop Pay")
-            return
-        }
-
-        await MainActor.run {
-            self.checkoutViewController = ShopifyCheckoutSheetKit.present(
-                checkout: redirectUrl,
-                from: topViewController,
-                entryPoint: .acceleratedCheckouts,
-                delegate: self
-            )
-        }
-    }
-
-    private func buildRedirectUrl() async throws -> URL? {
-        guard let checkoutUrl = try await getCheckoutUrl() else {
-            return nil
-        }
-
-        return checkoutUrl.appendQueryParam(name: "payment", value: "shop_pay")
-    }
-
-    private func getCheckoutUrl() async throws -> URL? {
-        switch identifier {
-        case let .cart(id):
-            let cart = try await storefront.cart(by: .init(id))
-            return cart?.checkoutUrl.url
-        case let .variant(_, quantity):
-            return URL(
-                string: "https://\(configuration.storefrontDomain)/cart/\(identifier.getTokenComponent()):\(quantity)"
-            )
-        case .invariant:
-            return nil
-        }
-    }
-
-    private func getTopViewController() -> UIViewController? {
-        guard
-            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-            let window = windowScene.windows.first
-        else {
-            return nil
-        }
-
-        var topController = window.rootViewController
-        while let presentedController = topController?.presentedViewController {
-            topController = presentedController
-        }
-        return topController
     }
 }
 
