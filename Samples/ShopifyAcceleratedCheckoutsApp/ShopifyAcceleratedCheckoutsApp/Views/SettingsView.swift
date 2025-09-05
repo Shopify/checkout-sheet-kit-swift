@@ -100,27 +100,27 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                Toggle("Email", isOn: $requireEmail)
-                if !requireEmail {
-                    TextField("(Optional)", text: $email)
-                        .textContentType(.emailAddress)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
+                Toggle("Require Email from Apple Pay", isOn: $requireEmail)
 
-                    Text("Email will be attached to the buyerIdentity during cartCreate.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                TextField("Prefill Email (Optional)", text: $email)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                    .accessibilityLabel("Email field")
 
-                Toggle("Phone Number", isOn: $requirePhone)
-                if !requirePhone {
-                    TextField("(Optional)", text: $phone)
-                        .textContentType(.telephoneNumber)
-                        .keyboardType(.phonePad)
-                    Text("Phone Number will be attached to the buyerIdentity during cartCreate.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Text("Email will be attached to the buyerIdentity during cartCreate.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Toggle("Require Phone from Apple Pay", isOn: $requirePhone)
+
+                TextField("Prefill Phone (Optional)", text: $phone)
+                    .textContentType(.telephoneNumber)
+                    .keyboardType(.phonePad)
+
+                Text("Phone Number will be attached to the buyerIdentity during cartCreate.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
         }
         .navigationTitle("Settings")
