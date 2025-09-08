@@ -358,7 +358,7 @@ class CheckoutWebViewTests: XCTestCase {
 			isPreload: true
 		)
 
-		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
+		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Purpose")
 		XCTAssertEqual(secPurposeHeader, "prefetch")
 	}
 
@@ -370,7 +370,7 @@ class CheckoutWebViewTests: XCTestCase {
 			isPreload: false
 		)
 
-		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
+		let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Purpose")
 		XCTAssertEqual(secPurposeHeader, nil)
 		XCTAssertFalse(webView.isPreloadRequest)
 	}
