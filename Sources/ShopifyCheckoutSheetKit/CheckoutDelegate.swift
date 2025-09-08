@@ -44,6 +44,20 @@ public protocol CheckoutDelegate: AnyObject {
 
     /// Tells te delegate that a Web Pixel event was emitted
     func checkoutDidEmitWebPixelEvent(event: PixelEvent)
+    
+    // MARK: - Embedded Checkout Events (Schema 2025-04)
+    
+    /// Tells the delegate that the embedded checkout state has changed
+    func checkoutDidChangeState(state: CheckoutStatePayload)
+    
+    /// Tells the delegate that the embedded checkout successfully completed with order details
+    func checkoutDidComplete(payload: CheckoutCompletePayload)
+    
+    /// Tells the delegate that the embedded checkout encountered one or more errors
+    func checkoutDidFail(errors: [ErrorPayload])
+    
+    /// Tells the delegate that an embedded checkout web pixel event was emitted
+    func checkoutDidEmitWebPixelEvent(payload: WebPixelsPayload)
 }
 
 extension CheckoutDelegate {
@@ -67,5 +81,23 @@ extension CheckoutDelegate {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         }
+    }
+    
+    // MARK: - Embedded Checkout Default Implementations
+    
+    public func checkoutDidChangeState(state: CheckoutStatePayload) {
+        /// No-op by default
+    }
+    
+    public func checkoutDidComplete(payload: CheckoutCompletePayload) {
+        /// No-op by default
+    }
+    
+    public func checkoutDidFail(errors: [ErrorPayload]) {
+        /// No-op by default
+    }
+    
+    public func checkoutDidEmitWebPixelEvent(payload: WebPixelsPayload) {
+        /// No-op by default
     }
 }
