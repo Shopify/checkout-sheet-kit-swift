@@ -35,7 +35,7 @@ public enum LogLevel: String, CaseIterable {
 
 public class OSLogger {
     private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
-    private var prefix: String
+    package var prefix: String
 
     package var logLevel: LogLevel
 

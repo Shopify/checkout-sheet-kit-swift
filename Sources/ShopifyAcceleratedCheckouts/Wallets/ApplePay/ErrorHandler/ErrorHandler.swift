@@ -65,7 +65,7 @@ class ErrorHandler {
 
         guard let action = sortedActions.first else {
             // This list should not be empty, otherwise we would not be in this error handling flow
-            ShopifyAcceleratedCheckouts.logger.error("[ErrorHandler][getHighestPriorityAction]: actions list is empty")
+            ShopifyAcceleratedCheckouts.logger.logError("[ErrorHandler][getHighestPriorityAction]: actions list is empty")
             return .interrupt(reason: .other)
         }
 

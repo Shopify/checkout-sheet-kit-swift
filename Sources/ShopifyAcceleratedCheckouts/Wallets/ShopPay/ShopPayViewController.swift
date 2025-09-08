@@ -50,12 +50,13 @@ class ShopPayViewController: WalletController {
         do {
             let cart = try await fetchCartByCheckoutIdentifier()
             guard let url = cart.checkoutUrl.url.appendQueryParam(name: "payment", value: "shop_pay") else {
+                logError("Failed to append query param to cart checkout url")
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
             }
             try await present(url: url, delegate: self)
         } catch {
             let error = CheckoutError.sdkError(underlying: error)
-            ShopifyAcceleratedCheckouts.logger.error("[present] Failed to create cart: \(error)")
+            logError("Failed to present Shop Pay: \(error)")
             eventHandlers.checkoutDidFail?(error)
         }
     }

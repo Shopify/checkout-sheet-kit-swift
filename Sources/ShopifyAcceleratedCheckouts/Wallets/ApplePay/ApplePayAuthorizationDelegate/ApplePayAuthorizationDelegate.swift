@@ -181,7 +181,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
                 try await self.controller.storefrontJulyRelease.cartRemovePersonalData(id: cartID)
             }.value
 
-            ShopifyAcceleratedCheckouts.logger.debug("Cleared PII from cart")
+            logDebug("Cleared PII from cart")
 
             do {
                 /// `cartRemovePersonalData` is used to clear PII collected via ApplePay
@@ -201,12 +201,12 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
                         )
                     )
 
-                    ShopifyAcceleratedCheckouts.logger.debug("Updated cart with ShopifyAcceleratedCheckouts.Customer")
+                    logDebug("Updated cart with ShopifyAcceleratedCheckouts.Customer")
                 }
             } catch {
                 /// Whilst it would be best to be able to re-attach this, we can still present CSK
                 /// without a successful response on `cartBuyerIdentityUpdate`
-                ShopifyAcceleratedCheckouts.logger.error("Failed to update cart buyer identity: \(error)")
+                logError("Failed to update cart buyer identity: \(error)")
             }
         }
 

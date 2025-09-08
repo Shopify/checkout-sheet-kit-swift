@@ -290,7 +290,7 @@ class PassKitFactory {
         merchantName: String
     ) -> [PKPaymentSummaryItem] {
         guard let cart else {
-            ShopifyAcceleratedCheckouts.logger.error("cart is nil.")
+            ShopifyAcceleratedCheckouts.logger.logError("cart is nil.")
             return []
         }
 
@@ -358,7 +358,7 @@ class PassKitFactory {
                 )
             }
         } catch {
-            ShopifyAcceleratedCheckouts.logger.error("Error creating discount allocations: \(error)")
+            ShopifyAcceleratedCheckouts.logger.logError("Error creating discount allocations: \(error)")
         }
 
         // 6. Total (with merchant name)

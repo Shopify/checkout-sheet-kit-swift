@@ -65,8 +65,8 @@ public struct AcceleratedCheckoutButtons: View {
     public init(cartID: String) {
         identifier = .cart(cartID: cartID).parse()
         if case let .invariant(reason) = identifier {
-            ShopifyAcceleratedCheckouts.logger.error(
-                "AcceleratedCheckoutButtons failed to parse identifier: \(reason)"
+            ShopifyAcceleratedCheckouts.logger.logError(
+                "\(AcceleratedCheckoutButtons.self) failed to parse identifier: \(reason)"
             )
             _currentRenderState = State(initialValue: .error(reason: reason))
         }
@@ -80,8 +80,8 @@ public struct AcceleratedCheckoutButtons: View {
     public init(variantID: String, quantity: Int) {
         identifier = .variant(variantID: variantID, quantity: quantity).parse()
         if case let .invariant(reason) = identifier {
-            ShopifyAcceleratedCheckouts.logger.error(
-                "AcceleratedCheckoutButtons failed to parse identifier: \(reason)"
+            ShopifyAcceleratedCheckouts.logger.logError(
+                "\(AcceleratedCheckoutButtons.self) failed to parse identifier: \(reason)"
             )
             _currentRenderState = State(initialValue: .error(reason: reason))
         }
@@ -131,7 +131,7 @@ public struct AcceleratedCheckoutButtons: View {
             currentRenderState = .rendered
         } catch {
             let reason = "Error loading shop settings: \(error)"
-            ShopifyAcceleratedCheckouts.logger.error(reason)
+            ShopifyAcceleratedCheckouts.logger.logError(reason)
             currentRenderState = .error(reason: reason)
         }
     }

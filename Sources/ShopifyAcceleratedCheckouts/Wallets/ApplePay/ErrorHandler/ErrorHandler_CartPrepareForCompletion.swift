@@ -35,7 +35,10 @@ extension ErrorHandler {
             return PaymentSheetAction.interrupt(reason: .cartThrottled)
         case .ready:
             // No-op: error handler not called for success result
-            ShopifyAcceleratedCheckouts.logger.error("ErrorHandler: map: received unexpected result type from Cart API on prepare")
+            ShopifyAcceleratedCheckouts.logger
+                .logError(
+                    "ErrorHandler: map: received unexpected result type from Cart API on prepare"
+                )
             return PaymentSheetAction.interrupt(reason: .other)
         }
     }

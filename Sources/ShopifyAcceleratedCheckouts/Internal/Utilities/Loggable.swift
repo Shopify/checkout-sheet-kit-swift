@@ -22,29 +22,36 @@
  */
 
 import Foundation
+import ShopifyCheckoutSheetKit
 
 /// Protocol for components that need logging with automatic namespace detection
 @available(iOS 16.0, *)
-protocol Loggable {}
+internal protocol Loggable {
+//    var osLogger: OSLogger { get set }
+}
 
 /// Default implementation for Loggable protocol
 @available(iOS 16.0, *)
 extension Loggable {
+    internal var osLogger: OSLogger {
+        ShopifyAcceleratedCheckouts.logger.osLogger
+    }
+
     /// Returns the name of the conforming class
     ///
     /// Usage:
     /// ```swift
     /// class MyClass : Loggable {
     ///     func foo() {
-    ///         print(logNameSpace) // prints: 'MyClass'
+    ///         print(namespace) // prints: 'MyClass'
     ///     }
     /// }
     /// ```
-    var namespace: String {
+    internal var namespace: String {
         String(describing: type(of: self))
     }
 
-    func createLogLine(
+    internal func createLogLine(
         _ message: String,
         method: String,
         fileID: String,
@@ -55,50 +62,63 @@ extension Loggable {
     }
 
     /// Log a debug message with automatic namespace
-    func logDebug(
+    internal func logDebug(
         _ message: String,
         method: String = #function,
         fileID: String = #fileID,
         line: Int = #line
     ) {
-        ShopifyAcceleratedCheckouts.logger.debug(
+        osLogger.debug(
             createLogLine(message, method: method, fileID: fileID, line: line)
         )
     }
 
     /// Log an info message with automatic namespace
-    func logInfo(
+    internal func logInfo(
         _ message: String,
         method: String = #function,
         fileID: String = #fileID,
         line: Int = #line
     ) {
-        ShopifyAcceleratedCheckouts.logger.info(
+        osLogger.info(
             createLogLine(message, method: method, fileID: fileID, line: line)
         )
     }
 
     /// Log an error message with automatic namespace
-    func logError(
+    internal func logError(
         _ message: String,
         method: String = #function,
         fileID: String = #fileID,
         line: Int = #line
     ) {
-        ShopifyAcceleratedCheckouts.logger.error(
+        osLogger.error(
             createLogLine(message, method: method, fileID: fileID, line: line)
         )
     }
 
     /// Log a fault message with automatic namespace
-    func logFault(
+    internal func logFault(
         _ message: String,
         method: String = #function,
         fileID: String = #fileID,
         line: Int = #line
     ) {
-        ShopifyAcceleratedCheckouts.logger.fault(
+        osLogger.fault(
             createLogLine(message, method: method, fileID: fileID, line: line)
         )
+    }
+}
+
+@available(iOS 16.0, *)
+internal class Logger: Loggable {
+    var osLogger: ShopifyCheckoutSheetKit.OSLogger
+
+    init(prefix: String, logLevel: LogLevel) {
+        osLogger = OSLogger(prefix: prefix, logLevel: logLevel)
+    }
+
+    func setLogLevel(to logLevel: LogLevel) {
+        osLogger.logLevel = logLevel
     }
 }

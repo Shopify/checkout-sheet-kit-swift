@@ -24,8 +24,14 @@
 import os.log
 import RegexBuilder
 @testable import ShopifyAcceleratedCheckouts
-@testable import ShopifyCheckoutSheetKit
 import XCTest
+
+// Import ShopifyCheckoutSheetKit separately to access OSLogger for testing
+@testable import ShopifyCheckoutSheetKit
+
+// To disambiguate, we'll use the actual types from each module
+// ACLogger is the Logger class from ShopifyAcceleratedCheckouts module
+// CSKLogger is the Logger protocol from ShopifyCheckoutSheetKit module
 
 // Custom XCTAssertRegex helper for regex pattern matching
 @available(iOS 16.0, *)
@@ -59,97 +65,119 @@ private class TestableOSLogger: OSLogger {
 }
 
 @available(iOS 16.0, *)
+private class TestableLogger {
+    var testableOSLogger: TestableOSLogger
+    var osLogger: OSLogger
+
+    init(captureMessages: Bool = true) {
+        testableOSLogger = TestableOSLogger(captureMessages: captureMessages)
+        osLogger = testableOSLogger
+    }
+
+    func setLogLevel(to logLevel: LogLevel) {
+        osLogger.logLevel = logLevel
+    }
+}
+
+@available(iOS 16.0, *)
 final class LoggableTests: XCTestCase {
-    private var originalLogger: OSLogger!
+    // Store the original logger to restore after tests
+    private var originalOSLogger: OSLogger!
 
     override func setUp() {
         super.setUp()
-        originalLogger = ShopifyAcceleratedCheckouts.logger
+        // Store the original OSLogger for restoration
+        originalOSLogger = ShopifyAcceleratedCheckouts.logger.osLogger
     }
 
     override func tearDown() {
-        ShopifyAcceleratedCheckouts.logger = originalLogger
+        // Restore the original OSLogger
+        ShopifyAcceleratedCheckouts.logger.osLogger = originalOSLogger
         super.tearDown()
     }
 
     func test_logDebug_withMessage_shouldFormatCorrectly() {
-        let testLogger = TestableOSLogger()
-        ShopifyAcceleratedCheckouts.logger = testLogger
+        let testLogger = TestableLogger()
+        // Replace the OSLogger with our testable version
+        ShopifyAcceleratedCheckouts.logger.osLogger = testLogger.testableOSLogger
         let helper = LoggableTestHelper()
 
         helper.logDebug("Test debug message")
 
-        XCTAssertEqual(testLogger.capturedMessages.count, 1)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages.count, 1)
 
         let pattern = #/\[ShopifyAcceleratedCheckouts\] \(Debug\) - \[LoggableTests\.swift:test_logDebug_withMessage_shouldFormatCorrectly\(\):\d+\] Test debug message/#
 
         XCTAssertRegex(
-            testLogger.capturedMessages[0].message,
+            testLogger.testableOSLogger.capturedMessages[0].message,
             pattern,
-            "Log message format incorrect: \(testLogger.capturedMessages[0].message)"
+            "Log message format incorrect: \(testLogger.testableOSLogger.capturedMessages[0].message)"
         )
 
-        XCTAssertEqual(testLogger.capturedMessages[0].type, .debug)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages[0].type, .debug)
     }
 
     func test_logInfo_withMessage_shouldFormatCorrectly() {
-        let testLogger = TestableOSLogger()
-        ShopifyAcceleratedCheckouts.logger = testLogger
+        let testLogger = TestableLogger()
+        // Replace the OSLogger with our testable version
+        ShopifyAcceleratedCheckouts.logger.osLogger = testLogger.testableOSLogger
         let helper = LoggableTestHelper()
 
         helper.logInfo("Test info message")
 
-        XCTAssertEqual(testLogger.capturedMessages.count, 1)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages.count, 1)
 
         let pattern = #/\[ShopifyAcceleratedCheckouts\] \(Info\) - \[LoggableTests\.swift:test_logInfo_withMessage_shouldFormatCorrectly\(\):\d+\] Test info message/#
 
         XCTAssertRegex(
-            testLogger.capturedMessages[0].message,
+            testLogger.testableOSLogger.capturedMessages[0].message,
             pattern,
-            "Log message format incorrect: \(testLogger.capturedMessages[0].message)"
+            "Log message format incorrect: \(testLogger.testableOSLogger.capturedMessages[0].message)"
         )
 
-        XCTAssertEqual(testLogger.capturedMessages[0].type, .info)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages[0].type, .info)
     }
 
     func test_logError_withMessage_shouldFormatCorrectly() {
-        let testLogger = TestableOSLogger()
-        ShopifyAcceleratedCheckouts.logger = testLogger
+        let testLogger = TestableLogger()
+        // Replace the OSLogger with our testable version
+        ShopifyAcceleratedCheckouts.logger.osLogger = testLogger.testableOSLogger
         let helper = LoggableTestHelper()
 
         helper.logError("Test error message")
 
-        XCTAssertEqual(testLogger.capturedMessages.count, 1)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages.count, 1)
 
         let pattern = #/\[ShopifyAcceleratedCheckouts\] \(Error\) - \[LoggableTests\.swift:test_logError_withMessage_shouldFormatCorrectly\(\):\d+\] Test error message/#
 
         XCTAssertRegex(
-            testLogger.capturedMessages[0].message,
+            testLogger.testableOSLogger.capturedMessages[0].message,
             pattern,
-            "Log message format incorrect: \(testLogger.capturedMessages[0].message)"
+            "Log message format incorrect: \(testLogger.testableOSLogger.capturedMessages[0].message)"
         )
 
-        XCTAssertEqual(testLogger.capturedMessages[0].type, .error)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages[0].type, .error)
     }
 
     func test_logFault_withMessage_shouldFormatCorrectly() {
-        let testLogger = TestableOSLogger()
-        ShopifyAcceleratedCheckouts.logger = testLogger
+        let testLogger = TestableLogger()
+        // Replace the OSLogger with our testable version
+        ShopifyAcceleratedCheckouts.logger.osLogger = testLogger.testableOSLogger
         let helper = LoggableTestHelper()
 
         helper.logFault("Test fault message")
 
-        XCTAssertEqual(testLogger.capturedMessages.count, 1)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages.count, 1)
 
         let pattern = #/\[ShopifyAcceleratedCheckouts\] \(Fault\) - \[LoggableTests\.swift:test_logFault_withMessage_shouldFormatCorrectly\(\):\d+\] Test fault message/#
 
         XCTAssertRegex(
-            testLogger.capturedMessages[0].message,
+            testLogger.testableOSLogger.capturedMessages[0].message,
             pattern,
-            "Log message format incorrect: \(testLogger.capturedMessages[0].message)"
+            "Log message format incorrect: \(testLogger.testableOSLogger.capturedMessages[0].message)"
         )
 
-        XCTAssertEqual(testLogger.capturedMessages[0].type, .fault)
+        XCTAssertEqual(testLogger.testableOSLogger.capturedMessages[0].type, .fault)
     }
 
     func test_namespace_extraction() {
