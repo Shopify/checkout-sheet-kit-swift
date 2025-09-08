@@ -104,7 +104,6 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
     }
 
     private func startPaymentRequest() async throws {
-        logDebug("Starting Apple Pay payment request")
         guard let cart = controller.cart else {
             logError("No cart available for payment request")
             return
@@ -114,9 +113,10 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
 
         var paymentController = paymentControllerFactory(paymentRequest)
         paymentController.delegate = self
-        let presented = await paymentController.present()
 
+        let presented = await paymentController.present()
         logDebug("Apple Pay sheet presented: \(presented)")
+
         try await transition(to: presented ? .appleSheetPresented : .reset)
     }
 
