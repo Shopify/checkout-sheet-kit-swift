@@ -53,30 +53,22 @@ public class OSLogger {
 
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
-
-        let fullMessage = "[\(prefix)] (Debug) - \(message)"
-        sendToOSLog(fullMessage, type: .debug)
+        sendToOSLog(getMessage(from: message, logLevel: "Debug"), type: .debug)
     }
 
     public func info(_ message: String) {
         guard shouldEmit(.debug) else { return }
-
-        let fullMessage = "[\(prefix)] (Info) - \(message)"
-        sendToOSLog(fullMessage, type: .info)
+        sendToOSLog(getMessage(from: message, logLevel: "Info"), type: .info)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
-
-        let fullMessage = "[\(prefix)] (Error) - \(message)"
-        sendToOSLog(fullMessage, type: .error)
+        sendToOSLog(getMessage(from: message, logLevel: "Error"), type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
-
-        let fullMessage = "[\(prefix)] (Fault) - \(message)"
-        sendToOSLog(fullMessage, type: .fault)
+        sendToOSLog(getMessage(from: message, logLevel: "Fault"), type: .fault)
     }
 
     /// Capturing `os_log` output is not possible
@@ -85,10 +77,12 @@ public class OSLogger {
         os_log("%@", log: logger, type: type, message)
     }
 
+    internal func getMessage(from message: String, logLevel: String) -> String {
+        return "[\(prefix)] (\(logLevel)) - \(message)"
+    }
+
     private func shouldEmit(_ choice: LogLevel) -> Bool {
-        if logLevel == .none {
-            return false
-        }
+        if logLevel == .none { return false }
 
         return logLevel == .all || logLevel == choice
     }

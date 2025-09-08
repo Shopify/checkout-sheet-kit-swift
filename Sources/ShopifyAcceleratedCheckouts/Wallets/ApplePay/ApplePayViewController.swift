@@ -150,7 +150,7 @@ class ApplePayViewController: WalletController, PayController, Loggable {
             controller: self
         )
 
-        logInfo("Initialized with identifier: \(identifier), domain: \(configuration.common.storefrontDomain)", method: "init")
+        logInfo("Initialized with identifier: \(identifier), domain: \(configuration.common.storefrontDomain)")
     }
 
     func onPress() async {
@@ -164,7 +164,7 @@ class ApplePayViewController: WalletController, PayController, Loggable {
             logDebug("Cart ready, transitioning to payment request. Cart ID: \(cart?.id.description ?? "unknown")")
             try? await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
-            logError("Failed to setup cart: \(error)", method: "startPayment")
+            logError("Failed to setup cart: \(error)")
             await onCheckoutFail?(.sdkError(underlying: error))
             try? await authorizationDelegate.transition(to: .completed)
         }

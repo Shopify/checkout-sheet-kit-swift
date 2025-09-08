@@ -22,7 +22,6 @@
  */
 
 import Foundation
-import ShopifyCheckoutSheetKit
 
 /// High-level API for Storefront operations using the custom GraphQL client
 @available(iOS 16.0, *)

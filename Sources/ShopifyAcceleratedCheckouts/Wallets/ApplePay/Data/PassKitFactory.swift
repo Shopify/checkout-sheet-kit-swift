@@ -24,7 +24,7 @@
 import PassKit
 
 @available(iOS 16.0, *)
-class PassKitFactory {
+class PassKitFactory : Loggable {
     static let shared = PassKitFactory()
 
     private struct DeliveryOptionWithGroupType {
@@ -290,7 +290,7 @@ class PassKitFactory {
         merchantName: String
     ) -> [PKPaymentSummaryItem] {
         guard let cart else {
-            ShopifyAcceleratedCheckouts.logger.logError("cart is nil.")
+            logError("cart is nil.")
             return []
         }
 
@@ -358,7 +358,7 @@ class PassKitFactory {
                 )
             }
         } catch {
-            ShopifyAcceleratedCheckouts.logger.logError("Error creating discount allocations: \(error)")
+            logError("Error creating discount allocations: \(error)")
         }
 
         // 6. Total (with merchant name)

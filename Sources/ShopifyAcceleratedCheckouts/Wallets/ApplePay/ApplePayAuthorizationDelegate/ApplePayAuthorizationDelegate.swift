@@ -122,7 +122,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
 
     func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
-            logError("Invalid state transition: \(String(describing: state)) -> \(String(describing: nextState))")
+            logError("Invalid state transition: \(String(describing: state)) -> \(String(describing: nextState)).")
             throw InvalidStateTransitionError(fromState: state, toState: nextState)
         }
 
@@ -152,7 +152,6 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
     }
 
     private func onReset() async throws {
-        logDebug("Resetting Apple Pay authorization state")
         pkEncoder = PKEncoder(configuration: configuration, cart: { self.controller.cart })
         pkDecoder = PKDecoder(configuration: configuration, cart: { self.controller.cart })
         selectedShippingAddressID = nil
@@ -161,7 +160,6 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
     }
 
     private func onPresentingCSK(to url: URL?, previousState: ApplePayState) async throws {
-        logDebug("Presenting checkout sheet")
         guard let url else {
             logError("No URL available for checkout sheet presentation")
             try await transition(
@@ -206,7 +204,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
             } catch {
                 /// Whilst it would be best to be able to re-attach this, we can still present CSK
                 /// without a successful response on `cartBuyerIdentityUpdate`
-                logError("Failed to update cart buyer identity: \(error)")
+                logError("Failed to attach cart buyer identity: \(error) continuing with CheckoutKit.present()")
             }
         }
 
@@ -237,11 +235,13 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
 
     func ensureCurrencyNotChanged() throws {
         guard let initialCurrencyCode = pkDecoder.initialCurrencyCode else {
+            logError("initialCurrencyCode was nil")
             return
         }
         let currentCurrencyCode = controller.cart?.cost.totalAmount.currencyCode
 
         guard initialCurrencyCode == currentCurrencyCode else {
+            logError("currencyCodeChanged")
             throw StorefrontAPI.Errors.currencyChanged
         }
     }
@@ -259,31 +259,25 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
                     addressId: addressID
                 )
 
+                logDebug("Clearing selectedShippingAddress")
                 // Clear the selected address ID since we removed it
                 selectedShippingAddressID = nil
             } catch {
-                if let responseError = error as? StorefrontAPI.Errors {
-                    logError("Delivery address remove failed: \(responseError)")
-                }
+                logError("Delivery address remove failed: \(error)")
             }
         }
 
-        do {
-            let cart = try await controller.storefront.cartDeliveryAddressesAdd(
-                id: cartID,
-                address: address,
-                validate: validate
-            )
+        let cart = try await controller.storefront.cartDeliveryAddressesAdd(
+            id: cartID,
+            address: address,
+            validate: validate
+        )
+        logDebug("cartDeliveryAddressesAdd complete: \(address)")
 
-            selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
+        selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
+        logDebug("New selectedShippingAddressID: \(address)")
 
-            return cart
-        } catch {
-            if let responseError = error as? StorefrontAPI.Errors {
-                logError("Delivery address add failed: \(responseError)")
-            }
-            throw error
-        }
+        return cart
     }
 }
 

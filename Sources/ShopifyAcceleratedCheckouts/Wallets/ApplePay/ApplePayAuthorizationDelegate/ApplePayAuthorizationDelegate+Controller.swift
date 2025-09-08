@@ -34,46 +34,37 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
-        logDebug("Method triggered", method: "didSelectShippingContact")
         pkEncoder.shippingContact = .success(contact)
 
         // Clear selected shipping method to prevent stale identifier errors
         pkEncoder.selectedShippingMethod = nil
         pkDecoder.selectedShippingMethod = nil
-        logDebug("Cleared selected shipping method", method: "didSelectShippingContact")
 
         do {
             let cartID = try pkEncoder.cartID.get()
-
             let shippingAddress = try pkEncoder.shippingAddress.get()
-
             // Store current cart state before attempting address update
             let previousCart = controller.cart
 
             let cart = try await upsertShippingAddress(to: shippingAddress)
-            logDebug("Shipping address upserted successfully", method: "didSelectShippingContact")
-
             // If address update cleared delivery groups, revert to previous cart and show error
             if cart.deliveryGroups.nodes.isEmpty, previousCart?.deliveryGroups.nodes.isEmpty == false {
-                logError("Address update cleared delivery groups - reverting to previous cart", method: "didSelectShippingContact")
+                logInfo("Address update cleared delivery groups - reverting to previous cart")
                 try setCart(to: previousCart)
 
                 return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.addressUnserviceableError])
             }
-
-            try setCart(to: cart)
-            logDebug("Cart updated with new shipping address", method: "didSelectShippingContact")
+            logDebug("Shipping address upsert complete")
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-            logDebug("Cart prepared for completion", method: "didSelectShippingContact")
-
             try setCart(to: result.cart)
 
             return pkDecoder.paymentRequestShippingContactUpdate()
         } catch {
-            logError("Method failed: \(error)", method: "didSelectShippingContact")
+            logError("Failed to set shipping contact: \(error)")
             return await handleError(error: error, cart: controller.cart) {
-                pkDecoder.paymentRequestShippingContactUpdate(errors: $0)
+                logInfo("Handling error with: \($0)")
+                return pkDecoder.paymentRequestShippingContactUpdate(errors: $0)
             }
         }
     }
@@ -81,14 +72,13 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
     /// Triggers on payment sheet presentation with default card, and if user changes payment method
     /// NOTE: If the user changes the card, the billingContact field will be nil when this fires again
     ///
-    /// This event is necessary in 'digital' (non-shippable) products flow.
+    /// This event is necessary in 'digital' (non-shippable) product flows.
     /// Allows access to country so cart can determine taxes prior to `didAuthorizePayment`,
-    /// minimizing payment.amount discrepancies.
+    /// minimizing `PKPayment.amount` discrepancies.
     func paymentAuthorizationController(
         _: PKPaymentAuthorizationController,
         didSelectPaymentMethod paymentMethod: PKPaymentMethod
     ) async -> PKPaymentRequestPaymentMethodUpdate {
-        logDebug("Method triggered", method: "didSelectPaymentMethod")
         pkEncoder.selectedPaymentMethod = paymentMethod
 
         do {
@@ -101,11 +91,12 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                   let billingPostalAddress = try? pkEncoder.billingPostalAddress.get(),
                   let country = billingPostalAddress.country
             else {
-                logDebug("Skipping payment method processing - shipping required or no billing address", method: "didSelectPaymentMethod")
+                logInfo("Skipping buyerIdentityUpdate: taxable address will be sourced from shipping contact")
                 return pkDecoder.paymentRequestPaymentMethodUpdate()
             }
+
             let cartID = try pkEncoder.cartID.get()
-            logDebug("Updating buyer identity with country: \(country)", method: "didSelectPaymentMethod")
+
             try await controller.storefront.cartBuyerIdentityUpdate(
                 id: cartID,
                 input: .init(
@@ -113,21 +104,21 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     customerAccessToken: configuration.common.customer?.customerAccessToken
                 )
             )
-
-            logDebug("Updating billing address", method: "didSelectPaymentMethod")
-            try await controller.storefront
-                .cartBillingAddressUpdate(id: cartID, billingAddress: billingPostalAddress)
+            logDebug("cartBuyerIdentityUpdate complete: \(country)")
+            try await controller.storefront.cartBillingAddressUpdate(
+                id: cartID,
+                billingAddress: billingPostalAddress
+            )
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-            logDebug("Cart prepared for completion after payment method selection", method: "didSelectPaymentMethod")
             try setCart(to: result.cart)
 
             return pkDecoder.paymentRequestPaymentMethodUpdate()
         } catch {
-            logError("Method failed: \(error)", method: "didSelectShippingContact")
-
+            logError("Failed to set billing address taxable country: \(error)")
             return await handleError(error: error, cart: controller.cart) {
-                pkDecoder.paymentRequestPaymentMethodUpdate(errors: $0)
+                logInfo("Handling error with: \($0)")
+                return pkDecoder.paymentRequestPaymentMethodUpdate(errors: $0)
             }
         }
     }
@@ -136,14 +127,13 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        logDebug("Method triggered", method: "didSelectShippingMethod")
         // Check if this shipping method identifier is still valid
         let availableShippingMethods = pkDecoder.shippingMethods
         let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
         let methodToUse: PKShippingMethod = isValidMethod ? shippingMethod : (availableShippingMethods.first ?? shippingMethod)
 
         if !isValidMethod {
-            logDebug("Selected shipping method invalid, using fallback method", method: "didSelectShippingMethod")
+            logDebug("Selected shipping method invalid, using fallback method \(methodToUse)")
         }
 
         pkEncoder.selectedShippingMethod = methodToUse
@@ -154,27 +144,24 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let selectedDeliveryOptionHandle = try pkEncoder.selectedDeliveryOptionHandle.get()
             let deliveryGroupID = try pkEncoder.deliveryGroupID.get()
 
-            logDebug("Updating selected delivery options", method: "didSelectShippingMethod")
-            let cart = try await controller.storefront
-                .cartSelectedDeliveryOptionsUpdate(
-                    id: cartID,
-                    deliveryGroupId: deliveryGroupID,
-                    deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
-                )
+            let cart = try await controller.storefront.cartSelectedDeliveryOptionsUpdate(
+                id: cartID,
+                deliveryGroupId: deliveryGroupID,
+                deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
+            )
             try setCart(to: cart)
-            logDebug("Cart updated with selected delivery options", method: "didSelectShippingMethod")
+            logDebug("cartSelectedDeliveryOptionsUpdate complete")
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-            logDebug("Cart prepared for completion after shipping method selection", method: "didSelectShippingMethod")
-
             try setCart(to: result.cart)
 
             return pkDecoder.paymentRequestShippingMethodUpdate()
         } catch {
-            logError("Method failed: \(error)", method: "didSelectShippingContact")
+            logError("Method failed: \(error)")
 
-            return await handleError(error: error, cart: controller.cart) { _ in
-                pkDecoder.paymentRequestShippingMethodUpdate()
+            return await handleError(error: error, cart: controller.cart) {
+                logInfo("Handling error with: \($0)")
+                return pkDecoder.paymentRequestShippingMethodUpdate()
             }
         }
     }
@@ -183,7 +170,6 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didAuthorizePayment payment: PKPayment
     ) async -> PKPaymentAuthorizationResult {
-        logDebug("Method triggered - beginning payment authorization", method: "didAuthorizePayment")
         do {
             pkEncoder.payment = payment
             try? await transition(to: .paymentAuthorized(payment: payment))
@@ -194,7 +180,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 || configuration.common.customer?.phoneNumber != nil
                 || configuration.common.customer?.customerAccessToken != nil
             {
-                logDebug("Updating buyer identity with contact information", method: "didAuthorizePayment")
+                logInfo("Updating buyer identity with contact information")
                 try await controller.storefront.cartBuyerIdentityUpdate(
                     id: cartID,
                     input: .init(
@@ -205,25 +191,25 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 )
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
-                logDebug("Buyer identity updated and cart prepared", method: "didAuthorizePayment")
+                logDebug("cartBuyerIdentityUpdate complete")
             }
 
             if try pkDecoder.isShippingRequired() {
-                logDebug("Processing shipping address for shippable products", method: "didAuthorizePayment")
+                logDebug("Updating shipping address")
                 let shippingAddress = try pkEncoder.shippingAddress.get()
                 _ = try await upsertShippingAddress(to: shippingAddress, validate: true)
 
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
-                logDebug("Shipping address processed and cart prepared", method: "didAuthorizePayment")
+                logDebug("upsertShippingAddress complete")
             } else {
                 /// If the cart is entirely digital updating with a complete billingAddress
                 /// allows us to resolve pending terms on taxes prior to cartPaymentUpdate
-                logDebug("Processing digital cart with billing address", method: "didAuthorizePayment")
+                logDebug("Updating billing address")
                 guard
                     let billingPostalAddress = try? pkEncoder.billingPostalAddress.get()
                 else {
-                    logDebug("No billing address available for digital cart", method: "didAuthorizePayment")
+                    logDebug("No billing address available for digital cart")
                     return pkDecoder.paymentAuthorizationResult()
                 }
 
@@ -234,43 +220,43 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
-                logDebug("Digital cart billing address updated and cart prepared", method: "didAuthorizePayment")
+                logDebug("cartBillingAddressUpdate complete")
             }
 
-            logDebug("Preparing payment data for submission", method: "didAuthorizePayment")
             let totalAmount = try pkEncoder.totalAmount.get()
             let applePayPayment = try pkEncoder.applePayPayment.get()
 
             /// Taxes may become pending again fail to resolve despite updating within the didUpdatePaymentMethod
             /// So we retry one time to see if the error clears on retry
-            logDebug("Updating cart payment with retry logic", method: "didAuthorizePayment")
             _ = try await Task.retrying(priority: nil, maxRetryCount: 1) {
+                self.logDebug("attempting cartPaymentUpdate")
                 try await self.controller.storefront.cartPaymentUpdate(
                     id: cartID,
                     totalAmount: totalAmount,
                     applePayPayment: applePayPayment
                 )
             }.value
-            logDebug("Cart payment updated successfully", method: "didAuthorizePayment")
+            logDebug("cartPaymentUpdate complete")
 
-            logDebug("Submitting cart for completion", method: "didAuthorizePayment")
             let response = try await controller.storefront.cartSubmitForCompletion(id: cartID)
-            logDebug("Cart submitted for completion successfully", method: "didAuthorizePayment")
+            logDebug("cartSubmitForCompletion complete")
+
             try? await transition(
                 to: .cartSubmittedForCompletion(redirectURL: response.redirectUrl.url)
             )
 
             return pkDecoder.paymentAuthorizationResult()
         } catch {
-            logError("Method failed: \(error)", method: "didSelectShippingContact")
+            logError("Method failed: \(error)")
             return await handleError(error: error, cart: controller.cart) {
-                pkDecoder.paymentAuthorizationResult(errors: $0)
+                logInfo("Handling error with: \($0)")
+                return pkDecoder.paymentAuthorizationResult(errors: $0)
             }
         }
     }
 
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
-        logDebug("Payment authorization finished, current state: \(state)", method: "paymentAuthorizationControllerDidFinish")
+        logDebug("current state: \(state), transitioning to .completed")
 
         controller.dismiss {
             Task { try? await self.transition(to: .completed) }
@@ -282,20 +268,19 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         cart _: StorefrontAPI.Cart?,
         completion: (_: [Error]) -> T
     ) async -> T {
-        logDebug("Handling error with ErrorHandler", method: "handleError")
         guard let action = ErrorHandler.map(error: error, cart: controller.cart) else {
-            logError("ErrorHandler could not map error - transitioning to unexpected error", method: "handleError")
+            logInfo("ErrorHandler could not map error - transitioning to unexpected error")
             try? await transition(to: .unexpectedError(error: abortError))
             return completion([abortError])
         }
 
         switch action {
         case let .showError(errors):
-            logDebug("ErrorHandler mapped to showError - returning to Apple sheet", method: "handleError")
+            logDebug("ErrorHandler mapped to showError - returning to Apple sheet")
             try? await transition(to: .appleSheetPresented)
             return completion(errors)
         case let .interrupt(reason, checkoutURL):
-            logDebug("ErrorHandler mapped to interrupt with reason: \(reason)", method: "handleError")
+            logDebug("ErrorHandler mapped to interrupt with reason: \(reason)")
             try? await transition(to: .interrupt(reason: reason))
             if let checkoutURL {
                 self.checkoutURL = checkoutURL
