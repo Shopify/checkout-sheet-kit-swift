@@ -38,7 +38,10 @@ struct ShopifyAcceleratedCheckoutsApp: App {
         .init(
             storefrontDomain: EnvironmentVariables.storefrontDomain,
             storefrontAccessToken: EnvironmentVariables.storefrontAccessToken,
-            customer: ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: phone)
+            customer: ShopifyAcceleratedCheckouts.Customer(
+                email: email.isEmpty ? nil : email,
+                phoneNumber: phone.isEmpty ? nil : phone
+            )
         )
     }
 
