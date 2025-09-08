@@ -40,19 +40,18 @@ extension Loggable {
     ///     }
     /// }
     /// ```
-    private var namespace: String {
+    var namespace: String {
         String(describing: type(of: self))
     }
 
-    private func createLogLocation(method: String, fileID: String, line: Int) -> String {
+    func createLogLine(
+        _ message: String,
+        method: String,
+        fileID: String,
+        line: Int
+    ) -> String {
         let fileName = fileID.split(separator: "/").last.map { String($0) } ?? fileID
-        return "\(fileName):\(method):\(line)"
-    }
-
-    private func createLogLine(_ message: String, method: String, fileID: String, line: Int)
-        -> String
-    {
-        return "[\(createLogLocation(method: method, fileID: fileID, line: line))] \(message)"
+        return "[\(fileName):\(method):\(line)] \(message)"
     }
 
     /// Log a debug message with automatic namespace
