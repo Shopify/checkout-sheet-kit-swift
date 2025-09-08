@@ -29,10 +29,12 @@ class WalletController: ObservableObject {
     @Published var identifier: CheckoutIdentifier
     @Published var storefront: StorefrontAPIProtocol
     @Published var checkoutViewController: CheckoutViewController?
+    @Published var customer: ShopifyAcceleratedCheckouts.Customer?
 
-    init(identifier: CheckoutIdentifier, storefront: StorefrontAPIProtocol) {
+    init(identifier: CheckoutIdentifier, storefront: StorefrontAPIProtocol, customer: ShopifyAcceleratedCheckouts.Customer? = nil) {
         self.identifier = identifier
         self.storefront = storefront
+        self.customer = customer
     }
 
     func fetchCartByCheckoutIdentifier() async throws -> StorefrontAPI.Types.Cart {
@@ -45,7 +47,7 @@ class WalletController: ObservableObject {
 
         case let .variant(id, quantity):
             let items = Array(repeating: GraphQLScalars.ID(id), count: quantity)
-            return try await storefront.cartCreate(with: items, customer: nil)
+            return try await storefront.cartCreate(with: items, customer: customer)
 
         case .invariant:
             throw ShopifyAcceleratedCheckouts.Error.cartAcquisition(identifier: identifier)

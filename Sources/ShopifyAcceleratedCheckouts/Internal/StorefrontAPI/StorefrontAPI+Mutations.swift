@@ -36,6 +36,15 @@ extension StorefrontAPI {
         with items: [GraphQLScalars.ID] = [],
         customer: ShopifyAcceleratedCheckouts.Customer? = nil
     ) async throws -> Cart {
+        return try await cartCreateWithRetry(items: items, customer: customer)
+    }
+    
+    /// Private helper to create cart with retry logic for invalid buyer identity fields
+    private func cartCreateWithRetry(
+        items: [GraphQLScalars.ID],
+        customer: ShopifyAcceleratedCheckouts.Customer?,
+        excludeFields: Set<String> = []
+    ) async throws -> Cart {
         var input: [String: Any] = [
             "lines": items.map { ["merchandiseId": $0.rawValue] }
         ]
@@ -43,10 +52,11 @@ extension StorefrontAPI {
         if let customer {
             var buyerIdentity: [String: String] = [:]
 
-            if let email = customer.email {
+            // Only add fields that are not in the exclude list
+            if let email = customer.email, !excludeFields.contains("email") {
                 buyerIdentity["email"] = email
             }
-            if let phoneNumber = customer.phoneNumber {
+            if let phoneNumber = customer.phoneNumber, !excludeFields.contains("phone") {
                 buyerIdentity["phone"] = phoneNumber
             }
             if let customerAccessToken = customer.customerAccessToken {
@@ -68,11 +78,51 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
+        // Check if we have user errors that we can retry
+        if !payload.userErrors.isEmpty && excludeFields.isEmpty {
+            let fieldsToExclude = getFieldsToExcludeForRetry(errors: payload.userErrors)
+            if !fieldsToExclude.isEmpty {
+                // Retry without the invalid field(s)
+                return try await cartCreateWithRetry(
+                    items: items,
+                    customer: customer,
+                    excludeFields: fieldsToExclude
+                )
+            }
+        }
+        
+        // If we can't retry, validate as normal
+        try validateUserErrors(payload.userErrors, checkoutURL: payload.cart?.checkoutUrl.url)
         let cart = try validateCart(payload.cart, requestName: "cartCreate")
-
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
-
         return cart
+    }
+    
+    /// Determine which buyer identity fields to exclude based on all user errors
+    private func getFieldsToExcludeForRetry(errors: [CartUserError]) -> Set<String> {
+        var fieldsToExclude = Set<String>()
+        
+        for error in errors {
+            // Check if this is an invalid buyer identity field error
+            guard error.code == .invalid,
+                  let field = error.field else {
+                continue
+            }
+            
+            // Check the field path
+            let fieldPath = field.joined(separator: ".")
+            
+            switch fieldPath {
+            case "input.buyerIdentity.email":
+                fieldsToExclude.insert("email")
+            case "input.buyerIdentity.phone":
+                fieldsToExclude.insert("phone")
+            default:
+                // Not a buyer identity error, keep checking other errors
+                continue
+            }
+        }
+        
+        return fieldsToExclude
     }
 
     struct CartBuyerIdentityUpdateInput: Codable {

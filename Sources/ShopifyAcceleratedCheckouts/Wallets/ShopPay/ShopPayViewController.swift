@@ -41,7 +41,8 @@ class ShopPayViewController: WalletController {
             storefront: StorefrontAPI(
                 storefrontDomain: configuration.storefrontDomain,
                 storefrontAccessToken: configuration.storefrontAccessToken
-            )
+            ),
+            customer: configuration.customer
         )
         self.identifier = identifier.parse()
     }

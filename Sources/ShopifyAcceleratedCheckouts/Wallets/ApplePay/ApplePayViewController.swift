@@ -144,7 +144,7 @@ class ApplePayViewController: WalletController, PayController {
         super.init(identifier: identifier, storefront: StorefrontAPI(
             storefrontDomain: configuration.common.storefrontDomain,
             storefrontAccessToken: configuration.common.storefrontAccessToken
-        ))
+        ), customer: configuration.common.customer)
         __authorizationDelegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
             controller: self
