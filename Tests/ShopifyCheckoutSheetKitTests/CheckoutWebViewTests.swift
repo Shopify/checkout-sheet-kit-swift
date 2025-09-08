@@ -357,8 +357,8 @@ class CheckoutWebViewTests: XCTestCase {
             isPreload: true
         )
 
-        let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
-        XCTAssertEqual(secPurposeHeader, "prefetch")
+        let purposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Purpose")
+        XCTAssertEqual(purposeHeader, "prefetch")
     }
 
     func testNoPreloadDoesNotSendPrefetchHeader() {
@@ -369,8 +369,8 @@ class CheckoutWebViewTests: XCTestCase {
             isPreload: false
         )
 
-        let secPurposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Sec-Purpose")
-        XCTAssertEqual(secPurposeHeader, nil)
+        let purposeHeader = webView.lastLoadedURLRequest?.value(forHTTPHeaderField: "Shopify-Purpose")
+        XCTAssertEqual(purposeHeader, nil)
         XCTAssertFalse(webView.isPreloadRequest)
     }
 
