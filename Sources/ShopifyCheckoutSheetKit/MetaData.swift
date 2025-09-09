@@ -25,7 +25,7 @@ import Foundation
 
 package enum MetaData {
     /// The version of the `ShopifyCheckoutSheetKit` library.
-    package static let version = "3.2.0"
+    package static let version = "3.4.0-rc.8"
     /// The schema version of the CheckoutSheetProtocol.
     package static let schemaVersion = "8.1"
 
