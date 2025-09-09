@@ -1,32 +1,12 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
 
 extension Storefront {
     struct CartFragment: Storefront.SelectionSet, Fragment {
         static var fragmentDefinition: StaticString {
-            #"fragment CartFragment on Cart { __typename id checkoutUrl totalQuantity buyerIdentity { __typename email } deliveryGroups(first: 10) { __typename nodes { __typename ...CartDeliveryGroupFragment } } lines(first: 250) { __typename nodes { __typename ...CartLineFragment } } cost { __typename totalAmount { __typename amount currencyCode } subtotalAmount { __typename amount currencyCode } totalTaxAmount { __typename amount currencyCode } } }"#
+            #"fragment CartFragment on Cart { __typename id checkoutUrl totalQuantity buyerIdentity { __typename email phone customer { __typename email phone } } deliveryGroups(first: 10) { __typename nodes { __typename ...CartDeliveryGroupFragment } } lines(first: 250) { __typename nodes { __typename ...CartLineFragment } } cost { __typename totalAmount { __typename amount currencyCode } subtotalAmount { __typename amount currencyCode } totalTaxAmount { __typename amount currencyCode } } }"#
         }
 
         let __data: DataDict
@@ -70,11 +50,37 @@ extension Storefront {
             static var __parentType: any ApolloAPI.ParentType { Storefront.Objects.CartBuyerIdentity }
             static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
-                .field("email", String?.self)
+                .field("email", String?.self),
+                .field("phone", String?.self),
+                .field("customer", Customer?.self)
             ] }
 
             /// The email address of the buyer that's interacting with the cart.
             var email: String? { __data["email"] }
+            /// The phone number of the buyer that's interacting with the cart.
+            var phone: String? { __data["phone"] }
+            /// The customer account associated with the cart.
+            var customer: Customer? { __data["customer"] }
+
+            /// BuyerIdentity.Customer
+            ///
+            /// Parent Type: `Customer`
+            struct Customer: Storefront.SelectionSet {
+                let __data: DataDict
+                init(_dataDict: DataDict) { __data = _dataDict }
+
+                static var __parentType: any ApolloAPI.ParentType { Storefront.Objects.Customer }
+                static var __selections: [ApolloAPI.Selection] { [
+                    .field("__typename", String.self),
+                    .field("email", String?.self),
+                    .field("phone", String?.self)
+                ] }
+
+                /// The customer’s email address.
+                var email: String? { __data["email"] }
+                /// The customer’s phone number.
+                var phone: String? { __data["phone"] }
+            }
         }
 
         /// DeliveryGroups
