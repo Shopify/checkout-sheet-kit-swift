@@ -235,7 +235,7 @@ class CheckoutWebView: WKWebView {
 
         if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
-            request.setValue("prefetch", forHTTPHeaderField: "Sec-Purpose")
+            request.setValue("prefetch", forHTTPHeaderField: "Shopify-Purpose")
         }
 
         load(request)

@@ -24,7 +24,7 @@
 import UIKit
 
 /// The version of the `ShopifyCheckoutSheetKit` library.
-public let version = "3.2.0"
+public let version = "3.4.0-rc.8"
 
 var invalidateOnConfigurationChange = true
 
