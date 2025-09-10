@@ -203,6 +203,19 @@ class PKEncoder {
         // Allow the API return an error if the country code is not recognized
         return countryCode
     }
+    
+    /// Apple trims half of the zip exclusively for GB/Canada
+    /// https://developer.apple.com/documentation/applepayontheweb/applepaysession/onshippingcontactselected
+    /// checkout-web pads the postal code to ensure that deliveryGroups are returned when no flat rates
+    /// https://github.com/shop/world/blob/01066aec0ab38cc4c14ece1a00eceef6cfa162ef/areas/clients/checkout-web/app/utilities/wallets/helpers.ts#L175-L188
+    func addPaddingToPostalCode(for postalCode: String?, in country: String) -> String? {
+        guard let postalCode else { return nil }
+        return switch country {
+            case "GB": "\(postalCode)0ZZ"
+            case "CA": "\(postalCode)0Z0"
+            default: postalCode
+        }
+    }
 
     func pkContactToAddress(contact: PKContact?)
         -> Result<StorefrontAPI.Types.Address, ShopifyAcceleratedCheckouts.Error>
@@ -211,14 +224,19 @@ class PKEncoder {
             return .failure(.invariant(expected: "postalAddress"))
         }
         let country = mapToCountryCode(code: postalAddress.isoCountryCode)
+        let paddedZipCode = addPaddingToPostalCode(
+            for: postalAddress.postalCode,
+            in: country
+        )
+        
         // HK does not have postal codes. Apple Pay puts Region in postalCode
         // See: https://github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/map-to-address.ts#L17
         var (zip, province): (String?, String?) =
             switch country {
-            case "HK": (nil, postalAddress.postalCode)
+            case "HK": (nil, paddedZipCode)
             default:
                 (
-                    postalAddress.postalCode,
+                    paddedZipCode,
                     !postalAddress.state.isEmpty
                         ? postalAddress.state
                         : !postalAddress.subLocality.isEmpty ? postalAddress.subLocality : nil
