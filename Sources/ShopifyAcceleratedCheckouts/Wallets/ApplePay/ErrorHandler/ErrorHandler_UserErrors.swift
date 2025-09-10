@@ -260,10 +260,10 @@ extension ErrorHandler {
         case .invalid:
             switch field {
             case "buyerIdentity.email":
-                return PaymentSheetAction.showError(errors: [
-                    ApplePayAuthorizationDelegate.ValidationErrors.emailInvalid(
-                        message: "errors.invalid.email".localizedString)
-                ])
+                // It's not possible to edit email if it was not requested in the sheet, fallback to CSK
+                return PaymentSheetAction.interrupt(
+                    reason: .invalidEmail, checkoutURL: cart?.checkoutUrl.url
+                )
             case "input.lines.0.quantity":
                 // Stock problem, decelerate
                 return PaymentSheetAction.interrupt(

@@ -440,8 +440,12 @@ class ApplePayViewControllerTests: XCTestCase {
 
         XCTAssertEqual(result.id, mockCart.id)
 
-        // only .interrupt PaymentSheetActions will cause a transition (see ApplePayViewController.handleErrorAction)
-        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 0)
+        // Invalid email errors trigger an interrupt to fallback to CSK
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
+        XCTAssertEqual(
+            mockAuthorizationDelegate.transitionHistory.first,
+            .interrupt(reason: .invalidEmail)
+        )
     }
 
     @MainActor

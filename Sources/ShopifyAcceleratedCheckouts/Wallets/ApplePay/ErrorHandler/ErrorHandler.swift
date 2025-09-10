@@ -32,6 +32,7 @@ class ErrorHandler {
         case cartNotReady
         case cartThrottled
         case notEnoughStock
+        case invalidEmail
         case other
         // These errors are unhandled by Portable Wallets
         case unhandled
@@ -42,6 +43,7 @@ class ErrorHandler {
             case .dynamicTax: "wallet_dynamic_tax"
             case .cartNotReady: "wallet_cart_not_ready"
             case .notEnoughStock: "wallet_not_enough_stock"
+            case .invalidEmail: nil
             case .other: nil
             case .unhandled: nil
             // These are handled in checkout-web by default

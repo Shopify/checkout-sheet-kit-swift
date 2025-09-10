@@ -178,10 +178,10 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 errorCode: .invalid,
                 field: ["buyerIdentity", "email"],
                 shippingCountry: "US",
-                expectedAction: .showError(.emailInvalid),
+                expectedAction: .interrupt(.invalidEmail),
                 expectedField: nil,
-                expectedMessageKey: "errors.invalid.email",
-                testDescription: "returns emailInvalid error when email is invalid"
+                expectedMessageKey: nil,
+                testDescription: "returns invalidEmail interrupt when email is invalid to fallback to CSK"
             ),
             TestCase(
                 errorCode: .invalid,
@@ -339,12 +339,11 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
 
         let result = ErrorHandler.map(errors: [unhandledError, nameError, emailError], shippingCountry: "US", cart: nil)
 
-        // Should return combined show errors (higher priority than interrupt)
         switch result {
-        case let .showError(errors):
-            XCTAssertEqual(errors.count, 2, "nameError and emailError should be combined")
+        case let .interrupt(reason, _):
+            XCTAssertEqual(reason, .invalidEmail, "Email error should trigger invalidEmail interrupt")
         default:
-            XCTFail("Expected showError action with combined errors")
+            XCTFail("Expected interrupt action for email error")
         }
     }
 
