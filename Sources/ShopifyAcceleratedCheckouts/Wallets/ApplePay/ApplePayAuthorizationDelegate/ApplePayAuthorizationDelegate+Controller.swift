@@ -48,20 +48,16 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             // Store current cart state before attempting address update
             let previousCart = controller.cart
 
-            let cart = try await upsertShippingAddress(to: shippingAddress)
+            try await upsertShippingAddress(to: shippingAddress)
+            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
+            try setCart(to: result.cart)
 
             // If address update cleared delivery groups, revert to previous cart and show error
-            if cart.deliveryGroups.nodes.isEmpty, previousCart?.deliveryGroups.nodes.isEmpty == false {
+            if result.cart?.deliveryGroups.nodes.isEmpty == true, previousCart?.deliveryGroups.nodes.isEmpty == false {
                 try setCart(to: previousCart)
 
                 return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.addressUnserviceableError])
             }
-
-            try setCart(to: cart)
-
-            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-
-            try setCart(to: result.cart)
 
             return pkDecoder.paymentRequestShippingContactUpdate()
         } catch {
@@ -105,8 +101,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 )
             )
 
-            try await controller.storefront
-                .cartBillingAddressUpdate(id: cartID, billingAddress: billingPostalAddress)
+            try await controller.storefront.cartBillingAddressUpdate(
+                id: cartID,
+                billingAddress: billingPostalAddress
+            )
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
             try setCart(to: result.cart)
@@ -138,13 +136,12 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let selectedDeliveryOptionHandle = try pkEncoder.selectedDeliveryOptionHandle.get()
             let deliveryGroupID = try pkEncoder.deliveryGroupID.get()
 
-            let cart = try await controller.storefront
+            try await controller.storefront
                 .cartSelectedDeliveryOptionsUpdate(
                     id: cartID,
                     deliveryGroupId: deliveryGroupID,
                     deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
                 )
-            try setCart(to: cart)
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
@@ -188,7 +185,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             if try pkDecoder.isShippingRequired() {
                 let shippingAddress = try pkEncoder.shippingAddress.get()
-                _ = try await upsertShippingAddress(to: shippingAddress, validate: true)
+                try await upsertShippingAddress(to: shippingAddress, validate: true)
 
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
