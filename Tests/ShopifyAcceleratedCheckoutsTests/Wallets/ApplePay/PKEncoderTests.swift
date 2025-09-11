@@ -699,4 +699,582 @@ class PKEncoderTests: XCTestCase {
         XCTAssertEqual(address.zip, "10001")
         XCTAssertEqual(address.country, "US")
     }
+
+    // MARK: - cartID Tests
+
+    func test_cartID_withValidCart_shouldReturnCartID() throws {
+        let mockCart = StorefrontAPI.Cart.testCart
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { mockCart })
+
+        let result = testEncoder.cartID
+        let cartID = try result.get()
+
+        XCTAssertEqual(cartID, mockCart.id)
+    }
+
+    func test_cartID_withNilCart_shouldReturnFailure() {
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { nil })
+
+        let result = testEncoder.cartID
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "cart")
+    }
+
+    // MARK: - selectedDeliveryOptionHandle Tests
+
+    func test_selectedDeliveryOptionHandle_withValidShippingMethod_shouldReturnHandle() throws {
+        let testEncoder = encoder
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.setValue("test-delivery-option-123", forKey: "identifier")
+        testEncoder.selectedShippingMethod = shippingMethod
+
+        let result = testEncoder.selectedDeliveryOptionHandle
+        let handle = try result.get()
+
+        XCTAssertEqual(handle.rawValue, "test-delivery-option-123")
+    }
+
+    func test_selectedDeliveryOptionHandle_withNilShippingMethod_shouldReturnFailure() {
+        let testEncoder = encoder
+        testEncoder.selectedShippingMethod = nil
+
+        let result = testEncoder.selectedDeliveryOptionHandle
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "shippingMethod")
+    }
+
+    func test_selectedDeliveryOptionHandle_withNilIdentifier_shouldReturnFailure() {
+        let testEncoder = encoder
+        let shippingMethod = PKShippingMethod()
+        testEncoder.selectedShippingMethod = shippingMethod
+
+        let result = testEncoder.selectedDeliveryOptionHandle
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "shippingMethodID")
+    }
+
+    // MARK: - deliveryGroupID Tests
+
+    func test_deliveryGroupID_withNilCart_shouldReturnFailure() {
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { nil })
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.setValue("test-delivery-option-123", forKey: "identifier")
+        testEncoder.selectedShippingMethod = shippingMethod
+
+        let result = testEncoder.deliveryGroupID
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "cart")
+    }
+
+    func test_deliveryGroupID_withNilSelectedShippingMethod_shouldReturnFailure() {
+        let mockCart = StorefrontAPI.Cart.testCart
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { mockCart })
+        testEncoder.selectedShippingMethod = nil
+
+        let result = testEncoder.deliveryGroupID
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "selectedShippingMethodId")
+    }
+
+    func test_deliveryGroupID_withInvalidDeliveryOptionHandle_shouldReturnFailure() {
+        let mockCart = StorefrontAPI.Cart.testCart
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { mockCart })
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.setValue("invalid-delivery-option", forKey: "identifier")
+        testEncoder.selectedShippingMethod = shippingMethod
+
+        let result = testEncoder.deliveryGroupID
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "deliveryGroupID")
+    }
+
+    func test_deliveryGroupID_withValidData_shouldReturnGroupID() throws {
+        let mockCart = StorefrontAPI.Cart.testCart
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { mockCart })
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.setValue("standard-shipping", forKey: "identifier")
+        testEncoder.selectedShippingMethod = shippingMethod
+
+        let result = testEncoder.deliveryGroupID
+        let groupID = try result.get()
+
+        XCTAssertEqual(groupID.rawValue, "gid://shopify/CartDeliveryGroup/1")
+    }
+
+    // MARK: - billingContact Tests
+
+    func test_billingContact_withValidPayment_shouldReturnContact() throws {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let billingContact = createMockContact(emailAddress: "billing@test.com")
+        payment.setValue(billingContact, forKey: "billingContact")
+        testEncoder.payment = payment
+
+        let result = testEncoder.billingContact
+        let contact = try result.get()
+
+        XCTAssertEqual(contact.emailAddress, "billing@test.com")
+    }
+
+    func test_billingContact_withNilPayment_shouldReturnFailure() {
+        let testEncoder = encoder
+        testEncoder.payment = nil
+
+        let result = testEncoder.billingContact
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "payment")
+    }
+
+    // MARK: - shippingContact Tests
+
+    func test_shippingContact_withPaymentShippingContact_shouldReturnPaymentContact() throws {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let shippingContact = createMockContact(emailAddress: "shipping@test.com")
+        payment.setValue(shippingContact, forKey: "shippingContact")
+        testEncoder.payment = payment
+
+        let result = testEncoder.shippingContact
+        let contact = try result.get()
+
+        XCTAssertEqual(contact.emailAddress, "shipping@test.com")
+    }
+
+    func test_shippingContact_withSelectedShippingContact_shouldReturnSelectedContact() throws {
+        let testEncoder = encoder
+        testEncoder.payment = nil
+        let selectedContact = createMockContact(emailAddress: "selected@test.com")
+        testEncoder.shippingContact = .success(selectedContact)
+
+        let result = testEncoder.shippingContact
+        let contact = try result.get()
+
+        XCTAssertEqual(contact.emailAddress, "selected@test.com")
+    }
+
+    func test_shippingContact_withNilPaymentAndFailedSelectedContact_shouldReturnFailure() {
+        let testEncoder = encoder
+        testEncoder.payment = nil
+        testEncoder.shippingContact = .failure(.invariant(expected: "test"))
+
+        let result = testEncoder.shippingContact
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "payment")
+    }
+
+    func test_shippingContact_setter_shouldUpdateSelectedShippingContact() throws {
+        let testEncoder = encoder
+        let contact = createMockContact(emailAddress: "setter@test.com")
+
+        testEncoder.shippingContact = .success(contact)
+
+        let result = testEncoder.shippingContact
+        let retrievedContact = try result.get()
+
+        XCTAssertEqual(retrievedContact.emailAddress, "setter@test.com")
+    }
+
+    // MARK: - lastDigits Tests
+
+    func test_lastDigits_withValidPayment_shouldReturnLastDigits() throws {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let token = PKPaymentToken()
+        let paymentMethod = PKPaymentMethod()
+        paymentMethod.setValue("•••• 1234", forKey: "displayName")
+        token.setValue(paymentMethod, forKey: "paymentMethod")
+        payment.setValue(token, forKey: "token")
+        testEncoder.payment = payment
+
+        let result = testEncoder.lastDigits
+        let digits = try result.get()
+
+        XCTAssertEqual(digits, "1234")
+    }
+
+    func test_lastDigits_withNilPayment_shouldReturnFailure() {
+        let testEncoder = encoder
+        testEncoder.payment = nil
+
+        let result = testEncoder.lastDigits
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "payment")
+    }
+
+    func test_lastDigits_withNilDisplayName_shouldReturnFailure() {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let token = PKPaymentToken()
+        let paymentMethod = PKPaymentMethod()
+        token.setValue(paymentMethod, forKey: "paymentMethod")
+        payment.setValue(token, forKey: "token")
+        testEncoder.payment = payment
+
+        let result = testEncoder.lastDigits
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "displayName")
+    }
+
+    // MARK: - billingAddress Tests
+
+    func test_billingAddress_withValidBillingContact_shouldReturnAddress() throws {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let billingContact = createMockContact(
+            street: "123 Billing St",
+            city: "Billing City",
+            state: "CA",
+            postalCode: "90210",
+            isoCountryCode: "US"
+        )
+        payment.setValue(billingContact, forKey: "billingContact")
+        testEncoder.payment = payment
+
+        let result = testEncoder.billingAddress
+        let address = try result.get()
+
+        XCTAssertEqual(address.address1, "123 Billing St")
+        XCTAssertEqual(address.city, "Billing City")
+        XCTAssertEqual(address.province, "CA")
+        XCTAssertEqual(address.zip, "90210")
+        XCTAssertEqual(address.country, "US")
+    }
+
+    func test_billingAddress_withFailedBillingContact_shouldReturnFailure() {
+        let testEncoder = encoder
+        testEncoder.payment = nil
+
+        let result = testEncoder.billingAddress
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "billingContact")
+    }
+
+    // MARK: - shippingAddress Tests
+
+    func test_shippingAddress_withValidShippingContact_shouldReturnAddress() throws {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let shippingContact = createMockContact(
+            street: "456 Shipping Ave",
+            city: "Shipping Town",
+            state: "NY",
+            postalCode: "10001",
+            isoCountryCode: "US"
+        )
+        payment.setValue(shippingContact, forKey: "shippingContact")
+        testEncoder.payment = payment
+
+        let result = testEncoder.shippingAddress
+        let address = try result.get()
+
+        XCTAssertEqual(address.address1, "456 Shipping Ave")
+        XCTAssertEqual(address.city, "Shipping Town")
+        XCTAssertEqual(address.province, "NY")
+        XCTAssertEqual(address.zip, "10001")
+        XCTAssertEqual(address.country, "US")
+    }
+
+    func test_shippingAddress_withFailedShippingContact_shouldReturnFailure() {
+        let testEncoder = encoder
+        testEncoder.payment = nil
+
+        let result = testEncoder.shippingAddress
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "shippingContact")
+    }
+
+    // MARK: - totalAmount Tests
+
+    func test_totalAmount_withValidCart_shouldReturnAmount() throws {
+        let mockCart = StorefrontAPI.Cart.testCart
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { mockCart })
+
+        let result = testEncoder.totalAmount
+        let amount = try result.get()
+
+        XCTAssertEqual(amount.amount, mockCart.cost.totalAmount.amount)
+        XCTAssertEqual(amount.currencyCode, mockCart.cost.totalAmount.currencyCode)
+    }
+
+    func test_totalAmount_withNilCart_shouldReturnFailure() {
+        let testEncoder = PKEncoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { nil })
+
+        let result = testEncoder.totalAmount
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "cart")
+    }
+
+    // MARK: - applePayPayment Tests
+
+    func test_applePayPayment_withNilPayment_shouldReturnFailure() {
+        let testEncoder = encoder
+        testEncoder.payment = nil
+
+        let result = testEncoder.applePayPayment
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "payment")
+    }
+
+    func test_applePayPayment_withInvalidPaymentData_shouldReturnFailure() {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let token = PKPaymentToken()
+        // Set invalid payment data that will fail JSON decoding
+        token.setValue(Data(), forKey: "paymentData")
+        payment.setValue(token, forKey: "token")
+        testEncoder.payment = payment
+
+        let result = testEncoder.applePayPayment
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "paymentData")
+    }
+
+    func test_applePayPayment_withFailedBillingAddress_shouldReturnFailure() {
+        let testEncoder = encoder
+        // Set up payment without billing contact to make billingAddress fail
+        testEncoder.payment = nil
+
+        let result = testEncoder.applePayPayment
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "payment")
+    }
+
+    func test_applePayPayment_withFailedLastDigits_shouldReturnFailure() {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let token = PKPaymentToken()
+        let paymentMethod = PKPaymentMethod()
+        // Set displayName to nil to make lastDigits fail
+        paymentMethod.setValue(nil, forKey: "displayName")
+        token.setValue(paymentMethod, forKey: "paymentMethod")
+        payment.setValue(token, forKey: "token")
+
+        // Set up billing contact to pass billingAddress check
+        let billingContact = createMockContact(
+            street: "123 Test St",
+            city: "Test City",
+            state: "CA",
+            postalCode: "90210",
+            isoCountryCode: "US"
+        )
+        payment.setValue(billingContact, forKey: "billingContact")
+
+        // Create valid JSON payment data to pass paymentData check
+        let validPaymentData = """
+        {
+            "header": {
+                "ephemeralPublicKey": "test-key",
+                "publicKeyHash": "test-hash",
+                "transactionId": "test-transaction"
+            },
+            "data": "test-data",
+            "signature": "test-signature",
+            "version": "EC_v1"
+        }
+        """.data(using: .utf8)!
+        token.setValue(validPaymentData, forKey: "paymentData")
+
+        testEncoder.payment = payment
+
+        let result = testEncoder.applePayPayment
+
+        guard case let .failure(error) = result else {
+            XCTFail("Expected failure but got success")
+            return
+        }
+        guard case let .invariant(expected) = error else {
+            XCTFail("Expected invariant error but got: \(error)")
+            return
+        }
+        XCTAssertEqual(expected, "lastDigits")
+    }
+
+    func test_applePayPayment_withValidData_shouldReturnApplePayPayment() throws {
+        let testEncoder = encoder
+        let payment = PKPayment()
+        let token = PKPaymentToken()
+        let paymentMethod = PKPaymentMethod()
+
+        // Set up valid payment method with displayName for lastDigits
+        paymentMethod.setValue("•••• 1234", forKey: "displayName")
+        token.setValue(paymentMethod, forKey: "paymentMethod")
+        payment.setValue(token, forKey: "token")
+
+        // Set up billing contact for billingAddress
+        let billingContact = createMockContact(
+            givenName: "John",
+            familyName: "Doe",
+            street: "123 Apple Street",
+            city: "Cupertino",
+            state: "CA",
+            postalCode: "95014",
+            isoCountryCode: "US"
+        )
+        payment.setValue(billingContact, forKey: "billingContact")
+
+        // Create valid JSON payment data
+        let validPaymentData = """
+        {
+            "header": {
+                "ephemeralPublicKey": "BFz948MTG3OQ0Q7PyL1SvZzFZ7jd8+yV1CJ5cXEk8mbfw7XxuTHyGvYM2e1cMqo45Z+1wBTTgc8aNYj5Qhg2SWY=",
+                "publicKeyHash": "Xzgh8wOJfBa2YHKhOGjdl3hdvvdyq2/Pq1IHTCzF6Mc=",
+                "transactionId": "31323334353637"
+            },
+            "data": "nZqvl0G6G3M7YY7WEKKGZmMXDyOFKiw45b2MgYg6W0TM",
+            "signature": "MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIIC7TCCAukwggJkAgEAMIIB8TCCAR0CAQAwXDBNMQ==",
+            "version": "EC_v1"
+        }
+        """.data(using: .utf8)!
+        token.setValue(validPaymentData, forKey: "paymentData")
+
+        testEncoder.payment = payment
+
+        let result = testEncoder.applePayPayment
+        let applePayPayment = try result.get()
+
+        // Verify the returned ApplePayPayment object
+        XCTAssertEqual(applePayPayment.billingAddress.firstName, "John")
+        XCTAssertEqual(applePayPayment.billingAddress.lastName, "Doe")
+        XCTAssertEqual(applePayPayment.billingAddress.address1, "123 Apple Street")
+        XCTAssertEqual(applePayPayment.billingAddress.city, "Cupertino")
+        XCTAssertEqual(applePayPayment.billingAddress.province, "CA")
+        XCTAssertEqual(applePayPayment.billingAddress.zip, "95014")
+        XCTAssertEqual(applePayPayment.billingAddress.country, "US")
+
+        XCTAssertEqual(applePayPayment.ephemeralPublicKey, "BFz948MTG3OQ0Q7PyL1SvZzFZ7jd8+yV1CJ5cXEk8mbfw7XxuTHyGvYM2e1cMqo45Z+1wBTTgc8aNYj5Qhg2SWY=")
+        XCTAssertEqual(applePayPayment.publicKeyHash, "Xzgh8wOJfBa2YHKhOGjdl3hdvvdyq2/Pq1IHTCzF6Mc=")
+        XCTAssertEqual(applePayPayment.transactionId, "31323334353637")
+        XCTAssertEqual(applePayPayment.data, "nZqvl0G6G3M7YY7WEKKGZmMXDyOFKiw45b2MgYg6W0TM")
+        XCTAssertTrue(applePayPayment.signature.hasPrefix("MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIIC7TCCAukwggJkAgEAMIIB8TCCAR0CAQAwXDBNMQ=="))
+        XCTAssertEqual(applePayPayment.version, "EC_v1")
+        XCTAssertEqual(applePayPayment.lastDigits, "1234")
+    }
 }

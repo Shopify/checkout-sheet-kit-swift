@@ -22,6 +22,7 @@
  */
 
 import Foundation
+import PassKit
 @testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import XCTest
@@ -164,12 +165,31 @@ extension ApplePayConfigurationWrapper {
 extension StorefrontAPI.Cart {
     static var testCart: StorefrontAPI.Cart {
         let checkoutURL = URL(string: "https://test-shop.myshopify.com/checkout")!
+
+        // Create delivery option that matches test expectations
+        let deliveryOption = StorefrontAPI.CartDeliveryOption(
+            handle: "standard-shipping",
+            title: "Standard Shipping",
+            code: "STANDARD",
+            deliveryMethodType: .shipping,
+            description: "5-7 business days",
+            estimatedCost: StorefrontAPI.MoneyV2(amount: Decimal(5.00), currencyCode: "USD")
+        )
+
+        // Create delivery group with the delivery option
+        let deliveryGroup = StorefrontAPI.CartDeliveryGroup(
+            id: GraphQLScalars.ID("gid://shopify/CartDeliveryGroup/1"),
+            groupType: .oneTimePurchase,
+            deliveryOptions: [deliveryOption],
+            selectedDeliveryOption: nil
+        )
+
         return StorefrontAPI.Cart(
             id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
             checkoutUrl: GraphQLScalars.URL(checkoutURL),
             totalQuantity: 1,
             buyerIdentity: nil,
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: [deliveryGroup]),
             delivery: nil,
             lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
             cost: StorefrontAPI.CartCost(
@@ -336,5 +356,36 @@ class TestStorefrontAPI: MockStorefrontAPI {
             fatalError("cartCreateResult not configured for TestStorefrontAPI")
         }
         return try result.get()
+    }
+}
+
+// MARK: - PKPaymentRequest Helpers
+
+@available(iOS 17.0, *)
+extension PKPaymentRequest {
+    static var testPaymentRequest: PKPaymentRequest {
+        let request = PKPaymentRequest()
+        request.countryCode = "US"
+        request.currencyCode = "USD"
+        request.paymentSummaryItems = [.init(label: "item 1", amount: 22.00, type: .final)]
+        request.supportedNetworks = .init([.amex, .masterCard, .visa])
+        request.merchantCapabilities = .threeDSecure
+        return request
+    }
+
+    static func testPaymentRequest(
+        countryCode: String = "US",
+        currencyCode: String = "USD",
+        label: String = "item 1",
+        amount: NSDecimalNumber = 22.00,
+        supportedNetworks: [PKPaymentNetwork] = [.amex, .masterCard, .visa]
+    ) -> PKPaymentRequest {
+        let request = PKPaymentRequest()
+        request.countryCode = countryCode
+        request.currencyCode = currencyCode
+        request.paymentSummaryItems = [.init(label: label, amount: amount, type: .final)]
+        request.supportedNetworks = .init(supportedNetworks)
+        request.merchantCapabilities = .threeDSecure
+        return request
     }
 }

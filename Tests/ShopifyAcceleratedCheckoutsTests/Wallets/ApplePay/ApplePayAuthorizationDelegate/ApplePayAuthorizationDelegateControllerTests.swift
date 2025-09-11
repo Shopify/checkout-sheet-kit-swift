@@ -70,7 +70,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         shippingMethod.amount = NSDecimalNumber(string: "5.00")
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: shippingMethod
         )
 
@@ -84,10 +84,26 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         invalidMethod.label = "Invalid Method"
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: invalidMethod
         )
         XCTAssertNotNil(result, "Should handle invalid method with fallback logic")
+    }
+
+    func test_didSelectShippingMethod_withCartIDError_shouldReturnFailureStatus() async throws {
+        try delegate.setCart(to: nil)
+
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.identifier = "standard-shipping"
+        shippingMethod.label = "Standard Shipping"
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingMethod: shippingMethod
+        )
+
+        XCTAssertEqual(result.status, .failure, "Should return failure status when cartID cannot be retrieved")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
     }
 
     // MARK: - Shipping Contact Update Logic Tests
@@ -97,7 +113,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         contact.postalAddress = createPostalAddress()
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingContact: contact
         )
 
@@ -110,7 +126,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         contact.postalAddress = createPostalAddress()
 
         let result = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingContact: contact
         )
 
@@ -199,7 +215,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         MockURLProtocol.lastOperation = nil
 
         _ = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: valid
         )
 
@@ -218,7 +234,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         MockURLProtocol.lastOperation = nil
 
         _ = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: selected
         )
 
@@ -233,11 +249,110 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         MockURLProtocol.lastOperation = nil
 
         _ = await delegate.paymentAuthorizationController(
-            PKPaymentAuthorizationController(),
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: selected
         )
 
         XCTAssertEqual(delegate.pkEncoder.selectedShippingMethod?.identifier, "only-method")
+    }
+
+    func test_didSelectShippingMethod_withSelectedDeliveryOptionHandleError_shouldReturnFailureStatus() async throws {
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.identifier = nil
+        shippingMethod.label = "Method Without ID"
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingMethod: shippingMethod
+        )
+
+        XCTAssertEqual(result.status, .failure, "Should return failure status when selectedDeliveryOptionHandle.get() throws")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
+    }
+
+    func test_didSelectShippingMethod_withDeliveryGroupIDError_shouldReturnFailureStatus() async throws {
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.identifier = "nonexistent-delivery-group"
+        shippingMethod.label = "Invalid Delivery Group Method"
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingMethod: shippingMethod
+        )
+
+        XCTAssertEqual(result.status, .failure, "Should return failure status when deliveryGroupID.get() throws")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
+    }
+
+    func test_didSelectShippingMethod_withCartSelectedDeliveryOptionsUpdateError_shouldReturnFailureStatus() async throws {
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.identifier = "standard-shipping"
+        shippingMethod.label = "Standard Shipping"
+
+        MockURLProtocol.failDeliveryUpdate = true
+        defer { MockURLProtocol.failDeliveryUpdate = false }
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingMethod: shippingMethod
+        )
+
+        XCTAssertEqual(result.status, .failure, "Should return failure status when cartSelectedDeliveryOptionsUpdate throws")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
+    }
+
+    func test_didSelectShippingMethod_withCartPrepareForCompletionError_shouldReturnFailureStatus() async throws {
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.identifier = "standard-shipping"
+        shippingMethod.label = "Standard Shipping"
+
+        MockURLProtocol.failPrepareForCompletion = true
+        defer { MockURLProtocol.failPrepareForCompletion = false }
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingMethod: shippingMethod
+        )
+
+        XCTAssertEqual(result.status, .failure, "Should return failure status when cartPrepareForCompletion throws")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
+    }
+
+    func test_didSelectShippingMethod_withMappableCartUserError_shouldMaintainSuccessStatus() async throws {
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.identifier = "standard-shipping"
+        shippingMethod.label = "Standard Shipping"
+
+        // This tests the core PR functionality: CartUserError(invalid, buyerIdentity.email)
+        // maps to ValidationErrors.emailInvalid (PKPaymentError) which maintains success status
+        MockURLProtocol.returnMappableCartUserError = true
+        defer { MockURLProtocol.returnMappableCartUserError = false }
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingMethod: shippingMethod
+        )
+
+        XCTAssertEqual(result.status, .success, "Should maintain success status when CartUserError maps to PKPaymentError")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should return payment summary items")
+        XCTAssertTrue(result.errors.isEmpty, "Should not errors")
+    }
+
+    func test_didSelectShippingMethod_withSetCartError_shouldReturnFailureStatus() async throws {
+        let shippingMethod = PKShippingMethod()
+        shippingMethod.identifier = "standard-shipping"
+        shippingMethod.label = "Standard Shipping"
+
+        MockURLProtocol.returnInvalidCart = true
+        defer { MockURLProtocol.returnInvalidCart = false }
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingMethod: shippingMethod
+        )
+
+        XCTAssertEqual(result.status, .failure, "Should return failure status when setCart throws")
+        XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
     }
 
     // MARK: - Helper Methods
@@ -276,7 +391,19 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
             "\"checkoutUrl\":\"https://stub/checkout\"," +
             "\"totalQuantity\":0," +
             "\"buyerIdentity\":null," +
-            "\"deliveryGroups\":{\"nodes\":[]}," +
+            "\"deliveryGroups\":{\"nodes\":[{" +
+            "\"id\":\"gid://shopify/CartDeliveryGroup/1\"," +
+            "\"groupType\":\"ONE_TIME_PURCHASE\"," +
+            "\"deliveryOptions\":[{" +
+            "\"handle\":\"standard-shipping\"," +
+            "\"title\":\"Standard Shipping\"," +
+            "\"code\":\"STANDARD\"," +
+            "\"deliveryMethodType\":\"SHIPPING\"," +
+            "\"description\":\"5-7 business days\"," +
+            "\"estimatedCost\":{\"amount\":\"5.00\",\"currencyCode\":\"USD\"}" +
+            "}]," +
+            "\"selectedDeliveryOption\":null" +
+            "}]}," +
             "\"delivery\":null," +
             "\"lines\":{\"nodes\":[]}," +
             "\"cost\":{\"totalAmount\":{\"amount\":\"0.00\",\"currencyCode\":\"USD\"}}," +
@@ -287,7 +414,19 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
             "\"checkoutUrl\":\"https://stub/checkout\"," +
             "\"totalQuantity\":0," +
             "\"buyerIdentity\":null," +
-            "\"deliveryGroups\":{\"nodes\":[]}," +
+            "\"deliveryGroups\":{\"nodes\":[{" +
+            "\"id\":\"gid://shopify/CartDeliveryGroup/1\"," +
+            "\"groupType\":\"ONE_TIME_PURCHASE\"," +
+            "\"deliveryOptions\":[{" +
+            "\"handle\":\"standard-shipping\"," +
+            "\"title\":\"Standard Shipping\"," +
+            "\"code\":\"STANDARD\"," +
+            "\"deliveryMethodType\":\"SHIPPING\"," +
+            "\"description\":\"5-7 business days\"," +
+            "\"estimatedCost\":{\"amount\":\"5.00\",\"currencyCode\":\"USD\"}" +
+            "}]," +
+            "\"selectedDeliveryOption\":null" +
+            "}]}," +
             "\"delivery\":{\"addresses\":[{\"id\":\"gid://shopify/CartSelectableAddress/1\",\"selected\":true,\"address\":{\"countryCode\":\"US\"}}]}," +
             "\"lines\":{\"nodes\":[]}," +
             "\"cost\":{\"totalAmount\":{\"amount\":\"0.00\",\"currencyCode\":\"USD\"}}," +
@@ -295,6 +434,10 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
 
         static var failRemove = false
         static var failAdd = false
+        static var failDeliveryUpdate = false
+        static var failPrepareForCompletion = false
+        static var returnMappableCartUserError = false
+        static var returnInvalidCart = false
         static var lastOperation: String?
 
         static func response(for op: String) -> Data {
@@ -318,24 +461,53 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         override func startLoading() {
             let bodyStr = request.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? ""
             let ops = ["cartDeliveryAddressesAdd", "cartDeliveryAddressesRemove", "cartSelectedDeliveryOptionsUpdate", "cartPrepareForCompletion"]
-            let op = ops.first { bodyStr.contains($0) } ?? "cartDeliveryAddressesAdd"
+            let op = ops.first { bodyStr.contains($0) } ?? {
+                // Fallback: if returnMappableCartUserError is true, assume it's cartSelectedDeliveryOptionsUpdate
+                if Self.returnMappableCartUserError {
+                    return "cartSelectedDeliveryOptionsUpdate"
+                }
+                return "cartDeliveryAddressesAdd"
+            }()
             Self.lastOperation = op
-            if (op == "cartDeliveryAddressesRemove" && Self.failRemove) || (op == "cartDeliveryAddressesAdd" && Self.failAdd) {
+
+            let shouldFail = (op == "cartDeliveryAddressesRemove" && Self.failRemove) ||
+                (op == "cartDeliveryAddressesAdd" && Self.failAdd) ||
+                (op == "cartSelectedDeliveryOptionsUpdate" && Self.failDeliveryUpdate) ||
+                (op == "cartPrepareForCompletion" && Self.failPrepareForCompletion)
+            let data: Data
+            if shouldFail {
                 let errorJSON = "{\"data\":{\"\(op)\":{\"cart\":null,\"userErrors\":[{\"message\":\"fail\"}]}}}"
-                let data = Data(errorJSON.utf8)
-                let resp = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
-                client?.urlProtocol(self, didReceive: resp, cacheStoragePolicy: .notAllowed)
-                client?.urlProtocol(self, didLoad: data)
+                data = Data(errorJSON.utf8)
+            } else if Self.returnMappableCartUserError, op == "cartSelectedDeliveryOptionsUpdate" {
+                data = Self.responseWithCartUserError(operation: op, errorCode: "INVALID")
+            } else if Self.returnInvalidCart {
+                let invalidCartJSON = "{\"data\":{\"\(op)\":{\"cart\":{\"invalid\":\"structure\"},\"userErrors\":[]}}}"
+                data = Data(invalidCartJSON.utf8)
             } else {
-                let data = Self.response(for: op)
-                let resp = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
-                client?.urlProtocol(self, didReceive: resp, cacheStoragePolicy: .notAllowed)
-                client?.urlProtocol(self, didLoad: data)
+                data = Self.response(for: op)
             }
+            let resp = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            client?.urlProtocol(self, didReceive: resp, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
             client?.urlProtocolDidFinishLoading(self)
         }
 
         override func stopLoading() {}
-        static func reset() { lastOperation = nil; failRemove = false; failAdd = false }
+        static func reset() {
+            lastOperation = nil
+            failRemove = false
+            failAdd = false
+            failDeliveryUpdate = false
+            failPrepareForCompletion = false
+            returnMappableCartUserError = false
+            returnInvalidCart = false
+        }
+
+        static func responseWithCartUserError(operation: String, errorCode: String) -> Data {
+            let json = "{" +
+                "\"data\":{\"" + operation + "\":{\"cart\": " + mockCartResponse + "," +
+                "\"userErrors\":[{\"field\":[\"buyerIdentity\",\"email\"],\"message\":\"Email format is invalid\",\"code\":\"" + errorCode + "\"}]}}}"
+            return Data(json.utf8)
+        }
     }
 }
