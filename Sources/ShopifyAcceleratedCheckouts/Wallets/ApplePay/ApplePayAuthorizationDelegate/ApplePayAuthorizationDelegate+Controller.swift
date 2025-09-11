@@ -49,6 +49,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let previousCart = controller.cart
 
             try await upsertShippingAddress(to: shippingAddress)
+
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
             try setCart(to: result.cart)
 
@@ -56,6 +57,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             if result.cart?.deliveryGroups.nodes.isEmpty == true, previousCart?.deliveryGroups.nodes.isEmpty == false {
                 try setCart(to: previousCart)
 
+                ShopifyAcceleratedCheckouts.logger.error("ApplePay: didSelectShippingContact deliveryGroups were unexpectedly empty")
                 return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.addressUnserviceableError])
             }
 
@@ -123,13 +125,14 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        // Check if this shipping method identifier is still valid
-        let availableShippingMethods = pkDecoder.shippingMethods
-        let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
-        let methodToUse: PKShippingMethod = isValidMethod ? shippingMethod : (availableShippingMethods.first ?? shippingMethod)
+        let isValidShippingMethod = pkDecoder.shippingMethods.contains { $0.identifier == shippingMethod.identifier }
+        if !isValidShippingMethod {
+            // TODO; ADD THE ERROR HERE FROM https://github.com/Shopify/checkout-sheet-kit-swift/pull/409
+            return pkDecoder.paymentRequestShippingMethodUpdate()
+        }
 
-        pkEncoder.selectedShippingMethod = methodToUse
-        pkDecoder.selectedShippingMethod = methodToUse
+        pkEncoder.selectedShippingMethod = shippingMethod
+        pkDecoder.selectedShippingMethod = shippingMethod
 
         do {
             let cartID = try pkEncoder.cartID.get()
