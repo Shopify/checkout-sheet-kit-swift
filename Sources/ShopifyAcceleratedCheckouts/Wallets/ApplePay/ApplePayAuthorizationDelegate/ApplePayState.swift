@@ -113,10 +113,12 @@ enum ApplePayState: Equatable {
              (.startPaymentRequest, .appleSheetPresented),
              /// Failing to construct paymentRequest or present payment sheet
              (.startPaymentRequest, .reset),
+             (.startPaymentRequest, .completed),
 
              (.appleSheetPresented, .paymentAuthorized),
              (.appleSheetPresented, .paymentAuthorizationFailed),
              (.appleSheetPresented, .interrupt),
+
              /// User cancels the sheet
              (.appleSheetPresented, .completed),
 

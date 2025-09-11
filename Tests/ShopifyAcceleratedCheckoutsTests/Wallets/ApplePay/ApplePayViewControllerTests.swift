@@ -470,4 +470,22 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertNil(viewController.cart)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
     }
+
+    @MainActor
+    func test_onPress_whenAuthorizationDelegateTransitionThrows_handlesError() async {
+        let mockCart = StorefrontAPI.Cart.testCart(
+            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
+        )
+        mockStorefront.cartResult = .success(mockCart)
+
+        mockAuthorizationDelegate.shouldThrowOnTransition = true
+
+        await viewController.onPress()
+
+        // Should have attempted the transition, and since delegate throws, onPress catch block is triggered
+        // This results in 2 transitions: .startPaymentRequest (attempted) + .completed (error handling)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.first, .startPaymentRequest)
+        XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
+    }
 }
