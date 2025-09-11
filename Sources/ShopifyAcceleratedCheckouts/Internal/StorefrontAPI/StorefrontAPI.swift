@@ -95,7 +95,7 @@ protocol StorefrontAPIProtocol {
         id: GraphQLScalars.ID,
         deliveryGroupId: GraphQLScalars.ID,
         deliveryOptionHandle: String
-    ) async throws -> StorefrontAPI.Cart
+    ) async throws -> StorefrontAPI.Cart?
 
     @discardableResult func cartPaymentUpdate(
         id: GraphQLScalars.ID,

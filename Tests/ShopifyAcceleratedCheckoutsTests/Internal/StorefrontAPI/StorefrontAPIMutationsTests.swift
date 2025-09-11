@@ -885,8 +885,9 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             deliveryOptionHandle: "express"
         )
 
-        XCTAssertEqual(cart.deliveryGroups.nodes.first?.selectedDeliveryOption?.handle, "express")
-        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "34.99")!)
+        XCTAssertNotNil(cart)
+        XCTAssertEqual(cart?.deliveryGroups.nodes.first?.selectedDeliveryOption?.handle, "express")
+        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "34.99")!)
     }
 
     // MARK: - Cart Payment Update Tests
