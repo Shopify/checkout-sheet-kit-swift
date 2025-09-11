@@ -127,8 +127,12 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
     ) async -> PKPaymentRequestShippingMethodUpdate {
         let isValidShippingMethod = pkDecoder.shippingMethods.contains { $0.identifier == shippingMethod.identifier }
         if !isValidShippingMethod {
-            // TODO; ADD THE ERROR HERE FROM https://github.com/Shopify/checkout-sheet-kit-swift/pull/409
-            return pkDecoder.paymentRequestShippingMethodUpdate()
+            return pkDecoder
+                .paymentRequestShippingMethodUpdate(
+                    errors: [ShopifyAcceleratedCheckouts.Error.invariant(
+                        expected: "isValidShippingMethod true"
+                    )]
+                )
         }
 
         pkEncoder.selectedShippingMethod = shippingMethod

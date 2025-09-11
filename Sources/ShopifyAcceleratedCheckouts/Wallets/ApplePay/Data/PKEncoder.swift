@@ -209,7 +209,7 @@ class PKEncoder {
     /// checkout-web pads the postal code to ensure that deliveryGroups are returned when no flat rates
     /// https://github.com/shop/world/blob/01066aec0ab38cc4c14ece1a00eceef6cfa162ef/areas/clients/checkout-web/app/utilities/wallets/helpers.ts#L175-L188
     func addPaddingToPostalCode(for postalCode: String?, in country: String) -> String? {
-        guard let postalCode else { return nil }
+        guard let postalCode, !postalCode.isEmpty else { return nil }
         return switch country {
         case "GB": "\(postalCode)0ZZ"
         case "CA": "\(postalCode)0Z0"
