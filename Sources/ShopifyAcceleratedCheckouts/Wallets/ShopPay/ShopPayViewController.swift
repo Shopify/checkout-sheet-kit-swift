@@ -25,7 +25,7 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 @available(iOS 16.0, *)
-class ShopPayViewController: WalletController {
+class ShopPayViewController: WalletController, Loggable {
     var configuration: ShopifyAcceleratedCheckouts.Configuration
     var eventHandlers: EventHandlers
 

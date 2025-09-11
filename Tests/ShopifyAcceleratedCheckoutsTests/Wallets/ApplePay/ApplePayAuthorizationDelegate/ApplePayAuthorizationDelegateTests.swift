@@ -413,8 +413,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
     // MARK: onCompleted()
 
-    func
-        test_onCompleted_withCartSubmittedForCompletion_shouldTransitionToPresentingCSKWithRedirectURL()
+    func test_onCompleted_withCartSubmittedForCompletion_shouldTransitionToPresentingCSKWithRedirectURL()
         async throws
     {
         let redirectURL = URL(string: "https://shop.example.com/thank-you")!
@@ -441,8 +440,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         )
     }
 
-    func
-        test_onCompleted_withPaymentAuthorizationFailed_shouldTransitionToPresentingCSKWithCheckoutURL()
+    func test_onCompleted_withPaymentAuthorizationFailed_shouldTransitionToPresentingCSKWithCheckoutURL()
         async throws
     {
         let testError = NSError(domain: "test", code: 1, userInfo: nil)
