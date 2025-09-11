@@ -26,7 +26,7 @@
 extension Storefront {
     struct CartFragment: Storefront.SelectionSet, Fragment {
         static var fragmentDefinition: StaticString {
-            #"fragment CartFragment on Cart { __typename id checkoutUrl totalQuantity buyerIdentity { __typename email } deliveryGroups(first: 10) { __typename nodes { __typename ...CartDeliveryGroupFragment } } lines(first: 250) { __typename nodes { __typename ...CartLineFragment } } cost { __typename totalAmount { __typename amount currencyCode } subtotalAmount { __typename amount currencyCode } totalTaxAmount { __typename amount currencyCode } } }"#
+            #"fragment CartFragment on Cart { __typename id checkoutUrl totalQuantity buyerIdentity { __typename email phone customer { __typename email phone } } deliveryGroups(first: 10) { __typename nodes { __typename ...CartDeliveryGroupFragment } } lines(first: 250) { __typename nodes { __typename ...CartLineFragment } } cost { __typename totalAmount { __typename amount currencyCode } subtotalAmount { __typename amount currencyCode } totalTaxAmount { __typename amount currencyCode } } }"#
         }
 
         let __data: DataDict
@@ -70,11 +70,37 @@ extension Storefront {
             static var __parentType: any ApolloAPI.ParentType { Storefront.Objects.CartBuyerIdentity }
             static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
-                .field("email", String?.self)
+                .field("email", String?.self),
+                .field("phone", String?.self),
+                .field("customer", Customer?.self)
             ] }
 
             /// The email address of the buyer that's interacting with the cart.
             var email: String? { __data["email"] }
+            /// The phone number of the buyer that's interacting with the cart.
+            var phone: String? { __data["phone"] }
+            /// The customer account associated with the cart.
+            var customer: Customer? { __data["customer"] }
+
+            /// BuyerIdentity.Customer
+            ///
+            /// Parent Type: `Customer`
+            struct Customer: Storefront.SelectionSet {
+                let __data: DataDict
+                init(_dataDict: DataDict) { __data = _dataDict }
+
+                static var __parentType: any ApolloAPI.ParentType { Storefront.Objects.Customer }
+                static var __selections: [ApolloAPI.Selection] { [
+                    .field("__typename", String.self),
+                    .field("email", String?.self),
+                    .field("phone", String?.self)
+                ] }
+
+                /// The customer’s email address.
+                var email: String? { __data["email"] }
+                /// The customer’s phone number.
+                var phone: String? { __data["phone"] }
+            }
         }
 
         /// DeliveryGroups

@@ -179,15 +179,19 @@ class PKDecoder {
         var fields: Set<PKContactField> = []
 
         let buyerIdentity = cart()?.buyerIdentity
-        let isEmailEmpty = buyerIdentity?.email?.isEmpty ?? true
-        let isPhoneEmpty = buyerIdentity?.phone?.isEmpty ?? true
 
-        // Only request email if it's not already in buyerIdentity
+        let email = buyerIdentity?.customer?.email ?? buyerIdentity?.email
+        let isEmailEmpty = email?.isEmpty ?? true
+
+        let phone = buyerIdentity?.customer?.phone ?? buyerIdentity?.phone
+        let isPhoneEmpty = phone?.isEmpty ?? true
+
+        // Only request email if it's not already provided
         if configuration.applePay.contactFields.contains(.email), isEmailEmpty {
             fields.insert(.emailAddress)
         }
 
-        // Only request phone if it's not already in buyerIdentity
+        // Only request phone if it's not already provided
         if configuration.applePay.contactFields.contains(.phone), isPhoneEmpty {
             fields.insert(.phoneNumber)
         }

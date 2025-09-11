@@ -140,7 +140,7 @@ class PKDecoderTests: XCTestCase {
         )
 
         let fields = testDecoder.requiredContactFields
-        XCTAssertEqual(fields, [.emailAddress])
+        XCTAssertEqual(fields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsIncludesEmailWhenRequestedAndNotInBuyerIdentity() {
@@ -156,7 +156,7 @@ class PKDecoderTests: XCTestCase {
         )
 
         let fields = testDecoder.requiredContactFields
-        XCTAssertEqual(fields, [.emailAddress])
+        XCTAssertEqual(fields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsIncludesPhoneWhenRequestedAndNotInBuyerIdentity() {
@@ -189,7 +189,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: "test@example.com",
-                phone: nil
+                phone: nil,
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -229,7 +230,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: nil,
-                phone: "+1234567890"
+                phone: "+1234567890",
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -252,7 +254,7 @@ class PKDecoderTests: XCTestCase {
         let fields = testDecoder.requiredContactFields
         // Phone should not be requested since it's already in buyerIdentity
         // Only email should be requested
-        XCTAssertEqual(fields, [.emailAddress])
+        XCTAssertEqual(fields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsExcludesBothWhenBothAlreadyInBuyerIdentity() {
@@ -269,7 +271,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: "test@example.com",
-                phone: "+1234567890"
+                phone: "+1234567890",
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -308,7 +311,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: "", // Empty string should be treated as not present
-                phone: "" // Empty string should be treated as not present
+                phone: "", // Empty string should be treated as not present
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -330,7 +334,7 @@ class PKDecoderTests: XCTestCase {
 
         let fields = testDecoder.requiredContactFields
         // Both email and phone should be requested since empty strings are treated as not present
-        XCTAssertEqual(fields, [.emailAddress, .phoneNumber])
+        XCTAssertEqual(fields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
     }
 
     func testRequiredContactFieldsRequestsBothWhenBothNilInBuyerIdentity() {
@@ -347,7 +351,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: nil,
-                phone: nil
+                phone: nil,
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -369,7 +374,7 @@ class PKDecoderTests: XCTestCase {
 
         let fields = testDecoder.requiredContactFields
         // Both email and phone should be requested since they are nil in buyerIdentity
-        XCTAssertEqual(fields, [.emailAddress, .phoneNumber])
+        XCTAssertEqual(fields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
     }
 
     func testRequiredContactFieldsRequestsBothWhenBuyerIdentityIsNil() {
@@ -405,7 +410,7 @@ class PKDecoderTests: XCTestCase {
 
         let fields = testDecoder.requiredContactFields
         // Both email and phone should be requested since buyerIdentity is nil
-        XCTAssertEqual(fields, [.emailAddress, .phoneNumber])
+        XCTAssertEqual(fields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
     }
 
     // MARK: - Minimum Required Field Tests
@@ -443,7 +448,7 @@ class PKDecoderTests: XCTestCase {
 
         let fields = testDecoder.requiredContactFields
         // Should default to requiring email when no fields are configured and buyer identity is empty
-        XCTAssertEqual(fields, [.emailAddress])
+        XCTAssertEqual(fields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsRespectsExistingEmailInBuyerIdentityEvenWithNoConfig() {
@@ -460,7 +465,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: "test@example.com",
-                phone: nil
+                phone: nil,
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -499,7 +505,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: nil,
-                phone: "+1234567890"
+                phone: "+1234567890",
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -538,7 +545,8 @@ class PKDecoderTests: XCTestCase {
             totalQuantity: 1,
             buyerIdentity: StorefrontAPI.CartBuyerIdentity(
                 email: "", // Empty string
-                phone: "" // Empty string
+                phone: "", // Empty string
+                customer: nil
             ),
             deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
             delivery: nil,
@@ -560,6 +568,218 @@ class PKDecoderTests: XCTestCase {
 
         let fields = testDecoder.requiredContactFields
         // Should default to requiring email when buyer identity has empty strings
-        XCTAssertEqual(fields, [.emailAddress])
+        XCTAssertEqual(fields, [PKContactField.emailAddress])
+    }
+
+    func testRequiredContactFieldsWithCustomerEmailAndPhone() {
+        let configuration = ApplePayConfigurationWrapper.testConfiguration(
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: [.email, .phone]
+            )
+        )
+
+        let cartWithCustomer = StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
+                email: nil,
+                phone: nil,
+                customer: StorefrontAPI.CartCustomer(
+                    email: "customer@example.com",
+                    phone: "+9876543210"
+                )
+            ),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+
+        let testDecoder = PKDecoder(
+            configuration: configuration,
+            cart: { cartWithCustomer }
+        )
+
+        let fields = testDecoder.requiredContactFields
+        // Should not require any fields since customer has both email and phone
+        XCTAssertTrue(fields.isEmpty)
+    }
+
+    func testRequiredContactFieldsWithCustomerEmailOnly() {
+        let configuration = ApplePayConfigurationWrapper.testConfiguration(
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: [.email, .phone]
+            )
+        )
+
+        let cartWithCustomerEmail = StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
+                email: nil,
+                phone: nil,
+                customer: StorefrontAPI.CartCustomer(
+                    email: "customer@example.com",
+                    phone: nil
+                )
+            ),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+
+        let testDecoder = PKDecoder(
+            configuration: configuration,
+            cart: { cartWithCustomerEmail }
+        )
+
+        let fields = testDecoder.requiredContactFields
+        // Should only require phone since customer has email
+        XCTAssertEqual(fields, [.phoneNumber])
+    }
+
+    func testRequiredContactFieldsWithCustomerPhoneOnly() {
+        let configuration = ApplePayConfigurationWrapper.testConfiguration(
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: [.email, .phone]
+            )
+        )
+
+        let cartWithCustomerPhone = StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
+                email: nil,
+                phone: nil,
+                customer: StorefrontAPI.CartCustomer(
+                    email: nil,
+                    phone: "+9876543210"
+                )
+            ),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+
+        let testDecoder = PKDecoder(
+            configuration: configuration,
+            cart: { cartWithCustomerPhone }
+        )
+
+        let fields = testDecoder.requiredContactFields
+        // Should only require email since customer has phone
+        XCTAssertEqual(fields, [PKContactField.emailAddress])
+    }
+
+    func testRequiredContactFieldsFallbackToBuyerIdentityWhenCustomerIsNil() {
+        let configuration = ApplePayConfigurationWrapper.testConfiguration(
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: [.email, .phone]
+            )
+        )
+
+        let cartWithoutCustomer = StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
+                email: "buyer@example.com",
+                phone: "+1234567890",
+                customer: nil
+            ),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+
+        let testDecoder = PKDecoder(
+            configuration: configuration,
+            cart: { cartWithoutCustomer }
+        )
+
+        let fields = testDecoder.requiredContactFields
+        // Should not require any fields since buyerIdentity has both email and phone
+        XCTAssertTrue(fields.isEmpty)
+    }
+
+    func testRequiredContactFieldsCustomerTakesPrecedenceOverBuyerIdentity() {
+        let configuration = ApplePayConfigurationWrapper.testConfiguration(
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: [.email, .phone]
+            )
+        )
+
+        let cartWithBothCustomerAndBuyer = StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
+                email: "buyer@example.com",
+                phone: nil,
+                customer: StorefrontAPI.CartCustomer(
+                    email: "customer@example.com",
+                    phone: "+9876543210"
+                )
+            ),
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+
+        let testDecoder = PKDecoder(
+            configuration: configuration,
+            cart: { cartWithBothCustomerAndBuyer }
+        )
+
+        let fields = testDecoder.requiredContactFields
+        // Should not require any fields since customer has both email and phone (customer takes precedence)
+        XCTAssertTrue(fields.isEmpty)
     }
 }
