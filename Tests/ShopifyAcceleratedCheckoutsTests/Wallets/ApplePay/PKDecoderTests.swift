@@ -33,6 +33,66 @@ class PKDecoderTests: XCTestCase {
         return PKDecoder(configuration: ApplePayConfigurationWrapper.testConfiguration, cart: { self.cart() })
     }
 
+    // MARK: - Helper Factory Methods
+
+    private func makeCart(
+        email: String? = nil,
+        phone: String? = nil,
+        customerEmail: String? = nil,
+        customerPhone: String? = nil
+    ) -> StorefrontAPI.Cart {
+        let customer: StorefrontAPI.CartCustomer? = (customerEmail != nil || customerPhone != nil) ?
+            StorefrontAPI.CartCustomer(email: customerEmail, phone: customerPhone) : nil
+
+        let buyerIdentity: StorefrontAPI.CartBuyerIdentity? = (email != nil || phone != nil || customer != nil) ?
+            StorefrontAPI.CartBuyerIdentity(email: email, phone: phone, customer: customer) : nil
+
+        return StorefrontAPI.Cart(
+            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: buyerIdentity,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+    }
+
+    private func makeConfiguration(
+        customerEmail: String? = nil,
+        customerPhone: String? = nil,
+        contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
+    ) -> ApplePayConfigurationWrapper {
+        let customer = (customerEmail != nil || customerPhone != nil) ?
+            ShopifyAcceleratedCheckouts.Customer(email: customerEmail, phoneNumber: customerPhone) : nil
+
+        let config = ShopifyAcceleratedCheckouts.Configuration.testConfiguration(customer: customer)
+
+        return ApplePayConfigurationWrapper.testConfiguration(
+            common: config,
+            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                merchantIdentifier: "merchant.test.id",
+                contactFields: contactFields
+            )
+        )
+    }
+
+    private func makeDecoder(
+        configuration: ApplePayConfigurationWrapper? = nil,
+        cart: StorefrontAPI.Cart? = nil
+    ) -> PKDecoder {
+        let config = configuration ?? makeConfiguration()
+        return PKDecoder(configuration: config, cart: { cart })
+    }
+
     // MARK: - Initialization Tests
 
     func testInitializesDecoderCorrectly() {
@@ -51,66 +111,47 @@ class PKDecoderTests: XCTestCase {
     // MARK: - paymentSummaryItems Tests
 
     func testReturnsEmptyPaymentSummaryWhenCartIsNil() {
-        let testDecoder = decoder
-        testDecoder.cart = { nil }
-
-        let summaryItems = testDecoder.paymentSummaryItems
-        XCTAssertTrue(summaryItems.isEmpty)
+        let testDecoder = makeDecoder(cart: nil)
+        XCTAssertTrue(testDecoder.paymentSummaryItems.isEmpty)
     }
 
     func testReturnsEmptyPaymentSummaryWhenCartHasNoLines() {
-        let testDecoder = decoder
         // Don't set cart - it remains nil
-
-        let summaryItems = testDecoder.paymentSummaryItems
-        XCTAssertTrue(summaryItems.isEmpty)
+        let testDecoder = makeDecoder(cart: nil)
+        XCTAssertTrue(testDecoder.paymentSummaryItems.isEmpty)
     }
 
     func testPaymentSummaryItemsWithShippingMethodButNilCart() {
-        let testDecoder = decoder
-        let shippingMethod = PKShippingMethod(
-            label: "Express", amount: NSDecimalNumber(decimal: 5.00)
-        )
+        let testDecoder = makeDecoder(cart: nil)
+        let shippingMethod = PKShippingMethod(label: "Express", amount: NSDecimalNumber(decimal: 5.00))
         testDecoder.selectedShippingMethod = shippingMethod
-        testDecoder.cart = { nil }
 
-        let summaryItems = testDecoder.paymentSummaryItems
-        XCTAssertTrue(summaryItems.isEmpty)
+        XCTAssertTrue(testDecoder.paymentSummaryItems.isEmpty)
     }
 
     // MARK: - shippingMethods Tests
 
     func testReturnsEmptyShippingMethodsWhenCartIsNil() {
-        let testDecoder = decoder
-        testDecoder.cart = { nil }
-
-        let shippingMethods = testDecoder.shippingMethods
-        XCTAssertTrue(shippingMethods.isEmpty)
+        let testDecoder = makeDecoder(cart: nil)
+        XCTAssertTrue(testDecoder.shippingMethods.isEmpty)
     }
 
     func testReturnsEmptyShippingMethodsWhenNoDeliveryGroups() {
-        let testDecoder = decoder
         // Don't set cart - it remains nil
-
-        let shippingMethods = testDecoder.shippingMethods
-        XCTAssertTrue(shippingMethods.isEmpty)
+        let testDecoder = makeDecoder(cart: nil)
+        XCTAssertTrue(testDecoder.shippingMethods.isEmpty)
     }
 
     func testShippingMethodsWithNilCartReturnsEmpty() {
-        let testDecoder = decoder
-        testDecoder.cart = { nil }
-
-        let shippingMethods = testDecoder.shippingMethods
-        XCTAssertTrue(shippingMethods.isEmpty)
+        let testDecoder = makeDecoder(cart: nil)
+        XCTAssertTrue(testDecoder.shippingMethods.isEmpty)
     }
 
     // MARK: - selectedShippingMethod Tests
 
     func testSelectedShippingMethodCanBeSetAndRetrieved() {
-        let testDecoder = decoder
-        let shippingMethod = PKShippingMethod(
-            label: "Express", amount: NSDecimalNumber(decimal: 5.00)
-        )
+        let testDecoder = makeDecoder()
+        let shippingMethod = PKShippingMethod(label: "Express", amount: NSDecimalNumber(decimal: 5.00))
         shippingMethod.detail = "1-2 business days"
         shippingMethod.identifier = "express"
 
@@ -118,9 +159,7 @@ class PKDecoderTests: XCTestCase {
 
         XCTAssertNotNil(testDecoder.selectedShippingMethod)
         XCTAssertEqual(testDecoder.selectedShippingMethod?.label, "Express")
-        XCTAssertEqual(
-            testDecoder.selectedShippingMethod?.amount, NSDecimalNumber(decimal: 5.00)
-        )
+        XCTAssertEqual(testDecoder.selectedShippingMethod?.amount, NSDecimalNumber(decimal: 5.00))
         XCTAssertEqual(testDecoder.selectedShippingMethod?.detail, "1-2 business days")
         XCTAssertEqual(testDecoder.selectedShippingMethod?.identifier, "express")
     }
@@ -128,659 +167,214 @@ class PKDecoderTests: XCTestCase {
     // MARK: - requiredContactFields Tests
 
     func testRequiredContactFieldsDefaultsToEmailWhenNoFieldsConfigured() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: []
-            )
-        )
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { nil }
-        )
+        let configuration = makeConfiguration(contactFields: [])
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
 
-        let fields = testDecoder.requiredContactFields
-        XCTAssertEqual(fields, [PKContactField.emailAddress])
+        XCTAssertEqual(testDecoder.requiredContactFields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsIncludesEmailWhenRequestedAndNotInBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email]
-            )
-        )
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { nil }
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email])
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
 
-        let fields = testDecoder.requiredContactFields
-        XCTAssertEqual(fields, [PKContactField.emailAddress])
+        XCTAssertEqual(testDecoder.requiredContactFields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsIncludesPhoneWhenRequestedAndNotInBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.phone]
-            )
-        )
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { nil }
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
 
-        let fields = testDecoder.requiredContactFields
-        XCTAssertEqual(fields, [.phoneNumber])
+        XCTAssertEqual(testDecoder.requiredContactFields, [.phoneNumber])
     }
 
     func testRequiredContactFieldsExcludesEmailWhenAlreadyInBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(email: "test@example.com")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithBuyerEmail = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: "test@example.com",
-                phone: nil,
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithBuyerEmail }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Email should not be requested since it's already in buyerIdentity
-        // Only phone should be requested
-        XCTAssertEqual(fields, [.phoneNumber])
+        XCTAssertEqual(testDecoder.requiredContactFields, [.phoneNumber])
     }
 
     func testRequiredContactFieldsExcludesPhoneWhenAlreadyInBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(phone: "+1234567890")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithBuyerPhone = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: nil,
-                phone: "+1234567890",
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithBuyerPhone }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Phone should not be requested since it's already in buyerIdentity
-        // Only email should be requested
-        XCTAssertEqual(fields, [PKContactField.emailAddress])
+        XCTAssertEqual(testDecoder.requiredContactFields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsExcludesBothWhenBothAlreadyInBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(email: "test@example.com", phone: "+1234567890")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithFullBuyerIdentity = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: "test@example.com",
-                phone: "+1234567890",
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithFullBuyerIdentity }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Neither email nor phone should be requested since both are in buyerIdentity
-        XCTAssertTrue(fields.isEmpty)
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
     }
 
     func testRequiredContactFieldsTreatsEmptyStringsAsNotPresent() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(email: "", phone: "")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithEmptyBuyerIdentity = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: "", // Empty string should be treated as not present
-                phone: "", // Empty string should be treated as not present
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithEmptyBuyerIdentity }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Both email and phone should be requested since empty strings are treated as not present
-        XCTAssertEqual(fields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
+        XCTAssertEqual(testDecoder.requiredContactFields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
     }
 
     func testRequiredContactFieldsRequestsBothWhenBothNilInBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(email: nil, phone: nil)
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithNilBuyerIdentity = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: nil,
-                phone: nil,
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithNilBuyerIdentity }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Both email and phone should be requested since they are nil in buyerIdentity
-        XCTAssertEqual(fields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
+        XCTAssertEqual(testDecoder.requiredContactFields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
     }
 
     func testRequiredContactFieldsRequestsBothWhenBuyerIdentityIsNil() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart()
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithoutBuyerIdentity = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: nil,
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithoutBuyerIdentity }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Both email and phone should be requested since buyerIdentity is nil
-        XCTAssertEqual(fields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
+        XCTAssertEqual(testDecoder.requiredContactFields, Set([PKContactField.emailAddress, PKContactField.phoneNumber]))
     }
 
     // MARK: - Minimum Required Field Tests
 
     func testRequiredContactFieldsDefaultsToEmailWhenNoFieldsAndNoBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: []
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [])
+        let cart = makeCart()
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithoutBuyerIdentity = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: nil,
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithoutBuyerIdentity }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should default to requiring email when no fields are configured and buyer identity is empty
-        XCTAssertEqual(fields, [PKContactField.emailAddress])
+        XCTAssertEqual(testDecoder.requiredContactFields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsRespectsExistingEmailInBuyerIdentityEvenWithNoConfig() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: []
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [])
+        let cart = makeCart(email: "test@example.com")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithEmail = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: "test@example.com",
-                phone: nil,
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithEmail }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should not require any fields since email exists in buyer identity
-        XCTAssertTrue(fields.isEmpty)
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
     }
 
     func testRequiredContactFieldsRespectsExistingPhoneInBuyerIdentityEvenWithNoConfig() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: []
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [])
+        let cart = makeCart(phone: "+1234567890")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithPhone = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: nil,
-                phone: "+1234567890",
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithPhone }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should not require any fields since phone exists in buyer identity
-        XCTAssertTrue(fields.isEmpty)
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
     }
 
     func testRequiredContactFieldsDefaultsToEmailWithEmptyBuyerIdentityStrings() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: []
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [])
+        let cart = makeCart(email: "", phone: "")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithEmptyStrings = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: "", // Empty string
-                phone: "", // Empty string
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithEmptyStrings }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should default to requiring email when buyer identity has empty strings
-        XCTAssertEqual(fields, [PKContactField.emailAddress])
+        XCTAssertEqual(testDecoder.requiredContactFields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsWithCustomerEmailAndPhone() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(customerEmail: "customer@example.com", customerPhone: "+9876543210")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithCustomer = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: nil,
-                phone: nil,
-                customer: StorefrontAPI.CartCustomer(
-                    email: "customer@example.com",
-                    phone: "+9876543210"
-                )
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithCustomer }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should not require any fields since customer has both email and phone
-        XCTAssertTrue(fields.isEmpty)
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
     }
 
     func testRequiredContactFieldsWithCustomerEmailOnly() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(customerEmail: "customer@example.com")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithCustomerEmail = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: nil,
-                phone: nil,
-                customer: StorefrontAPI.CartCustomer(
-                    email: "customer@example.com",
-                    phone: nil
-                )
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithCustomerEmail }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should only require phone since customer has email
-        XCTAssertEqual(fields, [.phoneNumber])
+        XCTAssertEqual(testDecoder.requiredContactFields, [.phoneNumber])
     }
 
     func testRequiredContactFieldsWithCustomerPhoneOnly() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(customerPhone: "+9876543210")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithCustomerPhone = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: nil,
-                phone: nil,
-                customer: StorefrontAPI.CartCustomer(
-                    email: nil,
-                    phone: "+9876543210"
-                )
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithCustomerPhone }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should only require email since customer has phone
-        XCTAssertEqual(fields, [PKContactField.emailAddress])
+        XCTAssertEqual(testDecoder.requiredContactFields, [PKContactField.emailAddress])
     }
 
     func testRequiredContactFieldsFallbackToBuyerIdentityWhenCustomerIsNil() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
-        )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(email: "buyer@example.com", phone: "+1234567890")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithoutCustomer = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: "buyer@example.com",
-                phone: "+1234567890",
-                customer: nil
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
-        )
-
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithoutCustomer }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should not require any fields since buyerIdentity has both email and phone
-        XCTAssertTrue(fields.isEmpty)
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
     }
 
     func testRequiredContactFieldsCustomerTakesPrecedenceOverBuyerIdentity() {
-        let configuration = ApplePayConfigurationWrapper.testConfiguration(
-            applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-                merchantIdentifier: "merchant.test.id",
-                contactFields: [.email, .phone]
-            )
+        let configuration = makeConfiguration(contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(
+            email: "buyer@example.com",
+            phone: nil,
+            customerEmail: "customer@example.com",
+            customerPhone: "+9876543210"
         )
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
 
-        let cartWithBothCustomerAndBuyer = StorefrontAPI.Cart(
-            id: GraphQLScalars.ID("gid://Shopify/Cart/test-cart-id"),
-            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
-            totalQuantity: 1,
-            buyerIdentity: StorefrontAPI.CartBuyerIdentity(
-                email: "buyer@example.com",
-                phone: nil,
-                customer: StorefrontAPI.CartCustomer(
-                    email: "customer@example.com",
-                    phone: "+9876543210"
-                )
-            ),
-            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: []),
-            delivery: nil,
-            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
-            cost: StorefrontAPI.CartCost(
-                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
-                subtotalAmount: nil,
-                totalTaxAmount: nil,
-                totalDutyAmount: nil
-            ),
-            discountCodes: [],
-            discountAllocations: []
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
+    }
+
+    // MARK: - Customer Configuration Priority Tests
+
+    func testRequiredContactFieldsUsesCustomerConfigurationEmailOverBuyerIdentity() {
+        let configuration = makeConfiguration(customerEmail: "config@example.com", contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(email: "buyer@example.com")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
+
+        XCTAssertEqual(testDecoder.requiredContactFields, [.phoneNumber])
+    }
+
+    func testRequiredContactFieldsUsesCustomerConfigurationPhoneOverBuyerIdentity() {
+        let configuration = makeConfiguration(customerPhone: "+1234567890", contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let cart = makeCart(phone: "+9876543210")
+        let testDecoder = makeDecoder(configuration: configuration, cart: cart)
+
+        XCTAssertEqual(testDecoder.requiredContactFields, [.emailAddress])
+    }
+
+    // MARK: - Customer Configuration With Email Tests
+
+    func testRequiredContactFieldsExcludesEmailWhenInCustomerConfiguration() {
+        let configuration = makeConfiguration(customerEmail: "config@example.com", contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email])
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
+
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
+    }
+
+    func testRequiredContactFieldsTreatsEmptyCustomerEmailAsNotPresent() {
+        let configuration = makeConfiguration(customerEmail: "", contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email])
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
+
+        XCTAssertEqual(testDecoder.requiredContactFields, [.emailAddress])
+    }
+
+    // MARK: - Customer Configuration With Phone Tests
+
+    func testRequiredContactFieldsExcludesPhoneWhenInCustomerConfiguration() {
+        let configuration = makeConfiguration(customerPhone: "+1234567890", contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
+
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
+    }
+
+    func testRequiredContactFieldsTreatsEmptyCustomerPhoneAsNotPresent() {
+        let configuration = makeConfiguration(customerPhone: "", contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.phone])
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
+
+        XCTAssertEqual(testDecoder.requiredContactFields, [.phoneNumber])
+    }
+
+    // MARK: - Customer Configuration With Both Email and Phone Tests
+
+    func testRequiredContactFieldsExcludesBothWhenBothInCustomerConfiguration() {
+        let configuration = makeConfiguration(
+            customerEmail: "config@example.com",
+            customerPhone: "+1234567890",
+            contactFields: [ShopifyAcceleratedCheckouts.RequiredContactFields.email, ShopifyAcceleratedCheckouts.RequiredContactFields.phone]
         )
+        let testDecoder = makeDecoder(configuration: configuration, cart: nil)
 
-        let testDecoder = PKDecoder(
-            configuration: configuration,
-            cart: { cartWithBothCustomerAndBuyer }
-        )
-
-        let fields = testDecoder.requiredContactFields
-        // Should not require any fields since customer has both email and phone (customer takes precedence)
-        XCTAssertTrue(fields.isEmpty)
+        XCTAssertTrue(testDecoder.requiredContactFields.isEmpty)
     }
 
     // MARK: - Error Handling Method Tests

@@ -192,10 +192,10 @@ class PKDecoder {
 
         let buyerIdentity = cart()?.buyerIdentity
 
-        let email = buyerIdentity?.customer?.email ?? buyerIdentity?.email
+        let email = getContactEmail(buyerIdentity: buyerIdentity)
         let isEmailEmpty = email?.isEmpty ?? true
 
-        let phone = buyerIdentity?.customer?.phone ?? buyerIdentity?.phone
+        let phone = getContactPhone(buyerIdentity: buyerIdentity)
         let isPhoneEmpty = phone?.isEmpty ?? true
 
         // Only request email if it's not already provided
@@ -215,6 +215,18 @@ class PKDecoder {
         }
 
         return fields
+    }
+
+    private func getContactEmail(buyerIdentity: StorefrontAPI.CartBuyerIdentity?) -> String? {
+        configuration.common.customer?.email ??
+            buyerIdentity?.customer?.email ??
+            buyerIdentity?.email
+    }
+
+    private func getContactPhone(buyerIdentity: StorefrontAPI.CartBuyerIdentity?) -> String? {
+        configuration.common.customer?.phoneNumber ??
+            buyerIdentity?.customer?.phone ??
+            buyerIdentity?.phone
     }
 
     /// https://github.com/Shopify/portable-wallets/blob/85f2f8ec83d801d2b93e405aa71237fb7316c838/src/components/AcceleratedCheckout/AcceleratedCheckout.ts#L450
