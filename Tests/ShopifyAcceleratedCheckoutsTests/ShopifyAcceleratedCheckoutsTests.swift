@@ -53,7 +53,7 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
         )
         XCTAssertNotNil(ShopifyAcceleratedCheckouts.logger)
         XCTAssertEqual(
-            ShopifyAcceleratedCheckouts.logger.logLevel,
+            ShopifyAcceleratedCheckouts.logger.osLogger.logLevel,
             LogLevel.error,
             "Default logger logLevel should be .error"
         )
@@ -61,7 +61,7 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
 
     func test_configuration_onLogLevelChange_usesExistingInstance() {
         let originalLogger = ShopifyAcceleratedCheckouts.logger
-        let originalLogLevel = ShopifyAcceleratedCheckouts.logger.logLevel
+        let originalLogLevel = ShopifyAcceleratedCheckouts.logger.osLogger.logLevel
 
         ShopifyAcceleratedCheckouts.logLevel = originalLogLevel
         let newLogger = ShopifyAcceleratedCheckouts.logger
@@ -75,24 +75,24 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
     func test_logger_withDifferentLogLevels_shouldHaveCorrectLogLevel() {
         ShopifyAcceleratedCheckouts.logLevel = .all
         XCTAssertEqual(
-            ShopifyAcceleratedCheckouts.logger.logLevel, .all, "Logger should have .all log level"
+            ShopifyAcceleratedCheckouts.logger.osLogger.logLevel, .all, "Logger should have .all log level"
         )
 
         ShopifyAcceleratedCheckouts.logLevel = .debug
         XCTAssertEqual(
-            ShopifyAcceleratedCheckouts.logger.logLevel, .debug,
+            ShopifyAcceleratedCheckouts.logger.osLogger.logLevel, .debug,
             "Logger should have .debug log level"
         )
 
         ShopifyAcceleratedCheckouts.logLevel = .error
         XCTAssertEqual(
-            ShopifyAcceleratedCheckouts.logger.logLevel, .error,
+            ShopifyAcceleratedCheckouts.logger.osLogger.logLevel, .error,
             "Logger should have .error log level"
         )
 
         ShopifyAcceleratedCheckouts.logLevel = .none
         XCTAssertEqual(
-            ShopifyAcceleratedCheckouts.logger.logLevel, .none, "Logger should have .none log level"
+            ShopifyAcceleratedCheckouts.logger.osLogger.logLevel, .none, "Logger should have .none log level"
         )
     }
 }

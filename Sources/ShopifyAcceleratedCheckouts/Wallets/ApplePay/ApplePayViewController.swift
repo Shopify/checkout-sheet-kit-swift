@@ -37,7 +37,7 @@ protocol PayController: AnyObject {
 }
 
 @available(iOS 16.0, *)
-class ApplePayViewController: WalletController, PayController {
+class ApplePayViewController: WalletController, PayController, Loggable {
     @Published var configuration: ApplePayConfigurationWrapper
     @Published var storefrontJulyRelease: StorefrontAPIProtocol
     @Published var paymentController: PKPaymentAuthorizationController?
@@ -149,26 +149,33 @@ class ApplePayViewController: WalletController, PayController {
             configuration: configuration,
             controller: self
         )
+
+        logInfo("Initialized with identifier: \(identifier), domain: \(configuration.common.storefrontDomain)")
     }
 
     func onPress() async {
         do {
+            logDebug("Attempting to create or fetch cart")
             cart = try await createOrfetchCart()
             guard cart != nil else {
+                logError("Cart is nil after creation/fetch attempt")
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
             }
+            logDebug("Cart ready, transitioning to payment request. Cart ID: \(cart?.id.description ?? "unknown")")
             try? await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
-            ShopifyAcceleratedCheckouts.logger.error("[startPayment] Failed to setup cart: \(error)")
+            logError("Failed to setup cart: \(error)")
             await onCheckoutFail?(.sdkError(underlying: error))
             try? await authorizationDelegate.transition(to: .completed)
         }
     }
 
     func createOrfetchCart() async throws -> StorefrontAPI.Types.Cart {
+        logDebug("Creating or fetching cart for identifier: \(identifier)")
         do {
             return try await fetchCartByCheckoutIdentifier()
         } catch let error as StorefrontAPI.Errors {
+            logError("StorefrontAPI error: \(error)")
             return try await handleStorefrontError(error)
         } catch {
             try? await authorizationDelegate.transition(to: .terminalError(error: error))
@@ -179,20 +186,32 @@ class ApplePayViewController: WalletController, PayController {
     private func handleStorefrontError(_ error: StorefrontAPI.Errors) async throws
         -> StorefrontAPI.Types.Cart
     {
+        logDebug("Handling StorefrontAPI error")
         switch error {
         case let .userError(userErrors, cart):
-            guard let cart else { throw error }
+            logError("User errors: \(userErrors)")
+            guard let cart else {
+                logError("No cart available in user error response")
+                throw error
+            }
             let action = ErrorHandler.map(errors: userErrors, shippingCountry: nil, cart: cart)
+            logDebug("Mapped error action: \(action)")
             try await handleErrorAction(action: action, cart: cart)
             return cart
 
         case let .warning(type, cart):
-            guard let cart else { throw error }
+            logDebug("Warning type: \(type)")
+            guard let cart else {
+                logError("No cart available in warning response")
+                throw error
+            }
             let action = ErrorHandler.map(warningType: type, cart: cart)
+            logDebug("Mapped warning action: \(action)")
             try await handleErrorAction(action: action, cart: cart)
             return cart
 
         default:
+            logError("Unexpected error type: \(error)")
             try? await authorizationDelegate.transition(to: .unexpectedError(error: error))
             throw error
         }
@@ -203,13 +222,16 @@ class ApplePayViewController: WalletController, PayController {
         action: ErrorHandler.PaymentSheetAction,
         cart: StorefrontAPI.Types.Cart
     ) async throws {
+        logDebug("Handling error action: \(action)")
         if case let .interrupt(reason, _) = action {
+            logDebug("Interrupt reason: \(reason), updating cart")
             try authorizationDelegate.setCart(to: cart)
             try? await authorizationDelegate.transition(to: .interrupt(reason: reason))
         }
     }
 
     func present(url: URL) async throws {
+        logDebug("Presenting checkout sheet with URL: \(url)")
         try await present(url: url, delegate: self)
     }
 }
@@ -217,6 +239,7 @@ class ApplePayViewController: WalletController, PayController {
 @available(iOS 16.0, *)
 extension ApplePayViewController: CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
+        logInfo("Checkout completed. Order ID: \(event.orderDetails.id)")
         Task { @MainActor in
             self.onCheckoutComplete?(event)
             try await authorizationDelegate.transition(to: .completed)
@@ -224,12 +247,14 @@ extension ApplePayViewController: CheckoutDelegate {
     }
 
     func checkoutDidFail(error: CheckoutError) {
+        logError("Checkout failed: \(error.localizedDescription)")
         Task { @MainActor in
             self.onCheckoutFail?(error)
         }
     }
 
     func checkoutDidCancel() {
+        logInfo("Checkout cancelled by user")
         Task { @MainActor in
             /// x right button on CSK doesn't dismiss automatically
             checkoutViewController?.dismiss(animated: true)
@@ -239,16 +264,28 @@ extension ApplePayViewController: CheckoutDelegate {
     }
 
     @MainActor func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return onShouldRecoverFromError?(error) ?? error.isRecoverable
+        let shouldRecover = onShouldRecoverFromError?(error) ?? error.isRecoverable
+        logDebug("Error recovery decision for \(error): \(shouldRecover ? "will recover" : "will not recover")")
+        return shouldRecover
     }
 
     func checkoutDidClickLink(url: URL) {
+        logDebug("Link clicked: \(url)")
         Task { @MainActor in
             self.onCheckoutClickLink?(url)
         }
     }
 
     func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+        let eventName: String = {
+            switch event {
+            case let .customEvent(customEvent):
+                return customEvent.name ?? "custom"
+            case let .standardEvent(standardEvent):
+                return standardEvent.name ?? "standard"
+            }
+        }()
+        logDebug("Web pixel event emitted: \(eventName)")
         Task { @MainActor in
             self.onCheckoutWebPixelEvent?(event)
         }

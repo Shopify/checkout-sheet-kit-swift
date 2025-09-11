@@ -35,7 +35,8 @@ public enum LogLevel: String, CaseIterable {
 
 public class OSLogger {
     private let logger = OSLog(subsystem: subsystem, category: OSLog.Category.pointsOfInterest)
-    private var prefix: String
+    package var prefix: String
+
     package var logLevel: LogLevel
 
     public static var shared = OSLogger()
@@ -52,26 +53,22 @@ public class OSLogger {
 
     public func debug(_ message: String) {
         guard shouldEmit(.debug) else { return }
-
-        sendToOSLog("[\(prefix)] (Debug) - \(message)", type: .debug)
+        sendToOSLog(getMessage(from: message, logLevel: "Debug"), type: .debug)
     }
 
     public func info(_ message: String) {
         guard shouldEmit(.debug) else { return }
-
-        sendToOSLog("[\(prefix)] (Info) - \(message)", type: .info)
+        sendToOSLog(getMessage(from: message, logLevel: "Info"), type: .info)
     }
 
     public func error(_ message: String) {
         guard shouldEmit(.error) else { return }
-
-        sendToOSLog("[\(prefix)] (Error) - \(message)", type: .error)
+        sendToOSLog(getMessage(from: message, logLevel: "Error"), type: .error)
     }
 
     public func fault(_ message: String) {
         guard shouldEmit(.error) else { return }
-
-        sendToOSLog("[\(prefix)] (Fault) - \(message)", type: .fault)
+        sendToOSLog(getMessage(from: message, logLevel: "Fault"), type: .fault)
     }
 
     /// Capturing `os_log` output is not possible
@@ -80,10 +77,12 @@ public class OSLogger {
         os_log("%@", log: logger, type: type, message)
     }
 
+    internal func getMessage(from message: String, logLevel: String) -> String {
+        return "[\(prefix)] (\(logLevel)) - \(message)"
+    }
+
     private func shouldEmit(_ choice: LogLevel) -> Bool {
-        if logLevel == .none {
-            return false
-        }
+        if logLevel == .none { return false }
 
         return logLevel == .all || logLevel == choice
     }

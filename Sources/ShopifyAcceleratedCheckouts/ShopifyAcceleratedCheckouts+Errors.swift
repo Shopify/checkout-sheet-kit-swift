@@ -23,6 +23,7 @@
 
 import Foundation
 
+@available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
     enum Error: LocalizedError {
         case invariant(expected: String)

@@ -23,6 +23,7 @@
 
 import ShopifyCheckoutSheetKit
 
+@available(iOS 16.0, *)
 public enum ShopifyAcceleratedCheckouts {
     /// Storefront API version used for cart operations
     /// Note: We also use `2025-07` for `cartRemovePersonalData` mutations. We are working towards migrating all requests to `2025-07`.
@@ -34,11 +35,14 @@ public enum ShopifyAcceleratedCheckouts {
     /// Default: .error - which will emit "error" and "fault" logs
     public static var logLevel: LogLevel = .error {
         didSet {
-            logger.logLevel = logLevel
+            logger.setLogLevel(to: logLevel)
         }
     }
 
     /// Shared logger for ShopifyAcceleratedCheckouts
-    /// To modify the logLevel
-    internal static var logger = OSLogger(prefix: name, logLevel: logLevel)
+    /// Use ShopifyAcceleratedCheckouts.logLevel to modify verbosity
+    internal static var logger = Logger(
+        prefix: name,
+        logLevel: logLevel
+    )
 }

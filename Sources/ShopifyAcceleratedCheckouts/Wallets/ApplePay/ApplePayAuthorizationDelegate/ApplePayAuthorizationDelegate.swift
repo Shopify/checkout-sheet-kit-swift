@@ -41,7 +41,7 @@ extension PKPaymentAuthorizationController: PaymentAuthorizationController {}
 typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthorizationController
 
 @available(iOS 16.0, *)
-class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
+class ApplePayAuthorizationDelegate: NSObject, ObservableObject, Loggable {
     let configuration: ApplePayConfigurationWrapper
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
     var controller: PayController
@@ -99,28 +99,30 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private(set) var state: ApplePayState = .idle {
         didSet {
-            ShopifyAcceleratedCheckouts.logger.debug(
-                "ApplePayState: \(String(describing: oldValue)) -> \(String(describing: state))")
+            logDebug("State transition: \(String(describing: oldValue)) -> \(String(describing: state))")
         }
     }
 
     private func startPaymentRequest() async throws {
-        guard let cart = controller.cart else { return }
+        guard let cart = controller.cart else {
+            logError("No cart available for payment request")
+            return
+        }
         try setCart(to: cart)
         let paymentRequest = try pkDecoder.createPaymentRequest()
 
         var paymentController = paymentControllerFactory(paymentRequest)
         paymentController.delegate = self
+
         let presented = await paymentController.present()
+        logDebug("Apple Pay sheet presented: \(presented)")
 
         try await transition(to: presented ? .appleSheetPresented : .reset)
     }
 
     func transition(to nextState: ApplePayState) async throws {
         guard state.canTransition(to: nextState) else {
-            ShopifyAcceleratedCheckouts.logger.error(
-                "InvalidStateTransitionError: \(String(describing: state)) -> \(String(describing: nextState))"
-            )
+            logError("Invalid state transition: \(String(describing: state)) -> \(String(describing: nextState)).")
             throw InvalidStateTransitionError(fromState: state, toState: nextState)
         }
 
@@ -159,6 +161,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private func onPresentingCSK(to url: URL?, previousState: ApplePayState) async throws {
         guard let url else {
+            logError("No URL available for checkout sheet presentation")
             try await transition(
                 to: .terminalError(
                     error: ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
@@ -176,7 +179,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
                 try await self.controller.storefrontJulyRelease.cartRemovePersonalData(id: cartID)
             }.value
 
-            ShopifyAcceleratedCheckouts.logger.debug("Cleared PII from cart")
+            logDebug("Cleared PII from cart")
 
             do {
                 /// `cartRemovePersonalData` is used to clear PII collected via ApplePay
@@ -196,12 +199,12 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
                         )
                     )
 
-                    ShopifyAcceleratedCheckouts.logger.debug("Updated cart with ShopifyAcceleratedCheckouts.Customer")
+                    logDebug("Updated cart with ShopifyAcceleratedCheckouts.Customer")
                 }
             } catch {
                 /// Whilst it would be best to be able to re-attach this, we can still present CSK
                 /// without a successful response on `cartBuyerIdentityUpdate`
-                ShopifyAcceleratedCheckouts.logger.error("Failed to update cart buyer identity: \(error)")
+                logError("Failed to attach cart buyer identity: \(error) continuing with CheckoutKit.present()")
             }
         }
 
@@ -232,11 +235,13 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     func ensureCurrencyNotChanged() throws {
         guard let initialCurrencyCode = pkDecoder.initialCurrencyCode else {
+            logError("initialCurrencyCode was nil")
             return
         }
         let currentCurrencyCode = controller.cart?.cost.totalAmount.currencyCode
 
         guard initialCurrencyCode == currentCurrencyCode else {
+            logError("currencyCodeChanged")
             throw StorefrontAPI.Errors.currencyChanged
         }
     }
@@ -254,31 +259,25 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
                     addressId: addressID
                 )
 
+                logDebug("Clearing selectedShippingAddress")
                 // Clear the selected address ID since we removed it
                 selectedShippingAddressID = nil
             } catch {
-                if let responseError = error as? StorefrontAPI.Errors {
-                    print("upsertShippingAddress - Storefront API Error: \(responseError)")
-                }
+                logError("Delivery address remove failed: \(error)")
             }
         }
 
-        do {
-            let cart = try await controller.storefront.cartDeliveryAddressesAdd(
-                id: cartID,
-                address: address,
-                validate: validate
-            )
+        let cart = try await controller.storefront.cartDeliveryAddressesAdd(
+            id: cartID,
+            address: address,
+            validate: validate
+        )
+        logDebug("cartDeliveryAddressesAdd complete: \(address)")
 
-            selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
+        selectedShippingAddressID = cart.delivery?.addresses.first { $0.selected }?.id
+        logDebug("New selectedShippingAddressID: \(address)")
 
-            return cart
-        } catch {
-            if let responseError = error as? StorefrontAPI.Errors {
-                print("upsertShippingAddress - Storefront API Error: \(responseError)")
-            }
-            throw error
-        }
+        return cart
     }
 }
 
