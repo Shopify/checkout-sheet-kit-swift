@@ -29,10 +29,11 @@ extension ErrorHandler {
     static func map(
         errors: [StorefrontAPI.CartUserError],
         shippingCountry: String?,
-        cart: StorefrontAPI.Types.Cart?
+        cart: StorefrontAPI.Types.Cart?,
+        requiredContactFields: Set<PKContactField>? = nil
     ) -> PaymentSheetAction {
         let actions = errors.map {
-            getErrorAction(error: $0, shippingCountry: shippingCountry, cart: cart)
+            getErrorAction(error: $0, shippingCountry: shippingCountry, cart: cart, requiredContactFields: requiredContactFields)
         }
         return getHighestPriorityAction(actions: actions)
     }
@@ -41,7 +42,8 @@ extension ErrorHandler {
     private static func getErrorAction(
         error: StorefrontAPI.CartUserError,
         shippingCountry: String?,
-        cart: StorefrontAPI.Types.Cart?
+        cart: StorefrontAPI.Types.Cart?,
+        requiredContactFields: Set<PKContactField>?
     ) -> PaymentSheetAction {
         let field = mapField(field: error.field)
 
@@ -260,20 +262,40 @@ extension ErrorHandler {
         case .invalid:
             switch field {
             case "buyerIdentity.email":
-                return PaymentSheetAction.showError(errors: [
-                    ApplePayAuthorizationDelegate.ValidationErrors.emailInvalid(
-                        message: "errors.invalid.email".localizedString)
-                ])
+                // Check if email field is visible in the Apple Pay sheet
+                let isEmailRequired = requiredContactFields?.contains(.emailAddress) ?? false
+                if isEmailRequired {
+                    // Email field is visible, user can correct it
+                    return PaymentSheetAction.showError(errors: [
+                        ApplePayAuthorizationDelegate.ValidationErrors.emailInvalid(
+                            message: "errors.invalid.email".localizedString)
+                    ])
+                } else {
+                    // Email field is not visible, user can't correct it, fallback to CSK
+                    return PaymentSheetAction.interrupt(
+                        reason: .other, checkoutURL: cart?.checkoutUrl.url
+                    )
+                }
             case "input.lines.0.quantity":
                 // Stock problem, decelerate
                 return PaymentSheetAction.interrupt(
                     reason: .outOfStock, checkoutURL: cart?.checkoutUrl.url
                 )
             case "buyerIdentity.phone":
-                return PaymentSheetAction.showError(errors: [
-                    ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
-                        message: "errors.invalid.phone".localizedString)
-                ])
+                // Check if phone field is visible in the Apple Pay sheet
+                let isPhoneRequired = requiredContactFields?.contains(.phoneNumber) ?? false
+                if isPhoneRequired {
+                    // Phone field is visible, user can correct it
+                    return PaymentSheetAction.showError(errors: [
+                        ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
+                            message: "errors.invalid.phone".localizedString)
+                    ])
+                } else {
+                    // Phone field is not visible, user can't correct it, fallback to CSK
+                    return PaymentSheetAction.interrupt(
+                        reason: .other, checkoutURL: cart?.checkoutUrl.url
+                    )
+                }
             default:
                 return PaymentSheetAction.interrupt(
                     reason: .unhandled, checkoutURL: cart?.checkoutUrl.url

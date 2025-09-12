@@ -323,8 +323,8 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         shippingMethod.identifier = "standard-shipping"
         shippingMethod.label = "Standard Shipping"
 
-        // This tests the core PR functionality: CartUserError(invalid, buyerIdentity.email)
-        // maps to ValidationErrors.emailInvalid (PKPaymentError) which maintains success status
+        // This tests that CartUserError(ADDRESS_FIELD_IS_REQUIRED, addresses.0.address.deliveryAddress.firstName)
+        // maps to ValidationErrors.nameInvalid (PKPaymentError) which maintains success status
         MockURLProtocol.returnMappableCartUserError = true
         defer { MockURLProtocol.returnMappableCartUserError = false }
 
@@ -503,10 +503,10 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
             returnInvalidCart = false
         }
 
-        static func responseWithCartUserError(operation: String, errorCode: String) -> Data {
+        static func responseWithCartUserError(operation: String, errorCode _: String) -> Data {
             let json = "{" +
                 "\"data\":{\"" + operation + "\":{\"cart\": " + mockCartResponse + "," +
-                "\"userErrors\":[{\"field\":[\"buyerIdentity\",\"email\"],\"message\":\"Email format is invalid\",\"code\":\"" + errorCode + "\"}]}}}"
+                "\"userErrors\":[{\"field\":[\"addresses\",\"0\",\"address\",\"deliveryAddress\",\"firstName\"],\"message\":\"First name is invalid\",\"code\":\"ADDRESS_FIELD_IS_REQUIRED\"}]}}}"
             return Data(json.utf8)
         }
     }

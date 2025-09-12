@@ -250,7 +250,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         cart _: StorefrontAPI.Cart?,
         completion: (_: [Error]) -> T
     ) async -> T {
-        guard let action = ErrorHandler.map(error: error, cart: controller.cart) else {
+        guard let action = ErrorHandler.map(error: error, cart: controller.cart, requiredContactFields: pkDecoder.requiredContactFields) else {
             try? await transition(to: .unexpectedError(error: abortError))
             return completion([abortError])
         }
