@@ -270,10 +270,10 @@ extension ErrorHandler {
                     reason: .outOfStock, checkoutURL: cart?.checkoutUrl.url
                 )
             case "buyerIdentity.phone":
-                return PaymentSheetAction.showError(errors: [
-                    ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
-                        message: "errors.invalid.phone".localizedString)
-                ])
+                // It's not possible to edit phone if it was not requested in the sheet, fallback to CSK
+                return PaymentSheetAction.interrupt(
+                    reason: .invalidPhone, checkoutURL: cart?.checkoutUrl.url
+                )
             default:
                 return PaymentSheetAction.interrupt(
                     reason: .unhandled, checkoutURL: cart?.checkoutUrl.url

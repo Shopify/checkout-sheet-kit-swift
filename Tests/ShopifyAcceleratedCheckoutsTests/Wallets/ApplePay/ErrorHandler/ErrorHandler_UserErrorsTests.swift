@@ -196,10 +196,10 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 errorCode: .invalid,
                 field: ["buyerIdentity", "phone"],
                 shippingCountry: "US",
-                expectedAction: .showError(.phoneNumberInvalid),
+                expectedAction: .interrupt(.invalidPhone),
                 expectedField: nil,
                 expectedMessageKey: "errors.invalid.phone",
-                testDescription: "returns phoneNumberInvalid error when phone is invalid"
+                testDescription: "returns invalidPhone interrupt when phone is invalid"
             ),
 
             // MARK: - Unserviceable Address Errors
