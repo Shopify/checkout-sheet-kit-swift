@@ -22,6 +22,7 @@
  */
 
 import Foundation
+import PassKit
 
 @available(iOS 16.0, *)
 class ErrorHandler {
@@ -86,24 +87,24 @@ class ErrorHandler {
         return shippingAddress?.countryCode
     }
 
-    static func map(error: Error, cart: StorefrontAPI.Cart?) -> PaymentSheetAction? {
+    static func map(error: Error, cart: StorefrontAPI.Cart?, requiredContactFields: Set<PKContactField>? = nil) -> PaymentSheetAction? {
         let shippingCountry = getShippingCountry(cart: cart)
         switch error {
         case let cartUserError as StorefrontAPI.CartUserError:
             // Handle StorefrontAPI errors directly - we don't have the cart here but the checkout URL
             // is already captured in the delegate
-            return ErrorHandler.map(errors: [cartUserError], shippingCountry: shippingCountry, cart: nil)
+            return ErrorHandler.map(errors: [cartUserError], shippingCountry: shippingCountry, cart: nil, requiredContactFields: requiredContactFields)
         case let apiError as StorefrontAPI.Errors:
             switch apiError {
             case let .response(_, _, payload):
                 switch payload {
                 case let .cartSubmitForCompletion(submitPayload):
-                    return ErrorHandler.map(payload: submitPayload, shippingCountry: shippingCountry)
+                    return ErrorHandler.map(payload: submitPayload, shippingCountry: shippingCountry, requiredContactFields: requiredContactFields)
                 case let .cartPrepareForCompletion(preparePayload):
                     return ErrorHandler.map(payload: preparePayload)
                 }
             case let .userError(userErrors, cart):
-                return ErrorHandler.map(errors: userErrors, shippingCountry: shippingCountry, cart: cart)
+                return ErrorHandler.map(errors: userErrors, shippingCountry: shippingCountry, cart: cart, requiredContactFields: requiredContactFields)
             case .currencyChanged:
                 return .interrupt(reason: .currencyChanged, checkoutURL: cart?.checkoutUrl.url)
             case let .warning(type, cart):

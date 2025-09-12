@@ -27,14 +27,14 @@ import PassKit
 @available(iOS 16.0, *)
 extension ErrorHandler {
     static func map(
-        payload: StorefrontAPI.CartSubmitForCompletionPayload, shippingCountry: String?
+        payload: StorefrontAPI.CartSubmitForCompletionPayload, shippingCountry: String?, requiredContactFields: Set<PKContactField>? = nil
     ) -> PaymentSheetAction {
         guard let result = payload.result else { return PaymentSheetAction.interrupt(reason: .other) }
         switch result {
         case let .failed(submitFailed):
             let filteredErrors = filterGenericViolations(errors: submitFailed.errors)
             let actions = filteredErrors.map {
-                getErrorAction(error: $0, shippingCountry: shippingCountry, checkoutURL: submitFailed.checkoutUrl?.url)
+                getErrorAction(error: $0, shippingCountry: shippingCountry, checkoutURL: submitFailed.checkoutUrl?.url, requiredContactFields: requiredContactFields)
             }
             return getHighestPriorityAction(actions: actions)
         case .alreadyAccepted:
@@ -50,7 +50,7 @@ extension ErrorHandler {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    private static func getErrorAction(error: StorefrontAPI.SubmissionError, shippingCountry: String?, checkoutURL: URL?)
+    private static func getErrorAction(error: StorefrontAPI.SubmissionError, shippingCountry: String?, checkoutURL: URL?, requiredContactFields _: Set<PKContactField>? = nil)
         -> PaymentSheetAction
     {
         switch error.code {

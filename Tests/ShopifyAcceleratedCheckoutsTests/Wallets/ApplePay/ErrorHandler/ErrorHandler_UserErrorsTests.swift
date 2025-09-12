@@ -358,6 +358,101 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
             XCTFail("Expected unhandled interrupt for nil error code")
         }
     }
+
+    // MARK: - Email/Phone Error Tests with Required Fields
+
+    func testMap_invalidEmail_whenEmailRequired_showsError() {
+        let error = createCartUserError(code: .invalid, field: ["buyerIdentity", "email"])
+        let requiredFields: Set<PKContactField> = [.emailAddress]
+        let result = ErrorHandler.map(errors: [error], shippingCountry: "US", cart: nil, requiredContactFields: requiredFields)
+
+        switch result {
+        case let .showError(errors):
+            XCTAssertEqual(errors.count, 1)
+            // The error returned by ValidationErrors.emailInvalid is an NSError with specific userInfo
+            XCTAssertNotNil(errors.first)
+            let nsError = errors.first as? NSError
+            XCTAssertNotNil(nsError)
+            XCTAssertEqual(nsError?.userInfo[PKPaymentErrorKey.contactFieldUserInfoKey.rawValue] as? PKContactField, .emailAddress)
+        default:
+            XCTFail("Expected showError for invalid email when email is required")
+        }
+    }
+
+    func testMap_invalidEmail_whenEmailNotRequired_interrupts() {
+        let error = createCartUserError(code: .invalid, field: ["buyerIdentity", "email"])
+        let requiredFields: Set<PKContactField> = [] // Email not required
+        let result = ErrorHandler.map(errors: [error], shippingCountry: "US", cart: nil, requiredContactFields: requiredFields)
+
+        switch result {
+        case let .interrupt(reason, _):
+            XCTAssertEqual(reason, .other)
+        default:
+            XCTFail("Expected interrupt for invalid email when email is not required")
+        }
+    }
+
+    func testMap_invalidPhone_whenPhoneRequired_showsError() {
+        let error = createCartUserError(code: .invalid, field: ["buyerIdentity", "phone"])
+        let requiredFields: Set<PKContactField> = [.phoneNumber]
+        let result = ErrorHandler.map(errors: [error], shippingCountry: "US", cart: nil, requiredContactFields: requiredFields)
+
+        switch result {
+        case let .showError(errors):
+            XCTAssertEqual(errors.count, 1)
+            // The error returned by ValidationErrors.phoneNumberInvalid is an NSError with specific userInfo
+            XCTAssertNotNil(errors.first)
+            let nsError = errors.first as? NSError
+            XCTAssertNotNil(nsError)
+            XCTAssertEqual(nsError?.userInfo[PKPaymentErrorKey.contactFieldUserInfoKey.rawValue] as? PKContactField, .phoneNumber)
+        default:
+            XCTFail("Expected showError for invalid phone when phone is required")
+        }
+    }
+
+    func testMap_invalidPhone_whenPhoneNotRequired_interrupts() {
+        let error = createCartUserError(code: .invalid, field: ["buyerIdentity", "phone"])
+        let requiredFields: Set<PKContactField> = [] // Phone not required
+        let result = ErrorHandler.map(errors: [error], shippingCountry: "US", cart: nil, requiredContactFields: requiredFields)
+
+        switch result {
+        case let .interrupt(reason, _):
+            XCTAssertEqual(reason, .other)
+        default:
+            XCTFail("Expected interrupt for invalid phone when phone is not required")
+        }
+    }
+
+    func testMap_invalidEmail_whenBothEmailAndPhoneRequired_showsError() {
+        let error = createCartUserError(code: .invalid, field: ["buyerIdentity", "email"])
+        let requiredFields: Set<PKContactField> = [.emailAddress, .phoneNumber]
+        let result = ErrorHandler.map(errors: [error], shippingCountry: "US", cart: nil, requiredContactFields: requiredFields)
+
+        switch result {
+        case let .showError(errors):
+            XCTAssertEqual(errors.count, 1)
+            // The error returned by ValidationErrors.emailInvalid is an NSError with specific userInfo
+            XCTAssertNotNil(errors.first)
+            let nsError = errors.first as? NSError
+            XCTAssertNotNil(nsError)
+            XCTAssertEqual(nsError?.userInfo[PKPaymentErrorKey.contactFieldUserInfoKey.rawValue] as? PKContactField, .emailAddress)
+        default:
+            XCTFail("Expected showError for invalid email when both fields are required")
+        }
+    }
+
+    func testMap_invalidEmail_whenNilRequiredFields_interrupts() {
+        let error = createCartUserError(code: .invalid, field: ["buyerIdentity", "email"])
+        // Pass nil for requiredContactFields to test default behavior
+        let result = ErrorHandler.map(errors: [error], shippingCountry: "US", cart: nil, requiredContactFields: nil)
+
+        switch result {
+        case let .interrupt(reason, _):
+            XCTAssertEqual(reason, .other)
+        default:
+            XCTFail("Expected interrupt for invalid email when requiredContactFields is nil")
+        }
+    }
 }
 
 // MARK: - Mock Helper Methods
