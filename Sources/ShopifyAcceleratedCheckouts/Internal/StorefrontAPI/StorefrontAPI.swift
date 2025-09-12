@@ -64,7 +64,7 @@ protocol StorefrontAPIProtocol {
 
     // MARK: - Mutation Methods
 
-    func cartCreate(
+    @discardableResult func cartCreate(
         with items: [GraphQLScalars.ID], customer: ShopifyAcceleratedCheckouts.Customer?
     ) async throws -> StorefrontAPI.Cart
 
@@ -73,29 +73,29 @@ protocol StorefrontAPIProtocol {
         input buyerIdentity: StorefrontAPI.CartBuyerIdentityUpdateInput
     ) async throws -> StorefrontAPI.Cart
 
-    func cartDeliveryAddressesAdd(
+    @discardableResult func cartDeliveryAddressesAdd(
         id: GraphQLScalars.ID,
         address: StorefrontAPI.Address,
         validate: Bool
     ) async throws -> StorefrontAPI.Cart
 
-    func cartDeliveryAddressesUpdate(
+    @discardableResult func cartDeliveryAddressesUpdate(
         id: GraphQLScalars.ID,
         addressId: GraphQLScalars.ID,
         address: StorefrontAPI.Address,
         validate: Bool
     ) async throws -> StorefrontAPI.Cart
 
-    func cartDeliveryAddressesRemove(
+    @discardableResult func cartDeliveryAddressesRemove(
         id: GraphQLScalars.ID,
         addressId: GraphQLScalars.ID
     ) async throws -> StorefrontAPI.Cart
 
-    func cartSelectedDeliveryOptionsUpdate(
+    @discardableResult func cartSelectedDeliveryOptionsUpdate(
         id: GraphQLScalars.ID,
         deliveryGroupId: GraphQLScalars.ID,
         deliveryOptionHandle: String
-    ) async throws -> StorefrontAPI.Cart
+    ) async throws -> StorefrontAPI.Cart?
 
     @discardableResult func cartPaymentUpdate(
         id: GraphQLScalars.ID,

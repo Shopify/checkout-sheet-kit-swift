@@ -307,8 +307,9 @@ class PKEncoderTests: XCTestCase {
 
     // MARK: - Address Mapping Tests
 
-    func testDoesNotPadIncompletePostalCodes() throws {
-        let contact = createMockContact(
+    func testPadsIncompleteCanadianPostalCodes() throws {
+        // Full address with street - should NOT pad
+        let fullAddressContact = createMockContact(
             street: "33 New Montgomery St\n750",
             city: "San Francisco",
             state: "CA",
@@ -317,11 +318,27 @@ class PKEncoderTests: XCTestCase {
             isoCountryCode: "CA"
         )
 
-        let result = encoder.pkContactToAddress(contact: contact)
+        let fullAddressResult = encoder.pkContactToAddress(contact: fullAddressContact)
+        let fullAddress = try fullAddressResult.get()
 
-        let address = try result.get()
+        // Full address should NOT be padded
+        XCTAssertEqual(fullAddress.zip, "A1A", "Full address postal code should NOT be padded")
 
-        XCTAssertEqual(address.zip, "A1A")
+        // Partial address without street - SHOULD pad
+        let partialAddressContact = createMockContact(
+            street: "", // Empty street indicates partial address
+            city: "San Francisco",
+            state: "CA",
+            postalCode: "A1A",
+            country: "Canada",
+            isoCountryCode: "CA"
+        )
+
+        let partialAddressResult = encoder.pkContactToAddress(contact: partialAddressContact)
+        let partialAddress = try partialAddressResult.get()
+
+        // Partial address SHOULD be padded with 0Z0
+        XCTAssertEqual(partialAddress.zip, "A1A0Z0", "Partial address postal code should be padded")
     }
 
     func testHongKongAddressHandling() throws {
@@ -443,7 +460,7 @@ class PKEncoderTests: XCTestCase {
         XCTAssertNil(address.address1)
         XCTAssertNil(address.address2)
         XCTAssertEqual(address.city, "")
-        XCTAssertEqual(address.zip, "")
+        XCTAssertNil(address.zip) // Empty postal code now returns nil
         XCTAssertNil(address.province)
         XCTAssertEqual(address.country, "ZZ")
         XCTAssertNil(address.phone)
@@ -1276,5 +1293,450 @@ class PKEncoderTests: XCTestCase {
         XCTAssertTrue(applePayPayment.signature.hasPrefix("MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIIC7TCCAukwggJkAgEAMIIB8TCCAR0CAQAwXDBNMQ=="))
         XCTAssertEqual(applePayPayment.version, "EC_v1")
         XCTAssertEqual(applePayPayment.lastDigits, "1234")
+    }
+
+    // MARK: - Postal Code Padding Tests
+
+    func test_addPaddingToPostalCode_withGB_shouldAddSuffix0ZZ() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        let result = encoder.addPaddingToPostalCode(for: "SW1A", in: "GB")
+        XCTAssertEqual(result, "SW1A0ZZ")
+
+        let result2 = encoder.addPaddingToPostalCode(for: "E1", in: "GB")
+        XCTAssertEqual(result2, "E10ZZ")
+
+        let result3 = encoder.addPaddingToPostalCode(for: "EC1A 1", in: "GB")
+        XCTAssertEqual(result3, "EC1A 10ZZ")
+    }
+
+    func test_addPaddingToPostalCode_withCA_shouldAddSuffix0Z0() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        let result = encoder.addPaddingToPostalCode(for: "M5V", in: "CA")
+        XCTAssertEqual(result, "M5V0Z0")
+
+        let result2 = encoder.addPaddingToPostalCode(for: "K1A", in: "CA")
+        XCTAssertEqual(result2, "K1A0Z0")
+
+        let result3 = encoder.addPaddingToPostalCode(for: "V6B 2", in: "CA")
+        XCTAssertEqual(result3, "V6B 20Z0")
+    }
+
+    func test_addPaddingToPostalCode_withOtherCountries_shouldReturnUnchanged() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        let usResult = encoder.addPaddingToPostalCode(for: "10001", in: "US")
+        XCTAssertEqual(usResult, "10001")
+
+        let frResult = encoder.addPaddingToPostalCode(for: "75001", in: "FR")
+        XCTAssertEqual(frResult, "75001")
+
+        let deResult = encoder.addPaddingToPostalCode(for: "10115", in: "DE")
+        XCTAssertEqual(deResult, "10115")
+
+        let jpResult = encoder.addPaddingToPostalCode(for: "100-0001", in: "JP")
+        XCTAssertEqual(jpResult, "100-0001")
+    }
+
+    func test_addPaddingToPostalCode_withNilPostalCode_shouldReturnNil() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        let gbResult = encoder.addPaddingToPostalCode(for: nil, in: "GB")
+        XCTAssertNil(gbResult)
+
+        let caResult = encoder.addPaddingToPostalCode(for: nil, in: "CA")
+        XCTAssertNil(caResult)
+
+        let usResult = encoder.addPaddingToPostalCode(for: nil, in: "US")
+        XCTAssertNil(usResult)
+    }
+
+    func test_addPaddingToPostalCode_withEmptyPostalCode_shouldReturnNil() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        let gbResult = encoder.addPaddingToPostalCode(for: "", in: "GB")
+        XCTAssertNil(gbResult, "Empty postal code should return nil for GB")
+
+        let caResult = encoder.addPaddingToPostalCode(for: "", in: "CA")
+        XCTAssertNil(caResult, "Empty postal code should return nil for CA")
+
+        let usResult = encoder.addPaddingToPostalCode(for: "", in: "US")
+        XCTAssertNil(usResult, "Empty postal code should return nil for US")
+    }
+
+    func test_pkContactToAddress_withGB_fullAddress_shouldNotPadPostalCode() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Full address with street - should NOT pad
+        let contact = createMockContact(
+            street: "10 Downing Street",
+            city: "London",
+            state: "England",
+            postalCode: "SW1A 2AA",
+            country: "United Kingdom",
+            isoCountryCode: "GB"
+        )
+
+        let result = encoder.pkContactToAddress(contact: contact)
+
+        guard case let .success(address) = result else {
+            XCTFail("Expected success but got failure")
+            return
+        }
+
+        XCTAssertEqual(address.zip, "SW1A 2AA", "GB full address postal code should NOT be padded")
+        XCTAssertEqual(address.country, "GB")
+        XCTAssertEqual(address.city, "London")
+        XCTAssertEqual(address.province, "England")
+    }
+
+    func test_pkContactToAddress_withGB_partialAddress_shouldPadPostalCode() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Partial address with empty street - should pad
+        let contact = createMockContact(
+            street: "",
+            city: "London",
+            state: "England",
+            postalCode: "SW1A 2",
+            country: "United Kingdom",
+            isoCountryCode: "GB"
+        )
+
+        let result = encoder.pkContactToAddress(contact: contact)
+
+        guard case let .success(address) = result else {
+            XCTFail("Expected success but got failure")
+            return
+        }
+
+        XCTAssertEqual(address.zip, "SW1A 20ZZ", "GB partial address postal code should be padded with 0ZZ")
+        XCTAssertEqual(address.country, "GB")
+        XCTAssertEqual(address.city, "London")
+        XCTAssertEqual(address.province, "England")
+    }
+
+    func test_pkContactToAddress_withCA_fullAddress_shouldNotPadPostalCode() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Full address with street - should NOT pad
+        let contact = createMockContact(
+            street: "80 Wellington Street",
+            city: "Ottawa",
+            state: "ON",
+            postalCode: "K1A 0A6",
+            country: "Canada",
+            isoCountryCode: "CA"
+        )
+
+        let result = encoder.pkContactToAddress(contact: contact)
+
+        guard case let .success(address) = result else {
+            XCTFail("Expected success but got failure")
+            return
+        }
+
+        XCTAssertEqual(address.zip, "K1A 0A6", "CA full address postal code should NOT be padded")
+        XCTAssertEqual(address.country, "CA")
+        XCTAssertEqual(address.city, "Ottawa")
+        XCTAssertEqual(address.province, "ON")
+    }
+
+    func test_pkContactToAddress_withCA_partialAddress_shouldPadPostalCode() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Partial address with empty street - should pad
+        let contact = createMockContact(
+            street: "",
+            city: "Ottawa",
+            state: "ON",
+            postalCode: "K1A 0",
+            country: "Canada",
+            isoCountryCode: "CA"
+        )
+
+        let result = encoder.pkContactToAddress(contact: contact)
+
+        guard case let .success(address) = result else {
+            XCTFail("Expected success but got failure")
+            return
+        }
+
+        XCTAssertEqual(address.zip, "K1A 00Z0", "CA partial address postal code should be padded with 0Z0")
+        XCTAssertEqual(address.country, "CA")
+        XCTAssertEqual(address.city, "Ottawa")
+        XCTAssertEqual(address.province, "ON")
+    }
+
+    func test_pkContactToAddress_withUS_shouldNotPadPostalCode() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        let contact = createMockContact(
+            street: "1600 Pennsylvania Avenue",
+            city: "Washington",
+            state: "DC",
+            postalCode: "20500",
+            country: "United States",
+            isoCountryCode: "US"
+        )
+
+        let result = encoder.pkContactToAddress(contact: contact)
+
+        guard case let .success(address) = result else {
+            XCTFail("Expected success but got failure")
+            return
+        }
+
+        XCTAssertEqual(address.zip, "20500", "US postal code should not be padded")
+        XCTAssertEqual(address.country, "US")
+        XCTAssertEqual(address.city, "Washington")
+        XCTAssertEqual(address.province, "DC")
+    }
+
+    func test_pkContactToAddress_withHK_shouldHandleSpecialCase() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // HK doesn't have postal codes, Apple Pay puts Region in postalCode field
+        let contact = createMockContact(
+            street: "1 Tim Mei Avenue",
+            city: "Hong Kong",
+            state: "",
+            postalCode: "Central",
+            country: "Hong Kong",
+            isoCountryCode: "HK"
+        )
+
+        let result = encoder.pkContactToAddress(contact: contact)
+
+        guard case let .success(address) = result else {
+            XCTFail("Expected success but got failure")
+            return
+        }
+
+        // For HK, postal code becomes province and zip is nil
+        XCTAssertNil(address.zip, "HK should have nil zip code")
+        XCTAssertEqual(address.province, "Central", "HK postal code should become province")
+        XCTAssertEqual(address.country, "HK")
+        XCTAssertEqual(address.city, "Hong Kong")
+    }
+
+    func test_addPaddingToPostalCode_caseInsensitive_shouldWork() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Test lowercase country codes
+        let gbLowerResult = encoder.addPaddingToPostalCode(for: "SW1A", in: "gb")
+        XCTAssertEqual(gbLowerResult, "SW1A", "Lowercase country code should not match")
+
+        let caLowerResult = encoder.addPaddingToPostalCode(for: "K1A", in: "ca")
+        XCTAssertEqual(caLowerResult, "K1A", "Lowercase country code should not match")
+
+        // Test mixed case
+        let gbMixedResult = encoder.addPaddingToPostalCode(for: "SW1A", in: "Gb")
+        XCTAssertEqual(gbMixedResult, "SW1A", "Mixed case country code should not match")
+    }
+
+    func test_pkContactToAddress_withPartialGB_postalCode_shouldPadCorrectly() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Test various partial GB postal codes that Apple might return
+        let testCases = [
+            ("SW1", "SW10ZZ"),
+            ("W1", "W10ZZ"),
+            ("EC1A", "EC1A0ZZ"),
+            ("N1 9", "N1 90ZZ")
+        ]
+
+        for (input, expected) in testCases {
+            // Partial address - empty street should trigger padding
+            let contact = createMockContact(
+                street: "", // Empty street indicates partial address
+                city: "London",
+                state: "England",
+                postalCode: input,
+                country: "United Kingdom",
+                isoCountryCode: "GB"
+            )
+
+            let result = encoder.pkContactToAddress(contact: contact)
+
+            guard case let .success(address) = result else {
+                XCTFail("Expected success for postal code \(input)")
+                continue
+            }
+
+            XCTAssertEqual(address.zip, expected, "Partial address postal code '\(input)' should be padded to '\(expected)'")
+        }
+    }
+
+    func test_pkContactToAddress_withFullGB_postalCode_shouldNotPadCorrectly() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Test that full addresses with street don't get padded
+        let testCases = [
+            "SW1A 2AA",
+            "W1D 3QU",
+            "EC1A 1BB",
+            "N1 9GU"
+        ]
+
+        for postalCode in testCases {
+            // Full address - has street so should NOT trigger padding
+            let contact = createMockContact(
+                street: "Test Street",
+                city: "London",
+                state: "England",
+                postalCode: postalCode,
+                country: "United Kingdom",
+                isoCountryCode: "GB"
+            )
+
+            let result = encoder.pkContactToAddress(contact: contact)
+
+            guard case let .success(address) = result else {
+                XCTFail("Expected success for postal code \(postalCode)")
+                continue
+            }
+
+            XCTAssertEqual(address.zip, postalCode, "Full address postal code '\(postalCode)' should NOT be padded")
+        }
+    }
+
+    func test_pkContactToAddress_withEmptyPostalCode_shouldReturnNilZip() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Test empty postal code for GB with full address (has street)
+        let gbContact = createMockContact(
+            street: "10 Downing Street",
+            city: "London",
+            state: "England",
+            postalCode: "",
+            country: "United Kingdom",
+            isoCountryCode: "GB"
+        )
+
+        let gbResult = encoder.pkContactToAddress(contact: gbContact)
+        guard case let .success(gbAddress) = gbResult else {
+            XCTFail("Expected success for GB")
+            return
+        }
+        XCTAssertEqual(gbAddress.zip, "", "Empty postal code should result in empty string for GB full address")
+
+        // Test empty postal code for CA with full address (has street)
+        let caContact = createMockContact(
+            street: "80 Wellington Street",
+            city: "Ottawa",
+            state: "ON",
+            postalCode: "",
+            country: "Canada",
+            isoCountryCode: "CA"
+        )
+
+        let caResult = encoder.pkContactToAddress(contact: caContact)
+        guard case let .success(caAddress) = caResult else {
+            XCTFail("Expected success for CA")
+            return
+        }
+        XCTAssertEqual(caAddress.zip, "", "Empty postal code should result in empty string for CA full address")
+
+        // Test empty postal code for partial address (no street) - should also return nil
+        let partialContact = createMockContact(
+            street: "",
+            city: "London",
+            state: "England",
+            postalCode: "",
+            country: "United Kingdom",
+            isoCountryCode: "GB"
+        )
+
+        let partialResult = encoder.pkContactToAddress(contact: partialContact)
+        guard case let .success(partialAddress) = partialResult else {
+            XCTFail("Expected success for partial address")
+            return
+        }
+        XCTAssertNil(partialAddress.zip, "Empty postal code should result in nil zip for partial address")
+
+        // Test empty postal code for US
+        let usContact = createMockContact(
+            street: "1600 Pennsylvania Avenue",
+            city: "Washington",
+            state: "DC",
+            postalCode: "",
+            country: "United States",
+            isoCountryCode: "US"
+        )
+
+        let usResult = encoder.pkContactToAddress(contact: usContact)
+        guard case let .success(usAddress) = usResult else {
+            XCTFail("Expected success for US")
+            return
+        }
+        XCTAssertEqual(usAddress.zip, "", "Empty postal code should result in empty string for US")
+    }
+
+    func test_pkContactToAddress_withPartialCA_postalCode_shouldPadCorrectly() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Test various partial CA postal codes that Apple might return
+        let testCases = [
+            ("M5V", "M5V0Z0"),
+            ("K1A", "K1A0Z0"),
+            ("V6B 2", "V6B 20Z0"),
+            ("H2X", "H2X0Z0")
+        ]
+
+        for (input, expected) in testCases {
+            // Partial address - empty street should trigger padding
+            let contact = createMockContact(
+                street: "", // Empty street indicates partial address
+                city: "Toronto",
+                state: "ON",
+                postalCode: input,
+                country: "Canada",
+                isoCountryCode: "CA"
+            )
+
+            let result = encoder.pkContactToAddress(contact: contact)
+
+            guard case let .success(address) = result else {
+                XCTFail("Expected success for postal code \(input)")
+                continue
+            }
+
+            XCTAssertEqual(address.zip, expected, "Partial address postal code '\(input)' should be padded to '\(expected)'")
+        }
+    }
+
+    func test_pkContactToAddress_withFullCA_postalCode_shouldNotPadCorrectly() {
+        let encoder = PKEncoder(configuration: .testConfiguration, cart: cart)
+
+        // Test that full addresses with street don't get padded
+        let testCases = [
+            "M5V 3A8",
+            "K1A 0A6",
+            "V6B 2W6",
+            "H2X 1Y4"
+        ]
+
+        for postalCode in testCases {
+            // Full address - has street so should NOT trigger padding
+            let contact = createMockContact(
+                street: "Test Street",
+                city: "Toronto",
+                state: "ON",
+                postalCode: postalCode,
+                country: "Canada",
+                isoCountryCode: "CA"
+            )
+
+            let result = encoder.pkContactToAddress(contact: contact)
+
+            guard case let .success(address) = result else {
+                XCTFail("Expected success for postal code \(postalCode)")
+                continue
+            }
+
+            XCTAssertEqual(address.zip, postalCode, "Full address postal code '\(postalCode)' should NOT be padded")
+        }
     }
 }

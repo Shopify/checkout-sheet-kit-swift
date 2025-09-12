@@ -264,7 +264,7 @@ extension StorefrontAPI {
         id: GraphQLScalars.ID,
         deliveryGroupId: GraphQLScalars.ID,
         deliveryOptionHandle: String
-    ) async throws -> Cart {
+    ) async throws -> Cart? {
         let variables: [String: Any] = [
             "cartId": id.rawValue,
             "selectedDeliveryOptions": [
@@ -283,11 +283,14 @@ extension StorefrontAPI {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartSelectedDeliveryOptionsUpdate")
+        // Temporarily skipping this check due to cart bug where cartSelectedDeliveryOptionsUpdate
+        // is wrongly returning PendingTerms causing cart:nil despite successfully setting deliveryOption
+        // See: https://github.com/shop/issues-fulfillment/issues/2594
+        // let cart = try validateCart(payload.cart, requestName: "cartSelectedDeliveryOptionsUpdate")
 
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
+        try validateUserErrors(payload.userErrors, checkoutURL: payload.cart?.checkoutUrl.url)
 
-        return cart
+        return payload.cart
     }
 
     /// Update cart payment
