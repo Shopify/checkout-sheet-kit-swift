@@ -444,7 +444,7 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 1)
         XCTAssertEqual(
             mockAuthorizationDelegate.transitionHistory.first,
-            .interrupt(reason: .invalidEmail)
+            .interrupt(reason: .other)
         )
     }
 

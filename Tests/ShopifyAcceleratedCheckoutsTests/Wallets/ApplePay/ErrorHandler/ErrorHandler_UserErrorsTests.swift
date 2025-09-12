@@ -178,10 +178,10 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 errorCode: .invalid,
                 field: ["buyerIdentity", "email"],
                 shippingCountry: "US",
-                expectedAction: .interrupt(.invalidEmail),
+                expectedAction: .interrupt(.other),
                 expectedField: nil,
                 expectedMessageKey: nil,
-                testDescription: "returns invalidEmail interrupt when email is invalid to fallback to CSK"
+                testDescription: "returns other interrupt when email is invalid to fallback to CSK"
             ),
             TestCase(
                 errorCode: .invalid,
@@ -196,10 +196,10 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
                 errorCode: .invalid,
                 field: ["buyerIdentity", "phone"],
                 shippingCountry: "US",
-                expectedAction: .interrupt(.invalidPhone),
+                expectedAction: .interrupt(.other),
                 expectedField: nil,
                 expectedMessageKey: "errors.invalid.phone",
-                testDescription: "returns invalidPhone interrupt when phone is invalid"
+                testDescription: "returns other interrupt when phone is invalid"
             ),
 
             // MARK: - Unserviceable Address Errors
@@ -341,7 +341,7 @@ class ErrorHandler_UserErrorsTest: XCTestCase {
 
         switch result {
         case let .interrupt(reason, _):
-            XCTAssertEqual(reason, .invalidEmail, "Email error should trigger invalidEmail interrupt")
+            XCTAssertEqual(reason, .other, "Email error should trigger other interrupt")
         default:
             XCTFail("Expected interrupt action for email error")
         }

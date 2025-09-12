@@ -262,7 +262,7 @@ extension ErrorHandler {
             case "buyerIdentity.email":
                 // It's not possible to edit email if it was not requested in the sheet, fallback to CSK
                 return PaymentSheetAction.interrupt(
-                    reason: .invalidEmail, checkoutURL: cart?.checkoutUrl.url
+                    reason: .other, checkoutURL: cart?.checkoutUrl.url
                 )
             case "input.lines.0.quantity":
                 // Stock problem, decelerate
@@ -272,7 +272,7 @@ extension ErrorHandler {
             case "buyerIdentity.phone":
                 // It's not possible to edit phone if it was not requested in the sheet, fallback to CSK
                 return PaymentSheetAction.interrupt(
-                    reason: .invalidPhone, checkoutURL: cart?.checkoutUrl.url
+                    reason: .other, checkoutURL: cart?.checkoutUrl.url
                 )
             default:
                 return PaymentSheetAction.interrupt(
