@@ -223,8 +223,9 @@ class PKEncoder {
         guard let postalAddress = contact?.postalAddress else {
             return .failure(.invariant(expected: "postalAddress"))
         }
+        let isFullAddress = !postalAddress.street.isEmpty
         let country = mapToCountryCode(code: postalAddress.isoCountryCode)
-        let paddedZipCode = addPaddingToPostalCode(
+        let paddedZipCode = isFullAddress ? postalAddress.postalCode : addPaddingToPostalCode(
             for: postalAddress.postalCode,
             in: country
         )
