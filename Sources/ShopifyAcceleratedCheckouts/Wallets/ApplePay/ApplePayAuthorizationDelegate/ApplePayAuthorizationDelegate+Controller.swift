@@ -194,6 +194,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 let shippingAddress = try pkEncoder.shippingAddress.get()
                 try await upsertShippingAddress(to: shippingAddress, validate: true)
 
+                // Re-apply the selected shipping method after address validation
+                // This is necessary because address updates reset the selected shipping method
+                try await reapplySelectedShippingMethod()
+
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
             } else {
@@ -247,6 +251,22 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         controller.dismiss {
             Task { try? await self.transition(to: .completed) }
         }
+    }
+
+    internal func reapplySelectedShippingMethod() async throws {
+        guard let selectedDeliveryOptionHandle = try? pkEncoder.selectedDeliveryOptionHandle.get(),
+              let deliveryGroupID = try? pkEncoder.deliveryGroupID.get()
+        else {
+            return
+        }
+
+        let cartID = try pkEncoder.cartID.get()
+        try await controller.storefront.cartPrepareForCompletion(id: cartID)
+        try await controller.storefront.cartSelectedDeliveryOptionsUpdate(
+            id: cartID,
+            deliveryGroupId: deliveryGroupID,
+            deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
+        )
     }
 
     func handleError<T>(
