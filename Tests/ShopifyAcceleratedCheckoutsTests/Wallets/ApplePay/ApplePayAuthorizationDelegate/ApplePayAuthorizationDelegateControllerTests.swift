@@ -91,11 +91,15 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
     }
 
     func test_didSelectShippingMethod_withCartIDError_shouldReturnFailureStatus() async throws {
-        try delegate.setCart(to: nil)
-
+        // Add the shipping method to available methods so it passes validation
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = "standard-shipping"
         shippingMethod.label = "Standard Shipping"
+
+        delegate.pkDecoder = makeStubDecoder(methods: [shippingMethod])
+
+        // Now set cart to nil to cause cartID.get() to fail
+        try delegate.setCart(to: nil)
 
         let result = await delegate.paymentAuthorizationController(
             PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
@@ -223,7 +227,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertFalse(delegate.pkDecoder.paymentSummaryItems.isEmpty)
     }
 
-    func test_didSelectShippingMethod_whenMethodIsInvalid_shouldFallbackToFirstAvailable() async throws {
+    func test_didSelectShippingMethod_whenMethodIsInvalid_shouldNotSetShippingMethod() async throws {
         let firstAvailable = PKShippingMethod()
         firstAvailable.identifier = "first-available"
 
@@ -233,27 +237,29 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         delegate.pkDecoder = makeStubDecoder(methods: [firstAvailable])
         MockURLProtocol.lastOperation = nil
 
-        _ = await delegate.paymentAuthorizationController(
+        let result = await delegate.paymentAuthorizationController(
             PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: selected
         )
 
-        XCTAssertEqual(delegate.pkEncoder.selectedShippingMethod?.identifier, "first-available")
+        XCTAssertNil(delegate.pkEncoder.selectedShippingMethod, "Should not set invalid shipping method")
+        XCTAssertEqual(result.status, .failure, "Should return failure status for invalid method")
     }
 
-    func test_didSelectShippingMethod_whenNoMethodsAvailable_shouldKeepOriginal() async throws {
+    func test_didSelectShippingMethod_whenNoMethodsAvailable_shouldNotSetShippingMethod() async throws {
         let selected = PKShippingMethod()
         selected.identifier = "only-method"
 
         delegate.pkDecoder = makeStubDecoder(methods: [])
         MockURLProtocol.lastOperation = nil
 
-        _ = await delegate.paymentAuthorizationController(
+        let result = await delegate.paymentAuthorizationController(
             PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
             didSelectShippingMethod: selected
         )
 
-        XCTAssertEqual(delegate.pkEncoder.selectedShippingMethod?.identifier, "only-method")
+        XCTAssertNil(delegate.pkEncoder.selectedShippingMethod, "Should not set shipping method when no methods available")
+        XCTAssertEqual(result.status, .failure, "Should return failure status when no methods available")
     }
 
     func test_didSelectShippingMethod_withSelectedDeliveryOptionHandleError_shouldReturnFailureStatus() async throws {

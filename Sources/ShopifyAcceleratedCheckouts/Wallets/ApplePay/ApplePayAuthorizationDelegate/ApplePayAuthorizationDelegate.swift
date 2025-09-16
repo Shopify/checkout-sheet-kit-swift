@@ -241,7 +241,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         }
     }
 
-    func upsertShippingAddress(to address: StorefrontAPI.Types.Address, validate: Bool = false)
+    @discardableResult func upsertShippingAddress(to address: StorefrontAPI.Types.Address, validate: Bool = false)
         async throws -> StorefrontAPI.Types.Cart
     {
         let cartID = try pkEncoder.cartID.get()

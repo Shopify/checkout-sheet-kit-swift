@@ -48,20 +48,18 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             // Store current cart state before attempting address update
             let previousCart = controller.cart
 
-            let cart = try await upsertShippingAddress(to: shippingAddress)
-
-            // If address update cleared delivery groups, revert to previous cart and show error
-            if cart.deliveryGroups.nodes.isEmpty, previousCart?.deliveryGroups.nodes.isEmpty == false {
-                try setCart(to: previousCart)
-
-                return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.addressUnserviceableError])
-            }
-
-            try setCart(to: cart)
+            try await upsertShippingAddress(to: shippingAddress)
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-
             try setCart(to: result.cart)
+
+            // If address update cleared delivery groups, revert to previous cart and show error
+            if result.cart?.deliveryGroups.nodes.isEmpty == true, previousCart?.deliveryGroups.nodes.isEmpty == false {
+                try setCart(to: previousCart)
+
+                ShopifyAcceleratedCheckouts.logger.error("ApplePay: didSelectShippingContact deliveryGroups were unexpectedly empty")
+                return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.addressUnserviceableError])
+            }
 
             return pkDecoder.paymentRequestShippingContactUpdate()
         } catch {
@@ -105,8 +103,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 )
             )
 
-            try await controller.storefront
-                .cartBillingAddressUpdate(id: cartID, billingAddress: billingPostalAddress)
+            try await controller.storefront.cartBillingAddressUpdate(
+                id: cartID,
+                billingAddress: billingPostalAddress
+            )
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
             try setCart(to: result.cart)
@@ -125,26 +125,30 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         _: PKPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        // Check if this shipping method identifier is still valid
-        let availableShippingMethods = pkDecoder.shippingMethods
-        let isValidMethod = availableShippingMethods.contains { $0.identifier == shippingMethod.identifier }
-        let methodToUse: PKShippingMethod = isValidMethod ? shippingMethod : (availableShippingMethods.first ?? shippingMethod)
+        let isValidShippingMethod = pkDecoder.shippingMethods.contains { $0.identifier == shippingMethod.identifier }
+        if !isValidShippingMethod {
+            return pkDecoder
+                .paymentRequestShippingMethodUpdate(
+                    errors: [ShopifyAcceleratedCheckouts.Error.invariant(
+                        expected: "isValidShippingMethod true"
+                    )]
+                )
+        }
 
-        pkEncoder.selectedShippingMethod = methodToUse
-        pkDecoder.selectedShippingMethod = methodToUse
+        pkEncoder.selectedShippingMethod = shippingMethod
+        pkDecoder.selectedShippingMethod = shippingMethod
 
         do {
             let cartID = try pkEncoder.cartID.get()
             let selectedDeliveryOptionHandle = try pkEncoder.selectedDeliveryOptionHandle.get()
             let deliveryGroupID = try pkEncoder.deliveryGroupID.get()
 
-            let cart = try await controller.storefront
+            try await controller.storefront
                 .cartSelectedDeliveryOptionsUpdate(
                     id: cartID,
                     deliveryGroupId: deliveryGroupID,
                     deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
                 )
-            try setCart(to: cart)
 
             let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
 
@@ -188,7 +192,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             if try pkDecoder.isShippingRequired() {
                 let shippingAddress = try pkEncoder.shippingAddress.get()
-                _ = try await upsertShippingAddress(to: shippingAddress, validate: true)
+                try await upsertShippingAddress(to: shippingAddress, validate: true)
 
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)

@@ -291,7 +291,7 @@ class MockStorefrontAPI: StorefrontAPIProtocol {
     func cartSelectedDeliveryOptionsUpdate(
         id _: GraphQLScalars.ID, deliveryGroupId _: GraphQLScalars.ID,
         deliveryOptionHandle _: String
-    ) async throws -> StorefrontAPI.Cart {
+    ) async throws -> StorefrontAPI.Cart? {
         fatalError(
             "cartSelectedDeliveryOptionsUpdate(id:deliveryGroupId:deliveryOptionHandle:) not implemented in test. Override this method in your test class."
         )
