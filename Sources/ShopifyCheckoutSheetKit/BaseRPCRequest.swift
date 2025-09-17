@@ -21,52 +21,40 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import WebKit
 
-class MockNavigationAction: WKNavigationAction {
-    private let mockRequest: URLRequest
-    private let mockTargetFrame: WKFrameInfo?
+/// Base class for all RPC request implementations
+public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
+    public typealias Params = P
+    public typealias ResponsePayload = R
 
-    override var request: URLRequest {
-        return mockRequest
+    public let id: String?
+    public let params: Params
+    public weak var webview: WKWebView?
+
+    /// Subclasses must override this to provide their method name
+    public class var method: String {
+        fatalError("Subclasses must override method")
     }
 
-    override var targetFrame: WKFrameInfo? {
-        return mockTargetFrame
+    /// Required initializer that all RPC requests must implement
+    public required init(id: String?, params: Params) {
+        self.id = id
+        self.params = params
+        webview = nil
     }
 
-    init(url: URL, targetFrame: WKFrameInfo? = MockMainFrameInfo()) {
-        mockRequest = URLRequest(url: url)
-        mockTargetFrame = targetFrame
-        super.init()
-    }
-}
-
-class MockExternalNavigationAction: WKNavigationAction {
-    private let mockRequest: URLRequest
-    private let navType: WKNavigationType
-
-    override var request: URLRequest {
-        return mockRequest
-    }
-
-    override var navigationType: WKNavigationType {
-        return navType
-    }
-
-    override var targetFrame: WKFrameInfo? {
-        return nil
-    }
-
-    init(url: URL, navigationType: WKNavigationType = .linkActivated) {
-        mockRequest = URLRequest(url: url)
-        navType = navigationType
-        super.init()
+    /// Default validation does nothing - subclasses can override
+    public func validate(payload _: ResponsePayload) throws {
+        // Subclasses can override if they need validation
     }
 }
 
-private final class MockMainFrameInfo: WKFrameInfo {
-    override var isMainFrame: Bool {
-        true
+// MARK: - TypeErasedRPCDecodable conformance
+
+extension BaseRPCRequest: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCRequest {
+        return try JSONDecoder().decode(Self.self, from: data)
     }
 }

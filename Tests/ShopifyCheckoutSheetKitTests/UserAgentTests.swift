@@ -56,7 +56,6 @@ class UserAgentTests: XCTestCase {
     }
 
     func test_string_withRecoveryTypeAndDarkColorScheme_shouldReturnRecoveryUserAgent() {
-        let schemaVersion = MetaData.schemaVersion
         let recoveryUA = UserAgent.string(
             type: .recovery,
             colorScheme: .dark,

@@ -23,10 +23,9 @@
 
 @preconcurrency import Buy
 import PassKit
-import SwiftUI
-
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
+import SwiftUI
 
 struct CartView: View {
     @State var cartCompleted: Bool = false
@@ -61,9 +60,35 @@ struct CartView: View {
                             .onCancel {
                                 print("Accelerated checkout cancelled")
                             }
-                            .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
+                            .environmentObject(
+                                appConfiguration.acceleratedCheckoutsStorefrontConfig
+                            )
                             .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
                     }
+
+                    Button(
+                        action: { showCheckoutSheet = true },
+                        label: {
+                            HStack {
+                                Text("Buy Now")
+                                    .fontWeight(.bold)
+                                Spacer()
+                                if let amount = cartManager.cart?.cost.totalAmount,
+                                   let total = amount.formattedString()
+                                {
+                                    Text(total)
+                                        .fontWeight(.bold)
+                                }
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(isBusy ? Color.gray : Color(ColorPalette.primaryColor))
+                            .cornerRadius(DesignSystem.cornerRadius)
+                        }
+                    )
+                    .disabled(isBusy)
+                    .foregroundColor(.white)
+                    .accessibilityIdentifier("checkoutSheetButton")
 
                     Button(
                         action: { showCheckoutSheet = true },
@@ -111,6 +136,40 @@ struct CartView: View {
                             showCheckoutSheet = false
                             // Handle checkout failure
                             print("Checkout failed: \(error)")
+                        }
+                        .onAddressChangeIntent { event in
+                            print(
+                                "🎉 SwiftUI: Address change intent received for addressType: \(event.params.addressType)"
+                            )
+
+                            // Respond with hardcoded address after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                let hardcodedAddress = CartAddress(
+                                    firstName: "Jane",
+                                    lastName: "Smith",
+                                    address1: "456 SwiftUI Avenue",
+                                    address2: "Suite 200",
+                                    city: "Vancouver",
+                                    countryCode: "CA",
+                                    phone: "+1-604-555-0456",
+                                    provinceCode: "BC",
+                                    zip: "V6B 1A1"
+                                )
+
+                                let addressInput = CartSelectableAddress(
+                                    address: hardcodedAddress)
+                                let delivery = CartDelivery(addresses: [addressInput])
+                                let response = DeliveryAddressChangePayload(delivery: delivery)
+
+                                print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
+                                do {
+                                    try event.respondWith(payload: response)
+                                } catch {
+                                    print(
+                                        "Failed to respondwith: Responding with hardcoded Vancouver address"
+                                    )
+                                }
+                            }
                         }
                         .edgesIgnoringSafeArea(.all)
                 }
@@ -204,36 +263,44 @@ struct CartLines: View {
                             Spacer()
 
                             HStack(spacing: 20) {
-                                Button(action: {
-                                    /// Prevent multiple simulataneous calls
-                                    guard node.quantity > 1, updating != node.id else {
-                                        return
+                                Button(
+                                    action: {
+                                        /// Prevent multiple simulataneous calls
+                                        guard node.quantity > 1, updating != node.id else {
+                                            return
+                                        }
+
+                                        updating = node.id
+
+                                        /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
+                                        ShopifyCheckoutSheetKit.invalidate()
+
+                                        _Concurrency.Task {
+                                            let cart = try await CartManager.shared
+                                                .performCartLinesUpdate(
+                                                    id: node.id, quantity: node.quantity - 1
+                                                )
+                                            CartManager.shared.cart = cart
+                                            updating = nil
+
+                                            CartManager.shared.preloadCheckout()
+                                        }
+                                    },
+                                    label: {
+                                        Image(systemName: "minus")
+                                            .font(.system(size: 12))
+                                            .frame(width: 32, height: 32)
+                                            .background(Color.gray.opacity(0.1))
+                                            .clipShape(Circle())
                                     }
-
-                                    updating = node.id
-
-                                    /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
-                                    ShopifyCheckoutSheetKit.invalidate()
-
-                                    _Concurrency.Task {
-                                        let cart = try await CartManager.shared.performCartLinesUpdate(id: node.id, quantity: node.quantity - 1)
-                                        CartManager.shared.cart = cart
-                                        updating = nil
-
-                                        CartManager.shared.preloadCheckout()
-                                    }
-                                }, label: {
-                                    Image(systemName: "minus")
-                                        .font(.system(size: 12))
-                                        .frame(width: 32, height: 32)
-                                        .background(Color.gray.opacity(0.1))
-                                        .clipShape(Circle())
-                                })
+                                )
 
                                 VStack {
                                     if updating == node.id {
-                                        ProgressView().progressViewStyle(CircularProgressViewStyle())
-                                            .scaleEffect(0.8)
+                                        ProgressView().progressViewStyle(
+                                            CircularProgressViewStyle()
+                                        )
+                                        .scaleEffect(0.8)
                                     } else {
                                         Text("\(node.quantity)")
                                             .frame(width: 20)
@@ -253,14 +320,16 @@ struct CartLines: View {
                                         ShopifyCheckoutSheetKit.invalidate()
 
                                         _Concurrency.Task {
-                                            let cart = try await CartManager.shared.performCartLinesUpdate(
-                                                id: node.id,
-                                                quantity: node.quantity + 1
-                                            )
+                                            let cart = try await CartManager.shared
+                                                .performCartLinesUpdate(
+                                                    id: node.id,
+                                                    quantity: node.quantity + 1
+                                                )
                                             CartManager.shared.cart = cart
                                             updating = nil
 
-                                            ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
+                                            ShopifyCheckoutSheetKit.preload(
+                                                checkout: cart.checkoutUrl)
                                         }
                                     },
                                     label: {

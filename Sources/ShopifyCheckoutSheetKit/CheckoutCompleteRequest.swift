@@ -22,23 +22,9 @@
  */
 
 import Foundation
+import WebKit
 
-public enum MetaData {
-    /// The version of the `ShopifyCheckoutSheetKit` library.
-    package static let version = "3.4.0-rc.8"
-    /// The schema version of the CheckoutSheetProtocol.
-    package static let schemaVersion = "2025-10"
-
-    /// In time this will be used to track the top level package that is
-    /// making API calls or is the initiator of CSK.
-    /// For now this is exclusive to AcceleratedCheckouts to ensure backwards
-    /// compatibility.
-    public enum EntryPoint: String {
-        case acceleratedCheckouts = "AcceleratedCheckouts"
-    }
-
-    public enum Platform: String {
-        case iOS
-        case reactNative = "ReactNative"
-    }
+/// Request for checkout completion events
+public final class CheckoutCompleteRequest: BaseRPCRequest<CheckoutCompletedEvent, EmptyResponse> {
+    override public static var method: String { "completed" }
 }

@@ -44,6 +44,12 @@ public protocol CheckoutDelegate: AnyObject {
 
     /// Tells te delegate that a Web Pixel event was emitted
     func checkoutDidEmitWebPixelEvent(event: PixelEvent)
+
+    /// Tells the delegate that the checkout is requesting address change intent (e.g., for native address picker)
+    func checkoutDidRequestAddressChange(event: AddressChangeRequested)
+
+    /// Tells the delegate that the checkout is requesting card change intent (e.g., for native card picker)
+    func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested)
 }
 
 extension CheckoutDelegate {
@@ -61,6 +67,14 @@ extension CheckoutDelegate {
 
     public func shouldRecoverFromError(error: CheckoutError) -> Bool {
         return error.isRecoverable
+    }
+
+    public func checkoutDidRequestAddressChange(event _: AddressChangeRequested) {
+        /// No-op by default
+    }
+
+    public func checkoutDidRequestCardChange(event _: CheckoutCardChangeRequested) {
+        /// No-op by default
     }
 
     private func handleUrl(_ url: URL) {

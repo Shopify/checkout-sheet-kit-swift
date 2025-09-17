@@ -256,6 +256,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         CheckoutController.shared?.present(checkout: url)
     }
 
+    public func presentBuyNow(checkoutURL: URL, partner: Partner) {
+        let url = checkoutURL.appending(
+            queryItems: [.init(name: "partner", value: partner.rawValue)]
+        )
+        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: url)
+        let navController = UINavigationController(rootViewController: embeddedCheckout)
+        navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+
+        window?.topMostViewController()?.present(navController, animated: true)
+    }
+
     func navigateTo(_ screen: Screen) {
         if let tabBarVC = window?.rootViewController as? UITabBarController {
             tabBarVC.selectedIndex = screen.rawValue

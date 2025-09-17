@@ -25,15 +25,8 @@ import SwiftUI
 import UIKit
 
 public class CheckoutViewController: UINavigationController {
-    public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: nil)
-        rootViewController.notifyPresented()
-        super.init(rootViewController: rootViewController)
-        presentationController?.delegate = rootViewController
-    }
-
-    package init(checkout url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: entryPoint)
+    public init(checkout url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, options: options)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
@@ -71,9 +64,11 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 
     var checkoutURL: URL
     var delegate = CheckoutDelegateWrapper()
+    var options: CheckoutOptions?
 
-    public init(checkout url: URL) {
+    public init(checkout url: URL, options: CheckoutOptions? = nil) {
         checkoutURL = url
+        self.options = options
 
         /// Programatic usage of the library will invalidate the cache each time the configuration changes.
         /// This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
@@ -81,7 +76,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     }
 
     public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-        return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+        return CheckoutViewController(checkout: checkoutURL, delegate: delegate, options: options)
     }
 
     public func updateUIViewController(_ uiViewController: CheckoutViewController, context _: Self.Context) {
@@ -126,6 +121,16 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
         delegate.onLinkClick = action
         return self
     }
+
+    @discardableResult public func onAddressChangeIntent(_ action: @escaping (AddressChangeRequested) -> Void) -> Self {
+        delegate.onAddressChangeIntent = action
+        return self
+    }
+
+    @discardableResult public func onPaymentChangeIntent(_ action: @escaping (CheckoutCardChangeRequested) -> Void) -> Self {
+        delegate.onPaymentChangeRequested = action
+        return self
+    }
 }
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
@@ -134,6 +139,8 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onFail: ((CheckoutError) -> Void)?
     var onPixelEvent: ((PixelEvent) -> Void)?
     var onLinkClick: ((URL) -> Void)?
+    var onAddressChangeIntent: ((AddressChangeRequested) -> Void)?
+    var onPaymentChangeRequested: ((CheckoutCardChangeRequested) -> Void)?
 
     public func checkoutDidFail(error: CheckoutError) {
         onFail?(error)
@@ -161,6 +168,14 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         }
+    }
+
+    public func checkoutDidRequestAddressChange(event: AddressChangeRequested) {
+        onAddressChangeIntent?(event)
+    }
+
+    public func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested) {
+        onPaymentChangeRequested?(event)
     }
 }
 
