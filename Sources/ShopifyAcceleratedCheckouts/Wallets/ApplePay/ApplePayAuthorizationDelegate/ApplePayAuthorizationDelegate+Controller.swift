@@ -194,8 +194,11 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 let shippingAddress = try pkEncoder.shippingAddress.get()
                 try await upsertShippingAddress(to: shippingAddress, validate: true)
 
-                // Re-apply the selected shipping method after address validation
-                // This is necessary because address updates reset the selected shipping method
+                // TEMPORARY WORKAROUND: Re-apply the selected shipping method after address validation
+                // This is necessary because we're using cartRemoveDeliveryAddress + cartAddDeliveryAddress
+                // instead of cartUpdateDeliveryAddress, which resets the selected shipping method.
+                // Remove this extra request once cartUpdateDeliveryAddress is fixed to preserve
+                // the selected shipping method during address updates.
                 try await reapplySelectedShippingMethod()
 
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
