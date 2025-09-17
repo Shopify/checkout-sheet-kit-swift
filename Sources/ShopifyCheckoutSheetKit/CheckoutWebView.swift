@@ -72,7 +72,7 @@ public class CheckoutWebView: WKWebView {
             return CheckoutWebView(recovery: true, options: options)
         }
 
-        let cacheKey = "\(url.absoluteString)_\(options?.entryPoint?.rawValue ?? "nil")"
+        let cacheKey = "\(url.sanitizedString)_\(options?.entryPoint?.rawValue ?? "nil")"
 
         guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
             OSLogger.shared.debug("Preloading not enabled")
@@ -630,33 +630,5 @@ extension CheckoutWebView {
         var isStale: Bool {
             abs(timestamp.timeIntervalSinceNow) >= timeout
         }
-    }
-}
-
-extension URL {
-    /// Returns a sanitized URL string safe for logging by redacting sensitive authentication data
-    internal var sanitizedString: String {
-        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
-            return absoluteString
-        }
-
-        // Redact authentication value from embed parameter
-        if let embedIndex = components.queryItems?.firstIndex(where: { $0.name == EmbedQueryParamKey.embed }),
-           let embedValue = components.queryItems?[embedIndex].value
-        {
-            let sanitizedEmbed = embedValue
-                .split(separator: ",")
-                .map { field -> String in
-                    if field.starts(with: "\(EmbedFieldKey.authentication)=") {
-                        return "\(EmbedFieldKey.authentication)=\(EmbedFieldValue.redacted)"
-                    }
-                    return String(field)
-                }
-                .joined(separator: ",")
-
-            components.queryItems?[embedIndex] = URLQueryItem(name: EmbedQueryParamKey.embed, value: sanitizedEmbed)
-        }
-
-        return components.url?.absoluteString ?? absoluteString
     }
 }

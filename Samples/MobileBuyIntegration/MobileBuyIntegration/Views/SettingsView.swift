@@ -64,6 +64,24 @@ struct SettingsView: View {
                             ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
                         }
                     Toggle("Prefill buyer information", isOn: $config.useVaultedState)
+
+                    if config.isAuthenticationConfigured {
+                        Toggle("App authentication", isOn: $config.useAppAuthentication)
+                            .onChange(of: config.useAppAuthentication) { newValue in
+                                if newValue {
+                                    // Invalidate cached checkout when enabling authentication
+                                    ShopifyCheckoutSheetKit.invalidate()
+                                }
+                            }
+                    } else {
+                        HStack {
+                            Text("App authentication")
+                            Spacer()
+                            Text("Not configured")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
 
                 Section(header: Text("Universal Links")) {

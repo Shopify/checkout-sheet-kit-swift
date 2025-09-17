@@ -261,7 +261,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     public func presentBuyNow(checkoutURL: URL) {
-        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL)
+        let options = appConfiguration.createCheckoutOptions()
+        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL, options: options)
         let navController = UINavigationController(rootViewController: embeddedCheckout)
         navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
 

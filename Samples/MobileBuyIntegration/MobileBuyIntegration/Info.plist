@@ -28,6 +28,12 @@
 	<string>$(EMAIL)</string>
 	<key>Phone</key>
 	<string>$(PHONE)</string>
+	<key>AppApiKey</key>
+	<string>$(APP_API_KEY)</string>
+	<key>AppSharedSecret</key>
+	<string>$(APP_SHARED_SECRET)</string>
+	<key>AppAccessToken</key>
+	<string>$(APP_ACCESS_TOKEN)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location may be required to locate pickup points near you when you request this shipping option.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
