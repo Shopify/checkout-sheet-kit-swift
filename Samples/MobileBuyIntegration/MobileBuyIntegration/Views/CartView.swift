@@ -112,6 +112,31 @@ struct CartView: View {
                             // Handle checkout failure
                             print("Checkout failed: \(error)")
                         }
+                        .onAddressChangeIntent { event in
+                            print("🎉 SwiftUI: Address change intent received for addressType: \(event.addressType)")
+                            
+                            // Respond with hardcoded address after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                let hardcodedAddress = CartDeliveryAddressInput(
+                                    firstName: "Jane",
+                                    lastName: "Smith", 
+                                    address1: "456 SwiftUI Avenue",
+                                    address2: "Suite 200",
+                                    city: "Vancouver",
+                                    countryCode: "CA",
+                                    phone: "+1-604-555-0456",
+                                    provinceCode: "BC",
+                                    zip: "V6B 1A1"
+                                )
+                                
+                                let addressInput = CartSelectableAddressInput(address: hardcodedAddress)
+                                let delivery = CartDelivery(addresses: [addressInput])
+                                let payload = DeliveryAddressChangePayload(delivery: delivery)
+                                
+                                print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
+                                event.respondWith(result: payload)
+                            }
+                        }
                         .edgesIgnoringSafeArea(.all)
                 }
             }

@@ -32,12 +32,13 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
+    func checkoutViewDidRequestAddressChange(event: CheckoutAddressChangeIntentEvent)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
 private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
-class CheckoutWebView: WKWebView {
+public class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
     var timer: Date?
 
@@ -132,7 +133,7 @@ class CheckoutWebView: WKWebView {
 
     // MARK: Initializers
 
-    init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) {
+    public init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) {
         OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".
@@ -251,7 +252,7 @@ class CheckoutWebView: WKWebView {
 }
 
 extension CheckoutWebView: WKScriptMessageHandler {
-    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
+    public func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         do {
             switch try CheckoutBridge.decode(message) {
             /// Completed event
@@ -288,6 +289,30 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 if let nonOptionalEvent = event {
                     viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
                 }
+            /// Address change intent
+            case let .addressChangeIntent(event):
+                OSLogger.shared.info("Address change intent event received: \(event.addressType)")
+                // Create a new event with proper callbacks that reference this webView
+                let eventWithCallbacks = CheckoutAddressChangeIntentEvent(
+                    addressType: event.addressType,
+                    onResponse: { [weak self] payload in
+                        guard let self = self else {
+                            OSLogger.shared.info("CheckoutWebView deallocated, cannot send address response")
+                            return
+                        }
+                        OSLogger.shared.info("Sending address change response back to web")
+                        CheckoutBridge.sendDeliveryAddressChange(self, payload)
+                    },
+                    onCancel: { [weak self] in
+                        guard let self = self else {
+                            OSLogger.shared.info("CheckoutWebView deallocated, cannot send address cancellation")
+                            return
+                        }
+                        OSLogger.shared.info("Sending address change cancellation back to web")
+                        CheckoutBridge.sendMessage(self, messageName: "deliveryAddressCancel", messageBody: nil)
+                    }
+                )
+                viewDelegate?.checkoutViewDidRequestAddressChange(event: eventWithCallbacks)
             default:
                 ()
             }
@@ -299,7 +324,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 }
 
 extension CheckoutWebView: WKNavigationDelegate {
-    func webView(_: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    public func webView(_: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = action.request.url else {
             decisionHandler(.allow)
             return
@@ -315,7 +340,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         decisionHandler(.allow)
     }
 
-    func webView(_: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+    public func webView(_: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         if let response = navigationResponse.response as? HTTPURLResponse {
             decisionHandler(handleResponse(response))
             return
@@ -382,7 +407,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         return .allow
     }
 
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+    public func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
         timer = Date()
@@ -390,13 +415,13 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     /// No need to emit checkoutDidFail error here as it has been handled in handleResponse already
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
     }
 
-    func webView(_: WKWebView, didFinish _: WKNavigation!) {
+    public func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         viewDelegate?.checkoutViewDidFinishNavigation()
 
         if let startTime = timer {
@@ -421,7 +446,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         timer = nil
     }
 
-    func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
+    public func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         timer = nil
 
         let nsError = error as NSError

@@ -81,6 +81,12 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
             sendMessage(webView, messageName: "instrumentation", messageBody: payload)
         }
     }
+    
+    static func sendDeliveryAddressChange(_ webView: WKWebView, _ addressChangePayload: DeliveryAddressChangePayload) {
+        if let payload = addressChangePayload.toBridgeEvent() {
+            sendMessage(webView, messageName: "deliveryAddressChange", messageBody: payload)
+        }
+    }
 
     static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
         let dispatchMessageBody: String
@@ -133,6 +139,9 @@ extension CheckoutBridge {
 
         /// Eventing
         case webPixels(event: PixelEvent?)
+        
+        /// Address Change Intent
+        case addressChangeIntent(event: CheckoutAddressChangeIntentEvent)
 
         /// Generic
         case unsupported(String)
@@ -173,6 +182,10 @@ extension CheckoutBridge {
                 let webPixelsDecoder = WebPixelsEventDecoder()
                 let event = try webPixelsDecoder.decode(from: container, using: decoder)
                 self = .webPixels(event: event)
+            case "addressChangeIntent":
+                let addressChangeIntentDecoder = CheckoutAddressChangeIntentDecoder()
+                let event = addressChangeIntentDecoder.decode(from: container, using: decoder)
+                self = .addressChangeIntent(event: event)
             default:
                 self = .unsupported(name)
             }
@@ -192,6 +205,12 @@ enum InstrumentationType: String, Codable {
 }
 
 extension InstrumentationPayload {
+    func toBridgeEvent() -> String? {
+        SdkToWebEvent(detail: self).toJson()
+    }
+}
+
+extension DeliveryAddressChangePayload {
     func toBridgeEvent() -> String? {
         SdkToWebEvent(detail: self).toJson()
     }

@@ -24,7 +24,7 @@
 import UIKit
 import WebKit
 
-class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
+public class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
     weak var delegate: CheckoutDelegate?
     var checkoutViewDidFailWithErrorCount = 0
     var checkoutView: CheckoutWebView
@@ -253,6 +253,10 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
         delegate?.checkoutDidEmitWebPixelEvent(event: event)
+    }
+    
+    func checkoutViewDidRequestAddressChange(event: CheckoutAddressChangeIntentEvent) {
+        delegate?.checkoutDidRequestAddressChange(event: event)
     }
 
     private func isRecoverableError() -> Bool {

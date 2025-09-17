@@ -84,4 +84,8 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
         completedEventReceived = event
         didEmitCheckoutCompletedEventExpectation?.fulfill()
     }
+    
+    func checkoutViewDidRequestAddressChange(event: CheckoutAddressChangeIntentEvent) {
+        // Mock implementation - could add expectations here if needed for testing
+    }
 }
