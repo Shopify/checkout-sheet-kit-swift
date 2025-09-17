@@ -89,7 +89,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         /// Branding Logo
         let logoImageView = UIImageView(image: UIImage(named: "logo"))
         logoImageView.contentMode = .scaleAspectFit
-        logoImageView.widthAnchor.constraint(equalToConstant: 90).isActive = true
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            logoImageView.widthAnchor.constraint(lessThanOrEqualToConstant: 90),
+            logoImageView.heightAnchor.constraint(equalToConstant: 44)
+        ])
 
         /// Catalog grid view
         productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
