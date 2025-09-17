@@ -537,7 +537,7 @@ extension CartViewController: CheckoutDelegate {
     func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
         resetCart()
 
-        ShopifyCheckoutSheetKit.configuration.logger.log("Order created: \(event.orderDetails.id)")
+        ShopifyCheckoutSheetKit.configuration.logger.log("Order created: \(event.orderConfirmation.order.id)")
     }
 
     func checkoutDidCancel() {
@@ -547,6 +547,33 @@ extension CartViewController: CheckoutDelegate {
     func checkoutDidClickContactLink(url: URL) {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
+        }
+    }
+
+    func checkoutDidRequestAddressChange(event: AddressChangeRequested) {
+        // Respond with a hardcoded address after 2 seconds to simulate native address picker
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            let hardcodedAddress = CartAddress(
+                firstName: "Alice",
+                lastName: "Johnson",
+                address1: "789 UIKit Boulevard",
+                address2: "Floor 3",
+                city: "Montreal",
+                countryCode: "CA",
+                phone: "+1-514-555-0789",
+                provinceCode: "QC",
+                zip: "H3B 2Y7"
+            )
+
+            let addressInput = CartSelectableAddress(address: hardcodedAddress)
+            let delivery = CartDelivery(addresses: [addressInput])
+            let response = DeliveryAddressChangePayload(delivery: delivery)
+
+            do {
+                try event.respondWith(payload: response)
+            } catch {
+                print("[AddressChangeRequest]: Failed to respondWith ")
+            }
         }
     }
 

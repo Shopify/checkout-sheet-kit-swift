@@ -24,6 +24,7 @@
 import Foundation
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
+import SwiftUI
 
 public final class AppConfiguration: ObservableObject {
     public var storefrontDomain: String = InfoDictionary.shared.domain
@@ -31,7 +32,7 @@ public final class AppConfiguration: ObservableObject {
     @Published public var universalLinks = UniversalLinks()
 
     /// Prefill buyer information
-    @Published public var useVaultedState: Bool = false
+    @AppStorage("useVaultedState") public var useVaultedState: Bool = false
 
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")

@@ -24,8 +24,8 @@
 import UIKit
 import WebKit
 
-class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
-    weak var delegate: CheckoutDelegate?
+public class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
+    public weak var delegate: CheckoutDelegate?
     var checkoutViewDidFailWithErrorCount = 0
     var checkoutView: CheckoutWebView
 
@@ -38,6 +38,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
     var initialNavigation: Bool = true
 
     private let checkoutURL: URL
+    private let options: CheckoutOptions?
 
     private lazy var closeBarButtonItem: UIBarButtonItem = {
         if let closeButtonTintColor = ShopifyCheckoutSheetKit.configuration.closeButtonTintColor {
@@ -61,11 +62,12 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
         checkoutURL = url
         self.delegate = delegate
+        self.options = options
 
-        let checkoutView = CheckoutWebView.for(checkout: url, entryPoint: entryPoint)
+        let checkoutView = CheckoutWebView.for(checkout: url, options: options)
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
         self.checkoutView = checkoutView
@@ -137,7 +139,9 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
         }
     }
 
-    func notifyPresented() {
+    /// Ensures the bridge connects and presented event fires
+    /// Must be called after attaching to hierarchy (viewDidLoad)
+    public func notifyPresented() {
         checkoutView.checkoutDidPresent = true
     }
 
@@ -171,7 +175,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
         progressObserver?.invalidate()
         checkoutView.removeFromSuperview()
 
-        checkoutView = CheckoutWebView.for(checkout: url, recovery: true)
+        checkoutView = CheckoutWebView.for(checkout: url, recovery: true, options: options)
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
         checkoutView.viewDelegate = self
@@ -253,6 +257,14 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
 
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
         delegate?.checkoutDidEmitWebPixelEvent(event: event)
+    }
+
+    func checkoutViewDidRequestAddressChange(event: AddressChangeRequested) {
+        delegate?.checkoutDidRequestAddressChange(event: event)
+    }
+
+    func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested) {
+        delegate?.checkoutDidRequestCardChange(event: event)
     }
 
     private func isRecoverableError() -> Bool {

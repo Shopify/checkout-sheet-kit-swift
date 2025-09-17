@@ -21,24 +21,16 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Foundation
+import UIKit
 
-public enum MetaData {
-    /// The version of the `ShopifyCheckoutSheetKit` library.
-    package static let version = "3.4.0-rc.8"
-    /// The schema version of the CheckoutSheetProtocol.
-    package static let schemaVersion = "2025-10"
-
-    /// In time this will be used to track the top level package that is
-    /// making API calls or is the initiator of CSK.
-    /// For now this is exclusive to AcceleratedCheckouts to ensure backwards
-    /// compatibility.
-    public enum EntryPoint: String {
-        case acceleratedCheckouts = "AcceleratedCheckouts"
-    }
-
-    public enum Platform: String {
-        case iOS
-        case reactNative = "ReactNative"
+extension UIView {
+    func addSubviewPinnedToEdges(of other: UIView) {
+        addSubview(other)
+        NSLayoutConstraint.activate([
+            topAnchor.constraint(equalTo: other.topAnchor),
+            leadingAnchor.constraint(equalTo: other.leadingAnchor),
+            trailingAnchor.constraint(equalTo: other.trailingAnchor),
+            bottomAnchor.constraint(equalTo: other.bottomAnchor)
+        ])
     }
 }

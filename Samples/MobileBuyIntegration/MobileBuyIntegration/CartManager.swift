@@ -252,6 +252,36 @@ class CartManager: ObservableObject {
         cart = nil
         isDirty = false
     }
+
+    static func createBuyNowCart(variantId: GraphQL.ID) async throws -> Storefront.Cart {
+        let input = StorefrontInputFactory.shared.createCartInput([variantId])
+
+        let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
+            $0.cartCreate(input: input) {
+                $0.cart { $0.cartManagerFragment() }
+                    .userErrors { $0.code().message() }
+            }
+        }
+
+        do {
+            guard let payload = try await StorefrontClient.shared.executeAsync(mutation: mutation).cartCreate
+            else { throw CartManager.Errors.payloadUnwrap }
+
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
+                throw Errors.invariant(message: "cart returned nil")
+            }
+
+            return cart
+        } catch {
+            throw Errors.apiErrors(requestName: "createBuyNowCart", message: "\(error)")
+        }
+    }
 }
 
 extension CartManager {

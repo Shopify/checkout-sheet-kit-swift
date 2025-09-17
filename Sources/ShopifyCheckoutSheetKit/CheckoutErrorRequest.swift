@@ -21,52 +21,26 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import WebKit
 
-class MockNavigationAction: WKNavigationAction {
-    private let mockRequest: URLRequest
-    private let mockTargetFrame: WKFrameInfo?
+/// Parameters for error events - array of error events
+public struct CheckoutErrorParams: Decodable {
+    public let errors: [CheckoutErrorEvent]
 
-    override var request: URLRequest {
-        return mockRequest
-    }
-
-    override var targetFrame: WKFrameInfo? {
-        return mockTargetFrame
-    }
-
-    init(url: URL, targetFrame: WKFrameInfo? = MockMainFrameInfo()) {
-        mockRequest = URLRequest(url: url)
-        mockTargetFrame = targetFrame
-        super.init()
+    public init(from decoder: Decoder) throws {
+        // The params is an array directly
+        let container = try decoder.singleValueContainer()
+        errors = try container.decode([CheckoutErrorEvent].self)
     }
 }
 
-class MockExternalNavigationAction: WKNavigationAction {
-    private let mockRequest: URLRequest
-    private let navType: WKNavigationType
+/// Request for checkout error events
+public final class CheckoutErrorRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse> {
+    override public static var method: String { "error" }
 
-    override var request: URLRequest {
-        return mockRequest
-    }
-
-    override var navigationType: WKNavigationType {
-        return navType
-    }
-
-    override var targetFrame: WKFrameInfo? {
-        return nil
-    }
-
-    init(url: URL, navigationType: WKNavigationType = .linkActivated) {
-        mockRequest = URLRequest(url: url)
-        navType = navigationType
-        super.init()
-    }
-}
-
-private final class MockMainFrameInfo: WKFrameInfo {
-    override var isMainFrame: Bool {
-        true
+    /// Convenience getter to access the first error
+    public var firstError: CheckoutErrorEvent? {
+        return params.errors.first
     }
 }

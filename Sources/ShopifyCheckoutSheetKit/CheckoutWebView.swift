@@ -32,12 +32,14 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
+    func checkoutViewDidRequestAddressChange(event: AddressChangeRequested)
+    func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
 private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
-class CheckoutWebView: WKWebView {
+public class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
     var timer: Date?
 
@@ -62,23 +64,23 @@ class CheckoutWebView: WKWebView {
         return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
     }
 
-    static func `for`(checkout url: URL, recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) -> CheckoutWebView {
-        OSLogger.shared.debug("Creating webview for URL: \(url.absoluteString), recovery: \(recovery)")
+    static func `for`(checkout url: URL, recovery: Bool = false, options: CheckoutOptions? = nil) -> CheckoutWebView {
+        OSLogger.shared.debug("Creating webview for URL: \(url.sanitizedString), recovery: \(recovery)")
 
         if recovery {
             CheckoutWebView.invalidate()
-            return CheckoutWebView(recovery: true, entryPoint: entryPoint)
+            return CheckoutWebView(recovery: true, options: options)
         }
 
-        let cacheKey = "\(url.absoluteString)_\(entryPoint?.rawValue ?? "nil")"
+        let cacheKey = "\(url.absoluteString)_\(options?.entryPoint?.rawValue ?? "nil")"
 
         guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
             OSLogger.shared.debug("Preloading not enabled")
-            return uncacheableView(entryPoint: entryPoint)
+            return uncacheableView(options: options)
         }
 
         guard let cache, cacheKey == cache.key, !cache.isStale else {
-            let view = CheckoutWebView(entryPoint: entryPoint)
+            let view = CheckoutWebView(options: options)
             CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
             return view
         }
@@ -87,9 +89,9 @@ class CheckoutWebView: WKWebView {
         return cache.view
     }
 
-    static func uncacheableView(entryPoint: MetaData.EntryPoint? = nil) -> CheckoutWebView {
+    static func uncacheableView(options: CheckoutOptions? = nil) -> CheckoutWebView {
         uncacheableViewRef?.detachBridge()
-        let view = CheckoutWebView(entryPoint: entryPoint)
+        let view = CheckoutWebView(options: options)
         uncacheableViewRef = view
         return view
     }
@@ -128,24 +130,23 @@ class CheckoutWebView: WKWebView {
 
     var isPreloadRequest: Bool = false
 
-    private var entryPoint: MetaData.EntryPoint?
+    private var options: CheckoutOptions?
 
     // MARK: Initializers
 
-    init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) {
+    public init(
+        frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(),
+        recovery: Bool = false, options: CheckoutOptions? = nil
+    ) {
         OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".
         configuration.allowsInlineMediaPlayback = true
-        self.entryPoint = entryPoint
+        self.options = options
 
         if recovery {
             /// Uses a non-persistent, private cookie store to avoid cross-instance pollution
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-            configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent(entryPoint: entryPoint)
-        } else {
-            /// Set the User-Agent in non-recovery view
-            configuration.applicationNameForUserAgent = CheckoutBridge.applicationName(entryPoint: entryPoint)
         }
 
         isRecovery = recovery
@@ -215,7 +216,8 @@ class CheckoutWebView: WKWebView {
 
             if let url = change.newValue as? URL {
                 if CheckoutURL(from: url).isConfirmationPage() {
-                    self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
+                    self.viewDelegate?.checkoutViewDidCompleteCheckout(
+                        event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
                     navigationObserver?.invalidate()
                 }
             }
@@ -230,13 +232,16 @@ class CheckoutWebView: WKWebView {
     // MARK: -
 
     func load(checkout url: URL, isPreload: Bool = false) {
-        OSLogger.shared.info("Loading checkout URL: \(url.absoluteString), isPreload: \(isPreload)")
-        var request = URLRequest(url: url)
+        OSLogger.shared.info("Loading checkout URL: \(url.sanitizedString), isPreload: \(isPreload)")
+        var request = URLRequest(
+            url: url.withEmbedParam(isRecovery: isRecovery, entryPoint: options?.entryPoint, options: options))
 
         if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
             request.setValue("prefetch", forHTTPHeaderField: "Shopify-Purpose")
         }
+
+        // request.setValue("09-12-amazon-poc-native-address-book", forHTTPHeaderField: "Shopify-Checkout-Preview")
 
         load(request)
     }
@@ -251,63 +256,120 @@ class CheckoutWebView: WKWebView {
 }
 
 extension CheckoutWebView: WKScriptMessageHandler {
-    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
+    public func userContentController(
+        _: WKUserContentController, didReceive message: WKScriptMessage
+    ) {
+        guard let viewDelegate else { return }
+
         do {
-            switch try CheckoutBridge.decode(message) {
-            /// Completed event
-            case let .checkoutComplete(checkoutCompletedEvent):
+            let request = try CheckoutBridge.decode(message)
+
+            switch request {
+            case let completeRequest as CheckoutCompleteRequest:
                 OSLogger.shared.info("Checkout completed event received")
-                viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
-            /// Error: Checkout unavailable
-            case let .checkoutUnavailable(message, code):
-                OSLogger.shared.error("Checkout unavailable error received: \(message ?? "No message"), code: \(code)")
-                viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
-                        message: message ?? "Checkout unavailable.",
-                        code: CheckoutUnavailable.clientError(code: code),
-                        recoverable: true
-                    )
+                viewDelegate.checkoutViewDidCompleteCheckout(event: completeRequest.params)
+
+            case let modalRequest as CheckoutModalToggledRequest:
+                viewDelegate.checkoutViewDidToggleModal(
+                    modalVisible: modalRequest.params.modalVisible
                 )
-            /// Error: Storefront not configured properly
-            case let .configurationError(message, code):
-                OSLogger.shared.error("Configuration error received: \(message ?? "No message"), code: \(code)")
-                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
-                    message: message ?? "Storefront configuration error.",
+
+            case let pixelsRequest as WebPixelsRequest:
+                guard let event = pixelsRequest.pixelEvent else { return }
+                viewDelegate.checkoutViewDidEmitWebPixelEvent(event: event)
+
+            case let addressRequest as AddressChangeRequested:
+                OSLogger.shared.info(
+                    "Address change intent event received: \(addressRequest.params.addressType)"
+                )
+                viewDelegate.checkoutViewDidRequestAddressChange(event: addressRequest)
+
+            case let cardRequest as CheckoutCardChangeRequested:
+                OSLogger.shared.info(
+                    "Card change intent event received"
+                )
+                viewDelegate.checkoutViewDidRequestCardChange(event: cardRequest)
+
+            case let errorRequest as CheckoutErrorRequest:
+                handleCheckoutError(errorRequest)
+
+            // Ignore unsupported requests
+            case is UnsupportedRequest:
+                OSLogger.shared.debug("Unsupported request: \(String(describing: request.id))")
+
+            default:
+                OSLogger.shared.debug(
+                    "Unknown request type received \(String(describing: request.id))"
+                )
+            }
+        } catch {
+            OSLogger.shared.error(
+                "[CheckoutWebView]: Failed to decode event: \(error.localizedDescription)"
+            )
+            viewDelegate.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+        }
+    }
+
+    fileprivate func handleCheckoutError(_ errorRequest: CheckoutErrorRequest) {
+        guard let viewDelegate else { return }
+        guard let error = errorRequest.firstError else { return }
+        let code = CheckoutErrorCode.from(error.code)
+
+        switch error.group {
+        case .configuration:
+            OSLogger.shared.error(
+                "Configuration error received: \(error.reason ?? "No message"), code: \(code)"
+            )
+            viewDelegate.checkoutViewDidFailWithError(
+                error: .checkoutUnavailable(
+                    message: error.reason ?? "Storefront configuration error.",
                     code: CheckoutUnavailable.clientError(code: code),
                     recoverable: false
                 ))
-            /// Error: Checkout expired
-            case let .checkoutExpired(message, code):
-                OSLogger.shared.info("Checkout expired error received: \(message ?? "No message"), code: \(code)")
-                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: code))
-            /// Checkout modal toggled
-            case let .checkoutModalToggled(modalVisible):
-                viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
-            /// Checkout web pixel event
-            case let .webPixels(event):
-                if let nonOptionalEvent = event {
-                    viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
-                }
-            default:
-                ()
-            }
-        } catch {
-            OSLogger.shared.error("Error decoding bridge script message: \(error.localizedDescription)")
-            viewDelegate?.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+        case .unrecoverable:
+            OSLogger.shared.error(
+                "Checkout unavailable error received: \(error.reason ?? "No message"), code: \(code)"
+            )
+            viewDelegate.checkoutViewDidFailWithError(
+                error: .checkoutUnavailable(
+                    message: error.reason ?? "Checkout unavailable.",
+                    code: CheckoutUnavailable.clientError(code: code),
+                    recoverable: true
+                )
+            )
+        case .expired:
+            OSLogger.shared.info(
+                "Checkout expired error received: \(error.reason ?? "No message"), code: \(code)"
+            )
+            viewDelegate.checkoutViewDidFailWithError(
+                error: .checkoutExpired(
+                    message: error.reason ?? "Checkout has expired.", code: code
+                ))
+        default:
+            OSLogger.shared.error("Unknown error group received: \(error.group)")
         }
     }
 }
 
 extension CheckoutWebView: WKNavigationDelegate {
-    func webView(_: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    public func webView(
+        _: WKWebView, decidePolicyFor action: WKNavigationAction,
+        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+    ) {
         guard let url = action.request.url else {
             decisionHandler(.allow)
             return
         }
 
         if isExternalLink(action) || CheckoutURL(from: url).isDeepLink() {
-            OSLogger.shared.debug("External or deep link clicked: \(url.absoluteString) - request intercepted")
+            OSLogger.shared.debug(
+                "External or deep link clicked: \(url.sanitizedString) - request intercepted")
             viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
+            decisionHandler(.cancel)
+            return
+        }
+
+        if handleEmbedParamIfNeeded(for: action, url: url) {
             decisionHandler(.cancel)
             return
         }
@@ -315,7 +377,10 @@ extension CheckoutWebView: WKNavigationDelegate {
         decisionHandler(.allow)
     }
 
-    func webView(_: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+    public func webView(
+        _: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
+        decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+    ) {
         if let response = navigationResponse.response as? HTTPURLResponse {
             decisionHandler(handleResponse(response))
             return
@@ -339,33 +404,52 @@ extension CheckoutWebView: WKNavigationDelegate {
             /// Invalidate cache for any sort of error
             CheckoutWebView.invalidate()
 
-            OSLogger.shared.debug("Handling response for URL: \(response.url?.absoluteString ?? "unknown URL"), status code: \(statusCode)")
+            OSLogger.shared.debug(
+                "Handling response for URL: \(response.url?.sanitizedString ?? "unknown URL"), status code: \(statusCode)"
+            )
 
             switch statusCode {
             case 401:
                 OSLogger.shared.debug("Unauthorized access (401)")
-                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: errorMessageForStatusCode, code: CheckoutUnavailable.httpError(statusCode: statusCode), recoverable: false))
-            case 404:
-                OSLogger.shared.debug("Not found (404)")
-                if let reason = headers[deprecatedReasonHeader] as? String, reason.lowercased() == checkoutLiquidNotSupportedReason {
-                    viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
-                } else {
-                    viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
+                viewDelegate?.checkoutViewDidFailWithError(
+                    error: .checkoutUnavailable(
                         message: errorMessageForStatusCode,
                         code: CheckoutUnavailable.httpError(statusCode: statusCode),
                         recoverable: false
                     ))
+            case 404:
+                OSLogger.shared.debug("Not found (404)")
+                if let reason = headers[deprecatedReasonHeader] as? String,
+                   reason.lowercased() == checkoutLiquidNotSupportedReason
+                {
+                    viewDelegate?.checkoutViewDidFailWithError(
+                        error: .configurationError(
+                            message:
+                            "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
+                            code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false
+                        ))
+                } else {
+                    viewDelegate?.checkoutViewDidFailWithError(
+                        error: .checkoutUnavailable(
+                            message: errorMessageForStatusCode,
+                            code: CheckoutUnavailable.httpError(statusCode: statusCode),
+                            recoverable: false
+                        ))
                 }
             case 410:
                 OSLogger.shared.debug("Gone (410)")
-                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired))
+                viewDelegate?.checkoutViewDidFailWithError(
+                    error: .checkoutExpired(
+                        message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired
+                    ))
             case 500 ... 599:
                 OSLogger.shared.debug("Server error (5xx)")
-                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
-                    message: errorMessageForStatusCode,
-                    code: CheckoutUnavailable.httpError(statusCode: statusCode),
-                    recoverable: allowRecoverable
-                ))
+                viewDelegate?.checkoutViewDidFailWithError(
+                    error: .checkoutUnavailable(
+                        message: errorMessageForStatusCode,
+                        code: CheckoutUnavailable.httpError(statusCode: statusCode),
+                        recoverable: allowRecoverable
+                    ))
             default:
                 OSLogger.shared.debug("\(statusCode) error received")
                 viewDelegate?.checkoutViewDidFailWithError(
@@ -382,21 +466,24 @@ extension CheckoutWebView: WKNavigationDelegate {
         return .allow
     }
 
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
-        let url = webView.url?.absoluteString ?? ""
+    public func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+        let url = webView.url?.sanitizedString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
         timer = Date()
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
     /// No need to emit checkoutDidFail error here as it has been handled in handleResponse already
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
-        let url = webView.url?.absoluteString ?? ""
-        OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
+    public func webView(
+        _ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error
+    ) {
+        let url = webView.url?.sanitizedString ?? ""
+        OSLogger.shared.debug(
+            "Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
     }
 
-    func webView(_: WKWebView, didFinish _: WKNavigation!) {
+    public func webView(_: WKWebView, didFinish _: WKNavigation!) {
         viewDelegate?.checkoutViewDidFinishNavigation()
 
         if let startTime = timer {
@@ -421,12 +508,14 @@ extension CheckoutWebView: WKNavigationDelegate {
         timer = nil
     }
 
-    func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
+    public func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         timer = nil
 
         let nsError = error as NSError
 
-        OSLogger.shared.debug("WebView navigation failed with error: description:\(nsError.localizedDescription) domain:\(nsError.domain) code:\(nsError.code)")
+        OSLogger.shared.debug(
+            "WebView navigation failed with error: description:\(nsError.localizedDescription) domain:\(nsError.domain) code:\(nsError.code)"
+        )
 
         /// Ignore cancelled redirects
         if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
@@ -445,9 +534,14 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         guard let url = action.request.url else { return false }
-        guard let url = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+        guard let url = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return false
+        }
 
-        guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?.value else { return false }
+        guard
+            let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?
+            .value
+        else { return false }
 
         return openExternally.lowercased() == "true" || openExternally == "1"
     }
@@ -456,8 +550,34 @@ extension CheckoutWebView: WKNavigationDelegate {
         guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return url
         }
-        urlComponents.queryItems = urlComponents.queryItems?.filter { !($0.name == "open_externally") }
+        urlComponents.queryItems = urlComponents.queryItems?.filter {
+            !($0.name == "open_externally")
+        }
         return urlComponents.url ?? url
+    }
+
+    private func handleEmbedParamIfNeeded(for action: WKNavigationAction, url: URL) -> Bool {
+        guard
+            let scheme = url.scheme?.lowercased(),
+            scheme == "http" || scheme == "https"
+        else {
+            return false
+        }
+
+        guard action.targetsMainFrame,
+              url.needsEmbedUpdate(isRecovery: isRecovery, entryPoint: options?.entryPoint, options: options)
+        else {
+            return false
+        }
+
+        var updatedRequest = action.request
+        updatedRequest.url = url.withEmbedParam(
+            isRecovery: isRecovery,
+            entryPoint: options?.entryPoint,
+            options: options
+        )
+        load(updatedRequest)
+        return true
     }
 
     private func isCheckout(url: URL?) -> Bool {
@@ -479,6 +599,20 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 }
 
+extension WKNavigationAction {
+    fileprivate var targetsMainFrame: Bool {
+        if let targetFrame {
+            return targetFrame.isMainFrame
+        }
+
+        if let mainDocumentURL = request.mainDocumentURL {
+            return mainDocumentURL == request.url
+        }
+
+        return true
+    }
+}
+
 extension CheckoutWebView {
     fileprivate struct CacheEntry {
         let key: String
@@ -492,5 +626,33 @@ extension CheckoutWebView {
         var isStale: Bool {
             abs(timestamp.timeIntervalSinceNow) >= timeout
         }
+    }
+}
+
+extension URL {
+    /// Returns a sanitized URL string safe for logging by redacting sensitive authentication data
+    internal var sanitizedString: String {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            return absoluteString
+        }
+
+        // Redact authentication value from embed parameter
+        if let embedIndex = components.queryItems?.firstIndex(where: { $0.name == EmbedQueryParamKey.embed }),
+           let embedValue = components.queryItems?[embedIndex].value
+        {
+            let sanitizedEmbed = embedValue
+                .split(separator: ",")
+                .map { field -> String in
+                    if field.starts(with: "\(EmbedFieldKey.authentication)=") {
+                        return "\(EmbedFieldKey.authentication)=\(EmbedFieldValue.redacted)"
+                    }
+                    return String(field)
+                }
+                .joined(separator: ",")
+
+            components.queryItems?[embedIndex] = URLQueryItem(name: EmbedQueryParamKey.embed, value: sanitizedEmbed)
+        }
+
+        return components.url?.absoluteString ?? absoluteString
     }
 }
