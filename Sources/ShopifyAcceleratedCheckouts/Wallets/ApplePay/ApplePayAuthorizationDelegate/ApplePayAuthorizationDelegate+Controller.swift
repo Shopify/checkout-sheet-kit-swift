@@ -192,14 +192,16 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             if try pkDecoder.isShippingRequired() {
                 let shippingAddress = try pkEncoder.shippingAddress.get()
-                try await upsertShippingAddress(to: shippingAddress, validate: true)
+                let cart = try await upsertShippingAddress(to: shippingAddress, validate: true)
 
-                // TEMPORARY WORKAROUND: Re-apply the selected shipping method after address validation
-                // This is necessary because we're using cartRemoveDeliveryAddress + cartAddDeliveryAddress
-                // instead of cartUpdateDeliveryAddress, which resets the selected shipping method.
-                // Remove this extra request once cartUpdateDeliveryAddress is fixed to preserve
-                // the selected shipping method during address updates.
-                try await reapplySelectedShippingMethod()
+                // TEMPORARY WORKAROUND: Re-apply the selected shipping method after upserting the address
+                // This is necessary because we're using cartDeliveryAddressesRemove + cartDeliveryAddressesAdd
+                // instead of cartDeliveryAddressesUpdate, which resets the selected shipping method.
+                // We only reapply if the selected shipping method has actually changed.
+                // Remove this once this issue has been resolved: https://github.com/shop/issues-fulfillment/issues/2476
+                if shouldReapplyShippingMethod(cart: cart) {
+                    try await reapplySelectedShippingMethod()
+                }
 
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
@@ -253,6 +255,30 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
         controller.dismiss {
             Task { try? await self.transition(to: .completed) }
+        }
+    }
+
+    internal func shouldReapplyShippingMethod(cart: StorefrontAPI.Cart?) -> Bool {
+        // Check if we have a selected shipping method to reapply
+        guard let selectedDeliveryOptionHandle = try? pkEncoder.selectedDeliveryOptionHandle.get() else {
+            return false
+        }
+
+        // Check if the cart already has the correct shipping method selected
+        guard let cart else {
+            // If we can't determine the cart state, reapply to be safe
+            return true
+        }
+
+        let deliveryGroups = cart.deliveryGroups.nodes
+        guard !deliveryGroups.isEmpty else {
+            // If we can't determine the cart state, reapply to be safe
+            return true
+        }
+
+        // Use contains instead of manual loop for better performance
+        return !deliveryGroups.contains { group in
+            group.selectedDeliveryOption?.handle == selectedDeliveryOptionHandle.rawValue
         }
     }
 
