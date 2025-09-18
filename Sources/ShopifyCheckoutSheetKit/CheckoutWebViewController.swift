@@ -137,7 +137,7 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
         }
     }
 
-    func notifyPresented() {
+    public func notifyPresented() {
         checkoutView.checkoutDidPresent = true
     }
 
