@@ -91,6 +91,7 @@ public protocol RespondableEvent {
 }
 
 public class CheckoutAddressChangeIntentEvent: RespondableEvent {
+    public let id: String = UUID().uuidString
     public let addressType: String
     private let onResponse: (DeliveryAddressChangePayload) -> Void
     private let onCancel: () -> Void
