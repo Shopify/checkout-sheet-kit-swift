@@ -690,6 +690,17 @@
         }
       }
     },
+    "errors.unsupported.country" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shipping to this country is not available through Apple Pay"
+          }
+        }
+      }
+    },
     "errors.url.first_name" : {
       "extractionState" : "manual",
       "localizations" : {

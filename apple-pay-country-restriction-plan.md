@@ -211,3 +211,125 @@ let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
     // supportedShippingCountries omitted = all countries allowed
 )
 ```
+
+## Enhanced Implementation Plan
+
+### 📋 Overview
+
+Implement configurable country restrictions for Apple Pay shipping addresses to handle merchant-specific limitations while maintaining backward compatibility.
+
+### 🎯 Implementation Steps
+
+#### Phase 1: Core Configuration (ApplePayConfiguration.swift)
+
+1. **Add `supportedShippingCountries` property** to `ApplePayConfiguration` class
+
+   - Type: `Set<String>?` for O(1) lookup performance
+   - Default: `nil` (all countries allowed - backward compatible)
+   - Store ISO 3166-1 alpha-2 country codes
+
+2. **Update initializer** with new parameter (default nil)
+
+3. **Update copy initializer** in `ApplePayConfiguration`
+
+4. **No changes needed** to `ApplePayConfigurationWrapper` (automatically passes through)
+
+#### Phase 2: Country Validation Logic
+
+1. **Leverage existing country code infrastructure** in PKEncoder
+
+   - Use existing `mapToCountryCode()` for normalization
+   - Reuse `US_TERRITORY_COUNTRY_CODES` and `FallbackCountryCodes` mappings
+
+2. **Update `didSelectShippingContact` method** in ApplePayAuthorizationDelegate+Controller.swift:
+
+   - Add validation after line 41 (after clearing selected shipping method)
+   - Use PKEncoder's existing country normalization
+   - Return specific error for unsupported countries
+
+3. **Create localized error message** in ValidationErrors:
+   ```swift
+   static var shippingCountryNotSupported: Error {
+       PKPaymentRequest.paymentShippingAddressUnserviceableError(
+           withLocalizedDescription: "Shipping to this country is not available through Apple Pay. Please use standard checkout."
+       )
+   }
+   ```
+
+#### Phase 3: Testing Strategy
+
+1. **Unit Tests** for ApplePayAuthorizationDelegateControllerTests:
+
+   - Test country validation with restrictions enabled
+   - Test backward compatibility (nil/empty set)
+   - Test US territory handling
+   - Test error message presentation
+   - Test state preservation on country change
+
+2. **Test Cases**:
+   - `test_didSelectShippingContact_withSupportedCountry_shouldProceed`
+   - `test_didSelectShippingContact_withUnsupportedCountry_shouldShowError`
+   - `test_didSelectShippingContact_withNoRestrictions_shouldAllowAll`
+   - `test_didSelectShippingContact_withUSTerritory_shouldNormalizeCorrectly`
+
+#### Phase 4: Sample App Updates
+
+1. **Update CheckoutViewController** with example configuration
+2. **Add toggle UI** for testing different country restriction scenarios
+3. **Document configuration examples** in sample app
+
+#### Phase 5: Documentation & Analytics
+
+1. **API Documentation**:
+
+   - Add comprehensive documentation to `supportedShippingCountries` property
+   - Include examples for common merchant scenarios
+
+2. **Migration Guide**:
+
+   - Document that existing integrations are unaffected (nil = all countries)
+   - Provide clear upgrade path examples
+
+3. **Analytics Tracking** (future consideration):
+   - Log when users encounter country restrictions
+   - Track fallback to standard checkout
+
+### 🔍 Key Implementation Details
+
+#### Country Code Normalization
+
+- Leverage existing PKEncoder's `mapToCountryCode()` method
+- Handles US territories (PR, VI, GU, MP, AS, UM) correctly
+- Maps fallback codes (e.g., UK → GB, ZZ for unknown)
+
+#### Error Handling
+
+- Use existing `ValidationErrors` structure
+- Maintain consistent error presentation with other validation errors
+- Clear, actionable error messages directing to standard checkout
+
+#### Performance Considerations
+
+- Use `Set<String>` for O(1) country lookup
+- Validation occurs only once per address selection
+- No additional API calls required
+
+### 🧪 Testing Approach
+
+1. Run tests with: `DEV_NO_AUTO_UPDATE=1 /opt/dev/bin/dev test Tests/ShopifyAcceleratedCheckoutsTests/Wallets/ApplePay/ApplePayAuthorizationDelegate/ApplePayAuthorizationDelegateControllerTests.swift`
+2. Type check with: `DEV_NO_AUTO_UPDATE=1 /opt/dev/bin/dev type-check Sources/ShopifyAcceleratedCheckouts/Wallets/ApplePay/ApplePayConfiguration.swift`
+
+### 🚀 Rollout Strategy
+
+1. **Phase 1**: Deploy configuration changes (backward compatible)
+2. **Phase 2**: Enable for test merchants
+3. **Phase 3**: Gradual rollout with monitoring
+4. **Phase 4**: Full release with documentation
+
+### ✅ Success Criteria
+
+- Zero impact on existing integrations
+- Clear error messaging for restricted countries
+- Comprehensive test coverage
+- Performance within existing SLAs
+- Smooth merchant adoption path

@@ -68,5 +68,12 @@ extension ApplePayAuthorizationDelegate {
                 withLocalizedDescription: "Invalid shipping address"
             )
         }
+
+        static var shippingCountryNotSupported: Error {
+            PKPaymentRequest.paymentShippingAddressInvalidError(
+                withKey: "country",
+                localizedDescription: "errors.unsupported.country".localizedString
+            )
+        }
     }
 }
