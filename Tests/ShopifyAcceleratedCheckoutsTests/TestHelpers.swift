@@ -127,11 +127,13 @@ extension ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     }
 
     static func testConfiguration(
-        merchantIdentifier: String = "merchant.test.id"
+        merchantIdentifier: String = "merchant.test.id",
+        supportedShippingCountries: Set<String>? = nil
     ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
         return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
             merchantIdentifier: merchantIdentifier,
-            contactFields: [.email, .phone]
+            contactFields: [.email, .phone],
+            supportedShippingCountries: supportedShippingCountries
         )
     }
 }

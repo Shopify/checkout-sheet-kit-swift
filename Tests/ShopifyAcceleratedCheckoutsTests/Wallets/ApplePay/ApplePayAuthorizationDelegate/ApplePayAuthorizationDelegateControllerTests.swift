@@ -138,6 +138,123 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result)
     }
 
+    func test_didSelectShippingContact_withUnsupportedCountry_shouldReturnError() async throws {
+        // Configure with only US as supported country
+        let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration.testConfiguration(supportedShippingCountries: ["US"])
+        let configWithRestriction = ApplePayConfigurationWrapper.testConfiguration(applePay: applePayConfig)
+        delegate = ApplePayAuthorizationDelegate(
+            configuration: configWithRestriction,
+            controller: mockController,
+            clock: MockClock()
+        )
+        try delegate.setCart(to: mockController.cart)
+
+        // Create contact with France (FR) as the country
+        let contact = PKContact()
+        let address = CNMutablePostalAddress()
+        address.street = "123 Rue de Test"
+        address.city = "Paris"
+        address.state = ""
+        address.postalCode = "75001"
+        address.isoCountryCode = "FR"
+        contact.postalAddress = address
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingContact: contact
+        )
+
+        XCTAssertNotNil(result, "Should return a result for unsupported country")
+        XCTAssertNotNil(result.errors, "Should have errors for unsupported country")
+        XCTAssertFalse(result.errors?.isEmpty ?? true, "Should have at least one error")
+        // PKPaymentError errors maintain success status to keep the sheet open for user correction
+        XCTAssertEqual(result.status, .success, "Should return success status with PKPaymentError for user correction")
+
+        // Verify the error is specifically about country validation
+        if let firstError = result.errors?.first as? NSError {
+            XCTAssertEqual(firstError.domain, PKPaymentErrorDomain, "Error should be a PKPaymentError")
+            // The error code for shipping address invalid is 2 (PKPaymentError.Code.shippingContactInvalidError)
+            XCTAssertEqual(firstError.code, PKPaymentError.Code.shippingContactInvalidError.rawValue, "Should be shipping contact invalid error")
+        } else {
+            XCTFail("Expected to find an error in the result, but errors array was empty or nil")
+        }
+    }
+
+    func test_didSelectShippingContact_withSupportedCountry_shouldProceed() async throws {
+        // Configure with US and CA as supported countries
+        let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration.testConfiguration(supportedShippingCountries: ["US", "CA"])
+        let configWithRestriction = ApplePayConfigurationWrapper.testConfiguration(applePay: applePayConfig)
+        delegate = ApplePayAuthorizationDelegate(
+            configuration: configWithRestriction,
+            controller: mockController,
+            clock: MockClock()
+        )
+        try delegate.setCart(to: mockController.cart)
+
+        // Create contact with US as the country (which is in the supported list)
+        let contact = PKContact()
+        let address = CNMutablePostalAddress()
+        address.street = "123 Main Street"
+        address.city = "San Francisco"
+        address.state = "CA"
+        address.postalCode = "94102"
+        address.isoCountryCode = "US"
+        contact.postalAddress = address
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingContact: contact
+        )
+
+        XCTAssertNotNil(result, "Should return a result for supported country")
+        if let errors = result.errors, !errors.isEmpty {
+            // Verify we don't have the country not supported error
+            let errorMessages = errors.compactMap { ($0 as NSError).localizedDescription }
+            XCTAssertFalse(
+                errorMessages.contains { $0.contains("country") || $0.contains("Country") },
+                "Should not have country-related errors for supported country"
+            )
+        }
+        XCTAssertNotNil(result.shippingMethods, "Should have shipping methods")
+    }
+
+    func test_didSelectShippingContact_withNoRestrictions_shouldAllowAll() async throws {
+        // Configure without country restrictions (nil or empty array)
+        let configNoRestrictions = ApplePayConfigurationWrapper.testConfiguration()
+        delegate = ApplePayAuthorizationDelegate(
+            configuration: configNoRestrictions,
+            controller: mockController,
+            clock: MockClock()
+        )
+        try delegate.setCart(to: mockController.cart)
+
+        // Create contact with any country (e.g., Japan/JP)
+        let contact = PKContact()
+        let address = CNMutablePostalAddress()
+        address.street = "1-1 Shibuya"
+        address.city = "Tokyo"
+        address.state = "Tokyo"
+        address.postalCode = "150-0002"
+        address.isoCountryCode = "JP"
+        contact.postalAddress = address
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingContact: contact
+        )
+
+        XCTAssertNotNil(result, "Should return a result when no restrictions")
+        if let errors = result.errors, !errors.isEmpty {
+            // Verify we don't have the country not supported error
+            let errorMessages = errors.compactMap { ($0 as NSError).localizedDescription }
+            XCTAssertFalse(
+                errorMessages.contains { $0.contains("country") || $0.contains("Country") },
+                "Should not have country-related errors when no restrictions"
+            )
+        }
+        XCTAssertNotNil(result.shippingMethods, "Should have shipping methods")
+    }
+
     // MARK: - upsertShippingAddress Strategy Tests
 
     func test_upsertShippingAddress_withExistingAddressID_shouldFollowRemoveThenAddStrategy() async throws {
