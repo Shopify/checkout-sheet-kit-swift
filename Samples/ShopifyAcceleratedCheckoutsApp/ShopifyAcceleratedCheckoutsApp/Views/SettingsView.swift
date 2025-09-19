@@ -159,11 +159,11 @@ struct SettingsView: View {
 struct CountrySelectionView: View {
     @Binding var supportedCountriesString: String
     @State private var searchText = ""
-    
+
     private var selectedCountries: Set<String> {
         Set(supportedCountriesString.split(separator: ",").map { String($0) }.filter { !$0.isEmpty })
     }
-    
+
     private func toggleCountry(_ code: String) {
         var countries = selectedCountries
         if countries.contains(code) {
@@ -173,7 +173,7 @@ struct CountrySelectionView: View {
         }
         supportedCountriesString = countries.joined(separator: ",")
     }
-    
+
     // Create an array of all country codes with their display names
     private static let allCountries: [(code: String, name: String)] = [
         ("US", "United States"),
@@ -391,18 +391,18 @@ struct CountrySelectionView: View {
         ("MO", "Macau"),
         ("BZ", "Belize")
     ].sorted { $0.name < $1.name }
-    
+
     private var filteredCountries: [(code: String, name: String)] {
         if searchText.isEmpty {
             return Self.allCountries
         } else {
             return Self.allCountries.filter { country in
                 country.name.localizedCaseInsensitiveContains(searchText) ||
-                country.code.localizedCaseInsensitiveContains(searchText)
+                    country.code.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
-    
+
     var body: some View {
         List {
             Section {
@@ -417,7 +417,7 @@ struct CountrySelectionView: View {
                     .foregroundColor(.red)
                 }
             }
-            
+
             Section("Countries") {
                 ForEach(filteredCountries, id: \.code) { country in
                     HStack {
