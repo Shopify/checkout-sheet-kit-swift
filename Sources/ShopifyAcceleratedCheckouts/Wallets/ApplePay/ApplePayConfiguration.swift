@@ -63,12 +63,12 @@ extension ShopifyAcceleratedCheckouts {
         /// Countries supported for Apple Pay shipping addresses.
         ///
         /// This property allows merchants to restrict which countries are available for
-        /// shipping addresses during the Apple Pay checkout flow. This is useful when
-        /// Apple Pay-specific limitations exist that are separate from general shipping capabilities.
+        /// shipping addresses during the Apple Pay checkout flow. Uses ISO 3166-1 alpha-2
+        /// country codes (e.g., "US", "CA", "GB").
         ///
-        /// - Note: Set of ISO 3166-1 alpha-2 country codes (e.g., "US", "CA", "GB")
-        /// - Note: When nil or empty, all countries are allowed (backward compatible)
-        /// - Note: This restriction is separate from the merchant's general shipping capabilities
+        /// When nil or empty, all countries are allowed, maintaining backward compatibility.
+        ///
+        /// - Note: This restriction is separate from the merchant's general shipping capabilities.
         public let supportedShippingCountries: Set<String>?
 
         /// Creates a new Apple Pay configuration.
@@ -76,9 +76,8 @@ extension ShopifyAcceleratedCheckouts {
         /// - Parameters:
         ///   - merchantIdentifier: The merchant identifier registered with Apple.
         ///   - contactFields: Contact information fields to require from the customer.
-        ///   - supportedShippingCountries: Optional set of ISO 3166-1 alpha-2 country codes
-        ///                                 to restrict shipping addresses. When nil or empty,
-        ///                                 all countries are allowed (default behavior).
+        ///   - supportedShippingCountries: Optional set of ISO 3166-1 alpha-2 country codes to restrict
+        ///                                 shipping addresses. Defaults to nil (all countries allowed).
         /// - Note: Supported payment networks are automatically determined based on the
         ///         merchant's accepted card brands configuration in Shopify.
         public init(
