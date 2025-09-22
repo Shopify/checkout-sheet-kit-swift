@@ -32,6 +32,7 @@ enum AppStorageKeys: String {
     case logLevel
     case email
     case phone
+    case supportedCountries
 }
 
 struct SettingsView: View {
@@ -46,12 +47,21 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageKeys.email.rawValue) var email: String = ""
     @AppStorage(AppStorageKeys.phone.rawValue) var phone: String = ""
+    @AppStorage(AppStorageKeys.supportedCountries.rawValue) var supportedCountriesString: String = ""
 
     private let availableLocales: [(name: String, isoCode: String)] = [
         ("English", "en"),
         ("English (US)", "en-US"),
         ("French", "fr-FR")
     ]
+
+    private var selectedCountries: Set<String> {
+        Set(supportedCountriesString.split(separator: ",").map { String($0) }.filter { !$0.isEmpty })
+    }
+
+    private func isCountrySelected(_ code: String) -> Bool {
+        selectedCountries.contains(code)
+    }
 
     var body: some View {
         Form {
@@ -122,8 +132,102 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+
+            Section("Apple Pay Shipping Countries") {
+                Text("Select countries where Apple Pay shipping is supported. Leave empty to allow all countries.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                if !selectedCountries.isEmpty {
+                    Text("Selected: \(selectedCountries.joined(separator: ", "))")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                }
+
+                NavigationLink("Select Countries (\(selectedCountries.count) selected)") {
+                    CountrySelectionView(
+                        supportedCountriesString: $supportedCountriesString
+                    )
+                }
+            }
         }
         .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct CountrySelectionView: View {
+    @Binding var supportedCountriesString: String
+    @State private var searchText = ""
+
+    private var selectedCountries: Set<String> {
+        Set(supportedCountriesString.split(separator: ",").map { String($0) }.filter { !$0.isEmpty })
+    }
+
+    private func toggleCountry(_ code: String) {
+        var countries = selectedCountries
+        if countries.contains(code) {
+            countries.remove(code)
+        } else {
+            countries.insert(code)
+        }
+        supportedCountriesString = countries.joined(separator: ",")
+    }
+
+    // Dynamically generate all country codes with their display names
+    private static let allCountries: [(code: String, name: String)] = {
+        let locale = Locale(identifier: "en_US")
+
+        return NSLocale.isoCountryCodes.compactMap { code in
+            locale.localizedString(forRegionCode: code).map { (code: code, name: $0) }
+        }.sorted { $0.name < $1.name }
+    }()
+
+    private var filteredCountries: [(code: String, name: String)] {
+        if searchText.isEmpty {
+            return Self.allCountries
+        } else {
+            return Self.allCountries.filter { country in
+                country.name.localizedCaseInsensitiveContains(searchText) ||
+                    country.code.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+
+    var body: some View {
+        List {
+            Section {
+                if selectedCountries.isEmpty {
+                    Text("No countries selected - All countries allowed")
+                        .foregroundColor(.secondary)
+                        .italic()
+                } else {
+                    Button("Clear All") {
+                        supportedCountriesString = ""
+                    }
+                    .foregroundColor(.red)
+                }
+            }
+
+            Section("Countries") {
+                ForEach(filteredCountries, id: \.code) { country in
+                    HStack {
+                        Text("\(country.name) (\(country.code))")
+                        Spacer()
+                        if selectedCountries.contains(country.code) {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        toggleCountry(country.code)
+                    }
+                }
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search countries")
+        .navigationTitle("Select Countries")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

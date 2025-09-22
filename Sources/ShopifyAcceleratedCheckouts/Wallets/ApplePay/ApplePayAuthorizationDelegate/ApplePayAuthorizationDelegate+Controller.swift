@@ -40,6 +40,18 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         pkEncoder.selectedShippingMethod = nil
         pkDecoder.selectedShippingMethod = nil
 
+        // Validate country if restrictions are configured
+        if let supportedCountries = configuration.applePay.supportedShippingCountries,
+           !supportedCountries.isEmpty
+        {
+            let contactCountryCode = contact.postalAddress?.isoCountryCode
+            let normalizedCountry = pkEncoder.mapToCountryCode(code: contactCountryCode)
+
+            if !supportedCountries.contains(normalizedCountry) {
+                return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.shippingCountryNotSupported(supportedCountries: supportedCountries)])
+            }
+        }
+
         do {
             let cartID = try pkEncoder.cartID.get()
 

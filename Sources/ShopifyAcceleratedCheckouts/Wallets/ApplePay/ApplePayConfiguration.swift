@@ -60,24 +60,40 @@ extension ShopifyAcceleratedCheckouts {
         ///         For shops requiring customer accounts, include `.email` in the array.
         public let contactFields: [RequiredContactFields]
 
+        /// Countries supported for Apple Pay shipping addresses.
+        ///
+        /// This property allows merchants to restrict which countries are available for
+        /// shipping addresses during the Apple Pay checkout flow. Uses ISO 3166-1 alpha-2
+        /// country codes (e.g., "US", "CA", "GB").
+        ///
+        /// When nil or empty, all countries are allowed.
+        ///
+        /// - Note: This restriction is separate from the merchant's general shipping capabilities.
+        public let supportedShippingCountries: Set<String>?
+
         /// Creates a new Apple Pay configuration.
         ///
         /// - Parameters:
         ///   - merchantIdentifier: The merchant identifier registered with Apple.
         ///   - contactFields: Contact information fields to require from the customer.
+        ///   - supportedShippingCountries: Optional set of ISO 3166-1 alpha-2 country codes to restrict
+        ///                                 shipping addresses. Defaults to nil (all countries allowed).
         /// - Note: Supported payment networks are automatically determined based on the
         ///         merchant's accepted card brands configuration in Shopify.
         public init(
             merchantIdentifier: String,
-            contactFields: [RequiredContactFields]
+            contactFields: [RequiredContactFields],
+            supportedShippingCountries: Set<String>? = nil
         ) {
             self.merchantIdentifier = merchantIdentifier
             self.contactFields = contactFields
+            self.supportedShippingCountries = supportedShippingCountries
         }
 
         package required init(copy: ApplePayConfiguration) {
             merchantIdentifier = copy.merchantIdentifier
             contactFields = copy.contactFields
+            supportedShippingCountries = copy.supportedShippingCountries
         }
     }
 }

@@ -33,6 +33,7 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     @AppStorage(AppStorageKeys.logLevel.rawValue) var logLevel: LogLevel = .all
     @AppStorage(AppStorageKeys.email.rawValue) var email: String = ""
     @AppStorage(AppStorageKeys.phone.rawValue) var phone: String = ""
+    @AppStorage(AppStorageKeys.supportedCountries.rawValue) var supportedCountriesString: String = ""
 
     var configuration: ShopifyAcceleratedCheckouts.Configuration {
         .init(
@@ -46,7 +47,12 @@ struct ShopifyAcceleratedCheckoutsApp: App {
     }
 
     var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration {
-        createApplePayConfiguration(requireEmail: requireEmail, requirePhone: requirePhone)
+        let countries = supportedCountriesString.isEmpty ? nil : Set(supportedCountriesString.split(separator: ",").map { String($0) })
+        return createApplePayConfiguration(
+            requireEmail: requireEmail,
+            requirePhone: requirePhone,
+            supportedCountries: countries
+        )
     }
 
     var body: some Scene {
@@ -58,7 +64,7 @@ struct ShopifyAcceleratedCheckoutsApp: App {
                             SettingsButton()
                         }
                     }
-                    .id("\(requireEmail)-\(requirePhone)")
+                    .id("\(requireEmail)-\(requirePhone)-\(supportedCountriesString)")
                     .onChange(of: email) { _ in updateConfiguration() }
                     .onChange(of: phone) { _ in updateConfiguration() }
             }
@@ -81,7 +87,8 @@ struct ShopifyAcceleratedCheckoutsApp: App {
 
 private func createApplePayConfiguration(
     requireEmail: Bool,
-    requirePhone: Bool
+    requirePhone: Bool,
+    supportedCountries: Set<String>?
 ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
 
@@ -90,6 +97,7 @@ private func createApplePayConfiguration(
 
     return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
         merchantIdentifier: "merchant.com.shopify.example.ShopifyAcceleratedCheckoutsApp",
-        contactFields: fields
+        contactFields: fields,
+        supportedShippingCountries: supportedCountries
     )
 }
