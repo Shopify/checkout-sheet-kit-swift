@@ -285,7 +285,6 @@ extension StorefrontAPI {
 
         // Temporarily skipping this check due to cart bug where cartSelectedDeliveryOptionsUpdate
         // is wrongly returning PendingTerms causing cart:nil despite successfully setting deliveryOption
-        // See: https://github.com/shop/issues-fulfillment/issues/2594
         // let cart = try validateCart(payload.cart, requestName: "cartSelectedDeliveryOptionsUpdate")
 
         try validateUserErrors(payload.userErrors, checkoutURL: payload.cart?.checkoutUrl.url)

@@ -96,7 +96,6 @@ class PKDecoder {
         return paymentRequest
     }
 
-    // https://github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/map-to-apple-pay-line-items.ts
     var paymentSummaryItems: [PKPaymentSummaryItem] {
         return PassKitFactory.shared.mapToApplePayLineItems(
             cart: cart(),
@@ -105,14 +104,12 @@ class PKDecoder {
         )
     }
 
-    // https:github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/map-to-apple-pay-shipping-methods.ts
     var shippingMethods: [PKShippingMethod] {
         PassKitFactory.shared.createShippingMethods(
             deliveryGroups: cart()?.deliveryGroups.nodes
         )
     }
 
-    //        https:github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/get-discount-allocations-for-line-items.ts
     var discountAllocations: [PassKitFactory.DiscountAllocationInfo] {
         do {
             return try PassKitFactory.shared.createDiscountAllocations(
@@ -186,7 +183,6 @@ class PKDecoder {
         .postalAddress
     ]
 
-    // https://github.com/shop/world/blob/db694ab60e8e23ad2d1c6e9e1d2491f3d48ecde0/areas/clients/checkout-web/app/utilities/wallets/hooks/index.ts#L106
     var requiredContactFields: Set<PKContactField> {
         var fields: Set<PKContactField> = []
 
@@ -229,7 +225,6 @@ class PKDecoder {
             buyerIdentity?.phone
     }
 
-    /// https://github.com/Shopify/portable-wallets/blob/85f2f8ec83d801d2b93e405aa71237fb7316c838/src/components/AcceleratedCheckout/AcceleratedCheckout.ts#L450
     func isShippingRequired() throws -> Bool {
         guard let cart = cart() else {
             throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")

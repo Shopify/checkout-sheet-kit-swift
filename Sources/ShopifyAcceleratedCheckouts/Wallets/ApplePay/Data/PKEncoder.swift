@@ -62,7 +62,6 @@ class PKEncoder {
     ]
 
     /// Provides valid, corresponding CountryCode for known but invalid country codes
-    /// See https://github.com/Shopify/checkout-web/pull/28334
     static let FallbackCountryCodes: [String: String] = [
         "UK": "GB",
         "JA": "JP",
@@ -190,7 +189,6 @@ class PKEncoder {
     }
 
     /// Apple's countryCode conforms to ISO-3166 used in our API but in lower case
-    /// https://github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/map-to-address.ts#L63
     func mapToCountryCode(code: String?) -> String {
         guard let code, !code.isEmpty else { return "ZZ" }
 
@@ -206,8 +204,6 @@ class PKEncoder {
 
     /// Apple trims half of the zip exclusively for GB/Canada
     /// https://developer.apple.com/documentation/applepayontheweb/applepaysession/onshippingcontactselected
-    /// checkout-web pads the postal code to ensure that deliveryGroups are returned when no flat rates
-    /// https://github.com/shop/world/blob/01066aec0ab38cc4c14ece1a00eceef6cfa162ef/areas/clients/checkout-web/app/utilities/wallets/helpers.ts#L175-L188
     func addPaddingToPostalCode(for postalCode: String?, in country: String) -> String? {
         guard let postalCode, !postalCode.isEmpty else { return nil }
         return switch country {
@@ -231,7 +227,6 @@ class PKEncoder {
         )
 
         // HK does not have postal codes. Apple Pay puts Region in postalCode
-        // See: https://github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/map-to-address.ts#L17
         var (zip, province): (String?, String?) =
             switch country {
             case "HK": (nil, paddedZipCode)
@@ -244,7 +239,6 @@ class PKEncoder {
                 )
             }
 
-        // https://github.com/Shopify/portable-wallets/blob/69bcad21de759cc191f86b38a8a12ecee18e3b6e/src/components/ApplePayButton/helpers/map-to-address.ts#L42
         if PKEncoder.US_TERRITORY_COUNTRY_CODES[postalAddress.country] != nil {
             province = postalAddress.country
         }
@@ -257,7 +251,6 @@ class PKEncoder {
         /// desktop and >=16.2 iOS), but it's still possible to add addresses without a last name in the Apple Wallet
         /// settings
         /// This lines up with what we do for Google Pay & Meta Pay when only a single name is provided
-        /// See: https://github.com/Shopify/core-issues/issues/53587
         let lastName: String? = {
             let familyName = contact?.name?.familyName
             if let familyName, !familyName.isEmpty { return familyName }

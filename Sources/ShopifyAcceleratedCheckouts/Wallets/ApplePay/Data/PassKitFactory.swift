@@ -57,8 +57,6 @@ class PassKitFactory {
     /// - deliveryGroups: An array of `Storefront.CartDeliveryGroup` to generate shipping methods from.
     ///
     /// - Returns: An array of `PKShippingMethod` representing all possible shipping combinations.
-    ///
-    /// See: https://github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/map-to-apple-pay-shipping-methods.ts
     func createShippingMethods(
         deliveryGroups: [StorefrontAPI.CartDeliveryGroup]?
     ) -> [PKShippingMethod] {
@@ -136,8 +134,6 @@ class PassKitFactory {
     /// - Parameter cart: The cart to get discount allocations from
     /// - Returns: An array of DiscountAllocationInfo representing all discounts
     /// - Throws: ShopifyAcceleratedCheckouts.Error if cart is nil
-    ///
-    /// See: https://github.com/Shopify/portable-wallets/blob/main/src/components/ApplePayButton/helpers/get-discount-allocations-for-line-items.ts
     func createDiscountAllocations(cart: StorefrontAPI.Cart?) throws
         -> [DiscountAllocationInfo]
     {
@@ -297,7 +293,6 @@ class PassKitFactory {
         var lineItems: [PKPaymentSummaryItem] = []
 
         // 1. Subtotal (sum of all line items before discounts)
-        // https://github.com/Shopify/portable-wallets/blob/main/src/utils/get-subtotal-from-line-items.ts#L17
         let subtotal = getSubtotalFromLineItems(cart: cart)
 
         if subtotal > 0 {
