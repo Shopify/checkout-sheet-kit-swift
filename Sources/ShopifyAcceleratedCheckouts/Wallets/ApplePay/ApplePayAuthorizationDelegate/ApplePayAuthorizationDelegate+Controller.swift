@@ -198,7 +198,6 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 // This is necessary because we're using cartDeliveryAddressesRemove + cartDeliveryAddressesAdd
                 // instead of cartDeliveryAddressesUpdate, which resets the selected shipping method.
                 // We only reapply if the selected shipping method has actually changed.
-                // Remove this once this issue has been resolved: https://github.com/shop/issues-fulfillment/issues/2476
                 if shouldReapplyShippingMethod(cart: cart) {
                     try await reapplySelectedShippingMethod()
                 }

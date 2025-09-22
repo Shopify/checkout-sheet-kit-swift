@@ -45,7 +45,7 @@ class ErrorHandler {
             case .notEnoughStock: "wallet_not_enough_stock"
             case .other: nil
             case .unhandled: nil
-            // These are handled in checkout-web by default
+            // These are handled in checkout by default
             case .cartThrottled: nil
             case .outOfStock: nil
             }
