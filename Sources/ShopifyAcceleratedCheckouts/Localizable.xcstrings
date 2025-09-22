@@ -690,13 +690,24 @@
         }
       }
     },
-    "errors.unsupported.country" : {
+    "errors.unsupported.country.list" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shipping to this country is not available through Apple Pay"
+            "value" : "Apple Pay is only available in select countries: %@"
+          }
+        }
+      }
+    },
+    "errors.unsupported.country.list.with.others" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Pay is only available in select countries: %@ and others"
           }
         }
       }

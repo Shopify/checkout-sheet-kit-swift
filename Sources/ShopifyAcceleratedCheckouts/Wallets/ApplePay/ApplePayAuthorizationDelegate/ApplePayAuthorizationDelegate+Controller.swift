@@ -48,7 +48,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let normalizedCountry = pkEncoder.mapToCountryCode(code: contactCountryCode)
 
             if !supportedCountries.contains(normalizedCountry) {
-                return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.shippingCountryNotSupported])
+                return pkDecoder.paymentRequestShippingContactUpdate(errors: [ValidationErrors.shippingCountryNotSupported(supportedCountries: supportedCountries)])
             }
         }
 

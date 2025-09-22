@@ -255,6 +255,86 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result.shippingMethods, "Should have shipping methods")
     }
 
+    // MARK: - Country List Error Message Tests
+
+    func test_shippingCountryNotSupported_withShortList_shouldShowFullList() async throws {
+        // Configure with a small set of countries that fits in 128 chars
+        let supportedCountries = Set(["US", "CA", "GB", "FR"])
+        let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration.testConfiguration(supportedShippingCountries: supportedCountries)
+        let config = ApplePayConfigurationWrapper.testConfiguration(applePay: applePayConfig)
+        delegate = ApplePayAuthorizationDelegate(
+            configuration: config,
+            controller: mockController,
+            clock: MockClock()
+        )
+        try delegate.setCart(to: mockController.cart)
+
+        // Create contact with unsupported country
+        let contact = PKContact()
+        let address = CNMutablePostalAddress()
+        address.isoCountryCode = "JP"
+        contact.postalAddress = address
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingContact: contact
+        )
+
+        // Verify error message contains full list
+        if let firstError = result.errors?.first as? NSError {
+            let message = firstError.localizedDescription
+            XCTAssertTrue(message.contains("CA"), "Should include CA in list")
+            XCTAssertTrue(message.contains("FR"), "Should include FR in list")
+            XCTAssertTrue(message.contains("GB"), "Should include GB in list")
+            XCTAssertTrue(message.contains("US"), "Should include US in list")
+            XCTAssertFalse(message.contains("and others"), "Should not truncate short list")
+            XCTAssertLessThanOrEqual(message.count, 128, "Message should respect 128 char guideline")
+        } else {
+            XCTFail("Expected error for unsupported country")
+        }
+    }
+
+    func test_shippingCountryNotSupported_withLongList_shouldTruncateWithOthers() async throws {
+        // Configure with many countries that exceed 128 chars
+        let supportedCountries = Set([
+            "US", "CA", "GB", "FR", "DE", "IT", "ES", "PT", "NL", "BE",
+            "CH", "AT", "SE", "NO", "DK", "FI", "PL", "CZ", "HU", "RO",
+            "BG", "HR", "SI", "SK", "EE", "LV", "LT", "IE", "LU", "MT"
+        ])
+        let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration.testConfiguration(supportedShippingCountries: supportedCountries)
+        let config = ApplePayConfigurationWrapper.testConfiguration(applePay: applePayConfig)
+        delegate = ApplePayAuthorizationDelegate(
+            configuration: config,
+            controller: mockController,
+            clock: MockClock()
+        )
+        try delegate.setCart(to: mockController.cart)
+
+        // Create contact with unsupported country
+        let contact = PKContact()
+        let address = CNMutablePostalAddress()
+        address.isoCountryCode = "JP"
+        contact.postalAddress = address
+
+        let result = await delegate.paymentAuthorizationController(
+            PKPaymentAuthorizationController(paymentRequest: .testPaymentRequest),
+            didSelectShippingContact: contact
+        )
+
+        // Verify error message is truncated with "and others"
+        if let firstError = result.errors?.first as? NSError {
+            let message = firstError.localizedDescription
+            XCTAssertTrue(message.contains("and others"), "Should truncate long list with 'and others'")
+            XCTAssertLessThanOrEqual(message.count, 128, "Message should respect 128 char guideline")
+            // Should include at least some countries (alphabetically first ones)
+            XCTAssertTrue(message.contains("AT") || message.contains("BE"), "Should include some countries")
+            // Should NOT include all countries
+            XCTAssertFalse(message.contains("MT") && message.contains("SK") && message.contains("SI"), "Should not include all countries")
+        } else {
+            XCTFail("Expected error for unsupported country")
+        }
+    }
+
     // MARK: - upsertShippingAddress Strategy Tests
 
     func test_upsertShippingAddress_withExistingAddressID_shouldFollowRemoveThenAddStrategy() async throws {
