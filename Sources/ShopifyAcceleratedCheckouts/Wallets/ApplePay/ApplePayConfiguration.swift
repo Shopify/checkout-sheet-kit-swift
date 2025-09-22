@@ -66,7 +66,7 @@ extension ShopifyAcceleratedCheckouts {
         /// shipping addresses during the Apple Pay checkout flow. Uses ISO 3166-1 alpha-2
         /// country codes (e.g., "US", "CA", "GB").
         ///
-        /// When nil or empty, all countries are allowed, maintaining backward compatibility.
+        /// When nil or empty, all countries are allowed.
         ///
         /// - Note: This restriction is separate from the merchant's general shipping capabilities.
         public let supportedShippingCountries: Set<String>?
