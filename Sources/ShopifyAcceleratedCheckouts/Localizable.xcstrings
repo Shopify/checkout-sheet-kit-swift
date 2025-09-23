@@ -74,6 +74,12 @@
             "state": "translated",
             "value": "地址行不得包含表情符號"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresregel mag geen emoji's bevatten."
+          }
         }
       }
     },
@@ -138,6 +144,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "地址第二行不得包含表情符號"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweede adresregel mag geen emoji's bevatten."
           }
         }
       }
@@ -204,6 +216,12 @@
             "state": "translated",
             "value": "城市不得包含表情符號"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plaats mag geen emoji's bevatten."
+          }
         }
       }
     },
@@ -268,6 +286,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "名字不得包含表情符號"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voornaam mag geen emoji's bevatten"
           }
         }
       }
@@ -334,6 +358,12 @@
             "state": "translated",
             "value": "姓氏不得包含表情符號"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Achternaam mag geen emoji's bevatten"
+          }
         }
       }
     },
@@ -398,6 +428,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "郵政/郵遞區號不得包含表情符號"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Postcode mag geen emoji's bevatten."
           }
         }
       }
@@ -464,6 +500,12 @@
             "state": "translated",
             "value": "地址行不得包含 HTML 標籤"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresregel mag geen HTML-tags bevatten."
+          }
         }
       }
     },
@@ -528,6 +570,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "地址第二行不得包含 HTML 標籤"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweede adresregel mag geen HTML-tags bevatten."
           }
         }
       }
@@ -594,6 +642,12 @@
             "state": "translated",
             "value": "城市不得包含 HTML 標籤"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plaats mag geen HTML-tags bevatten."
+          }
         }
       }
     },
@@ -658,6 +712,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "名字不得包含 HTML 標籤"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voornaam mag geen HTML-tags bevatten."
           }
         }
       }
@@ -724,6 +784,12 @@
             "state": "translated",
             "value": "姓氏不得包含 HTML 標籤"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Achternaam mag geen HTML-tags bevatten."
+          }
         }
       }
     },
@@ -788,6 +854,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入有效的地址"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldig adres in."
           }
         }
       }
@@ -854,6 +926,12 @@
             "state": "translated",
             "value": "輸入有效的公寓、套房等。"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldig appartement- of suitenummer, enz. in."
+          }
         }
       }
     },
@@ -918,6 +996,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "請輸入有效的城市"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldige plaatsnaam in."
           }
         }
       }
@@ -984,6 +1068,12 @@
             "state": "translated",
             "value": "輸入有效的電子郵件"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldig e-mailadres in."
+          }
         }
       }
     },
@@ -1048,6 +1138,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "請輸入有效的大公國"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldig emiraat in"
           }
         }
       }
@@ -1114,6 +1210,12 @@
             "state": "translated",
             "value": "請輸入有效的名字"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldige voornaam in."
+          }
         }
       }
     },
@@ -1178,6 +1280,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入有效的姓氏"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldige achternaam in."
           }
         }
       }
@@ -1244,6 +1352,12 @@
             "state": "translated",
             "value": "請輸入有效的電話號碼"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldig telefoonnummer in"
+          }
         }
       }
     },
@@ -1308,6 +1422,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入有效的郵遞區號"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een geldige ZIP- of postcode in."
           }
         }
       }
@@ -1374,6 +1494,12 @@
             "state": "translated",
             "value": "選取有效的州/省"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecteer een geldige staat/provincie."
+          }
         }
       }
     },
@@ -1438,6 +1564,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入地址"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een adres in."
           }
         }
       }
@@ -1504,6 +1636,12 @@
             "state": "translated",
             "value": "輸入公寓、套房等"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een appartement- of suitenummer in, etc."
+          }
         }
       }
     },
@@ -1568,6 +1706,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入城市"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een plaatsnaam in."
           }
         }
       }
@@ -1634,6 +1778,12 @@
             "state": "translated",
             "value": "選取國家/地區"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecteer een land"
+          }
         }
       }
     },
@@ -1698,6 +1848,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "請輸入電子郵件地址"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een e-mailadres in."
           }
         }
       }
@@ -1764,6 +1920,12 @@
             "state": "translated",
             "value": "請輸入大公國"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een emiraat in"
+          }
         }
       }
     },
@@ -1828,6 +1990,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入名字"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een voornaam in."
           }
         }
       }
@@ -1894,6 +2062,12 @@
             "state": "translated",
             "value": "輸入姓氏"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een achternaam in."
+          }
         }
       }
     },
@@ -1958,6 +2132,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入電話號碼"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een telefoonnummer in."
           }
         }
       }
@@ -2024,6 +2204,12 @@
             "state": "translated",
             "value": "輸入郵遞區號"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voer een ZIP- of postcode in."
+          }
         }
       }
     },
@@ -2088,6 +2274,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "選取州/省"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecteer een staat/provincie."
           }
         }
       }
@@ -2154,6 +2346,12 @@
             "state": "translated",
             "value": "地址行過長"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresregel is te lang"
+          }
         }
       }
     },
@@ -2218,6 +2416,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "地址第二行過長"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweede adresregel is te lang"
           }
         }
       }
@@ -2284,6 +2488,12 @@
             "state": "translated",
             "value": "城市過長"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plaats is te lang"
+          }
         }
       }
     },
@@ -2349,6 +2559,12 @@
             "state": "translated",
             "value": "名字過長"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voornaam is te lang"
+          }
         }
       }
     },
@@ -2413,6 +2629,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "姓氏過長"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Achternaam is te lang"
           }
         }
       }
@@ -2501,6 +2723,12 @@
             "state": "translated",
             "value": "名字不得包含網址"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voornaam mag geen URL bevatten."
+          }
         }
       }
     },
@@ -2565,6 +2793,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "姓氏不得包含網址"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Achternaam mag geen URL bevatten."
           }
         }
       }
@@ -2631,6 +2865,12 @@
             "state": "translated",
             "value": "折扣"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Korting"
+          }
         }
       }
     },
@@ -2695,6 +2935,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "關稅"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Douanerechten"
           }
         }
       }
@@ -2761,6 +3007,12 @@
             "state": "translated",
             "value": "運送"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verzending"
+          }
         }
       }
     },
@@ -2825,6 +3077,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "運送 (一次性購買)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verzenden (eenmalige aankoop)"
           }
         }
       }
@@ -2891,6 +3149,12 @@
             "state": "translated",
             "value": "運送 (訂閱)"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verzenden (abonnement)"
+          }
         }
       }
     },
@@ -2956,6 +3220,12 @@
             "state": "translated",
             "value": "小計"
           }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtotaal"
+          }
         }
       }
     },
@@ -3020,6 +3290,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "稅金"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Btw"
           }
         }
       }
