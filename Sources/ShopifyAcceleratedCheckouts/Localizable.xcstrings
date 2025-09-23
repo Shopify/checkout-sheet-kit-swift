@@ -20,6 +20,12 @@
             "state" : "translated",
             "value" : "Address line cannot contain emojis"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La ligne d’adresse ne peut pas contenir d’emojis"
+          }
         }
       }
     },
@@ -30,6 +36,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Second address line cannot contain emojis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La deuxième ligne d’adresse ne peut pas contenir d’emojis"
           }
         }
       }
@@ -42,6 +54,12 @@
             "state" : "translated",
             "value" : "City cannot contain emojis"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La ville ne peut pas contenir d’emojis"
+          }
         }
       }
     },
@@ -52,6 +70,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "First name cannot contain emojis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le prénom ne peut pas contenir d’emojis"
           }
         }
       }
@@ -64,6 +88,12 @@
             "state" : "translated",
             "value" : "Last name cannot contain emojis"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom ne peut pas contenir d’emojis"
+          }
         }
       }
     },
@@ -74,6 +104,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Postal code/zip cannot contain emojis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le code postal ne peut pas contenir d’emojis"
           }
         }
       }
@@ -86,6 +122,12 @@
             "state" : "translated",
             "value" : "Address line cannot contain HTML tags"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La ligne d’adresse ne peut pas contenir de balises HTML"
+          }
         }
       }
     },
@@ -96,6 +138,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Second address line cannot contain HTML tags"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La deuxième ligne d’adresse ne peut pas contenir de balises HTML"
           }
         }
       }
@@ -108,6 +156,12 @@
             "state" : "translated",
             "value" : "City cannot contain HTML tags"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La ville ne peut pas contenir de balises HTML"
+          }
         }
       }
     },
@@ -118,6 +172,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "First name cannot contain HTML tags"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le prénom ne peut pas contenir de balises HTML"
           }
         }
       }
@@ -130,6 +190,12 @@
             "state" : "translated",
             "value" : "Last name cannot contain HTML tags"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom ne peut pas contenir de balises HTML"
+          }
         }
       }
     },
@@ -140,6 +206,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a valid address"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir une adresse valide"
           }
         }
       }
@@ -152,6 +224,12 @@
             "state" : "translated",
             "value" : "Enter a valid apartment, suite, etc."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrez un numéro d’appartement, de suite, etc. valide"
+          }
         }
       }
     },
@@ -162,6 +240,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a valid city"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir une ville valide"
           }
         }
       }
@@ -174,6 +258,12 @@
             "state" : "translated",
             "value" : "Enter a valid email"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir une adresse e-mail valide"
+          }
         }
       }
     },
@@ -184,6 +274,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a valid emirate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un émirat valide"
           }
         }
       }
@@ -196,6 +292,12 @@
             "state" : "translated",
             "value" : "Enter a valid first name"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez saisir un prénom valide"
+          }
         }
       }
     },
@@ -206,6 +308,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a valid last name"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un nom valide"
           }
         }
       }
@@ -218,6 +326,12 @@
             "state" : "translated",
             "value" : "Enter a valid phone number"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un numéro de téléphone valide"
+          }
         }
       }
     },
@@ -228,6 +342,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a valid zip / postal code"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un code postal valide"
           }
         }
       }
@@ -240,6 +360,12 @@
             "state" : "translated",
             "value" : "Select a valid state / province"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un État/une province valide"
+          }
         }
       }
     },
@@ -250,6 +376,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter an address"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir une adresse"
           }
         }
       }
@@ -262,6 +394,12 @@
             "state" : "translated",
             "value" : "Enter an apartment, suite, etc."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un numéro d’appartement, de suite, etc."
+          }
         }
       }
     },
@@ -272,6 +410,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a city"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrez une ville"
           }
         }
       }
@@ -284,6 +428,12 @@
             "state" : "translated",
             "value" : "Select a country"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner un pays"
+          }
         }
       }
     },
@@ -294,6 +444,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter an email address"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez une adresse e-mail"
           }
         }
       }
@@ -306,6 +462,12 @@
             "state" : "translated",
             "value" : "Enter an emirate"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un émirat"
+          }
         }
       }
     },
@@ -316,6 +478,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a first name"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un prénom"
           }
         }
       }
@@ -328,6 +496,12 @@
             "state" : "translated",
             "value" : "Enter a last name"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un nom"
+          }
         }
       }
     },
@@ -338,6 +512,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a phone number"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir un numéro de téléphone"
           }
         }
       }
@@ -350,6 +530,12 @@
             "state" : "translated",
             "value" : "Enter a ZIP / postal code"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un code postal"
+          }
         }
       }
     },
@@ -360,6 +546,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select a state / province"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un État/une province"
           }
         }
       }
@@ -372,6 +564,12 @@
             "state" : "translated",
             "value" : "Address line is too long"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La ligne d’adresse est trop longue"
+          }
         }
       }
     },
@@ -382,6 +580,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Second address line is too long"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deuxième ligne d’adresse est trop longue"
           }
         }
       }
@@ -394,6 +598,12 @@
             "state" : "translated",
             "value" : "City is too long"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom de la ville est trop long"
+          }
         }
       }
     },
@@ -405,6 +615,12 @@
             "state" : "translated",
             "value" : "First name is too long"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le prénom est trop long"
+          }
         }
       }
     },
@@ -415,6 +631,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last name is too long"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom est trop long"
           }
         }
       }
@@ -449,6 +671,12 @@
             "state" : "translated",
             "value" : "First name cannot contain a URL"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le prénom ne peut pas contenir d’URL"
+          }
         }
       }
     },
@@ -459,6 +687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last name cannot contain a URL"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom ne peut pas contenir d’URL"
           }
         }
       }
@@ -471,6 +705,12 @@
             "state" : "translated",
             "value" : "Discount"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réduction"
+          }
         }
       }
     },
@@ -481,6 +721,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Duties"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de douane"
           }
         }
       }
@@ -493,6 +739,12 @@
             "state" : "translated",
             "value" : "Shipping"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expédition"
+          }
         }
       }
     },
@@ -503,6 +755,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shipping (One-time purchase)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expédition (Achat ponctuel)"
           }
         }
       }
@@ -515,6 +773,12 @@
             "state" : "translated",
             "value" : "Shipping (Subscription)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expédition (Abonnement)"
+          }
         }
       }
     },
@@ -526,6 +790,12 @@
             "state" : "translated",
             "value" : "Subtotal"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sous-total"
+          }
         }
       }
     },
@@ -533,6 +803,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taxes"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taxes"
