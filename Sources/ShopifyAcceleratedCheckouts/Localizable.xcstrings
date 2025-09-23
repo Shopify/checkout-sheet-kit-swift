@@ -26,6 +26,12 @@
             "state" : "translated",
             "value" : "La ligne d’adresse ne peut pas contenir d’emojis"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresszeile darf keine Emojis enthalten"
+          }
         }
       }
     },
@@ -42,6 +48,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La deuxième ligne d’adresse ne peut pas contenir d’emojis"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweite Adresszeile darf keine Emojis enthalten"
           }
         }
       }
@@ -60,6 +72,12 @@
             "state" : "translated",
             "value" : "La ville ne peut pas contenir d’emojis"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stadt darf keine Emojis enthalten"
+          }
         }
       }
     },
@@ -76,6 +94,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le prénom ne peut pas contenir d’emojis"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorname darf keine Emojis enthalten"
           }
         }
       }
@@ -94,6 +118,12 @@
             "state" : "translated",
             "value" : "Le nom ne peut pas contenir d’emojis"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachname darf keine Emojis enthalten"
+          }
         }
       }
     },
@@ -111,6 +141,12 @@
             "state" : "translated",
             "value" : "Le code postal ne peut pas contenir d’emojis"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postleitzahl darf keine Emojis enthalten"
+          }
         }
       }
     },
@@ -126,7 +162,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La ligne d’adresse ne peut pas contenir de balises HTML"
+            "value" : "La ligne d'adresse ne peut pas contenir de balises HTML"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresszeile darf keine HTML-Tags enthalten"
           }
         }
       }
@@ -143,7 +185,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La deuxième ligne d’adresse ne peut pas contenir de balises HTML"
+            "value" : "La deuxième ligne d'adresse ne peut pas contenir de balises HTML"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweite Adresszeile darf keine HTML-Tags enthalten"
           }
         }
       }
@@ -162,6 +210,12 @@
             "state" : "translated",
             "value" : "La ville ne peut pas contenir de balises HTML"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stadt darf keine HTML-Tags enthalten"
+          }
         }
       }
     },
@@ -178,6 +232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le prénom ne peut pas contenir de balises HTML"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Vorname darf keine HTML-Tags enthalten"
           }
         }
       }
@@ -196,6 +256,12 @@
             "state" : "translated",
             "value" : "Le nom ne peut pas contenir de balises HTML"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Nachname darf keine HTML-Tags enthalten"
+          }
         }
       }
     },
@@ -213,6 +279,12 @@
             "state" : "translated",
             "value" : "Saisir une adresse valide"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine gültige Adresse ein"
+          }
         }
       }
     },
@@ -228,7 +300,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entrez un numéro d’appartement, de suite, etc. valide"
+            "value" : "Entrez un numéro d'appartement, de suite, etc. valide"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine gültige Wohnung, ein gültiges Zimmer usw. ein"
           }
         }
       }
@@ -247,6 +325,12 @@
             "state" : "translated",
             "value" : "Saisir une ville valide"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine gültige Stadt eingeben"
+          }
         }
       }
     },
@@ -263,6 +347,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisir une adresse e-mail valide"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine gültige E-Mail-Adresse ein"
           }
         }
       }
@@ -281,6 +371,12 @@
             "state" : "translated",
             "value" : "Saisir un émirat valide"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gültiges Emirat eingeben"
+          }
         }
       }
     },
@@ -297,6 +393,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez saisir un prénom valide"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib einen gültigen Vornamen ein"
           }
         }
       }
@@ -315,6 +417,12 @@
             "state" : "translated",
             "value" : "Saisir un nom valide"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib einen gültigen Nachnamen ein"
+          }
         }
       }
     },
@@ -331,6 +439,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisir un numéro de téléphone valide"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine gültige Telefonnummer eingeben"
           }
         }
       }
@@ -349,6 +463,12 @@
             "state" : "translated",
             "value" : "Saisissez un code postal valide"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine gültige Postleitzahl ein"
+          }
         }
       }
     },
@@ -365,6 +485,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionnez un État/une province valide"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein gültiges Bundesland / eine gültige Provinz auswählen"
           }
         }
       }
@@ -383,6 +509,12 @@
             "state" : "translated",
             "value" : "Saisir une adresse"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine Adresse ein"
+          }
         }
       }
     },
@@ -399,6 +531,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisir un numéro d’appartement, de suite, etc."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine Wohnung, ein Zimmer usw. ein"
           }
         }
       }
@@ -417,6 +555,12 @@
             "state" : "translated",
             "value" : "Entrez une ville"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine Stadt ein"
+          }
         }
       }
     },
@@ -433,6 +577,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionner un pays"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Land auswählen"
           }
         }
       }
@@ -451,6 +601,12 @@
             "state" : "translated",
             "value" : "Saisissez une adresse e-mail"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine E-Mail-Adresse ein."
+          }
         }
       }
     },
@@ -467,6 +623,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisir un émirat"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Emirat eingeben"
           }
         }
       }
@@ -485,6 +647,12 @@
             "state" : "translated",
             "value" : "Saisir un prénom"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib einen Vornamen ein"
+          }
         }
       }
     },
@@ -501,6 +669,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisir un nom"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib einen Nachnamen ein"
           }
         }
       }
@@ -519,6 +693,12 @@
             "state" : "translated",
             "value" : "Saisir un numéro de téléphone"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine Telefonnummer ein"
+          }
         }
       }
     },
@@ -535,6 +715,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisissez un code postal"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine Postleitzahl ein"
           }
         }
       }
@@ -553,6 +739,12 @@
             "state" : "translated",
             "value" : "Sélectionnez un État/une province"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Bundesland/eine Provinz aus"
+          }
         }
       }
     },
@@ -569,6 +761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La ligne d’adresse est trop longue"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresszeile ist zu lang"
           }
         }
       }
@@ -587,6 +785,12 @@
             "state" : "translated",
             "value" : "Deuxième ligne d’adresse est trop longue"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweite Adresszeile ist zu lang"
+          }
         }
       }
     },
@@ -603,6 +807,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le nom de la ville est trop long"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stadt ist zu lang"
           }
         }
       }
@@ -621,6 +831,12 @@
             "state" : "translated",
             "value" : "Le prénom est trop long"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorname ist zu lang"
+          }
         }
       }
     },
@@ -637,6 +853,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le nom est trop long"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachname ist zu lang"
           }
         }
       }
@@ -677,6 +899,12 @@
             "state" : "translated",
             "value" : "Le prénom ne peut pas contenir d’URL"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorname darf keine URL enthalten"
+          }
         }
       }
     },
@@ -693,6 +921,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le nom ne peut pas contenir d’URL"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachname darf keine URL enthalten"
           }
         }
       }
@@ -711,6 +945,12 @@
             "state" : "translated",
             "value" : "Réduction"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rabatt"
+          }
         }
       }
     },
@@ -727,6 +967,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frais de douane"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zollgebühren"
           }
         }
       }
@@ -745,6 +991,12 @@
             "state" : "translated",
             "value" : "Expédition"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versand"
+          }
         }
       }
     },
@@ -761,6 +1013,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expédition (Achat ponctuel)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versand (einmaliger Kauf)"
           }
         }
       }
@@ -779,6 +1037,12 @@
             "state" : "translated",
             "value" : "Expédition (Abonnement)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versand (Abonnement)"
+          }
         }
       }
     },
@@ -796,6 +1060,12 @@
             "state" : "translated",
             "value" : "Sous-total"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischensumme"
+          }
         }
       }
     },
@@ -812,6 +1082,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taxes"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Steuern"
           }
         }
       }
