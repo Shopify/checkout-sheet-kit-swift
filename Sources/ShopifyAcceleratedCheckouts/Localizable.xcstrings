@@ -176,6 +176,12 @@
             "state": "translated",
             "value": "บรรทัดที่อยู่ต้องไม่มีอีโมจิ"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng địa chỉ không được chứa biểu tượng cảm xúc"
+          }
         }
       }
     },
@@ -342,6 +348,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "บรรทัดที่อยู่ที่สองต้องไม่มีอีโมจิ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng địa chỉ thứ hai không được chứa biểu tượng cảm xúc"
           }
         }
       }
@@ -510,6 +522,12 @@
             "state": "translated",
             "value": "เมืองต้องไม่มีอีโมจิ"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thành phố không được chứa biểu tượng cảm xúc"
+          }
         }
       }
     },
@@ -676,6 +694,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ชื่อต้องไม่มีอีโมจิ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên không được chứa biểu tượng cảm xúc"
           }
         }
       }
@@ -844,6 +868,12 @@
             "state": "translated",
             "value": "นามสกุลต้องไม่มีอีโมจิ"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Họ không được chứa biểu tượng cảm xúc"
+          }
         }
       }
     },
@@ -1010,6 +1040,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "รหัสไปรษณีย์ต้องไม่มีอีโมจิ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mã bưu chính không được chứa biểu tượng cảm xúc"
           }
         }
       }
@@ -1178,6 +1214,12 @@
             "state": "translated",
             "value": "บรรทัดที่อยู่ต้องไม่มีแท็ก HTML"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng địa chỉ không được chứa thẻ HTML"
+          }
         }
       }
     },
@@ -1344,6 +1386,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "บรรทัดที่อยู่ที่สองต้องไม่มีแท็ก HTML"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng địa chỉ thứ hai không được chứa thẻ HTML"
           }
         }
       }
@@ -1512,6 +1560,12 @@
             "state": "translated",
             "value": "เมืองต้องไม่มีแท็ก HTML"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thành phố không được chứa thẻ HTML"
+          }
         }
       }
     },
@@ -1678,6 +1732,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ชื่อต้องไม่มีแท็ก HTML"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên không được chứa thẻ HTML"
           }
         }
       }
@@ -1846,6 +1906,12 @@
             "state": "translated",
             "value": "นามสกุลต้องไม่มีแท็ก HTML"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Họ không được chứa thẻ HTML"
+          }
         }
       }
     },
@@ -2012,6 +2078,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนที่อยู่ที่ถูกต้อง"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập địa chỉ hợp lệ"
           }
         }
       }
@@ -2180,6 +2252,12 @@
             "state": "translated",
             "value": "ป้อนอพาร์ตเมนต์ ห้องชุด ฯลฯ ที่ถูกต้อง"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập căn hộ, phòng, v.v. hợp lệ"
+          }
         }
       }
     },
@@ -2346,6 +2424,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนเมืองที่ถูกต้อง"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập thành phố hợp lệ"
           }
         }
       }
@@ -2514,6 +2598,12 @@
             "state": "translated",
             "value": "ป้อนอีเมลที่ถูกต้อง"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập email hợp lệ"
+          }
         }
       }
     },
@@ -2680,6 +2770,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนเอมิเรตที่ถูกต้อง"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập tiểu vương quốc hợp lệ"
           }
         }
       }
@@ -2848,6 +2944,12 @@
             "state": "translated",
             "value": "ป้อนชื่อที่ถูกต้อง"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập tên hợp lệ"
+          }
         }
       }
     },
@@ -3014,6 +3116,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนนามสกุลที่ถูกต้อง"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập họ hợp lệ"
           }
         }
       }
@@ -3182,6 +3290,12 @@
             "state": "translated",
             "value": "ป้อนหมายเลขโทรศัพท์ที่ถูกต้อง"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập số điện thoại hợp lệ"
+          }
         }
       }
     },
@@ -3348,6 +3462,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนรหัสไปรษณีย์ที่ถูกต้อง"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập mã bưu chính hợp lệ"
           }
         }
       }
@@ -3516,6 +3636,12 @@
             "state": "translated",
             "value": "เลือกรัฐ/จังหวัดที่ถูกต้อง"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn tiểu bang/tỉnh hợp lệ"
+          }
         }
       }
     },
@@ -3682,6 +3808,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนที่อยู่"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập địa chỉ"
           }
         }
       }
@@ -3850,6 +3982,12 @@
             "state": "translated",
             "value": "ป้อนอพาร์ตเมนต์ ห้องชุด ฯลฯ"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập căn hộ, phòng, v.v."
+          }
         }
       }
     },
@@ -4016,6 +4154,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนเมือง"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập thành phố"
           }
         }
       }
@@ -4184,6 +4328,12 @@
             "state": "translated",
             "value": "เลือกประเทศ"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn quốc gia"
+          }
         }
       }
     },
@@ -4350,6 +4500,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนที่อยู่อีเมล"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập địa chỉ email"
           }
         }
       }
@@ -4518,6 +4674,12 @@
             "state": "translated",
             "value": "ป้อนเอมิเรต"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập tiểu vương quốc"
+          }
         }
       }
     },
@@ -4684,6 +4846,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนชื่อ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập tên"
           }
         }
       }
@@ -4852,6 +5020,12 @@
             "state": "translated",
             "value": "ป้อนนามสกุล"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập họ"
+          }
         }
       }
     },
@@ -5018,6 +5192,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ป้อนหมายเลขโทรศัพท์"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập số điện thoại"
           }
         }
       }
@@ -5186,6 +5366,12 @@
             "state": "translated",
             "value": "ป้อนรหัสไปรษณีย์"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập mã bưu chính"
+          }
         }
       }
     },
@@ -5352,6 +5538,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "เลือกรัฐ/จังหวัด"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn tiểu bang/tỉnh"
           }
         }
       }
@@ -5520,6 +5712,12 @@
             "state": "translated",
             "value": "บรรทัดที่อยู่ยาวเกินไป"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng địa chỉ quá dài"
+          }
         }
       }
     },
@@ -5686,6 +5884,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "บรรทัดที่อยู่ที่สองยาวเกินไป"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng địa chỉ thứ hai quá dài"
           }
         }
       }
@@ -5854,6 +6058,12 @@
             "state": "translated",
             "value": "เมืองยาวเกินไป"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thành phố quá dài"
+          }
         }
       }
     },
@@ -6021,6 +6231,12 @@
             "state": "translated",
             "value": "ชื่อยาวเกินไป"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên quá dài"
+          }
         }
       }
     },
@@ -6187,6 +6403,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "นามสกุลยาวเกินไป"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Họ quá dài"
           }
         }
       }
@@ -6377,6 +6599,12 @@
             "state": "translated",
             "value": "ชื่อต้องไม่มี URL"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên không được chứa URL"
+          }
         }
       }
     },
@@ -6543,6 +6771,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "นามสกุลต้องไม่มี URL"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Họ không được chứa URL"
           }
         }
       }
@@ -6711,6 +6945,12 @@
             "state": "translated",
             "value": "ส่วนลด"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giảm giá"
+          }
         }
       }
     },
@@ -6877,6 +7117,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ภาษีศุลกากร"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thuế hải quan"
           }
         }
       }
@@ -7045,6 +7291,12 @@
             "state": "translated",
             "value": "การจัดส่ง"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vận chuyển"
+          }
         }
       }
     },
@@ -7211,6 +7463,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "การจัดส่ง (ซื้อครั้งเดียว)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vận chuyển (mua một lần)"
           }
         }
       }
@@ -7379,6 +7637,12 @@
             "state": "translated",
             "value": "การจัดส่ง (การสมัครสมาชิก)"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vận chuyển (đăng ký)"
+          }
         }
       }
     },
@@ -7546,6 +7810,12 @@
             "state": "translated",
             "value": "ยอดรวม"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tổng phụ"
+          }
         }
       }
     },
@@ -7712,6 +7982,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ภาษี"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thuế"
           }
         }
       }
