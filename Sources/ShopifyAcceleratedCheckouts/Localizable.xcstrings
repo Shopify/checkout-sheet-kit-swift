@@ -206,6 +206,12 @@
             "state": "translated",
             "value": "Adreso eilutėje negali būti jaustukinių piktogramų"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A linha de endereço não pode conter emojis"
+          }
         }
       }
     },
@@ -402,6 +408,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Antroje adreso eilutėje negali būti jaustukinių piktogramų"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A segunda linha de endereço não pode conter emojis"
           }
         }
       }
@@ -600,6 +612,12 @@
             "state": "translated",
             "value": "Mieste negali būti jaustukinių piktogramų"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cidade não pode conter emojis"
+          }
         }
       }
     },
@@ -796,6 +814,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Varde negali būti jaustukinių piktogramų"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome próprio não pode conter emojis"
           }
         }
       }
@@ -994,6 +1018,12 @@
             "state": "translated",
             "value": "Pavardėje negali būti jaustukinių piktogramų"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O apelido não pode conter emojis"
+          }
         }
       }
     },
@@ -1190,6 +1220,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pašto kode negali būti jaustukinių piktogramų"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O código postal não pode conter emojis"
           }
         }
       }
@@ -1388,6 +1424,12 @@
             "state": "translated",
             "value": "Adreso eilutėje negali būti HTML žymų"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A linha de endereço não pode conter etiquetas HTML"
+          }
         }
       }
     },
@@ -1584,6 +1626,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Antroje adreso eilutėje negali būti HTML žymų"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A segunda linha de endereço não pode conter etiquetas HTML"
           }
         }
       }
@@ -1782,6 +1830,12 @@
             "state": "translated",
             "value": "Mieste negali būti HTML žymų"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cidade não pode conter etiquetas HTML"
+          }
         }
       }
     },
@@ -1978,6 +2032,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Varde negali būti HTML žymų"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome próprio não pode conter etiquetas HTML"
           }
         }
       }
@@ -2176,6 +2236,12 @@
             "state": "translated",
             "value": "Pavardėje negali būti HTML žymų"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O apelido não pode conter etiquetas HTML"
+          }
         }
       }
     },
@@ -2372,6 +2438,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite galiojantį adresą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um endereço válido"
           }
         }
       }
@@ -2570,6 +2642,12 @@
             "state": "translated",
             "value": "Įveskite galiojantį butą, numerį ir t. t."
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um apartamento, andar, etc. válido"
+          }
         }
       }
     },
@@ -2766,6 +2844,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite galiojantį miestą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza uma cidade válida"
           }
         }
       }
@@ -2964,6 +3048,12 @@
             "state": "translated",
             "value": "Įveskite galiojantį el. pašto adresą"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um e-mail válido"
+          }
         }
       }
     },
@@ -3160,6 +3250,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite galiojantį emyratą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um emirado válido"
           }
         }
       }
@@ -3358,6 +3454,12 @@
             "state": "translated",
             "value": "Įveskite galiojantį vardą"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um nome próprio válido"
+          }
         }
       }
     },
@@ -3554,6 +3656,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite galiojančią pavardę"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um apelido válido"
           }
         }
       }
@@ -3752,6 +3860,12 @@
             "state": "translated",
             "value": "Įveskite galiojantį telefono numerį"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um número de telefone válido"
+          }
         }
       }
     },
@@ -3948,6 +4062,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite galiojantį pašto kodą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um código postal válido"
           }
         }
       }
@@ -4146,6 +4266,12 @@
             "state": "translated",
             "value": "Pasirinkite galiojančią valstiją / provinciją"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione um estado/província válido"
+          }
         }
       }
     },
@@ -4342,6 +4468,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite adresą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um endereço"
           }
         }
       }
@@ -4540,6 +4672,12 @@
             "state": "translated",
             "value": "Įveskite butą, numerį ir t. t."
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza apartamento, andar, etc."
+          }
         }
       }
     },
@@ -4736,6 +4874,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite miestą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza uma cidade"
           }
         }
       }
@@ -4934,6 +5078,12 @@
             "state": "translated",
             "value": "Pasirinkite šalį"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione um país"
+          }
         }
       }
     },
@@ -5130,6 +5280,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite el. pašto adresą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um endereço de e-mail"
           }
         }
       }
@@ -5328,6 +5484,12 @@
             "state": "translated",
             "value": "Įveskite emyratą"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um emirado"
+          }
         }
       }
     },
@@ -5524,6 +5686,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite vardą"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um nome próprio"
           }
         }
       }
@@ -5722,6 +5890,12 @@
             "state": "translated",
             "value": "Įveskite pavardę"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um apelido"
+          }
         }
       }
     },
@@ -5918,6 +6092,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Įveskite telefono numerį"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um número de telefone"
           }
         }
       }
@@ -6116,6 +6296,12 @@
             "state": "translated",
             "value": "Įveskite pašto kodą"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduza um código postal"
+          }
         }
       }
     },
@@ -6312,6 +6498,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pasirinkite valstiją / provinciją"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione um estado/província"
           }
         }
       }
@@ -6510,6 +6702,12 @@
             "state": "translated",
             "value": "Adreso eilutė per ilga"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A linha de endereço é demasiado longa"
+          }
         }
       }
     },
@@ -6706,6 +6904,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Antra adreso eilutė per ilga"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A segunda linha de endereço é demasiado longa"
           }
         }
       }
@@ -6904,6 +7108,12 @@
             "state": "translated",
             "value": "Miestas per ilgas"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cidade é demasiado longa"
+          }
         }
       }
     },
@@ -7101,6 +7311,12 @@
             "state": "translated",
             "value": "Vardas per ilgas"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome próprio é demasiado longo"
+          }
         }
       }
     },
@@ -7297,6 +7513,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pavardė per ilga"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O apelido é demasiado longo"
           }
         }
       }
@@ -7517,6 +7739,12 @@
             "state": "translated",
             "value": "Varde negali būti URL"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome próprio não pode conter URLs"
+          }
         }
       }
     },
@@ -7713,6 +7941,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pavardėje negali būti URL"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O apelido não pode conter URLs"
           }
         }
       }
@@ -7911,6 +8145,12 @@
             "state": "translated",
             "value": "Nuolaida"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desconto"
+          }
         }
       }
     },
@@ -8107,6 +8347,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Muitai"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direitos aduaneiros"
           }
         }
       }
@@ -8305,6 +8551,12 @@
             "state": "translated",
             "value": "Siuntimas"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envio"
+          }
         }
       }
     },
@@ -8501,6 +8753,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Siuntimas (vienkartinis pirkimas)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envio (compra única)"
           }
         }
       }
@@ -8699,6 +8957,12 @@
             "state": "translated",
             "value": "Siuntimas (prenumerata)"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envio (subscrição)"
+          }
         }
       }
     },
@@ -8896,6 +9160,12 @@
             "state": "translated",
             "value": "Tarpinė suma"
           }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtotal"
+          }
         }
       }
     },
@@ -9092,6 +9362,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mokesčiai"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostos"
           }
         }
       }
