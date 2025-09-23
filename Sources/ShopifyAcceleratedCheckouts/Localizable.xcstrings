@@ -140,6 +140,12 @@
             "state": "translated",
             "value": "Linia de adresă nu poate conține emoji-uri"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riadok adresy nemôže obsahovať emotikony"
+          }
         }
       }
     },
@@ -270,6 +276,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A doua linie de adresă nu poate conține emoji-uri"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druhý riadok adresy nemôže obsahovať emotikony"
           }
         }
       }
@@ -402,6 +414,12 @@
             "state": "translated",
             "value": "Orașul nu poate conține emoji-uri"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mesto nemôže obsahovať emotikony"
+          }
         }
       }
     },
@@ -532,6 +550,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prenumele nu poate conține emoji-uri"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krstné meno nemôže obsahovať emotikony"
           }
         }
       }
@@ -664,6 +688,12 @@
             "state": "translated",
             "value": "Numele nu poate conține emoji-uri"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Priezvisko nemôže obsahovať emotikony"
+          }
         }
       }
     },
@@ -794,6 +824,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Codul poștal nu poate conține emoji-uri"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PSČ nemôže obsahovať emotikony"
           }
         }
       }
@@ -926,6 +962,12 @@
             "state": "translated",
             "value": "Linia de adresă nu poate conține etichete HTML"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riadok adresy nemôže obsahovať značky HTML"
+          }
         }
       }
     },
@@ -1056,6 +1098,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A doua linie de adresă nu poate conține etichete HTML"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druhý riadok adresy nemôže obsahovať značky HTML"
           }
         }
       }
@@ -1188,6 +1236,12 @@
             "state": "translated",
             "value": "Orașul nu poate conține etichete HTML"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mesto nemôže obsahovať značky HTML"
+          }
         }
       }
     },
@@ -1318,6 +1372,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prenumele nu poate conține etichete HTML"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krstné meno nemôže obsahovať značky HTML"
           }
         }
       }
@@ -1450,6 +1510,12 @@
             "state": "translated",
             "value": "Numele nu poate conține etichete HTML"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Priezvisko nemôže obsahovať značky HTML"
+          }
         }
       }
     },
@@ -1580,6 +1646,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu o adresă validă"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platnú adresu"
           }
         }
       }
@@ -1712,6 +1784,12 @@
             "state": "translated",
             "value": "Introdu un apartament, o suită etc. valide"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platný byt, apartmán atď."
+          }
         }
       }
     },
@@ -1842,6 +1920,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu un oraș valid"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platné mesto"
           }
         }
       }
@@ -1974,6 +2058,12 @@
             "state": "translated",
             "value": "Introdu o adresă de e-mail validă"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platnú e-mailovú adresu"
+          }
         }
       }
     },
@@ -2104,6 +2194,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu un emirat valid"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platný emirát"
           }
         }
       }
@@ -2236,6 +2332,12 @@
             "state": "translated",
             "value": "Introdu un prenume valid"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platné krstné meno"
+          }
         }
       }
     },
@@ -2366,6 +2468,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu un nume valid"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platné priezvisko"
           }
         }
       }
@@ -2498,6 +2606,12 @@
             "state": "translated",
             "value": "Introdu un număr de telefon valid"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platné telefónne číslo"
+          }
         }
       }
     },
@@ -2628,6 +2742,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu un cod poștal valid"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte platné PSČ"
           }
         }
       }
@@ -2760,6 +2880,12 @@
             "state": "translated",
             "value": "Selectează un stat/o provincie validă"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyberte platný štát/provinciu"
+          }
         }
       }
     },
@@ -2890,6 +3016,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu o adresă"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte adresu"
           }
         }
       }
@@ -3022,6 +3154,12 @@
             "state": "translated",
             "value": "Introdu apartamentul, suita etc."
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte byt, apartmán atď."
+          }
         }
       }
     },
@@ -3152,6 +3290,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu un oraș"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte mesto"
           }
         }
       }
@@ -3284,6 +3428,12 @@
             "state": "translated",
             "value": "Selectează o țară"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyberte krajinu"
+          }
         }
       }
     },
@@ -3414,6 +3564,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu o adresă de e-mail"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte e-mailovú adresu"
           }
         }
       }
@@ -3546,6 +3702,12 @@
             "state": "translated",
             "value": "Introdu un emirat"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte emirát"
+          }
         }
       }
     },
@@ -3676,6 +3838,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu un prenume"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte krstné meno"
           }
         }
       }
@@ -3808,6 +3976,12 @@
             "state": "translated",
             "value": "Introdu un nume"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte priezvisko"
+          }
         }
       }
     },
@@ -3938,6 +4112,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Introdu un număr de telefon"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte telefónne číslo"
           }
         }
       }
@@ -4070,6 +4250,12 @@
             "state": "translated",
             "value": "Introdu un cod poștal"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadajte PSČ"
+          }
         }
       }
     },
@@ -4200,6 +4386,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Selectează un stat/o provincie"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyberte štát/provinciu"
           }
         }
       }
@@ -4332,6 +4524,12 @@
             "state": "translated",
             "value": "Linia de adresă este prea lungă"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riadok adresy je príliš dlhý"
+          }
         }
       }
     },
@@ -4462,6 +4660,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A doua linie de adresă este prea lungă"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druhý riadok adresy je príliš dlhý"
           }
         }
       }
@@ -4594,6 +4798,12 @@
             "state": "translated",
             "value": "Orașul este prea lung"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mesto je príliš dlhé"
+          }
         }
       }
     },
@@ -4725,6 +4935,12 @@
             "state": "translated",
             "value": "Prenumele este prea lung"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krstné meno je príliš dlhé"
+          }
         }
       }
     },
@@ -4855,6 +5071,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Numele este prea lung"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Priezvisko je príliš dlhé"
           }
         }
       }
@@ -5009,6 +5231,12 @@
             "state": "translated",
             "value": "Prenumele nu poate conține URL-uri"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krstné meno nemôže obsahovať URL adresy"
+          }
         }
       }
     },
@@ -5139,6 +5367,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Numele nu poate conține URL-uri"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Priezvisko nemôže obsahovať URL adresy"
           }
         }
       }
@@ -5271,6 +5505,12 @@
             "state": "translated",
             "value": "Reducere"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zľava"
+          }
         }
       }
     },
@@ -5401,6 +5641,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Taxe vamale"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clá"
           }
         }
       }
@@ -5533,6 +5779,12 @@
             "state": "translated",
             "value": "Expediere"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doprava"
+          }
         }
       }
     },
@@ -5663,6 +5915,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expediere (achiziție unică)"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doprava (jednorazový nákup)"
           }
         }
       }
@@ -5795,6 +6053,12 @@
             "state": "translated",
             "value": "Expediere (abonament)"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doprava (predplatné)"
+          }
         }
       }
     },
@@ -5926,6 +6190,12 @@
             "state": "translated",
             "value": "Subtotal"
           }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medzisúčet"
+          }
         }
       }
     },
@@ -6056,6 +6326,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Taxe"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dane"
           }
         }
       }
