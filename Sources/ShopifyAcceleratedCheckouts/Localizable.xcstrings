@@ -122,6 +122,12 @@
             "state": "translated",
             "value": "Adres satırı emoji içeremez"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Řádek adresy nemůže obsahovat emotikony"
+          }
         }
       }
     },
@@ -234,6 +240,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "İkinci adres satırı emoji içeremez"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druhý řádek adresy nemůže obsahovat emotikony"
           }
         }
       }
@@ -348,6 +360,12 @@
             "state": "translated",
             "value": "Şehir emoji içeremez"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Město nemůže obsahovat emotikony"
+          }
         }
       }
     },
@@ -460,6 +478,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ad emoji içeremez"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Křestní jméno nemůže obsahovat emotikony"
           }
         }
       }
@@ -574,6 +598,12 @@
             "state": "translated",
             "value": "Soyadı emoji içeremez"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Příjmení nemůže obsahovat emotikony"
+          }
         }
       }
     },
@@ -686,6 +716,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Posta kodu emoji içeremez"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PSČ nemůže obsahovat emotikony"
           }
         }
       }
@@ -800,6 +836,12 @@
             "state": "translated",
             "value": "Adres satırı HTML etiketleri içeremez"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Řádek adresy nemůže obsahovat značky HTML"
+          }
         }
       }
     },
@@ -912,6 +954,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "İkinci adres satırı HTML etiketleri içeremez"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druhý řádek adresy nemůže obsahovat značky HTML"
           }
         }
       }
@@ -1026,6 +1074,12 @@
             "state": "translated",
             "value": "Şehir HTML etiketleri içeremez"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Město nemůže obsahovat značky HTML"
+          }
         }
       }
     },
@@ -1138,6 +1192,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ad HTML etiketleri içeremez"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Křestní jméno nemůže obsahovat značky HTML"
           }
         }
       }
@@ -1252,6 +1312,12 @@
             "state": "translated",
             "value": "Soyadı HTML etiketleri içeremez"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Příjmení nemůže obsahovat značky HTML"
+          }
         }
       }
     },
@@ -1364,6 +1430,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geçerli bir adres girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platnou adresu"
           }
         }
       }
@@ -1478,6 +1550,12 @@
             "state": "translated",
             "value": "Geçerli bir daire, süit vb. girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platný byt, apartmán atd."
+          }
         }
       }
     },
@@ -1590,6 +1668,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geçerli bir şehir girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platné město"
           }
         }
       }
@@ -1704,6 +1788,12 @@
             "state": "translated",
             "value": "Geçerli bir e-posta girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platnou e-mailovou adresu"
+          }
         }
       }
     },
@@ -1816,6 +1906,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geçerli bir emirlik girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platný emirát"
           }
         }
       }
@@ -1930,6 +2026,12 @@
             "state": "translated",
             "value": "Geçerli bir ad girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platné křestní jméno"
+          }
         }
       }
     },
@@ -2042,6 +2144,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geçerli bir soyadı girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platné příjmení"
           }
         }
       }
@@ -2156,6 +2264,12 @@
             "state": "translated",
             "value": "Geçerli bir telefon numarası girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platné telefonní číslo"
+          }
         }
       }
     },
@@ -2268,6 +2382,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geçerli bir posta kodu girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte platné PSČ"
           }
         }
       }
@@ -2382,6 +2502,12 @@
             "state": "translated",
             "value": "Geçerli bir eyalet/il seçin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyberte platný stát/provincii"
+          }
         }
       }
     },
@@ -2494,6 +2620,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bir adres girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte adresu"
           }
         }
       }
@@ -2608,6 +2740,12 @@
             "state": "translated",
             "value": "Daire, süit vb. girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte byt, apartmán atd."
+          }
         }
       }
     },
@@ -2720,6 +2858,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bir şehir girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte město"
           }
         }
       }
@@ -2834,6 +2978,12 @@
             "state": "translated",
             "value": "Bir ülke seçin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyberte zemi"
+          }
         }
       }
     },
@@ -2946,6 +3096,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bir e-posta adresi girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte e-mailovou adresu"
           }
         }
       }
@@ -3060,6 +3216,12 @@
             "state": "translated",
             "value": "Bir emirlik girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte emirát"
+          }
         }
       }
     },
@@ -3172,6 +3334,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bir ad girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte křestní jméno"
           }
         }
       }
@@ -3286,6 +3454,12 @@
             "state": "translated",
             "value": "Bir soyadı girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte příjmení"
+          }
         }
       }
     },
@@ -3398,6 +3572,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bir telefon numarası girin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte telefonní číslo"
           }
         }
       }
@@ -3512,6 +3692,12 @@
             "state": "translated",
             "value": "Bir posta kodu girin"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zadejte PSČ"
+          }
         }
       }
     },
@@ -3624,6 +3810,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bir eyalet/il seçin"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyberte stát/provincii"
           }
         }
       }
@@ -3738,6 +3930,12 @@
             "state": "translated",
             "value": "Adres satırı çok uzun"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Řádek adresy je příliš dlouhý"
+          }
         }
       }
     },
@@ -3850,6 +4048,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "İkinci adres satırı çok uzun"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druhý řádek adresy je příliš dlouhý"
           }
         }
       }
@@ -3964,6 +4168,12 @@
             "state": "translated",
             "value": "Şehir çok uzun"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Město je příliš dlouhé"
+          }
         }
       }
     },
@@ -4077,6 +4287,12 @@
             "state": "translated",
             "value": "Ad çok uzun"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Křestní jméno je příliš dlouhé"
+          }
         }
       }
     },
@@ -4189,6 +4405,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Soyadı çok uzun"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Příjmení je příliš dlouhé"
           }
         }
       }
@@ -4325,6 +4547,12 @@
             "state": "translated",
             "value": "Ad URL içeremez"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Křestní jméno nemůže obsahovat URL"
+          }
         }
       }
     },
@@ -4437,6 +4665,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Soyadı URL içeremez"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Příjmení nemůže obsahovat URL"
           }
         }
       }
@@ -4551,6 +4785,12 @@
             "state": "translated",
             "value": "İndirim"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleva"
+          }
         }
       }
     },
@@ -4663,6 +4903,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gümrük vergileri"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cla"
           }
         }
       }
@@ -4777,6 +5023,12 @@
             "state": "translated",
             "value": "Kargo"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doprava"
+          }
         }
       }
     },
@@ -4889,6 +5141,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kargo (tek seferlik satın alım)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doprava (jednorázový nákup)"
           }
         }
       }
@@ -5003,6 +5261,12 @@
             "state": "translated",
             "value": "Kargo (abonelik)"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doprava (předplatné)"
+          }
         }
       }
     },
@@ -5116,6 +5380,12 @@
             "state": "translated",
             "value": "Ara Toplam"
           }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mezisoučet"
+          }
         }
       }
     },
@@ -5228,6 +5498,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vergiler"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daně"
           }
         }
       }
