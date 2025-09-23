@@ -110,6 +110,12 @@
             "state": "translated",
             "value": "Osoiterivi ei voi sisältää hymiöitä"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresselinje kan ikke inneholde emojier"
+          }
         }
       }
     },
@@ -210,6 +216,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Toinen osoiterivi ei voi sisältää hymiöitä"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andre adresselinje kan ikke inneholde emojier"
           }
         }
       }
@@ -312,6 +324,12 @@
             "state": "translated",
             "value": "Kaupunki ei voi sisältää hymiöitä"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By kan ikke inneholde emojier"
+          }
         }
       }
     },
@@ -412,6 +430,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Etunimi ei voi sisältää hymiöitä"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn kan ikke inneholde emojier"
           }
         }
       }
@@ -514,6 +538,12 @@
             "state": "translated",
             "value": "Sukunimi ei voi sisältää hymiöitä"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etternavn kan ikke inneholde emojier"
+          }
         }
       }
     },
@@ -614,6 +644,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Postinumero ei voi sisältää hymiöitä"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Postnummer kan ikke inneholde emojier"
           }
         }
       }
@@ -716,6 +752,12 @@
             "state": "translated",
             "value": "Osoiterivi ei voi sisältää HTML-tageja"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresselinje kan ikke inneholde HTML-koder"
+          }
         }
       }
     },
@@ -816,6 +858,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Toinen osoiterivi ei voi sisältää HTML-tageja"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andre adresselinje kan ikke inneholde HTML-koder"
           }
         }
       }
@@ -918,6 +966,12 @@
             "state": "translated",
             "value": "Kaupunki ei voi sisältää HTML-tageja"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By kan ikke inneholde HTML-koder"
+          }
         }
       }
     },
@@ -1018,6 +1072,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Etunimi ei voi sisältää HTML-tageja"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn kan ikke inneholde HTML-koder"
           }
         }
       }
@@ -1120,6 +1180,12 @@
             "state": "translated",
             "value": "Sukunimi ei voi sisältää HTML-tageja"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etternavn kan ikke inneholde HTML-koder"
+          }
         }
       }
     },
@@ -1220,6 +1286,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä kelvollinen osoite"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn en gyldig adresse"
           }
         }
       }
@@ -1322,6 +1394,12 @@
             "state": "translated",
             "value": "Syötä kelvollinen asunto, sviitti jne."
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn en gyldig leilighet, suite osv."
+          }
         }
       }
     },
@@ -1422,6 +1500,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä kelvollinen kaupunki"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn en gyldig by"
           }
         }
       }
@@ -1524,6 +1608,12 @@
             "state": "translated",
             "value": "Syötä kelvollinen sähköpostiosoite"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn en gyldig e-postadresse"
+          }
         }
       }
     },
@@ -1624,6 +1714,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä kelvollinen emiraatti"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et gyldig emirat"
           }
         }
       }
@@ -1726,6 +1822,12 @@
             "state": "translated",
             "value": "Syötä kelvollinen etunimi"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et gyldig fornavn"
+          }
         }
       }
     },
@@ -1826,6 +1928,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä kelvollinen sukunimi"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et gyldig etternavn"
           }
         }
       }
@@ -1928,6 +2036,12 @@
             "state": "translated",
             "value": "Syötä kelvollinen puhelinnumero"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et gyldig telefonnummer"
+          }
         }
       }
     },
@@ -2028,6 +2142,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä kelvollinen postinumero"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et gyldig postnummer"
           }
         }
       }
@@ -2130,6 +2250,12 @@
             "state": "translated",
             "value": "Valitse kelvollinen osavaltio/provinssi"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velg en gyldig stat/provins"
+          }
         }
       }
     },
@@ -2230,6 +2356,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä osoite"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn en adresse"
           }
         }
       }
@@ -2332,6 +2464,12 @@
             "state": "translated",
             "value": "Syötä asunto, sviitti jne."
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn leilighet, suite osv."
+          }
         }
       }
     },
@@ -2432,6 +2570,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä kaupunki"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn en by"
           }
         }
       }
@@ -2534,6 +2678,12 @@
             "state": "translated",
             "value": "Valitse maa"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velg et land"
+          }
         }
       }
     },
@@ -2634,6 +2784,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä sähköpostiosoite"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn en e-postadresse"
           }
         }
       }
@@ -2736,6 +2892,12 @@
             "state": "translated",
             "value": "Syötä emiraatti"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et emirat"
+          }
         }
       }
     },
@@ -2836,6 +2998,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä etunimi"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et fornavn"
           }
         }
       }
@@ -2938,6 +3106,12 @@
             "state": "translated",
             "value": "Syötä sukunimi"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et etternavn"
+          }
         }
       }
     },
@@ -3038,6 +3212,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syötä puhelinnumero"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et telefonnummer"
           }
         }
       }
@@ -3140,6 +3320,12 @@
             "state": "translated",
             "value": "Syötä postinumero"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skriv inn et postnummer"
+          }
         }
       }
     },
@@ -3240,6 +3426,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Valitse osavaltio/provinssi"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velg en stat/provins"
           }
         }
       }
@@ -3342,6 +3534,12 @@
             "state": "translated",
             "value": "Osoiterivi on liian pitkä"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresselinje er for lang"
+          }
         }
       }
     },
@@ -3442,6 +3640,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Toinen osoiterivi on liian pitkä"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andre adresselinje er for lang"
           }
         }
       }
@@ -3544,6 +3748,12 @@
             "state": "translated",
             "value": "Kaupunki on liian pitkä"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By er for lang"
+          }
         }
       }
     },
@@ -3645,6 +3855,12 @@
             "state": "translated",
             "value": "Etunimi on liian pitkä"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn er for langt"
+          }
         }
       }
     },
@@ -3745,6 +3961,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sukunimi on liian pitkä"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etternavn er for langt"
           }
         }
       }
@@ -3869,6 +4091,12 @@
             "state": "translated",
             "value": "Etunimi ei voi sisältää URL-osoitteita"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn kan ikke inneholde URL-er"
+          }
         }
       }
     },
@@ -3969,6 +4197,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sukunimi ei voi sisältää URL-osoitteita"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etternavn kan ikke inneholde URL-er"
           }
         }
       }
@@ -4071,6 +4305,12 @@
             "state": "translated",
             "value": "Alennus"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rabatt"
+          }
         }
       }
     },
@@ -4171,6 +4411,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tullit"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avgifter"
           }
         }
       }
@@ -4273,6 +4519,12 @@
             "state": "translated",
             "value": "Toimitus"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frakt"
+          }
         }
       }
     },
@@ -4373,6 +4625,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Toimitus (kertaostos)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frakt (engangskjøp)"
           }
         }
       }
@@ -4475,6 +4733,12 @@
             "state": "translated",
             "value": "Toimitus (tilaus)"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frakt (abonnement)"
+          }
         }
       }
     },
@@ -4576,6 +4840,12 @@
             "state": "translated",
             "value": "Välisumma"
           }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delsum"
+          }
         }
       }
     },
@@ -4676,6 +4946,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verot"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avgifter"
           }
         }
       }
