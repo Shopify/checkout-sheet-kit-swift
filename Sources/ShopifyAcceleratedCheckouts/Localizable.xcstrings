@@ -170,6 +170,12 @@
             "state": "translated",
             "value": "Η γραμμή διεύθυνσης δεν μπορεί να περιέχει emojis"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บรรทัดที่อยู่ต้องไม่มีอีโมจิ"
+          }
         }
       }
     },
@@ -330,6 +336,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Η δεύτερη γραμμή διεύθυνσης δεν μπορεί να περιέχει emojis"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บรรทัดที่อยู่ที่สองต้องไม่มีอีโมจิ"
           }
         }
       }
@@ -492,6 +504,12 @@
             "state": "translated",
             "value": "Η πόλη δεν μπορεί να περιέχει emojis"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เมืองต้องไม่มีอีโมจิ"
+          }
         }
       }
     },
@@ -652,6 +670,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Το όνομα δεν μπορεί να περιέχει emojis"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ชื่อต้องไม่มีอีโมจิ"
           }
         }
       }
@@ -814,6 +838,12 @@
             "state": "translated",
             "value": "Το επώνυμο δεν μπορεί να περιέχει emojis"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "นามสกุลต้องไม่มีอีโมจิ"
+          }
         }
       }
     },
@@ -974,6 +1004,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ο ταχυδρομικός κώδικας δεν μπορεί να περιέχει emojis"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รหัสไปรษณีย์ต้องไม่มีอีโมจิ"
           }
         }
       }
@@ -1136,6 +1172,12 @@
             "state": "translated",
             "value": "Η γραμμή διεύθυνσης δεν μπορεί να περιέχει ετικέτες HTML"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บรรทัดที่อยู่ต้องไม่มีแท็ก HTML"
+          }
         }
       }
     },
@@ -1296,6 +1338,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Η δεύτερη γραμμή διεύθυνσης δεν μπορεί να περιέχει ετικέτες HTML"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บรรทัดที่อยู่ที่สองต้องไม่มีแท็ก HTML"
           }
         }
       }
@@ -1458,6 +1506,12 @@
             "state": "translated",
             "value": "Η πόλη δεν μπορεί να περιέχει ετικέτες HTML"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เมืองต้องไม่มีแท็ก HTML"
+          }
         }
       }
     },
@@ -1618,6 +1672,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Το όνομα δεν μπορεί να περιέχει ετικέτες HTML"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ชื่อต้องไม่มีแท็ก HTML"
           }
         }
       }
@@ -1780,6 +1840,12 @@
             "state": "translated",
             "value": "Το επώνυμο δεν μπορεί να περιέχει ετικέτες HTML"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "นามสกุลต้องไม่มีแท็ก HTML"
+          }
         }
       }
     },
@@ -1940,6 +2006,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε μια έγκυρη διεύθυνση"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนที่อยู่ที่ถูกต้อง"
           }
         }
       }
@@ -2102,6 +2174,12 @@
             "state": "translated",
             "value": "Εισαγάγετε ένα έγκυρο διαμέρισμα, σουίτα κ.λπ."
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนอพาร์ตเมนต์ ห้องชุด ฯลฯ ที่ถูกต้อง"
+          }
         }
       }
     },
@@ -2262,6 +2340,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε μια έγκυρη πόλη"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนเมืองที่ถูกต้อง"
           }
         }
       }
@@ -2424,6 +2508,12 @@
             "state": "translated",
             "value": "Εισαγάγετε ένα έγκυρο email"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนอีเมลที่ถูกต้อง"
+          }
         }
       }
     },
@@ -2584,6 +2674,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε ένα έγκυρο εμιράτο"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนเอมิเรตที่ถูกต้อง"
           }
         }
       }
@@ -2746,6 +2842,12 @@
             "state": "translated",
             "value": "Εισαγάγετε ένα έγκυρο όνομα"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนชื่อที่ถูกต้อง"
+          }
         }
       }
     },
@@ -2906,6 +3008,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε ένα έγκυρο επώνυμο"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนนามสกุลที่ถูกต้อง"
           }
         }
       }
@@ -3068,6 +3176,12 @@
             "state": "translated",
             "value": "Εισαγάγετε έναν έγκυρο αριθμό τηλεφώνου"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนหมายเลขโทรศัพท์ที่ถูกต้อง"
+          }
         }
       }
     },
@@ -3228,6 +3342,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε έναν έγκυρο ταχυδρομικό κώδικα"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนรหัสไปรษณีย์ที่ถูกต้อง"
           }
         }
       }
@@ -3390,6 +3510,12 @@
             "state": "translated",
             "value": "Επιλέξτε μια έγκυρη πολιτεία/επαρχία"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลือกรัฐ/จังหวัดที่ถูกต้อง"
+          }
         }
       }
     },
@@ -3550,6 +3676,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε μια διεύθυνση"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนที่อยู่"
           }
         }
       }
@@ -3712,6 +3844,12 @@
             "state": "translated",
             "value": "Εισαγάγετε διαμέρισμα, σουίτα κ.λπ."
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนอพาร์ตเมนต์ ห้องชุด ฯลฯ"
+          }
         }
       }
     },
@@ -3872,6 +4010,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε μια πόλη"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนเมือง"
           }
         }
       }
@@ -4034,6 +4178,12 @@
             "state": "translated",
             "value": "Επιλέξτε μια χώρα"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลือกประเทศ"
+          }
         }
       }
     },
@@ -4194,6 +4344,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε μια διεύθυνση email"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนที่อยู่อีเมล"
           }
         }
       }
@@ -4356,6 +4512,12 @@
             "state": "translated",
             "value": "Εισαγάγετε ένα εμιράτο"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนเอมิเรต"
+          }
         }
       }
     },
@@ -4516,6 +4678,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε όνομα"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนชื่อ"
           }
         }
       }
@@ -4678,6 +4846,12 @@
             "state": "translated",
             "value": "Εισαγάγετε επώνυμο"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนนามสกุล"
+          }
         }
       }
     },
@@ -4838,6 +5012,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγάγετε έναν αριθμό τηλεφώνου"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนหมายเลขโทรศัพท์"
           }
         }
       }
@@ -5000,6 +5180,12 @@
             "state": "translated",
             "value": "Εισαγάγετε έναν ταχυδρομικό κώδικα"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ป้อนรหัสไปรษณีย์"
+          }
         }
       }
     },
@@ -5160,6 +5346,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Επιλέξτε μια πολιτεία/επαρχία"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลือกรัฐ/จังหวัด"
           }
         }
       }
@@ -5322,6 +5514,12 @@
             "state": "translated",
             "value": "Η γραμμή διεύθυνσης είναι πολύ μεγάλη"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บรรทัดที่อยู่ยาวเกินไป"
+          }
         }
       }
     },
@@ -5482,6 +5680,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Η δεύτερη γραμμή διεύθυνσης είναι πολύ μεγάλη"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บรรทัดที่อยู่ที่สองยาวเกินไป"
           }
         }
       }
@@ -5644,6 +5848,12 @@
             "state": "translated",
             "value": "Η πόλη είναι πολύ μεγάλη"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เมืองยาวเกินไป"
+          }
         }
       }
     },
@@ -5805,6 +6015,12 @@
             "state": "translated",
             "value": "Το όνομα είναι πολύ μεγάλο"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ชื่อยาวเกินไป"
+          }
         }
       }
     },
@@ -5965,6 +6181,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Το επώνυμο είναι πολύ μεγάλο"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "นามสกุลยาวเกินไป"
           }
         }
       }
@@ -6149,6 +6371,12 @@
             "state": "translated",
             "value": "Το όνομα δεν μπορεί να περιέχει URL"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ชื่อต้องไม่มี URL"
+          }
         }
       }
     },
@@ -6309,6 +6537,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Το επώνυμο δεν μπορεί να περιέχει URL"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "นามสกุลต้องไม่มี URL"
           }
         }
       }
@@ -6471,6 +6705,12 @@
             "state": "translated",
             "value": "Έκπτωση"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ส่วนลด"
+          }
         }
       }
     },
@@ -6631,6 +6871,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Δασμοί"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ภาษีศุลกากร"
           }
         }
       }
@@ -6793,6 +7039,12 @@
             "state": "translated",
             "value": "Αποστολή"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การจัดส่ง"
+          }
         }
       }
     },
@@ -6953,6 +7205,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Αποστολή (εφάπαξ αγορά)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การจัดส่ง (ซื้อครั้งเดียว)"
           }
         }
       }
@@ -7115,6 +7373,12 @@
             "state": "translated",
             "value": "Αποστολή (συνδρομή)"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การจัดส่ง (การสมัครสมาชิก)"
+          }
         }
       }
     },
@@ -7276,6 +7540,12 @@
             "state": "translated",
             "value": "Υποσύνολο"
           }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ยอดรวม"
+          }
         }
       }
     },
@@ -7436,6 +7706,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Φόροι"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ภาษี"
           }
         }
       }
