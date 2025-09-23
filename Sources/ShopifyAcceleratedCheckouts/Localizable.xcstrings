@@ -1,1927 +1,2201 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "errors.applePay.unsupported" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ApplePay is not supported on your device."
+  "sourceLanguage": "en",
+  "strings": {
+    "errors.applePay.unsupported": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ApplePay is not supported on your device."
           }
         }
       }
     },
-    "errors.emojis.address1" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Address line cannot contain emojis"
+    "errors.emojis.address1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Address line cannot contain emojis"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La ligne d'adresse ne peut pas contenir d'emojis"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ligne d'adresse ne peut pas contenir d'emojis"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresszeile darf keine Emojis enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresszeile darf keine Emojis enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "住所1に絵文字を含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住所1に絵文字を含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La línea de la dirección no puede contener emojis."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La línea de la dirección no puede contener emojis."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La riga dell'indirizzo non può contenere emoji"
-          }
-        }
-      }
-    },
-    "errors.emojis.address2" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Second address line cannot contain emojis"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La riga dell'indirizzo non può contenere emoji"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La deuxième ligne d'adresse ne peut pas contenir d'emojis"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zweite Adresszeile darf keine Emojis enthalten"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "住所2に絵文字を含めることはできません"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La segunda línea de la dirección no puede contener emojis."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La seconda riga dell'indirizzo non può contenere emoji"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A linha do endereço não pode conter emojis"
           }
         }
       }
     },
-    "errors.emojis.city" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "City cannot contain emojis"
+    "errors.emojis.address2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Second address line cannot contain emojis"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La ville ne peut pas contenir d'emojis"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La deuxième ligne d'adresse ne peut pas contenir d'emojis"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stadt darf keine Emojis enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite Adresszeile darf keine Emojis enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "都市に絵文字を含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住所2に絵文字を含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La ciudad no puede contener emojis."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La segunda línea de la dirección no puede contener emojis."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La città non può contenere emoji"
-          }
-        }
-      }
-    },
-    "errors.emojis.first_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First name cannot contain emojis"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La seconda riga dell'indirizzo non può contenere emoji"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le prénom ne peut pas contenir d'emojis"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorname darf keine Emojis enthalten"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名に絵文字を含めることはできません"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El nombre no puede contener emojis."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il nome non può contenere emoji"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A segunda linha do endereço não pode conter emojis"
           }
         }
       }
     },
-    "errors.emojis.last_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last name cannot contain emojis"
+    "errors.emojis.city": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "City cannot contain emojis"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le nom ne peut pas contenir d'emojis"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ville ne peut pas contenir d'emojis"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nachname darf keine Emojis enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stadt darf keine Emojis enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "姓に絵文字を含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "都市に絵文字を含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El apellido no puede contener emojis"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ciudad no puede contener emojis."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il cognome non può contenere emoji"
-          }
-        }
-      }
-    },
-    "errors.emojis.postal_code" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Postal code/zip cannot contain emojis"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La città non può contenere emoji"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le code postal ne peut pas contenir d'emojis"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Postleitzahl darf keine Emojis enthalten"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "郵便番号に絵文字を含めることはできません"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El código postal no puede contener emojis."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il Codice postale/CAP non può contenere emoji"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome da cidade não pode conter emojis"
           }
         }
       }
     },
-    "errors.html_tags.address1" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Address line cannot contain HTML tags"
+    "errors.emojis.first_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First name cannot contain emojis"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La ligne d'adresse ne peut pas contenir de balises HTML"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le prénom ne peut pas contenir d'emojis"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresszeile darf keine HTML-Tags enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorname darf keine Emojis enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "住所1にHTMLタグを含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名に絵文字を含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La línea de dirección no puede contener etiquetas HTML."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre no puede contener emojis."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La riga dell'indirizzo non può contenere tag HTML"
-          }
-        }
-      }
-    },
-    "errors.html_tags.address2" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Second address line cannot contain HTML tags"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome non può contenere emoji"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La deuxième ligne d'adresse ne peut pas contenir de balises HTML"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zweite Adresszeile darf keine HTML-Tags enthalten"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "住所2にHTMLタグを含めることはできません"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La segunda línea de la dirección no puede contener etiquetas HTML."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La seconda riga dell'indirizzo non può contenere tag HTML"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome não pode conter emojis"
           }
         }
       }
     },
-    "errors.html_tags.city" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "City cannot contain HTML tags"
+    "errors.emojis.last_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last name cannot contain emojis"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La ville ne peut pas contenir de balises HTML"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom ne peut pas contenir d'emojis"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stadt darf keine HTML-Tags enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachname darf keine Emojis enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "都市にHTMLタグを含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓に絵文字を含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La ciudad no puede contener etiquetas HTML."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El apellido no puede contener emojis"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La città non può contenere tag HTML"
-          }
-        }
-      }
-    },
-    "errors.html_tags.first_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First name cannot contain HTML tags"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il cognome non può contenere emoji"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le prénom ne peut pas contenir de balises HTML"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Vorname darf keine HTML-Tags enthalten"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名にHTMLタグを含めることはできません"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El nombre no puede contener etiquetas HTML."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il nome non può contenere tag HTML"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O sobrenome não pode conter emojis"
           }
         }
       }
     },
-    "errors.html_tags.last_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last name cannot contain HTML tags"
+    "errors.emojis.postal_code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Postal code/zip cannot contain emojis"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le nom ne peut pas contenir de balises HTML"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le code postal ne peut pas contenir d'emojis"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Nachname darf keine HTML-Tags enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Postleitzahl darf keine Emojis enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "姓にHTMLタグを含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "郵便番号に絵文字を含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El apellido no puede contener etiquetas HTML."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El código postal no puede contener emojis."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il cognome non può contenere tag HTML"
-          }
-        }
-      }
-    },
-    "errors.invalid.address1" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid address"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Codice postale/CAP non può contenere emoji"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir une adresse valide"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine gültige Adresse ein"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な住所を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce una dirección válida"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un indirizzo valido"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O CEP não pode conter emojis"
           }
         }
       }
     },
-    "errors.invalid.address2" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid apartment, suite, etc."
+    "errors.html_tags.address1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Address line cannot contain HTML tags"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrez un numéro d'appartement, de suite, etc. valide"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ligne d'adresse ne peut pas contenir de balises HTML"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine gültige Wohnung, ein gültiges Zimmer usw. ein"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresszeile darf keine HTML-Tags enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な建物名、部屋番号などを入力してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住所1にHTMLタグを含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un departamento, una suite, etc. válidos"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La línea de dirección no puede contener etiquetas HTML."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci scala, interno, ecc. validi"
-          }
-        }
-      }
-    },
-    "errors.invalid.city" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid city"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La riga dell'indirizzo non può contenere tag HTML"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir une ville valide"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eine gültige Stadt eingeben"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な市区町村を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce una ciudad válida"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci una città valida"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A linha do endereço não pode conter tags HTML"
           }
         }
       }
     },
-    "errors.invalid.email" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid email"
+    "errors.html_tags.address2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Second address line cannot contain HTML tags"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir une adresse e-mail valide"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La deuxième ligne d'adresse ne peut pas contenir de balises HTML"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine gültige E-Mail-Adresse ein"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite Adresszeile darf keine HTML-Tags enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効なメールアドレスを入力してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住所2にHTMLタグを含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un correo electrónico válido"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La segunda línea de la dirección no puede contener etiquetas HTML."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un indirizzo email valido"
-          }
-        }
-      }
-    },
-    "errors.invalid.emirate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid emirate"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La seconda riga dell'indirizzo non può contenere tag HTML"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un émirat valide"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gültiges Emirat eingeben"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な首長国を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ingresa un emirato válido"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un emirato valido"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A segunda linha do endereço não pode conter tags HTML"
           }
         }
       }
     },
-    "errors.invalid.first_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid first name"
+    "errors.html_tags.city": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "City cannot contain HTML tags"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veuillez saisir un prénom valide"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ville ne peut pas contenir de balises HTML"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib einen gültigen Vornamen ein"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stadt darf keine HTML-Tags enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な名を入力してください。"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "都市にHTMLタグを含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un nombre válido"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ciudad no puede contener etiquetas HTML."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un nome valido"
-          }
-        }
-      }
-    },
-    "errors.invalid.last_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid last name"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La città non può contenere tag HTML"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un nom valide"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib einen gültigen Nachnamen ein"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な姓を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un apellido válido"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un cognome valido"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cidade não pode conter tags HTML"
           }
         }
       }
     },
-    "errors.invalid.phone" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid phone number"
+    "errors.html_tags.first_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First name cannot contain HTML tags"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un numéro de téléphone valide"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le prénom ne peut pas contenir de balises HTML"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eine gültige Telefonnummer eingeben"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Vorname darf keine HTML-Tags enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な電話番号を入力してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名にHTMLタグを含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un número de teléfono válido"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre no puede contener etiquetas HTML."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un numero di telefono valido"
-          }
-        }
-      }
-    },
-    "errors.invalid.postal_code" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a valid zip / postal code"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome non può contenere tag HTML"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisissez un code postal valide"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine gültige Postleitzahl ein"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な郵便番号を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un código postal válido"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un CAP/Codice di avviamento postale valido"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome não pode conter tags HTML"
           }
         }
       }
     },
-    "errors.invalid.zone" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a valid state / province"
+    "errors.html_tags.last_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last name cannot contain HTML tags"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionnez un État/une province valide"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom ne peut pas contenir de balises HTML"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein gültiges Bundesland / eine gültige Provinz auswählen"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Nachname darf keine HTML-Tags enthalten"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効な都道府県/州を選択してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓にHTMLタグを含めることはできません"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecciona un estado o una provincia válidos."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El apellido no puede contener etiquetas HTML."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleziona uno stato / provincia valido"
-          }
-        }
-      }
-    },
-    "errors.missing.address1" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter an address"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il cognome non può contenere tag HTML"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir une adresse"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine Adresse ein"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "住所を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce una dirección."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci l'indirizzo"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O sobrenome não pode conter tags HTML"
           }
         }
       }
     },
-    "errors.missing.address2" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter an apartment, suite, etc."
+    "errors.invalid.address1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid address"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un numéro d’appartement, de suite, etc."
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir une adresse valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine Wohnung, ein Zimmer usw. ein"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine gültige Adresse ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "建物名、部屋番号などを入力してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な住所を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un apartamento, oficina, etc."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce una dirección válida"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci scala, interno, ecc."
-          }
-        }
-      }
-    },
-    "errors.missing.city" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a city"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un indirizzo valido"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrez une ville"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine Stadt ein"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "市区町村を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce una ciudad."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci la città"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um endereço válido"
           }
         }
       }
     },
-    "errors.missing.country" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a country"
+    "errors.invalid.address2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid apartment, suite, etc."
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionner un pays"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrez un numéro d'appartement, de suite, etc. valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Land auswählen"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine gültige Wohnung, ein gültiges Zimmer usw. ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "国を選択"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な建物名、部屋番号などを入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecciona un país"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un departamento, una suite, etc. válidos"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleziona un paese"
-          }
-        }
-      }
-    },
-    "errors.missing.email" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter an email address"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci scala, interno, ecc. validi"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisissez une adresse e-mail"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine E-Mail-Adresse ein."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メールアドレスを入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce una dirección de correo electrónico"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un indirizzo email"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um apartamento, bloco etc. válido"
           }
         }
       }
     },
-    "errors.missing.emirate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter an emirate"
+    "errors.invalid.city": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid city"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un émirat"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir une ville valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein Emirat eingeben"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine gültige Stadt eingeben"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "首長国を入力してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な市区町村を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ingresa un emirato"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce una ciudad válida"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un emirato"
-          }
-        }
-      }
-    },
-    "errors.missing.first_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a first name"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci una città valida"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un prénom"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib einen Vornamen ein"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un nombre."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci il nome"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira uma cidade válida"
           }
         }
       }
     },
-    "errors.missing.last_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a last name"
+    "errors.invalid.email": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid email"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un nom"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir une adresse e-mail valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib einen Nachnamen ein"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine gültige E-Mail-Adresse ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "姓を入力してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効なメールアドレスを入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un apellido."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un correo electrónico válido"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci il cognome"
-          }
-        }
-      }
-    },
-    "errors.missing.phone" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a phone number"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un indirizzo email valido"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisir un numéro de téléphone"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine Telefonnummer ein"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "電話番号を入力してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un número de teléfono"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci un numero di telefono"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um e-mail válido"
           }
         }
       }
     },
-    "errors.missing.postal_code" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a ZIP / postal code"
+    "errors.invalid.emirate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid emirate"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisissez un code postal"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un émirat valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine Postleitzahl ein"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gültiges Emirat eingeben"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "郵便番号を入力してください"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な首長国を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introduce un código postal."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingresa un emirato válido"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inserisci il codice postale"
-          }
-        }
-      }
-    },
-    "errors.missing.zone" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a state / province"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un emirato valido"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionnez un État/une province"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wähle ein Bundesland/eine Provinz aus"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "都道府県/州を選択してください"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecciona un estado o una provincia."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleziona uno stato/provincia"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um emirado válido"
           }
         }
       }
     },
-    "errors.too_long.address1" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Address line is too long"
+    "errors.invalid.first_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid first name"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La ligne d’adresse est trop longue"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veuillez saisir un prénom valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresszeile ist zu lang"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib einen gültigen Vornamen ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "住所1が長すぎます"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な名を入力してください。"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La línea de la dirección es demasiado larga."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un nombre válido"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La riga dell'indirizzo è troppo lunga"
-          }
-        }
-      }
-    },
-    "errors.too_long.address2" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Second address line is too long"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un nome valido"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deuxième ligne d’adresse est trop longue"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zweite Adresszeile ist zu lang"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "住所2が長すぎます"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La segunda línea de la dirección es demasiado larga."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La seconda riga dell'indirizzo è troppo lunga"
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um nome válido"
           }
         }
       }
     },
-    "errors.too_long.city" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "City is too long"
+    "errors.invalid.last_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid last name"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le nom de la ville est trop long"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un nom valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stadt ist zu lang"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib einen gültigen Nachnamen ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "都市名が長すぎます"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な姓を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El nombre de la ciudad es demasiado largo."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un apellido válido"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il nome della città è troppo lungo"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un cognome valido"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um sobrenome válido"
           }
         }
       }
     },
-    "errors.too_long.first_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First name is too long"
+    "errors.invalid.phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid phone number"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le prénom est trop long"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un numéro de téléphone valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorname ist zu lang"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine gültige Telefonnummer eingeben"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名が長すぎます"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な電話番号を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El nombre es demasiado largo."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un número de teléfono válido"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il nome è troppo lungo"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un numero di telefono valido"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um telefone válido"
           }
         }
       }
     },
-    "errors.too_long.last_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last name is too long"
+    "errors.invalid.postal_code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid zip / postal code"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le nom est trop long"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez un code postal valide"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nachname ist zu lang"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine gültige Postleitzahl ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "姓が長すぎます"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な郵便番号を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El apellido es demasiado largo."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un código postal válido"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il cognome è troppo lungo"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un CAP/Codice di avviamento postale valido"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um CEP válido"
           }
         }
       }
     },
-    "errors.unsupported.country.list" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Pay is only available in select countries: %@"
+    "errors.invalid.zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select a valid state / province"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélectionnez un État/une province valide"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein gültiges Bundesland / eine gültige Provinz auswählen"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効な都道府県/州を選択してください"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecciona un estado o una provincia válidos."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona uno stato / provincia valido"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione um estado/província válido"
           }
         }
       }
     },
-    "errors.unsupported.country.list.with.others" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Pay is only available in select countries: %@ and others"
+    "errors.missing.address1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter an address"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir une adresse"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine Adresse ein"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住所を入力してください"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce una dirección."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci l'indirizzo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira o endereço"
           }
         }
       }
     },
-    "errors.url.first_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First name cannot contain a URL"
+    "errors.missing.address2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter an apartment, suite, etc."
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le prénom ne peut pas contenir d’URL"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un numéro d’appartement, de suite, etc."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorname darf keine URL enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine Wohnung, ein Zimmer usw. ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名にURLを含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建物名、部屋番号などを入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El nombre no puede contener una URL."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un apartamento, oficina, etc."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il nome non può contenere un URL"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci scala, interno, ecc."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira apartamento, bloco etc."
           }
         }
       }
     },
-    "errors.url.last_name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last name cannot contain a URL"
+    "errors.missing.city": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a city"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le nom ne peut pas contenir d’URL"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrez une ville"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nachname darf keine URL enthalten"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine Stadt ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "姓にURLを含めることはできません"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "市区町村を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El apellido no puede contener una URL."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce una ciudad."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il cognome non può contenere un URL"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci la città"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira uma cidade"
           }
         }
       }
     },
-    "order_summary.discount" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Discount"
+    "errors.missing.country": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select a country"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réduction"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélectionner un pays"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rabatt"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Land auswählen"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ディスカウント"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "国を選択"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Descuento"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecciona un país"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sconto"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona un paese"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione um país"
           }
         }
       }
     },
-    "order_summary.duties" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duties"
+    "errors.missing.email": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter an email address"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frais de douane"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez une adresse e-mail"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zollgebühren"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine E-Mail-Adresse ein."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "関税"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メールアドレスを入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aranceles"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce una dirección de correo electrónico"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dazi"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un indirizzo email"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um endereço de e-mail"
           }
         }
       }
     },
-    "order_summary.shipping" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shipping"
+    "errors.missing.emirate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter an emirate"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expédition"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un émirat"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versand"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Emirat eingeben"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "配送"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首長国を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envío"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingresa un emirato"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spedizione"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un emirato"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um emirado"
           }
         }
       }
     },
-    "order_summary.shipping_one_time_purchase" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shipping (One-time purchase)"
+    "errors.missing.first_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a first name"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expédition (Achat ponctuel)"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un prénom"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versand (einmaliger Kauf)"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib einen Vornamen ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "配送 (一度限りの購入)"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envío (compra única)"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un nombre."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spedizione (acquisto una tantum)"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci il nome"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira o nome"
           }
         }
       }
     },
-    "order_summary.shipping_subscription" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shipping (Subscription)"
+    "errors.missing.last_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a last name"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expédition (Abonnement)"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un nom"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versand (Abonnement)"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib einen Nachnamen ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "配送 (定期購入)"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envío (suscripción)"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un apellido."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spedizione (abbonamento)"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci il cognome"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira o sobrenome"
           }
         }
       }
     },
-    "order_summary.subtotal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subtotal"
+    "errors.missing.phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a phone number"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sous-total"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir un numéro de téléphone"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zwischensumme"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine Telefonnummer ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "小計"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "電話番号を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subtotal"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un número de teléfono"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subtotale"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un numero di telefono"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um número de telefone"
           }
         }
       }
     },
-    "order_summary.taxes" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Taxes"
+    "errors.missing.postal_code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a ZIP / postal code"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Taxes"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez un code postal"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Steuern"
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib eine Postleitzahl ein"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "税"
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "郵便番号を入力してください"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impuestos"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce un código postal."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imposte"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci il codice postale"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira um CEP"
+          }
+        }
+      }
+    },
+    "errors.missing.zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select a state / province"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélectionnez un État/une province"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle ein Bundesland/eine Provinz aus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "都道府県/州を選択してください"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecciona un estado o una provincia."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona uno stato/provincia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione um estado/província"
+          }
+        }
+      }
+    },
+    "errors.too_long.address1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Address line is too long"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ligne d’adresse est trop longue"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresszeile ist zu lang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住所1が長すぎます"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La línea de la dirección es demasiado larga."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La riga dell'indirizzo è troppo lunga"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A linha de endereço é longa demais"
+          }
+        }
+      }
+    },
+    "errors.too_long.address2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Second address line is too long"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deuxième ligne d’adresse est trop longue"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite Adresszeile ist zu lang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住所2が長すぎます"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La segunda línea de la dirección es demasiado larga."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La seconda riga dell'indirizzo è troppo lunga"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A segunda linha de endereço é longa demais"
+          }
+        }
+      }
+    },
+    "errors.too_long.city": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "City is too long"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom de la ville est trop long"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stadt ist zu lang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "都市名が長すぎます"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre de la ciudad es demasiado largo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome della città è troppo lungo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cidade é longa demais"
+          }
+        }
+      }
+    },
+    "errors.too_long.first_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First name is too long"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le prénom est trop long"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorname ist zu lang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名が長すぎます"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre es demasiado largo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome è troppo lungo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome é longo demais"
+          }
+        }
+      }
+    },
+    "errors.too_long.last_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last name is too long"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom est trop long"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachname ist zu lang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓が長すぎます"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El apellido es demasiado largo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il cognome è troppo lungo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O sobrenome é longo demais"
+          }
+        }
+      }
+    },
+    "errors.unsupported.country.list": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Pay is only available in select countries: %@"
+          }
+        }
+      }
+    },
+    "errors.unsupported.country.list.with.others": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Pay is only available in select countries: %@ and others"
+          }
+        }
+      }
+    },
+    "errors.url.first_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First name cannot contain a URL"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le prénom ne peut pas contenir d’URL"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorname darf keine URL enthalten"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名にURLを含めることはできません"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre no puede contener una URL."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome non può contenere un URL"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome não pode conter URLs"
+          }
+        }
+      }
+    },
+    "errors.url.last_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last name cannot contain a URL"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom ne peut pas contenir d’URL"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachname darf keine URL enthalten"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓にURLを含めることはできません"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El apellido no puede contener una URL."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il cognome non può contenere un URL"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O sobrenome não pode conter URLs"
+          }
+        }
+      }
+    },
+    "order_summary.discount": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discount"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réduction"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rabatt"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ディスカウント"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descuento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sconto"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desconto"
+          }
+        }
+      }
+    },
+    "order_summary.duties": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duties"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frais de douane"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zollgebühren"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "関税"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aranceles"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dazi"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tributos de importação"
+          }
+        }
+      }
+    },
+    "order_summary.shipping": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shipping"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expédition"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versand"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配送"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envío"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spedizione"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frete"
+          }
+        }
+      }
+    },
+    "order_summary.shipping_one_time_purchase": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shipping (One-time purchase)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expédition (Achat ponctuel)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versand (einmaliger Kauf)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配送 (一度限りの購入)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envío (compra única)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spedizione (acquisto una tantum)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frete (compra única)"
+          }
+        }
+      }
+    },
+    "order_summary.shipping_subscription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shipping (Subscription)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expédition (Abonnement)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versand (Abonnement)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配送 (定期購入)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envío (suscripción)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spedizione (abbonamento)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frete (assinatura)"
+          }
+        }
+      }
+    },
+    "order_summary.subtotal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtotal"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sous-total"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwischensumme"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小計"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtotal"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtotale"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtotal"
+          }
+        }
+      }
+    },
+    "order_summary.taxes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxes"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxes"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steuern"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "税"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impuestos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imposte"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tributos"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
-
-
