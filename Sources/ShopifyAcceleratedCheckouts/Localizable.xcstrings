@@ -92,6 +92,12 @@
             "state": "translated",
             "value": "Строка адреса не может содержать эмодзи"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressrad kan inte innehålla emojis"
+          }
         }
       }
     },
@@ -174,6 +180,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вторая строка адреса не может содержать эмодзи"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andra adressraden kan inte innehålla emojis"
           }
         }
       }
@@ -258,6 +270,12 @@
             "state": "translated",
             "value": "Город не может содержать эмодзи"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stad kan inte innehålla emojis"
+          }
         }
       }
     },
@@ -340,6 +358,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Имя не может содержать эмодзи"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förnamn kan inte innehålla emojis"
           }
         }
       }
@@ -424,6 +448,12 @@
             "state": "translated",
             "value": "Фамилия не может содержать эмодзи"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternamn kan inte innehålla emojis"
+          }
         }
       }
     },
@@ -506,6 +536,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Почтовый индекс не может содержать эмодзи"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Postnummer kan inte innehålla emojis"
           }
         }
       }
@@ -590,6 +626,12 @@
             "state": "translated",
             "value": "Строка адреса не может содержать теги HTML"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressrad kan inte innehålla HTML-taggar"
+          }
         }
       }
     },
@@ -672,6 +714,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вторая строка адреса не может содержать теги HTML"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andra adressraden kan inte innehålla HTML-taggar"
           }
         }
       }
@@ -756,6 +804,12 @@
             "state": "translated",
             "value": "Город не может содержать теги HTML"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stad kan inte innehålla HTML-taggar"
+          }
         }
       }
     },
@@ -838,6 +892,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Имя не может содержать теги HTML"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förnamn kan inte innehålla HTML-taggar"
           }
         }
       }
@@ -922,6 +982,12 @@
             "state": "translated",
             "value": "Фамилия не может содержать теги HTML"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternamn kan inte innehålla HTML-taggar"
+          }
         }
       }
     },
@@ -1004,6 +1070,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите действительный адрес"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange en giltig adress"
           }
         }
       }
@@ -1088,6 +1160,12 @@
             "state": "translated",
             "value": "Введите действительную квартиру, офис и т. д."
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange giltig lägenhet, svit osv."
+          }
         }
       }
     },
@@ -1170,6 +1248,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите действительный город"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange en giltig stad"
           }
         }
       }
@@ -1254,6 +1338,12 @@
             "state": "translated",
             "value": "Введите действительный адрес электронной почты"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange en giltig e-postadress"
+          }
         }
       }
     },
@@ -1336,6 +1426,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите действительный эмират"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett giltigt emirat"
           }
         }
       }
@@ -1420,6 +1516,12 @@
             "state": "translated",
             "value": "Введите действительное имя"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett giltigt förnamn"
+          }
         }
       }
     },
@@ -1502,6 +1604,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите действительную фамилию"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett giltigt efternamn"
           }
         }
       }
@@ -1586,6 +1694,12 @@
             "state": "translated",
             "value": "Введите действительный номер телефона"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett giltigt telefonnummer"
+          }
         }
       }
     },
@@ -1668,6 +1782,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите действительный почтовый индекс"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett giltigt postnummer"
           }
         }
       }
@@ -1752,6 +1872,12 @@
             "state": "translated",
             "value": "Выберите действительный штат/провинцию"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Välj en giltig region/provins"
+          }
         }
       }
     },
@@ -1834,6 +1960,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите адрес"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange en adress"
           }
         }
       }
@@ -1918,6 +2050,12 @@
             "state": "translated",
             "value": "Введите квартиру, офис и т. д."
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange lägenhet, svit osv."
+          }
         }
       }
     },
@@ -2000,6 +2138,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите город"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange en stad"
           }
         }
       }
@@ -2084,6 +2228,12 @@
             "state": "translated",
             "value": "Выберите страну"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Välj ett land"
+          }
         }
       }
     },
@@ -2166,6 +2316,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите адрес электронной почты"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange en e-postadress"
           }
         }
       }
@@ -2250,6 +2406,12 @@
             "state": "translated",
             "value": "Введите эмират"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett emirat"
+          }
         }
       }
     },
@@ -2332,6 +2494,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите имя"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett förnamn"
           }
         }
       }
@@ -2416,6 +2584,12 @@
             "state": "translated",
             "value": "Введите фамилию"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett efternamn"
+          }
         }
       }
     },
@@ -2498,6 +2672,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите номер телефона"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett telefonnummer"
           }
         }
       }
@@ -2582,6 +2762,12 @@
             "state": "translated",
             "value": "Введите почтовый индекс"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange ett postnummer"
+          }
         }
       }
     },
@@ -2664,6 +2850,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выберите штат/провинцию"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Välj en region/provins"
           }
         }
       }
@@ -2748,6 +2940,12 @@
             "state": "translated",
             "value": "Строка адреса слишком длинная"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressraden är för lång"
+          }
         }
       }
     },
@@ -2830,6 +3028,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вторая строка адреса слишком длинная"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den andra adressraden är för lång"
           }
         }
       }
@@ -2914,6 +3118,12 @@
             "state": "translated",
             "value": "Город слишком длинный"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Staden är för lång"
+          }
         }
       }
     },
@@ -2997,6 +3207,12 @@
             "state": "translated",
             "value": "Имя слишком длинное"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förnamnet är för långt"
+          }
         }
       }
     },
@@ -3079,6 +3295,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Фамилия слишком длинная"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternamnet är för långt"
           }
         }
       }
@@ -3185,6 +3407,12 @@
             "state": "translated",
             "value": "Имя не может содержать URL-адреса"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förnamn kan inte innehålla webbadresser"
+          }
         }
       }
     },
@@ -3267,6 +3495,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Фамилия не может содержать URL-адреса"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternamn kan inte innehålla webbadresser"
           }
         }
       }
@@ -3351,6 +3585,12 @@
             "state": "translated",
             "value": "Скидка"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rabatt"
+          }
         }
       }
     },
@@ -3433,6 +3673,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пошлины"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tullavgifter"
           }
         }
       }
@@ -3517,6 +3763,12 @@
             "state": "translated",
             "value": "Доставка"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frakt"
+          }
         }
       }
     },
@@ -3599,6 +3851,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Доставка (разовая покупка)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frakt (engångsköp)"
           }
         }
       }
@@ -3683,6 +3941,12 @@
             "state": "translated",
             "value": "Доставка (подписка)"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frakt (prenumeration)"
+          }
         }
       }
     },
@@ -3766,6 +4030,12 @@
             "state": "translated",
             "value": "Промежуточный итог"
           }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delsumma"
+          }
         }
       }
     },
@@ -3848,6 +4118,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Налоги"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skatter"
           }
         }
       }
