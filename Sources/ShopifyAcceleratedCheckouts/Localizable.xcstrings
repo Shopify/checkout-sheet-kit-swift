@@ -194,6 +194,12 @@
             "state": "translated",
             "value": "Baris alamat tidak boleh mengandungi emoji"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पता लाइन में इमोजी नहीं हो सकते"
+          }
         }
       }
     },
@@ -378,6 +384,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Baris alamat kedua tidak boleh mengandungi emoji"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दूसरी पता लाइन में इमोजी नहीं हो सकते"
           }
         }
       }
@@ -564,6 +576,12 @@
             "state": "translated",
             "value": "Bandar tidak boleh mengandungi emoji"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शहर में इमोजी नहीं हो सकते"
+          }
         }
       }
     },
@@ -748,6 +766,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama pertama tidak boleh mengandungi emoji"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पहले नाम में इमोजी नहीं हो सकते"
           }
         }
       }
@@ -934,6 +958,12 @@
             "state": "translated",
             "value": "Nama akhir tidak boleh mengandungi emoji"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अंतिम नाम में इमोजी नहीं हो सकते"
+          }
         }
       }
     },
@@ -1118,6 +1148,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Poskod tidak boleh mengandungi emoji"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पिन कोड में इमोजी नहीं हो सकते"
           }
         }
       }
@@ -1304,6 +1340,12 @@
             "state": "translated",
             "value": "Baris alamat tidak boleh mengandungi tag HTML"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पता लाइन में HTML टैग नहीं हो सकते"
+          }
         }
       }
     },
@@ -1488,6 +1530,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Baris alamat kedua tidak boleh mengandungi tag HTML"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दूसरी पता लाइन में HTML टैग नहीं हो सकते"
           }
         }
       }
@@ -1674,6 +1722,12 @@
             "state": "translated",
             "value": "Bandar tidak boleh mengandungi tag HTML"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शहर में HTML टैग नहीं हो सकते"
+          }
         }
       }
     },
@@ -1858,6 +1912,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama pertama tidak boleh mengandungi tag HTML"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पहले नाम में HTML टैग नहीं हो सकते"
           }
         }
       }
@@ -2044,6 +2104,12 @@
             "state": "translated",
             "value": "Nama akhir tidak boleh mengandungi tag HTML"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अंतिम नाम में HTML टैग नहीं हो सकते"
+          }
         }
       }
     },
@@ -2228,6 +2294,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan alamat yang sah"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य पता दर्ज करें"
           }
         }
       }
@@ -2414,6 +2486,12 @@
             "state": "translated",
             "value": "Masukkan pangsapuri, suite, dsb. yang sah"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य अपार्टमेंट, सुइट आदि दर्ज करें"
+          }
         }
       }
     },
@@ -2598,6 +2676,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan bandar yang sah"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य शहर दर्ज करें"
           }
         }
       }
@@ -2784,6 +2868,12 @@
             "state": "translated",
             "value": "Masukkan e-mel yang sah"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य ईमेल दर्ज करें"
+          }
         }
       }
     },
@@ -2968,6 +3058,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan emirat yang sah"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य अमीरात दर्ज करें"
           }
         }
       }
@@ -3154,6 +3250,12 @@
             "state": "translated",
             "value": "Masukkan nama pertama yang sah"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य पहला नाम दर्ज करें"
+          }
         }
       }
     },
@@ -3338,6 +3440,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan nama akhir yang sah"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य अंतिम नाम दर्ज करें"
           }
         }
       }
@@ -3524,6 +3632,12 @@
             "state": "translated",
             "value": "Masukkan nombor telefon yang sah"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य फ़ोन नंबर दर्ज करें"
+          }
         }
       }
     },
@@ -3708,6 +3822,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan poskod yang sah"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य पिन कोड दर्ज करें"
           }
         }
       }
@@ -3894,6 +4014,12 @@
             "state": "translated",
             "value": "Pilih negeri/wilayah yang sah"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मान्य राज्य/प्रांत चुनें"
+          }
         }
       }
     },
@@ -4078,6 +4204,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan alamat"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पता दर्ज करें"
           }
         }
       }
@@ -4264,6 +4396,12 @@
             "state": "translated",
             "value": "Masukkan pangsapuri, suite, dsb."
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अपार्टमेंट, सुइट आदि दर्ज करें"
+          }
         }
       }
     },
@@ -4448,6 +4586,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan bandar"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शहर दर्ज करें"
           }
         }
       }
@@ -4634,6 +4778,12 @@
             "state": "translated",
             "value": "Pilih negara"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "देश चुनें"
+          }
         }
       }
     },
@@ -4818,6 +4968,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan alamat e-mel"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ईमेल पता दर्ज करें"
           }
         }
       }
@@ -5004,6 +5160,12 @@
             "state": "translated",
             "value": "Masukkan emirat"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अमीरात दर्ज करें"
+          }
         }
       }
     },
@@ -5188,6 +5350,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan nama pertama"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पहला नाम दर्ज करें"
           }
         }
       }
@@ -5374,6 +5542,12 @@
             "state": "translated",
             "value": "Masukkan nama akhir"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अंतिम नाम दर्ज करें"
+          }
         }
       }
     },
@@ -5558,6 +5732,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan nombor telefon"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फ़ोन नंबर दर्ज करें"
           }
         }
       }
@@ -5744,6 +5924,12 @@
             "state": "translated",
             "value": "Masukkan poskod"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पिन कोड दर्ज करें"
+          }
         }
       }
     },
@@ -5928,6 +6114,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pilih negeri/wilayah"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "राज्य/प्रांत चुनें"
           }
         }
       }
@@ -6114,6 +6306,12 @@
             "state": "translated",
             "value": "Baris alamat terlalu panjang"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पता लाइन बहुत लंबी है"
+          }
         }
       }
     },
@@ -6298,6 +6496,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Baris alamat kedua terlalu panjang"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दूसरी पता लाइन बहुत लंबी है"
           }
         }
       }
@@ -6484,6 +6688,12 @@
             "state": "translated",
             "value": "Bandar terlalu panjang"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शहर बहुत लंबा है"
+          }
         }
       }
     },
@@ -6669,6 +6879,12 @@
             "state": "translated",
             "value": "Nama pertama terlalu panjang"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पहला नाम बहुत लंबा है"
+          }
         }
       }
     },
@@ -6853,6 +7069,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama akhir terlalu panjang"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अंतिम नाम बहुत लंबा है"
           }
         }
       }
@@ -7061,6 +7283,12 @@
             "state": "translated",
             "value": "Nama pertama tidak boleh mengandungi URL"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पहले नाम में URL नहीं हो सकते"
+          }
         }
       }
     },
@@ -7245,6 +7473,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama akhir tidak boleh mengandungi URL"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अंतिम नाम में URL नहीं हो सकते"
           }
         }
       }
@@ -7431,6 +7665,12 @@
             "state": "translated",
             "value": "Diskaun"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "छूट"
+          }
         }
       }
     },
@@ -7615,6 +7855,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Duti"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शुल्क"
           }
         }
       }
@@ -7801,6 +8047,12 @@
             "state": "translated",
             "value": "Penghantaran"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शिपिंग"
+          }
         }
       }
     },
@@ -7985,6 +8237,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Penghantaran (pembelian sekali)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शिपिंग (एक बार की खरीदारी)"
           }
         }
       }
@@ -8171,6 +8429,12 @@
             "state": "translated",
             "value": "Penghantaran (langganan)"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शिपिंग (सदस्यता)"
+          }
         }
       }
     },
@@ -8356,6 +8620,12 @@
             "state": "translated",
             "value": "Subjumlah"
           }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "उप-योग"
+          }
         }
       }
     },
@@ -8540,6 +8810,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cukai"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कर"
           }
         }
       }
