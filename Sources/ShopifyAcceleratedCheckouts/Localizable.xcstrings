@@ -80,6 +80,12 @@
             "state": "translated",
             "value": "Adresregel mag geen emoji's bevatten."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linia adresu nie może zawierać emoji"
+          }
         }
       }
     },
@@ -150,6 +156,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tweede adresregel mag geen emoji's bevatten."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druga linia adresu nie może zawierać emoji"
           }
         }
       }
@@ -222,6 +234,12 @@
             "state": "translated",
             "value": "Plaats mag geen emoji's bevatten."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miasto nie może zawierać emoji"
+          }
         }
       }
     },
@@ -292,6 +310,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voornaam mag geen emoji's bevatten"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imię nie może zawierać emoji"
           }
         }
       }
@@ -364,6 +388,12 @@
             "state": "translated",
             "value": "Achternaam mag geen emoji's bevatten"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nazwisko nie może zawierać emoji"
+          }
         }
       }
     },
@@ -434,6 +464,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Postcode mag geen emoji's bevatten."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod pocztowy nie może zawierać emoji"
           }
         }
       }
@@ -506,6 +542,12 @@
             "state": "translated",
             "value": "Adresregel mag geen HTML-tags bevatten."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linia adresu nie może zawierać tagów HTML"
+          }
         }
       }
     },
@@ -576,6 +618,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tweede adresregel mag geen HTML-tags bevatten."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druga linia adresu nie może zawierać tagów HTML"
           }
         }
       }
@@ -648,6 +696,12 @@
             "state": "translated",
             "value": "Plaats mag geen HTML-tags bevatten."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miasto nie może zawierać tagów HTML"
+          }
         }
       }
     },
@@ -718,6 +772,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voornaam mag geen HTML-tags bevatten."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imię nie może zawierać tagów HTML"
           }
         }
       }
@@ -790,6 +850,12 @@
             "state": "translated",
             "value": "Achternaam mag geen HTML-tags bevatten."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nazwisko nie może zawierać tagów HTML"
+          }
         }
       }
     },
@@ -860,6 +926,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een geldig adres in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz prawidłowy adres"
           }
         }
       }
@@ -932,6 +1004,12 @@
             "state": "translated",
             "value": "Voer een geldig appartement- of suitenummer, enz. in."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz prawidłowe mieszkanie, apartament itp."
+          }
         }
       }
     },
@@ -1002,6 +1080,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een geldige plaatsnaam in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz prawidłowe miasto"
           }
         }
       }
@@ -1074,6 +1158,12 @@
             "state": "translated",
             "value": "Voer een geldig e-mailadres in."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz poprawny adres e-mail"
+          }
         }
       }
     },
@@ -1144,6 +1234,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een geldig emiraat in"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wprowadź prawidłowy emirat"
           }
         }
       }
@@ -1216,6 +1312,12 @@
             "state": "translated",
             "value": "Voer een geldige voornaam in."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz prawidłowe imię"
+          }
         }
       }
     },
@@ -1286,6 +1388,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een geldige achternaam in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz prawidłowe nazwisko"
           }
         }
       }
@@ -1358,6 +1466,12 @@
             "state": "translated",
             "value": "Voer een geldig telefoonnummer in"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz prawidłowy numer telefonu"
+          }
         }
       }
     },
@@ -1428,6 +1542,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een geldige ZIP- of postcode in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz prawidłowy kod pocztowy"
           }
         }
       }
@@ -1500,6 +1620,12 @@
             "state": "translated",
             "value": "Selecteer een geldige staat/provincie."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz prawidłowy stan / prowincję"
+          }
         }
       }
     },
@@ -1570,6 +1696,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een adres in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz adres"
           }
         }
       }
@@ -1642,6 +1774,12 @@
             "state": "translated",
             "value": "Voer een appartement- of suitenummer in, etc."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz mieszkanie, apartament itp."
+          }
         }
       }
     },
@@ -1712,6 +1850,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een plaatsnaam in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz miasto"
           }
         }
       }
@@ -1784,6 +1928,12 @@
             "state": "translated",
             "value": "Selecteer een land"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz kraj"
+          }
         }
       }
     },
@@ -1854,6 +2004,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een e-mailadres in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz adres e-mail"
           }
         }
       }
@@ -1926,6 +2082,12 @@
             "state": "translated",
             "value": "Voer een emiraat in"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wprowadź emirat"
+          }
         }
       }
     },
@@ -1996,6 +2158,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een voornaam in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz imię"
           }
         }
       }
@@ -2068,6 +2236,12 @@
             "state": "translated",
             "value": "Voer een achternaam in."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz nazwisko"
+          }
         }
       }
     },
@@ -2138,6 +2312,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voer een telefoonnummer in."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wprowadź numer telefonu"
           }
         }
       }
@@ -2210,6 +2390,12 @@
             "state": "translated",
             "value": "Voer een ZIP- of postcode in."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wpisz kod pocztowy"
+          }
         }
       }
     },
@@ -2280,6 +2466,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Selecteer een staat/provincie."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz województwo"
           }
         }
       }
@@ -2352,6 +2544,12 @@
             "state": "translated",
             "value": "Adresregel is te lang"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linia adresu jest za długa"
+          }
         }
       }
     },
@@ -2422,6 +2620,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tweede adresregel is te lang"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Druga linia adresu jest za długa"
           }
         }
       }
@@ -2494,6 +2698,12 @@
             "state": "translated",
             "value": "Plaats is te lang"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miasto zawiera zbyt dużo znaków"
+          }
         }
       }
     },
@@ -2565,6 +2775,12 @@
             "state": "translated",
             "value": "Voornaam is te lang"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imię jest za długie"
+          }
         }
       }
     },
@@ -2635,6 +2851,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Achternaam is te lang"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nazwisko jest za długie"
           }
         }
       }
@@ -2729,6 +2951,12 @@
             "state": "translated",
             "value": "Voornaam mag geen URL bevatten."
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imię nie może zawierać adresu URL"
+          }
         }
       }
     },
@@ -2799,6 +3027,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Achternaam mag geen URL bevatten."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nazwisko nie może zawierać adresu URL"
           }
         }
       }
@@ -2871,6 +3105,12 @@
             "state": "translated",
             "value": "Korting"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rabat"
+          }
         }
       }
     },
@@ -2941,6 +3181,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Douanerechten"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cła"
           }
         }
       }
@@ -3013,6 +3259,12 @@
             "state": "translated",
             "value": "Verzending"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wysyłka"
+          }
         }
       }
     },
@@ -3083,6 +3335,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verzenden (eenmalige aankoop)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wysyłka (zakup jednorazowy)"
           }
         }
       }
@@ -3155,6 +3413,12 @@
             "state": "translated",
             "value": "Verzenden (abonnement)"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wysyłka (subskrypcja)"
+          }
         }
       }
     },
@@ -3226,6 +3490,12 @@
             "state": "translated",
             "value": "Subtotaal"
           }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suma częściowa"
+          }
         }
       }
     },
@@ -3296,6 +3566,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Btw"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Podatki"
           }
         }
       }
