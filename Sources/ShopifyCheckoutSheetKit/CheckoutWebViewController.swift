@@ -41,20 +41,35 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     private lazy var closeBarButtonItem: UIBarButtonItem = {
         if let closeButtonTintColor = ShopifyCheckoutSheetKit.configuration.closeButtonTintColor {
-            let image = UIImage(systemName: "xmark.circle.fill")
-            let item = UIBarButtonItem(
-                image: image,
-                style: .plain,
-                target: self,
-                action: #selector(close)
-            )
+            var item: UIBarButtonItem
+
+            if #available(iOS 26.0, *) {
+                /// Liquid glass renders the icon inside a circular bubble by default
+                item = UIBarButtonItem(
+                    image: UIImage(systemName: "xmark"),
+                    style: .plain,
+                    target: self,
+                    action: #selector(close)
+                )
+            } else {
+                item = UIBarButtonItem(
+                    image: UIImage(systemName: "xmark.circle.fill"),
+                    style: .plain,
+                    target: self,
+                    action: #selector(close)
+                )
+            }
+
             item.tintColor = closeButtonTintColor
             return item
-        } else {
-            return UIBarButtonItem(
-                barButtonSystemItem: .close, target: self, action: #selector(close)
-            )
         }
+
+        /// Use system default if no custom tint color was provided
+        return UIBarButtonItem(
+            barButtonSystemItem: .close,
+            target: self,
+            action: #selector(close)
+        )
     }()
 
     var progressObserver: NSKeyValueObservation?
