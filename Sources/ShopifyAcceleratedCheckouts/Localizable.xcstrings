@@ -98,6 +98,12 @@
             "state": "translated",
             "value": "Adressrad kan inte innehålla emojis"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresselinje må ikke indeholde emojis"
+          }
         }
       }
     },
@@ -186,6 +192,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Andra adressraden kan inte innehålla emojis"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anden adresselinje må ikke indeholde emojis"
           }
         }
       }
@@ -276,6 +288,12 @@
             "state": "translated",
             "value": "Stad kan inte innehålla emojis"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By må ikke indeholde emojis"
+          }
         }
       }
     },
@@ -364,6 +382,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Förnamn kan inte innehålla emojis"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn må ikke indeholde emojis"
           }
         }
       }
@@ -454,6 +478,12 @@
             "state": "translated",
             "value": "Efternamn kan inte innehålla emojis"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternavn må ikke indeholde emojis"
+          }
         }
       }
     },
@@ -542,6 +572,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Postnummer kan inte innehålla emojis"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Postnummer må ikke indeholde emojis"
           }
         }
       }
@@ -632,6 +668,12 @@
             "state": "translated",
             "value": "Adressrad kan inte innehålla HTML-taggar"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresselinje må ikke indeholde HTML-tags"
+          }
         }
       }
     },
@@ -720,6 +762,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Andra adressraden kan inte innehålla HTML-taggar"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anden adresselinje må ikke indeholde HTML-tags"
           }
         }
       }
@@ -810,6 +858,12 @@
             "state": "translated",
             "value": "Stad kan inte innehålla HTML-taggar"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By må ikke indeholde HTML-tags"
+          }
         }
       }
     },
@@ -898,6 +952,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Förnamn kan inte innehålla HTML-taggar"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn må ikke indeholde HTML-tags"
           }
         }
       }
@@ -988,6 +1048,12 @@
             "state": "translated",
             "value": "Efternamn kan inte innehålla HTML-taggar"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternavn må ikke indeholde HTML-tags"
+          }
         }
       }
     },
@@ -1076,6 +1142,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange en giltig adress"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv en gyldig adresse"
           }
         }
       }
@@ -1166,6 +1238,12 @@
             "state": "translated",
             "value": "Ange giltig lägenhet, svit osv."
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv en gyldig lejlighed, etage osv."
+          }
         }
       }
     },
@@ -1254,6 +1332,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange en giltig stad"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv en gyldig by"
           }
         }
       }
@@ -1344,6 +1428,12 @@
             "state": "translated",
             "value": "Ange en giltig e-postadress"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv en gyldig e-mailadresse"
+          }
         }
       }
     },
@@ -1432,6 +1522,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange ett giltigt emirat"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et gyldigt emirat"
           }
         }
       }
@@ -1522,6 +1618,12 @@
             "state": "translated",
             "value": "Ange ett giltigt förnamn"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et gyldigt fornavn"
+          }
         }
       }
     },
@@ -1610,6 +1712,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange ett giltigt efternamn"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et gyldigt efternavn"
           }
         }
       }
@@ -1700,6 +1808,12 @@
             "state": "translated",
             "value": "Ange ett giltigt telefonnummer"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et gyldigt telefonnummer"
+          }
         }
       }
     },
@@ -1788,6 +1902,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange ett giltigt postnummer"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et gyldigt postnummer"
           }
         }
       }
@@ -1878,6 +1998,12 @@
             "state": "translated",
             "value": "Välj en giltig region/provins"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vælg en gyldig stat/provins"
+          }
         }
       }
     },
@@ -1966,6 +2092,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange en adress"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv en adresse"
           }
         }
       }
@@ -2056,6 +2188,12 @@
             "state": "translated",
             "value": "Ange lägenhet, svit osv."
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv lejlighed, etage osv."
+          }
         }
       }
     },
@@ -2144,6 +2282,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange en stad"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv en by"
           }
         }
       }
@@ -2234,6 +2378,12 @@
             "state": "translated",
             "value": "Välj ett land"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vælg et land"
+          }
         }
       }
     },
@@ -2322,6 +2472,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange en e-postadress"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv en e-mailadresse"
           }
         }
       }
@@ -2412,6 +2568,12 @@
             "state": "translated",
             "value": "Ange ett emirat"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et emirat"
+          }
         }
       }
     },
@@ -2500,6 +2662,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange ett förnamn"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et fornavn"
           }
         }
       }
@@ -2590,6 +2758,12 @@
             "state": "translated",
             "value": "Ange ett efternamn"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et efternavn"
+          }
         }
       }
     },
@@ -2678,6 +2852,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ange ett telefonnummer"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et telefonnummer"
           }
         }
       }
@@ -2768,6 +2948,12 @@
             "state": "translated",
             "value": "Ange ett postnummer"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv et postnummer"
+          }
         }
       }
     },
@@ -2856,6 +3042,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Välj en region/provins"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vælg en stat/provins"
           }
         }
       }
@@ -2946,6 +3138,12 @@
             "state": "translated",
             "value": "Adressraden är för lång"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresselinje er for lang"
+          }
         }
       }
     },
@@ -3034,6 +3232,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Den andra adressraden är för lång"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anden adresselinje er for lang"
           }
         }
       }
@@ -3124,6 +3328,12 @@
             "state": "translated",
             "value": "Staden är för lång"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By er for lang"
+          }
         }
       }
     },
@@ -3213,6 +3423,12 @@
             "state": "translated",
             "value": "Förnamnet är för långt"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn er for langt"
+          }
         }
       }
     },
@@ -3301,6 +3517,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Efternamnet är för långt"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternavn er for langt"
           }
         }
       }
@@ -3413,6 +3635,12 @@
             "state": "translated",
             "value": "Förnamn kan inte innehålla webbadresser"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fornavn må ikke indeholde URL'er"
+          }
         }
       }
     },
@@ -3501,6 +3729,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Efternamn kan inte innehålla webbadresser"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efternavn må ikke indeholde URL'er"
           }
         }
       }
@@ -3591,6 +3825,12 @@
             "state": "translated",
             "value": "Rabatt"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rabat"
+          }
         }
       }
     },
@@ -3679,6 +3919,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tullavgifter"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afgifter"
           }
         }
       }
@@ -3769,6 +4015,12 @@
             "state": "translated",
             "value": "Frakt"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forsendelse"
+          }
         }
       }
     },
@@ -3857,6 +4109,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Frakt (engångsköp)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forsendelse (engangskøb)"
           }
         }
       }
@@ -3947,6 +4205,12 @@
             "state": "translated",
             "value": "Frakt (prenumeration)"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forsendelse (abonnement)"
+          }
         }
       }
     },
@@ -4036,6 +4300,12 @@
             "state": "translated",
             "value": "Delsumma"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtotal"
+          }
         }
       }
     },
@@ -4121,6 +4391,12 @@
           }
         },
         "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skatter"
+          }
+        },
+        "da": {
           "stringUnit": {
             "state": "translated",
             "value": "Skatter"
