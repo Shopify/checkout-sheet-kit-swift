@@ -128,6 +128,12 @@
             "state": "translated",
             "value": "Řádek adresy nemůže obsahovat emotikony"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A címsor nem tartalmazhat hangulatjeleket"
+          }
         }
       }
     },
@@ -246,6 +252,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Druhý řádek adresy nemůže obsahovat emotikony"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A második címsor nem tartalmazhat hangulatjeleket"
           }
         }
       }
@@ -366,6 +378,12 @@
             "state": "translated",
             "value": "Město nemůže obsahovat emotikony"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A város nem tartalmazhat hangulatjeleket"
+          }
         }
       }
     },
@@ -484,6 +502,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Křestní jméno nemůže obsahovat emotikony"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az utónév nem tartalmazhat hangulatjeleket"
           }
         }
       }
@@ -604,6 +628,12 @@
             "state": "translated",
             "value": "Příjmení nemůže obsahovat emotikony"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A vezetéknév nem tartalmazhat hangulatjeleket"
+          }
         }
       }
     },
@@ -722,6 +752,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "PSČ nemůže obsahovat emotikony"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az irányítószám nem tartalmazhat hangulatjeleket"
           }
         }
       }
@@ -842,6 +878,12 @@
             "state": "translated",
             "value": "Řádek adresy nemůže obsahovat značky HTML"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A címsor nem tartalmazhat HTML-címkéket"
+          }
         }
       }
     },
@@ -960,6 +1002,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Druhý řádek adresy nemůže obsahovat značky HTML"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A második címsor nem tartalmazhat HTML-címkéket"
           }
         }
       }
@@ -1080,6 +1128,12 @@
             "state": "translated",
             "value": "Město nemůže obsahovat značky HTML"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A város nem tartalmazhat HTML-címkéket"
+          }
         }
       }
     },
@@ -1198,6 +1252,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Křestní jméno nemůže obsahovat značky HTML"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az utónév nem tartalmazhat HTML-címkéket"
           }
         }
       }
@@ -1318,6 +1378,12 @@
             "state": "translated",
             "value": "Příjmení nemůže obsahovat značky HTML"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A vezetéknév nem tartalmazhat HTML-címkéket"
+          }
         }
       }
     },
@@ -1436,6 +1502,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte platnou adresu"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes címet"
           }
         }
       }
@@ -1556,6 +1628,12 @@
             "state": "translated",
             "value": "Zadejte platný byt, apartmán atd."
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes lakás-, lakosztályszámot stb."
+          }
         }
       }
     },
@@ -1674,6 +1752,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte platné město"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes várost"
           }
         }
       }
@@ -1794,6 +1878,12 @@
             "state": "translated",
             "value": "Zadejte platnou e-mailovou adresu"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes e-mail-címet"
+          }
         }
       }
     },
@@ -1912,6 +2002,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte platný emirát"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes emirátust"
           }
         }
       }
@@ -2032,6 +2128,12 @@
             "state": "translated",
             "value": "Zadejte platné křestní jméno"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes utónevet"
+          }
         }
       }
     },
@@ -2150,6 +2252,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte platné příjmení"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes vezetéknevet"
           }
         }
       }
@@ -2270,6 +2378,12 @@
             "state": "translated",
             "value": "Zadejte platné telefonní číslo"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes telefonszámot"
+          }
         }
       }
     },
@@ -2388,6 +2502,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte platné PSČ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy érvényes irányítószámot"
           }
         }
       }
@@ -2508,6 +2628,12 @@
             "state": "translated",
             "value": "Vyberte platný stát/provincii"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Válasszon egy érvényes államot/tartományt"
+          }
         }
       }
     },
@@ -2626,6 +2752,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte adresu"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy címet"
           }
         }
       }
@@ -2746,6 +2878,12 @@
             "state": "translated",
             "value": "Zadejte byt, apartmán atd."
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adja meg a lakás, lakosztály stb. számát"
+          }
         }
       }
     },
@@ -2864,6 +3002,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte město"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy várost"
           }
         }
       }
@@ -2984,6 +3128,12 @@
             "state": "translated",
             "value": "Vyberte zemi"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Válasszon egy országot"
+          }
         }
       }
     },
@@ -3102,6 +3252,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte e-mailovou adresu"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy e-mail-címet"
           }
         }
       }
@@ -3222,6 +3378,12 @@
             "state": "translated",
             "value": "Zadejte emirát"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy emirátust"
+          }
         }
       }
     },
@@ -3340,6 +3502,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte křestní jméno"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy utónevet"
           }
         }
       }
@@ -3460,6 +3628,12 @@
             "state": "translated",
             "value": "Zadejte příjmení"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy vezetéknevet"
+          }
         }
       }
     },
@@ -3578,6 +3752,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zadejte telefonní číslo"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy telefonszámot"
           }
         }
       }
@@ -3698,6 +3878,12 @@
             "state": "translated",
             "value": "Zadejte PSČ"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjon meg egy irányítószámot"
+          }
         }
       }
     },
@@ -3816,6 +4002,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vyberte stát/provincii"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Válasszon egy államot/tartományt"
           }
         }
       }
@@ -3936,6 +4128,12 @@
             "state": "translated",
             "value": "Řádek adresy je příliš dlouhý"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A címsor túl hosszú"
+          }
         }
       }
     },
@@ -4054,6 +4252,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Druhý řádek adresy je příliš dlouhý"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A második címsor túl hosszú"
           }
         }
       }
@@ -4174,6 +4378,12 @@
             "state": "translated",
             "value": "Město je příliš dlouhé"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A város túl hosszú"
+          }
         }
       }
     },
@@ -4293,6 +4503,12 @@
             "state": "translated",
             "value": "Křestní jméno je příliš dlouhé"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az utónév túl hosszú"
+          }
         }
       }
     },
@@ -4411,6 +4627,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Příjmení je příliš dlouhé"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A vezetéknév túl hosszú"
           }
         }
       }
@@ -4553,6 +4775,12 @@
             "state": "translated",
             "value": "Křestní jméno nemůže obsahovat URL"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az utónév nem tartalmazhat URL-címeket"
+          }
         }
       }
     },
@@ -4671,6 +4899,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Příjmení nemůže obsahovat URL"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A vezetéknév nem tartalmazhat URL-címeket"
           }
         }
       }
@@ -4791,6 +5025,12 @@
             "state": "translated",
             "value": "Sleva"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kedvezmény"
+          }
         }
       }
     },
@@ -4909,6 +5149,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cla"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vámok"
           }
         }
       }
@@ -5029,6 +5275,12 @@
             "state": "translated",
             "value": "Doprava"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szállítás"
+          }
         }
       }
     },
@@ -5147,6 +5399,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Doprava (jednorázový nákup)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szállítás (egyszeri vásárlás)"
           }
         }
       }
@@ -5267,6 +5525,12 @@
             "state": "translated",
             "value": "Doprava (předplatné)"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szállítás (előfizetés)"
+          }
         }
       }
     },
@@ -5386,6 +5650,12 @@
             "state": "translated",
             "value": "Mezisoučet"
           }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Részösszeg"
+          }
         }
       }
     },
@@ -5504,6 +5774,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Daně"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adók"
           }
         }
       }
