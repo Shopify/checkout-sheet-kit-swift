@@ -158,6 +158,12 @@
             "state": "translated",
             "value": "Redak adrese ne može sadržavati emotikone"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адресният ред не може да съдържа емотикони"
+          }
         }
       }
     },
@@ -306,6 +312,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Drugi redak adrese ne može sadržavati emotikone"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вторият адресен ред не може да съдържа емотикони"
           }
         }
       }
@@ -456,6 +468,12 @@
             "state": "translated",
             "value": "Grad ne može sadržavati emotikone"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Градът не може да съдържа емотикони"
+          }
         }
       }
     },
@@ -604,6 +622,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ime ne može sadržavati emotikone"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Името не може да съдържа емотикони"
           }
         }
       }
@@ -754,6 +778,12 @@
             "state": "translated",
             "value": "Prezime ne može sadržavati emotikone"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фамилията не може да съдържа емотикони"
+          }
         }
       }
     },
@@ -902,6 +932,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Poštanski broj ne može sadržavati emotikone"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пощенският код не може да съдържа емотикони"
           }
         }
       }
@@ -1052,6 +1088,12 @@
             "state": "translated",
             "value": "Redak adrese ne može sadržavati HTML oznake"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адресният ред не може да съдържа HTML тагове"
+          }
         }
       }
     },
@@ -1200,6 +1242,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Drugi redak adrese ne može sadržavati HTML oznake"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вторият адресен ред не може да съдържа HTML тагове"
           }
         }
       }
@@ -1350,6 +1398,12 @@
             "state": "translated",
             "value": "Grad ne može sadržavati HTML oznake"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Градът не може да съдържа HTML тагове"
+          }
         }
       }
     },
@@ -1498,6 +1552,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ime ne može sadržavati HTML oznake"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Името не може да съдържа HTML тагове"
           }
         }
       }
@@ -1648,6 +1708,12 @@
             "state": "translated",
             "value": "Prezime ne može sadržavati HTML oznake"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фамилията не може да съдържа HTML тагове"
+          }
         }
       }
     },
@@ -1796,6 +1862,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite valjanu adresu"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валиден адрес"
           }
         }
       }
@@ -1946,6 +2018,12 @@
             "state": "translated",
             "value": "Unesite valjan stan, apartman itd."
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валиден апартамент, офис и др."
+          }
         }
       }
     },
@@ -2094,6 +2172,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite valjan grad"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валиден град"
           }
         }
       }
@@ -2244,6 +2328,12 @@
             "state": "translated",
             "value": "Unesite valjanu adresu e-pošte"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валиден имейл"
+          }
         }
       }
     },
@@ -2392,6 +2482,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite valjan emirat"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валидно емирство"
           }
         }
       }
@@ -2542,6 +2638,12 @@
             "state": "translated",
             "value": "Unesite valjano ime"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валидно име"
+          }
         }
       }
     },
@@ -2690,6 +2792,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite valjano prezime"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валидна фамилия"
           }
         }
       }
@@ -2840,6 +2948,12 @@
             "state": "translated",
             "value": "Unesite važeći telefonski broj"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валиден телефонен номер"
+          }
         }
       }
     },
@@ -2988,6 +3102,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite važeći poštanski broj"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете валиден пощенски код"
           }
         }
       }
@@ -3138,6 +3258,12 @@
             "state": "translated",
             "value": "Odaberite valjanu državu/pokrajinu"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Изберете валиден щат/провинция"
+          }
         }
       }
     },
@@ -3286,6 +3412,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite adresu"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете адрес"
           }
         }
       }
@@ -3436,6 +3568,12 @@
             "state": "translated",
             "value": "Unesite stan, apartman itd."
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете апартамент, офис и др."
+          }
         }
       }
     },
@@ -3584,6 +3722,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite grad"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете град"
           }
         }
       }
@@ -3734,6 +3878,12 @@
             "state": "translated",
             "value": "Odaberite državu"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Изберете държава"
+          }
         }
       }
     },
@@ -3882,6 +4032,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite adresu e-pošte"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете имейл адрес"
           }
         }
       }
@@ -4032,6 +4188,12 @@
             "state": "translated",
             "value": "Unesite emirat"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете емирство"
+          }
         }
       }
     },
@@ -4180,6 +4342,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite ime"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете име"
           }
         }
       }
@@ -4330,6 +4498,12 @@
             "state": "translated",
             "value": "Unesite prezime"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете фамилия"
+          }
         }
       }
     },
@@ -4478,6 +4652,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unesite telefonski broj"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете телефонен номер"
           }
         }
       }
@@ -4628,6 +4808,12 @@
             "state": "translated",
             "value": "Unesite poštanski broj"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Въведете пощенски код"
+          }
         }
       }
     },
@@ -4776,6 +4962,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Odaberite državu/pokrajinu"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Изберете щат/провинция"
           }
         }
       }
@@ -4926,6 +5118,12 @@
             "state": "translated",
             "value": "Redak adrese je predugačak"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адресният ред е твърде дълъг"
+          }
         }
       }
     },
@@ -5074,6 +5272,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Drugi redak adrese je predugačak"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вторият адресен ред е твърде дълъг"
           }
         }
       }
@@ -5224,6 +5428,12 @@
             "state": "translated",
             "value": "Grad je predugačak"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Градът е твърде дълъг"
+          }
         }
       }
     },
@@ -5373,6 +5583,12 @@
             "state": "translated",
             "value": "Ime je predugo"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Името е твърде дълго"
+          }
         }
       }
     },
@@ -5521,6 +5737,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prezime je predugo"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фамилията е твърде дълга"
           }
         }
       }
@@ -5693,6 +5915,12 @@
             "state": "translated",
             "value": "Ime ne može sadržavati URL-ove"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Името не може да съдържа URL адреси"
+          }
         }
       }
     },
@@ -5841,6 +6069,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prezime ne može sadržavati URL-ove"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фамилията не може да съдържа URL адреси"
           }
         }
       }
@@ -5991,6 +6225,12 @@
             "state": "translated",
             "value": "Popust"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отстъпка"
+          }
         }
       }
     },
@@ -6139,6 +6379,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Carine"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мита"
           }
         }
       }
@@ -6289,6 +6535,12 @@
             "state": "translated",
             "value": "Dostava"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доставка"
+          }
         }
       }
     },
@@ -6437,6 +6689,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dostava (jednokratna kupnja)"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доставка (еднократна покупка)"
           }
         }
       }
@@ -6587,6 +6845,12 @@
             "state": "translated",
             "value": "Dostava (pretplata)"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доставка (абонамент)"
+          }
         }
       }
     },
@@ -6736,6 +7000,12 @@
             "state": "translated",
             "value": "Međuzbroj"
           }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Междинна сума"
+          }
         }
       }
     },
@@ -6884,6 +7154,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Porezi"
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Данъци"
           }
         }
       }
