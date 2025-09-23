@@ -24,13 +24,19 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La ligne d’adresse ne peut pas contenir d’emojis"
+            "value" : "La ligne d'adresse ne peut pas contenir d'emojis"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresszeile darf keine Emojis enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所1に絵文字を含めることはできません"
           }
         }
       }
@@ -47,13 +53,19 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La deuxième ligne d’adresse ne peut pas contenir d’emojis"
+            "value" : "La deuxième ligne d'adresse ne peut pas contenir d'emojis"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zweite Adresszeile darf keine Emojis enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所2に絵文字を含めることはできません"
           }
         }
       }
@@ -70,13 +82,19 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La ville ne peut pas contenir d’emojis"
+            "value" : "La ville ne peut pas contenir d'emojis"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stadt darf keine Emojis enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "都市に絵文字を含めることはできません"
           }
         }
       }
@@ -93,13 +111,19 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le prénom ne peut pas contenir d’emojis"
+            "value" : "Le prénom ne peut pas contenir d'emojis"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vorname darf keine Emojis enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名に絵文字を含めることはできません"
           }
         }
       }
@@ -116,13 +140,19 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le nom ne peut pas contenir d’emojis"
+            "value" : "Le nom ne peut pas contenir d'emojis"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nachname darf keine Emojis enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "姓に絵文字を含めることはできません"
           }
         }
       }
@@ -139,13 +169,19 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le code postal ne peut pas contenir d’emojis"
+            "value" : "Le code postal ne peut pas contenir d'emojis"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Postleitzahl darf keine Emojis enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "郵便番号に絵文字を含めることはできません"
           }
         }
       }
@@ -170,6 +206,12 @@
             "state" : "translated",
             "value" : "Adresszeile darf keine HTML-Tags enthalten"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所1にHTMLタグを含めることはできません"
+          }
         }
       }
     },
@@ -192,6 +234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zweite Adresszeile darf keine HTML-Tags enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所2にHTMLタグを含めることはできません"
           }
         }
       }
@@ -216,6 +264,12 @@
             "state" : "translated",
             "value" : "Stadt darf keine HTML-Tags enthalten"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "都市にHTMLタグを含めることはできません"
+          }
         }
       }
     },
@@ -238,6 +292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Der Vorname darf keine HTML-Tags enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名にHTMLタグを含めることはできません"
           }
         }
       }
@@ -262,6 +322,12 @@
             "state" : "translated",
             "value" : "Der Nachname darf keine HTML-Tags enthalten"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "姓にHTMLタグを含めることはできません"
+          }
         }
       }
     },
@@ -284,6 +350,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib eine gültige Adresse ein"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な住所を入力してください"
           }
         }
       }
@@ -308,6 +380,12 @@
             "state" : "translated",
             "value" : "Gib eine gültige Wohnung, ein gültiges Zimmer usw. ein"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な建物名、部屋番号などを入力してください"
+          }
         }
       }
     },
@@ -330,6 +408,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eine gültige Stadt eingeben"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な市区町村を入力してください"
           }
         }
       }
@@ -354,6 +438,12 @@
             "state" : "translated",
             "value" : "Gib eine gültige E-Mail-Adresse ein"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効なメールアドレスを入力してください"
+          }
         }
       }
     },
@@ -376,6 +466,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gültiges Emirat eingeben"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な首長国を入力してください"
           }
         }
       }
@@ -400,6 +496,12 @@
             "state" : "translated",
             "value" : "Gib einen gültigen Vornamen ein"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な名を入力してください。"
+          }
         }
       }
     },
@@ -422,6 +524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib einen gültigen Nachnamen ein"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な姓を入力してください"
           }
         }
       }
@@ -446,6 +554,12 @@
             "state" : "translated",
             "value" : "Eine gültige Telefonnummer eingeben"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な電話番号を入力してください"
+          }
         }
       }
     },
@@ -468,6 +582,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib eine gültige Postleitzahl ein"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な郵便番号を入力してください"
           }
         }
       }
@@ -492,6 +612,12 @@
             "state" : "translated",
             "value" : "Ein gültiges Bundesland / eine gültige Provinz auswählen"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効な都道府県/州を選択してください"
+          }
         }
       }
     },
@@ -514,6 +640,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib eine Adresse ein"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所を入力してください"
           }
         }
       }
@@ -538,6 +670,12 @@
             "state" : "translated",
             "value" : "Gib eine Wohnung, ein Zimmer usw. ein"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建物名、部屋番号などを入力してください"
+          }
         }
       }
     },
@@ -560,6 +698,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib eine Stadt ein"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "市区町村を入力してください"
           }
         }
       }
@@ -584,6 +728,12 @@
             "state" : "translated",
             "value" : "Land auswählen"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "国を選択"
+          }
         }
       }
     },
@@ -606,6 +756,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib eine E-Mail-Adresse ein."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メールアドレスを入力してください"
           }
         }
       }
@@ -630,6 +786,12 @@
             "state" : "translated",
             "value" : "Ein Emirat eingeben"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首長国を入力してください"
+          }
         }
       }
     },
@@ -652,6 +814,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib einen Vornamen ein"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名を入力してください"
           }
         }
       }
@@ -676,6 +844,12 @@
             "state" : "translated",
             "value" : "Gib einen Nachnamen ein"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "姓を入力してください"
+          }
         }
       }
     },
@@ -698,6 +872,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gib eine Telefonnummer ein"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "電話番号を入力してください"
           }
         }
       }
@@ -722,6 +902,12 @@
             "state" : "translated",
             "value" : "Gib eine Postleitzahl ein"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "郵便番号を入力してください"
+          }
         }
       }
     },
@@ -744,6 +930,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wähle ein Bundesland/eine Provinz aus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "都道府県/州を選択してください"
           }
         }
       }
@@ -768,6 +960,12 @@
             "state" : "translated",
             "value" : "Adresszeile ist zu lang"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所1が長すぎます"
+          }
         }
       }
     },
@@ -790,6 +988,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zweite Adresszeile ist zu lang"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所2が長すぎます"
           }
         }
       }
@@ -814,6 +1018,12 @@
             "state" : "translated",
             "value" : "Stadt ist zu lang"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "都市名が長すぎます"
+          }
         }
       }
     },
@@ -837,6 +1047,12 @@
             "state" : "translated",
             "value" : "Vorname ist zu lang"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名が長すぎます"
+          }
         }
       }
     },
@@ -859,6 +1075,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nachname ist zu lang"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "姓が長すぎます"
           }
         }
       }
@@ -905,6 +1127,12 @@
             "state" : "translated",
             "value" : "Vorname darf keine URL enthalten"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名にURLを含めることはできません"
+          }
         }
       }
     },
@@ -927,6 +1155,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nachname darf keine URL enthalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "姓にURLを含めることはできません"
           }
         }
       }
@@ -951,6 +1185,12 @@
             "state" : "translated",
             "value" : "Rabatt"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ディスカウント"
+          }
         }
       }
     },
@@ -973,6 +1213,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zollgebühren"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "関税"
           }
         }
       }
@@ -997,6 +1243,12 @@
             "state" : "translated",
             "value" : "Versand"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配送"
+          }
         }
       }
     },
@@ -1019,6 +1271,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versand (einmaliger Kauf)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配送 (一度限りの購入)"
           }
         }
       }
@@ -1043,6 +1301,12 @@
             "state" : "translated",
             "value" : "Versand (Abonnement)"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配送 (定期購入)"
+          }
         }
       }
     },
@@ -1066,6 +1330,12 @@
             "state" : "translated",
             "value" : "Zwischensumme"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小計"
+          }
         }
       }
     },
@@ -1088,6 +1358,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Steuern"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "税"
           }
         }
       }
