@@ -152,6 +152,12 @@
             "state": "translated",
             "value": "Vrstica z naslovom ne sme vsebovati čustvenih simbolov"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redak adrese ne može sadržavati emotikone"
+          }
         }
       }
     },
@@ -294,6 +300,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Druga vrstica z naslovom ne sme vsebovati čustvenih simbolov"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drugi redak adrese ne može sadržavati emotikone"
           }
         }
       }
@@ -438,6 +450,12 @@
             "state": "translated",
             "value": "Mesto ne sme vsebovati čustvenih simbolov"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grad ne može sadržavati emotikone"
+          }
         }
       }
     },
@@ -580,6 +598,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ime ne sme vsebovati čustvenih simbolov"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ime ne može sadržavati emotikone"
           }
         }
       }
@@ -724,6 +748,12 @@
             "state": "translated",
             "value": "Priimek ne sme vsebovati čustvenih simbolov"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prezime ne može sadržavati emotikone"
+          }
         }
       }
     },
@@ -866,6 +896,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Poštna številka ne sme vsebovati čustvenih simbolov"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poštanski broj ne može sadržavati emotikone"
           }
         }
       }
@@ -1010,6 +1046,12 @@
             "state": "translated",
             "value": "Vrstica z naslovom ne sme vsebovati oznak HTML"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redak adrese ne može sadržavati HTML oznake"
+          }
         }
       }
     },
@@ -1152,6 +1194,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Druga vrstica z naslovom ne sme vsebovati oznak HTML"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drugi redak adrese ne može sadržavati HTML oznake"
           }
         }
       }
@@ -1296,6 +1344,12 @@
             "state": "translated",
             "value": "Mesto ne sme vsebovati oznak HTML"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grad ne može sadržavati HTML oznake"
+          }
         }
       }
     },
@@ -1438,6 +1492,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ime ne sme vsebovati oznak HTML"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ime ne može sadržavati HTML oznake"
           }
         }
       }
@@ -1582,6 +1642,12 @@
             "state": "translated",
             "value": "Priimek ne sme vsebovati oznak HTML"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prezime ne može sadržavati HTML oznake"
+          }
         }
       }
     },
@@ -1724,6 +1790,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite veljaven naslov"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite valjanu adresu"
           }
         }
       }
@@ -1868,6 +1940,12 @@
             "state": "translated",
             "value": "Vnesite veljavno stanovanje, apartma itd."
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite valjan stan, apartman itd."
+          }
         }
       }
     },
@@ -2010,6 +2088,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite veljavno mesto"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite valjan grad"
           }
         }
       }
@@ -2154,6 +2238,12 @@
             "state": "translated",
             "value": "Vnesite veljaven e-poštni naslov"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite valjanu adresu e-pošte"
+          }
         }
       }
     },
@@ -2296,6 +2386,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite veljaven emirat"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite valjan emirat"
           }
         }
       }
@@ -2440,6 +2536,12 @@
             "state": "translated",
             "value": "Vnesite veljavno ime"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite valjano ime"
+          }
         }
       }
     },
@@ -2582,6 +2684,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite veljaven priimek"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite valjano prezime"
           }
         }
       }
@@ -2726,6 +2834,12 @@
             "state": "translated",
             "value": "Vnesite veljavno telefonsko številko"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite važeći telefonski broj"
+          }
         }
       }
     },
@@ -2868,6 +2982,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite veljavno poštno številko"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite važeći poštanski broj"
           }
         }
       }
@@ -3012,6 +3132,12 @@
             "state": "translated",
             "value": "Izberite veljavno zvezno državo/provinco"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odaberite valjanu državu/pokrajinu"
+          }
         }
       }
     },
@@ -3154,6 +3280,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite naslov"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite adresu"
           }
         }
       }
@@ -3298,6 +3430,12 @@
             "state": "translated",
             "value": "Vnesite stanovanje, apartma itd."
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite stan, apartman itd."
+          }
         }
       }
     },
@@ -3440,6 +3578,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite mesto"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite grad"
           }
         }
       }
@@ -3584,6 +3728,12 @@
             "state": "translated",
             "value": "Izberite državo"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odaberite državu"
+          }
         }
       }
     },
@@ -3726,6 +3876,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite e-poštni naslov"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite adresu e-pošte"
           }
         }
       }
@@ -3870,6 +4026,12 @@
             "state": "translated",
             "value": "Vnesite emirat"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite emirat"
+          }
         }
       }
     },
@@ -4012,6 +4174,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite ime"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite ime"
           }
         }
       }
@@ -4156,6 +4324,12 @@
             "state": "translated",
             "value": "Vnesite priimek"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite prezime"
+          }
         }
       }
     },
@@ -4298,6 +4472,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vnesite telefonsko številko"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite telefonski broj"
           }
         }
       }
@@ -4442,6 +4622,12 @@
             "state": "translated",
             "value": "Vnesite poštno številko"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unesite poštanski broj"
+          }
         }
       }
     },
@@ -4584,6 +4770,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Izberite zvezno državo/provinco"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odaberite državu/pokrajinu"
           }
         }
       }
@@ -4728,6 +4920,12 @@
             "state": "translated",
             "value": "Vrstica z naslovom je predolga"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redak adrese je predugačak"
+          }
         }
       }
     },
@@ -4870,6 +5068,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Druga vrstica z naslovom je predolga"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drugi redak adrese je predugačak"
           }
         }
       }
@@ -5014,6 +5218,12 @@
             "state": "translated",
             "value": "Mesto je predolgo"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grad je predugačak"
+          }
         }
       }
     },
@@ -5157,6 +5367,12 @@
             "state": "translated",
             "value": "Ime je predolgo"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ime je predugo"
+          }
         }
       }
     },
@@ -5299,6 +5515,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Priimek je predolg"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prezime je predugo"
           }
         }
       }
@@ -5465,6 +5687,12 @@
             "state": "translated",
             "value": "Ime ne sme vsebovati URL-jev"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ime ne može sadržavati URL-ove"
+          }
         }
       }
     },
@@ -5608,6 +5836,12 @@
             "state": "translated",
             "value": "Priimek ne sme vsebovati URL-jev"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prezime ne može sadržavati URL-ove"
+          }
         }
       }
     },
@@ -5747,6 +5981,12 @@
           }
         },
         "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Popust"
+          }
+        },
+        "hr": {
           "stringUnit": {
             "state": "translated",
             "value": "Popust"
@@ -5894,6 +6134,12 @@
             "state": "translated",
             "value": "Carine"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carine"
+          }
         }
       }
     },
@@ -6036,6 +6282,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pošiljanje"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dostava"
           }
         }
       }
@@ -6180,6 +6432,12 @@
             "state": "translated",
             "value": "Pošiljanje (enkratni nakup)"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dostava (jednokratna kupnja)"
+          }
         }
       }
     },
@@ -6322,6 +6580,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pošiljanje (naročnina)"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dostava (pretplata)"
           }
         }
       }
@@ -6466,6 +6730,12 @@
             "state": "translated",
             "value": "Vmesni seštevek"
           }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Međuzbroj"
+          }
         }
       }
     },
@@ -6608,6 +6878,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Davki"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Porezi"
           }
         }
       }
