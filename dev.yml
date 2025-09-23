@@ -10,6 +10,11 @@ up:
     - rover
     - jq
   - ruby
+  - xcode:
+      version: "26.0"
+      runtimes:
+        ios:
+          - "26.0"
   - custom:
       name: Ensure Storefront.xcconfig file
       met?: |
