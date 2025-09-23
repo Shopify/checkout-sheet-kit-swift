@@ -53,13 +53,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         ShopifyCheckoutSheetKit.configure {
             /// Checkout color scheme setting
-            $0.colorScheme = .web
+            $0.colorScheme = .automatic
 
             /// Customize progress bar color
             $0.tintColor = ColorPalette.primaryColor
-
-            /// Customize sheet color (matches web configuration by default)
-            $0.backgroundColor = ColorPalette.backgroundColor
 
             /// Enable preloading
             $0.preloading.enabled = true
@@ -67,6 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             /// Optional logger used for internal purposes
             $0.logger = FileLogger("log.txt")
 
+            /// Optional log level for Checkout Sheet Kit
             $0.logLevel = checkoutSheetKitLogLevel
         }
 
