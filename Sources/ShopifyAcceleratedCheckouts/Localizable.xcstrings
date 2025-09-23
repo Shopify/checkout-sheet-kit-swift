@@ -164,6 +164,12 @@
             "state": "translated",
             "value": "Адресният ред не може да съдържа емотикони"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η γραμμή διεύθυνσης δεν μπορεί να περιέχει emojis"
+          }
         }
       }
     },
@@ -318,6 +324,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вторият адресен ред не може да съдържа емотикони"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η δεύτερη γραμμή διεύθυνσης δεν μπορεί να περιέχει emojis"
           }
         }
       }
@@ -474,6 +486,12 @@
             "state": "translated",
             "value": "Градът не може да съдържа емотикони"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η πόλη δεν μπορεί να περιέχει emojis"
+          }
         }
       }
     },
@@ -628,6 +646,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Името не може да съдържа емотикони"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το όνομα δεν μπορεί να περιέχει emojis"
           }
         }
       }
@@ -784,6 +808,12 @@
             "state": "translated",
             "value": "Фамилията не може да съдържа емотикони"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το επώνυμο δεν μπορεί να περιέχει emojis"
+          }
         }
       }
     },
@@ -938,6 +968,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пощенският код не може да съдържа емотикони"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ο ταχυδρομικός κώδικας δεν μπορεί να περιέχει emojis"
           }
         }
       }
@@ -1094,6 +1130,12 @@
             "state": "translated",
             "value": "Адресният ред не може да съдържа HTML тагове"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η γραμμή διεύθυνσης δεν μπορεί να περιέχει ετικέτες HTML"
+          }
         }
       }
     },
@@ -1248,6 +1290,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вторият адресен ред не може да съдържа HTML тагове"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η δεύτερη γραμμή διεύθυνσης δεν μπορεί να περιέχει ετικέτες HTML"
           }
         }
       }
@@ -1404,6 +1452,12 @@
             "state": "translated",
             "value": "Градът не може да съдържа HTML тагове"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η πόλη δεν μπορεί να περιέχει ετικέτες HTML"
+          }
         }
       }
     },
@@ -1558,6 +1612,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Името не може да съдържа HTML тагове"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το όνομα δεν μπορεί να περιέχει ετικέτες HTML"
           }
         }
       }
@@ -1714,6 +1774,12 @@
             "state": "translated",
             "value": "Фамилията не може да съдържа HTML тагове"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το επώνυμο δεν μπορεί να περιέχει ετικέτες HTML"
+          }
         }
       }
     },
@@ -1868,6 +1934,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете валиден адрес"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε μια έγκυρη διεύθυνση"
           }
         }
       }
@@ -2024,6 +2096,12 @@
             "state": "translated",
             "value": "Въведете валиден апартамент, офис и др."
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε ένα έγκυρο διαμέρισμα, σουίτα κ.λπ."
+          }
         }
       }
     },
@@ -2178,6 +2256,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете валиден град"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε μια έγκυρη πόλη"
           }
         }
       }
@@ -2334,6 +2418,12 @@
             "state": "translated",
             "value": "Въведете валиден имейл"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε ένα έγκυρο email"
+          }
         }
       }
     },
@@ -2488,6 +2578,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете валидно емирство"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε ένα έγκυρο εμιράτο"
           }
         }
       }
@@ -2644,6 +2740,12 @@
             "state": "translated",
             "value": "Въведете валидно име"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε ένα έγκυρο όνομα"
+          }
         }
       }
     },
@@ -2798,6 +2900,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете валидна фамилия"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε ένα έγκυρο επώνυμο"
           }
         }
       }
@@ -2954,6 +3062,12 @@
             "state": "translated",
             "value": "Въведете валиден телефонен номер"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε έναν έγκυρο αριθμό τηλεφώνου"
+          }
         }
       }
     },
@@ -3108,6 +3222,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете валиден пощенски код"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε έναν έγκυρο ταχυδρομικό κώδικα"
           }
         }
       }
@@ -3264,6 +3384,12 @@
             "state": "translated",
             "value": "Изберете валиден щат/провинция"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επιλέξτε μια έγκυρη πολιτεία/επαρχία"
+          }
         }
       }
     },
@@ -3418,6 +3544,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете адрес"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε μια διεύθυνση"
           }
         }
       }
@@ -3574,6 +3706,12 @@
             "state": "translated",
             "value": "Въведете апартамент, офис и др."
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε διαμέρισμα, σουίτα κ.λπ."
+          }
         }
       }
     },
@@ -3728,6 +3866,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете град"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε μια πόλη"
           }
         }
       }
@@ -3884,6 +4028,12 @@
             "state": "translated",
             "value": "Изберете държава"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επιλέξτε μια χώρα"
+          }
         }
       }
     },
@@ -4038,6 +4188,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете имейл адрес"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε μια διεύθυνση email"
           }
         }
       }
@@ -4194,6 +4350,12 @@
             "state": "translated",
             "value": "Въведете емирство"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε ένα εμιράτο"
+          }
         }
       }
     },
@@ -4348,6 +4510,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете име"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε όνομα"
           }
         }
       }
@@ -4504,6 +4672,12 @@
             "state": "translated",
             "value": "Въведете фамилия"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε επώνυμο"
+          }
         }
       }
     },
@@ -4658,6 +4832,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Въведете телефонен номер"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε έναν αριθμό τηλεφώνου"
           }
         }
       }
@@ -4814,6 +4994,12 @@
             "state": "translated",
             "value": "Въведете пощенски код"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγάγετε έναν ταχυδρομικό κώδικα"
+          }
         }
       }
     },
@@ -4968,6 +5154,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Изберете щат/провинция"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επιλέξτε μια πολιτεία/επαρχία"
           }
         }
       }
@@ -5124,6 +5316,12 @@
             "state": "translated",
             "value": "Адресният ред е твърде дълъг"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η γραμμή διεύθυνσης είναι πολύ μεγάλη"
+          }
         }
       }
     },
@@ -5278,6 +5476,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вторият адресен ред е твърде дълъг"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η δεύτερη γραμμή διεύθυνσης είναι πολύ μεγάλη"
           }
         }
       }
@@ -5434,6 +5638,12 @@
             "state": "translated",
             "value": "Градът е твърде дълъг"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η πόλη είναι πολύ μεγάλη"
+          }
         }
       }
     },
@@ -5589,6 +5799,12 @@
             "state": "translated",
             "value": "Името е твърде дълго"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το όνομα είναι πολύ μεγάλο"
+          }
         }
       }
     },
@@ -5743,6 +5959,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Фамилията е твърде дълга"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το επώνυμο είναι πολύ μεγάλο"
           }
         }
       }
@@ -5921,6 +6143,12 @@
             "state": "translated",
             "value": "Името не може да съдържа URL адреси"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το όνομα δεν μπορεί να περιέχει URL"
+          }
         }
       }
     },
@@ -6075,6 +6303,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Фамилията не може да съдържа URL адреси"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το επώνυμο δεν μπορεί να περιέχει URL"
           }
         }
       }
@@ -6231,6 +6465,12 @@
             "state": "translated",
             "value": "Отстъпка"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Έκπτωση"
+          }
         }
       }
     },
@@ -6385,6 +6625,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Мита"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δασμοί"
           }
         }
       }
@@ -6541,6 +6787,12 @@
             "state": "translated",
             "value": "Доставка"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αποστολή"
+          }
         }
       }
     },
@@ -6695,6 +6947,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Доставка (еднократна покупка)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αποστολή (εφάπαξ αγορά)"
           }
         }
       }
@@ -6851,6 +7109,12 @@
             "state": "translated",
             "value": "Доставка (абонамент)"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αποστολή (συνδρομή)"
+          }
         }
       }
     },
@@ -7006,6 +7270,12 @@
             "state": "translated",
             "value": "Междинна сума"
           }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Υποσύνολο"
+          }
         }
       }
     },
@@ -7160,6 +7430,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Данъци"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Φόροι"
           }
         }
       }
