@@ -56,6 +56,12 @@
             "state": "translated",
             "value": "A linha do endereço não pode conter emojis"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주소란에 이모티콘을 포함할 수 없습니다"
+          }
         }
       }
     },
@@ -102,6 +108,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A segunda linha do endereço não pode conter emojis"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주소의 두 번째 줄에 이모티콘을 포함할 수 없습니다"
           }
         }
       }
@@ -150,6 +162,12 @@
             "state": "translated",
             "value": "O nome da cidade não pode conter emojis"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구/군/시에 이모티콘을 포함할 수 없습니다"
+          }
         }
       }
     },
@@ -196,6 +214,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "O nome não pode conter emojis"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름에 이모티콘을 포함할 수 없습니다"
           }
         }
       }
@@ -244,6 +268,12 @@
             "state": "translated",
             "value": "O sobrenome não pode conter emojis"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "성에 이모티콘을 포함할 수 없습니다"
+          }
         }
       }
     },
@@ -290,6 +320,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "O CEP não pode conter emojis"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "우편 번호에 이모티콘을 포함할 수 없습니다"
           }
         }
       }
@@ -338,6 +374,12 @@
             "state": "translated",
             "value": "A linha do endereço não pode conter tags HTML"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주소란 1에 HTML 태그를 포함할 수 없습니다"
+          }
         }
       }
     },
@@ -384,6 +426,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A segunda linha do endereço não pode conter tags HTML"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주소의 두 번째 줄에 HTML 태그를 포함할 수 없습니다"
           }
         }
       }
@@ -432,6 +480,12 @@
             "state": "translated",
             "value": "A cidade não pode conter tags HTML"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구/군/시에 HTML 태그를 포함할 수 없습니다"
+          }
         }
       }
     },
@@ -478,6 +532,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "O nome não pode conter tags HTML"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름에 HTML 태그를 포함할 수 없습니다"
           }
         }
       }
@@ -526,6 +586,12 @@
             "state": "translated",
             "value": "O sobrenome não pode conter tags HTML"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "성에 HTML 태그를 포함할 수 없습니다"
+          }
         }
       }
     },
@@ -572,6 +638,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira um endereço válido"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 주소를 입력하세요"
           }
         }
       }
@@ -620,6 +692,12 @@
             "state": "translated",
             "value": "Insira um apartamento, bloco etc. válido"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 아파트, 동/호수 등을 입력하세요"
+          }
         }
       }
     },
@@ -666,6 +744,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira uma cidade válida"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 구/군/시를 입력하세요"
           }
         }
       }
@@ -714,6 +798,12 @@
             "state": "translated",
             "value": "Insira um e-mail válido"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 이메일을 입력하세요"
+          }
         }
       }
     },
@@ -760,6 +850,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira um emirado válido"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 토후국 입력"
           }
         }
       }
@@ -808,6 +904,12 @@
             "state": "translated",
             "value": "Insira um nome válido"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 이름을 입력하세요"
+          }
         }
       }
     },
@@ -854,6 +956,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira um sobrenome válido"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 성을 입력하세요"
           }
         }
       }
@@ -902,6 +1010,12 @@
             "state": "translated",
             "value": "Insira um telefone válido"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 전화번호를 입력하세요"
+          }
         }
       }
     },
@@ -948,6 +1062,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira um CEP válido"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "올바른 우편 번호를 입력하세요"
           }
         }
       }
@@ -996,6 +1116,12 @@
             "state": "translated",
             "value": "Selecione um estado/província válido"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유효한 시/도를 선택하세요"
+          }
         }
       }
     },
@@ -1042,6 +1168,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira o endereço"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주소를 입력하세요"
           }
         }
       }
@@ -1090,6 +1222,12 @@
             "state": "translated",
             "value": "Insira apartamento, bloco etc."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아파트, 동/호수 등을 입력하세요"
+          }
         }
       }
     },
@@ -1136,6 +1274,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira uma cidade"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구/군/시를 입력하세요"
           }
         }
       }
@@ -1184,6 +1328,12 @@
             "state": "translated",
             "value": "Selecione um país"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "국가 선택"
+          }
         }
       }
     },
@@ -1230,6 +1380,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira um endereço de e-mail"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이메일 주소를 입력하세요"
           }
         }
       }
@@ -1278,6 +1434,12 @@
             "state": "translated",
             "value": "Insira um emirado"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "토후국 입력"
+          }
         }
       }
     },
@@ -1324,6 +1486,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira o nome"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름을 입력하세요"
           }
         }
       }
@@ -1372,6 +1540,12 @@
             "state": "translated",
             "value": "Insira o sobrenome"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "성을 입력하세요"
+          }
         }
       }
     },
@@ -1418,6 +1592,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Insira um número de telefone"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전화번호를 입력하세요"
           }
         }
       }
@@ -1466,6 +1646,12 @@
             "state": "translated",
             "value": "Insira um CEP"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "우편 번호를 입력하세요"
+          }
         }
       }
     },
@@ -1512,6 +1698,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Selecione um estado/província"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시/도를 선택하세요"
           }
         }
       }
@@ -1560,6 +1752,12 @@
             "state": "translated",
             "value": "A linha de endereço é longa demais"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주소 줄이 너무 깁니다"
+          }
         }
       }
     },
@@ -1606,6 +1804,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A segunda linha de endereço é longa demais"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "두 번째 주소 줄이 너무 깁니다"
           }
         }
       }
@@ -1654,6 +1858,12 @@
             "state": "translated",
             "value": "A cidade é longa demais"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구/군/시가 너무 깁니다"
+          }
         }
       }
     },
@@ -1701,6 +1911,12 @@
             "state": "translated",
             "value": "O nome é longo demais"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름이 너무 깁니다"
+          }
         }
       }
     },
@@ -1747,6 +1963,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "O sobrenome é longo demais"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "성이 너무 깁니다"
           }
         }
       }
@@ -1817,6 +2039,12 @@
             "state": "translated",
             "value": "O nome não pode conter URLs"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름에 URL을 포함할 수 없습니다"
+          }
         }
       }
     },
@@ -1863,6 +2091,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "O sobrenome não pode conter URLs"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "성에 URL을 포함할 수 없습니다"
           }
         }
       }
@@ -1911,6 +2145,12 @@
             "state": "translated",
             "value": "Desconto"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "할인"
+          }
         }
       }
     },
@@ -1957,6 +2197,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tributos de importação"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "관세"
           }
         }
       }
@@ -2005,6 +2251,12 @@
             "state": "translated",
             "value": "Frete"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "배송"
+          }
         }
       }
     },
@@ -2051,6 +2303,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Frete (compra única)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "배송(1회성 구매)"
           }
         }
       }
@@ -2099,6 +2357,12 @@
             "state": "translated",
             "value": "Frete (assinatura)"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "배송(구독)"
+          }
         }
       }
     },
@@ -2146,6 +2410,12 @@
             "state": "translated",
             "value": "Subtotal"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소계"
+          }
         }
       }
     },
@@ -2192,6 +2462,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tributos"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "세금"
           }
         }
       }
