@@ -116,6 +116,12 @@
             "state": "translated",
             "value": "Adresselinje kan ikke inneholde emojier"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adres satırı emoji içeremez"
+          }
         }
       }
     },
@@ -222,6 +228,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Andre adresselinje kan ikke inneholde emojier"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İkinci adres satırı emoji içeremez"
           }
         }
       }
@@ -330,6 +342,12 @@
             "state": "translated",
             "value": "By kan ikke inneholde emojier"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şehir emoji içeremez"
+          }
         }
       }
     },
@@ -436,6 +454,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fornavn kan ikke inneholde emojier"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ad emoji içeremez"
           }
         }
       }
@@ -544,6 +568,12 @@
             "state": "translated",
             "value": "Etternavn kan ikke inneholde emojier"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soyadı emoji içeremez"
+          }
         }
       }
     },
@@ -650,6 +680,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Postnummer kan ikke inneholde emojier"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posta kodu emoji içeremez"
           }
         }
       }
@@ -758,6 +794,12 @@
             "state": "translated",
             "value": "Adresselinje kan ikke inneholde HTML-koder"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adres satırı HTML etiketleri içeremez"
+          }
         }
       }
     },
@@ -864,6 +906,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Andre adresselinje kan ikke inneholde HTML-koder"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İkinci adres satırı HTML etiketleri içeremez"
           }
         }
       }
@@ -972,6 +1020,12 @@
             "state": "translated",
             "value": "By kan ikke inneholde HTML-koder"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şehir HTML etiketleri içeremez"
+          }
         }
       }
     },
@@ -1078,6 +1132,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fornavn kan ikke inneholde HTML-koder"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ad HTML etiketleri içeremez"
           }
         }
       }
@@ -1186,6 +1246,12 @@
             "state": "translated",
             "value": "Etternavn kan ikke inneholde HTML-koder"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soyadı HTML etiketleri içeremez"
+          }
         }
       }
     },
@@ -1292,6 +1358,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn en gyldig adresse"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir adres girin"
           }
         }
       }
@@ -1400,6 +1472,12 @@
             "state": "translated",
             "value": "Skriv inn en gyldig leilighet, suite osv."
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir daire, süit vb. girin"
+          }
         }
       }
     },
@@ -1506,6 +1584,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn en gyldig by"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir şehir girin"
           }
         }
       }
@@ -1614,6 +1698,12 @@
             "state": "translated",
             "value": "Skriv inn en gyldig e-postadresse"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir e-posta girin"
+          }
         }
       }
     },
@@ -1720,6 +1810,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn et gyldig emirat"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir emirlik girin"
           }
         }
       }
@@ -1828,6 +1924,12 @@
             "state": "translated",
             "value": "Skriv inn et gyldig fornavn"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir ad girin"
+          }
         }
       }
     },
@@ -1934,6 +2036,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn et gyldig etternavn"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir soyadı girin"
           }
         }
       }
@@ -2042,6 +2150,12 @@
             "state": "translated",
             "value": "Skriv inn et gyldig telefonnummer"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir telefon numarası girin"
+          }
         }
       }
     },
@@ -2148,6 +2262,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn et gyldig postnummer"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir posta kodu girin"
           }
         }
       }
@@ -2256,6 +2376,12 @@
             "state": "translated",
             "value": "Velg en gyldig stat/provins"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli bir eyalet/il seçin"
+          }
         }
       }
     },
@@ -2362,6 +2488,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn en adresse"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir adres girin"
           }
         }
       }
@@ -2470,6 +2602,12 @@
             "state": "translated",
             "value": "Skriv inn leilighet, suite osv."
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daire, süit vb. girin"
+          }
         }
       }
     },
@@ -2576,6 +2714,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn en by"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir şehir girin"
           }
         }
       }
@@ -2684,6 +2828,12 @@
             "state": "translated",
             "value": "Velg et land"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir ülke seçin"
+          }
         }
       }
     },
@@ -2790,6 +2940,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn en e-postadresse"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir e-posta adresi girin"
           }
         }
       }
@@ -2898,6 +3054,12 @@
             "state": "translated",
             "value": "Skriv inn et emirat"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir emirlik girin"
+          }
         }
       }
     },
@@ -3004,6 +3166,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn et fornavn"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir ad girin"
           }
         }
       }
@@ -3112,6 +3280,12 @@
             "state": "translated",
             "value": "Skriv inn et etternavn"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir soyadı girin"
+          }
         }
       }
     },
@@ -3218,6 +3392,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skriv inn et telefonnummer"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir telefon numarası girin"
           }
         }
       }
@@ -3326,6 +3506,12 @@
             "state": "translated",
             "value": "Skriv inn et postnummer"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir posta kodu girin"
+          }
         }
       }
     },
@@ -3432,6 +3618,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Velg en stat/provins"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir eyalet/il seçin"
           }
         }
       }
@@ -3540,6 +3732,12 @@
             "state": "translated",
             "value": "Adresselinje er for lang"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adres satırı çok uzun"
+          }
         }
       }
     },
@@ -3646,6 +3844,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Andre adresselinje er for lang"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İkinci adres satırı çok uzun"
           }
         }
       }
@@ -3754,6 +3958,12 @@
             "state": "translated",
             "value": "By er for lang"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şehir çok uzun"
+          }
         }
       }
     },
@@ -3861,6 +4071,12 @@
             "state": "translated",
             "value": "Fornavn er for langt"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ad çok uzun"
+          }
         }
       }
     },
@@ -3967,6 +4183,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Etternavn er for langt"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soyadı çok uzun"
           }
         }
       }
@@ -4097,6 +4319,12 @@
             "state": "translated",
             "value": "Fornavn kan ikke inneholde URL-er"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ad URL içeremez"
+          }
         }
       }
     },
@@ -4203,6 +4431,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Etternavn kan ikke inneholde URL-er"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soyadı URL içeremez"
           }
         }
       }
@@ -4311,6 +4545,12 @@
             "state": "translated",
             "value": "Rabatt"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirim"
+          }
         }
       }
     },
@@ -4417,6 +4657,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Avgifter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gümrük vergileri"
           }
         }
       }
@@ -4525,6 +4771,12 @@
             "state": "translated",
             "value": "Frakt"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kargo"
+          }
         }
       }
     },
@@ -4631,6 +4883,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Frakt (engangskjøp)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kargo (tek seferlik satın alım)"
           }
         }
       }
@@ -4739,6 +4997,12 @@
             "state": "translated",
             "value": "Frakt (abonnement)"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kargo (abonelik)"
+          }
         }
       }
     },
@@ -4846,6 +5110,12 @@
             "state": "translated",
             "value": "Delsum"
           }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ara Toplam"
+          }
         }
       }
     },
@@ -4952,6 +5222,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Avgifter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergiler"
           }
         }
       }
