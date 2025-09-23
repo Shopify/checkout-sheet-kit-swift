@@ -1,194 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "action.view" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View %{content}"
-          }
-        },
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View %{content}"
-          }
-        }
-      }
-    },
-    "brand.amazon_pay" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Amazon Pay"
-          }
-        },
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Amazon Pay"
-          }
-        }
-      }
-    },
-    "brand.apple_pay" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Pay"
-          }
-        }
-      }
-    },
-    "brand.buy_with_prime" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy with Prime"
-          }
-        }
-      }
-    },
-    "brand.google_pay" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Google Pay"
-          }
-        }
-      }
-    },
-    "brand.paypal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPal"
-          }
-        }
-      }
-    },
-    "brand.shop_pay" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shop Pay"
-          }
-        }
-      }
-    },
-    "buy_with_button_content" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy with %{wallet}"
-          }
-        }
-      }
-    },
-    "delivery_promises.connect_delivery_promises" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{promiseOne} and %{promiseTwo}"
-          }
-        }
-      }
-    },
-    "error_dialogs.checkout.button_text" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close"
-          }
-        }
-      }
-    },
-    "error_dialogs.checkout.generic_error" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Checkout is currently unavailable due to technical problems. Please try again in a few minutes."
-          }
-        }
-      }
-    },
-    "error_dialogs.checkout.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transaction failed"
-          }
-        }
-      }
-    },
-    "error_dialogs.wallet.eligibility_error" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Items that were eligible for %{wallet} are no longer in your cart."
-          }
-        }
-      }
-    },
-    "error_dialogs.wallet.generic_error" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "There was an issue with %{wallet}. Try again or use a different payment method."
-          }
-        }
-      }
-    },
-    "error_dialogs.wallet.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{wallet} unavailable"
-          }
-        }
-      }
-    },
-    "errors.address_unserviceable" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{shopName} does not currently deliver to this address. Use a different address to complete your purchase."
-          }
-        }
-      }
-    },
     "errors.applePay.unsupported" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -196,23 +8,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ApplePay is not supported on your device."
-          }
-        },
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ApplePay is not supported on your device."
-          }
-        }
-      }
-    },
-    "errors.currency.mismatch" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your cart and currency has been updated based on your shipping country."
           }
         }
       }
@@ -360,17 +155,6 @@
         }
       }
     },
-    "errors.invalid.billing_address" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invalid billing address"
-          }
-        }
-      }
-    },
     "errors.invalid.city" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -378,28 +162,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a valid city"
-          }
-        }
-      }
-    },
-    "errors.invalid.country" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a country / region"
-          }
-        }
-      }
-    },
-    "errors.invalid.discount" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invalid discount"
           }
         }
       }
@@ -448,17 +210,6 @@
         }
       }
     },
-    "errors.invalid.payment_method" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invalid payment method"
-          }
-        }
-      }
-    },
     "errors.invalid.phone" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -477,17 +228,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a valid zip / postal code"
-          }
-        }
-      }
-    },
-    "errors.invalid.shipping_address" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invalid shipping address"
           }
         }
       }
@@ -613,17 +353,6 @@
         }
       }
     },
-    "errors.missing.shipping_option" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a shipping method"
-          }
-        }
-      }
-    },
     "errors.missing.zone" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -734,39 +463,6 @@
         }
       }
     },
-    "express_checkout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Express checkout"
-          }
-        }
-      }
-    },
-    "instruments_copy.checkout.buy_now" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy it now"
-          }
-        }
-      }
-    },
-    "more_payment_options" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "More payment options"
-          }
-        }
-      }
-    },
     "order_summary.discount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -822,138 +518,6 @@
         }
       }
     },
-    "order_summary.subscriptions.recurring_total_intervals.day.one" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "day"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_intervals.day.other" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{count} days"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_intervals.month.one" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "month"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_intervals.month.other" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{count} months"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_intervals.week.one" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "week"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_intervals.week.other" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{count} weeks"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_intervals.year.one" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "year"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_intervals.year.other" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{count} years"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_total_tooltip_line" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Does not include shipping, tax, duties, or any applicable discounts"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_totals" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{fixedPrice} every %{interval}"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_totals_with_policies.one" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First payment %{fixedPrice}, then %{recurringPrice} every %{interval}"
-          }
-        }
-      }
-    },
-    "order_summary.subscriptions.recurring_totals_with_policies.other" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First %{count} payments %{fixedPrice} each, then %{recurringPrice} every %{interval}"
-          }
-        }
-      }
-    },
     "order_summary.subtotal" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -975,95 +539,9 @@
           }
         }
       }
-    },
-    "order_summary.total" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Total"
-          }
-        }
-      }
-    },
-    "shipping_methods.choose_delivery_strategy" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a delivery method"
-          }
-        }
-      }
-    },
-    "shipping_methods.connect_shipping_methods" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%{methodOne} and %{methodTwo}"
-          }
-        }
-      }
-    },
-    "shop_promise_delivery.next_day" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Next-day delivery"
-          }
-        }
-      }
-    },
-    "shop_promise_delivery.same_day" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Same-day delivery"
-          }
-        }
-      }
-    },
-    "shop_promise_delivery.two_day" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2-day delivery"
-          }
-        }
-      }
-    },
-    "subscriptions.cancellation_policy" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancellation policy"
-          }
-        }
-      }
-    },
-    "subscriptions.policy_not_found" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The subscription policy could not be found. Refresh the page or contact us for more information."
-          }
-        }
-      }
     }
   },
   "version" : "1.0"
 }
+
+
