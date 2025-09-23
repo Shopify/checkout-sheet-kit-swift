@@ -200,6 +200,12 @@
             "state": "translated",
             "value": "पता लाइन में इमोजी नहीं हो सकते"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adreso eilutėje negali būti jaustukinių piktogramų"
+          }
         }
       }
     },
@@ -390,6 +396,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "दूसरी पता लाइन में इमोजी नहीं हो सकते"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antroje adreso eilutėje negali būti jaustukinių piktogramų"
           }
         }
       }
@@ -582,6 +594,12 @@
             "state": "translated",
             "value": "शहर में इमोजी नहीं हो सकते"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mieste negali būti jaustukinių piktogramų"
+          }
         }
       }
     },
@@ -772,6 +790,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "पहले नाम में इमोजी नहीं हो सकते"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varde negali būti jaustukinių piktogramų"
           }
         }
       }
@@ -964,6 +988,12 @@
             "state": "translated",
             "value": "अंतिम नाम में इमोजी नहीं हो सकते"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavardėje negali būti jaustukinių piktogramų"
+          }
         }
       }
     },
@@ -1154,6 +1184,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "पिन कोड में इमोजी नहीं हो सकते"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pašto kode negali būti jaustukinių piktogramų"
           }
         }
       }
@@ -1346,6 +1382,12 @@
             "state": "translated",
             "value": "पता लाइन में HTML टैग नहीं हो सकते"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adreso eilutėje negali būti HTML žymų"
+          }
         }
       }
     },
@@ -1536,6 +1578,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "दूसरी पता लाइन में HTML टैग नहीं हो सकते"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antroje adreso eilutėje negali būti HTML žymų"
           }
         }
       }
@@ -1728,6 +1776,12 @@
             "state": "translated",
             "value": "शहर में HTML टैग नहीं हो सकते"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mieste negali būti HTML žymų"
+          }
         }
       }
     },
@@ -1918,6 +1972,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "पहले नाम में HTML टैग नहीं हो सकते"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varde negali būti HTML žymų"
           }
         }
       }
@@ -2110,6 +2170,12 @@
             "state": "translated",
             "value": "अंतिम नाम में HTML टैग नहीं हो सकते"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavardėje negali būti HTML žymų"
+          }
         }
       }
     },
@@ -2300,6 +2366,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "मान्य पता दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį adresą"
           }
         }
       }
@@ -2492,6 +2564,12 @@
             "state": "translated",
             "value": "मान्य अपार्टमेंट, सुइट आदि दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį butą, numerį ir t. t."
+          }
         }
       }
     },
@@ -2682,6 +2760,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "मान्य शहर दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį miestą"
           }
         }
       }
@@ -2874,6 +2958,12 @@
             "state": "translated",
             "value": "मान्य ईमेल दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį el. pašto adresą"
+          }
         }
       }
     },
@@ -3064,6 +3154,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "मान्य अमीरात दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį emyratą"
           }
         }
       }
@@ -3256,6 +3352,12 @@
             "state": "translated",
             "value": "मान्य पहला नाम दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį vardą"
+          }
         }
       }
     },
@@ -3446,6 +3548,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "मान्य अंतिम नाम दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojančią pavardę"
           }
         }
       }
@@ -3638,6 +3746,12 @@
             "state": "translated",
             "value": "मान्य फ़ोन नंबर दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį telefono numerį"
+          }
         }
       }
     },
@@ -3828,6 +3942,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "मान्य पिन कोड दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite galiojantį pašto kodą"
           }
         }
       }
@@ -4020,6 +4140,12 @@
             "state": "translated",
             "value": "मान्य राज्य/प्रांत चुनें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasirinkite galiojančią valstiją / provinciją"
+          }
         }
       }
     },
@@ -4210,6 +4336,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "पता दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite adresą"
           }
         }
       }
@@ -4402,6 +4534,12 @@
             "state": "translated",
             "value": "अपार्टमेंट, सुइट आदि दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite butą, numerį ir t. t."
+          }
         }
       }
     },
@@ -4592,6 +4730,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "शहर दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite miestą"
           }
         }
       }
@@ -4784,6 +4928,12 @@
             "state": "translated",
             "value": "देश चुनें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasirinkite šalį"
+          }
         }
       }
     },
@@ -4974,6 +5124,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ईमेल पता दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite el. pašto adresą"
           }
         }
       }
@@ -5166,6 +5322,12 @@
             "state": "translated",
             "value": "अमीरात दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite emyratą"
+          }
         }
       }
     },
@@ -5356,6 +5518,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "पहला नाम दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite vardą"
           }
         }
       }
@@ -5548,6 +5716,12 @@
             "state": "translated",
             "value": "अंतिम नाम दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite pavardę"
+          }
         }
       }
     },
@@ -5738,6 +5912,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "फ़ोन नंबर दर्ज करें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite telefono numerį"
           }
         }
       }
@@ -5930,6 +6110,12 @@
             "state": "translated",
             "value": "पिन कोड दर्ज करें"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Įveskite pašto kodą"
+          }
         }
       }
     },
@@ -6120,6 +6306,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "राज्य/प्रांत चुनें"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasirinkite valstiją / provinciją"
           }
         }
       }
@@ -6312,6 +6504,12 @@
             "state": "translated",
             "value": "पता लाइन बहुत लंबी है"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adreso eilutė per ilga"
+          }
         }
       }
     },
@@ -6502,6 +6700,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "दूसरी पता लाइन बहुत लंबी है"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antra adreso eilutė per ilga"
           }
         }
       }
@@ -6694,6 +6898,12 @@
             "state": "translated",
             "value": "शहर बहुत लंबा है"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miestas per ilgas"
+          }
         }
       }
     },
@@ -6885,6 +7095,12 @@
             "state": "translated",
             "value": "पहला नाम बहुत लंबा है"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vardas per ilgas"
+          }
         }
       }
     },
@@ -7075,6 +7291,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "अंतिम नाम बहुत लंबा है"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavardė per ilga"
           }
         }
       }
@@ -7289,6 +7511,12 @@
             "state": "translated",
             "value": "पहले नाम में URL नहीं हो सकते"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varde negali būti URL"
+          }
         }
       }
     },
@@ -7479,6 +7707,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "अंतिम नाम में URL नहीं हो सकते"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavardėje negali būti URL"
           }
         }
       }
@@ -7671,6 +7905,12 @@
             "state": "translated",
             "value": "छूट"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuolaida"
+          }
         }
       }
     },
@@ -7861,6 +8101,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "शुल्क"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muitai"
           }
         }
       }
@@ -8053,6 +8299,12 @@
             "state": "translated",
             "value": "शिपिंग"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siuntimas"
+          }
         }
       }
     },
@@ -8243,6 +8495,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "शिपिंग (एक बार की खरीदारी)"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siuntimas (vienkartinis pirkimas)"
           }
         }
       }
@@ -8435,6 +8693,12 @@
             "state": "translated",
             "value": "शिपिंग (सदस्यता)"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siuntimas (prenumerata)"
+          }
         }
       }
     },
@@ -8626,6 +8890,12 @@
             "state": "translated",
             "value": "उप-योग"
           }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarpinė suma"
+          }
         }
       }
     },
@@ -8816,6 +9086,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "कर"
+          }
+        },
+        "lt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mokesčiai"
           }
         }
       }
