@@ -188,6 +188,12 @@
             "state": "translated",
             "value": "Baris alamat tidak boleh berisi emoji"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baris alamat tidak boleh mengandungi emoji"
+          }
         }
       }
     },
@@ -366,6 +372,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Baris alamat kedua tidak boleh berisi emoji"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baris alamat kedua tidak boleh mengandungi emoji"
           }
         }
       }
@@ -546,6 +558,12 @@
             "state": "translated",
             "value": "Kota tidak boleh berisi emoji"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandar tidak boleh mengandungi emoji"
+          }
         }
       }
     },
@@ -724,6 +742,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama depan tidak boleh berisi emoji"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama pertama tidak boleh mengandungi emoji"
           }
         }
       }
@@ -904,6 +928,12 @@
             "state": "translated",
             "value": "Nama belakang tidak boleh berisi emoji"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama akhir tidak boleh mengandungi emoji"
+          }
         }
       }
     },
@@ -1082,6 +1112,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kode pos tidak boleh berisi emoji"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poskod tidak boleh mengandungi emoji"
           }
         }
       }
@@ -1262,6 +1298,12 @@
             "state": "translated",
             "value": "Baris alamat tidak boleh berisi tag HTML"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baris alamat tidak boleh mengandungi tag HTML"
+          }
         }
       }
     },
@@ -1440,6 +1482,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Baris alamat kedua tidak boleh berisi tag HTML"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baris alamat kedua tidak boleh mengandungi tag HTML"
           }
         }
       }
@@ -1620,6 +1668,12 @@
             "state": "translated",
             "value": "Kota tidak boleh berisi tag HTML"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandar tidak boleh mengandungi tag HTML"
+          }
         }
       }
     },
@@ -1798,6 +1852,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama depan tidak boleh berisi tag HTML"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama pertama tidak boleh mengandungi tag HTML"
           }
         }
       }
@@ -1978,6 +2038,12 @@
             "state": "translated",
             "value": "Nama belakang tidak boleh berisi tag HTML"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama akhir tidak boleh mengandungi tag HTML"
+          }
         }
       }
     },
@@ -2156,6 +2222,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan alamat yang valid"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan alamat yang sah"
           }
         }
       }
@@ -2336,6 +2408,12 @@
             "state": "translated",
             "value": "Masukkan apartemen, suite, dll. yang valid"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan pangsapuri, suite, dsb. yang sah"
+          }
         }
       }
     },
@@ -2514,6 +2592,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan kota yang valid"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan bandar yang sah"
           }
         }
       }
@@ -2694,6 +2778,12 @@
             "state": "translated",
             "value": "Masukkan email yang valid"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan e-mel yang sah"
+          }
         }
       }
     },
@@ -2872,6 +2962,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan emirat yang valid"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan emirat yang sah"
           }
         }
       }
@@ -3052,6 +3148,12 @@
             "state": "translated",
             "value": "Masukkan nama depan yang valid"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan nama pertama yang sah"
+          }
         }
       }
     },
@@ -3230,6 +3332,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan nama belakang yang valid"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan nama akhir yang sah"
           }
         }
       }
@@ -3410,6 +3518,12 @@
             "state": "translated",
             "value": "Masukkan nomor telepon yang valid"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan nombor telefon yang sah"
+          }
         }
       }
     },
@@ -3588,6 +3702,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan kode pos yang valid"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan poskod yang sah"
           }
         }
       }
@@ -3768,6 +3888,12 @@
             "state": "translated",
             "value": "Pilih negara bagian/provinsi yang valid"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih negeri/wilayah yang sah"
+          }
         }
       }
     },
@@ -3943,6 +4069,12 @@
           }
         },
         "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan alamat"
+          }
+        },
+        "ms": {
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan alamat"
@@ -4126,6 +4258,12 @@
             "state": "translated",
             "value": "Masukkan apartemen, suite, dll."
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan pangsapuri, suite, dsb."
+          }
         }
       }
     },
@@ -4305,6 +4443,12 @@
             "state": "translated",
             "value": "Masukkan kota"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan bandar"
+          }
         }
       }
     },
@@ -4480,6 +4624,12 @@
           }
         },
         "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih negara"
+          }
+        },
+        "ms": {
           "stringUnit": {
             "state": "translated",
             "value": "Pilih negara"
@@ -4663,6 +4813,12 @@
             "state": "translated",
             "value": "Masukkan alamat email"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan alamat e-mel"
+          }
         }
       }
     },
@@ -4838,6 +4994,12 @@
           }
         },
         "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan emirat"
+          }
+        },
+        "ms": {
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan emirat"
@@ -5021,6 +5183,12 @@
             "state": "translated",
             "value": "Masukkan nama depan"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan nama pertama"
+          }
         }
       }
     },
@@ -5199,6 +5367,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan nama belakang"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan nama akhir"
           }
         }
       }
@@ -5379,6 +5553,12 @@
             "state": "translated",
             "value": "Masukkan nomor telepon"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan nombor telefon"
+          }
         }
       }
     },
@@ -5557,6 +5737,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Masukkan kode pos"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masukkan poskod"
           }
         }
       }
@@ -5737,6 +5923,12 @@
             "state": "translated",
             "value": "Pilih negara bagian/provinsi"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih negeri/wilayah"
+          }
         }
       }
     },
@@ -5912,6 +6104,12 @@
           }
         },
         "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baris alamat terlalu panjang"
+          }
+        },
+        "ms": {
           "stringUnit": {
             "state": "translated",
             "value": "Baris alamat terlalu panjang"
@@ -6095,6 +6293,12 @@
             "state": "translated",
             "value": "Baris alamat kedua terlalu panjang"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baris alamat kedua terlalu panjang"
+          }
         }
       }
     },
@@ -6273,6 +6477,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kota terlalu panjang"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandar terlalu panjang"
           }
         }
       }
@@ -6453,6 +6663,12 @@
             "state": "translated",
             "value": "Nama depan terlalu panjang"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama pertama terlalu panjang"
+          }
         }
       }
     },
@@ -6631,6 +6847,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama belakang terlalu panjang"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama akhir terlalu panjang"
           }
         }
       }
@@ -6833,6 +7055,12 @@
             "state": "translated",
             "value": "Nama depan tidak boleh berisi URL"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama pertama tidak boleh mengandungi URL"
+          }
         }
       }
     },
@@ -7011,6 +7239,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nama belakang tidak boleh berisi URL"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama akhir tidak boleh mengandungi URL"
           }
         }
       }
@@ -7191,6 +7425,12 @@
             "state": "translated",
             "value": "Diskon"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diskaun"
+          }
         }
       }
     },
@@ -7369,6 +7609,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bea cukai"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duti"
           }
         }
       }
@@ -7549,6 +7795,12 @@
             "state": "translated",
             "value": "Pengiriman"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penghantaran"
+          }
         }
       }
     },
@@ -7727,6 +7979,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pengiriman (pembelian satu kali)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penghantaran (pembelian sekali)"
           }
         }
       }
@@ -7907,6 +8165,12 @@
             "state": "translated",
             "value": "Pengiriman (langganan)"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penghantaran (langganan)"
+          }
         }
       }
     },
@@ -8086,6 +8350,12 @@
             "state": "translated",
             "value": "Subtotal"
           }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subjumlah"
+          }
         }
       }
     },
@@ -8264,6 +8534,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pajak"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cukai"
           }
         }
       }
