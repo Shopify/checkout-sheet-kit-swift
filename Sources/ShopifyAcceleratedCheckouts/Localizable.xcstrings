@@ -68,6 +68,12 @@
             "state": "translated",
             "value": "地址行不能包含表情符号"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址行不得包含表情符號"
+          }
         }
       }
     },
@@ -126,6 +132,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "第二个地址行不能包含表情符号"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址第二行不得包含表情符號"
           }
         }
       }
@@ -186,6 +198,12 @@
             "state": "translated",
             "value": "城市不能包含表情符号"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "城市不得包含表情符號"
+          }
         }
       }
     },
@@ -244,6 +262,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "名字不能包含表情符号"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名字不得包含表情符號"
           }
         }
       }
@@ -304,6 +328,12 @@
             "state": "translated",
             "value": "姓氏不能包含表情符号"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓氏不得包含表情符號"
+          }
         }
       }
     },
@@ -362,6 +392,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "邮政编码不能包含表情符号"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "郵政/郵遞區號不得包含表情符號"
           }
         }
       }
@@ -422,6 +458,12 @@
             "state": "translated",
             "value": "地址行不能包含 HTML 标记"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址行不得包含 HTML 標籤"
+          }
         }
       }
     },
@@ -480,6 +522,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "第二个地址行不能包含 HTML 标记"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址第二行不得包含 HTML 標籤"
           }
         }
       }
@@ -540,6 +588,12 @@
             "state": "translated",
             "value": "城市不能包含 HTML 标记"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "城市不得包含 HTML 標籤"
+          }
         }
       }
     },
@@ -598,6 +652,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "名字不能包含 HTML 标记"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名字不得包含 HTML 標籤"
           }
         }
       }
@@ -658,6 +718,12 @@
             "state": "translated",
             "value": "姓氏不能包含 HTML 标记"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓氏不得包含 HTML 標籤"
+          }
         }
       }
     },
@@ -716,6 +782,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入有效地址"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入有效的地址"
           }
         }
       }
@@ -776,6 +848,12 @@
             "state": "translated",
             "value": "请输入有效的公寓、房间号等"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入有效的公寓、套房等。"
+          }
         }
       }
     },
@@ -834,6 +912,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请请输入有效城市"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入有效的城市"
           }
         }
       }
@@ -894,6 +978,12 @@
             "state": "translated",
             "value": "输入有效的邮箱"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入有效的電子郵件"
+          }
         }
       }
     },
@@ -952,6 +1042,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "输入一个有效的酋长国"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入有效的大公國"
           }
         }
       }
@@ -1012,6 +1108,12 @@
             "state": "translated",
             "value": "请输入有效名字"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入有效的名字"
+          }
         }
       }
     },
@@ -1070,6 +1172,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入有效姓氏"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入有效的姓氏"
           }
         }
       }
@@ -1130,6 +1238,12 @@
             "state": "translated",
             "value": "输入有效的电话号码"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入有效的電話號碼"
+          }
         }
       }
     },
@@ -1188,6 +1302,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入有效的邮政编码"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入有效的郵遞區號"
           }
         }
       }
@@ -1248,6 +1368,12 @@
             "state": "translated",
             "value": "请选择有效的州/省"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選取有效的州/省"
+          }
         }
       }
     },
@@ -1306,6 +1432,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入地址"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入地址"
           }
         }
       }
@@ -1366,6 +1498,12 @@
             "state": "translated",
             "value": "输入公寓、房间号等。"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入公寓、套房等"
+          }
         }
       }
     },
@@ -1424,6 +1562,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入城市"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入城市"
           }
         }
       }
@@ -1484,6 +1628,12 @@
             "state": "translated",
             "value": "选择国家/地区"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選取國家/地區"
+          }
         }
       }
     },
@@ -1542,6 +1692,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入邮箱"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入電子郵件地址"
           }
         }
       }
@@ -1602,6 +1758,12 @@
             "state": "translated",
             "value": "输入一个酋长国"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入大公國"
+          }
         }
       }
     },
@@ -1660,6 +1822,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "输入名字"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入名字"
           }
         }
       }
@@ -1720,6 +1888,12 @@
             "state": "translated",
             "value": "请输入姓氏"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入姓氏"
+          }
         }
       }
     },
@@ -1778,6 +1952,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "输入电话号码"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入電話號碼"
           }
         }
       }
@@ -1838,6 +2018,12 @@
             "state": "translated",
             "value": "请输入邮政编码"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入郵遞區號"
+          }
         }
       }
     },
@@ -1896,6 +2082,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请选择州/省"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選取州/省"
           }
         }
       }
@@ -1956,6 +2148,12 @@
             "state": "translated",
             "value": "地址行过长"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址行過長"
+          }
         }
       }
     },
@@ -2014,6 +2212,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "第二个地址行过长"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址第二行過長"
           }
         }
       }
@@ -2074,6 +2278,12 @@
             "state": "translated",
             "value": "城市名过长"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "城市過長"
+          }
         }
       }
     },
@@ -2133,6 +2343,12 @@
             "state": "translated",
             "value": "名字过长"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名字過長"
+          }
         }
       }
     },
@@ -2191,6 +2407,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "姓氏过长"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓氏過長"
           }
         }
       }
@@ -2273,6 +2495,12 @@
             "state": "translated",
             "value": "名字不能包含 URL"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名字不得包含網址"
+          }
         }
       }
     },
@@ -2332,6 +2560,12 @@
             "state": "translated",
             "value": "姓氏不能包含 URL"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓氏不得包含網址"
+          }
         }
       }
     },
@@ -2387,6 +2621,12 @@
           }
         },
         "zh-CN": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣"
+          }
+        },
+        "zh-TW": {
           "stringUnit": {
             "state": "translated",
             "value": "折扣"
@@ -2450,6 +2690,12 @@
             "state": "translated",
             "value": "关税"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關稅"
+          }
         }
       }
     },
@@ -2508,6 +2754,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "运费"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "運送"
           }
         }
       }
@@ -2568,6 +2820,12 @@
             "state": "translated",
             "value": "运费（一次性购买）"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "運送 (一次性購買)"
+          }
         }
       }
     },
@@ -2626,6 +2884,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "运费（订阅）"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "運送 (訂閱)"
           }
         }
       }
@@ -2686,6 +2950,12 @@
             "state": "translated",
             "value": "小计"
           }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小計"
+          }
         }
       }
     },
@@ -2744,6 +3014,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "税费"
+          }
+        },
+        "zh-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稅金"
           }
         }
       }
