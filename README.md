@@ -562,6 +562,227 @@ public func checkoutDidClickLink(url: URL) {
 }
 ```
 
+## Accelerated Checkouts
+
+Accelerated checkout buttons surface Apple Pay and Shop Pay options earlier in the buyer journey so more orders complete without leaving your app. The feature is currently offered as a release candidate. For an end-to-end walkthrough see the [`ShopifyAcceleratedCheckoutsApp` sample](Samples/ShopifyAcceleratedCheckoutsApp).
+
+### Prerequisites
+
+- iOS 16 or later
+- The `write_cart_wallet_payments` access scope ([request access](https://www.appsheet.com/start/1ff317b6-2da1-4f39-b041-c01cfada6098))
+- Apple Pay payment processing certificates ([setup guide](https://shopify.dev/docs/storefronts/mobile/create-apple-payment-processing-certificates))
+- A device configured for Apple Pay ([Apple setup instructions](https://developer.apple.com/documentation/passkit/setting-up-apple-pay))
+
+### Install the package
+
+Add the release candidate to your package manifest so you can import `ShopifyAcceleratedCheckouts` alongside `ShopifyCheckoutSheetKit`.
+
+```swift
+dependencies: [
+  // Use the latest release candidate version
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", "3.4.0-rc.3"..<"3.4.0")
+]
+```
+
+Then add the product to your target dependencies:
+
+```swift
+.target(
+    name: "YourApp",
+    dependencies: ["ShopifyAcceleratedCheckouts"]
+)
+```
+
+If you add the dependency in Xcode, select the repository URL above and choose the desired release candidate when prompted.
+
+### Configure the integration
+
+Create a configuration object that connects the accelerated checkout buttons to your storefront. Provide the domain, Storefront API access token, and optionally the current customer.
+
+```swift
+import ShopifyAcceleratedCheckouts
+
+let configuration = ShopifyAcceleratedCheckouts.Configuration(
+    storefrontDomain: "your-shop.myshopify.com",
+    storefrontAccessToken: "your-storefront-access-token",
+    customer: ShopifyAcceleratedCheckouts.Customer(
+        email: "customer@example.com",
+        phoneNumber: "0123456789",
+        customerAccessToken: "optional-customer-access-token"
+    )
+)
+```
+
+> Pass `nil` for `customer` when the buyer is anonymous, and update the configuration later when their details are known.
+
+Configure Apple Pay with your merchant identifier, required contact fields, and any shipping restrictions.
+
+```swift
+let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+    merchantIdentifier: "merchant.com.yourcompany",
+    contactFields: [.email, .phone]
+)
+```
+
+Use the `contactFields` parameter to request specific details from the buyer's Apple Pay sheet. Provide any
+combination of `.email` and `.phone`. If you omit the parameter (or pass an empty array), Apple Pay still prompts for an
+email address unless it already has one for the buyer (for example, when you supply `customer.email`).
+
+```swift
+// Require only an email address
+let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+    merchantIdentifier: "merchant.com.yourcompany",
+    contactFields: [.email]
+)
+
+// Require only a phone number
+let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+    merchantIdentifier: "merchant.com.yourcompany",
+    contactFields: [.phone]
+)
+
+// Default behaviour: Apple Pay prompts for email unless it already has one
+let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+    merchantIdentifier: "merchant.com.yourcompany"
+)
+```
+
+If you need to limit shipping destinations, pass ISO 3166-1 alpha-2 country codes to `supportedShippingCountries`.
+Leave the parameter as `nil` (the default) to accept all countries and only restrict shipping when Apple Pay cannot
+technically support a destination.
+
+```swift
+// Allow shipping to the United States and Canada only
+let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+    merchantIdentifier: "merchant.com.yourcompany",
+    contactFields: [.email, .phone],
+    supportedShippingCountries: ["US", "CA"]
+)
+```
+
+Inject both configuration objects into your SwiftUI hierarchy so every `AcceleratedCheckoutButtons` instance can read them:
+
+```swift
+@main
+struct MyApp: App {
+    let configuration = ShopifyAcceleratedCheckouts.Configuration(...)
+    let applePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(...)
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environmentObject(configuration)
+                .environmentObject(applePayConfig)
+        }
+    }
+}
+```
+
+If you are building a UIKit surface, wrap the SwiftUI buttons with a `UIHostingController` and provide the same environment objects before adding the view to your hierarchy.
+
+### Render accelerated checkout buttons
+
+Use `AcceleratedCheckoutButtons` to attach accelerated checkout calls-to-action to product or cart surfaces once you have a valid cart ID or product variant ID from the Storefront API. Guard the component with `#available(iOS 16.0, *)` if your app still supports older OS versions.
+
+```swift
+if #available(iOS 16.0, *) {
+    AcceleratedCheckoutButtons(cartID: cartID)
+        .wallets([..shopPay, .applePay])
+} else {
+    FallbackCheckoutButton()
+}
+```
+
+#### Customize wallet options
+
+Accelerated checkout buttons display every available wallet by default. Use `.wallets(_:)` to show a subset or adjust the
+order shoppers see them in.
+
+```swift
+// Display only Shop Pay
+AcceleratedCheckoutButtons(cartID: cartID)
+    .wallets([.shopPay])
+
+// Display Shop Pay first, then Apple Pay
+AcceleratedCheckoutButtons(cartID: cartID)
+    .wallets([.shopPay, .applePay])
+```
+
+#### Modify the Apple Pay button label
+
+Use `.applePayLabel(_:)` to map to the native `PayWithApplePayButtonLabel` values. The default is `.plain`.
+
+```swift
+AcceleratedCheckoutButtons(cartID: cartID)
+    .applePayLabel(.buy)
+```
+
+#### Customize button corners
+
+The `.cornerRadius(_:)` modifier lets you match the buttons to other calls-to-action in your app. Buttons default to an
+8 pt radius.
+
+```swift
+// Pill-shaped buttons
+AcceleratedCheckoutButtons(cartID: cartID)
+    .cornerRadius(16)
+
+// Square buttons
+AcceleratedCheckoutButtons(cartID: cartID)
+    .cornerRadius(0)
+```
+
+For custom layouts, compose the buttons inside your own SwiftUI view and reuse that view across surfaces.
+
+### Handle loading, errors, and lifecycle events
+
+Listen for render state changes so you can display matching loading or error UI and only show the buttons when they are ready.
+
+```swift
+@State private var renderState: RenderState = .loading
+
+var body: some View {
+    if case .loading = renderState {
+        ProgressView()
+    }
+
+    if case .error = renderState {
+        ErrorStateView()
+    }
+
+    AcceleratedCheckoutButtons(cartID: cartID)
+        .onRenderStateChange { state in
+            renderState = state
+        }
+}
+```
+
+Attach lifecycle handlers to respond when buyers finish, cancel, or encounter an error. Clearing the cart after a successful accelerated checkout prevents reuse of an expired cart ID.
+
+```swift
+AcceleratedCheckoutButtons(cartID: cartID)
+    .onComplete { _ in
+        cartManager.clearCart()
+    }
+    .onFail { error in
+        logger.error("Accelerated checkout failed: \(error)")
+    }
+    .onCancel {
+        analytics.track(.acceleratedCheckoutCancelled)
+    }
+    .onWebPixelEvent { event in
+        analytics.track(event)
+    }
+    .onClickLink { url in
+        UIApplication.shared.open(url)
+    }
+```
+
+### Troubleshooting
+
+- Increase verbosity during development with `ShopifyAcceleratedCheckouts.logLevel = .all` and `ShopifyCheckoutSheetKit.configuration.logLevel = .all`.
+- If the Apple Pay sheet dismisses immediately, verify your merchant ID configuration in the Apple Developer portal and Xcode signing settings.
+
 ---
 
 ## Explore the sample apps
