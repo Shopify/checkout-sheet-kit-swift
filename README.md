@@ -7,7 +7,7 @@
 
 **Note**: We're in the process of renaming "Checkout Sheet Kit" to "Checkout Kit." The dev docs and README already use the new name, while the package itself will be updated in an upcoming version.
 
-- [Shopify Checkout Kit - Swift](#shopify-checkout-sheet-kit---swift)
+- [Shopify Checkout Kit - Swift](#shopify-checkout-kit---swift)
   - [Requirements](#requirements)
   - [Getting Started](#getting-started)
     - [Package.swift](#packageswift)
@@ -39,6 +39,16 @@
     - [Shop Pay](#shop-pay)
     - [Customer Account API](#customer-account-api)
   - [Offsite Payments](#offsite-payments)
+  - [Accelerated Checkouts](#accelerated-checkouts)
+    - [Prerequisites](#prerequisites)
+    - [Install the package](#install-the-package)
+    - [Configure the integration](#configure-the-integration)
+    - [Render accelerated checkout buttons](#render-accelerated-checkout-buttons)
+      - [Customize wallet options](#customize-wallet-options)
+      - [Modify the Apple Pay button label](#modify-the-apple-pay-button-label)
+      - [Customize button corners](#customize-button-corners)
+    - [Handle loading, errors, and lifecycle events](#handle-loading-errors-and-lifecycle-events)
+    - [Troubleshooting](#troubleshooting)
   - [Explore the sample apps](#explore-the-sample-apps)
   - [Contributing](#contributing)
   - [License](#license)
@@ -496,15 +506,15 @@ func shouldRecoverFromError(error: CheckoutError) {
 
 ### `CheckoutError`
 
-| Type                                                            | Description                                | Recommendation                                                                                    |
-| --------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                         |
-| `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                      |
-| `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                  |
+| Type                                                            | Description                                | Recommendation                                                                              |
+| --------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                   |
+| `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                |
+| `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                            |
 | `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Kit for usage with password protected stores. |
-| `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                              |
-| `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                    |
-| `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                           |
+| `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                        |
+| `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                              |
+| `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                     |
 
 ## Integrating identity & customer accounts
 
