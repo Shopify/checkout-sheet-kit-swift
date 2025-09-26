@@ -238,6 +238,8 @@ public class CheckoutWebView: WKWebView {
             isPreloadRequest = true
             request.setValue("prefetch", forHTTPHeaderField: "Shopify-Purpose")
         }
+        
+        // request.setValue("09-12-amazon-poc-native-address-book", forHTTPHeaderField: "Shopify-Checkout-Preview")
 
         load(request)
     }
