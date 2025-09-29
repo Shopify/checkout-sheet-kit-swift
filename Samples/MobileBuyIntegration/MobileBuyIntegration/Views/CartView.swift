@@ -100,17 +100,29 @@ struct CartView: View {
                     CheckoutSheet(checkout: url)
                         .colorScheme(.automatic)
                         .onCancel {
+                            print("[ShopifyCheckoutKit] CANCEL")
                             showCheckoutSheet = false
                         }
                         .onComplete { event in
-                            showCheckoutSheet = false
                             // Handle checkout completion
-                            print("Checkout completed with order ID: \(event.orderDetails.id)")
+                            print("[ShopifyCheckoutKit] COMPLETE - Checkout completed with order ID: \(event.orderDetails.id)")
+                            CartManager.shared.resetCart()
                         }
                         .onFail { error in
                             showCheckoutSheet = false
                             // Handle checkout failure
-                            print("Checkout failed: \(error)")
+                            print("[ShopifyCheckoutKit] FAIL - Checkout failed: \(error)")
+                        }
+                        .onLinkClick { url in
+                            print("[ShopifyCheckoutKit] LINK CLICK - \(url)")
+                        }
+                        .onPixelEvent { event in
+                            switch event {
+                            case let .customEvent(event):
+                                print("[ShopifyCheckoutKit] PIXEL - \(String(describing: event.name))")
+                            case let .standardEvent(event):
+                                print("[ShopifyCheckoutKit] PIXEL - \(String(describing: event.name))")
+                            }
                         }
                         .edgesIgnoringSafeArea(.all)
                 }
