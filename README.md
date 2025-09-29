@@ -623,6 +623,7 @@ let configuration = ShopifyAcceleratedCheckouts.Configuration(
 )
 ```
 
+> [!TIP]
 > Pass `nil` for `customer` when the buyer is anonymous, and update the configuration later when their details are known.
 
 Configure Apple Pay with your merchant identifier, required contact fields, and any shipping restrictions.
@@ -698,8 +699,6 @@ Use `AcceleratedCheckoutButtons` to attach accelerated checkout calls-to-action 
 if #available(iOS 16.0, *) {
     AcceleratedCheckoutButtons(cartID: cartID)
         .wallets([..shopPay, .applePay])
-} else {
-    FallbackCheckoutButton()
 }
 ```
 
