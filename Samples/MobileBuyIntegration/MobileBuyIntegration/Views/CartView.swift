@@ -31,6 +31,7 @@ import ShopifyCheckoutSheetKit
 struct CartView: View {
     @State var cartCompleted: Bool = false
     @State var isBusy: Bool = false
+    @State var isCompleted: Bool = false
     @State var showCheckoutSheet: Bool = false
 
     @ObservedObject var cartManager: CartManager = .shared
@@ -102,11 +103,16 @@ struct CartView: View {
                         .onCancel {
                             print("[ShopifyCheckoutKit] CANCEL")
                             showCheckoutSheet = false
+
+                            if isCompleted {
+                                CartManager.shared.resetCart()
+                                isCompleted = false
+                            }
                         }
                         .onComplete { event in
                             // Handle checkout completion
                             print("[ShopifyCheckoutKit] COMPLETE - Checkout completed with order ID: \(event.orderDetails.id)")
-                            CartManager.shared.resetCart()
+                            isCompleted = true
                         }
                         .onFail { error in
                             showCheckoutSheet = false
