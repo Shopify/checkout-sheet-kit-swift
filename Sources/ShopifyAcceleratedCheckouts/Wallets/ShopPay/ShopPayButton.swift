@@ -90,6 +90,7 @@ internal struct Internal_ShopPayButton: View {
                         .scaledToFit()
                         .frame(height: 24)
                         .frame(maxWidth: .infinity)
+                        .accessibilityLabel("Shop Pay")
                 }
                 .frame(height: 48)
                 /// This ensures that the blue background is clickable
