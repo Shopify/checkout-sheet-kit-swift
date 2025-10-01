@@ -22,6 +22,63 @@
  */
 
 import Foundation
+import WebKit
+
+public protocol RespondableEvent: AnyObject {
+    associatedtype ResponseType: Codable
+
+    var id: String { get }
+    var responseMessageName: String { get }
+    var cancellationMessageName: String? { get }
+    var hasResponded: Bool { get set }
+    var webView: WKWebView? { get set }
+
+    func respondWith(json jsonString: String) throws
+    func decode(from responseData: String) throws -> ResponseType
+    func respondWith(result: ResponseType)
+    func validate(payload: ResponseType) throws
+}
+
+extension RespondableEvent {
+    public func respondWith(json jsonString: String) throws {
+        let payload = try decode(from: jsonString)
+        respondWith(result: payload)
+    }
+
+    public func respondWith(result: ResponseType) {
+        guard !hasResponded else { return }
+        hasResponded = true
+        guard let webView else { return }
+
+        if let payload = SdkToWebEvent(detail: result).toJson() {
+            CheckoutBridge.sendMessage(
+                webView,
+                messageName: responseMessageName,
+                messageBody: payload
+            )
+        }
+    }
+
+    public func decode(from responseData: String) throws -> ResponseType {
+        guard let data = responseData.data(using: .utf8) else {
+            throw EventResponseError.invalidEncoding
+        }
+
+        do {
+            let payload = try JSONDecoder().decode(ResponseType.self, from: data)
+            try validate(payload: payload)
+            return payload
+        } catch let error as DecodingError {
+            throw EventResponseError.decodingFailed(formatDecodingError(error))
+        } catch let error as EventResponseError {
+            throw error
+        } catch {
+            throw EventResponseError.decodingFailed(error.localizedDescription)
+        }
+    }
+
+    public func validate(payload _: ResponseType) throws {}
+}
 
 public enum EventResponseError: Error {
     case invalidEncoding
@@ -43,47 +100,5 @@ func formatDecodingError(_ error: DecodingError) -> String {
         return "Data corrupted: \(context.debugDescription)"
     @unknown default:
         return "Unknown decoding error"
-    }
-}
-
-public protocol RespondableEventBase {
-    var id: String { get }
-    func decodeAndRespond(from responseData: String) throws
-    func cancel()
-}
-
-public protocol RespondableEvent: RespondableEventBase {
-    associatedtype ResponseType: Codable
-    func decode(from responseData: String) throws -> ResponseType
-    func respondWith(result: ResponseType)
-    func validate(payload: ResponseType) throws
-}
-
-extension RespondableEvent {
-    public func decodeAndRespond(from responseData: String) throws {
-        let payload = try decode(from: responseData)
-        respondWith(result: payload)
-    }
-
-    public func decode(from responseData: String) throws -> ResponseType {
-        guard let data = responseData.data(using: .utf8) else {
-            throw EventResponseError.invalidEncoding
-        }
-
-        do {
-            let payload = try JSONDecoder().decode(ResponseType.self, from: data)
-            try validate(payload: payload)
-            return payload
-        } catch let error as DecodingError {
-            throw EventResponseError.decodingFailed(formatDecodingError(error))
-        } catch let error as EventResponseError {
-            throw error
-        } catch {
-            throw EventResponseError.decodingFailed(error.localizedDescription)
-        }
-    }
-
-    public func validate(payload: ResponseType) throws {
-        // No-op by default - override in conforming types if validation is needed
     }
 }

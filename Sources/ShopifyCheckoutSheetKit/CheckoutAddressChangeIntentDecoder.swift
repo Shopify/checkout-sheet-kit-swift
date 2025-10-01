@@ -28,36 +28,18 @@ class CheckoutAddressChangeIntentDecoder {
     func decode(
         from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>,
         using _: Decoder
-    ) -> CheckoutAddressChangeIntentEvent {
-        do {
-            let messageBody = try container.decode(String.self, forKey: .body)
-            
-            guard let data = messageBody.data(using: .utf8) else {
-                return createEmptyCheckoutAddressChangeIntentEvent()
-            }
-            
-            let eventData = try JSONDecoder().decode(CheckoutAddressChangeIntentEventData.self, from: data)
-            
-            return CheckoutAddressChangeIntentEvent(
-                addressType: eventData.addressType,
-                onResponse: { _ in
-                    OSLogger.shared.info("AddressChangeIntent response - will be handled by CheckoutWebView")
-                },
-                onCancel: {
-                    OSLogger.shared.info("AddressChangeIntent cancel - will be handled by CheckoutWebView")
-                }
-            )
-        } catch {
-            OSLogger.shared.error("Error decoding \"addressChangeIntent\" event - \(error.localizedDescription)")
-            return createEmptyCheckoutAddressChangeIntentEvent()
-        }
-    }
-}
+    ) throws -> CheckoutAddressChangeIntentEvent {
+        let messageBody = try container.decode(String.self, forKey: .body)
 
-private func createEmptyCheckoutAddressChangeIntentEvent() -> CheckoutAddressChangeIntentEvent {
-    return CheckoutAddressChangeIntentEvent(
-        addressType: "",
-        onResponse: { _ in },
-        onCancel: { }
-    )
+        guard let data = messageBody.data(using: .utf8) else {
+            throw BridgeError.invalidBridgeEvent()
+        }
+
+        let eventData = try JSONDecoder().decode(CheckoutAddressChangeIntentEventData.self, from: data)
+
+        return CheckoutAddressChangeIntentEvent(
+            addressType: eventData.addressType,
+            webView: nil
+        )
+    }
 }

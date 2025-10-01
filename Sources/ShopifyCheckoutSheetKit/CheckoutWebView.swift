@@ -238,7 +238,7 @@ public class CheckoutWebView: WKWebView {
             isPreloadRequest = true
             request.setValue("prefetch", forHTTPHeaderField: "Shopify-Purpose")
         }
-        
+
         // request.setValue("09-12-amazon-poc-native-address-book", forHTTPHeaderField: "Shopify-Checkout-Preview")
 
         load(request)
@@ -288,33 +288,17 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
             /// Checkout web pixel event
             case let .webPixels(event):
-                if let nonOptionalEvent = event {
-                    viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
+                if let event {
+                    viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: event)
                 }
             /// Address change intent
             case let .addressChangeIntent(event):
                 OSLogger.shared.info("Address change intent event received: \(event.addressType)")
-                // Create a new event with proper callbacks that reference this webView
-                let eventWithCallbacks = CheckoutAddressChangeIntentEvent(
+                let eventWithWebView = CheckoutAddressChangeIntentEvent(
                     addressType: event.addressType,
-                    onResponse: { [weak self] payload in
-                        guard let self = self else {
-                            OSLogger.shared.info("CheckoutWebView deallocated, cannot send address response")
-                            return
-                        }
-                        OSLogger.shared.info("Sending address change response back to web")
-                        CheckoutBridge.sendDeliveryAddressChange(self, payload)
-                    },
-                    onCancel: { [weak self] in
-                        guard let self = self else {
-                            OSLogger.shared.info("CheckoutWebView deallocated, cannot send address cancellation")
-                            return
-                        }
-                        OSLogger.shared.info("Sending address change cancellation back to web")
-                        CheckoutBridge.sendMessage(self, messageName: "deliveryAddressCancel", messageBody: nil)
-                    }
+                    webView: self
                 )
-                viewDelegate?.checkoutViewDidRequestAddressChange(event: eventWithCallbacks)
+                viewDelegate?.checkoutViewDidRequestAddressChange(event: eventWithWebView)
             default:
                 ()
             }
@@ -423,7 +407,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         timer = nil
     }
 
-    public func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
+    public func webView(_: WKWebView, didFinish _: WKNavigation!) {
         viewDelegate?.checkoutViewDidFinishNavigation()
 
         if let startTime = timer {

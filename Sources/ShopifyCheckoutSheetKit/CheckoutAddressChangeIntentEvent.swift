@@ -22,6 +22,38 @@
  */
 
 import Foundation
+import WebKit
+
+public class CheckoutAddressChangeIntentEvent: RespondableEvent {
+    public typealias ResponseType = DeliveryAddressChangePayload
+
+    public let id: String = UUID().uuidString
+    public let addressType: String
+    public var hasResponded = false
+    public weak var webView: WKWebView?
+
+    public let responseMessageName = "deliveryAddressChange"
+    public let cancellationMessageName: String? = "deliveryAddressCancel"
+
+    internal init(addressType: String, webView: WKWebView?) {
+        self.addressType = addressType
+        self.webView = webView
+    }
+
+    public func validate(payload: DeliveryAddressChangePayload) throws {
+        guard !payload.delivery.addresses.isEmpty else {
+            throw EventResponseError.validationFailed("At least one address is required")
+        }
+
+        for (index, selectableAddress) in payload.delivery.addresses.enumerated() {
+            let address = selectableAddress.address
+
+            if let countryCode = address.countryCode, countryCode.isEmpty {
+                throw EventResponseError.validationFailed("Country code cannot be empty at index \(index)")
+            }
+        }
+    }
+}
 
 public struct CheckoutAddressChangeIntentEventData: Codable {
     public let addressType: String
@@ -29,7 +61,7 @@ public struct CheckoutAddressChangeIntentEventData: Codable {
 
 public struct DeliveryAddressChangePayload: Codable {
     public let delivery: CartDelivery
-    
+
     public init(delivery: CartDelivery) {
         self.delivery = delivery
     }
@@ -37,7 +69,7 @@ public struct DeliveryAddressChangePayload: Codable {
 
 public struct CartDelivery: Codable {
     public let addresses: [CartSelectableAddressInput]
-    
+
     public init(addresses: [CartSelectableAddressInput]) {
         self.addresses = addresses
     }
@@ -45,7 +77,7 @@ public struct CartDelivery: Codable {
 
 public struct CartSelectableAddressInput: Codable {
     public let address: CartDeliveryAddressInput
-    
+
     public init(address: CartDeliveryAddressInput) {
         self.address = address
     }
@@ -61,7 +93,7 @@ public struct CartDeliveryAddressInput: Codable {
     public let phone: String?
     public let provinceCode: String?
     public let zip: String?
-    
+
     public init(
         firstName: String? = nil,
         lastName: String? = nil,
@@ -82,51 +114,5 @@ public struct CartDeliveryAddressInput: Codable {
         self.phone = phone
         self.provinceCode = provinceCode
         self.zip = zip
-    }
-}
-
-public class CheckoutAddressChangeIntentEvent: RespondableEvent {
-    public typealias ResponseType = DeliveryAddressChangePayload
-
-    public let id: String = UUID().uuidString
-    public let addressType: String
-    private let onResponse: (DeliveryAddressChangePayload) -> Void
-    private let onCancel: () -> Void
-    private var hasResponded = false
-
-    internal init(
-        addressType: String,
-        onResponse: @escaping (DeliveryAddressChangePayload) -> Void,
-        onCancel: @escaping () -> Void
-    ) {
-        self.addressType = addressType
-        self.onResponse = onResponse
-        self.onCancel = onCancel
-    }
-
-    public func validate(payload: DeliveryAddressChangePayload) throws {
-        guard !payload.delivery.addresses.isEmpty else {
-            throw EventResponseError.validationFailed("At least one address is required")
-        }
-
-        for (index, selectableAddress) in payload.delivery.addresses.enumerated() {
-            let address = selectableAddress.address
-
-            if let countryCode = address.countryCode, countryCode.isEmpty {
-                throw EventResponseError.validationFailed("Country code cannot be empty at index \(index)")
-            }
-        }
-    }
-
-    public func respondWith(result: DeliveryAddressChangePayload) {
-        guard !hasResponded else { return }
-        hasResponded = true
-        onResponse(result)
-    }
-
-    public func cancel() {
-        guard !hasResponded else { return }
-        hasResponded = true
-        onCancel()
     }
 }
