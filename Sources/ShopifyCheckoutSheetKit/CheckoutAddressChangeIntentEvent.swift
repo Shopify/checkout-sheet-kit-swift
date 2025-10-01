@@ -85,12 +85,9 @@ public struct CartDeliveryAddressInput: Codable {
     }
 }
 
-public protocol RespondableEvent {
-    func respondWith(result: DeliveryAddressChangePayload)
-    func cancel()
-}
-
 public class CheckoutAddressChangeIntentEvent: RespondableEvent {
+    public typealias ResponseType = DeliveryAddressChangePayload
+
     public let id: String = UUID().uuidString
     public let addressType: String
     private let onResponse: (DeliveryAddressChangePayload) -> Void
@@ -105,6 +102,20 @@ public class CheckoutAddressChangeIntentEvent: RespondableEvent {
         self.addressType = addressType
         self.onResponse = onResponse
         self.onCancel = onCancel
+    }
+
+    public func validate(payload: DeliveryAddressChangePayload) throws {
+        guard !payload.delivery.addresses.isEmpty else {
+            throw EventResponseError.validationFailed("At least one address is required")
+        }
+
+        for (index, selectableAddress) in payload.delivery.addresses.enumerated() {
+            let address = selectableAddress.address
+
+            if let countryCode = address.countryCode, countryCode.isEmpty {
+                throw EventResponseError.validationFailed("Country code cannot be empty at index \(index)")
+            }
+        }
     }
 
     public func respondWith(result: DeliveryAddressChangePayload) {
