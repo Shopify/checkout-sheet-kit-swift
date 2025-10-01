@@ -25,7 +25,6 @@ import Foundation
 
 public enum CheckoutErrorCode: String, Codable {
     case storefrontPasswordRequired = "storefront_password_required"
-    case checkoutLiquidNotMigrated = "checkout_liquid_not_migrated"
     case cartExpired = "cart_expired"
     case cartCompleted = "cart_completed"
     case invalidCart = "invalid_cart"
