@@ -34,9 +34,6 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
 }
 
-private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
-private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
-
 class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
     var timer: Date?
@@ -347,15 +344,11 @@ extension CheckoutWebView: WKNavigationDelegate {
                 viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(message: errorMessageForStatusCode, code: CheckoutUnavailable.httpError(statusCode: statusCode), recoverable: false))
             case 404:
                 OSLogger.shared.debug("Not found (404)")
-                if let reason = headers[deprecatedReasonHeader] as? String, reason.lowercased() == checkoutLiquidNotSupportedReason {
-                    viewDelegate?.checkoutViewDidFailWithError(error: .configurationError(message: "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.", code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
-                } else {
-                    viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
-                        message: errorMessageForStatusCode,
-                        code: CheckoutUnavailable.httpError(statusCode: statusCode),
-                        recoverable: false
-                    ))
-                }
+                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
+                    message: errorMessageForStatusCode,
+                    code: CheckoutUnavailable.httpError(statusCode: statusCode),
+                    recoverable: false
+                ))
             case 410:
                 OSLogger.shared.debug("Gone (410)")
                 viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired))

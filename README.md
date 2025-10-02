@@ -56,8 +56,7 @@
 ## Requirements
 
 - Swift 5.7+
-- iOS SDK 13.0+
-- The SDK is not compatible with checkout.liquid. The Shopify Store must be migrated for extensibility
+- iOS 13.0+ for Checkout Sheet, iOS 16+ for Accelerated Checkouts
 
 ## Getting Started
 
@@ -508,7 +507,6 @@ func shouldRecoverFromError(error: CheckoutError) {
 
 | Type                                                            | Description                                | Recommendation                                                                              |
 | --------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                   |
 | `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                |
 | `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                            |
 | `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Kit for usage with password protected stores. |
