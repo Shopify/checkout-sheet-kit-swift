@@ -29,9 +29,11 @@ import WebKit
 public protocol RPCRequest: AnyObject {
     associatedtype RPCResponse: Codable
 
+    /// nil if request is a notification type
     var id: String? { get }
     var jsonrpc: String { get }
 
+    // 4.1 Notification - https://www.jsonrpc.org/specification
     var isNotification: Bool { get }
 
     /// Event Name
@@ -54,7 +56,8 @@ public protocol RPCRequest: AnyObject {
 extension RPCRequest {
     public var jsonrpc: String { "2.0" }
     // TODO; May not be needed
-    public var isNotification: Bool { return id != nil }
+    /// id is nil if notification type
+    public var isNotification: Bool { id == nil }
 
     public func respondWith(json jsonString: String) throws {
         let payload = try decode(from: jsonString)
