@@ -7,51 +7,50 @@
 
 **Note**: We're in the process of renaming "Checkout Sheet Kit" to "Checkout Kit." The dev docs and README already use the new name, while the package itself will be updated in an upcoming version.
 
-- [Shopify Checkout Kit - Swift](#shopify-checkout-kit---swift)
-  - [Requirements](#requirements)
-  - [Getting Started](#getting-started)
-    - [Package.swift](#packageswift)
-    - [Xcode](#xcode)
-    - [CocoaPods](#cocoapods)
-  - [Programmatic Usage](#programmatic-usage)
-  - [SwiftUI Usage](#swiftui-usage)
-  - [Configuration](#configuration)
-    - [`colorScheme`](#colorscheme)
-    - [`tintColor`](#tintcolor)
-    - [`backgroundColor`](#backgroundcolor)
-    - [`title`](#title)
-    - [`closeButtonTintColor`](#closebuttontintcolor)
-    - [SwiftUI Configuration](#swiftui-configuration)
-  - [Preloading](#preloading)
-    - [Important considerations](#important-considerations)
-    - [Flash Sales](#flash-sales)
-    - [When to preload](#when-to-preload)
-    - [Cache invalidation](#cache-invalidation)
-    - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
-    - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
-  - [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
-    - [Integrating with Web Pixels, monitoring behavioral data](#integrating-with-web-pixels-monitoring-behavioral-data)
-  - [Error handling](#error-handling)
-    - [`CheckoutError`](#checkouterror)
-  - [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
-    - [Cart: buyer bag, identity, and preferences](#cart-buyer-bag-identity-and-preferences)
-    - [Multipass](#multipass)
-    - [Shop Pay](#shop-pay)
-    - [Customer Account API](#customer-account-api)
-  - [Offsite Payments](#offsite-payments)
-  - [Accelerated Checkouts](#accelerated-checkouts)
-    - [Prerequisites](#prerequisites)
-    - [Install the package](#install-the-package)
-    - [Configure the integration](#configure-the-integration)
-    - [Render accelerated checkout buttons](#render-accelerated-checkout-buttons)
-      - [Customize wallet options](#customize-wallet-options)
-      - [Modify the Apple Pay button label](#modify-the-apple-pay-button-label)
-      - [Customize button corners](#customize-button-corners)
-    - [Handle loading, errors, and lifecycle events](#handle-loading-errors-and-lifecycle-events)
-    - [Troubleshooting](#troubleshooting)
-  - [Explore the sample apps](#explore-the-sample-apps)
-  - [Contributing](#contributing)
-  - [License](#license)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+  - [Package.swift](#packageswift)
+  - [Xcode](#xcode)
+  - [CocoaPods](#cocoapods)
+- [Programmatic Usage](#programmatic-usage)
+- [SwiftUI Usage](#swiftui-usage)
+- [Configuration](#configuration)
+  - [`colorScheme`](#colorscheme)
+  - [`tintColor`](#tintcolor)
+  - [`backgroundColor`](#backgroundcolor)
+  - [`title`](#title)
+  - [`closeButtonTintColor`](#closebuttontintcolor)
+  - [SwiftUI Configuration](#swiftui-configuration)
+- [Preloading](#preloading)
+  - [Important considerations](#important-considerations)
+  - [Flash Sales](#flash-sales)
+  - [When to preload](#when-to-preload)
+  - [Cache invalidation](#cache-invalidation)
+  - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
+  - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
+- [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
+  - [Integrating with Web Pixels, monitoring behavioral data](#integrating-with-web-pixels-monitoring-behavioral-data)
+- [Error handling](#error-handling)
+  - [`CheckoutError`](#checkouterror)
+- [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
+  - [Cart: buyer bag, identity, and preferences](#cart-buyer-bag-identity-and-preferences)
+  - [Multipass](#multipass)
+  - [Shop Pay](#shop-pay)
+  - [Customer Account API](#customer-account-api)
+- [Offsite Payments](#offsite-payments)
+- [Accelerated Checkouts](#accelerated-checkouts)
+  - [Prerequisites](#prerequisites)
+  - [Install the package](#install-the-package)
+  - [Configure the integration](#configure-the-integration)
+  - [Render accelerated checkout buttons](#render-accelerated-checkout-buttons)
+    - [Customize wallet options](#customize-wallet-options)
+    - [Modify the Apple Pay button label](#modify-the-apple-pay-button-label)
+    - [Customize button corners](#customize-button-corners)
+  - [Handle loading, errors, and lifecycle events](#handle-loading-errors-and-lifecycle-events)
+  - [Troubleshooting](#troubleshooting)
+- [Explore the sample apps](#explore-the-sample-apps)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Requirements
 
@@ -572,7 +571,7 @@ public func checkoutDidClickLink(url: URL) {
 
 ## Accelerated Checkouts
 
-Accelerated checkout buttons surface Apple Pay and Shop Pay options earlier in the buyer journey so more orders complete without leaving your app. The feature is currently offered as a release candidate. For an end-to-end walkthrough see the [`ShopifyAcceleratedCheckoutsApp` sample](Samples/ShopifyAcceleratedCheckoutsApp).
+Accelerated checkout buttons surface Apple Pay and Shop Pay options earlier in the buyer journey so more orders complete without leaving your app. For an end-to-end walkthrough see the [`ShopifyAcceleratedCheckoutsApp` sample](Samples/ShopifyAcceleratedCheckoutsApp).
 
 ### Prerequisites
 
@@ -583,12 +582,11 @@ Accelerated checkout buttons surface Apple Pay and Shop Pay options earlier in t
 
 ### Install the package
 
-Add the release candidate to your package manifest so you can import `ShopifyAcceleratedCheckouts` alongside `ShopifyCheckoutSheetKit`.
+Update your package manifest to import `ShopifyAcceleratedCheckouts` alongside `ShopifyCheckoutSheetKit`.
 
 ```swift
 dependencies: [
-  // Use the latest release candidate version
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", "3.4.0-rc.3"..<"3.4.0")
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "3.4.0")
 ]
 ```
 
@@ -600,8 +598,6 @@ Then add the product to your target dependencies:
     dependencies: ["ShopifyAcceleratedCheckouts"]
 )
 ```
-
-If you add the dependency in Xcode, select the repository URL above and choose the desired release candidate when prompted.
 
 ### Configure the integration
 
