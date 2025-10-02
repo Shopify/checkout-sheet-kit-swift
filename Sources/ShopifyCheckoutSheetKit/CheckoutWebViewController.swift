@@ -254,8 +254,8 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
         delegate?.checkoutDidEmitWebPixelEvent(event: event)
     }
-    
-    func checkoutViewDidRequestAddressChange(event: CheckoutAddressChangeIntentEvent) {
+
+    func checkoutViewDidRequestAddressChange(event: AddressChangeRequest) {
         delegate?.checkoutDidRequestAddressChange(event: event)
     }
 

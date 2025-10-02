@@ -135,7 +135,7 @@ extension CheckoutBridge {
         case webPixels(event: PixelEvent?)
 
         /// Address Change Intent
-        case addressChangeIntent(event: CheckoutAddressChangeIntentEvent)
+        case addressChangeIntent(event: AddressChangeRequest)
 
         /// Generic
         case unsupported(String)

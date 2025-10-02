@@ -32,7 +32,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
-    func checkoutViewDidRequestAddressChange(event: CheckoutAddressChangeIntentEvent)
+    func checkoutViewDidRequestAddressChange(event: AddressChangeRequest)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
@@ -294,9 +294,9 @@ extension CheckoutWebView: WKScriptMessageHandler {
             /// Address change intent
             case let .addressChangeIntent(event):
                 OSLogger.shared.info("Address change intent event received: \(event.addressType)")
-                let eventWithWebView = CheckoutAddressChangeIntentEvent(
+                let eventWithWebView = AddressChangeRequest(
                     addressType: event.addressType,
-                    webView: self
+                    webview: self
                 )
                 viewDelegate?.checkoutViewDidRequestAddressChange(event: eventWithWebView)
             default:

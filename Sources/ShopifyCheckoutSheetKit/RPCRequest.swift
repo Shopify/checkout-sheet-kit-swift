@@ -24,60 +24,73 @@
 import Foundation
 import WebKit
 
-public protocol RespondableEvent: AnyObject {
-    associatedtype ResponseType: Codable
+/// (Web) The Client is defined as the origin of Request objects and the handler of Response objects.
+/// (Native) The Server is defined as the origin of Response objects and the handler of Request objects.
+public protocol RPCRequest: AnyObject {
+    associatedtype RPCResponse: Codable
 
-    var id: String { get }
-    var responseMessageName: String { get }
-    var cancellationMessageName: String? { get }
+    var id: String? { get }
+    var jsonrpc: String { get }
+
+    var isNotification: Bool { get }
+
+    /// Event Name
+    static var type: String { get }
+
     var hasResponded: Bool { get set }
-    var webView: WKWebView? { get set }
+    var webview: WKWebView? { get set }
 
+    /// jsonString should decode into RPCResponse
     func respondWith(json jsonString: String) throws
-    func decode(from responseData: String) throws -> ResponseType
-    func respondWith(result: ResponseType)
-    func validate(payload: ResponseType) throws
+    func respondWith(result: RPCResponse) throws
+
+    /// (Optional) Called in respondWith before dispatching message over bridge
+    /// Apply validations outside of RPCResponse decoding
+    /// e.g. RPCResponse.someArrayProperty.count > 0
+    /// default: no-op
+    func validate(payload: RPCResponse) throws
 }
 
-extension RespondableEvent {
+extension RPCRequest {
+    public var jsonrpc: String { "2.0" }
+    // TODO; May not be needed
+    public var isNotification: Bool { return id != nil }
+
     public func respondWith(json jsonString: String) throws {
         let payload = try decode(from: jsonString)
-        respondWith(result: payload)
+        try respondWith(result: payload)
     }
 
-    public func respondWith(result: ResponseType) {
+    public func respondWith(result: RPCResponse) throws {
+        guard let webview else { return }
+        guard !isNotification else { return }
         guard !hasResponded else { return }
         hasResponded = true
-        guard let webView else { return }
 
-        if let payload = SdkToWebEvent(detail: result).toJson() {
-            CheckoutBridge.sendMessage(
-                webView,
-                messageName: responseMessageName,
-                messageBody: payload
-            )
-        }
+        try validate(payload: result)
+
+        guard let payload = SdkToWebEvent(detail: result).toJson() else { return }
+
+        CheckoutBridge.sendMessage(webview, messageName: Self.type, messageBody: payload)
     }
 
-    public func decode(from responseData: String) throws -> ResponseType {
+    /// `from` should be a .utf8 encoded json string
+    /// Decodes into RespondableEvent.RPCResponse Codable
+    func decode(from responseData: String) throws -> RPCResponse {
         guard let data = responseData.data(using: .utf8) else {
             throw EventResponseError.invalidEncoding
         }
 
         do {
-            let payload = try JSONDecoder().decode(ResponseType.self, from: data)
-            try validate(payload: payload)
-            return payload
+            return try JSONDecoder().decode(RPCResponse.self, from: data)
         } catch let error as DecodingError {
             throw EventResponseError.decodingFailed(formatDecodingError(error))
-        } catch let error as EventResponseError {
-            throw error
         } catch {
             throw EventResponseError.decodingFailed(error.localizedDescription)
         }
     }
 
-    public func validate(payload _: ResponseType) throws {}
+    public func validate(payload _: RPCResponse) throws {}
 }
 
 public enum EventResponseError: Error {
@@ -88,15 +101,15 @@ public enum EventResponseError: Error {
 
 func formatDecodingError(_ error: DecodingError) -> String {
     switch error {
-    case .keyNotFound(let key, _):
+    case let .keyNotFound(key, _):
         return "Missing required field: \(key.stringValue)"
-    case .typeMismatch(let type, let context):
+    case let .typeMismatch(type, context):
         let path = context.codingPath.map(\.stringValue).joined(separator: ".")
         return "Type mismatch at \(path): expected \(type)"
-    case .valueNotFound(let type, let context):
+    case let .valueNotFound(type, context):
         let path = context.codingPath.map(\.stringValue).joined(separator: ".")
         return "Missing value at \(path): expected \(type)"
-    case .dataCorrupted(let context):
+    case let .dataCorrupted(context):
         return "Data corrupted: \(context.debugDescription)"
     @unknown default:
         return "Unknown decoding error"

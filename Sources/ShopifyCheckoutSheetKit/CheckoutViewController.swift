@@ -126,8 +126,8 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
         delegate.onLinkClick = action
         return self
     }
-    
-    @discardableResult public func onAddressChangeIntent(_ action: @escaping (CheckoutAddressChangeIntentEvent) -> Void) -> Self {
+
+    @discardableResult public func onAddressChangeIntent(_ action: @escaping (AddressChangeRequest) -> Void) -> Self {
         delegate.onAddressChangeIntent = action
         return self
     }
@@ -139,7 +139,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onFail: ((CheckoutError) -> Void)?
     var onPixelEvent: ((PixelEvent) -> Void)?
     var onLinkClick: ((URL) -> Void)?
-    var onAddressChangeIntent: ((CheckoutAddressChangeIntentEvent) -> Void)?
+    var onAddressChangeIntent: ((AddressChangeRequest) -> Void)?
 
     public func checkoutDidFail(error: CheckoutError) {
         onFail?(error)
@@ -168,8 +168,8 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
             UIApplication.shared.open(url)
         }
     }
-    
-    public func checkoutDidRequestAddressChange(event: CheckoutAddressChangeIntentEvent) {
+
+    public func checkoutDidRequestAddressChange(event: AddressChangeRequest) {
         onAddressChangeIntent?(event)
     }
 }

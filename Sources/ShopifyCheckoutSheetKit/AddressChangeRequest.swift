@@ -24,20 +24,20 @@
 import Foundation
 import WebKit
 
-public class CheckoutAddressChangeIntentEvent: RespondableEvent {
+public final class AddressChangeRequest: RPCRequest {
     public typealias ResponseType = DeliveryAddressChangePayload
 
-    public let id: String = UUID().uuidString
+    public static let type = "deliveryAddressChange"
+    public let id: String? = UUID().uuidString
+
     public let addressType: String
+    public weak var webview: WKWebView?
+
     public var hasResponded = false
-    public weak var webView: WKWebView?
 
-    public let responseMessageName = "deliveryAddressChange"
-    public let cancellationMessageName: String? = "deliveryAddressCancel"
-
-    internal init(addressType: String, webView: WKWebView?) {
+    internal init(addressType: String, webview: WKWebView?) {
         self.addressType = addressType
-        self.webView = webView
+        self.webview = webview
     }
 
     public func validate(payload: DeliveryAddressChangePayload) throws {
@@ -49,7 +49,9 @@ public class CheckoutAddressChangeIntentEvent: RespondableEvent {
             let address = selectableAddress.address
 
             if let countryCode = address.countryCode, countryCode.isEmpty {
-                throw EventResponseError.validationFailed("Country code cannot be empty at index \(index)")
+                throw EventResponseError.validationFailed(
+                    "Country code cannot be empty at index \(index)"
+                )
             }
         }
     }

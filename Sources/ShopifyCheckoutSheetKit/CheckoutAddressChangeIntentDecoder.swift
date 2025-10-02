@@ -28,7 +28,7 @@ class CheckoutAddressChangeIntentDecoder {
     func decode(
         from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>,
         using _: Decoder
-    ) throws -> CheckoutAddressChangeIntentEvent {
+    ) throws -> AddressChangeRequest {
         let messageBody = try container.decode(String.self, forKey: .body)
 
         guard let data = messageBody.data(using: .utf8) else {
@@ -37,9 +37,9 @@ class CheckoutAddressChangeIntentDecoder {
 
         let eventData = try JSONDecoder().decode(CheckoutAddressChangeIntentEventData.self, from: data)
 
-        return CheckoutAddressChangeIntentEvent(
+        return AddressChangeRequest(
             addressType: eventData.addressType,
-            webView: nil
+            webview: nil
         )
     }
 }
