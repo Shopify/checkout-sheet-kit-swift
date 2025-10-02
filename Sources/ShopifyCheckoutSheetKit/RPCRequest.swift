@@ -56,7 +56,7 @@ public protocol RPCRequest: AnyObject {
 extension RPCRequest {
     public var jsonrpc: String { "2.0" }
     // TODO; May not be needed
-    /// id is nil if notification type
+    /// The request is a notification type if id is nil
     public var isNotification: Bool { id == nil }
 
     public func respondWith(json jsonString: String) throws {
