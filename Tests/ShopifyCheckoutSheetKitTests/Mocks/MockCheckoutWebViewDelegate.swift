@@ -84,4 +84,36 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
         completedEventReceived = event
         didEmitCheckoutCompletedEventExpectation?.fulfill()
     }
+    
+    // MARK: - Embedded Checkout Delegate Methods
+    
+    var stateChangePayloadReceived: CheckoutStatePayload?
+    var completePayloadReceived: CheckoutCompletePayload?
+    var errorsReceived: [ErrorPayload]?
+    var webPixelsPayloadReceived: WebPixelsPayload?
+    
+    var didChangeStateExpectation: XCTestExpectation?
+    var didCompleteEmbeddedCheckoutExpectation: XCTestExpectation?
+    var didFailEmbeddedCheckoutExpectation: XCTestExpectation?
+    var didEmitEmbeddedWebPixelEventExpectation: XCTestExpectation?
+    
+    func checkoutViewDidChangeState(state: CheckoutStatePayload) {
+        stateChangePayloadReceived = state
+        didChangeStateExpectation?.fulfill()
+    }
+    
+    func checkoutViewDidComplete(payload: CheckoutCompletePayload) {
+        completePayloadReceived = payload
+        didCompleteEmbeddedCheckoutExpectation?.fulfill()
+    }
+    
+    func checkoutViewDidFail(errors: [ErrorPayload]) {
+        errorsReceived = errors
+        didFailEmbeddedCheckoutExpectation?.fulfill()
+    }
+    
+    func checkoutViewDidEmitWebPixelEvent(payload: WebPixelsPayload) {
+        webPixelsPayloadReceived = payload
+        didEmitEmbeddedWebPixelEventExpectation?.fulfill()
+    }
 }
