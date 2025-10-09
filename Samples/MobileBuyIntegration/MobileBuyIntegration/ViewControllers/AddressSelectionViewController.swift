@@ -66,6 +66,8 @@ class AddressSelectionViewController: UIViewController {
                 zip: "M4L 1C9"
             )
         ),
+        /// This address will cause validation errors on postcalCode
+        /// causing the address form to 'unroll' back in checkout
         AddressOption(
             label: "Broken Ave",
             address: CartDeliveryAddressInput(
@@ -107,13 +109,11 @@ class AddressSelectionViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(AddressCell.self, forCellReuseIdentifier: "AddressCell")
+        tableView.alwaysBounceVertical = false;
 
-        view.addSubview(tableView)
+        view.addSubviewPinnedToEdges(of: tableView)
 
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -80)
         ])
     }

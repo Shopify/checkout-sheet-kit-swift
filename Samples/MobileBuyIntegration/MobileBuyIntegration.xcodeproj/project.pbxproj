@@ -34,8 +34,9 @@
 		CB05E6C42D4954E800466376 /* Storefront.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Storefront.swift */; };
 		CB1B10B32E4CDDB0001713F8 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CB1B10B22E4CDDB0001713F8 /* ShopifyAcceleratedCheckouts */; };
 		CB1B10B52E4CDDB0001713F8 /* ShopifyCheckoutSheetKit in Frameworks */ = {isa = PBXBuildFile; productRef = CB1B10B42E4CDDB0001713F8 /* ShopifyCheckoutSheetKit */; };
+		CB3613492E98055700BBE31D /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3613482E98054B00BBE31D /* UIView.swift */; };
+		CB36134B2E98065800BBE31D /* ShopifyCheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */; };
 		CB476E0F2E97CAC200878439 /* AddressSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */; };
-		CB476E102E97CAC200878439 /* EmbeddedCheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB476E0E2E97CAC200878439 /* EmbeddedCheckoutViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,8 +69,9 @@
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CB05E6BE2D4951D700466376 /* InfoDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDictionary.swift; sourceTree = "<group>"; };
 		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
+		CB3613482E98054B00BBE31D /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
+		CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopifyCheckoutViewController.swift; sourceTree = "<group>"; };
 		CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSelectionViewController.swift; sourceTree = "<group>"; };
-		CB476E0E2E97CAC200878439 /* EmbeddedCheckoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedCheckoutViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +176,7 @@
 		CB05E6C22D4954DF00466376 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				CB3613482E98054B00BBE31D /* UIView.swift */,
 				CB05E6C32D4954E400466376 /* Storefront.swift */,
 			);
 			path = Extensions;
@@ -195,8 +198,8 @@
 		CB05E6C82D4B81EF00466376 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */,
 				CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */,
-				CB476E0E2E97CAC200878439 /* EmbeddedCheckoutViewController.swift */,
 				4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */,
 				6A3393622CEF742200E89FAA /* CheckoutController.swift */,
 			);
@@ -319,13 +322,14 @@
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,
 				86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */,
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,
+				CB36134B2E98065800BBE31D /* ShopifyCheckoutViewController.swift in Sources */,
 				CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */,
 				6A257A152AFBB06300610DA5 /* Logger.swift in Sources */,
 				4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */,
 				6A2E77C02CE618720067062D /* CartView.swift in Sources */,
 				6A3393652CEF9E8100E89FAA /* Theme.swift in Sources */,
+				CB3613492E98055700BBE31D /* UIView.swift in Sources */,
 				CB476E0F2E97CAC200878439 /* AddressSelectionViewController.swift in Sources */,
-				CB476E102E97CAC200878439 /* EmbeddedCheckoutViewController.swift in Sources */,
 				6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */,
 				4EA7F9B62A9D2B9D003276A1 /* SettingsView.swift in Sources */,
 				6A3467332B600E64007314A8 /* LogsView.swift in Sources */,

@@ -25,16 +25,15 @@ import OSLog
 import ShopifyCheckoutSheetKit
 import UIKit
 
-class EmbeddedCheckoutViewController: UIViewController {
-    private let checkoutURL: URL
-    private var checkoutWebViewController: CheckoutWebViewController?
-    // ^ CheckoutWebViewController currently is an internal component
-    // If we expose it, consumers can construct it in a UIViewController
-    // This allows presenting it *without* the sheet wrapper
+class ShopifyCheckoutViewController: UIViewController {
+    private var checkoutURL: URL
+    private var checkoutWebViewController: CheckoutWebViewController
 
     init(checkoutURL: URL) {
         self.checkoutURL = checkoutURL
+        self.checkoutWebViewController = CheckoutWebViewController(checkoutURL: checkoutURL)
         super.init(nibName: nil, bundle: nil)
+        self.checkoutWebViewController.delegate = self
     }
 
     @available(*, unavailable)
@@ -44,47 +43,34 @@ class EmbeddedCheckoutViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupHeader()
+        setupViewController()
+    }
 
+    private func setupHeader() {
         title = "Checkout"
-        //view.backgroundColor = .systemBackground
-        navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.black
-        ]
-
+        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .cancel,
             target: self,
             action: #selector(cancelCheckout)
         )
-
-        setupCheckoutWebViewController()
     }
-    // ^ viewDidLoad calls setupCheckoutWebViewController, causing `addChild` to attach it to the view
     
-    private func setupCheckoutWebViewController() {
-        let webViewController = CheckoutWebViewController(
-            checkoutURL: checkoutURL,
-            delegate: self
-        )
+    private func setupViewController() {
+        addChild(self.checkoutWebViewController)
+        self.checkoutWebViewController.didMove(toParent: self)
 
-        addChild(webViewController)
-
-        if let webView = webViewController.view {
-            webView.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(webView)
-
-            NSLayoutConstraint.activate([
-                webView.topAnchor.constraint(equalTo: view.topAnchor),
-                webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
+        guard let webView = self.checkoutWebViewController.view else {
+            OSLogger.shared.error(
+                "[EmbeddedCheckoutViewController]: failed to attach web view to view hierarchy"
+            )
+            return
         }
 
-        webViewController.didMove(toParent: self)
-        checkoutWebViewController = webViewController
-
-        webViewController.notifyPresented()
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubviewPinnedToEdges(of: webView)
+        self.checkoutWebViewController.notifyPresented()
     }
 
     @objc private func cancelCheckout() {
@@ -92,23 +78,27 @@ class EmbeddedCheckoutViewController: UIViewController {
     }
 
     deinit {
-        checkoutWebViewController?.willMove(toParent: nil)
-        checkoutWebViewController?.view.removeFromSuperview()
-        checkoutWebViewController?.removeFromParent()
+        checkoutWebViewController.willMove(toParent: nil)
+        checkoutWebViewController.view.removeFromSuperview()
+        checkoutWebViewController.removeFromParent()
     }
 }
 
-extension EmbeddedCheckoutViewController: CheckoutDelegate {
+extension ShopifyCheckoutViewController: CheckoutDelegate {
     func checkoutDidRequestAddressChange(event: AddressChangeRequest) {
-        OSLogger.shared.debug("[EmbeddedCheckout] Address change intent received for addressType: \(event.addressType)")
+        OSLogger.shared.debug(
+            "[EmbeddedCheckout] Address change intent received for addressType: \(event.addressType)"
+        )
 
         let addressViewController = AddressSelectionViewController(event: event)
         navigationController?.pushViewController(addressViewController, animated: true)
         // ^ UIViewController conforms to CheckoutDelegate
         // consumers can push onto the navigation stack
     }
+    
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
-        OSLogger.shared.debug("[EmbeddedCheckout] Checkout completed. Order ID: \(event.orderDetails.id)")
+        OSLogger.shared.debug(
+            "[EmbeddedCheckout] Checkout completed. Order ID: \(event.orderDetails.id)")
         dismiss(animated: true)
     }
 

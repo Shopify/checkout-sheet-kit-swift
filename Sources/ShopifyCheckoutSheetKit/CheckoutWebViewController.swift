@@ -25,7 +25,7 @@ import UIKit
 import WebKit
 
 public class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
-    weak var delegate: CheckoutDelegate?
+    public weak var delegate: CheckoutDelegate?
     var checkoutViewDidFailWithErrorCount = 0
     var checkoutView: CheckoutWebView
 
@@ -137,6 +137,8 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
         }
     }
 
+    /// Ensures the bridge connects and presented event fires
+    /// Must be called after attaching to hierarchy (viewDidLoad)
     public func notifyPresented() {
         checkoutView.checkoutDidPresent = true
     }
