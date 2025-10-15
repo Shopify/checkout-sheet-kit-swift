@@ -25,6 +25,27 @@
 import WebKit
 import XCTest
 
+// Captures the most recent navigation request so tests can assert how the web
+// view mutates URLs (e.g., when enforcing embed parameters) without relying on
+// actual WebKit loading behaviour.
+private final class RecordingCheckoutWebView: CheckoutWebView {
+    var lastLoadedRequest: URLRequest?
+
+    init(entryPoint: MetaData.EntryPoint?, recovery: Bool = false) {
+        super.init(frame: .zero, configuration: WKWebViewConfiguration(), recovery: recovery, entryPoint: entryPoint)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func load(_ request: URLRequest) -> WKNavigation? {
+        lastLoadedRequest = request
+        return nil
+    }
+}
+
 class CheckoutWebViewTests: XCTestCase {
     private var view: CheckoutWebView!
     private var recovery: CheckoutWebView!
@@ -39,7 +60,7 @@ class CheckoutWebViewTests: XCTestCase {
         view.checkoutBridge = MockCheckoutBridge.self
     }
 
-    private func createRecoveryAgent() -> CheckoutWebView {
+    private func createRecoveryView() -> CheckoutWebView {
         recovery = CheckoutWebView.for(checkout: url, recovery: true)
         mockDelegate = MockCheckoutWebViewDelegate()
         recovery.viewDelegate = mockDelegate
@@ -47,23 +68,89 @@ class CheckoutWebViewTests: XCTestCase {
     }
 
     func testCorrectlyConfiguresWebview() {
-        XCTAssertEqual(view.configuration.applicationNameForUserAgent, CheckoutBridge.applicationName)
         XCTAssertTrue(view.configuration.allowsInlineMediaPlayback)
     }
 
-    func testUsesRecoveryAgent() {
+    func testDecidePolicyForAddsEmbedParamWhenMissing() {
+        let originalConfiguration = ShopifyCheckoutSheetKit.configuration
+        ShopifyCheckoutSheetKit.configuration = ShopifyCheckoutSheetKit.Configuration()
+        defer { ShopifyCheckoutSheetKit.configuration = originalConfiguration }
+
+        let recordingView = RecordingCheckoutWebView(entryPoint: nil)
+        let checkoutURL = URL(string: "https://shopify.com/checkouts/123")!
+        let action = MockNavigationAction(url: checkoutURL)
+
+        let expectation = expectation(description: "decision handler called")
+
+        recordingView.webView(recordingView, decidePolicyFor: action) { policy in
+            XCTAssertEqual(policy, .cancel)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+
+        let recordedURL = recordingView.lastLoadedRequest?.url
+        XCTAssertNotNil(recordedURL)
+        XCTAssertTrue(recordedURL?.hasEmbedParam() ?? false)
+        XCTAssertTrue(recordedURL?.embedParamMatches(isRecovery: false, entryPoint: nil) ?? false)
+    }
+
+    func testDecidePolicyForUpdatesEmbedWhenPresent() {
+        let originalConfiguration = ShopifyCheckoutSheetKit.configuration
+        ShopifyCheckoutSheetKit.configuration = ShopifyCheckoutSheetKit.Configuration()
+        defer { ShopifyCheckoutSheetKit.configuration = originalConfiguration }
+
+        let recordingView = RecordingCheckoutWebView(entryPoint: nil)
+        let checkoutURL = URL(string: "https://shopify.com/checkouts/123?embed=foo")!
+        let action = MockNavigationAction(url: checkoutURL)
+
+        let expectation = expectation(description: "decision handler called")
+
+        recordingView.webView(recordingView, decidePolicyFor: action) { policy in
+            XCTAssertEqual(policy, .cancel)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+
+        let recordedURL = recordingView.lastLoadedRequest?.url
+        XCTAssertNotNil(recordedURL)
+        XCTAssertTrue(recordedURL?.embedParamMatches(isRecovery: false, entryPoint: nil) ?? false)
+    }
+
+    func testRecoveryConfigurationSetsExpectedProperties() {
         let backgroundColor: UIColor = .systemRed
         ShopifyCheckoutSheetKit.configuration.backgroundColor = backgroundColor
         ShopifyCheckoutSheetKit.configuration.colorScheme = .automatic
-        recovery = createRecoveryAgent()
+        recovery = createRecoveryView()
 
         XCTAssertTrue(recovery.isRecovery)
         XCTAssertFalse(recovery.isBridgeAttached)
         XCTAssertFalse(recovery.isPreloadingAvailable)
-        XCTAssertEqual(recovery.configuration.applicationNameForUserAgent, "ShopifyCheckoutSDK/\(ShopifyCheckoutSheetKit.version) (noconnect;automatic;standard_recovery)")
         XCTAssertTrue(recovery.configuration.allowsInlineMediaPlayback)
         XCTAssertEqual(recovery.backgroundColor, backgroundColor)
         XCTAssertFalse(recovery.isOpaque)
+    }
+
+    func testRecoveryLoadAddsRecoveryFlagToEmbedParam() {
+        let originalConfiguration = ShopifyCheckoutSheetKit.configuration
+        ShopifyCheckoutSheetKit.configuration = ShopifyCheckoutSheetKit.Configuration()
+        defer { ShopifyCheckoutSheetKit.configuration = originalConfiguration }
+
+        let standardEmbed = EmbedParamBuilder.build(isRecovery: false, entryPoint: nil)
+        var components = URLComponents(string: "https://shopify.com/checkouts/123")!
+        components.queryItems = [URLQueryItem(name: EmbedQueryParamKey.embed, value: standardEmbed)]
+        let startingURL = components.url!
+        let recoveryView = RecordingCheckoutWebView(entryPoint: nil, recovery: true)
+
+        recoveryView.load(checkout: startingURL)
+
+        let embeddedURL = recoveryView.lastLoadedRequest?.url
+        let embedComponents = embeddedURL.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
+        let embedValue = embedComponents?.queryItems?.first(where: { $0.name == EmbedQueryParamKey.embed })?.value
+
+        XCTAssertNotNil(embedValue)
+        XCTAssertTrue(embedValue?.contains("recovery=true") ?? false)
     }
 
     func testEmailContactLinkDelegation() {
@@ -182,7 +269,7 @@ class CheckoutWebViewTests: XCTestCase {
         ]
 
         for url in urls {
-            recovery = createRecoveryAgent()
+            recovery = createRecoveryView()
             let didCompleteCheckoutExpectation = expectation(description: "checkoutViewDidCompleteCheckout was called")
 
             mockDelegate.didEmitCheckoutCompletedEventExpectation = didCompleteCheckoutExpectation
@@ -214,7 +301,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, code, recoverable)):
+            case let .some(.checkoutUnavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "unauthorized")
                 XCTAssertFalse(recoverable)
             default:

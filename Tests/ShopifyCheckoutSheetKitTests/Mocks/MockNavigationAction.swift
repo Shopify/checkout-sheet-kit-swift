@@ -25,13 +25,19 @@ import WebKit
 
 class MockNavigationAction: WKNavigationAction {
     private let mockRequest: URLRequest
+    private let mockTargetFrame: WKFrameInfo?
 
     override var request: URLRequest {
         return mockRequest
     }
 
-    init(url: URL) {
+    override var targetFrame: WKFrameInfo? {
+        return mockTargetFrame
+    }
+
+    init(url: URL, targetFrame: WKFrameInfo? = MockMainFrameInfo()) {
         mockRequest = URLRequest(url: url)
+        mockTargetFrame = targetFrame
         super.init()
     }
 }
@@ -56,5 +62,11 @@ class MockExternalNavigationAction: WKNavigationAction {
         mockRequest = URLRequest(url: url)
         navType = navigationType
         super.init()
+    }
+}
+
+private final class MockMainFrameInfo: WKFrameInfo {
+    override var isMainFrame: Bool {
+        true
     }
 }
