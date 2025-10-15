@@ -95,22 +95,6 @@ class CheckoutWebViewControllerTests: XCTestCase {
     private let recoverableError = CheckoutError.checkoutUnavailable(message: "Test recoverable", code: .clientError(code: .unknown), recoverable: true)
     private let nonRecoverableError = CheckoutError.checkoutExpired(message: "Test non-recoverable", code: .cartExpired, recoverable: false)
 
-    func test_init_withNilEntryPoint_shouldSetCorrectUserAgent() {
-        let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: nil)
-
-        let expectedUserAgent = CheckoutBridge.applicationName(entryPoint: nil)
-
-        XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
-    }
-
-    func test_init_withAcceleratedCheckoutsEntryPoint_shouldSetCorrectUserAgent() {
-        let viewController = CheckoutWebViewController(checkoutURL: url, delegate: nil, entryPoint: .acceleratedCheckouts)
-
-        let expectedUserAgent = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
-
-        XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
-    }
-
     func test_checkoutViewDidFailWithError_incrementsErrorCount() {
         let mockDelegate = MockCheckoutDelegate()
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)

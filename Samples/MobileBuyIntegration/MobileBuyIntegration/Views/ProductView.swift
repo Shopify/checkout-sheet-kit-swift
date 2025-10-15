@@ -27,7 +27,7 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
 
-enum Partner:String, CaseIterable {
+enum Partner: String, CaseIterable {
     case microsoft = "Microsoft"
     case google = "Google"
     case openai = "OpenAI"
@@ -138,7 +138,7 @@ struct ProductView: View {
                         .cornerRadius(DesignSystem.cornerRadius)
                         .disabled(!variant.availableForSale || loading)
 
-                        ForEach(Partner.allCases, id: \.self.rawValue) { partner in
+                        ForEach(Partner.allCases, id: \.rawValue) { partner in
                             Button(action: { buyNow(partner: partner) }) {
                                 HStack {
                                     Image(systemName: "bag.fill")

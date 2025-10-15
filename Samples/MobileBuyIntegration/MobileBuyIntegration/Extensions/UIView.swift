@@ -25,12 +25,12 @@ import UIKit
 
 extension UIView {
     func addSubviewPinnedToEdges(of other: UIView) {
-        self.addSubview(other)
+        addSubview(other)
         NSLayoutConstraint.activate([
             topAnchor.constraint(equalTo: other.topAnchor),
             leadingAnchor.constraint(equalTo: other.leadingAnchor),
             trailingAnchor.constraint(equalTo: other.trailingAnchor),
-            bottomAnchor.constraint(equalTo: other.bottomAnchor),
+            bottomAnchor.constraint(equalTo: other.bottomAnchor)
         ])
     }
 }

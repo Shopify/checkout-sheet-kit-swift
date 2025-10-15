@@ -143,10 +143,6 @@ public class CheckoutWebView: WKWebView {
         if recovery {
             /// Uses a non-persistent, private cookie store to avoid cross-instance pollution
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-            configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent(entryPoint: entryPoint)
-        } else {
-            /// Set the User-Agent in non-recovery view
-            configuration.applicationNameForUserAgent = CheckoutBridge.applicationName(entryPoint: entryPoint)
         }
 
         isRecovery = recovery
@@ -232,7 +228,7 @@ public class CheckoutWebView: WKWebView {
 
     func load(checkout url: URL, isPreload: Bool = false) {
         OSLogger.shared.info("Loading checkout URL: \(url.absoluteString), isPreload: \(isPreload)")
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url.withEmbedParam(isRecovery: isRecovery, entryPoint: entryPoint))
 
         if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
@@ -319,6 +315,11 @@ extension CheckoutWebView: WKNavigationDelegate {
         if isExternalLink(action) || CheckoutURL(from: url).isDeepLink() {
             OSLogger.shared.debug("External or deep link clicked: \(url.absoluteString) - request intercepted")
             viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
+            decisionHandler(.cancel)
+            return
+        }
+
+        if handleEmbedParamIfNeeded(for: action, url: url) {
             decisionHandler(.cancel)
             return
         }
@@ -471,6 +472,24 @@ extension CheckoutWebView: WKNavigationDelegate {
         return urlComponents.url ?? url
     }
 
+    private func handleEmbedParamIfNeeded(for action: WKNavigationAction, url: URL) -> Bool {
+        guard
+            let scheme = url.scheme?.lowercased(),
+            scheme == "http" || scheme == "https"
+        else {
+            return false
+        }
+
+        guard action.targetsMainFrame, url.needsEmbedUpdate(isRecovery: isRecovery, entryPoint: entryPoint) else {
+            return false
+        }
+
+        var updatedRequest = action.request
+        updatedRequest.url = url.withEmbedParam(isRecovery: isRecovery, entryPoint: entryPoint)
+        load(updatedRequest)
+        return true
+    }
+
     private func isCheckout(url: URL?) -> Bool {
         return self.url == url
     }
@@ -487,6 +506,20 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         return nil
+    }
+}
+
+extension WKNavigationAction {
+    fileprivate var targetsMainFrame: Bool {
+        if let targetFrame {
+            return targetFrame.isMainFrame
+        }
+
+        if let mainDocumentURL = request.mainDocumentURL {
+            return mainDocumentURL == request.url
+        }
+
+        return true
     }
 }
 

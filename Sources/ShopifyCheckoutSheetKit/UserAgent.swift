@@ -41,8 +41,7 @@ public enum UserAgent {
         case recovery
     }
 
-    // TODO: Undo the hardcoded version
-    private static let baseUserAgent = "ShopifyCheckoutSDK/3.5.0"
+    private static let baseUserAgent = "ShopifyCheckoutSDK/\(MetaData.version)"
 
     // Shared format for CheckoutSheetKit and AcceleratedCheckouts
     package static func string(
