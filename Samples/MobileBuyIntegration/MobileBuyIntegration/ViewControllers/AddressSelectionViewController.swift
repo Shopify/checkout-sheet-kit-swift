@@ -109,7 +109,7 @@ class AddressSelectionViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(AddressCell.self, forCellReuseIdentifier: "AddressCell")
-        tableView.alwaysBounceVertical = false;
+        tableView.alwaysBounceVertical = false
 
         view.addSubviewPinnedToEdges(of: tableView)
 

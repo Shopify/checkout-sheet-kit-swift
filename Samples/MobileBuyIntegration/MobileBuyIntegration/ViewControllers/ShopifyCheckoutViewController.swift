@@ -31,9 +31,9 @@ class ShopifyCheckoutViewController: UIViewController {
 
     init(checkoutURL: URL) {
         self.checkoutURL = checkoutURL
-        self.checkoutWebViewController = CheckoutWebViewController(checkoutURL: checkoutURL)
+        checkoutWebViewController = CheckoutWebViewController(checkoutURL: checkoutURL)
         super.init(nibName: nil, bundle: nil)
-        self.checkoutWebViewController.delegate = self
+        checkoutWebViewController.delegate = self
     }
 
     @available(*, unavailable)
@@ -56,12 +56,12 @@ class ShopifyCheckoutViewController: UIViewController {
             action: #selector(cancelCheckout)
         )
     }
-    
-    private func setupViewController() {
-        addChild(self.checkoutWebViewController)
-        self.checkoutWebViewController.didMove(toParent: self)
 
-        guard let webView = self.checkoutWebViewController.view else {
+    private func setupViewController() {
+        addChild(checkoutWebViewController)
+        checkoutWebViewController.didMove(toParent: self)
+
+        guard let webView = checkoutWebViewController.view else {
             OSLogger.shared.error(
                 "[EmbeddedCheckoutViewController]: failed to attach web view to view hierarchy"
             )
@@ -70,7 +70,7 @@ class ShopifyCheckoutViewController: UIViewController {
 
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubviewPinnedToEdges(of: webView)
-        self.checkoutWebViewController.notifyPresented()
+        checkoutWebViewController.notifyPresented()
     }
 
     @objc private func cancelCheckout() {
@@ -95,7 +95,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         // ^ UIViewController conforms to CheckoutDelegate
         // consumers can push onto the navigation stack
     }
-    
+
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         OSLogger.shared.debug(
             "[EmbeddedCheckout] Checkout completed. Order ID: \(event.orderDetails.id)")
@@ -124,5 +124,4 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
 
         OSLogger.shared.debug("[EmbeddedCheckout] Pixel event: \(eventName ?? "")")
     }
-
 }

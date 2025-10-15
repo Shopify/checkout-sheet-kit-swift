@@ -509,8 +509,8 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 }
 
-private extension WKNavigationAction {
-    var targetsMainFrame: Bool {
+extension WKNavigationAction {
+    fileprivate var targetsMainFrame: Bool {
         if let targetFrame {
             return targetFrame.isMainFrame
         }
