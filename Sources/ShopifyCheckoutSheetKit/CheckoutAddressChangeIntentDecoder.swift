@@ -24,22 +24,31 @@
 import Foundation
 import WebKit
 
+public struct AddressChangeRequestData: Codable {
+    public let id: String
+    public let jsonrpc: String
+    public let method: String
+    public let params: Params
+
+    public struct Params: Codable {
+        public let addressType: String
+        public let selectedAddress: CartAddress?
+    }
+}
+
 class CheckoutAddressChangeIntentDecoder {
     func decode(
         from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>,
         using _: Decoder
-    ) throws -> AddressChangeRequest {
+    ) throws -> AddressChangeRequested {
         let messageBody = try container.decode(String.self, forKey: .body)
 
         guard let data = messageBody.data(using: .utf8) else {
             throw BridgeError.invalidBridgeEvent()
         }
 
-        let eventData = try JSONDecoder().decode(CheckoutAddressChangeIntentEventData.self, from: data)
+        let event = try JSONDecoder().decode(AddressChangeRequestData.self, from: data)
 
-        return AddressChangeRequest(
-            addressType: eventData.addressType,
-            webview: nil
-        )
+        return AddressChangeRequested(id: event.id, params: event.params, webview: nil)
     }
 }

@@ -94,7 +94,7 @@ extension CheckoutBridge {
         case webPixels(event: PixelEvent?)
 
         /// Address Change Intent
-        case addressChangeIntent(event: AddressChangeRequest)
+        case addressChangeIntent(event: AddressChangeRequested)
 
         /// Generic
         case unsupported(String)
@@ -136,8 +136,8 @@ extension CheckoutBridge {
                 let event = try webPixelsDecoder.decode(from: container, using: decoder)
                 self = .webPixels(event: event)
             case "addressChangeIntent":
-                let addressChangeIntentDecoder = CheckoutAddressChangeIntentDecoder()
-                let event = try addressChangeIntentDecoder.decode(from: container, using: decoder)
+                let event = try CheckoutAddressChangeIntentDecoder()
+                    .decode(from: container, using: decoder)
                 self = .addressChangeIntent(event: event)
             default:
                 self = .unsupported(name)

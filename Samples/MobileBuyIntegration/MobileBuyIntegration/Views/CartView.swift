@@ -139,12 +139,12 @@ struct CartView: View {
                         }
                         .onAddressChangeIntent { event in
                             print(
-                                "🎉 SwiftUI: Address change intent received for addressType: \(event.addressType)"
+                                "🎉 SwiftUI: Address change intent received for addressType: \(event.params.addressType)"
                             )
 
                             // Respond with hardcoded address after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                let hardcodedAddress = CartDeliveryAddressInput(
+                                let hardcodedAddress = CartAddress(
                                     firstName: "Jane",
                                     lastName: "Smith",
                                     address1: "456 SwiftUI Avenue",
@@ -156,14 +156,13 @@ struct CartView: View {
                                     zip: "V6B 1A1"
                                 )
 
-                                let addressInput = CartSelectableAddressInput(
+                                let addressInput = CartSelectableAddress(
                                     address: hardcodedAddress)
                                 let delivery = CartDelivery(addresses: [addressInput])
-                                let payload = DeliveryAddressChangePayload(delivery: delivery)
 
                                 print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
                                 do {
-                                    try event.respondWith(result: payload)
+                                    try event.respondWith(payload: delivery)
                                 } catch {
                                     print(
                                         "Failed to respondwith: Responding with hardcoded Vancouver address"

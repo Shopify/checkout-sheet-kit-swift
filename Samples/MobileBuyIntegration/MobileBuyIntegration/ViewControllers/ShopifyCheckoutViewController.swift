@@ -33,7 +33,8 @@ class ShopifyCheckoutViewController: UIViewController {
         self.checkoutURL = checkoutURL
         checkoutWebViewController = CheckoutWebViewController(checkoutURL: checkoutURL)
         super.init(nibName: nil, bundle: nil)
-        checkoutWebViewController.delegate = self
+        // ShopifyCheckoutViewController conforms to CheckoutDelegate to respond to lifecycle events
+        self.checkoutWebViewController.delegate = self
     }
 
     @available(*, unavailable)
@@ -85,9 +86,9 @@ class ShopifyCheckoutViewController: UIViewController {
 }
 
 extension ShopifyCheckoutViewController: CheckoutDelegate {
-    func checkoutDidRequestAddressChange(event: AddressChangeRequest) {
+    func checkoutDidRequestAddressChange(event: AddressChangeRequested) {
         OSLogger.shared.debug(
-            "[EmbeddedCheckout] Address change intent received for addressType: \(event.addressType)"
+            "[EmbeddedCheckout] Address change intent received for addressType: \(event.params.addressType)"
         )
 
         let addressViewController = AddressSelectionViewController(event: event)

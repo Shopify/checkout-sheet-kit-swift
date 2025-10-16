@@ -46,7 +46,7 @@ public protocol CheckoutDelegate: AnyObject {
     func checkoutDidEmitWebPixelEvent(event: PixelEvent)
 
     /// Tells the delegate that the checkout is requesting address change intent (e.g., for native address picker)
-    func checkoutDidRequestAddressChange(event: AddressChangeRequest)
+    func checkoutDidRequestAddressChange(event: AddressChangeRequested)
 }
 
 extension CheckoutDelegate {
@@ -66,7 +66,7 @@ extension CheckoutDelegate {
         return error.isRecoverable
     }
 
-    public func checkoutDidRequestAddressChange(event _: AddressChangeRequest) {
+    public func checkoutDidRequestAddressChange(event _: AddressChangeRequested) {
         /// No-op by default
     }
 

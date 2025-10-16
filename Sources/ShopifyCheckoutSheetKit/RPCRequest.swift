@@ -24,68 +24,115 @@
 import Foundation
 import WebKit
 
+/// Response to be decoded to a string for transport over CheckoutBridge
+public class RPCResponse<Payload: Codable>: Codable {
+    /// A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".
+    public var jsonrpc: String = "2.0"
+
+    /// This member is REQUIRED.
+    /// It MUST be the same as the value of the id member in the Request Object.
+    /// If there was an error in detecting the id in the Request object (e.g. Parse error/Invalid Request), it MUST be Null.
+    /// Either the result member or error member MUST be included, but both members MUST NOT be included.
+    var id: String?
+
+    /// This member is REQUIRED on success.
+    /// This member MUST NOT exist if there was an error invoking the method.
+    /// The value of this member is determined by the method invoked on the Server.
+    var result: Payload?
+
+    /// This member is REQUIRED on error.
+    /// This member MUST NOT exist if there was no error triggered during invocation.
+    /// The value for this member MUST be an Object as defined in section 5.1.
+    var error: String?
+
+    init(id: String? = nil, result: Payload? = nil) {
+        self.id = id
+        self.result = result
+    }
+    
+    init(id: String? = nil, error: String? = nil) {
+        self.id = id
+        self.error = error
+    }
+}
+
 /// (Web) The Client is defined as the origin of Request objects and the handler of Response objects.
 /// (Native) The Server is defined as the origin of Response objects and the handler of Request objects.
 public protocol RPCRequest: AnyObject {
-    associatedtype RPCResponse: Codable
-
-    /// nil if request is a notification type
-    var id: String? { get }
+    associatedtype Payload: Codable
+    typealias Response = RPCResponse<Payload>
+    
+    /// A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".
     var jsonrpc: String { get }
+
+    /// An identifier established by the Client that MUST contain a String, Number, or NULL value if included.
+    /// If it is not included it is assumed to be a notification.
+    /// The value SHOULD normally not be Null [1] and Numbers SHOULD NOT contain fractional parts [2]
+    var id: String? { get }
+
+    /// 4 Request object - https://www.jsonrpc.org/specification
+    /// A String containing the name of the method to be invoked. Method names that begin with the word rpc followed by a period character (U+002E or ASCII 46) are reserved for rpc-internal methods and extensions and MUST NOT be used for anything else.
+    static var method: String { get }
 
     // 4.1 Notification - https://www.jsonrpc.org/specification
     var isNotification: Bool { get }
 
-    /// Event Name
-    static var type: String { get }
-
-    var hasResponded: Bool { get set }
     var webview: WKWebView? { get set }
-
-    /// jsonString should decode into RPCResponse
-    func respondWith(json jsonString: String) throws
-    func respondWith(result: RPCResponse) throws
-
-    /// (Optional) Called in respondWith before dispatching message over bridge
-    /// Apply validations outside of RPCResponse decoding
-    /// e.g. RPCResponse.someArrayProperty.count > 0
-    /// default: no-op
-    func validate(payload: RPCResponse) throws
 }
 
 extension RPCRequest {
     public var jsonrpc: String { "2.0" }
-    // TODO; May not be needed
-    /// The request is a notification type if id is nil
+
     public var isNotification: Bool { id == nil }
 
+    /// TODO: split this into two methods instead?
+    /// React Native bridge will send a string to decode into Payload
     public func respondWith(json jsonString: String) throws {
-        let payload = try decode(from: jsonString)
-        try respondWith(result: payload)
+        do {
+            guard let payload = try? decode(from: jsonString) else {
+                return try respondWith(error: jsonString)
+            }
+            let response = Response(id: id, result: payload)
+            try respondWith(response: response)
+        } catch {
+            print(
+                "[RPCRequest] event \(String(describing: id)) decode json \(jsonString) error: \(error)"
+            )
+        }
     }
 
-    public func respondWith(result: RPCResponse) throws {
+    public func respondWith(payload: Payload) throws {
+        let response = Response(id: id, result: payload)
+        try respondWith(response: response)
+    }
+
+    public func respondWith(error: String) throws {
+        let response = Response(id: id, error: error)
+        try respondWith(response: response)
+    }
+
+    public func respondWith(response: Response) throws {
         guard let webview else { return }
         guard !isNotification else { return }
-        guard !hasResponded else { return }
-        hasResponded = true
 
-        try validate(payload: result)
+        if let result = response.result {
+            try validate(payload: result)
+        }
 
-        guard let payload = SdkToWebEvent(detail: result).toJson() else { return }
+        guard let payload = SdkToWebEvent(detail: response).toJson() else { return }
 
-        CheckoutBridge.sendMessage(webview, messageName: Self.type, messageBody: payload)
+        CheckoutBridge.sendMessage(webview, messageName: Self.method, messageBody: payload)
     }
 
     /// `from` should be a .utf8 encoded json string
     /// Decodes into RespondableEvent.RPCResponse Codable
-    func decode(from responseData: String) throws -> RPCResponse {
+    func decode(from responseData: String) throws -> Payload {
         guard let data = responseData.data(using: .utf8) else {
             throw EventResponseError.invalidEncoding
         }
 
         do {
-            return try JSONDecoder().decode(RPCResponse.self, from: data)
+            return try JSONDecoder().decode(Payload.self, from: data)
         } catch let error as DecodingError {
             throw EventResponseError.decodingFailed(formatDecodingError(error))
         } catch {
@@ -93,7 +140,11 @@ extension RPCRequest {
         }
     }
 
-    public func validate(payload _: RPCResponse) throws {}
+    /// (Optional) Called in respondWith before dispatching message over bridge
+    /// Apply validations outside of RPCResponse decoding
+    /// e.g. RPCResponse.someArrayProperty.count > 0
+    /// default: no-op
+    public func validate(payload _: Payload) throws {}
 }
 
 public enum EventResponseError: Error {

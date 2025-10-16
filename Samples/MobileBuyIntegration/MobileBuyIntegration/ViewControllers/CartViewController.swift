@@ -550,10 +550,10 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    func checkoutDidRequestAddressChange(event: AddressChangeRequest) {
+    func checkoutDidRequestAddressChange(event: AddressChangeRequested) {
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            let hardcodedAddress = CartDeliveryAddressInput(
+            let hardcodedAddress = CartAddress(
                 firstName: "Alice",
                 lastName: "Johnson",
                 address1: "789 UIKit Boulevard",
@@ -565,12 +565,11 @@ extension CartViewController: CheckoutDelegate {
                 zip: "H3B 2Y7"
             )
 
-            let addressInput = CartSelectableAddressInput(address: hardcodedAddress)
+            let addressInput = CartSelectableAddress(address: hardcodedAddress)
             let delivery = CartDelivery(addresses: [addressInput])
-            let payload = DeliveryAddressChangePayload(delivery: delivery)
 
             do {
-                try event.respondWith(result: payload)
+                try event.respondWith(payload: delivery)
             } catch {
                 print("[AddressChangeRequest]: Failed to respondWith ")
             }

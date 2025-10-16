@@ -82,12 +82,12 @@ extension CheckoutController: CheckoutDelegate {
         OSLogger.shared.debug("[CheckoutDelegate] Pixel event: \(eventName ?? "")")
     }
 
-    func checkoutDidRequestAddressChange(event: AddressChangeRequest) {
-        OSLogger.shared.debug("[CheckoutDelegate] Address change intent received for addressType: \(event.addressType)")
+    func checkoutDidRequestAddressChange(event: AddressChangeRequested) {
+        OSLogger.shared.debug("[CheckoutDelegate] Address change intent received for addressType: \(event.params.addressType)")
 
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            let hardcodedAddress = CartDeliveryAddressInput(
+            let hardcodedAddress = CartAddress(
                 firstName: "John",
                 lastName: "Doe",
                 address1: "123 Test Street",
@@ -99,13 +99,12 @@ extension CheckoutController: CheckoutDelegate {
                 zip: "M5V 1A1"
             )
 
-            let addressInput = CartSelectableAddressInput(address: hardcodedAddress)
+            let addressInput = CartSelectableAddress(address: hardcodedAddress)
             let delivery = CartDelivery(addresses: [addressInput])
-            let payload = DeliveryAddressChangePayload(delivery: delivery)
 
             OSLogger.shared.debug("[CheckoutDelegate] Responding with hardcoded Toronto address")
             do {
-                try event.respondWith(result: payload)
+                try event.respondWith(payload: delivery)
             } catch {
                 OSLogger.shared.error("[CheckoutDelegate] Failed to respond to address change intent: \(error)")
             }

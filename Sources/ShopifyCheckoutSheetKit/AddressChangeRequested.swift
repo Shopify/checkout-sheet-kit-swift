@@ -24,28 +24,37 @@
 import Foundation
 import WebKit
 
-public final class AddressChangeRequest: RPCRequest {
-    public typealias ResponseType = DeliveryAddressChangePayload
+public final class AddressChangeRequested: RPCRequest {
+    public typealias Payload = CartDelivery
 
-    public static let type = "deliveryAddressChange"
-    public let id: String? = UUID().uuidString
-
-    public let addressType: String
+    public static let method = "checkout.address-change-requested"
+    public let id: String?
     public weak var webview: WKWebView?
 
-    public var hasResponded = false
+    public let params: AddressChangeRequestData.Params
 
-    internal init(addressType: String, webview: WKWebView?) {
-        self.addressType = addressType
+    internal init(
+        id: String?,
+        params: AddressChangeRequestData.Params,
+        webview: WKWebView?
+    ) {
+        self.id = id
+        self.params = params
         self.webview = webview
     }
 
-    public func validate(payload: DeliveryAddressChangePayload) throws {
-        guard !payload.delivery.addresses.isEmpty else {
+    enum CodingKeys: String, CodingKey {
+        case addressType
+        case id = "id"
+    }
+
+    public func validate(payload: Payload) throws {
+        let addresses = payload.addresses
+        guard !addresses.isEmpty else {
             throw EventResponseError.validationFailed("At least one address is required")
         }
 
-        for (index, selectableAddress) in payload.delivery.addresses.enumerated() {
+        for (index, selectableAddress) in addresses.enumerated() {
             let address = selectableAddress.address
 
             if let countryCode = address.countryCode, countryCode.isEmpty {
@@ -57,35 +66,27 @@ public final class AddressChangeRequest: RPCRequest {
     }
 }
 
-public struct CheckoutAddressChangeIntentEventData: Codable {
-    public let addressType: String
-}
-
-public struct DeliveryAddressChangePayload: Codable {
-    public let delivery: CartDelivery
-
-    public init(delivery: CartDelivery) {
-        self.delivery = delivery
-    }
-}
-
+/// https://shopify.dev/docs/api/storefront/latest/objects/CartDelivery
 public struct CartDelivery: Codable {
-    public let addresses: [CartSelectableAddressInput]
+    public let addresses: [CartSelectableAddress]
 
-    public init(addresses: [CartSelectableAddressInput]) {
+    public init(addresses: [CartSelectableAddress]) {
         self.addresses = addresses
     }
 }
 
-public struct CartSelectableAddressInput: Codable {
-    public let address: CartDeliveryAddressInput
+/// https://shopify.dev/docs/api/storefront/latest/objects/CartSelectableAddress
+public struct CartSelectableAddress: Codable {
+    public let address: CartAddress
+    /// Possible other properties, oneTimeUse, selected, id
 
-    public init(address: CartDeliveryAddressInput) {
+    public init(address: CartAddress) {
         self.address = address
     }
 }
 
-public struct CartDeliveryAddressInput: Codable {
+/// https://shopify.dev/docs/api/storefront/latest/objects/CartAddress
+public struct CartAddress: Codable {
     public let firstName: String?
     public let lastName: String?
     public let address1: String?
