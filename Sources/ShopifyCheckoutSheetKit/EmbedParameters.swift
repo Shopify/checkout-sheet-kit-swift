@@ -84,7 +84,7 @@ enum EmbedParamBuilder {
                 guard let value, !value.isEmpty else { return nil }
                 return "\(key)=\(value)"
             }
-            .joined(separator: ", ")
+            .joined(separator: ",")
     }
 
     private static func branding(for colorScheme: Configuration.ColorScheme) -> String {
