@@ -49,7 +49,7 @@ public class RPCResponse<Payload: Codable>: Codable {
         self.id = id
         self.result = result
     }
-    
+
     init(id: String? = nil, error: String? = nil) {
         self.id = id
         self.error = error
@@ -59,9 +59,13 @@ public class RPCResponse<Payload: Codable>: Codable {
 /// (Web) The Client is defined as the origin of Request objects and the handler of Response objects.
 /// (Native) The Server is defined as the origin of Response objects and the handler of Request objects.
 public protocol RPCRequest: AnyObject {
-    associatedtype Payload: Codable
-    typealias Response = RPCResponse<Payload>
+    /// MetaData associated with the type of the request from Checkout
+    associatedtype Params: Decodable
     
+    /// Expected data structure to send in response
+    associatedtype ResponsePayload: Codable
+    typealias Response = RPCResponse<ResponsePayload>
+
     /// A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".
     var jsonrpc: String { get }
 
@@ -80,10 +84,31 @@ public protocol RPCRequest: AnyObject {
     var webview: WKWebView? { get set }
 }
 
+struct RPCEnvelope<Params: Decodable>: Decodable {
+    let id: String
+    let jsonrpc: String
+    let method: String
+    let params: Params
+}
+
 extension RPCRequest {
     public var jsonrpc: String { "2.0" }
 
     public var isNotification: Bool { id == nil }
+
+    static func decodeEnvelope(from decoder: Decoder) throws -> RPCEnvelope<Params> {
+        let envelope = try RPCEnvelope<Params>(from: decoder)
+
+        guard envelope.jsonrpc == "2.0" else {
+            throw BridgeError.invalidBridgeEvent()
+        }
+
+        guard envelope.method == Self.method else {
+            throw BridgeError.invalidBridgeEvent()
+        }
+
+        return envelope
+    }
 
     /// TODO: split this into two methods instead?
     /// React Native bridge will send a string to decode into Payload
@@ -101,7 +126,7 @@ extension RPCRequest {
         }
     }
 
-    public func respondWith(payload: Payload) throws {
+    public func respondWith(payload: ResponsePayload) throws {
         let response = Response(id: id, result: payload)
         try respondWith(response: response)
     }
@@ -126,13 +151,13 @@ extension RPCRequest {
 
     /// `from` should be a .utf8 encoded json string
     /// Decodes into RespondableEvent.RPCResponse Codable
-    func decode(from responseData: String) throws -> Payload {
+    func decode(from responseData: String) throws -> ResponsePayload {
         guard let data = responseData.data(using: .utf8) else {
             throw EventResponseError.invalidEncoding
         }
 
         do {
-            return try JSONDecoder().decode(Payload.self, from: data)
+            return try JSONDecoder().decode(ResponsePayload.self, from: data)
         } catch let error as DecodingError {
             throw EventResponseError.decodingFailed(formatDecodingError(error))
         } catch {
@@ -144,7 +169,7 @@ extension RPCRequest {
     /// Apply validations outside of RPCResponse decoding
     /// e.g. RPCResponse.someArrayProperty.count > 0
     /// default: no-op
-    public func validate(payload _: Payload) throws {}
+    public func validate(payload _: ResponsePayload) throws {}
 }
 
 public enum EventResponseError: Error {

@@ -50,7 +50,6 @@ class AddressSelectionViewController: UIViewController {
                 phone: "+1-888-746-7439",
                 provinceCode: "ON",
                 zip: "M5V 1M7"
-                
             )
         ),
         AddressOption(

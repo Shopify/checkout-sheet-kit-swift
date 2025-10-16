@@ -24,31 +24,30 @@
 import Foundation
 import WebKit
 
-public final class AddressChangeRequested: RPCRequest {
-    public typealias Payload = CartDelivery
+public final class AddressChangeRequested: RPCRequest, Decodable {
+    public typealias Params = AddressChangeRequestedParams
+    public typealias ResponsePayload = CartDelivery
 
     public static let method = "checkout.address-change-requested"
+
     public let id: String?
+    public let params: Params
     public weak var webview: WKWebView?
 
-    public let params: AddressChangeRequestData.Params
-
-    internal init(
-        id: String?,
-        params: AddressChangeRequestData.Params,
-        webview: WKWebView?
-    ) {
+    internal init(id: String?, params: Params, webview: WKWebView?) {
         self.id = id
         self.params = params
         self.webview = webview
     }
 
-    enum CodingKeys: String, CodingKey {
-        case addressType
-        case id = "id"
+    /// Webview is not serializable in CheckoutBridge, attach it later
+    public required init(from decoder: Decoder) throws {
+        let envelope = try Self.decodeEnvelope(from: decoder)
+        id = envelope.id
+        params = envelope.params
     }
 
-    public func validate(payload: Payload) throws {
+    public func validate(payload: ResponsePayload) throws {
         let addresses = payload.addresses
         guard !addresses.isEmpty else {
             throw EventResponseError.validationFailed("At least one address is required")
@@ -64,6 +63,11 @@ public final class AddressChangeRequested: RPCRequest {
             }
         }
     }
+}
+
+public struct AddressChangeRequestedParams: Codable {
+    public let addressType: String
+    public let selectedAddress: CartAddress?
 }
 
 /// https://shopify.dev/docs/api/storefront/latest/objects/CartDelivery
