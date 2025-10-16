@@ -27,41 +27,74 @@ import XCTest
 class UserAgentTests: XCTestCase {
     func test_string_withAcceleratedCheckoutsEntryPoint_shouldReturnCorrectUserAgent() {
         let schemaVersion = MetaData.schemaVersion
+        let version = MetaData.version
         let acceleratedCheckoutsUA = UserAgent.string(
             type: .standard,
             colorScheme: .automatic,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.4.0 (\(schemaVersion);automatic;standard) AcceleratedCheckouts")
+        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) AcceleratedCheckouts")
     }
 
     func test_string_withAcceleratedCheckoutsAndReactNativePlatform_shouldReturnUserAgentWithPlatform() {
         let schemaVersion = MetaData.schemaVersion
+        let version = MetaData.version
         let acceleratedCheckoutsUA = UserAgent.string(
             type: .standard,
             colorScheme: .automatic,
             platform: .reactNative,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.4.0 (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts")
+        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts")
     }
 
     func test_string_withoutEntryPoint_shouldReturnBasicUserAgent() {
         let schemaVersion = MetaData.schemaVersion
+        let version = MetaData.version
         let checkoutSheetKitUA = UserAgent.string(
             type: .standard,
             colorScheme: .automatic
         )
-        XCTAssertEqual(checkoutSheetKitUA, "ShopifyCheckoutSDK/3.4.0 (\(schemaVersion);automatic;standard)")
+        XCTAssertEqual(checkoutSheetKitUA, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard)")
     }
 
     func test_string_withRecoveryTypeAndDarkColorScheme_shouldReturnRecoveryUserAgent() {
         let schemaVersion = MetaData.schemaVersion
+        let version = MetaData.version
         let recoveryUA = UserAgent.string(
             type: .recovery,
             colorScheme: .dark,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(recoveryUA, "ShopifyCheckoutSDK/3.4.0 (noconnect;dark;standard_recovery) AcceleratedCheckouts")
+        XCTAssertEqual(recoveryUA, "ShopifyCheckoutSDK/\(version) (noconnect;dark;standard_recovery) AcceleratedCheckouts")
+    }
+
+    func test_applicationName_shouldContainChromeVersion() {
+        let userAgent = CheckoutBridge.applicationName
+
+        XCTAssertTrue(
+            userAgent.contains("Chrome/"),
+            "User agent must contain Chrome version for Google Pay support"
+        )
+    }
+
+    func test_applicationName_shouldMeetMinimumChromeVersionForGooglePay() {
+        let userAgent = CheckoutBridge.applicationName
+        let chromeVersionPattern = #"Chrome/(\d+)"#
+
+        guard let regex = try? NSRegularExpression(pattern: chromeVersionPattern),
+              let match = regex.firstMatch(in: userAgent, range: NSRange(userAgent.startIndex..., in: userAgent)),
+              let versionRange = Range(match.range(at: 1), in: userAgent),
+              let versionNumber = Int(userAgent[versionRange])
+        else {
+            XCTFail("Chrome version not found in user agent")
+            return
+        }
+
+        XCTAssertGreaterThanOrEqual(
+            versionNumber,
+            137,
+            "Chrome version must be >= 137 for Google Pay"
+        )
     }
 }
