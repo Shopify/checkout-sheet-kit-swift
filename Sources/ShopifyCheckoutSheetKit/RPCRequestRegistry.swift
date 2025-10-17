@@ -22,11 +22,11 @@
  */
 
 import Foundation
+import WebKit
 
 /// Registry of all supported RPC request types
 enum RPCRequestRegistry {
     /// Array of all supported request types
-    /// Using array for simple linear search - with small number of types, this is efficient
     static let requestTypes: [any RPCRequest.Type] = [
         AddressChangeRequested.self,
         CheckoutCompleteRequest.self,
@@ -36,7 +36,27 @@ enum RPCRequestRegistry {
     ]
 
     /// Find the request type for a given method name
+    /// for:method corresponds to RPCRequest.method
+    /// for:method is used to select correct Decoder
     static func requestType(for method: String) -> (any RPCRequest.Type)? {
         return requestTypes.first { $0.method == method }
+    }
+
+    /// Decode the appropriate request type for a given method
+    /// for:method corresponds to RPCRequest.method
+    /// for:method is used to select correct Decoder
+    static func decode(for method: String, from data: Data, webview: WKWebView) throws -> (any RPCRequest)? {
+        guard let requestType = requestTypes.first(where: { $0.method == method }) else {
+            return nil
+        }
+
+        // Cast to our type-erased protocol and decode
+        guard let decodableType = requestType as? any TypeErasedRPCDecodable.Type else {
+            return nil
+        }
+
+        let request = try decodableType.decodeErased(from: data)
+        request.webview = webview
+        return request
     }
 }

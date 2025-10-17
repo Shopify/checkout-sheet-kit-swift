@@ -24,6 +24,11 @@
 import Foundation
 import WebKit
 
+/// Protocol to enable type-erased decoding of RPC requests
+protocol TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCRequest
+}
+
 /// Response to be decoded to a string for transport over CheckoutBridge
 public class RPCResponse<Payload: Codable>: Codable {
     /// A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".

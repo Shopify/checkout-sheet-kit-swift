@@ -35,10 +35,11 @@ public struct UnsupportedParams: Decodable {
         // Try to capture the raw JSON as a dictionary
         // If it fails, just use an empty dictionary
         if let container = try? decoder.singleValueContainer(),
-           let dict = try? container.decode([String: AnyCodable].self) {
-            self.raw = dict.mapValues { $0.value }
+           let dict = try? container.decode([String: AnyCodable].self)
+        {
+            raw = dict.mapValues { $0.value }
         } else {
-            self.raw = [:]
+            raw = [:]
         }
     }
 
@@ -80,7 +81,7 @@ public final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyRe
     public let actualMethod: String
 
     /// We use a placeholder method name since this handles any unknown method
-    public override class var method: String { "__unsupported__" }
+    override public class var method: String { "__unsupported__" }
 
     /// Custom initializer that captures the actual method name
     public init(id: String?, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
@@ -90,7 +91,7 @@ public final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyRe
 
     /// Required initializer from protocol
     public required init(id: String?, params: UnsupportedParams) {
-        self.actualMethod = "__unknown__"
+        actualMethod = "__unknown__"
         super.init(id: id, params: params)
     }
 }

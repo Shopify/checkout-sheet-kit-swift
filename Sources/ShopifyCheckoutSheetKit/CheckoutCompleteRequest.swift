@@ -26,5 +26,5 @@ import WebKit
 
 /// Request for checkout completion events
 public final class CheckoutCompleteRequest: BaseRPCRequest<CheckoutCompletedEvent, EmptyResponse> {
-    public override static var method: String { "completed" }
+    override public static var method: String { "completed" }
 }

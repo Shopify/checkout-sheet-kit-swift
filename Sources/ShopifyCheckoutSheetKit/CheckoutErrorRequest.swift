@@ -31,13 +31,13 @@ public struct CheckoutErrorParams: Decodable {
     public init(from decoder: Decoder) throws {
         // The params is an array directly
         let container = try decoder.singleValueContainer()
-        self.errors = try container.decode([CheckoutErrorEvent].self)
+        errors = try container.decode([CheckoutErrorEvent].self)
     }
 }
 
 /// Request for checkout error events
 public final class CheckoutErrorRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse> {
-    public override static var method: String { "error" }
+    override public static var method: String { "error" }
 
     /// Convenience getter to access the first error
     public var firstError: CheckoutErrorEvent? {

@@ -25,9 +25,9 @@ import Foundation
 import WebKit
 
 public final class AddressChangeRequested: BaseRPCRequest<AddressChangeRequestedParams, CartDelivery> {
-    public override class var method: String { "checkout.addressChangeRequested" }
+    override public class var method: String { "checkout.addressChangeRequested" }
 
-    public override func validate(payload: ResponsePayload) throws {
+    override public func validate(payload: ResponsePayload) throws {
         let addresses = payload.addresses
         guard !addresses.isEmpty else {
             throw EventResponseError.validationFailed("At least one address is required")

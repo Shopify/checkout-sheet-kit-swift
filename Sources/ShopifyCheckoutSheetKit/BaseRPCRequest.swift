@@ -42,11 +42,19 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     public required init(id: String?, params: Params) {
         self.id = id
         self.params = params
-        self.webview = nil
+        webview = nil
     }
 
     /// Default validation does nothing - subclasses can override
-    public func validate(payload: ResponsePayload) throws {
+    public func validate(payload _: ResponsePayload) throws {
         // Subclasses can override if they need validation
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+
+extension BaseRPCRequest: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCRequest {
+        return try JSONDecoder().decode(Self.self, from: data)
     }
 }

@@ -83,8 +83,8 @@ public struct WebPixelsParams: Decodable {
     public init(from decoder: Decoder) throws {
         // The params contains the WebPixelsEvent structure
         let webPixelsEvent = try WebPixelsEvent(from: decoder)
-        self.name = webPixelsEvent.name
-        self.event = webPixelsEvent.event
+        name = webPixelsEvent.name
+        event = webPixelsEvent.event
     }
 
     /// Convert the event body to a PixelEvent enum
@@ -104,7 +104,7 @@ public struct WebPixelsParams: Decodable {
 
 /// Request for web pixels events
 public final class WebPixelsRequest: BaseRPCRequest<WebPixelsParams, EmptyResponse> {
-    public override static var method: String { "webPixels" }
+    override public static var method: String { "webPixels" }
 
     /// Convenience getter to access the pixel event
     public var pixelEvent: PixelEvent? {

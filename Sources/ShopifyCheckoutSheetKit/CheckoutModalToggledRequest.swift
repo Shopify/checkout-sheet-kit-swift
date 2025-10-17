@@ -32,7 +32,7 @@ public struct CheckoutModalToggledParams: Decodable {
         // The params is a string "true" or "false" directly
         let container = try decoder.singleValueContainer()
         let visibleString = try container.decode(String.self)
-        self.modalVisible = Bool(visibleString) ?? false
+        modalVisible = Bool(visibleString) ?? false
     }
 
     public init(modalVisible: Bool) {
@@ -42,5 +42,5 @@ public struct CheckoutModalToggledParams: Decodable {
 
 /// Request for checkout modal toggle events
 public final class CheckoutModalToggledRequest: BaseRPCRequest<CheckoutModalToggledParams, EmptyResponse> {
-    public override static var method: String { "checkoutBlockingEvent" }
+    override public static var method: String { "checkoutBlockingEvent" }
 }
