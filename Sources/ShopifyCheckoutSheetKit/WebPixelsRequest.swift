@@ -22,13 +22,16 @@
  */
 
 import Foundation
+import WebKit
 
-struct WebPixelsEvent: Decodable {
+/// Web pixels event structure
+public struct WebPixelsEvent: Decodable {
     let name: String
     let event: WebPixelsEventBody
 }
 
-struct WebPixelsEventBody: Decodable {
+/// Web pixels event body structure
+public struct WebPixelsEventBody: Decodable {
     let id: String
     let name: String
     let timestamp: String
@@ -47,7 +50,7 @@ struct WebPixelsEventBody: Decodable {
         case context
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try container.decode(String.self, forKey: .id)
@@ -72,30 +75,39 @@ struct WebPixelsEventBody: Decodable {
     }
 }
 
-class WebPixelsEventDecoder {
-    enum WebPixelsCodingKeys: String, CodingKey {
-        case name
-        case event
+/// Parameters for web pixels events
+public struct WebPixelsParams: Decodable {
+    public let name: String
+    public let event: WebPixelsEventBody
+
+    public init(from decoder: Decoder) throws {
+        // The params contains the WebPixelsEvent structure
+        let webPixelsEvent = try WebPixelsEvent(from: decoder)
+        self.name = webPixelsEvent.name
+        self.event = webPixelsEvent.event
     }
 
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using _: Decoder) throws -> PixelEvent? {
-        let messageBody = try container.decode(String.self, forKey: .body)
-
-        guard let data = messageBody.data(using: .utf8) else {
-            return nil
-        }
-
-        let webPixelsEvent = try JSONDecoder().decode(WebPixelsEvent.self, from: data)
-
-        switch webPixelsEvent.event.type {
+    /// Convert the event body to a PixelEvent enum
+    public var pixelEvent: PixelEvent? {
+        switch event.type {
         case "standard":
-            let standardEvent = StandardEvent(from: webPixelsEvent.event)
+            let standardEvent = StandardEvent(from: event)
             return .standardEvent(standardEvent)
         case "custom":
-            let customEvent = CustomEvent(from: webPixelsEvent.event)
+            let customEvent = CustomEvent(from: event)
             return .customEvent(customEvent)
         default:
             return nil
         }
+    }
+}
+
+/// Request for web pixels events
+public final class WebPixelsRequest: BaseRPCRequest<WebPixelsParams, EmptyResponse> {
+    public override static var method: String { "webPixels" }
+
+    /// Convenience getter to access the pixel event
+    public var pixelEvent: PixelEvent? {
+        return params.pixelEvent
     }
 }

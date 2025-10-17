@@ -79,7 +79,7 @@ public enum CheckoutError: Swift.Error {
     }
 }
 
-enum CheckoutErrorGroup: String, Codable {
+public enum CheckoutErrorGroup: String, Codable {
     /// An authentication error
     case authentication
     /// A shop configuration error
@@ -94,7 +94,7 @@ enum CheckoutErrorGroup: String, Codable {
     case unsupported
 }
 
-struct CheckoutErrorEvent: Codable {
+public struct CheckoutErrorEvent: Codable {
     public let group: CheckoutErrorGroup
     public let code: String?
     public let flowType: String?
@@ -107,24 +107,5 @@ struct CheckoutErrorEvent: Codable {
         self.flowType = flowType
         self.reason = reason
         self.type = type
-    }
-}
-
-class CheckoutErrorEventDecoder {
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using _: Decoder) -> CheckoutErrorEvent {
-        do {
-            let messageBody = try container.decode(String.self, forKey: .body)
-
-            /// Failure to decode will trigger the catch block
-            let data = messageBody.data(using: .utf8)
-
-            let events = try JSONDecoder().decode([CheckoutErrorEvent].self, from: data!)
-
-            /// Failure to find an event in the payload array will trigger the catch block
-            return events.first!
-        } catch {
-            OSLogger.shared.error("Error decoding \"error\" event - \(error.localizedDescription)")
-            return CheckoutErrorEvent(group: .unsupported, reason: "Decoded error could not be parsed.")
-        }
     }
 }

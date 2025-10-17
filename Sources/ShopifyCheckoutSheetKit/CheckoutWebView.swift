@@ -252,52 +252,66 @@ public class CheckoutWebView: WKWebView {
 extension CheckoutWebView: WKScriptMessageHandler {
     public func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         do {
-            switch try CheckoutBridge.decode(message) {
+            let request = try CheckoutBridge.decode(message)
+
+            switch request {
             /// Completed event
-            case let .checkoutComplete(checkoutCompletedEvent):
+            case let completeRequest as CheckoutCompleteRequest:
                 OSLogger.shared.info("Checkout completed event received")
-                viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
-            /// Error: Checkout unavailable
-            case let .checkoutUnavailable(message, code):
-                OSLogger.shared.error("Checkout unavailable error received: \(message ?? "No message"), code: \(code)")
-                viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
-                        message: message ?? "Checkout unavailable.",
-                        code: CheckoutUnavailable.clientError(code: code),
-                        recoverable: true
-                    )
-                )
-            /// Error: Storefront not configured properly
-            case let .configurationError(message, code):
-                OSLogger.shared.error("Configuration error received: \(message ?? "No message"), code: \(code)")
-                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
-                    message: message ?? "Storefront configuration error.",
-                    code: CheckoutUnavailable.clientError(code: code),
-                    recoverable: false
-                ))
-            /// Error: Checkout expired
-            case let .checkoutExpired(message, code):
-                OSLogger.shared.info("Checkout expired error received: \(message ?? "No message"), code: \(code)")
-                viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: code))
+                viewDelegate?.checkoutViewDidCompleteCheckout(event: completeRequest.params)
+
+            /// Error events
+            case let errorRequest as CheckoutErrorRequest:
+                if let error = errorRequest.firstError {
+                    let code = CheckoutErrorCode.from(error.code)
+
+                    switch error.group {
+                    case .configuration:
+                        OSLogger.shared.error("Configuration error received: \(error.reason ?? "No message"), code: \(code)")
+                        viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
+                            message: error.reason ?? "Storefront configuration error.",
+                            code: CheckoutUnavailable.clientError(code: code),
+                            recoverable: false
+                        ))
+                    case .unrecoverable:
+                        OSLogger.shared.error("Checkout unavailable error received: \(error.reason ?? "No message"), code: \(code)")
+                        viewDelegate?.checkoutViewDidFailWithError(
+                            error: .checkoutUnavailable(
+                                message: error.reason ?? "Checkout unavailable.",
+                                code: CheckoutUnavailable.clientError(code: code),
+                                recoverable: true
+                            )
+                        )
+                    case .expired:
+                        OSLogger.shared.info("Checkout expired error received: \(error.reason ?? "No message"), code: \(code)")
+                        viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: error.reason ?? "Checkout has expired.", code: code))
+                    default:
+                        OSLogger.shared.error("Unknown error group received: \(error.group)")
+                    }
+                }
+
             /// Checkout modal toggled
-            case let .checkoutModalToggled(modalVisible):
-                viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
+            case let modalRequest as CheckoutModalToggledRequest:
+                viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalRequest.params.modalVisible)
+
             /// Checkout web pixel event
-            case let .webPixels(event):
-                if let event {
+            case let pixelsRequest as WebPixelsRequest:
+                if let event = pixelsRequest.pixelEvent {
                     viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: event)
                 }
+
             /// Address change intent
-            case let .addressChangeIntent(event):
-                OSLogger.shared.info("Address change intent event received: \(event.params.addressType)")
-                let eventWithWebView = AddressChangeRequested(
-                    id: event.id,
-                    params: event.params,
-                    webview: self
-                )
-                viewDelegate?.checkoutViewDidRequestAddressChange(event: eventWithWebView)
+            case let addressRequest as AddressChangeRequested:
+                OSLogger.shared.info("Address change intent event received: \(addressRequest.params.addressType)")
+                viewDelegate?.checkoutViewDidRequestAddressChange(event: addressRequest)
+
+            /// Unsupported requests
+            case is UnsupportedRequest:
+                // Silently ignore unsupported requests
+                OSLogger.shared.debug("Unsupported request received")
+
             default:
-                ()
+                OSLogger.shared.debug("Unknown request type received")
             }
         } catch {
             OSLogger.shared.error("Error decoding bridge script message: \(error.localizedDescription)")

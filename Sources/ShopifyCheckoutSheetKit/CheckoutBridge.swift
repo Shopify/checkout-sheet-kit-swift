@@ -52,16 +52,63 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         webView.evaluateJavaScript(script)
     }
 
-    static func decode(_ message: WKScriptMessage) throws -> WebEvent {
+    static func decode(_ message: WKScriptMessage) throws -> any RPCRequest {
         guard let body = message.body as? String, let data = body.data(using: .utf8) else {
             throw BridgeError.invalidBridgeEvent()
         }
 
+        // Decode as JSON-RPC format only
         do {
-            return try JSONDecoder().decode(WebEvent.self, from: data)
+            return try decodeAsJSONRPC(from: data, webView: message.webView)
         } catch {
             throw BridgeError.invalidBridgeEvent(error)
         }
+    }
+
+    /// Decode JSON-RPC format messages
+    private static func decodeAsJSONRPC(from data: Data, webView: WKWebView?) throws -> any RPCRequest {
+        // First decode just enough to get the method
+        struct MethodExtractor: Decodable {
+            let method: String
+            let jsonrpc: String?
+        }
+
+        let extractor = try JSONDecoder().decode(MethodExtractor.self, from: data)
+
+        // Check if it's JSON-RPC format
+        guard extractor.jsonrpc == "2.0" else {
+            throw BridgeError.invalidBridgeEvent()
+        }
+
+        // Find the appropriate request type
+        guard let requestType = RPCRequestRegistry.requestType(for: extractor.method) else {
+            let envelope = try JSONDecoder().decode(UnsupportedEnvelope.self, from: data)
+            return UnsupportedRequest(id: envelope.id, actualMethod: envelope.method)
+        }
+        
+        // Create a decoder and decode the data
+        let decoder = JSONDecoder()
+        var request: any RPCRequest
+
+        // Check which concrete type it is and decode accordingly
+        switch requestType {
+        case is AddressChangeRequested.Type:
+            request = try decoder.decode(AddressChangeRequested.self, from: data)
+        case is CheckoutCompleteRequest.Type:
+            request = try decoder.decode(CheckoutCompleteRequest.self, from: data)
+        case is CheckoutErrorRequest.Type:
+            request = try decoder.decode(CheckoutErrorRequest.self, from: data)
+        case is CheckoutModalToggledRequest.Type:
+            request = try decoder.decode(CheckoutModalToggledRequest.self, from: data)
+        case is WebPixelsRequest.Type:
+            request = try decoder.decode(WebPixelsRequest.self, from: data)
+        default:
+            let envelope = try decoder.decode(UnsupportedEnvelope.self, from: data)
+            request = UnsupportedRequest(id: envelope.id, actualMethod: envelope.method)
+        }
+
+        request.webview = webView
+        return request
     }
 
     static func dispatchMessageTemplate(body: String) -> String {
@@ -77,73 +124,10 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
     }
 }
 
-extension CheckoutBridge {
-    enum WebEvent: Decodable {
-        /// Error types
-        case checkoutExpired(message: String?, code: CheckoutErrorCode)
-        case checkoutUnavailable(message: String?, code: CheckoutErrorCode)
-        case configurationError(message: String?, code: CheckoutErrorCode)
-
-        /// Success
-        case checkoutComplete(event: CheckoutCompletedEvent)
-
-        /// Presentational
-        case checkoutModalToggled(modalVisible: Bool)
-
-        /// Eventing
-        case webPixels(event: PixelEvent?)
-
-        /// Address Change Intent
-        case addressChangeIntent(event: AddressChangeRequested)
-
-        /// Generic
-        case unsupported(String)
-
-        enum CodingKeys: String, CodingKey {
-            case name
-            case body
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            let name = try container.decode(String.self, forKey: .name)
-
-            switch name {
-            case "completed":
-                let checkoutCompletedEvent = CheckoutCompletedEventDecoder().decode(from: container, using: decoder)
-                self = .checkoutComplete(event: checkoutCompletedEvent)
-            case "error":
-                let errorDecoder = CheckoutErrorEventDecoder()
-                let error = errorDecoder.decode(from: container, using: decoder)
-                let code = CheckoutErrorCode.from(error.code)
-
-                switch error.group {
-                case .configuration:
-                    self = .configurationError(message: error.reason, code: code)
-                case .unrecoverable:
-                    self = .checkoutUnavailable(message: error.reason, code: code)
-                case .expired:
-                    self = .checkoutExpired(message: error.reason, code: CheckoutErrorCode.from(error.code))
-                default:
-                    self = .unsupported(name)
-                }
-            case "checkoutBlockingEvent":
-                let modalVisible = try container.decode(String.self, forKey: .body)
-                self = .checkoutModalToggled(modalVisible: Bool(modalVisible)!)
-            case "webPixels":
-                let webPixelsDecoder = WebPixelsEventDecoder()
-                let event = try webPixelsDecoder.decode(from: container, using: decoder)
-                self = .webPixels(event: event)
-            case "addressChangeIntent":
-                let event = try CheckoutAddressChangeIntentDecoder()
-                    .decode(from: container, using: decoder)
-                self = .addressChangeIntent(event: event)
-            default:
-                self = .unsupported(name)
-            }
-        }
-    }
+// Handle unsupported methods
+struct UnsupportedEnvelope: Decodable {
+    let id: String?
+    let method: String
 }
 
 struct InstrumentationPayload: Codable {

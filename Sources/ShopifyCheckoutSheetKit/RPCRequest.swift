@@ -58,10 +58,10 @@ public class RPCResponse<Payload: Codable>: Codable {
 
 /// (Web) The Client is defined as the origin of Request objects and the handler of Response objects.
 /// (Native) The Server is defined as the origin of Response objects and the handler of Request objects.
-public protocol RPCRequest: AnyObject {
+public protocol RPCRequest: AnyObject, Decodable {
     /// MetaData associated with the type of the request from Checkout
     associatedtype Params: Decodable
-    
+
     /// Expected data structure to send in response
     associatedtype ResponsePayload: Codable
     typealias Response = RPCResponse<ResponsePayload>
@@ -74,6 +74,9 @@ public protocol RPCRequest: AnyObject {
     /// The value SHOULD normally not be Null [1] and Numbers SHOULD NOT contain fractional parts [2]
     var id: String? { get }
 
+    /// The params from the JSON-RPC request
+    var params: Params { get }
+
     /// 4 Request object - https://www.jsonrpc.org/specification
     /// A String containing the name of the method to be invoked. Method names that begin with the word rpc followed by a period character (U+002E or ASCII 46) are reserved for rpc-internal methods and extensions and MUST NOT be used for anything else.
     static var method: String { get }
@@ -82,10 +85,13 @@ public protocol RPCRequest: AnyObject {
     var isNotification: Bool { get }
 
     var webview: WKWebView? { get set }
+
+    /// Required initializer for creating requests from decoded params
+    init(id: String?, params: Params)
 }
 
 struct RPCEnvelope<Params: Decodable>: Decodable {
-    let id: String
+    let id: String?
     let jsonrpc: String
     let method: String
     let params: Params
@@ -95,6 +101,24 @@ extension RPCRequest {
     public var jsonrpc: String { "2.0" }
 
     public var isNotification: Bool { id == nil }
+
+    /// Default Decodable implementation for all RPCRequest types
+    public init(from decoder: Decoder) throws {
+        let envelope = try RPCEnvelope<Params>(from: decoder)
+
+        // Validate JSON-RPC version
+        guard envelope.jsonrpc == "2.0" else {
+            throw BridgeError.invalidBridgeEvent()
+        }
+
+        // Validate method matches this type
+        guard envelope.method == Self.method else {
+            throw BridgeError.invalidBridgeEvent()
+        }
+
+        // Use the required initializer
+        self.init(id: envelope.id, params: envelope.params)
+    }
 
     static func decodeEnvelope(from decoder: Decoder) throws -> RPCEnvelope<Params> {
         let envelope = try RPCEnvelope<Params>(from: decoder)

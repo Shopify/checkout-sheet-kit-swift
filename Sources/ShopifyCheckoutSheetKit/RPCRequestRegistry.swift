@@ -23,19 +23,20 @@
 
 import Foundation
 
-class CheckoutCompletedEventDecoder {
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using _: Decoder) -> CheckoutCompletedEvent {
-        do {
-            let messageBody = try container.decode(String.self, forKey: .body)
+/// Registry of all supported RPC request types
+enum RPCRequestRegistry {
+    /// Array of all supported request types
+    /// Using array for simple linear search - with small number of types, this is efficient
+    static let requestTypes: [any RPCRequest.Type] = [
+        AddressChangeRequested.self,
+        CheckoutCompleteRequest.self,
+        CheckoutErrorRequest.self,
+        CheckoutModalToggledRequest.self,
+        WebPixelsRequest.self
+    ]
 
-            guard let data = messageBody.data(using: .utf8) else {
-                return createEmptyCheckoutCompletedEvent()
-            }
-
-            return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)
-        } catch {
-            OSLogger.shared.error("Error decoding \"completed\" event - \(error.localizedDescription)")
-            return createEmptyCheckoutCompletedEvent()
-        }
+    /// Find the request type for a given method name
+    static func requestType(for method: String) -> (any RPCRequest.Type)? {
+        return requestTypes.first { $0.method == method }
     }
 }

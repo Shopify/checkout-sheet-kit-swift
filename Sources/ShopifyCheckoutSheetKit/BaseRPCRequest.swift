@@ -24,17 +24,29 @@
 import Foundation
 import WebKit
 
-class CheckoutAddressChangeIntentDecoder {
-    func decode(
-        from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>,
-        using _: Decoder
-    ) throws -> AddressChangeRequested {
-        let messageBody = try container.decode(String.self, forKey: .body)
+/// Base class for all RPC request implementations
+public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
+    public typealias Params = P
+    public typealias ResponsePayload = R
 
-        guard let data = messageBody.data(using: .utf8) else {
-            throw BridgeError.invalidBridgeEvent()
-        }
+    public let id: String?
+    public let params: Params
+    public weak var webview: WKWebView?
 
-        return try JSONDecoder().decode(AddressChangeRequested.self, from: data)
+    /// Subclasses must override this to provide their method name
+    public class var method: String {
+        fatalError("Subclasses must override method")
+    }
+
+    /// Required initializer that all RPC requests must implement
+    public required init(id: String?, params: Params) {
+        self.id = id
+        self.params = params
+        self.webview = nil
+    }
+
+    /// Default validation does nothing - subclasses can override
+    public func validate(payload: ResponsePayload) throws {
+        // Subclasses can override if they need validation
     }
 }

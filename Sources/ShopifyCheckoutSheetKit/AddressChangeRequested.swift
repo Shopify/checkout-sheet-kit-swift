@@ -24,30 +24,10 @@
 import Foundation
 import WebKit
 
-public final class AddressChangeRequested: RPCRequest, Decodable {
-    public typealias Params = AddressChangeRequestedParams
-    public typealias ResponsePayload = CartDelivery
+public final class AddressChangeRequested: BaseRPCRequest<AddressChangeRequestedParams, CartDelivery> {
+    public override class var method: String { "checkout.addressChangeRequested" }
 
-    public static let method = "checkout.address-change-requested"
-
-    public let id: String?
-    public let params: Params
-    public weak var webview: WKWebView?
-
-    internal init(id: String?, params: Params, webview: WKWebView?) {
-        self.id = id
-        self.params = params
-        self.webview = webview
-    }
-
-    /// Webview is not serializable in CheckoutBridge, attach it later
-    public required init(from decoder: Decoder) throws {
-        let envelope = try Self.decodeEnvelope(from: decoder)
-        id = envelope.id
-        params = envelope.params
-    }
-
-    public func validate(payload: ResponsePayload) throws {
+    public override func validate(payload: ResponsePayload) throws {
         let addresses = payload.addresses
         guard !addresses.isEmpty else {
             throw EventResponseError.validationFailed("At least one address is required")
@@ -67,7 +47,29 @@ public final class AddressChangeRequested: RPCRequest, Decodable {
 
 public struct AddressChangeRequestedParams: Codable {
     public let addressType: String
-    public let selectedAddress: CartAddress?
+    public let selectedAddress: IncomingAddress?
+}
+
+/// Address structure from incoming JSON-RPC request
+public struct IncomingAddress: Codable {
+    public let firstName: String?
+    public let lastName: String?
+    public let name: String?
+    public let address1: String?
+    public let address2: String?
+    public let city: String?
+    public let countryCode: String?
+    public let postalCode: String?
+    public let zoneCode: String?
+    public let phone: String?
+    /// TODO; DELETE THESE PROPERTIES ONCE WEB IS SENDING OVER THE ORIGINAL CARTDELIVERY AGAIN
+    public let oneTimeUse: Bool?
+    public let coordinates: Coordinates?
+
+    public struct Coordinates: Codable {
+        public let latitude: Double
+        public let longitude: Double
+    }
 }
 
 /// https://shopify.dev/docs/api/storefront/latest/objects/CartDelivery
