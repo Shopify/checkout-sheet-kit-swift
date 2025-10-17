@@ -26,15 +26,23 @@ import WebKit
 import XCTest
 
 class CheckoutBridgeTests: XCTestCase {
+    private lazy var mockWebView = MockWebView()
+
     class WKScriptMessageMock: WKScriptMessage {
         private let _mockBody: Any
+        private let _mockWebView: WKWebView?
 
         override var body: Any {
             _mockBody
         }
 
-        init(body: Any = "") {
+        override var webView: WKWebView? {
+            _mockWebView
+        }
+
+        init(body: Any = "", webView: WKWebView? = nil) {
             _mockBody = body
+            _mockWebView = webView
         }
     }
 
@@ -77,6 +85,25 @@ class CheckoutBridgeTests: XCTestCase {
         }
     }
 
+    func testDecodeReturnsUnsupportedRequestWhenWebViewIsNil() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "id": "test-id",
+            "method": "checkout.addressChangeRequested",
+            "params": {
+                "addressType": "shipping"
+            }
+        }
+        """)
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard result is UnsupportedRequest else {
+            return XCTFail("expected UnsupportedRequest when webView is nil, got \(result)")
+        }
+    }
+
     func testDecodeHandlesUnsupportedEventsGracefully() throws {
         let mock = WKScriptMessageMock(body: """
         {
@@ -85,7 +112,7 @@ class CheckoutBridgeTests: XCTestCase {
             "method": "unknown",
             "params": {}
         }
-        """)
+        """, webView: mockWebView)
 
         let result = try CheckoutBridge.decode(mock)
 
@@ -108,7 +135,7 @@ class CheckoutBridgeTests: XCTestCase {
                 "code": "cart_expired"
             }]
         }
-        """)
+        """, webView: mockWebView)
 
         let result = try CheckoutBridge.decode(mock)
 
@@ -129,7 +156,7 @@ class CheckoutBridgeTests: XCTestCase {
             "method": "checkoutBlockingEvent",
             "params": "true"
         }
-        """)
+        """, webView: mockWebView)
 
         let result = try CheckoutBridge.decode(mock)
 
@@ -168,7 +195,7 @@ class CheckoutBridgeTests: XCTestCase {
             }
           }
         }
-        """)
+        """, webView: mockWebView)
 
         let result = try CheckoutBridge.decode(mock)
 
@@ -205,7 +232,7 @@ class CheckoutBridgeTests: XCTestCase {
                 }
             }
         }
-        """)
+        """, webView: mockWebView)
 
         let result = try CheckoutBridge.decode(mock)
 
@@ -236,7 +263,7 @@ class CheckoutBridgeTests: XCTestCase {
                 }
             }
         }
-        """)
+        """, webView: mockWebView)
 
         let result = try CheckoutBridge.decode(mock)
 
@@ -261,7 +288,7 @@ class CheckoutBridgeTests: XCTestCase {
                 "currentCard": null
             }
         }
-        """)
+        """, webView: mockWebView)
 
         let result = try CheckoutBridge.decode(mock)
 
