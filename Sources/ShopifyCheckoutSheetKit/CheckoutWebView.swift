@@ -339,12 +339,12 @@ extension CheckoutWebView: WKScriptMessageHandler {
             )
             viewDelegate.checkoutViewDidFailWithError(
                 error: .checkoutExpired(
-                    message: error.reason ?? "Checkout has expired.", code: code))
+                    message: error.reason ?? "Checkout has expired.", code: code
+                ))
         default:
             OSLogger.shared.error("Unknown error group received: \(error.group)")
         }
     }
-
 }
 
 extension CheckoutWebView: WKNavigationDelegate {
@@ -411,17 +411,19 @@ extension CheckoutWebView: WKNavigationDelegate {
                     error: .checkoutUnavailable(
                         message: errorMessageForStatusCode,
                         code: CheckoutUnavailable.httpError(statusCode: statusCode),
-                        recoverable: false))
+                        recoverable: false
+                    ))
             case 404:
                 OSLogger.shared.debug("Not found (404)")
                 if let reason = headers[deprecatedReasonHeader] as? String,
-                    reason.lowercased() == checkoutLiquidNotSupportedReason
+                   reason.lowercased() == checkoutLiquidNotSupportedReason
                 {
                     viewDelegate?.checkoutViewDidFailWithError(
                         error: .configurationError(
                             message:
-                                "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
-                            code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false))
+                            "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
+                            code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false
+                        ))
                 } else {
                     viewDelegate?.checkoutViewDidFailWithError(
                         error: .checkoutUnavailable(
@@ -434,8 +436,9 @@ extension CheckoutWebView: WKNavigationDelegate {
                 OSLogger.shared.debug("Gone (410)")
                 viewDelegate?.checkoutViewDidFailWithError(
                     error: .checkoutExpired(
-                        message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired))
-            case 500...599:
+                        message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired
+                    ))
+            case 500 ... 599:
                 OSLogger.shared.debug("Server error (5xx)")
                 viewDelegate?.checkoutViewDidFailWithError(
                     error: .checkoutUnavailable(
@@ -533,7 +536,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
         guard
             let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?
-                .value
+            .value
         else { return false }
 
         return openExternally.lowercased() == "true" || openExternally == "1"
@@ -558,7 +561,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         guard action.targetsMainFrame,
-            url.needsEmbedUpdate(isRecovery: isRecovery, entryPoint: entryPoint)
+              url.needsEmbedUpdate(isRecovery: isRecovery, entryPoint: entryPoint)
         else {
             return false
         }

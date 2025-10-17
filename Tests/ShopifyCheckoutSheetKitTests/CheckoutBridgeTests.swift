@@ -222,4 +222,55 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("page_viewed", standardEvent.name)
         XCTAssertEqual("123", standardEvent.id)
     }
+
+    func testDecodeSupportsCheckoutCardChangeRequested() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "id": "card-change-123",
+            "method": "checkout.cardChangeRequested",
+            "params": {
+                "currentCard": {
+                    "last4": "4242",
+                    "brand": "visa"
+                }
+            }
+        }
+        """)
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let cardRequest = result as? CheckoutCardChangeRequested else {
+            XCTFail("Expected CheckoutCardChangeRequested, got \(result)")
+            return
+        }
+
+        XCTAssertEqual("card-change-123", cardRequest.id)
+        XCTAssertNotNil(cardRequest.params.currentCard)
+        XCTAssertEqual("4242", cardRequest.params.currentCard?.last4)
+        XCTAssertEqual("visa", cardRequest.params.currentCard?.brand)
+    }
+
+    func testDecodeSupportsCheckoutCardChangeRequestedWithoutCurrentCard() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "id": "card-change-456",
+            "method": "checkout.cardChangeRequested",
+            "params": {
+                "currentCard": null
+            }
+        }
+        """)
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let cardRequest = result as? CheckoutCardChangeRequested else {
+            XCTFail("Expected CheckoutCardChangeRequested, got \(result)")
+            return
+        }
+
+        XCTAssertEqual("card-change-456", cardRequest.id)
+        XCTAssertNil(cardRequest.params.currentCard)
+    }
 }

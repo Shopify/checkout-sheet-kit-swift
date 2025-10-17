@@ -81,7 +81,7 @@ public final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyRe
     public let actualMethod: String
 
     /// We use a placeholder method name since this handles any unknown method
-    override public class var method: String { "__unsupported__" }
+    override public static var method: String { "__unsupported__" }
 
     /// Custom initializer that captures the actual method name
     public init(id: String?, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {

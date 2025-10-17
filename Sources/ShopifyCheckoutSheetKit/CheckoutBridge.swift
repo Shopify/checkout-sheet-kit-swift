@@ -56,7 +56,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         guard let body = message.body as? String, let data = body.data(using: .utf8) else {
             throw BridgeError.invalidBridgeEvent()
         }
-        // Decode as JSON-RPC format only
+
         do {
             struct MethodExtractor: Decodable {
                 let method: String
@@ -84,14 +84,14 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
     static func dispatchMessageTemplate(body: String) -> String {
         return """
-            if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-            	window.MobileCheckoutSdk.dispatchMessage(\(body));
-            } else {
-            	window.addEventListener('mobileCheckoutBridgeReady', function () {
-            		window.MobileCheckoutSdk.dispatchMessage(\(body));
-            	}, {passive: true, once: true});
-            }
-            """
+        if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
+        	window.MobileCheckoutSdk.dispatchMessage(\(body));
+        } else {
+        	window.addEventListener('mobileCheckoutBridgeReady', function () {
+        		window.MobileCheckoutSdk.dispatchMessage(\(body));
+        	}, {passive: true, once: true});
+        }
+        """
     }
 }
 

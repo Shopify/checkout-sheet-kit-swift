@@ -25,7 +25,7 @@ import Foundation
 import WebKit
 
 public final class AddressChangeRequested: BaseRPCRequest<AddressChangeRequestedParams, CartDelivery> {
-    override public class var method: String { "checkout.addressChangeRequested" }
+    override public static var method: String { "checkout.addressChangeRequested" }
 
     override public func validate(payload: ResponsePayload) throws {
         let addresses = payload.addresses
