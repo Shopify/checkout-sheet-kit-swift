@@ -41,7 +41,7 @@ class CheckoutBridgeTests: XCTestCase {
     func testReturnsStandardUserAgent() {
         let version = ShopifyCheckoutSheetKit.version
         let schemaVersion = MetaData.schemaVersion
-        XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard)")
+        XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) Chrome/137.0.0.0 Safari/537.36")
     }
 
     func testReturnsRecoveryUserAgent() {
@@ -53,7 +53,7 @@ class CheckoutBridgeTests: XCTestCase {
         let version = ShopifyCheckoutSheetKit.version
         let schemaVersion = MetaData.schemaVersion
         ShopifyCheckoutSheetKit.configuration.platform = Platform.reactNative
-        XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative")
+        XCTAssertEqual(CheckoutBridge.applicationName, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative Chrome/137.0.0.0 Safari/537.36")
         XCTAssertEqual(CheckoutBridge.recoveryAgent, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) ReactNative")
         ShopifyCheckoutSheetKit.configuration.platform = nil
     }
@@ -64,7 +64,7 @@ class CheckoutBridgeTests: XCTestCase {
         let applicationNameWithEntryPoint = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
         let recoveryAgentWithEntryPoint = CheckoutBridge.recoveryAgent(entryPoint: .acceleratedCheckouts)
 
-        XCTAssertEqual(applicationNameWithEntryPoint, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) AcceleratedCheckouts")
+        XCTAssertEqual(applicationNameWithEntryPoint, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) AcceleratedCheckouts Chrome/137.0.0.0 Safari/537.36")
         XCTAssertEqual(recoveryAgentWithEntryPoint, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) AcceleratedCheckouts")
     }
 
@@ -76,7 +76,7 @@ class CheckoutBridgeTests: XCTestCase {
         let applicationNameWithEntryPoint = CheckoutBridge.applicationName(entryPoint: .acceleratedCheckouts)
         let recoveryAgentWithEntryPoint = CheckoutBridge.recoveryAgent(entryPoint: .acceleratedCheckouts)
 
-        XCTAssertEqual(applicationNameWithEntryPoint, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts")
+        XCTAssertEqual(applicationNameWithEntryPoint, "ShopifyCheckoutSDK/\(version) (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts Chrome/137.0.0.0 Safari/537.36")
         XCTAssertEqual(recoveryAgentWithEntryPoint, "ShopifyCheckoutSDK/\(version) (noconnect;automatic;standard_recovery) ReactNative AcceleratedCheckouts")
 
         ShopifyCheckoutSheetKit.configuration.platform = nil

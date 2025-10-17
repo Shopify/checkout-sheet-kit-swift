@@ -155,6 +155,7 @@ class CheckoutWebView: WKWebView {
         #endif
 
         navigationDelegate = self
+        uiDelegate = self
         translatesAutoresizingMaskIntoConstraints = false
         scrollView.contentInsetAdjustmentBehavior = .never
 
@@ -485,5 +486,38 @@ extension CheckoutWebView {
         var isStale: Bool {
             abs(timestamp.timeIntervalSinceNow) >= timeout
         }
+    }
+}
+
+// WKUIDelegate
+extension CheckoutWebView: WKUIDelegate {
+    func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures _: WKWindowFeatures
+    ) -> WKWebView? {
+        guard navigationAction.targetFrame == nil else {
+            return nil
+        }
+
+        let popupWebView = WKWebView(frame: webView.bounds, configuration: configuration)
+        popupWebView.translatesAutoresizingMaskIntoConstraints = false
+        popupWebView.uiDelegate = self
+        popupWebView.navigationDelegate = self
+
+        webView.addSubview(popupWebView)
+        NSLayoutConstraint.activate([
+            popupWebView.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
+            popupWebView.topAnchor.constraint(equalTo: webView.topAnchor),
+            popupWebView.trailingAnchor.constraint(equalTo: webView.trailingAnchor),
+            popupWebView.bottomAnchor.constraint(equalTo: webView.bottomAnchor)
+        ])
+
+        return popupWebView
+    }
+
+    func webViewDidClose(_ webView: WKWebView) {
+        webView.removeFromSuperview()
     }
 }

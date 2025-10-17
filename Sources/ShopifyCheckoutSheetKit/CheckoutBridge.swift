@@ -44,12 +44,15 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
         let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
 
-        return UserAgent.string(
+        let baseUserAgent = UserAgent.string(
             type: .standard,
             colorScheme: colorScheme,
             platform: platform,
             entryPoint: entryPoint
         )
+
+        // Include Chrome version to meet Google Pay minimum requirements (Chrome >= 137)
+        return "\(baseUserAgent) Chrome/137.0.0.0 Safari/537.36"
     }
 
     static var recoveryAgent: String {
