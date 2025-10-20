@@ -30,6 +30,8 @@
 		6A3D7ADC2B8E01460010EB27 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6A3D7ADB2B8E01460010EB27 /* Localizable.xcstrings */; };
 		6A774DD12B58023400C8EF7E /* CountryCode+inferRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */; };
 		86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86250DE32AD5521C002E45C2 /* AppConfiguration.swift */; };
+		C0908DEC2EA670B900998333 /* JWTTokenGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0908DEB2EA670B900998333 /* JWTTokenGenerator.swift */; };
+		C0908DED2EA670B900998333 /* AccessTokenEncryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0908DEA2EA670B900998333 /* AccessTokenEncryptor.swift */; };
 		CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6BE2D4951D700466376 /* InfoDictionary.swift */; };
 		CB05E6C42D4954E800466376 /* Storefront.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB05E6C32D4954E400466376 /* Storefront.swift */; };
 		CB1B10B32E4CDDB0001713F8 /* ShopifyAcceleratedCheckouts in Frameworks */ = {isa = PBXBuildFile; productRef = CB1B10B22E4CDDB0001713F8 /* ShopifyAcceleratedCheckouts */; };
@@ -68,6 +70,8 @@
 		6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CountryCode+inferRegion.swift"; sourceTree = "<group>"; };
 		6AE865492CE3BB6500A4971C /* MobileBuyIntegration.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobileBuyIntegration.entitlements; sourceTree = "<group>"; };
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		C0908DEA2EA670B900998333 /* AccessTokenEncryptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessTokenEncryptor.swift; sourceTree = "<group>"; };
+		C0908DEB2EA670B900998333 /* JWTTokenGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWTTokenGenerator.swift; sourceTree = "<group>"; };
 		CB05E6BE2D4951D700466376 /* InfoDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDictionary.swift; sourceTree = "<group>"; };
 		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
 		CB3613482E98054B00BBE31D /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
@@ -111,6 +115,7 @@
 		4EBBA7692A5F0CE200193E19 /* MobileBuyIntegration */ = {
 			isa = PBXGroup;
 			children = (
+				C0908DEE2EA6716300998333 /* Authentication */,
 				4EBBA77F2A5F0DA300193E19 /* Application */,
 				4EBBA7B82A5F26ED00193E19 /* Extensions */,
 				4EBBA77E2A5F0D8E00193E19 /* Resources */,
@@ -173,6 +178,15 @@
 				6A774DD02B58023400C8EF7E /* CountryCode+inferRegion.swift */,
 			);
 			name = Extensions;
+			sourceTree = "<group>";
+		};
+		C0908DEE2EA6716300998333 /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				C0908DEA2EA670B900998333 /* AccessTokenEncryptor.swift */,
+				C0908DEB2EA670B900998333 /* JWTTokenGenerator.swift */,
+			);
+			path = Authentication;
 			sourceTree = "<group>";
 		};
 		CB05E6C22D4954DF00466376 /* Extensions */ = {
@@ -322,6 +336,8 @@
 				CB05E6C42D4954E800466376 /* Storefront.swift in Sources */,
 				4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */,
 				4EF54F272A6F4C4F00F5E407 /* CartViewController.swift in Sources */,
+				C0908DEC2EA670B900998333 /* JWTTokenGenerator.swift in Sources */,
+				C0908DED2EA670B900998333 /* AccessTokenEncryptor.swift in Sources */,
 				4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */,
 				86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */,
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,

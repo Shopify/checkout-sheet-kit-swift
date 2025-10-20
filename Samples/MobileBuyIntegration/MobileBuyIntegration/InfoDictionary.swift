@@ -33,6 +33,21 @@ class InfoDictionary {
     let address1, address2, city, country, firstName, lastName, province, zip,
         email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
 
+    // Optional - Authentication configuration
+    let appApiKey: String?
+    let appSharedSecret: String?
+    let appAccessToken: String?
+
+    /// Returns true if all authentication configuration values are present and non-empty
+    var isAuthenticationConfigured: Bool {
+        guard let apiKey = appApiKey, !apiKey.isEmpty,
+              let secret = appSharedSecret, !secret.isEmpty,
+              let token = appAccessToken, !token.isEmpty else {
+            return false
+        }
+        return true
+    }
+
     init() {
         guard
             let infoPlist = Bundle.main.infoDictionary,
@@ -70,5 +85,8 @@ class InfoDictionary {
         self.version = version
         self.buildNumber = buildNumber
         self.merchantIdentifier = merchantIdentifier
+        self.appApiKey = infoPlist["AppApiKey"] as? String
+        self.appSharedSecret = infoPlist["AppSharedSecret"] as? String
+        self.appAccessToken = infoPlist["AppAccessToken"] as? String
     }
 }

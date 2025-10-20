@@ -34,6 +34,9 @@ public final class AppConfiguration: ObservableObject {
     /// Prefill buyer information
     @AppStorage("useVaultedState") public var useVaultedState: Bool = false
 
+    /// Use app authentication for checkouts (requires authentication configuration)
+    @AppStorage("useAppAuthentication") public var useAppAuthentication: Bool = false
+
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
 
@@ -47,6 +50,47 @@ public final class AppConfiguration: ObservableObject {
         merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
         contactFields: [.email]
     )
+
+    /// Returns true if authentication configuration is available
+    public var isAuthenticationConfigured: Bool {
+        InfoDictionary.shared.isAuthenticationConfigured
+    }
+
+    /// Generates a fresh JWT authentication token
+    ///
+    /// WARNING: This is for SAMPLE APP demonstration only.
+    /// Production apps MUST generate tokens server-side.
+    ///
+    /// - Returns: JWT token string, or nil if configuration is missing or generation fails
+    public func generateAuthToken() -> String? {
+        guard isAuthenticationConfigured,
+              let apiKey = InfoDictionary.shared.appApiKey,
+              let secret = InfoDictionary.shared.appSharedSecret,
+              let token = InfoDictionary.shared.appAccessToken else {
+            return nil
+        }
+
+        return JWTTokenGenerator.generateAuthToken(
+            apiKey: apiKey,
+            sharedSecret: secret,
+            accessToken: token
+        )
+    }
+
+    /// Generates checkout options with authentication if enabled and available
+    ///
+    /// - Returns: CheckoutOptions with authentication token if enabled, or nil otherwise
+    public func createCheckoutOptions() -> CheckoutOptions? {
+        guard useAppAuthentication else {
+            return nil
+        }
+
+        guard let token = generateAuthToken() else {
+            return nil
+        }
+
+        return CheckoutOptions(authentication: .token(token))
+    }
 }
 
 public var appConfiguration = AppConfiguration() {

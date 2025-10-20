@@ -260,7 +260,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let url = checkoutURL.appending(
             queryItems: [.init(name: "partner", value: partner.rawValue)]
         )
-        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: url)
+
+        let options = appConfiguration.createCheckoutOptions()
+
+        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: url, options: options)
         let navController = UINavigationController(rootViewController: embeddedCheckout)
         navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
 
