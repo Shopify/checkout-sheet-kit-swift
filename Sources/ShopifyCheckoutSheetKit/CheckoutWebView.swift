@@ -574,7 +574,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         updatedRequest.url = url.withEmbedParam(
             isRecovery: isRecovery,
             entryPoint: options?.entryPoint,
-            options: options
+            options: options,
         )
         load(updatedRequest)
         return true
