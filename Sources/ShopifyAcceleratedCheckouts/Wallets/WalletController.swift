@@ -60,8 +60,8 @@ class WalletController: ObservableObject {
         checkoutViewController = ShopifyCheckoutSheetKit.present(
             checkout: url,
             from: topViewController,
-            entryPoint: .acceleratedCheckouts,
-            delegate: delegate
+            delegate: delegate,
+            options: CheckoutOptions(entryPoint: .acceleratedCheckouts)
         )
     }
 

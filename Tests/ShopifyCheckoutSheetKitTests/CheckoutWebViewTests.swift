@@ -31,8 +31,8 @@ import XCTest
 private final class RecordingCheckoutWebView: CheckoutWebView {
     var lastLoadedRequest: URLRequest?
 
-    init(entryPoint: MetaData.EntryPoint?, recovery: Bool = false) {
-        super.init(frame: .zero, configuration: WKWebViewConfiguration(), recovery: recovery, entryPoint: entryPoint)
+    init(options: CheckoutOptions? = nil, recovery: Bool = false) {
+        super.init(frame: .zero, configuration: WKWebViewConfiguration(), recovery: recovery, options: options)
     }
 
     @available(*, unavailable)
@@ -76,7 +76,7 @@ class CheckoutWebViewTests: XCTestCase {
         ShopifyCheckoutSheetKit.configuration = ShopifyCheckoutSheetKit.Configuration()
         defer { ShopifyCheckoutSheetKit.configuration = originalConfiguration }
 
-        let recordingView = RecordingCheckoutWebView(entryPoint: nil)
+        let recordingView = RecordingCheckoutWebView(options: nil)
         let checkoutURL = URL(string: "https://shopify.com/checkouts/123")!
         let action = MockNavigationAction(url: checkoutURL)
 
@@ -100,7 +100,7 @@ class CheckoutWebViewTests: XCTestCase {
         ShopifyCheckoutSheetKit.configuration = ShopifyCheckoutSheetKit.Configuration()
         defer { ShopifyCheckoutSheetKit.configuration = originalConfiguration }
 
-        let recordingView = RecordingCheckoutWebView(entryPoint: nil)
+        let recordingView = RecordingCheckoutWebView(options: nil)
         let checkoutURL = URL(string: "https://shopify.com/checkouts/123?embed=foo")!
         let action = MockNavigationAction(url: checkoutURL)
 
@@ -141,7 +141,7 @@ class CheckoutWebViewTests: XCTestCase {
         var components = URLComponents(string: "https://shopify.com/checkouts/123")!
         components.queryItems = [URLQueryItem(name: EmbedQueryParamKey.embed, value: standardEmbed)]
         let startingURL = components.url!
-        let recoveryView = RecordingCheckoutWebView(entryPoint: nil, recovery: true)
+        let recoveryView = RecordingCheckoutWebView(options: nil, recovery: true)
 
         recoveryView.load(checkout: startingURL)
 
@@ -151,6 +151,26 @@ class CheckoutWebViewTests: XCTestCase {
 
         XCTAssertNotNil(embedValue)
         XCTAssertTrue(embedValue?.contains("recovery=true") ?? false)
+    }
+
+    func testLoadIncludesAuthenticationTokenInEmbedParam() {
+        let originalConfiguration = ShopifyCheckoutSheetKit.configuration
+        ShopifyCheckoutSheetKit.configuration = ShopifyCheckoutSheetKit.Configuration()
+        defer { ShopifyCheckoutSheetKit.configuration = originalConfiguration }
+
+        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test"
+        let options = CheckoutOptions(authentication: .token(token))
+        let checkoutURL = URL(string: "https://shopify.com/checkouts/123")!
+        let webView = RecordingCheckoutWebView(options: options)
+
+        webView.load(checkout: checkoutURL)
+
+        let loadedURL = webView.lastLoadedRequest?.url
+        let loadedComponents = loadedURL.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
+        let embedValue = loadedComponents?.queryItems?.first(where: { $0.name == EmbedQueryParamKey.embed })?.value
+
+        XCTAssertNotNil(embedValue)
+        XCTAssertTrue(embedValue?.contains("authentication=\(token)") ?? false)
     }
 
     func testEmailContactLinkDelegation() {
@@ -567,6 +587,47 @@ class CheckoutWebViewTests: XCTestCase {
         view.webView(view, didFail: nil, withError: error)
 
         XCTAssertNil(mockDelegate.errorReceived)
+    }
+
+    func testSanitizedStringRedactsAuthenticationToken() {
+        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.test"
+        var components = URLComponents(string: "https://shopify.com/checkouts/123")!
+        components.queryItems = [
+            URLQueryItem(
+                name: "embed",
+                value: "protocol=2025-10,branding=app,library=CheckoutKit/3.4.0,platform=swift,entry=sheet,authentication=\(token)"
+            )
+        ]
+        let url = components.url!
+
+        let sanitized = url.sanitizedString
+        let expected = "https://shopify.com/checkouts/123?embed=protocol%3D2025-10,branding%3Dapp,library%3DCheckoutKit/3.4.0,platform%3Dswift,entry%3Dsheet,authentication%3D%5BREDACTED%5D"
+
+        XCTAssertEqual(sanitized, expected)
+    }
+
+    func testSanitizedStringHandlesURLWithoutAuthentication() {
+        var components = URLComponents(string: "https://shopify.com/checkouts/123")!
+        components.queryItems = [
+            URLQueryItem(
+                name: "embed",
+                value: "protocol=2025-10,branding=app,library=CheckoutKit/3.4.0,platform=swift,entry=sheet"
+            )
+        ]
+        let url = components.url!
+
+        let sanitized = url.sanitizedString
+
+        // Should be equal since there's no authentication to redact
+        XCTAssertEqual(sanitized, url.absoluteString)
+    }
+
+    func testSanitizedStringHandlesURLWithoutEmbedParam() {
+        let url = URL(string: "https://shopify.com/checkouts/123?foo=bar")!
+
+        let sanitized = url.sanitizedString
+
+        XCTAssertEqual(sanitized, url.absoluteString)
     }
 }
 
