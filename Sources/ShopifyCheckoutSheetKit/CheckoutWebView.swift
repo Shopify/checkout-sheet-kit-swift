@@ -64,26 +64,23 @@ public class CheckoutWebView: WKWebView {
         return !isRecovery && ShopifyCheckoutSheetKit.configuration.preloading.enabled
     }
 
-    static func `for`(
-        checkout url: URL, recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil
-    ) -> CheckoutWebView {
-        OSLogger.shared.debug(
-            "Creating webview for URL: \(url.absoluteString), recovery: \(recovery)")
+    static func `for`(checkout url: URL, recovery: Bool = false, options: CheckoutOptions? = nil) -> CheckoutWebView {
+        OSLogger.shared.debug("Creating webview for URL: \(url.sanitizedString), recovery: \(recovery)")
 
         if recovery {
             CheckoutWebView.invalidate()
-            return CheckoutWebView(recovery: true, entryPoint: entryPoint)
+            return CheckoutWebView(recovery: true, options: options)
         }
 
-        let cacheKey = "\(url.absoluteString)_\(entryPoint?.rawValue ?? "nil")"
+        let cacheKey = "\(url.absoluteString)_\(options?.entryPoint?.rawValue ?? "nil")"
 
         guard ShopifyCheckoutSheetKit.configuration.preloading.enabled else {
             OSLogger.shared.debug("Preloading not enabled")
-            return uncacheableView(entryPoint: entryPoint)
+            return uncacheableView(options: options)
         }
 
         guard let cache, cacheKey == cache.key, !cache.isStale else {
-            let view = CheckoutWebView(entryPoint: entryPoint)
+            let view = CheckoutWebView(options: options)
             CheckoutWebView.cache = CacheEntry(key: cacheKey, view: view)
             return view
         }
@@ -92,9 +89,9 @@ public class CheckoutWebView: WKWebView {
         return cache.view
     }
 
-    static func uncacheableView(entryPoint: MetaData.EntryPoint? = nil) -> CheckoutWebView {
+    static func uncacheableView(options: CheckoutOptions? = nil) -> CheckoutWebView {
         uncacheableViewRef?.detachBridge()
-        let view = CheckoutWebView(entryPoint: entryPoint)
+        let view = CheckoutWebView(options: options)
         uncacheableViewRef = view
         return view
     }
@@ -133,19 +130,19 @@ public class CheckoutWebView: WKWebView {
 
     var isPreloadRequest: Bool = false
 
-    private var entryPoint: MetaData.EntryPoint?
+    private var options: CheckoutOptions?
 
     // MARK: Initializers
 
     public init(
         frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(),
-        recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil
+        recovery: Bool = false, options: CheckoutOptions? = nil
     ) {
         OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".
         configuration.allowsInlineMediaPlayback = true
-        self.entryPoint = entryPoint
+        self.options = options
 
         if recovery {
             /// Uses a non-persistent, private cookie store to avoid cross-instance pollution
@@ -235,9 +232,9 @@ public class CheckoutWebView: WKWebView {
     // MARK: -
 
     func load(checkout url: URL, isPreload: Bool = false) {
-        OSLogger.shared.info("Loading checkout URL: \(url.absoluteString), isPreload: \(isPreload)")
+        OSLogger.shared.info("Loading checkout URL: \(url.sanitizedString), isPreload: \(isPreload)")
         var request = URLRequest(
-            url: url.withEmbedParam(isRecovery: isRecovery, entryPoint: entryPoint))
+            url: url.withEmbedParam(isRecovery: isRecovery, entryPoint: options?.entryPoint, options: options))
 
         if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
@@ -366,7 +363,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
         if isExternalLink(action) || CheckoutURL(from: url).isDeepLink() {
             OSLogger.shared.debug(
-                "External or deep link clicked: \(url.absoluteString) - request intercepted")
+                "External or deep link clicked: \(url.sanitizedString) - request intercepted")
             viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
             decisionHandler(.cancel)
             return
@@ -408,7 +405,7 @@ extension CheckoutWebView: WKNavigationDelegate {
             CheckoutWebView.invalidate()
 
             OSLogger.shared.debug(
-                "Handling response for URL: \(response.url?.absoluteString ?? "unknown URL"), status code: \(statusCode)"
+                "Handling response for URL: \(response.url?.sanitizedString ?? "unknown URL"), status code: \(statusCode)"
             )
 
             switch statusCode {
@@ -470,7 +467,7 @@ extension CheckoutWebView: WKNavigationDelegate {
     }
 
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
-        let url = webView.url?.absoluteString ?? ""
+        let url = webView.url?.sanitizedString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
         timer = Date()
         viewDelegate?.checkoutViewDidStartNavigation()
@@ -480,7 +477,7 @@ extension CheckoutWebView: WKNavigationDelegate {
     public func webView(
         _ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error
     ) {
-        let url = webView.url?.absoluteString ?? ""
+        let url = webView.url?.sanitizedString ?? ""
         OSLogger.shared.debug(
             "Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
@@ -568,13 +565,17 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         guard action.targetsMainFrame,
-              url.needsEmbedUpdate(isRecovery: isRecovery, entryPoint: entryPoint)
+              url.needsEmbedUpdate(isRecovery: isRecovery, entryPoint: options?.entryPoint, options: options)
         else {
             return false
         }
 
         var updatedRequest = action.request
-        updatedRequest.url = url.withEmbedParam(isRecovery: isRecovery, entryPoint: entryPoint)
+        updatedRequest.url = url.withEmbedParam(
+            isRecovery: isRecovery,
+            entryPoint: options?.entryPoint,
+            options: options
+        )
         load(updatedRequest)
         return true
     }
@@ -625,5 +626,33 @@ extension CheckoutWebView {
         var isStale: Bool {
             abs(timestamp.timeIntervalSinceNow) >= timeout
         }
+    }
+}
+
+extension URL {
+    /// Returns a sanitized URL string safe for logging by redacting sensitive authentication data
+    internal var sanitizedString: String {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            return absoluteString
+        }
+
+        // Redact authentication value from embed parameter
+        if let embedIndex = components.queryItems?.firstIndex(where: { $0.name == EmbedQueryParamKey.embed }),
+           let embedValue = components.queryItems?[embedIndex].value
+        {
+            let sanitizedEmbed = embedValue
+                .split(separator: ",")
+                .map { field -> String in
+                    if field.starts(with: "\(EmbedFieldKey.authentication)=") {
+                        return "\(EmbedFieldKey.authentication)=\(EmbedFieldValue.redacted)"
+                    }
+                    return String(field)
+                }
+                .joined(separator: ",")
+
+            components.queryItems?[embedIndex] = URLQueryItem(name: EmbedQueryParamKey.embed, value: sanitizedEmbed)
+        }
+
+        return components.url?.absoluteString ?? absoluteString
     }
 }

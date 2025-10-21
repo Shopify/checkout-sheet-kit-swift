@@ -38,6 +38,7 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
     var initialNavigation: Bool = true
 
     private let checkoutURL: URL
+    private let options: CheckoutOptions?
 
     private lazy var closeBarButtonItem: UIBarButtonItem = {
         if let closeButtonTintColor = ShopifyCheckoutSheetKit.configuration.closeButtonTintColor {
@@ -61,11 +62,12 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
         checkoutURL = url
         self.delegate = delegate
+        self.options = options
 
-        let checkoutView = CheckoutWebView.for(checkout: url, entryPoint: entryPoint)
+        let checkoutView = CheckoutWebView.for(checkout: url, options: options)
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
         self.checkoutView = checkoutView
@@ -173,7 +175,7 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
         progressObserver?.invalidate()
         checkoutView.removeFromSuperview()
 
-        checkoutView = CheckoutWebView.for(checkout: url, recovery: true)
+        checkoutView = CheckoutWebView.for(checkout: url, recovery: true, options: options)
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
         checkoutView.viewDelegate = self

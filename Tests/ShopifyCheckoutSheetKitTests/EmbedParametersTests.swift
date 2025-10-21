@@ -44,7 +44,7 @@ final class EmbedParametersTests: XCTestCase {
 
         XCTAssertEqual(
             result,
-            "protocol=\(MetaData.schemaVersion), branding=app, library=CheckoutKit/\(trimmedMetaDataVersion()), platform=swift, entry=sheet"
+            "protocol=\(MetaData.schemaVersion),branding=app,library=CheckoutKit/\(trimmedMetaDataVersion()),platform=swift,entry=sheet"
         )
     }
 
@@ -67,8 +67,9 @@ final class EmbedParametersTests: XCTestCase {
 
     func test_build_withPlatformAndEntryPoint_includesPlatformAndEntryPoint() {
         ShopifyCheckoutSheetKit.configuration.platform = .reactNative
+        let options = CheckoutOptions(entryPoint: .acceleratedCheckouts)
 
-        let result = EmbedParamBuilder.build(entryPoint: .acceleratedCheckouts)
+        let result = EmbedParamBuilder.build(entryPoint: options.entryPoint, options: options)
 
         XCTAssertTrue(result.contains("platform=\(MetaData.Platform.reactNative.rawValue)"))
         XCTAssertTrue(result.contains("entrypoint=\(MetaData.EntryPoint.acceleratedCheckouts.rawValue)"))
@@ -94,7 +95,8 @@ final class EmbedParametersTests: XCTestCase {
 
     func test_withEmbedParam_setsWalletEntryForAcceleratedCheckouts() {
         let url = URL(string: "https://example.com/checkout")!
-        let result = url.withEmbedParam(isRecovery: false, entryPoint: .acceleratedCheckouts)
+        let options = CheckoutOptions(entryPoint: .acceleratedCheckouts)
+        let result = url.withEmbedParam(isRecovery: false, entryPoint: options.entryPoint, options: options)
 
         let components = URLComponents(url: result, resolvingAgainstBaseURL: false)
         let embedValue = components?.queryItems?.first(where: { $0.name == EmbedQueryParamKey.embed })?.value
@@ -132,10 +134,12 @@ final class EmbedParametersTests: XCTestCase {
     func test_build_withShopPayPayment_setsEntryToShopPay() {
         var components = URLComponents(string: "https://example.com/checkout")!
         components.queryItems = [URLQueryItem(name: "payment", value: "shop_pay")]
+        let options = CheckoutOptions(entryPoint: .acceleratedCheckouts)
 
         let result = EmbedParamBuilder.build(
-            entryPoint: .acceleratedCheckouts,
-            sourceComponents: components
+            entryPoint: options.entryPoint,
+            sourceComponents: components,
+            options: options
         )
 
         XCTAssertTrue(result.contains("entry=\(EmbedFieldValue.entryShopPay)"))
@@ -143,13 +147,116 @@ final class EmbedParametersTests: XCTestCase {
 
     func test_withEmbedParam_preservesShopPayEntry() {
         let baseURL = URL(string: "https://example.com/checkout?payment=shop_pay")!
-        let result = baseURL.withEmbedParam(isRecovery: false, entryPoint: .acceleratedCheckouts)
+        let options = CheckoutOptions(entryPoint: .acceleratedCheckouts)
+        let result = baseURL.withEmbedParam(isRecovery: false, entryPoint: options.entryPoint, options: options)
 
         let updatedComponents = URLComponents(url: result, resolvingAgainstBaseURL: false)
         let embedValue = updatedComponents?.queryItems?.first(where: { $0.name == EmbedQueryParamKey.embed })?.value
 
         XCTAssertNotNil(embedValue)
         XCTAssertTrue(embedValue?.contains("entry=\(EmbedFieldValue.entryShopPay)") ?? false)
+    }
+
+    // MARK: Authentication Tests
+
+    func test_build_withAuthenticationToken_includesAuthenticationInEmbed() {
+        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test"
+        let options = CheckoutOptions(authentication: .token(token))
+
+        let result = EmbedParamBuilder.build(entryPoint: nil, options: options)
+
+        XCTAssertTrue(result.contains("authentication=\(token)"))
+    }
+
+    func test_build_withoutAuthentication_omitsAuthenticationField() {
+        let result = EmbedParamBuilder.build(entryPoint: nil, options: nil)
+
+        XCTAssertFalse(result.contains("authentication="))
+    }
+
+    func test_withEmbedParam_includesAuthenticationToken() {
+        let url = URL(string: "https://example.com/checkout")!
+        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test"
+        let options = CheckoutOptions(authentication: .token(token))
+
+        let result = url.withEmbedParam(isRecovery: false, entryPoint: nil, options: options)
+
+        let components = URLComponents(url: result, resolvingAgainstBaseURL: false)
+        let embedValue = components?.queryItems?.first(where: { $0.name == EmbedQueryParamKey.embed })?.value
+
+        XCTAssertNotNil(embedValue)
+        XCTAssertTrue(embedValue?.contains("authentication=\(token)") ?? false)
+    }
+
+    func test_withEmbedParam_updatesEmbedValueWhenAuthenticationChanges() {
+        let url = URL(string: "https://example.com/checkout")!
+        let oldToken = "old_token"
+        let newToken = "new_token"
+
+        // First add with old token
+        let urlWithOldToken = url.withEmbedParam(
+            isRecovery: false,
+            entryPoint: nil,
+            options: CheckoutOptions(authentication: .token(oldToken))
+        )
+
+        // Then update with new token
+        let result = urlWithOldToken.withEmbedParam(
+            isRecovery: false,
+            entryPoint: nil,
+            options: CheckoutOptions(authentication: .token(newToken))
+        )
+
+        let components = URLComponents(url: result, resolvingAgainstBaseURL: false)
+        let embedValue = components?.queryItems?.first(where: { $0.name == EmbedQueryParamKey.embed })?.value
+
+        XCTAssertNotNil(embedValue)
+        XCTAssertTrue(embedValue?.contains("authentication=\(newToken)") ?? false)
+        XCTAssertFalse(embedValue?.contains("authentication=\(oldToken)") ?? true)
+    }
+
+    func test_needsEmbedUpdate_returnsFalseWhenAuthenticationChanges() {
+        // Authentication changes should NOT trigger an update
+        // (tokens are excluded from comparison for security reasons)
+        let url = URL(string: "https://example.com/checkout")!
+        let oldToken = "old_token"
+        let newToken = "new_token"
+
+        let urlWithOldToken = url.withEmbedParam(
+            isRecovery: false,
+            entryPoint: nil,
+            options: CheckoutOptions(authentication: .token(oldToken))
+        )
+
+        let needsUpdate = urlWithOldToken.needsEmbedUpdate(
+            isRecovery: false,
+            entryPoint: nil,
+            options: CheckoutOptions(authentication: .token(newToken))
+        )
+
+        XCTAssertFalse(needsUpdate)
+    }
+
+    func test_embedParamMatches_ignoresAuthenticationDifferences() {
+        // Authentication tokens should be ignored when comparing embed params
+        let url = URL(string: "https://example.com/checkout")!
+        let token = "some_token"
+        let options = CheckoutOptions(authentication: .token(token))
+
+        let urlWithToken = url.withEmbedParam(
+            isRecovery: false,
+            entryPoint: nil,
+            options: options
+        )
+
+        // Should match even with different auth token
+        let matches = urlWithToken.embedParamMatches(
+            isRecovery: false,
+            entryPoint: nil,
+            options: CheckoutOptions(authentication: .token("different_token"))
+        )
+
+        XCTAssertTrue(matches)
     }
 
     // MARK: Helpers

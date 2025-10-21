@@ -36,6 +36,7 @@ enum EmbedFieldKey {
     static let colorScheme = "colorscheme"
     static let recovery = "recovery"
     static let entryPoint = "entrypoint"
+    static let authentication = "authentication"
 }
 
 enum EmbedFieldValue {
@@ -45,13 +46,16 @@ enum EmbedFieldValue {
     static let entryWallet = "wallet"
     static let entryShopPay = "shop-pay"
     static let recoveryTrue = "true"
+    static let redacted = "[REDACTED]"
 }
 
 enum EmbedParamBuilder {
     static func build(
         isRecovery: Bool = false,
         entryPoint: MetaData.EntryPoint?,
-        sourceComponents: URLComponents? = nil
+        sourceComponents: URLComponents? = nil,
+        options: CheckoutOptions? = nil,
+        includeAuthentication: Bool = true
     ) -> String {
         let configuration = ShopifyCheckoutSheetKit.configuration
         let colorScheme = configuration.colorScheme
@@ -77,6 +81,10 @@ enum EmbedParamBuilder {
 
         if let entryPointValue {
             fields.append((EmbedFieldKey.entryPoint, entryPointValue))
+        }
+
+        if includeAuthentication, case let .token(authToken) = options?.authentication {
+            fields.append((EmbedFieldKey.authentication, authToken))
         }
 
         return fields
@@ -148,7 +156,7 @@ extension URL {
         embedQueryValue() != nil
     }
 
-    func embedParamMatches(isRecovery: Bool, entryPoint: MetaData.EntryPoint?) -> Bool {
+    func embedParamMatches(isRecovery: Bool, entryPoint: MetaData.EntryPoint?, options: CheckoutOptions? = nil) -> Bool {
         guard
             let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
             let embedValue = components.queryItems?.first(where: { $0.name == EmbedQueryParamKey.embed })?.value
@@ -156,23 +164,42 @@ extension URL {
             return false
         }
 
+        // Build expected value without authentication for comparison
+        // (auth tokens may be stripped from loaded URLs for security)
         let expectedValue = EmbedParamBuilder.build(
             isRecovery: isRecovery,
             entryPoint: entryPoint,
-            sourceComponents: components
+            sourceComponents: components,
+            options: options,
+            includeAuthentication: false
         )
-        return embedValue == expectedValue
+
+        let embedValueWithoutAuth = stripAuthenticationFromEmbed(embedValue)
+
+        return embedValueWithoutAuth == expectedValue
     }
 
-    func needsEmbedUpdate(isRecovery: Bool, entryPoint: MetaData.EntryPoint?) -> Bool {
+    private func stripAuthenticationFromEmbed(_ embedValue: String) -> String {
+        embedValue
+            .split(separator: ",")
+            .filter { !$0.starts(with: "\(EmbedFieldKey.authentication)=") }
+            .joined(separator: ",")
+    }
+
+    func needsEmbedUpdate(isRecovery: Bool, entryPoint: MetaData.EntryPoint?, options: CheckoutOptions? = nil) -> Bool {
         guard hasEmbedParam() else {
             return true
         }
 
-        return !embedParamMatches(isRecovery: isRecovery, entryPoint: entryPoint)
+        return !embedParamMatches(isRecovery: isRecovery, entryPoint: entryPoint, options: options)
     }
 
-    func withEmbedParam(isRecovery: Bool = false, entryPoint: MetaData.EntryPoint?) -> URL {
+    func withEmbedParam(
+        isRecovery: Bool = false,
+        entryPoint: MetaData.EntryPoint?,
+        options: CheckoutOptions? = nil,
+        includeAuthentication: Bool = true
+    ) -> URL {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
             return self
         }
@@ -181,7 +208,9 @@ extension URL {
         let expectedValue = EmbedParamBuilder.build(
             isRecovery: isRecovery,
             entryPoint: entryPoint,
-            sourceComponents: components
+            sourceComponents: components,
+            options: options,
+            includeAuthentication: includeAuthentication
         )
 
         if let index = queryItems.firstIndex(where: { $0.name == EmbedQueryParamKey.embed }) {
