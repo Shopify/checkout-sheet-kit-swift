@@ -37,6 +37,7 @@
 		CB3613492E98055700BBE31D /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3613482E98054B00BBE31D /* UIView.swift */; };
 		CB36134B2E98065800BBE31D /* ShopifyCheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */; };
 		CB476E0F2E97CAC200878439 /* AddressSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */; };
+		CBC3DEFC2EA684C000120CA1 /* CardSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3DEFB2EA684C000120CA1 /* CardSelectionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +73,7 @@
 		CB3613482E98054B00BBE31D /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopifyCheckoutViewController.swift; sourceTree = "<group>"; };
 		CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSelectionViewController.swift; sourceTree = "<group>"; };
+		CBC3DEFB2EA684C000120CA1 /* CardSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSelectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -198,6 +200,7 @@
 		CB05E6C82D4B81EF00466376 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				CBC3DEFB2EA684C000120CA1 /* CardSelectionViewController.swift */,
 				CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */,
 				CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */,
 				4EF54F262A6F4C4F00F5E407 /* CartViewController.swift */,
@@ -334,6 +337,7 @@
 				4EA7F9B62A9D2B9D003276A1 /* SettingsView.swift in Sources */,
 				6A3467332B600E64007314A8 /* LogsView.swift in Sources */,
 				6A257A132AFBA78500610DA5 /* LogReader.swift in Sources */,
+				CBC3DEFC2EA684C000120CA1 /* CardSelectionViewController.swift in Sources */,
 				6A3393632CEF742500E89FAA /* CheckoutController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

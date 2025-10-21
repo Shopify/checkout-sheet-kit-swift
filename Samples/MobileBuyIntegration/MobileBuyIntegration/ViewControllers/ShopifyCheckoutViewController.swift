@@ -97,6 +97,15 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         // consumers can push onto the navigation stack
     }
 
+    func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested) {
+        OSLogger.shared.debug(
+            "[EmbeddedCheckout] Card change intent received"
+        )
+
+        let cardViewController = CardSelectionViewController(event: event)
+        navigationController?.pushViewController(cardViewController, animated: true)
+    }
+
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         OSLogger.shared.debug(
             "[EmbeddedCheckout] Checkout completed. Order ID: \(event.orderDetails.id)")
