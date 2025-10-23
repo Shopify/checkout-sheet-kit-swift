@@ -141,9 +141,10 @@ class AddressSelectionViewController: UIViewController {
         let selectedAddress = addressOptions[selectedIndex].address
         let addressInput = CartSelectableAddress(address: selectedAddress)
         let delivery = CartDelivery(addresses: [addressInput])
+        let response = DeliveryAddressChangePayload(delivery: delivery)
 
         do {
-            try event.respondWith(payload: delivery)
+            try event.respondWith(payload: response)
             OSLogger.shared.debug("[AddressSelection] Successfully responded with address")
             navigationController?.popViewController(animated: true)
         } catch {

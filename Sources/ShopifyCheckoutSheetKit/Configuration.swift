@@ -62,7 +62,7 @@ public struct Configuration {
 
     /// Levels: all, debug, error, none
     /// Default: .error - which will emit "error" and "fault" logs
-    public var logLevel: LogLevel = .all
+    public var logLevel: LogLevel = .error
 }
 
 extension Configuration {

@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import WebKit
 
 enum BridgeError: Swift.Error {
@@ -50,6 +51,28 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         }
         let script = dispatchMessageTemplate(body: dispatchMessageBody)
         webView.evaluateJavaScript(script)
+    }
+
+    static func sendResponse(_ webView: WKWebView, messageBody: String) {
+        DispatchQueue.main.async {
+            let script = """
+            (function() {
+                try {
+                    if (window && typeof window.postMessage === 'function') {
+                        window.postMessage(\(messageBody), '*');
+                    } else if (window && window.console && window.console.error) {
+                        window.console.error('window.postMessage is not available.');
+                    }
+                } catch (error) {
+                    if (window && window.console && window.console.error) {
+                        window.console.error('Failed to post message to checkout', error);
+                    }
+                }
+            })();
+            """
+
+            webView.evaluateJavaScript(script)
+        }
     }
 
     static func decode(_ message: WKScriptMessage) throws -> any RPCRequest {

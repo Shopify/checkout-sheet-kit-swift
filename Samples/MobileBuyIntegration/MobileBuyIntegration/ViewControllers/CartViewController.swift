@@ -567,9 +567,10 @@ extension CartViewController: CheckoutDelegate {
 
             let addressInput = CartSelectableAddress(address: hardcodedAddress)
             let delivery = CartDelivery(addresses: [addressInput])
+            let response = DeliveryAddressChangePayload(delivery: delivery)
 
             do {
-                try event.respondWith(payload: delivery)
+                try event.respondWith(payload: response)
             } catch {
                 print("[AddressChangeRequest]: Failed to respondWith ")
             }

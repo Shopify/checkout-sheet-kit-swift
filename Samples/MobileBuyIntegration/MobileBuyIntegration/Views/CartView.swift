@@ -159,10 +159,11 @@ struct CartView: View {
                                 let addressInput = CartSelectableAddress(
                                     address: hardcodedAddress)
                                 let delivery = CartDelivery(addresses: [addressInput])
+                                let response = DeliveryAddressChangePayload(delivery: delivery)
 
                                 print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
                                 do {
-                                    try event.respondWith(payload: delivery)
+                                    try event.respondWith(payload: response)
                                 } catch {
                                     print(
                                         "Failed to respondwith: Responding with hardcoded Vancouver address"

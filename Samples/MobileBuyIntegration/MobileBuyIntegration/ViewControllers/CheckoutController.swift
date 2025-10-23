@@ -101,10 +101,11 @@ extension CheckoutController: CheckoutDelegate {
 
             let addressInput = CartSelectableAddress(address: hardcodedAddress)
             let delivery = CartDelivery(addresses: [addressInput])
+            let response = DeliveryAddressChangePayload(delivery: delivery)
 
             OSLogger.shared.debug("[CheckoutDelegate] Responding with hardcoded Toronto address")
             do {
-                try event.respondWith(payload: delivery)
+                try event.respondWith(payload: response)
             } catch {
                 OSLogger.shared.error("[CheckoutDelegate] Failed to respond to address change intent: \(error)")
             }

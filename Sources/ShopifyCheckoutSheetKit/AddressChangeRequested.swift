@@ -24,11 +24,11 @@
 import Foundation
 import WebKit
 
-public final class AddressChangeRequested: BaseRPCRequest<AddressChangeRequestedParams, CartDelivery> {
+public final class AddressChangeRequested: BaseRPCRequest<AddressChangeRequestedParams, DeliveryAddressChangePayload> {
     override public static var method: String { "checkout.addressChangeRequested" }
 
     override public func validate(payload: ResponsePayload) throws {
-        let addresses = payload.addresses
+        let addresses = payload.delivery.addresses
         guard !addresses.isEmpty else {
             throw EventResponseError.validationFailed("At least one address is required")
         }
@@ -69,6 +69,14 @@ public struct IncomingAddress: Codable {
     public struct Coordinates: Codable {
         public let latitude: Double
         public let longitude: Double
+    }
+}
+
+public struct DeliveryAddressChangePayload: Codable {
+    public let delivery: CartDelivery
+
+    public init(delivery: CartDelivery) {
+        self.delivery = delivery
     }
 }
 

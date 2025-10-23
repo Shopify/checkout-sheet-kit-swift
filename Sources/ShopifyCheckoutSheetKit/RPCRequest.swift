@@ -149,8 +149,8 @@ extension RPCRequest {
             let response = Response(id: id, result: payload)
             try respondWith(response: response)
         } catch {
-            print(
-                "[RPCRequest] event \(String(describing: id)) decode json \(jsonString) error: \(error)"
+            OSLogger.shared.error(
+                "[RPCRequest] respondWith(json:) failed to decode method: \(Self.method), id: \(String(describing: id)), error: \(error)"
             )
         }
     }
@@ -173,9 +173,34 @@ extension RPCRequest {
             try validate(payload: result)
         }
 
-        guard let payload = SdkToWebEvent(detail: response).toJson() else { return }
+        guard let payload = SdkToWebEvent(detail: response).toJson() else {
+            OSLogger.shared.error(
+                "[RPCRequest] sendMessage method: \(Self.method), id: \(String(describing: id)) failed to encode bridge payload"
+            )
+            return
+        }
 
         CheckoutBridge.sendMessage(webview, messageName: Self.method, messageBody: payload)
+
+        do {
+            let encoder = JSONEncoder()
+            let responseData = try encoder.encode(response)
+            guard let responseJson = String(data: responseData, encoding: .utf8) else {
+                OSLogger.shared.error(
+                    "[RPCRequest] sendResponse method: \(Self.method), id: \(String(describing: id)) failed to encode response string"
+                )
+                return
+            }
+
+            OSLogger.shared.error(
+                "[RPCRequest] postMessage method: \(Self.method), id: \(String(describing: id)), payload: \(responseJson)"
+            )
+            CheckoutBridge.sendResponse(webview, messageBody: responseJson)
+        } catch {
+            OSLogger.shared.error(
+                "[RPCRequest] sendResponse method: \(Self.method), id: \(String(describing: id)) encoding error: \(error)"
+            )
+        }
     }
 
     /// `from` should be a .utf8 encoded json string
