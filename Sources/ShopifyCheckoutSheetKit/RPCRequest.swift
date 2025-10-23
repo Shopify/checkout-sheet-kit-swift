@@ -173,15 +173,6 @@ extension RPCRequest {
             try validate(payload: result)
         }
 
-        guard let payload = SdkToWebEvent(detail: response).toJson() else {
-            OSLogger.shared.error(
-                "[RPCRequest] sendMessage method: \(Self.method), id: \(String(describing: id)) failed to encode bridge payload"
-            )
-            return
-        }
-
-        CheckoutBridge.sendMessage(webview, messageName: Self.method, messageBody: payload)
-
         do {
             let encoder = JSONEncoder()
             let responseData = try encoder.encode(response)
