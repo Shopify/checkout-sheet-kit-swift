@@ -192,9 +192,6 @@ extension RPCRequest {
                 return
             }
 
-            OSLogger.shared.error(
-                "[RPCRequest] postMessage method: \(Self.method), id: \(String(describing: id)), payload: \(responseJson)"
-            )
             CheckoutBridge.sendResponse(webview, messageBody: responseJson)
         } catch {
             OSLogger.shared.error(
