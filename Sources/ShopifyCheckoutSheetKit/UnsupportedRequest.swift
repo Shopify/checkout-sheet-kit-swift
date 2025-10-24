@@ -46,7 +46,7 @@ public struct UnsupportedParams: Decodable {
     public init(raw: [String: Any] = [:]) {
         self.raw = raw
     }
-    
+
     /// Helper type to decode Any values
     private struct AnyCodable: Decodable {
         let value: Any

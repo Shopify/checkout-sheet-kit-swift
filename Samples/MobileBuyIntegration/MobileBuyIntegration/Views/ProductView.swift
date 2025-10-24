@@ -27,13 +27,6 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
 
-enum Partner: String, CaseIterable {
-    case microsoft = "Microsoft"
-    case google = "Google"
-    case openai = "OpenAI"
-    case amazon = "Amazon"
-}
-
 struct ProductView: View {
     // MARK: Properties
 
@@ -138,23 +131,21 @@ struct ProductView: View {
                         .cornerRadius(DesignSystem.cornerRadius)
                         .disabled(!variant.availableForSale || loading)
 
-                        ForEach(Partner.allCases, id: \.rawValue) { partner in
-                            Button(action: { buyNow(partner: partner) }) {
-                                HStack {
-                                    Image(systemName: "bag.fill")
-                                        .font(.system(size: 14))
-                                    Text(buyNowLoading ? "Loading..." : "Buy Now (\(partner))")
-                                        .font(.headline)
-                                        .fontWeight(.bold)
-                                }
-                                .padding()
-                                .frame(maxWidth: .infinity)
+                        Button(action: buyNow) {
+                            HStack {
+                                Image(systemName: "bag.fill")
+                                    .font(.system(size: 14))
+                                Text(buyNowLoading ? "Loading..." : "Buy Now")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
                             }
-                            .background(Color(red: 1.0, green: 0.6, blue: 0.0))
-                            .foregroundStyle(.white)
-                            .cornerRadius(DesignSystem.cornerRadius)
-                            .disabled(!variant.availableForSale || buyNowLoading)
+                            .padding()
+                            .frame(maxWidth: .infinity)
                         }
+                        .background(Color(red: 1.0, green: 0.6, blue: 0.0))
+                        .foregroundStyle(.white)
+                        .cornerRadius(DesignSystem.cornerRadius)
+                        .disabled(!variant.availableForSale || buyNowLoading)
 
                         if variant.availableForSale {
                             AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
@@ -200,7 +191,7 @@ struct ProductView: View {
         }
     }
 
-    private func buyNow(partner: Partner) {
+    private func buyNow() {
         _Concurrency.Task {
             guard let variant = product.variants.nodes.first else { return }
 
@@ -214,7 +205,7 @@ struct ProductView: View {
                     if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                        let sceneDelegate = windowScene.delegate as? SceneDelegate
                     {
-                        sceneDelegate.presentBuyNow(checkoutURL: cart.checkoutUrl, partner: partner)
+                        sceneDelegate.presentBuyNow(checkoutURL: cart.checkoutUrl)
                     }
                 }
             } catch {

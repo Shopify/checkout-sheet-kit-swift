@@ -62,14 +62,6 @@ public struct IncomingAddress: Codable {
     public let postalCode: String?
     public let zoneCode: String?
     public let phone: String?
-    /// TODO; DELETE THESE PROPERTIES ONCE WEB IS SENDING OVER THE ORIGINAL CARTDELIVERY AGAIN
-    public let oneTimeUse: Bool?
-    public let coordinates: Coordinates?
-
-    public struct Coordinates: Codable {
-        public let latitude: Double
-        public let longitude: Double
-    }
 }
 
 public struct DeliveryAddressChangePayload: Codable {

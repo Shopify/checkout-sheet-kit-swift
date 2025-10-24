@@ -139,7 +139,6 @@ extension RPCRequest {
         return envelope
     }
 
-    /// TODO: split this into two methods instead?
     /// React Native bridge will send a string to decode into Payload
     public func respondWith(json jsonString: String) throws {
         do {

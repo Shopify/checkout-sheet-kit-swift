@@ -130,7 +130,7 @@ struct CartView: View {
                         .onComplete { event in
                             showCheckoutSheet = false
                             // Handle checkout completion
-                            print("Checkout completed with order ID: \(event.orderDetails.id)")
+                            print("Checkout completed with order ID: \(event.orderConfirmation.order.id)")
                         }
                         .onFail { error in
                             showCheckoutSheet = false

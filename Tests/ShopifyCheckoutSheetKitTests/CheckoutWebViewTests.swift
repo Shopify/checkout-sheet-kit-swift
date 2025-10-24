@@ -301,7 +301,7 @@ class CheckoutWebViewTests: XCTestCase {
             XCTAssertEqual(recovery.handleResponse(urlResponse), .allow)
 
             waitForExpectations(timeout: 5) { _ in
-                XCTAssertEqual(self.mockDelegate.completedEventReceived?.orderDetails.id, "1234")
+                XCTAssertEqual(self.mockDelegate.completedEventReceived?.orderConfirmation.order.id, "1234")
             }
         }
     }
