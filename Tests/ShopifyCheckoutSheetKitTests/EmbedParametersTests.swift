@@ -71,7 +71,7 @@ final class EmbedParametersTests: XCTestCase {
 
         let result = EmbedParamBuilder.build(entryPoint: options.entryPoint, options: options)
 
-        XCTAssertTrue(result.contains("platform=\(MetaData.Platform.reactNative.rawValue)"))
+        XCTAssertTrue(result.contains("platform=react-native"))
         XCTAssertTrue(result.contains("entrypoint=\(MetaData.EntryPoint.acceleratedCheckouts.rawValue)"))
         XCTAssertTrue(result.contains("entry=\(EmbedFieldValue.entryWallet)"))
     }
