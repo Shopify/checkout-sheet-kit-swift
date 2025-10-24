@@ -264,50 +264,53 @@ extension CheckoutWebView: WKScriptMessageHandler {
 
         do {
             let request = try CheckoutBridge.decode(message)
-
-            switch request {
-            case let completeRequest as CheckoutCompleteRequest:
-                OSLogger.shared.info("Checkout completed event received")
-                viewDelegate.checkoutViewDidCompleteCheckout(event: completeRequest.params)
-
-            case let modalRequest as CheckoutModalToggledRequest:
-                viewDelegate.checkoutViewDidToggleModal(
-                    modalVisible: modalRequest.params.modalVisible
-                )
-
-            case let pixelsRequest as WebPixelsRequest:
-                guard let event = pixelsRequest.pixelEvent else { return }
-                viewDelegate.checkoutViewDidEmitWebPixelEvent(event: event)
-
-            case let addressRequest as AddressChangeRequested:
-                OSLogger.shared.info(
-                    "Address change intent event received: \(addressRequest.params.addressType)"
-                )
-                viewDelegate.checkoutViewDidRequestAddressChange(event: addressRequest)
-
-            case let cardRequest as CheckoutCardChangeRequested:
-                OSLogger.shared.info(
-                    "Card change intent event received"
-                )
-                viewDelegate.checkoutViewDidRequestCardChange(event: cardRequest)
-
-            case let errorRequest as CheckoutErrorRequest:
-                handleCheckoutError(errorRequest)
-
-            // Ignore unsupported requests
-            case is UnsupportedRequest:
-                OSLogger.shared.debug("Unsupported request: \(String(describing: request.id))")
-
-            default:
-                OSLogger.shared.debug(
-                    "Unknown request type received \(String(describing: request.id))"
-                )
-            }
+            handleBridgeRequest(request, viewDelegate: viewDelegate)
         } catch {
             OSLogger.shared.error(
                 "[CheckoutWebView]: Failed to decode event: \(error.localizedDescription)"
             )
             viewDelegate.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+        }
+    }
+
+    private func handleBridgeRequest(_ request: any RPCRequest, viewDelegate: CheckoutWebViewDelegate) {
+        switch request {
+        case let completeRequest as CheckoutCompleteRequest:
+            OSLogger.shared.info("Checkout completed event received")
+            viewDelegate.checkoutViewDidCompleteCheckout(event: completeRequest.params)
+
+        case let modalRequest as CheckoutModalToggledRequest:
+            viewDelegate.checkoutViewDidToggleModal(
+                modalVisible: modalRequest.params.modalVisible
+            )
+
+        case let pixelsRequest as WebPixelsRequest:
+            guard let event = pixelsRequest.pixelEvent else { return }
+            viewDelegate.checkoutViewDidEmitWebPixelEvent(event: event)
+
+        case let addressRequest as AddressChangeRequested:
+            OSLogger.shared.info(
+                "Address change intent event received: \(addressRequest.params.addressType)"
+            )
+            viewDelegate.checkoutViewDidRequestAddressChange(event: addressRequest)
+
+        case let cardRequest as CheckoutCardChangeRequested:
+            OSLogger.shared.info(
+                "Card change intent event received"
+            )
+            viewDelegate.checkoutViewDidRequestCardChange(event: cardRequest)
+
+        case let errorRequest as CheckoutErrorRequest:
+            handleCheckoutError(errorRequest)
+
+        // Ignore unsupported requests
+        case is UnsupportedRequest:
+            OSLogger.shared.debug("Unsupported request: \(String(describing: request.id))")
+
+        default:
+            OSLogger.shared.debug(
+                "Unknown request type received \(String(describing: request.id))"
+            )
         }
     }
 
