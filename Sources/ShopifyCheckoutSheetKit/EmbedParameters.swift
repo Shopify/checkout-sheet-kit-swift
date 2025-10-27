@@ -122,7 +122,7 @@ enum EmbedParamBuilder {
 
         switch platform {
         case .reactNative:
-            return "react-native"
+            return "react-native-swift"
         }
     }
 
