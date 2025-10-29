@@ -38,7 +38,7 @@ class CheckoutViewDelegateTests: XCTestCase {
             $0.title = customTitle ?? "Checkout"
         }
         viewController = MockCheckoutWebViewController(
-            checkoutURL: checkoutURL, delegate: delegate
+            checkoutURL: checkoutURL, delegate: delegate, entryPoint: nil, options: nil
         )
 
         navigationController = UINavigationController(rootViewController: viewController)
@@ -209,7 +209,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 
     func testCloseButtonUsesSystemDefaultWhenTintColorIsNil() {
         ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = nil
-        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
+        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate, entryPoint: nil, options: nil)
 
         let closeButton = controller.navigationItem.rightBarButtonItem
         XCTAssertNotNil(closeButton)
@@ -220,7 +220,7 @@ class CheckoutViewDelegateTests: XCTestCase {
     func testCloseButtonUsesCustomImageAndTintWhenColorIsSet() {
         let customColor = UIColor.red
         ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = customColor
-        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
+        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate, entryPoint: nil, options: nil)
 
         let closeButton = controller.navigationItem.rightBarButtonItem
         XCTAssertNotNil(closeButton)
@@ -231,7 +231,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 
     func testCloseButtonImageIsXMarkCircleFill() {
         ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = .blue
-        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
+        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate, entryPoint: nil, options: nil)
 
         let closeButton = controller.navigationItem.rightBarButtonItem
         let expectedImage = UIImage(systemName: "xmark.circle.fill")
@@ -248,6 +248,10 @@ protocol Dismissible: AnyObject {
 }
 
 extension CheckoutWebViewController: Dismissible {}
+
+func createEmptyCheckoutCompletedPayload() -> CheckoutCompletePayload {
+    return CheckoutCompletePayload(orderID: "test_order_123")
+}
 
 class MockCheckoutWebViewController: CheckoutWebViewController {
     private(set) var dismissCalled = false

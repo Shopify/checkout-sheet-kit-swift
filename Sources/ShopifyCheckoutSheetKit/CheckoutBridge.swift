@@ -83,14 +83,49 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
     }
 
     static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?) {
-        let dispatchMessageBody: String
-        if let body = messageBody {
-            dispatchMessageBody = "'\(messageName)', \(body)"
+        let dispatchMessageBody = if let body = messageBody {
+            "'\(messageName)', \(body)"
         } else {
-            dispatchMessageBody = "'\(messageName)'"
+            "'\(messageName)'"
         }
         let script = dispatchMessageTemplate(body: dispatchMessageBody)
         webView.evaluateJavaScript(script)
+    }
+
+    /// Build embed query parameter string for embedded checkout
+    static func embedParams(authToken: String? = nil) -> String {
+        var params: [String] = []
+
+        // Authentication token (required for embedded checkout)
+        if let token = authToken {
+            params.append("authentication=\(token)")
+        }
+
+        // Protocol version (always 2025-04 for embedded checkout)
+        params.append("protocol=2025-04")
+
+        // Color scheme
+        let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
+        let normalizedColorScheme: String
+        switch colorScheme {
+        case .automatic:
+            normalizedColorScheme = "automatic"
+        case .light:
+            normalizedColorScheme = "light"
+        case .dark:
+            normalizedColorScheme = "dark"
+        case .web:
+            normalizedColorScheme = "web"
+        }
+        params.append("color-scheme=\(normalizedColorScheme)")
+
+        // Library identification  
+        params.append("library=CheckoutKit/4.0.0")
+
+        // Platform identification (valid: ReactNative, Swift, Android, Web)
+        params.append("platform=Swift")
+
+        return params.joined(separator: ",")
     }
 
     static func decode(_ message: WKScriptMessage) throws -> WebEvent {
