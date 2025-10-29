@@ -219,11 +219,6 @@ class CheckoutWebView: WKWebView {
         }
     }
 
-    func instrument(_ payload: InstrumentationPayload) {
-        OSLogger.shared.debug("Emitting instrumentation event with payload: \(payload)")
-        checkoutBridge.instrument(self, payload)
-    }
-
     // MARK: -
 
     func load(checkout url: URL, isPreload: Bool = false) {
@@ -396,19 +391,8 @@ extension CheckoutWebView: WKNavigationDelegate {
             let endTime = Date()
             let diff = endTime.timeIntervalSince(startTime)
             let message = "Loaded checkout in \(String(format: "%.2f", diff))s"
-            let preload = String(isPreloadRequest)
 
             ShopifyCheckoutSheetKit.configuration.logger.log(message)
-
-            if isBridgeAttached {
-                instrument(
-                    InstrumentationPayload(
-                        name: "checkout_finished_loading",
-                        value: Int(diff * 1000),
-                        type: .histogram,
-                        tags: ["preloading": preload]
-                    ))
-            }
         }
         checkoutDidLoad = true
         timer = nil

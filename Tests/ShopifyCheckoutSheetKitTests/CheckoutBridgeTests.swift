@@ -301,20 +301,6 @@ class CheckoutBridgeTests: XCTestCase {
         }
     }
 
-    func testInstrumentationPayloadToBridgeEvent() {
-        let payload = InstrumentationPayload(name: "test", value: 1, type: .histogram)
-        let jsonString = payload.toBridgeEvent()
-        XCTAssertNotNil(jsonString)
-
-        if let jsonData = jsonString?.data(using: .utf8) {
-            let decodedPayload = try? JSONDecoder().decode(SdkToWebEvent<InstrumentationPayload>.self, from: jsonData)
-            XCTAssertNotNil(decodedPayload)
-            XCTAssertEqual(decodedPayload?.detail.name, "test")
-            XCTAssertEqual(decodedPayload?.detail.value, 1)
-            XCTAssertEqual(decodedPayload?.detail.type, .histogram)
-        }
-    }
-
     func testSendMessageShouldCallEvaluateJavaScriptPresented() {
         let webView = MockWebView()
         webView.expectedScript = expectedPresentedScript()
