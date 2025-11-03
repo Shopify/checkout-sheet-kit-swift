@@ -29,9 +29,9 @@ class ShopifyCheckoutViewController: UIViewController {
     private var checkoutURL: URL
     private var checkoutWebViewController: CheckoutWebViewController
 
-    init(checkoutURL: URL) {
+    init(checkoutURL: URL, options: CheckoutOptions? = nil) {
         self.checkoutURL = checkoutURL
-        checkoutWebViewController = CheckoutWebViewController(checkoutURL: checkoutURL)
+        checkoutWebViewController = CheckoutWebViewController(checkoutURL: checkoutURL, options: options)
         super.init(nibName: nil, bundle: nil)
         // ShopifyCheckoutViewController conforms to CheckoutDelegate to respond to lifecycle events
         checkoutWebViewController.delegate = self

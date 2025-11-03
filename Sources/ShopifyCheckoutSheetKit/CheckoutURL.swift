@@ -60,3 +60,31 @@ public struct CheckoutURL {
         return !["http", "https"].contains(scheme)
     }
 }
+
+extension URL {
+    /// Returns a sanitized URL string safe for logging by redacting sensitive authentication data
+    internal var sanitizedString: String {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            return absoluteString
+        }
+
+        // Redact authentication value from embed parameter
+        if let embedIndex = components.queryItems?.firstIndex(where: { $0.name == EmbedQueryParamKey.embed }),
+           let embedValue = components.queryItems?[embedIndex].value
+        {
+            let sanitizedEmbed = embedValue
+                .split(separator: ",")
+                .map { field -> String in
+                    if field.starts(with: "\(EmbedFieldKey.authentication)=") {
+                        return "\(EmbedFieldKey.authentication)=\(EmbedFieldValue.redacted)"
+                    }
+                    return String(field)
+                }
+                .joined(separator: ",")
+
+            components.queryItems?[embedIndex] = URLQueryItem(name: EmbedQueryParamKey.embed, value: sanitizedEmbed)
+        }
+
+        return components.url?.absoluteString ?? absoluteString
+    }
+}

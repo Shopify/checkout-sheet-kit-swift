@@ -73,6 +73,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("[MobileBuyIntegration] AcceleratedCheckout Log level set to \(acceleratedCheckoutsLogLevel)")
         print("[MobileBuyIntegration] CheckoutSheetKit Log level set to \(checkoutSheetKitLogLevel)")
 
+        // Log app authentication configuration status
+        if appConfiguration.isAuthenticationConfigured {
+            print("[MobileBuyIntegration] App authentication configuration: ✓ Configured")
+            if appConfiguration.useAppAuthentication {
+                print("[MobileBuyIntegration] App authentication: ✓ Enabled")
+            } else {
+                print("[MobileBuyIntegration] App authentication: ✗ Disabled (toggle in Settings)")
+            }
+        } else {
+            print("[MobileBuyIntegration] App authentication configuration: ✗ Not configured (set APP_API_KEY, APP_SHARED_SECRET, APP_ACCESS_TOKEN in Storefront.xcconfig)")
+        }
+
         UIBarButtonItem.appearance().tintColor = ColorPalette.primaryColor
 
         return true

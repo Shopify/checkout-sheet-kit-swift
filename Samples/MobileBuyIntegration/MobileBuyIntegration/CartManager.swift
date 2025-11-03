@@ -51,7 +51,8 @@ class CartManager: ObservableObject {
     public func preloadCheckout() {
         /// Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
         if let url = cart?.checkoutUrl, isDirty {
-            ShopifyCheckoutSheetKit.preload(checkout: url)
+            let options = appConfiguration.createCheckoutOptions()
+            ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
             markCartAsReady()
         }
     }

@@ -43,7 +43,13 @@ class CheckoutController: UIViewController {
 
     public func present(checkout url: URL) {
         if let rootViewController = window?.topMostViewController() {
-            ShopifyCheckoutSheetKit.present(checkout: url, from: rootViewController, delegate: self)
+            let options = appConfiguration.createCheckoutOptions()
+            ShopifyCheckoutSheetKit.present(
+                checkout: url,
+                from: rootViewController,
+                delegate: self,
+                options: options
+            )
             root = rootViewController
         }
     }

@@ -431,7 +431,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.reloadData()
 
         if let url = CartManager.shared.cart?.checkoutUrl {
-            ShopifyCheckoutSheetKit.preload(checkout: url)
+            let options = appConfiguration.createCheckoutOptions()
+            ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
         }
     }
 
@@ -469,7 +470,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.setupCheckoutButtonContent() // Update button appearance for enabled state
                 cell.quantityLabel.text = "\(cart.lines.nodes[indexPath.item].quantity)"
 
-                ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
+                let options = appConfiguration.createCheckoutOptions()
+                ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl, options: options)
             }
         }
         return cell
@@ -508,7 +510,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc private func presentCheckout() {
         guard let url = CartManager.shared.cart?.checkoutUrl else { return }
 
-        ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
+        let options = appConfiguration.createCheckoutOptions()
+        ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self, options: options)
     }
 
     @objc private func resetCart() {
