@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1520"
+   LastUpgradeVersion = "2600"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
       <PreActions>
          <ExecutionAction
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
-               title = "Generate Entitlements"
-               scriptText = "cd &quot;${SRCROOT}/../..&quot;&#10;./Scripts/setup_entitlements&#10;">
-               <EnvironmentBuildable>
-                  <BuildableReference
-                     BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "4EBBA7662A5F0CE200193E19"
-                     BuildableName = "MobileBuyIntegration.app"
-                     BlueprintName = "MobileBuyIntegration"
-                     ReferencedContainer = "container:MobileBuyIntegration.xcodeproj">
-                  </BuildableReference>
-               </EnvironmentBuildable>
+               title = "Run Script"
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;test&#10;&#10;">
             </ActionContent>
          </ExecutionAction>
       </PreActions>
@@ -32,10 +24,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4EBBA7662A5F0CE200193E19"
-               BuildableName = "MobileBuyIntegration.app"
-               BlueprintName = "MobileBuyIntegration"
-               ReferencedContainer = "container:MobileBuyIntegration.xcodeproj">
+               BlueprintIdentifier = "ShopifyCheckoutSheetKit"
+               BuildableName = "ShopifyCheckoutSheetKit"
+               BlueprintName = "ShopifyCheckoutSheetKit"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -57,16 +49,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4EBBA7662A5F0CE200193E19"
-            BuildableName = "MobileBuyIntegration.app"
-            BlueprintName = "MobileBuyIntegration"
-            ReferencedContainer = "container:MobileBuyIntegration.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -74,16 +56,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4EBBA7662A5F0CE200193E19"
-            BuildableName = "MobileBuyIntegration.app"
-            BlueprintName = "MobileBuyIntegration"
-            ReferencedContainer = "container:MobileBuyIntegration.xcodeproj">
+            BlueprintIdentifier = "ShopifyCheckoutSheetKit"
+            BuildableName = "ShopifyCheckoutSheetKit"
+            BlueprintName = "ShopifyCheckoutSheetKit"
+            ReferencedContainer = "container:">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

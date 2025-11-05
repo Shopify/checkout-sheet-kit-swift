@@ -1,5 +1,13 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 
-(cd Samples/MobileBuyIntegration && ./Scripts/generate_entitlements.sh)
+echo "Generating entitlements for MobileBuyIntegration..."
+cd Samples/MobileBuyIntegration && ./Scripts/generate_entitlements.sh
+cd ../..
+
+echo "Generating entitlements for ShopifyAcceleratedCheckoutsApp..."
+cd Samples/ShopifyAcceleratedCheckoutsApp && ./Scripts/generate_entitlements.sh
+cd ../..
+
+echo "All entitlements generated successfully"

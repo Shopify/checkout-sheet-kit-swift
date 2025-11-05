@@ -1,5 +1,13 @@
 .build
-.swiftpm
+
+# Swift PM - ignore most but allow schemes
+.swiftpm/*
+!.swiftpm/xcode/
+.swiftpm/xcode/*
+!.swiftpm/xcode/xcshareddata/
+.swiftpm/xcode/xcshareddata/*
+!.swiftpm/xcode/xcshareddata/xcschemes/
+
 .DS_Store
 xcuserdata
 **/Storefront.xcconfig
