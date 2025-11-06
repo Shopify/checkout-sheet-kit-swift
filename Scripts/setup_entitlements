@@ -2,12 +2,14 @@
 
 set -e
 
-echo "Generating entitlements for MobileBuyIntegration..."
-cd Samples/MobileBuyIntegration && ./Scripts/generate_entitlements.sh
+echo "Setting up MobileBuyIntegration..."
+cd Samples/MobileBuyIntegration && ./Scripts/setup.sh
 cd ../..
 
-echo "Generating entitlements for ShopifyAcceleratedCheckoutsApp..."
-cd Samples/ShopifyAcceleratedCheckoutsApp && ./Scripts/generate_entitlements.sh
+echo ""
+echo "Setting up ShopifyAcceleratedCheckoutsApp..."
+cd Samples/ShopifyAcceleratedCheckoutsApp && ./Scripts/setup.sh
 cd ../..
 
-echo "All entitlements generated successfully"
+echo ""
+echo "✅ All sample apps setup completed successfully!"
