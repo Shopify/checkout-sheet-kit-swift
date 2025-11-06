@@ -33,6 +33,9 @@ class InfoDictionary {
     let address1, address2, city, country, firstName, lastName, province, zip,
         email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
 
+    // Authentication
+    let clientId, clientSecret, authEndpoint: String
+
     init() {
         guard
             let infoPlist = Bundle.main.infoDictionary,
@@ -50,7 +53,10 @@ class InfoDictionary {
             let accessToken = infoPlist["StorefrontAccessToken"] as? String,
             let merchantIdentifier = infoPlist["StorefrontMerchantIdentifier"] as? String,
             let version = infoPlist["CFBundleShortVersionString"] as? String,
-            let buildNumber = infoPlist["CFBundleVersion"] as? String
+            let buildNumber = infoPlist["CFBundleVersion"] as? String,
+            let clientId = infoPlist["ShopifyClientId"] as? String,
+            let clientSecret = infoPlist["ShopifyClientSecret"] as? String,
+            let authEndpoint = infoPlist["ShopifyAuthEndpoint"] as? String
         else {
             fatalError("Missing required configuration. Check your info.plist.")
         }
@@ -70,5 +76,8 @@ class InfoDictionary {
         self.version = version
         self.buildNumber = buildNumber
         self.merchantIdentifier = merchantIdentifier
+        self.clientId = clientId
+        self.clientSecret = clientSecret
+        self.authEndpoint = authEndpoint
     }
 }

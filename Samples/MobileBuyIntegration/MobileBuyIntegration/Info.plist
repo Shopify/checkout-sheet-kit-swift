@@ -8,6 +8,12 @@
 	<string>$(STOREFRONT_DOMAIN)</string>
 	<key>StorefrontAccessToken</key>
 	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
+	<key>ShopifyClientId</key>
+	<string>$(SHOPIFY_CLIENT_ID)</string>
+	<key>ShopifyClientSecret</key>
+	<string>$(SHOPIFY_CLIENT_SECRET)</string>
+	<key>ShopifyAuthEndpoint</key>
+	<string>$(SHOPIFY_AUTH_ENDPOINT)</string>
 	<key>Address1</key>
 	<string>$(ADDRESS_1)</string>
 	<key>Address2</key>
