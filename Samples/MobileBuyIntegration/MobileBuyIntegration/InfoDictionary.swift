@@ -36,6 +36,14 @@ class InfoDictionary {
     // Authentication
     let clientId, clientSecret, authEndpoint: String
 
+    /// Cleans configuration strings by removing surrounding whitespace and quotes
+    /// This handles common xcconfig formatting issues
+    private static func clean(_ value: String) -> String {
+        return value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+    }
+
     init() {
         guard
             let infoPlist = Bundle.main.infoDictionary,
@@ -61,23 +69,24 @@ class InfoDictionary {
             fatalError("Missing required configuration. Check your info.plist.")
         }
 
-        self.address1 = address1
-        self.address2 = address2
-        self.city = city
-        self.country = country
-        self.firstName = firstName
-        self.lastName = lastName
-        self.province = province
-        self.zip = zip
-        self.email = email
-        self.phone = phone
-        self.domain = domain
-        self.accessToken = accessToken
-        self.version = version
-        self.buildNumber = buildNumber
-        self.merchantIdentifier = merchantIdentifier
-        self.clientId = clientId
-        self.clientSecret = clientSecret
-        self.authEndpoint = authEndpoint
+        // Apply cleaning to all configuration values to handle xcconfig formatting issues
+        self.address1 = Self.clean(address1)
+        self.address2 = Self.clean(address2)
+        self.city = Self.clean(city)
+        self.country = Self.clean(country)
+        self.firstName = Self.clean(firstName)
+        self.lastName = Self.clean(lastName)
+        self.province = Self.clean(province)
+        self.zip = Self.clean(zip)
+        self.email = Self.clean(email)
+        self.phone = Self.clean(phone)
+        self.domain = Self.clean(domain)
+        self.accessToken = Self.clean(accessToken)
+        self.version = Self.clean(version)
+        self.buildNumber = Self.clean(buildNumber)
+        self.merchantIdentifier = Self.clean(merchantIdentifier)
+        self.clientId = Self.clean(clientId)
+        self.clientSecret = Self.clean(clientSecret)
+        self.authEndpoint = Self.clean(authEndpoint)
     }
 }

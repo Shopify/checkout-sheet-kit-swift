@@ -26,10 +26,12 @@ class AuthenticationService {
         }
 
         guard !authEndpoint.isEmpty else {
+            OSLogger.shared.error("[AuthenticationService] Auth endpoint is empty")
             throw AuthError.invalidEndpoint
         }
 
         guard let url = URL(string: authEndpoint) else {
+            OSLogger.shared.error("[AuthenticationService] Failed to create URL from: '\(authEndpoint)'")
             throw AuthError.invalidEndpoint
         }
 
