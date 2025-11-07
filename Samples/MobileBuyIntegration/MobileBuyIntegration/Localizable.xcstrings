@@ -22,7 +22,7 @@
     "Adding..." : {
 
     },
-    "Buy Now" : {
+    "Buy Now %@" : {
 
     },
     "By default, the app will only handle the selections above and route everything else to Safari. Enabling the \"Handle all Universal Links\" setting will route all Universal Links to this app." : {

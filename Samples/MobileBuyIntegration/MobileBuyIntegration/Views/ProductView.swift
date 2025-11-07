@@ -135,7 +135,7 @@ struct ProductView: View {
                             HStack {
                                 Image(systemName: "bag.fill")
                                     .font(.system(size: 14))
-                                Text(buyNowLoading ? "Loading..." : "Buy Now")
+                                Text(buyNowLoading ? "Loading..." : "Buy Now \(InfoDictionary.shared.displayName)")
                                     .font(.headline)
                                     .fontWeight(.bold)
                             }

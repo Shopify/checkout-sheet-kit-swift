@@ -15,7 +15,6 @@
 		4EBBA7772A5F0CE200193E19 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4EBBA7752A5F0CE200193E19 /* LaunchScreen.storyboard */; };
 		4EBBA7A32A5F0F5600193E19 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = 4EBBA7A22A5F0F5600193E19 /* Buy */; };
 		4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */; };
-		F96052895F6042C5BEF1738A /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F96052895F6042C5BEF1738B /* AuthenticationService.swift */; };
 		4EBBA7AE2A5F1BBF00193E19 /* UIImageView+URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */; };
 		4EBBA7B02A5F222F00193E19 /* MoneyV2+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA7AF2A5F222F00193E19 /* MoneyV2+Format.swift */; };
 		4EF54F242A6F456B00F5E407 /* CartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF54F232A6F456B00F5E407 /* CartManager.swift */; };
@@ -39,6 +38,7 @@
 		CB36134B2E98065800BBE31D /* ShopifyCheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */; };
 		CB476E0F2E97CAC200878439 /* AddressSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */; };
 		CBC3DEFC2EA684C000120CA1 /* CardSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3DEFB2EA684C000120CA1 /* CardSelectionViewController.swift */; };
+		F96052895F6042C5BEF1738A /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F96052895F6042C5BEF1738B /* AuthenticationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,7 +53,6 @@
 		4EBBA7782A5F0CE200193E19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4EBBA7A72A5F10C400193E19 /* Storefront.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Storefront.xcconfig; sourceTree = SOURCE_ROOT; };
 		4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontClient.swift; sourceTree = "<group>"; };
-		F96052895F6042C5BEF1738B /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		4EBBA7AD2A5F1BBF00193E19 /* UIImageView+URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+URL.swift"; sourceTree = "<group>"; };
 		4EBBA7AF2A5F222F00193E19 /* MoneyV2+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoneyV2+Format.swift"; sourceTree = "<group>"; };
 		4EF54F232A6F456B00F5E407 /* CartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartManager.swift; sourceTree = "<group>"; };
@@ -76,6 +75,7 @@
 		CB36134A2E98065800BBE31D /* ShopifyCheckoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopifyCheckoutViewController.swift; sourceTree = "<group>"; };
 		CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSelectionViewController.swift; sourceTree = "<group>"; };
 		CBC3DEFB2EA684C000120CA1 /* CardSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSelectionViewController.swift; sourceTree = "<group>"; };
+		F96052895F6042C5BEF1738B /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -491,7 +491,7 @@
 				DEVELOPMENT_TEAM = A7XGC83MZE;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MobileBuyIntegration/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Plant;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location may be required to locate pickup points near you when you request this shipping option.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -524,7 +524,7 @@
 				DEVELOPMENT_TEAM = A7XGC83MZE;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MobileBuyIntegration/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Plant;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location may be required to locate pickup points near you when you request this shipping option.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;

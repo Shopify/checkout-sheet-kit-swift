@@ -70,7 +70,7 @@ struct CartView: View {
                         action: { showCheckoutSheet = true },
                         label: {
                             HStack {
-                                Text("Buy Now")
+                                Text("Buy Now \(InfoDictionary.shared.displayName)")
                                     .fontWeight(.bold)
                                 Spacer()
                                 if let amount = cartManager.cart?.cost.totalAmount,
