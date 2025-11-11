@@ -50,6 +50,7 @@ public struct AcceleratedCheckoutButtons: View {
 
     /// The Apple Pay button label style
     private var applePayLabel: PayWithApplePayButtonLabel = .plain
+    private var applePayStyle: PayWithApplePayButtonStyle = .automatic
 
     @State private var shopSettings: ShopSettings?
     @State private var currentRenderState: RenderState = .loading {
@@ -68,6 +69,11 @@ public struct AcceleratedCheckoutButtons: View {
             ShopifyAcceleratedCheckouts.logger.error(reason)
             _currentRenderState = State(initialValue: .error(reason: reason))
         }
+    }
+    
+    public init(cartID: String, applePayStyle: PayWithApplePayButtonStyle) {
+        self.init(cartID: cartID)
+        self.applePayStyle = applePayStyle
     }
 
     /// Initializes an Apple Pay button with a variant ID
@@ -93,7 +99,8 @@ public struct AcceleratedCheckoutButtons: View {
                             ApplePayButton(
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
-                                cornerRadius: cornerRadius
+                                cornerRadius: cornerRadius,
+                                payWithApplePayButtonStyle: applePayStyle
                             )
                             .label(applePayLabel)
                         case .shopPay:
@@ -137,6 +144,12 @@ public struct AcceleratedCheckoutButtons: View {
 
 @available(iOS 16.0, *)
 extension AcceleratedCheckoutButtons {
+    public func applePayStyle(_ color: PayWithApplePayButtonStyle) -> AcceleratedCheckoutButtons {
+        var view = self
+        view.applePayStyle = color
+        return view
+    }
+
     public func applePayLabel(_ label: PayWithApplePayButtonLabel) -> AcceleratedCheckoutButtons {
         var view = self
         view.applePayLabel = label

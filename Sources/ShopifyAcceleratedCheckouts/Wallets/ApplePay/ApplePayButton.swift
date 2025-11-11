@@ -52,14 +52,18 @@ struct ApplePayButton: View {
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
 
+    private let payWithApplePayButtonStyle: PayWithApplePayButtonStyle
+    
     public init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        payWithApplePayButtonStyle: PayWithApplePayButtonStyle
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         self.cornerRadius = cornerRadius
+        self.payWithApplePayButtonStyle = payWithApplePayButtonStyle
     }
 
     var body: some View {
@@ -76,7 +80,8 @@ struct ApplePayButton: View {
                     shopSettings: shopSettings
                 ),
                 eventHandlers: eventHandlers,
-                cornerRadius: cornerRadius
+                cornerRadius: cornerRadius,
+                payWithApplePayButtonStyle: payWithApplePayButtonStyle
             )
         }
     }
@@ -94,13 +99,15 @@ struct ApplePayButton: View {
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
     /// The Apple Pay button label style
-    private var label: PayWithApplePayButtonLabel = .plain
+    private let label: PayWithApplePayButtonLabel
 
     /// The view controller for the Apple Pay button
-    private var controller: ApplePayViewController
+    private let controller: ApplePayViewController
 
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
+    
+    private let payWithApplePayButtonStyle: PayWithApplePayButtonStyle
 
     /// Initializes an Apple Pay button
     /// - Parameters:
@@ -113,14 +120,17 @@ struct Internal_ApplePayButton: View {
         label: PayWithApplePayButtonLabel,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        payWithApplePayButtonStyle: PayWithApplePayButtonStyle
     ) {
-        controller = ApplePayViewController(
+        self.controller = ApplePayViewController(
             identifier: identifier,
             configuration: configuration
         )
         self.label = label
         self.cornerRadius = cornerRadius
+        self.payWithApplePayButtonStyle = payWithApplePayButtonStyle
+        
         Task { @MainActor [controller] in
             controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
             controller.onCheckoutFail = eventHandlers.checkoutDidFail
@@ -131,16 +141,41 @@ struct Internal_ApplePayButton: View {
         }
     }
 
+    @ViewBuilder
+    private var applePayButton: some View {
+        if payWithApplePayButtonStyle == .black {
+            PayWithApplePayButton(
+                label,
+                action: { Task { await controller.onPress() } },
+                fallback: { Text("errors.applePay.unsupported".localizedString) }
+            )
+            .payWithApplePayButtonStyle(.black)
+        } else if payWithApplePayButtonStyle == .white {
+            PayWithApplePayButton(
+                label,
+                action: { Task { await controller.onPress() } },
+                fallback: { Text("errors.applePay.unsupported".localizedString) }
+            )
+            .payWithApplePayButtonStyle(.white)
+        } else if payWithApplePayButtonStyle == .whiteOutline {
+            PayWithApplePayButton(
+                label,
+                action: { Task { await controller.onPress() } },
+                fallback: { Text("errors.applePay.unsupported".localizedString) }
+            )
+            .payWithApplePayButtonStyle(.whiteOutline)
+        } else {
+            PayWithApplePayButton(
+                label,
+                action: { Task { await controller.onPress() } },
+                fallback: { Text("errors.applePay.unsupported".localizedString) }
+            )
+            .payWithApplePayButtonStyle(.automatic)
+        }
+    }
+
     var body: some View {
-        PayWithApplePayButton(
-            label,
-            action: {
-                Task { await controller.onPress() }
-            },
-            fallback: {
-                Text("errors.applePay.unsupported".localizedString)
-            }
-        )
-        .walletButtonStyle(cornerRadius: cornerRadius)
+        applePayButton
+            .walletButtonStyle(cornerRadius: cornerRadius)
     }
 }
