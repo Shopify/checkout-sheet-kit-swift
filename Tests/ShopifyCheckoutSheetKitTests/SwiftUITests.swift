@@ -41,7 +41,7 @@ class CheckoutViewControllerTests: XCTestCase {
     }
 }
 
-class CheckoutSheetTests: XCTestCase {
+class ShopifyCheckoutTests: XCTestCase {
     var checkoutURL: URL!
     var checkoutSheet: ShopifyCheckout!
 
