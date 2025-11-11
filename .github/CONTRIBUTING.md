@@ -40,18 +40,65 @@ When in doubt about whether we will be interested in including a new feature in 
 
 ## Releasing a new version
 
-Open a pull request with the following changes:
+### Preparing for a release
+
+Before creating a release, ensure the following version strings are updated and synchronized:
+
 1. Bump the [package version](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/Sources/ShopifyCheckoutSheetKit/ShopifyCheckoutSheetKit.swift#L27)
 2. Bump the [podspec version](https://github.com/Shopify/checkout-sheet-kit-swift/blob/main/ShopifyCheckoutSheetKit.podspec#L2)
 3. Add an entry to the top of the [CHANGELOG](../CHANGELOG.md)
 
-Once you have merged a pull request with these changes, you will be ready to publish a new version.
+**Important**: All three version strings must match exactly, including any pre-release suffixes (e.g., `-beta.1`, `-rc.1`).
 
-To do so, navigate to
-https://github.com/Shopify/checkout-sheet-kit-swift/releases and click "Draft a new release" then complete the following steps:
+### Version format
 
-1. Create a tag for the new version
-2. Use the same tag as the name for the version
-3. Document a full list of changes since the previous release, tagging merged pull requests where applicable, in the description box.
-4. Check "Set as the latest release" to ensure Swift Package Manager identifies this as the latest release.
-5. When ready, click "Publish release". This will ensure SPM can identity the latest version and it will kickstart the [CI process](https://github.com/Shopify/checkout-sheet-kit-swift/actions/workflows/deploy.yml) to publish a new version of the CocoaPod.
+- **Production releases**: `X.Y.Z` (e.g., `3.4.0`)
+- **Pre-releases**: `X.Y.Z-{alpha|beta|rc}.N` (e.g., `3.4.0-beta.1`, `3.4.0-rc.2`)
+
+Pre-release suffixes ensure:
+- CocoaPods users must explicitly opt-in to install pre-release versions
+- Swift Package Manager doesn't treat them as the default "latest" version
+
+### Creating a release
+
+Navigate to https://github.com/Shopify/checkout-sheet-kit-swift/releases and click "Draft a new release", then complete the following steps:
+
+#### For production releases (from `main` branch):
+
+1. Ensure you're on the `main` branch
+2. Create a tag for the new version (e.g., `3.4.0`)
+3. Use the same tag as the release title
+4. Document the full list of changes since the previous release, tagging merged pull requests where applicable
+5. ✅ Check "Set as the latest release" to ensure Swift Package Manager identifies this as the latest release
+6. Click "Publish release"
+
+#### For pre-releases (from non-`main` branch):
+
+1. Ensure you're on a feature/release branch (NOT `main`)
+2. Create a tag with a pre-release suffix (e.g., `3.4.0-beta.1`, `3.4.0-rc.2`)
+3. Use the same tag as the release title
+4. Document the changes being tested in this pre-release
+5. ✅ Check "Set as a pre-release" (NOT "Set as the latest release")
+6. Click "Publish release"
+
+### What happens after publishing
+
+When you publish a release (production or pre-release), the [publish workflow](https://github.com/Shopify/checkout-sheet-kit-swift/actions/workflows/publish.yml) will automatically:
+
+1. **Validate versions**: Ensures podspec, Swift package, and git tag versions all match
+2. **Deploy to CocoaPods**: Publishes the version to CocoaPods trunk
+3. **Swift Package Manager**: Automatically works from the git tag (no deployment needed)
+
+### Using pre-releases
+
+For users to install a pre-release version:
+
+**CocoaPods** - Must specify the exact version in Podfile:
+```ruby
+pod 'ShopifyCheckoutSheetKit', '3.4.0-beta.1'
+```
+
+**Swift Package Manager** - Must specify the exact version:
+```swift
+.package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", exact: "3.4.0-beta.1")
+```
