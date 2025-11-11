@@ -26,29 +26,32 @@ import Foundation
 /// Options for configuring checkout presentation and behavior for an individual checkout session.
 public struct CheckoutOptions {
     /// Authentication configuration, allowing identification the application initiating checkout and application of any app sepcific customizations.
-    public var authentication: Authentication?
+    public var authentication: Authentication = .none
 
     /// Entry point metadata for tracking checkout context (internal use only).
     package var entryPoint: MetaData.EntryPoint?
 
     /// Initializes checkout options.
-    /// - Parameter authentication: Optional authentication token.
-    public init(authentication: Authentication? = nil) {
+    /// - Parameter authentication: Authentication configuration for the checkout session.
+    public init(authentication: Authentication = .none) {
         self.authentication = authentication
         entryPoint = nil
     }
 
     /// Package-level initializer for internal use (e.g., AcceleratedCheckouts).
     /// - Parameters:
-    ///   - authentication: Optional authentication configuration.
+    ///   - authentication: Authentication configuration for the checkout session.
     ///   - entryPoint: Entry point metadata for tracking.
-    package init(authentication: Authentication? = nil, entryPoint: MetaData.EntryPoint?) {
+    package init(authentication: Authentication = .none, entryPoint: MetaData.EntryPoint?) {
         self.authentication = authentication
         self.entryPoint = entryPoint
     }
 
     /// Authentication options for checkout.
     public enum Authentication {
+        /// No authentication - checkout will run without app authentication.
+        case none
+
         /// Token-based authentication using a JWT token.
         /// - Parameter token: A valid JWT token string.
         case token(String)

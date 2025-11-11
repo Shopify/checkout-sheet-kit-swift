@@ -64,13 +64,12 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
 
     var checkoutURL: URL
     var delegate = CheckoutDelegateWrapper()
-    var options: CheckoutOptions?
+    var options: CheckoutOptions = .init()
 
     public init(checkout url: URL) {
         checkoutURL = url
-        options = nil
 
-        /// Programatic usage of the library will invalidate the cache each time the configuration changes.
+        /// Programmatic usage of the library will invalidate the cache each time the configuration changes.
         /// This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
         ShopifyCheckoutSheetKit.invalidateOnConfigurationChange = false
     }
@@ -135,17 +134,13 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     /// Configuration methods
 
     @discardableResult public func auth(token: String?) -> Self {
-        guard let token, !token.isEmpty else { return self }
-
-        var copy = self
-        let authentication = CheckoutOptions.Authentication.token(token)
-        if var existingOptions = copy.options {
-            existingOptions.authentication = authentication
-            copy.options = existingOptions
+        var view = self
+        if let token {
+            view.options.authentication = .token(token)
         } else {
-            copy.options = CheckoutOptions(authentication: authentication)
+            view.options.authentication = .none
         }
-        return copy
+        return view
     }
 }
 

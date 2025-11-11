@@ -167,4 +167,45 @@ class CheckoutConfigurableTests: XCTestCase {
         checkoutSheet.closeButtonTintColor(nil)
         XCTAssertNil(ShopifyCheckoutSheetKit.configuration.closeButtonTintColor)
     }
+
+    func testAuthWithToken() {
+        let token = "test-auth-token"
+        let authenticated = checkoutSheet.auth(token: token)
+
+        guard case let .token(actualToken) = authenticated.options.authentication else {
+            XCTFail("Expected authentication to be .token, but was \(authenticated.options.authentication)")
+            return
+        }
+
+        XCTAssertEqual(actualToken, token)
+    }
+
+    func testAuthWithNil() {
+        let unauthenticated = checkoutSheet.auth(token: nil)
+
+        guard case .none = unauthenticated.options.authentication else {
+            XCTFail("Expected authentication to be .none, but was \(unauthenticated.options.authentication)")
+            return
+        }
+    }
+
+    func testAuthClearsTokenWhenSetToNil() {
+        // First set a token
+        let token = "initial-token"
+        let authenticated = checkoutSheet.auth(token: token)
+
+        guard case let .token(actualToken) = authenticated.options.authentication else {
+            XCTFail("Expected authentication to be .token")
+            return
+        }
+        XCTAssertEqual(actualToken, token)
+
+        // Then clear it by passing nil
+        let cleared = authenticated.auth(token: nil)
+
+        guard case .none = cleared.options.authentication else {
+            XCTFail("Expected authentication to be .none after clearing, but was \(cleared.options.authentication)")
+            return
+        }
+    }
 }
