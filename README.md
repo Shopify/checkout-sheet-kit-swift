@@ -174,6 +174,42 @@ struct ContentView: View {
 > [!TIP]
 > To help optimize and deliver the best experience, the SDK also provides a [preloading API](#preloading) which can be used to initialize the checkout session ahead of time.
 
+### Application Authentication
+
+To allow customizing checkout with app specific branding, and/or to receive PII in checkout lifecycle events, you will need to pass an app authentication token to checkout via `CheckoutOptions` when calling `preload` or `present`.
+
+#### Programmatic Usage
+
+```swift
+let options = CheckoutOptions(authentication: .token(jwtToken))
+
+ShopifyCheckoutSheetKit.preload(checkout: checkoutURL, options: options)
+
+ShopifyCheckoutSheetKit.present(checkout: checkoutURL, from: self, delegate: self, options: options)
+```
+
+#### SwiftUI Usage
+
+For SwiftUI, use the `.auth()` modifier:
+
+```swift
+CheckoutSheet(checkout: checkoutURL)
+  .auth(token: jwtToken)
+  .onComplete { event in
+    handleCompletedEvent(event)
+  }
+```
+
+The `.auth()` modifier accepts an optional token, so you can safely call it with `nil` for unauthenticated checkouts:
+
+```swift
+CheckoutSheet(checkout: checkoutURL)
+  .auth(token: optionalToken) // token can be nil
+```
+
+> [!NOTE]
+> Tokens are embedded in the checkout URL and should be treated as secrets. Avoid logging the URL or persisting it beyond the lifetime of the session.
+
 ## Configuration
 
 The SDK provides a way to customize the presented checkout experience via the `ShopifyCheckoutSheetKit.configuration` object.
