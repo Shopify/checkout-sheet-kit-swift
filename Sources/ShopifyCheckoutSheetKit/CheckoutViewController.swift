@@ -40,7 +40,7 @@ public class CheckoutViewController: UINavigationController {
 
 /// Deprecated
 extension CheckoutViewController {
-    @available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
+    @available(*, deprecated, message: "Use \"ShopifyCheckout\" instead.")
     public struct Representable: UIViewControllerRepresentable {
         @Binding var checkoutURL: URL?
 
@@ -59,7 +59,7 @@ extension CheckoutViewController {
     }
 }
 
-public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable {
+public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurable {
     public typealias UIViewControllerType = CheckoutViewController
 
     var checkoutURL: URL
@@ -70,7 +70,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
         checkoutURL = url
         options = nil
 
-        /// Programatic usage of the library will invalidate the cache each time the configuration changes.
+        /// Programmatic usage of the library will invalidate the cache each time the configuration changes.
         /// This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
         ShopifyCheckoutSheetKit.invalidateOnConfigurationChange = false
     }
