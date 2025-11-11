@@ -88,6 +88,7 @@ struct ButtonSet: View {
                         variantID: productVariant.id,
                         quantity: firstVariantQuantity
                     )
+                    .applePayStyle(.whiteOutline)
                     .applePayLabel(.buy)
                     .cornerRadius(24)
                     .wallets([.applePay, .shopPay])
