@@ -40,7 +40,7 @@ public class CheckoutViewController: UINavigationController {
 
 /// Deprecated
 extension CheckoutViewController {
-    @available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
+    @available(*, deprecated, message: "Use \"ShopifyCheckout\" instead.")
     public struct Representable: UIViewControllerRepresentable {
         @Binding var checkoutURL: URL?
 
@@ -59,7 +59,7 @@ extension CheckoutViewController {
     }
 }
 
-public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable {
+public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurable {
     public typealias UIViewControllerType = CheckoutViewController
 
     var checkoutURL: URL

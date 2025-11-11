@@ -41,14 +41,14 @@ class CheckoutViewControllerTests: XCTestCase {
     }
 }
 
-class CheckoutSheetTests: XCTestCase {
+class ShopifyCheckoutTests: XCTestCase {
     var checkoutURL: URL!
-    var checkoutSheet: CheckoutSheet!
+    var checkoutSheet: ShopifyCheckout!
 
     override func setUp() {
         super.setUp()
         checkoutURL = URL(string: "https://www.shopify.com")
-        checkoutSheet = CheckoutSheet(checkout: checkoutURL)
+        checkoutSheet = ShopifyCheckout(checkout: checkoutURL)
     }
 
     /// Lifecycle events
@@ -123,12 +123,12 @@ class CheckoutSheetTests: XCTestCase {
 
 class CheckoutConfigurableTests: XCTestCase {
     var checkoutURL: URL!
-    var checkoutSheet: CheckoutSheet!
+    var checkoutSheet: ShopifyCheckout!
 
     override func setUp() {
         super.setUp()
         checkoutURL = URL(string: "https://www.shopify.com")
-        checkoutSheet = CheckoutSheet(checkout: checkoutURL)
+        checkoutSheet = ShopifyCheckout(checkout: checkoutURL)
     }
 
     /// Configuration modifiers

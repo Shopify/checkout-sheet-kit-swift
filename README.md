@@ -138,7 +138,7 @@ struct ContentView: View {
     }
     .sheet(isPresented: $isPresented) {
       if let url = checkoutURL {
-        CheckoutSheet(url: url)
+        ShopifyCheckout(checkout: url)
            /// Configuration
            .title("Checkout")
            .colorScheme(.automatic)
@@ -193,7 +193,7 @@ ShopifyCheckoutSheetKit.present(checkout: checkoutURL, from: self, delegate: sel
 For SwiftUI, use the `.auth()` modifier:
 
 ```swift
-CheckoutSheet(checkout: checkoutURL)
+ShopifyCheckout(checkout: checkoutURL)
   .auth(token: jwtToken)
   .onComplete { event in
     handleCompletedEvent(event)
@@ -203,7 +203,7 @@ CheckoutSheet(checkout: checkoutURL)
 The `.auth()` modifier accepts an optional token, so you can safely call it with `nil` for unauthenticated checkouts:
 
 ```swift
-CheckoutSheet(checkout: checkoutURL)
+ShopifyCheckout(checkout: checkoutURL)
   .auth(token: optionalToken) // token can be nil
 ```
 
@@ -313,7 +313,7 @@ ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = .systemRed
 Similarly, configuration modifiers are available to set the configuration of your checkout when using SwiftUI:
 
 ```swift
-CheckoutSheet(checkout: checkoutURL)
+ShopifyCheckout(checkout: checkoutURL)
   .title("Checkout")
   .colorScheme(.automatic)
   .tintColor(.blue)
