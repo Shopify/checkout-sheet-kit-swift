@@ -50,6 +50,7 @@ public struct AcceleratedCheckoutButtons: View {
 
     /// The Apple Pay button label style
     private var applePayLabel: PayWithApplePayButtonLabel = .plain
+    private var applePayColor: PayWithApplePayButtonStyle = .automatic
 
     @State private var shopSettings: ShopSettings?
     @State private var currentRenderState: RenderState = .loading {
@@ -137,6 +138,12 @@ public struct AcceleratedCheckoutButtons: View {
 
 @available(iOS 16.0, *)
 extension AcceleratedCheckoutButtons {
+    public func applePayColor(_ color: PayWithApplePayButtonStyle) -> AcceleratedCheckoutButtons {
+        var view = self
+        view.applePayColor = color
+        return view
+    }
+
     public func applePayLabel(_ label: PayWithApplePayButtonLabel) -> AcceleratedCheckoutButtons {
         var view = self
         view.applePayLabel = label

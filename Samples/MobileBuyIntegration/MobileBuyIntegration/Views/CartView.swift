@@ -62,6 +62,10 @@ struct CartView: View {
                             .onCancel {
                                 print("Accelerated checkout cancelled")
                             }
+                            .applePayColor(.white)
+                            // .applePayColor(.black)
+                            // .applePayColor(.automatic)
+                            // .applePayColor(.whiteOutline)
                             .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
                             .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
                     }
