@@ -40,7 +40,7 @@ public class CheckoutViewController: UINavigationController {
 
 /// Deprecated
 extension CheckoutViewController {
-    @available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
+    @available(*, deprecated, message: "Use \"ShopifyCheckout\" instead.")
     public struct Representable: UIViewControllerRepresentable {
         @Binding var checkoutURL: URL?
 
@@ -59,18 +59,17 @@ extension CheckoutViewController {
     }
 }
 
-public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable {
+public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurable {
     public typealias UIViewControllerType = CheckoutViewController
 
     var checkoutURL: URL
     var delegate = CheckoutDelegateWrapper()
-    var options: CheckoutOptions?
+    var options: CheckoutOptions = .init()
 
-    public init(checkout url: URL, options: CheckoutOptions? = nil) {
+    public init(checkout url: URL) {
         checkoutURL = url
-        self.options = options
 
-        /// Programatic usage of the library will invalidate the cache each time the configuration changes.
+        /// Programmatic usage of the library will invalidate the cache each time the configuration changes.
         /// This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
         ShopifyCheckoutSheetKit.invalidateOnConfigurationChange = false
     }
@@ -130,6 +129,18 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     @discardableResult public func onPaymentChangeIntent(_ action: @escaping (CheckoutCardChangeRequested) -> Void) -> Self {
         delegate.onPaymentChangeRequested = action
         return self
+    }
+
+    /// Configuration methods
+
+    @discardableResult public func auth(token: String?) -> Self {
+        var view = self
+        if let token {
+            view.options.authentication = .token(token)
+        } else {
+            view.options.authentication = .none
+        }
+        return view
     }
 }
 

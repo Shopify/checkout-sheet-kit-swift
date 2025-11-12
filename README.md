@@ -138,7 +138,7 @@ struct ContentView: View {
     }
     .sheet(isPresented: $isPresented) {
       if let url = checkoutURL {
-        CheckoutSheet(url: url)
+        ShopifyCheckout(checkout: url)
            /// Configuration
            .title("Checkout")
            .colorScheme(.automatic)
@@ -173,6 +173,42 @@ struct ContentView: View {
 
 > [!TIP]
 > To help optimize and deliver the best experience, the SDK also provides a [preloading API](#preloading) which can be used to initialize the checkout session ahead of time.
+
+### Application Authentication
+
+To allow customizing checkout with app specific branding, and/or to receive PII in checkout lifecycle events, you will need to pass an app authentication token to checkout via `CheckoutOptions` when calling `preload` or `present`.
+
+#### Programmatic Usage
+
+```swift
+let options = CheckoutOptions(authentication: .token(jwtToken))
+
+ShopifyCheckoutSheetKit.preload(checkout: checkoutURL, options: options)
+
+ShopifyCheckoutSheetKit.present(checkout: checkoutURL, from: self, delegate: self, options: options)
+```
+
+#### SwiftUI Usage
+
+For SwiftUI, use the `.auth()` modifier:
+
+```swift
+ShopifyCheckout(checkout: checkoutURL)
+  .auth(token: jwtToken)
+  .onComplete { event in
+    handleCompletedEvent(event)
+  }
+```
+
+The `.auth()` modifier accepts an optional token, so you can safely call it with `nil` for unauthenticated checkouts:
+
+```swift
+ShopifyCheckout(checkout: checkoutURL)
+  .auth(token: optionalToken) // token can be nil
+```
+
+> [!NOTE]
+> Tokens are embedded in the checkout URL and should be treated as secrets. Avoid logging the URL or persisting it beyond the lifetime of the session.
 
 ## Configuration
 
@@ -277,7 +313,7 @@ ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = .systemRed
 Similarly, configuration modifiers are available to set the configuration of your checkout when using SwiftUI:
 
 ```swift
-CheckoutSheet(checkout: checkoutURL)
+ShopifyCheckout(checkout: checkoutURL)
   .title("Checkout")
   .colorScheme(.automatic)
   .tintColor(.blue)

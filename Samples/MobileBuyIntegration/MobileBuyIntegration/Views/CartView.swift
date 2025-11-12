@@ -122,7 +122,8 @@ struct CartView: View {
             }
             .sheet(isPresented: $showCheckoutSheet) {
                 if let url = cartManager.cart?.checkoutUrl {
-                    CheckoutSheet(checkout: url)
+                    ShopifyCheckout(checkout: url)
+                        // .auth(token: "your-auth-token-here") // Uncomment to add authentication
                         .colorScheme(.automatic)
                         .onCancel {
                             showCheckoutSheet = false
