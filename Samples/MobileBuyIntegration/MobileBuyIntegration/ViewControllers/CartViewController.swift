@@ -21,8 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 @preconcurrency import Buy
 import Combine
+import OSLog
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import SwiftUI
@@ -508,7 +510,35 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc private func presentCheckout() {
         guard let url = CartManager.shared.cart?.checkoutUrl else { return }
 
-        ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
+        if AuthenticationService.shared.hasConfiguration() {
+            DispatchQueue.global().async { [weak self] in
+                guard let self = self else { return }
+
+                _Concurrency.Task {
+                    do {
+                        let token = try await AuthenticationService.shared.fetchAccessToken()
+                        let options = CheckoutOptions(authentication: .token(token))
+                        OSLogger.shared.debug("[CartViewController] Authentication token fetched successfully")
+
+                        await MainActor.run {
+                            ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
+                            ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self, options: options)
+                        }
+                    } catch {
+                        OSLogger.shared.debug("[CartViewController] Failed to fetch authentication token: \(error.localizedDescription)")
+
+                        await MainActor.run {
+                            ShopifyCheckoutSheetKit.preload(checkout: url)
+                            ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self, options: nil)
+                        }
+                    }
+                }
+            }
+        } else {
+            OSLogger.shared.debug("[CartViewController] Authentication not configured, proceeding without token")
+            ShopifyCheckoutSheetKit.preload(checkout: url)
+            ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self, options: nil)
+        }
     }
 
     @objc private func resetCart() {

@@ -32,7 +32,7 @@ public final class AppConfiguration: ObservableObject {
     @Published public var universalLinks = UniversalLinks()
 
     /// Prefill buyer information
-    @AppStorage("useVaultedState") public var useVaultedState: Bool = false
+    @AppStorage("useVaultedState_forcedToTrue") public var useVaultedState: Bool = true
 
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
