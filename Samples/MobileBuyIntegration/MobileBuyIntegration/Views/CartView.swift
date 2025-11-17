@@ -145,7 +145,7 @@ struct CartView: View {
 
                             // Respond with hardcoded address after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                let hardcodedAddress = CartAddress(
+                                let hardcodedAddress = CartDeliveryAddress(
                                     firstName: "Jane",
                                     lastName: "Smith",
                                     address1: "456 SwiftUI Avenue",
@@ -158,7 +158,7 @@ struct CartView: View {
                                 )
 
                                 let addressInput = CartSelectableAddress(
-                                    address: hardcodedAddress)
+                                    address: .deliveryAddress(hardcodedAddress))
                                 let delivery = CartDelivery(addresses: [addressInput])
                                 let response = DeliveryAddressChangePayload(delivery: delivery)
 
