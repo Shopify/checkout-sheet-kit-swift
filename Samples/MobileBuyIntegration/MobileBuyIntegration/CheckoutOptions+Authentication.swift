@@ -22,8 +22,8 @@
  */
 
 import Foundation
-import ShopifyCheckoutSheetKit
 import OSLog
+import ShopifyCheckoutSheetKit
 
 extension CheckoutOptions {
     static func withAccessToken() async -> CheckoutOptions? {

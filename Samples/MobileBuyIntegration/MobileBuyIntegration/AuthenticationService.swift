@@ -36,8 +36,8 @@ actor TokenManager {
 
     func getValidToken() -> String? {
         guard let token = cachedToken,
-            let expiry = tokenExpiryDate,
-            expiry > Date().addingTimeInterval(minimumTokenLifetime)
+              let expiry = tokenExpiryDate,
+              expiry > Date().addingTimeInterval(minimumTokenLifetime)
         else {
             return nil
         }
@@ -47,7 +47,7 @@ actor TokenManager {
     func cacheToken(_ token: String, expiresIn: Int?) {
         cachedToken = token
 
-        if let expiresIn = expiresIn {
+        if let expiresIn {
             let ttl = max(TimeInterval(expiresIn) - tokenBufferTime, minimumTokenLifetime)
             tokenExpiryDate = Date().addingTimeInterval(ttl)
             OSLogger.shared.debug("[AuthenticationService] Token cached with TTL: \(ttl) seconds")
@@ -84,9 +84,9 @@ class AuthenticationService {
 
     private init() {
         let info = InfoDictionary.shared
-        self.clientId = info.clientId
-        self.clientSecret = info.clientSecret
-        self.authEndpoint = info.authEndpoint
+        clientId = info.clientId
+        clientSecret = info.clientSecret
+        authEndpoint = info.authEndpoint
 
         if authEndpoint.isEmpty {
             OSLogger.shared.debug(
@@ -153,7 +153,7 @@ class AuthenticationService {
     }
 
     private func fetchNewAccessToken() async throws -> String {
-        guard !clientId.isEmpty && !clientSecret.isEmpty else {
+        guard !clientId.isEmpty, !clientSecret.isEmpty else {
             throw AuthError.missingCredentials
         }
 
@@ -176,7 +176,7 @@ class AuthenticationService {
         let body: [String: Any] = [
             "client_id": clientId,
             "client_secret": clientSecret,
-            "grant_type": "client_credentials",
+            "grant_type": "client_credentials"
         ]
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -227,7 +227,7 @@ class AuthenticationService {
                 return "Authentication credentials not configured"
             case .invalidEndpoint:
                 return "Invalid or missing authentication endpoint"
-            case .requestFailed(let statusCode):
+            case let .requestFailed(statusCode):
                 return "Authentication request failed with status code: \(statusCode)"
             case .invalidResponse:
                 return "Invalid response from authentication server"
@@ -245,7 +245,7 @@ class AuthenticationService {
             case accessToken = "access_token"
             case tokenType = "token_type"
             case expiresIn = "expires_in"
-            case scope = "scope"
+            case scope
         }
     }
 }

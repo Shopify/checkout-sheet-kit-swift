@@ -52,7 +52,7 @@ class AddressSelectionViewController: UIViewController {
                 zip: InfoDictionary.shared.zip
             )
         ),
-        
+
         AddressOption(
             label: "Valid Address lane",
             address: CartAddress(

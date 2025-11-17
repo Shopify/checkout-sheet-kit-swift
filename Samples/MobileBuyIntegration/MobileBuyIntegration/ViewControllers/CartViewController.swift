@@ -21,9 +21,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Foundation
 @preconcurrency import Buy
 import Combine
+import Foundation
 import OSLog
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
