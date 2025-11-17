@@ -39,6 +39,7 @@
 		CB476E0F2E97CAC200878439 /* AddressSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */; };
 		CBC3DEFC2EA684C000120CA1 /* CardSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3DEFB2EA684C000120CA1 /* CardSelectionViewController.swift */; };
 		F96052895F6042C5BEF1738A /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F96052895F6042C5BEF1738B /* AuthenticationService.swift */; };
+		F96052895F6042C5BEF1738C /* CheckoutOptions+Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = F96052895F6042C5BEF1738D /* CheckoutOptions+Authentication.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +77,7 @@
 		CB476E0D2E97CAC200878439 /* AddressSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSelectionViewController.swift; sourceTree = "<group>"; };
 		CBC3DEFB2EA684C000120CA1 /* CardSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSelectionViewController.swift; sourceTree = "<group>"; };
 		F96052895F6042C5BEF1738B /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
+		F96052895F6042C5BEF1738D /* CheckoutOptions+Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CheckoutOptions+Authentication.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */,
 				4EBBA7A92A5F124F00193E19 /* StorefrontClient.swift */,
 				F96052895F6042C5BEF1738B /* AuthenticationService.swift */,
+				F96052895F6042C5BEF1738D /* CheckoutOptions+Authentication.swift */,
 				6A3393642CEF9E7F00E89FAA /* Theme.swift */,
 				CB05E6C72D4B81B200466376 /* Views */,
 				CB05E6C82D4B81EF00466376 /* ViewControllers */,
@@ -329,6 +332,7 @@
 				86250DE42AD5521C002E45C2 /* AppConfiguration.swift in Sources */,
 				4EBBA7AA2A5F124F00193E19 /* StorefrontClient.swift in Sources */,
 				F96052895F6042C5BEF1738A /* AuthenticationService.swift in Sources */,
+				F96052895F6042C5BEF1738C /* CheckoutOptions+Authentication.swift in Sources */,
 				CB36134B2E98065800BBE31D /* ShopifyCheckoutViewController.swift in Sources */,
 				CB05E6BF2D4951DA00466376 /* InfoDictionary.swift in Sources */,
 				6A257A152AFBB06300610DA5 /* Logger.swift in Sources */,

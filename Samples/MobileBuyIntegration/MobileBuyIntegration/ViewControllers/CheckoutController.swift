@@ -45,25 +45,12 @@ class CheckoutController: UIViewController {
     public func present(checkout url: URL) {
         if let rootViewController = window?.topMostViewController() {
             _Concurrency.Task {
-                var options: CheckoutOptions?
-
-                if AuthenticationService.shared.hasConfiguration() {
-                    do {
-                        let token = try await AuthenticationService.shared.fetchAccessToken()
-                        options = CheckoutOptions(authentication: .token(token))
-                        OSLogger.shared.debug("[CheckoutController] Authentication token fetched successfully")
-                    } catch {
-                        OSLogger.shared.error("[CheckoutController] Failed to fetch authentication token: \(error.localizedDescription)")
-                    }
-                } else {
-                    OSLogger.shared.debug("[CheckoutController] Authentication not configured, proceeding without token")
-                }
-
+                let options = await CheckoutOptions.withAccessToken()
                 await MainActor.run {
                     ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
                     ShopifyCheckoutSheetKit.present(checkout: url, from: rootViewController, delegate: self, options: options)
-                    self.root = rootViewController
                 }
+                self.root = rootViewController
             }
         }
     }

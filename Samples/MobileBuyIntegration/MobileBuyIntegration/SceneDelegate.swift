@@ -80,6 +80,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         CheckoutController.shared = CheckoutController(window: window)
 
         self.window = window
+
+        AuthenticationService.shared.prefetchTokenInBackground()
     }
 
     private func subscribeToColorSchemeChanges() {
@@ -265,42 +267,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     public func presentBuyNow(checkoutURL: URL) {
         OSLogger.shared.debug("[SceneDelegate] presentBuyNow called with URL: \(checkoutURL)")
 
-        if AuthenticationService.shared.hasConfiguration() {
-            OSLogger.shared.debug("[SceneDelegate] Authentication is configured, fetching token for Buy Now")
+        _Concurrency.Task {
+            let options = await CheckoutOptions.withAccessToken()
 
-            _Concurrency.Task {
-                do {
-                    let token = try await AuthenticationService.shared.fetchAccessToken()
-                    let options = CheckoutOptions(authentication: .token(token))
-                    OSLogger.shared.debug("[SceneDelegate] Successfully fetched auth token for Buy Now")
-
-                    await MainActor.run {
-                        ShopifyCheckoutSheetKit.preload(checkout: checkoutURL, options: options)
-                        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL, options: options)
-                        let navController = UINavigationController(rootViewController: embeddedCheckout)
-                        navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-                        self.window?.topMostViewController()?.present(navController, animated: true)
-                    }
-                } catch {
-                    OSLogger.shared.error("[SceneDelegate] Failed to fetch auth token for Buy Now: \(error.localizedDescription)")
-
-                    // Present without auth on failure
-                    await MainActor.run {
-                        ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
-                        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL)
-                        let navController = UINavigationController(rootViewController: embeddedCheckout)
-                        navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-                        self.window?.topMostViewController()?.present(navController, animated: true)
-                    }
-                }
+            await MainActor.run {
+                ShopifyCheckoutSheetKit.preload(checkout: checkoutURL, options: options)
+                let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL, options: options)
+                let navController = UINavigationController(rootViewController: embeddedCheckout)
+                navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+                self.window?.topMostViewController()?.present(navController, animated: true)
             }
-        } else {
-            OSLogger.shared.debug("[SceneDelegate] Authentication not configured, presenting Buy Now without token")
-            ShopifyCheckoutSheetKit.preload(checkout: checkoutURL)
-            let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL)
-            let navController = UINavigationController(rootViewController: embeddedCheckout)
-            navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-            window?.topMostViewController()?.present(navController, animated: true)
         }
     }
 
