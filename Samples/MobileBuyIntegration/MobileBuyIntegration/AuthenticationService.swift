@@ -1,7 +1,54 @@
 import Foundation
 import OSLog
-import UIKit
 import ShopifyCheckoutSheetKit
+import UIKit
+
+actor TokenManager {
+    private var cachedToken: String?
+    private var tokenExpiryDate: Date?
+    private var tokenFetchTask: Task<String, Error>?
+
+    private let minimumTokenLifetime: TimeInterval = 5 * 60
+    private let tokenBufferTime: TimeInterval = 5 * 60
+
+    func getValidToken() -> String? {
+        guard let token = cachedToken,
+            let expiry = tokenExpiryDate,
+            expiry > Date().addingTimeInterval(minimumTokenLifetime)
+        else {
+            return nil
+        }
+        return token
+    }
+
+    func cacheToken(_ token: String, expiresIn: Int?) {
+        cachedToken = token
+
+        if let expiresIn = expiresIn {
+            let ttl = max(TimeInterval(expiresIn) - tokenBufferTime, minimumTokenLifetime)
+            tokenExpiryDate = Date().addingTimeInterval(ttl)
+            OSLogger.shared.debug("[AuthenticationService] Token cached with TTL: \(ttl) seconds")
+        } else {
+            tokenExpiryDate = Date().addingTimeInterval(55 * 60)
+            OSLogger.shared.debug(
+                "[AuthenticationService] Token cached with default TTL: 55 minutes"
+            )
+        }
+    }
+
+    func getExistingTask() -> Task<String, Error>? {
+        return tokenFetchTask
+    }
+
+    func setTask(_ task: Task<String, Error>?) {
+        tokenFetchTask = task
+    }
+
+    func remainingTokenLifetime() -> TimeInterval? {
+        guard let expiry = tokenExpiryDate else { return nil }
+        return expiry.timeIntervalSinceNow
+    }
+}
 
 class AuthenticationService {
     static let shared = AuthenticationService()
@@ -10,13 +57,7 @@ class AuthenticationService {
     private let clientSecret: String
     private let authEndpoint: String
 
-    private var cachedToken: String?
-    private var tokenExpiryDate: Date?
-    private var tokenFetchTask: Task<String, Error>?
-    private let tokenLock = NSLock()
-
-    private let minimumTokenLifetime: TimeInterval = 5 * 60
-    private let tokenBufferTime: TimeInterval = 5 * 60
+    private let tokenManager = TokenManager()
 
     private init() {
         let info = InfoDictionary.shared
@@ -25,38 +66,43 @@ class AuthenticationService {
         self.authEndpoint = info.authEndpoint
 
         if authEndpoint.isEmpty {
-            OSLogger.shared.debug("[AuthenticationService] Warning: ShopifyAuthEndpoint not configured")
+            OSLogger.shared.debug(
+                "[AuthenticationService] Warning: ShopifyAuthEndpoint not configured"
+            )
         }
     }
 
     func getAccessToken() async throws -> String {
-        tokenLock.lock()
-        defer { tokenLock.unlock() }
-
-        if let token = validCachedToken() {
-            OSLogger.shared.debug("[AuthenticationService] Using cached token with remaining lifetime: \(remainingTokenLifetime() ?? 0) seconds")
+        // Check for valid cached token
+        if let token = await tokenManager.getValidToken() {
+            let remaining = await tokenManager.remainingTokenLifetime() ?? 0
+            OSLogger.shared.debug(
+                "[AuthenticationService] Using cached token with remaining lifetime: \(remaining) seconds"
+            )
             return token
         }
 
-        if let existingTask = tokenFetchTask {
-            tokenLock.unlock()
+        // Check for existing fetch task
+        if let existingTask = await tokenManager.getExistingTask() {
             OSLogger.shared.debug("[AuthenticationService] Waiting for existing token fetch")
-            let result = try await existingTask.value
-            tokenLock.lock()
-            return result
+            return try await existingTask.value
         }
 
+        // Create new fetch task
         let task = Task<String, Error> {
             try await self.fetchNewAccessToken()
         }
-        tokenFetchTask = task
 
-        tokenLock.unlock()
-        let token = try await task.value
-        tokenLock.lock()
+        await tokenManager.setTask(task)
 
-        tokenFetchTask = nil
-        return token
+        do {
+            let token = try await task.value
+            await tokenManager.setTask(nil)
+            return token
+        } catch {
+            await tokenManager.setTask(nil)
+            throw error
+        }
     }
 
     func fetchAccessToken() async throws -> String {
@@ -72,9 +118,13 @@ class AuthenticationService {
         Task {
             do {
                 _ = try await getAccessToken()
-                OSLogger.shared.debug("[AuthenticationService] Successfully prefetched token in background")
+                OSLogger.shared.debug(
+                    "[AuthenticationService] Successfully prefetched token in background"
+                )
             } catch {
-                OSLogger.shared.error("[AuthenticationService] Failed to prefetch token: \(error.localizedDescription)")
+                OSLogger.shared.error(
+                    "[AuthenticationService] Failed to prefetch token: \(error.localizedDescription)"
+                )
             }
         }
     }
@@ -90,7 +140,9 @@ class AuthenticationService {
         }
 
         guard let url = URL(string: authEndpoint) else {
-            OSLogger.shared.error("[AuthenticationService] Failed to create URL from: '\(authEndpoint)'")
+            OSLogger.shared.error(
+                "[AuthenticationService] Failed to create URL from: '\(authEndpoint)'"
+            )
             throw AuthError.invalidEndpoint
         }
 
@@ -101,12 +153,14 @@ class AuthenticationService {
         let body: [String: Any] = [
             "client_id": clientId,
             "client_secret": clientSecret,
-            "grant_type": "client_credentials"
+            "grant_type": "client_credentials",
         ]
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        OSLogger.shared.debug("[AuthenticationService] Fetching new access token from \(authEndpoint)")
+        OSLogger.shared.debug(
+            "[AuthenticationService] Fetching new access token from \(authEndpoint)"
+        )
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
@@ -115,7 +169,9 @@ class AuthenticationService {
         }
 
         guard httpResponse.statusCode == 200 else {
-            OSLogger.shared.error("[AuthenticationService] Failed to fetch access token: HTTP \(httpResponse.statusCode)")
+            OSLogger.shared.error(
+                "[AuthenticationService] Failed to fetch access token: HTTP \(httpResponse.statusCode)"
+            )
             throw AuthError.requestFailed(statusCode: httpResponse.statusCode)
         }
 
@@ -123,44 +179,16 @@ class AuthenticationService {
 
         OSLogger.shared.debug("[AuthenticationService] Successfully fetched new access token")
 
-        cacheToken(tokenResponse)
+        await tokenManager.cacheToken(tokenResponse.accessToken, expiresIn: tokenResponse.expiresIn)
 
         return tokenResponse.accessToken
     }
 
-    private func cacheToken(_ response: TokenResponse) {
-        tokenLock.lock()
-        defer { tokenLock.unlock() }
-
-        cachedToken = response.accessToken
-
-        if let expiresIn = response.expiresIn {
-            let ttl = max(TimeInterval(expiresIn) - tokenBufferTime, minimumTokenLifetime)
-            tokenExpiryDate = Date().addingTimeInterval(ttl)
-            OSLogger.shared.debug("[AuthenticationService] Token cached with TTL: \(ttl) seconds")
-        } else {
-            tokenExpiryDate = Date().addingTimeInterval(55 * 60)
-            OSLogger.shared.debug("[AuthenticationService] Token cached with default TTL: 55 minutes")
-        }
-    }
-
-    private func validCachedToken() -> String? {
-        guard let token = cachedToken,
-              let expiry = tokenExpiryDate,
-              expiry > Date().addingTimeInterval(minimumTokenLifetime) else {
-            return nil
-        }
-        return token
-    }
-
-    private func remainingTokenLifetime() -> TimeInterval? {
-        guard let expiry = tokenExpiryDate else { return nil }
-        return expiry.timeIntervalSinceNow
-    }
-
     func hasConfiguration() -> Bool {
         let configured = !clientId.isEmpty && !clientSecret.isEmpty && !authEndpoint.isEmpty
-        OSLogger.shared.debug("[AuthenticationService] hasConfiguration called - clientId: \(!clientId.isEmpty), clientSecret: \(!clientSecret.isEmpty), authEndpoint: \(!authEndpoint.isEmpty), result: \(configured)")
+        OSLogger.shared.debug(
+            "[AuthenticationService] hasConfiguration called - clientId: \(!clientId.isEmpty), clientSecret: \(!clientSecret.isEmpty), authEndpoint: \(!authEndpoint.isEmpty), result: \(configured)"
+        )
         return configured
     }
 
