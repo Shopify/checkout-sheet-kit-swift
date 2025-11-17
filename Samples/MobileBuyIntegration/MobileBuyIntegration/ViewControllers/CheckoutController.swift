@@ -56,7 +56,7 @@ class CheckoutController: UIViewController {
     }
 
     public func preload() {
-//        CartManager.shared.preloadCheckout()
+        CartManager.shared.preloadCheckout()
     }
 }
 
