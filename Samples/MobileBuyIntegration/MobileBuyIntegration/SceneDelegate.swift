@@ -264,20 +264,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         CheckoutController.shared?.present(checkout: url)
     }
 
-    public func presentBuyNow(checkoutURL: URL) {
+    @MainActor
+    public func presentBuyNow(checkoutURL: URL) async {
         OSLogger.shared.debug("[SceneDelegate] presentBuyNow called with URL: \(checkoutURL)")
 
-        _Concurrency.Task {
-            let options = await CheckoutOptions.withAccessToken()
+        let options = await CheckoutOptions.withAccessToken()
 
-            await MainActor.run {
-                ShopifyCheckoutSheetKit.preload(checkout: checkoutURL, options: options)
-                let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL, options: options)
-                let navController = UINavigationController(rootViewController: embeddedCheckout)
-                navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-                self.window?.topMostViewController()?.present(navController, animated: true)
-            }
-        }
+        ShopifyCheckoutSheetKit.preload(checkout: checkoutURL, options: options)
+        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL, options: options)
+        let navController = UINavigationController(rootViewController: embeddedCheckout)
+        navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.window?.topMostViewController()?.present(navController, animated: true)
     }
 
     func navigateTo(_ screen: Screen) {
