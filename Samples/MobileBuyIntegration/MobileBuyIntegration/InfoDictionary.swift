@@ -33,6 +33,9 @@ class InfoDictionary {
     let address1, address2, city, country, firstName, lastName, province, zip,
         email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
 
+    // Optional
+    let webviewCustomHeader, webviewCustomHeaderValue: String?
+
     init() {
         guard
             let infoPlist = Bundle.main.infoDictionary,
@@ -70,5 +73,9 @@ class InfoDictionary {
         self.version = version
         self.buildNumber = buildNumber
         self.merchantIdentifier = merchantIdentifier
+
+        // Optional values
+        self.webviewCustomHeader = infoPlist["WebviewCustomHeader"] as? String
+        self.webviewCustomHeaderValue = infoPlist["WebviewCustomHeaderValue"] as? String
     }
 }

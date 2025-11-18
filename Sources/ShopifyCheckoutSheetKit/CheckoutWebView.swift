@@ -242,7 +242,14 @@ public class CheckoutWebView: WKWebView {
             request.setValue("prefetch", forHTTPHeaderField: "Shopify-Purpose")
         }
 
-        // request.setValue("09-12-amazon-poc-native-address-book", forHTTPHeaderField: "Shopify-Checkout-Preview")
+        // Apply custom headers if configured
+        if let infoDict = Bundle.main.infoDictionary,
+           let headerName = infoDict["WebviewCustomHeader"] as? String,
+           let headerValue = infoDict["WebviewCustomHeaderValue"] as? String,
+           !headerName.isEmpty,
+           !headerValue.isEmpty {
+            request.setValue(headerValue, forHTTPHeaderField: headerName)
+        }
 
         load(request)
     }

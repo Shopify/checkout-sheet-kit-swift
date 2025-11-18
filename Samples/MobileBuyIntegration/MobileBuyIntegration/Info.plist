@@ -28,6 +28,10 @@
 	<string>$(EMAIL)</string>
 	<key>Phone</key>
 	<string>$(PHONE)</string>
+	<key>WebviewCustomHeader</key>
+	<string>$(WEBVIEW_CUSTOM_HEADER)</string>
+	<key>WebviewCustomHeaderValue</key>
+	<string>$(WEBVIEW_CUSTOM_HEADER_VALUE)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location may be required to locate pickup points near you when you request this shipping option.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
