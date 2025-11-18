@@ -26,6 +26,7 @@ import WebKit
 
 protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidStartNavigation()
+    func checkoutViewDidStart(event: CheckoutStartEvent)
     func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent)
     func checkoutViewDidFinishNavigation()
     func checkoutViewDidClickLink(url: URL)
@@ -274,6 +275,10 @@ extension CheckoutWebView: WKScriptMessageHandler {
 
     private func handleBridgeRequest(_ request: any RPCRequest, viewDelegate: CheckoutWebViewDelegate) {
         switch request {
+        case let startRequest as CheckoutStartRequest:
+            OSLogger.shared.info("Checkout start event received")
+            viewDelegate.checkoutViewDidStart(event: startRequest.params)
+
         case let completeRequest as CheckoutCompleteRequest:
             OSLogger.shared.info("Checkout completed event received")
             viewDelegate.checkoutViewDidCompleteCheckout(event: completeRequest.params)

@@ -264,4 +264,48 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("card-change-456", cardRequest.id)
         XCTAssertNil(cardRequest.params.currentCard)
     }
+
+    func testDecodeSupportsCheckoutStart() throws {
+        let mock = WKScriptMessageMock(
+            body: createCheckoutStartJSON(
+                cartId: "gid://shopify/Cart/test-cart-123",
+                totalAmount: "100.00"
+            ),
+            webView: mockWebView
+        )
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let startRequest = result as? CheckoutStartRequest else {
+            XCTFail("Expected CheckoutStartRequest, got \(result)")
+            return
+        }
+
+        XCTAssertNil(startRequest.id)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", startRequest.params.cart.id)
+        XCTAssertEqual("100.00", startRequest.params.cart.cost.totalAmount.amount)
+        XCTAssertEqual("USD", startRequest.params.cart.cost.totalAmount.currencyCode)
+        XCTAssertEqual("test@example.com", startRequest.params.cart.buyerIdentity.email)
+    }
+
+    func testDecodeSupportsCheckoutComplete() throws {
+        let mock = WKScriptMessageMock(
+            body: createCheckoutCompleteJSON(
+                orderId: "gid://shopify/Order/test-order-123",
+                cartId: "gid://shopify/Cart/test-cart-123"
+            ),
+            webView: mockWebView
+        )
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let completeRequest = result as? CheckoutCompleteRequest else {
+            XCTFail("Expected CheckoutCompleteRequest, got \(result)")
+            return
+        }
+
+        XCTAssertNil(completeRequest.id)
+        XCTAssertEqual("gid://shopify/Order/test-order-123", completeRequest.params.orderConfirmation.order.id)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", completeRequest.params.cart.id)
+    }
 }

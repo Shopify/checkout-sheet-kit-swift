@@ -550,6 +550,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 }
 
 extension CartViewController: CheckoutDelegate {
+    func checkoutDidStart(event: ShopifyCheckoutSheetKit.CheckoutStartEvent) {
+        ShopifyCheckoutSheetKit.configuration.logger.log("Checkout started with cart: \(event.cart.id)")
+    }
+
     func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
         resetCart()
 

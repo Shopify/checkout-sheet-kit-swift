@@ -25,6 +25,8 @@
 import XCTest
 
 class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
+    var startEventReceived: CheckoutStartEvent?
+
     var completedEventReceived: CheckoutCompletedEvent?
 
     var errorReceived: CheckoutError?
@@ -32,6 +34,8 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
     var didStartNavigationExpectation: XCTestExpectation?
 
     var didFinishNavigationExpectation: XCTestExpectation?
+
+    var didStartExpectation: XCTestExpectation?
 
     var didCompleteCheckoutExpectation: XCTestExpectation?
 
@@ -47,6 +51,11 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 
     func checkoutViewDidStartNavigation() {
         didStartNavigationExpectation?.fulfill()
+    }
+
+    func checkoutViewDidStart(event: CheckoutStartEvent) {
+        startEventReceived = event
+        didStartExpectation?.fulfill()
     }
 
     func checkoutViewDidCompleteCheckout() {
