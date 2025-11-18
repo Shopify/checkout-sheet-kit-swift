@@ -166,7 +166,6 @@ struct ProductView: View {
         }
         .navigationTitle(product.collections.nodes.first?.title ?? product.title)
         .frame(idealWidth: 200)
-        
     }
 
     // MARK: Methods
@@ -203,7 +202,7 @@ struct ProductView: View {
                 buyNowLoading = false
 
                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let sceneDelegate = windowScene.delegate as? SceneDelegate
+                      let sceneDelegate = windowScene.delegate as? SceneDelegate
                 else { return }
                 await sceneDelegate.presentBuyNow(checkoutURL: cart.checkoutUrl)
             } catch {

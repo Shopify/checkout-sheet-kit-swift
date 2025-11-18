@@ -274,7 +274,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL, options: options)
         let navController = UINavigationController(rootViewController: embeddedCheckout)
         navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        self.window?.topMostViewController()?.present(navController, animated: true)
+        window?.topMostViewController()?.present(navController, animated: true)
     }
 
     func navigateTo(_ screen: Screen) {
