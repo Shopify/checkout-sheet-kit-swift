@@ -106,8 +106,10 @@ enum EmbedParamBuilder {
 
     private static func colorSchemeParameter(for colorScheme: Configuration.ColorScheme) -> String? {
         switch colorScheme {
-        case .web, .automatic:
+        case .web:
             return nil
+        case .automatic:
+            return "auto"
         default:
             return colorScheme.rawValue
         }

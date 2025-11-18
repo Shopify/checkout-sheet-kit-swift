@@ -65,6 +65,14 @@ final class EmbedParametersTests: XCTestCase {
         XCTAssertFalse(result.contains("colorscheme="))
     }
 
+    func test_build_withAutomaticColorScheme_setsColorSchemeToAuto() {
+        ShopifyCheckoutSheetKit.configuration.colorScheme = .automatic
+
+        let result = EmbedParamBuilder.build(entryPoint: nil)
+
+        XCTAssertTrue(result.contains("colorscheme=auto"))
+    }
+
     func test_build_withPlatformAndEntryPoint_includesPlatformAndEntryPoint() {
         ShopifyCheckoutSheetKit.configuration.platform = .reactNative
         let options = CheckoutOptions(entryPoint: .acceleratedCheckouts)
