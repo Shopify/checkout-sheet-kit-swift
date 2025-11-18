@@ -237,6 +237,16 @@ public class CheckoutWebView: WKWebView {
         var request = URLRequest(
             url: url.withEmbedParam(isRecovery: isRecovery, entryPoint: options?.entryPoint, options: options))
 
+        // Add embed parameters as header
+        let embedValue = EmbedParamBuilder.build(
+            isRecovery: isRecovery,
+            entryPoint: options?.entryPoint,
+            sourceComponents: URLComponents(url: url, resolvingAgainstBaseURL: false),
+            options: options,
+            includeAuthentication: true
+        )
+        request.setValue(embedValue, forHTTPHeaderField: "Shopify-Checkout-Embed")
+
         if isPreload, isPreloadingAvailable {
             isPreloadRequest = true
             request.setValue("prefetch", forHTTPHeaderField: "Shopify-Purpose")
