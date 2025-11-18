@@ -24,9 +24,8 @@
 import Foundation
 import OSLog
 import ShopifyCheckoutSheetKit
-import UIKit
 
-actor TokenManager {
+private actor TokenManager {
     private var cachedToken: String?
     private var tokenExpiryDate: Date?
     private var tokenFetchTask: Task<String, Error>?
@@ -126,10 +125,6 @@ class AuthenticationService {
             await tokenManager.setTask(nil)
             throw error
         }
-    }
-
-    func fetchAccessToken() async throws -> String {
-        return try await getAccessToken()
     }
 
     func prefetchTokenInBackground() {
