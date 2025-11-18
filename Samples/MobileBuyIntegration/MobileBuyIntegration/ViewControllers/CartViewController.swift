@@ -23,6 +23,8 @@
 
 @preconcurrency import Buy
 import Combine
+import Foundation
+import OSLog
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import SwiftUI
@@ -431,7 +433,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.reloadData()
 
         if let url = CartManager.shared.cart?.checkoutUrl {
-            ShopifyCheckoutSheetKit.preload(checkout: url)
+            _Concurrency.Task {
+                let options = await CheckoutOptions.withAccessToken()
+                await MainActor.run {
+                    ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
+                }
+            }
         }
     }
 
@@ -469,7 +476,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.setupCheckoutButtonContent() // Update button appearance for enabled state
                 cell.quantityLabel.text = "\(cart.lines.nodes[indexPath.item].quantity)"
 
-                ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
+                let options = await CheckoutOptions.withAccessToken()
+                await MainActor.run {
+                    ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl, options: options)
+                }
             }
         }
         return cell
@@ -508,7 +518,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc private func presentCheckout() {
         guard let url = CartManager.shared.cart?.checkoutUrl else { return }
 
-        ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
+        _Concurrency.Task {
+            let options = await CheckoutOptions.withAccessToken()
+            await MainActor.run {
+                ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
+                ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self, options: options)
+            }
+        }
     }
 
     @objc private func resetCart() {

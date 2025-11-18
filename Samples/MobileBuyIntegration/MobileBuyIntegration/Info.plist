@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>StorefrontMerchantIdentifier</key>
-	<string>$(STOREFRONT_MERCHANT_IDENTIFIER)</string>
-	<key>StorefrontDomain</key>
-	<string>$(STOREFRONT_DOMAIN)</string>
-	<key>StorefrontAccessToken</key>
-	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
 	<key>Address1</key>
 	<string>$(ADDRESS_1)</string>
 	<key>Address2</key>
@@ -16,22 +10,30 @@
 	<string>$(CITY)</string>
 	<key>Country</key>
 	<string>$(COUNTRY)</string>
-	<key>FirstName</key>
-	<string>$(FIRST_NAME)</string>
-	<key>LastName</key>
-	<string>$(LAST_NAME)</string>
-	<key>Province</key>
-	<string>$(PROVINCE)</string>
-	<key>Zip</key>
-	<string>$(ZIP)</string>
 	<key>Email</key>
 	<string>$(EMAIL)</string>
-	<key>Phone</key>
-	<string>$(PHONE)</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location may be required to locate pickup points near you when you request this shipping option.</string>
+	<key>FirstName</key>
+	<string>$(FIRST_NAME)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LastName</key>
+	<string>$(LAST_NAME)</string>
+	<key>Phone</key>
+	<string>$(PHONE)</string>
+	<key>Province</key>
+	<string>$(PROVINCE)</string>
+	<key>ShopifyAuthEndpoint</key>
+	<string>$(SHOPIFY_AUTH_ENDPOINT)</string>
+	<key>ShopifyClientId</key>
+	<string>$(SHOPIFY_CLIENT_ID)</string>
+	<key>ShopifyClientSecret</key>
+	<string>$(SHOPIFY_CLIENT_SECRET)</string>
+	<key>StorefrontAccessToken</key>
+	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
+	<key>StorefrontDomain</key>
+	<string>$(STOREFRONT_DOMAIN)</string>
+	<key>StorefrontMerchantIdentifier</key>
+	<string>$(STOREFRONT_MERCHANT_IDENTIFIER)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -49,5 +51,7 @@
 			</array>
 		</dict>
 	</dict>
+	<key>Zip</key>
+	<string>$(ZIP)</string>
 </dict>
 </plist>

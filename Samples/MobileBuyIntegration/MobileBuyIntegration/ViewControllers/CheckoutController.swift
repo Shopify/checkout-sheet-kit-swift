@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Foundation
 import OSLog
 import ShopifyCheckoutSheetKit
 import UIKit
@@ -43,8 +44,14 @@ class CheckoutController: UIViewController {
 
     public func present(checkout url: URL) {
         if let rootViewController = window?.topMostViewController() {
-            ShopifyCheckoutSheetKit.present(checkout: url, from: rootViewController, delegate: self)
-            root = rootViewController
+            _Concurrency.Task {
+                let options = await CheckoutOptions.withAccessToken()
+                await MainActor.run {
+                    ShopifyCheckoutSheetKit.preload(checkout: url, options: options)
+                    ShopifyCheckoutSheetKit.present(checkout: url, from: rootViewController, delegate: self, options: options)
+                }
+                self.root = rootViewController
+            }
         }
     }
 

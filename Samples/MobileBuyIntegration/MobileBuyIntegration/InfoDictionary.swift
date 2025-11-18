@@ -31,7 +31,18 @@ class InfoDictionary {
 
     // Required
     let address1, address2, city, country, firstName, lastName, province, zip,
-        email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
+        email, phone, domain, accessToken, version, buildNumber, merchantIdentifier, displayName: String
+
+    // Authentication
+    let clientId, clientSecret, authEndpoint: String
+
+    /// Cleans configuration strings by removing surrounding whitespace and quotes
+    /// This handles common xcconfig formatting issues
+    private static func clean(_ value: String) -> String {
+        return value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+    }
 
     init() {
         guard
@@ -50,25 +61,34 @@ class InfoDictionary {
             let accessToken = infoPlist["StorefrontAccessToken"] as? String,
             let merchantIdentifier = infoPlist["StorefrontMerchantIdentifier"] as? String,
             let version = infoPlist["CFBundleShortVersionString"] as? String,
-            let buildNumber = infoPlist["CFBundleVersion"] as? String
+            let buildNumber = infoPlist["CFBundleVersion"] as? String,
+            let clientId = infoPlist["ShopifyClientId"] as? String,
+            let clientSecret = infoPlist["ShopifyClientSecret"] as? String,
+            let displayName = infoPlist["CFBundleDisplayName"] as? String,
+            let authEndpoint = infoPlist["ShopifyAuthEndpoint"] as? String
         else {
             fatalError("Missing required configuration. Check your info.plist.")
         }
 
-        self.address1 = address1
-        self.address2 = address2
-        self.city = city
-        self.country = country
-        self.firstName = firstName
-        self.lastName = lastName
-        self.province = province
-        self.zip = zip
-        self.email = email
-        self.phone = phone
-        self.domain = domain
-        self.accessToken = accessToken
-        self.version = version
-        self.buildNumber = buildNumber
-        self.merchantIdentifier = merchantIdentifier
+        // Apply cleaning to all configuration values to handle xcconfig formatting issues
+        self.address1 = Self.clean(address1)
+        self.address2 = Self.clean(address2)
+        self.city = Self.clean(city)
+        self.country = Self.clean(country)
+        self.firstName = Self.clean(firstName)
+        self.lastName = Self.clean(lastName)
+        self.province = Self.clean(province)
+        self.zip = Self.clean(zip)
+        self.email = Self.clean(email)
+        self.phone = Self.clean(phone)
+        self.domain = Self.clean(domain)
+        self.accessToken = Self.clean(accessToken)
+        self.version = Self.clean(version)
+        self.buildNumber = Self.clean(buildNumber)
+        self.merchantIdentifier = Self.clean(merchantIdentifier)
+        self.clientId = Self.clean(clientId)
+        self.clientSecret = Self.clean(clientSecret)
+        self.displayName = Self.clean(displayName)
+        self.authEndpoint = Self.clean(authEndpoint)
     }
 }

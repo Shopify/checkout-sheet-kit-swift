@@ -22,6 +22,8 @@
  */
 
 import Combine
+import Foundation
+import OSLog
 import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
@@ -78,6 +80,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         CheckoutController.shared = CheckoutController(window: window)
 
         self.window = window
+
+        AuthenticationService.shared.prefetchTokenInBackground()
     }
 
     private func subscribeToColorSchemeChanges() {
@@ -260,11 +264,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         CheckoutController.shared?.present(checkout: url)
     }
 
-    public func presentBuyNow(checkoutURL: URL) {
-        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL)
+    @MainActor
+    public func presentBuyNow(checkoutURL: URL) async {
+        OSLogger.shared.debug("[SceneDelegate] presentBuyNow called with URL: \(checkoutURL)")
+
+        let options = await CheckoutOptions.withAccessToken()
+
+        ShopifyCheckoutSheetKit.preload(checkout: checkoutURL, options: options)
+        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL, options: options)
         let navController = UINavigationController(rootViewController: embeddedCheckout)
         navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-
         window?.topMostViewController()?.present(navController, animated: true)
     }
 

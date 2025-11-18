@@ -41,39 +41,40 @@ class AddressSelectionViewController: UIViewController {
         AddressOption(
             label: "Default",
             address: CartAddress(
-                firstName: "Evelyn",
-                lastName: "Hartley",
-                address1: "Default",
-                address2: "",
-                city: "Toronto",
-                countryCode: "CA",
-                phone: "+1-888-746-7439",
-                provinceCode: "ON",
-                zip: "M5V 1M7"
+                firstName: InfoDictionary.shared.firstName,
+                lastName: InfoDictionary.shared.lastName,
+                address1: InfoDictionary.shared.address1,
+                address2: InfoDictionary.shared.address2,
+                city: InfoDictionary.shared.city,
+                countryCode: InfoDictionary.shared.country,
+                phone: InfoDictionary.shared.phone,
+                provinceCode: InfoDictionary.shared.province,
+                zip: InfoDictionary.shared.zip
             )
         ),
+
         AddressOption(
-            label: "Happy path lane",
+            label: "Valid Address lane",
             address: CartAddress(
                 firstName: "Evelyn",
                 lastName: "Hartley",
-                address1: "Happy path lane",
-                address2: "Apt 5B",
-                city: "Toronto",
-                countryCode: "CA",
+                address1: "89 Haight Street",
+                address2: "Haight-Ashbury",
+                city: "San Francisco",
+                countryCode: "US",
                 phone: "+441792547555",
-                provinceCode: "ON",
-                zip: "M4L 1C9"
+                provinceCode: "CA",
+                zip: "94117"
             )
         ),
         /// This address will cause validation errors on postcalCode
         /// causing the address form to 'unroll' back in checkout
         AddressOption(
-            label: "Broken Ave",
+            label: "Broken Address Ave",
             address: CartAddress(
                 firstName: "Evelyn",
                 lastName: "Hartley",
-                address1: "Broken Ave",
+                address1: "Broken Address",
                 address2: "Apt 5B",
                 city: "Toronto",
                 countryCode: "CA",

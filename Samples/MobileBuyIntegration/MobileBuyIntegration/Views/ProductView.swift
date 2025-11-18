@@ -131,11 +131,11 @@ struct ProductView: View {
                         .cornerRadius(DesignSystem.cornerRadius)
                         .disabled(!variant.availableForSale || loading)
 
-                        Button(action: buyNow) {
+                        Button(action: handleBuyNow) {
                             HStack {
                                 Image(systemName: "bag.fill")
                                     .font(.system(size: 14))
-                                Text(buyNowLoading ? "Loading..." : "Buy Now")
+                                Text(buyNowLoading ? "Loading..." : "Buy Now \(InfoDictionary.shared.displayName)")
                                     .font(.headline)
                                     .fontWeight(.bold)
                             }
@@ -191,7 +191,7 @@ struct ProductView: View {
         }
     }
 
-    private func buyNow() {
+    private func handleBuyNow() {
         _Concurrency.Task {
             guard let variant = product.variants.nodes.first else { return }
 
@@ -201,13 +201,10 @@ struct ProductView: View {
                 let cart = try await CartManager.createBuyNowCart(variantId: variant.id)
                 buyNowLoading = false
 
-                await MainActor.run {
-                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                       let sceneDelegate = windowScene.delegate as? SceneDelegate
-                    {
-                        sceneDelegate.presentBuyNow(checkoutURL: cart.checkoutUrl)
-                    }
-                }
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                      let sceneDelegate = windowScene.delegate as? SceneDelegate
+                else { return }
+                await sceneDelegate.presentBuyNow(checkoutURL: cart.checkoutUrl)
             } catch {
                 buyNowLoading = false
                 ShopifyCheckoutSheetKit.configuration.logger.log("Buy Now failed: \(error.localizedDescription)")
