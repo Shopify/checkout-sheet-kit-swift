@@ -617,19 +617,6 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        switch event {
-        case let .customEvent(customEvent):
-            print("[PIXEL - Custom]", customEvent.name!)
-            if let genericEvent = mapToGenericEvent(customEvent: customEvent) {
-                recordAnalyticsEvent(genericEvent)
-            }
-        case let .standardEvent(standardEvent):
-            print("[PIXEL - Standard]", standardEvent.name!)
-            recordAnalyticsEvent(mapToGenericEvent(standardEvent: standardEvent))
-        }
-    }
-
     private func handleUnrecoverableError(_ message: String = "Checkout unavailable") {
         DispatchQueue.main.async {
             self.resetCart()
@@ -645,60 +632,4 @@ extension CartViewController {
 
         present(alert, animated: true, completion: nil)
     }
-}
-
-// analytics examples
-extension CartViewController {
-    private func mapToGenericEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
-        return AnalyticsEvent(
-            name: standardEvent.name!,
-            userId: getUserId(),
-            timestamp: standardEvent.timestamp!,
-            checkoutTotal: standardEvent.data?.checkout?.totalPrice?.amount ?? 0.0
-        )
-    }
-
-    private func mapToGenericEvent(customEvent: CustomEvent) -> AnalyticsEvent? {
-        guard customEvent.name != nil else {
-            print("Failed to parse custom event", customEvent)
-            return nil
-        }
-        return AnalyticsEvent(
-            name: customEvent.name!,
-            userId: getUserId(),
-            timestamp: customEvent.timestamp!,
-            checkoutTotal: nil
-        )
-    }
-
-    private func decodeAndMap(event: CustomEvent, decoder _: JSONDecoder = JSONDecoder()) throws -> AnalyticsEvent {
-        return AnalyticsEvent(
-            name: event.name!,
-            userId: getUserId(),
-            timestamp: event.timestamp!,
-            checkoutTotal: nil
-        )
-    }
-
-    private func getUserId() -> String {
-        // return ID for user used in your existing analytics system
-        return "123"
-    }
-
-    func recordAnalyticsEvent(_ event: AnalyticsEvent) {
-        // send the event to an analytics system, e.g. via an analytics sdk
-        appConfiguration.webPixelsLogger.log(event.name)
-    }
-}
-
-// example type, e.g. that may be defined by an analytics sdk
-struct AnalyticsEvent: Codable {
-    var name = ""
-    var userId = ""
-    var timestamp = ""
-    var checkoutTotal: Double? = 0.0
-}
-
-struct CustomPixelEventData: Codable {
-    var customAttribute = 0.0
 }

@@ -111,11 +111,6 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         return self
     }
 
-    @discardableResult public func onPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> Self {
-        delegate.onPixelEvent = action
-        return self
-    }
-
     @discardableResult public func onLinkClick(_ action: @escaping (URL) -> Void) -> Self {
         delegate.onLinkClick = action
         return self
@@ -148,17 +143,12 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onComplete: ((CheckoutCompletedEvent) -> Void)?
     var onCancel: (() -> Void)?
     var onFail: ((CheckoutError) -> Void)?
-    var onPixelEvent: ((PixelEvent) -> Void)?
     var onLinkClick: ((URL) -> Void)?
     var onAddressChangeIntent: ((AddressChangeRequested) -> Void)?
     var onPaymentChangeRequested: ((CheckoutCardChangeRequested) -> Void)?
 
     public func checkoutDidFail(error: CheckoutError) {
         onFail?(error)
-    }
-
-    public func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        onPixelEvent?(event)
     }
 
     public func checkoutDidComplete(event: CheckoutCompletedEvent) {

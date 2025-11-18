@@ -127,7 +127,6 @@ struct Internal_ApplePayButton: View {
             controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
             controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
             controller.onCheckoutClickLink = eventHandlers.checkoutDidClickLink
-            controller.onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
         }
     }
 

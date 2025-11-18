@@ -37,7 +37,6 @@ public struct EventHandlers {
     public var checkoutDidCancel: (() -> Void)?
     public var shouldRecoverFromError: ((CheckoutError) -> Bool)?
     public var checkoutDidClickLink: ((URL) -> Void)?
-    public var checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)?
     public var renderStateDidChange: ((RenderState) -> Void)?
 
     public init(
@@ -46,7 +45,6 @@ public struct EventHandlers {
         checkoutDidCancel: (() -> Void)? = nil,
         shouldRecoverFromError: ((CheckoutError) -> Bool)? = nil,
         checkoutDidClickLink: ((URL) -> Void)? = nil,
-        checkoutDidEmitWebPixelEvent: ((PixelEvent) -> Void)? = nil,
         renderStateDidChange: ((RenderState) -> Void)? = nil
     ) {
         self.checkoutDidComplete = checkoutDidComplete
@@ -54,7 +52,6 @@ public struct EventHandlers {
         self.checkoutDidCancel = checkoutDidCancel
         self.shouldRecoverFromError = shouldRecoverFromError
         self.checkoutDidClickLink = checkoutDidClickLink
-        self.checkoutDidEmitWebPixelEvent = checkoutDidEmitWebPixelEvent
         self.renderStateDidChange = renderStateDidChange
     }
 }

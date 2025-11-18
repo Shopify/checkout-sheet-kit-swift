@@ -92,21 +92,6 @@ class ShopifyCheckoutTests: XCTestCase {
         XCTAssertNotNil(actionData)
     }
 
-    func testOnPixelEvent() {
-        var actionCalled = false
-        var actionData: PixelEvent?
-        let standardEvent = StandardEvent(context: nil, id: "testId", name: "checkout_started", timestamp: "2022-01-01T00:00:00Z", data: nil)
-        let pixelEvent = PixelEvent.standardEvent(standardEvent)
-
-        checkoutSheet.onPixelEvent { event in
-            actionCalled = true
-            actionData = event
-        }
-        checkoutSheet.delegate.checkoutDidEmitWebPixelEvent(event: pixelEvent)
-        XCTAssertTrue(actionCalled)
-        XCTAssertNotNil(actionData)
-    }
-
     func testOnLinkClick() {
         var actionCalled = false
         var actionData: URL?

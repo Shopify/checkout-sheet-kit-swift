@@ -427,8 +427,6 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertEqual(capturedURLs, testURLs, "URLs should be captured in order")
     }
 
-    // MARK: - checkoutDidEmitWebPixelEvent Callback Tests
-
     // MARK: - Thread Safety Tests for New Callbacks
 }
 

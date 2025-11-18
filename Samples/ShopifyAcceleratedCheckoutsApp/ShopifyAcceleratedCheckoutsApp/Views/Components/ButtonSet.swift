@@ -59,17 +59,6 @@ struct ButtonSet: View {
                         .onClickLink { url in
                             print("🔗 Link clicked: \(url)")
                         }
-                        .onWebPixelEvent { event in
-                            let eventName: String = {
-                                switch event {
-                                case let .customEvent(customEvent):
-                                    return customEvent.name ?? "Unknown custom event"
-                                case let .standardEvent(standardEvent):
-                                    return standardEvent.name ?? "Unknown standard event"
-                                }
-                            }()
-                            print("📊 Web pixel event: \(eventName)")
-                        }
                         .onRenderStateChange {
                             cartRenderState = $0
                         }
@@ -107,17 +96,6 @@ struct ButtonSet: View {
                     }
                     .onClickLink { url in
                         print("🔗 Variant - Link clicked: \(url)")
-                    }
-                    .onWebPixelEvent { event in
-                        let eventName: String = {
-                            switch event {
-                            case let .customEvent(customEvent):
-                                return customEvent.name ?? "Unknown custom event"
-                            case let .standardEvent(standardEvent):
-                                return standardEvent.name ?? "Unknown standard event"
-                            }
-                        }()
-                        print("📊 Variant - Web pixel event: \(eventName)")
                     }
                     .onRenderStateChange {
                         variantRenderState = $0
