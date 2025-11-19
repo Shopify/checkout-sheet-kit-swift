@@ -44,7 +44,7 @@ final class EmbedParametersTests: XCTestCase {
 
         XCTAssertEqual(
             result,
-            "protocol=\(MetaData.schemaVersion),branding=app,library=CheckoutKit/\(trimmedMetaDataVersion()),platform=swift,entry=sheet"
+            "protocol=\(MetaData.schemaVersion),branding=app,library=CheckoutKit/\(trimmedMetaDataVersion()),platform=swift,entry=sheet,colorscheme=auto"
         )
     }
 
