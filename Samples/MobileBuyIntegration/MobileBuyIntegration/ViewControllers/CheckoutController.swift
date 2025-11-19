@@ -81,7 +81,7 @@ extension CheckoutController: CheckoutDelegate {
 
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            let hardcodedAddress = CartAddress(
+            let hardcodedAddress = CartDeliveryAddress(
                 firstName: "John",
                 lastName: "Doe",
                 address1: "123 Test Street",
@@ -93,7 +93,7 @@ extension CheckoutController: CheckoutDelegate {
                 zip: "M5V 1A1"
             )
 
-            let addressInput = CartSelectableAddress(address: hardcodedAddress)
+            let addressInput = CartSelectableAddress(address: .deliveryAddress(hardcodedAddress))
             let delivery = CartDelivery(addresses: [addressInput])
             let response = DeliveryAddressChangePayload(delivery: delivery)
 

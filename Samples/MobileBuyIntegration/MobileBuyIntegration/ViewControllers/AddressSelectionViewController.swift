@@ -27,7 +27,7 @@ import UIKit
 
 struct AddressOption {
     let label: String
-    let address: CartAddress
+    let address: CartDeliveryAddress
 }
 
 class AddressSelectionViewController: UIViewController {
@@ -40,7 +40,7 @@ class AddressSelectionViewController: UIViewController {
     private let addressOptions: [AddressOption] = [
         AddressOption(
             label: "Default",
-            address: CartAddress(
+            address: CartDeliveryAddress(
                 firstName: InfoDictionary.shared.firstName,
                 lastName: InfoDictionary.shared.lastName,
                 address1: InfoDictionary.shared.address1,
@@ -54,8 +54,8 @@ class AddressSelectionViewController: UIViewController {
         ),
 
         AddressOption(
-            label: "Valid Address lane",
-            address: CartAddress(
+            label: "Happy path lane",
+            address: CartDeliveryAddress(
                 firstName: "Evelyn",
                 lastName: "Hartley",
                 address1: "89 Haight Street",
@@ -71,7 +71,7 @@ class AddressSelectionViewController: UIViewController {
         /// causing the address form to 'unroll' back in checkout
         AddressOption(
             label: "Broken Address Ave",
-            address: CartAddress(
+            address: CartDeliveryAddress(
                 firstName: "Evelyn",
                 lastName: "Hartley",
                 address1: "Broken Address",
@@ -140,7 +140,7 @@ class AddressSelectionViewController: UIViewController {
 
     @objc private func confirmSelection() {
         let selectedAddress = addressOptions[selectedIndex].address
-        let addressInput = CartSelectableAddress(address: selectedAddress)
+        let addressInput = CartSelectableAddress(address: .deliveryAddress(selectedAddress))
         let delivery = CartDelivery(addresses: [addressInput])
         let response = DeliveryAddressChangePayload(delivery: delivery)
 
