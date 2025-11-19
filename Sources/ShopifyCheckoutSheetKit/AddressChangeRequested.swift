@@ -34,12 +34,13 @@ public final class AddressChangeRequested: BaseRPCRequest<AddressChangeRequested
         }
 
         for (index, selectableAddress) in addresses.enumerated() {
-            let address = selectableAddress.address
-
-            if let countryCode = address.countryCode, countryCode.isEmpty {
-                throw EventResponseError.validationFailed(
-                    "Country code cannot be empty at index \(index)"
-                )
+            switch selectableAddress.address {
+            case let .deliveryAddress(address):
+                if let countryCode = address.countryCode, countryCode.isEmpty {
+                    throw EventResponseError.validationFailed(
+                        "Country code cannot be empty at index \(index)"
+                    )
+                }
             }
         }
     }
@@ -69,59 +70,5 @@ public struct DeliveryAddressChangePayload: Codable {
 
     public init(delivery: CartDelivery) {
         self.delivery = delivery
-    }
-}
-
-/// https://shopify.dev/docs/api/storefront/latest/objects/CartDelivery
-public struct CartDelivery: Codable {
-    public let addresses: [CartSelectableAddress]
-
-    public init(addresses: [CartSelectableAddress]) {
-        self.addresses = addresses
-    }
-}
-
-/// https://shopify.dev/docs/api/storefront/latest/objects/CartSelectableAddress
-public struct CartSelectableAddress: Codable {
-    public let address: CartAddress
-    /// Possible other properties, oneTimeUse, selected, id
-
-    public init(address: CartAddress) {
-        self.address = address
-    }
-}
-
-/// https://shopify.dev/docs/api/storefront/latest/objects/CartAddress
-public struct CartAddress: Codable {
-    public let firstName: String?
-    public let lastName: String?
-    public let address1: String?
-    public let address2: String?
-    public let city: String?
-    public let countryCode: String?
-    public let phone: String?
-    public let provinceCode: String?
-    public let zip: String?
-
-    public init(
-        firstName: String? = nil,
-        lastName: String? = nil,
-        address1: String? = nil,
-        address2: String? = nil,
-        city: String? = nil,
-        countryCode: String? = nil,
-        phone: String? = nil,
-        provinceCode: String? = nil,
-        zip: String? = nil
-    ) {
-        self.firstName = firstName
-        self.lastName = lastName
-        self.address1 = address1
-        self.address2 = address2
-        self.city = city
-        self.countryCode = countryCode
-        self.phone = phone
-        self.provinceCode = provinceCode
-        self.zip = zip
     }
 }
