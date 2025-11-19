@@ -31,7 +31,6 @@ class MockCheckoutDelegate: CheckoutDelegate {
     var checkoutDidCancelCalled = false
     var checkoutDidCompleteCalled = false
     var checkoutDidClickLinkCalled = false
-    var checkoutDidEmitWebPixelEventCalled = false
 
     func checkoutDidFail(error _: CheckoutError) {
         checkoutDidFailCalled = true
@@ -49,10 +48,6 @@ class MockCheckoutDelegate: CheckoutDelegate {
         checkoutDidClickLinkCalled = true
     }
 
-    func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {
-        checkoutDidEmitWebPixelEventCalled = true
-    }
-
     func shouldRecoverFromError(error _: CheckoutError) -> Bool {
         return shouldRecoverFromErrorResult
     }
@@ -63,7 +58,6 @@ class DefaultCheckoutDelegate: CheckoutDelegate {
     func checkoutDidCancel() {}
     func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
     func checkoutDidClickLink(url _: URL) {}
-    func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
 
     func shouldRecoverFromError(error: CheckoutError) -> Bool {
         return error.isRecoverable

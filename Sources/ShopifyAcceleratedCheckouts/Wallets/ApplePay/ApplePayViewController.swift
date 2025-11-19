@@ -112,19 +112,6 @@ class ApplePayViewController: WalletController, PayController {
     @MainActor
     public var onCheckoutClickLink: ((URL) -> Void)?
 
-    /// Callback invoked when a web pixel event is emitted during checkout.
-    /// This closure is called on the main thread when pixel events occur.
-    ///
-    /// Example usage:
-    /// ```swift
-    /// applePayViewController.onCheckoutWebPixelEvent = { [weak self] event in
-    ///     self?.trackPixelEvent(event)
-    ///     self?.logAnalyticsEvent(.pixelFired, event: event)
-    /// }
-    /// ```
-    @MainActor
-    public var onCheckoutWebPixelEvent: ((PixelEvent) -> Void)?
-
     /// Initialization workaround for passing self to ApplePayAuthorizationDelegate
     private var __authorizationDelegate: ApplePayAuthorizationDelegate!
     var authorizationDelegate: ApplePayAuthorizationDelegate {
@@ -254,12 +241,6 @@ extension ApplePayViewController: CheckoutDelegate {
     func checkoutDidClickLink(url: URL) {
         Task { @MainActor in
             self.onCheckoutClickLink?(url)
-        }
-    }
-
-    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        Task { @MainActor in
-            self.onCheckoutWebPixelEvent?(event)
         }
     }
 }

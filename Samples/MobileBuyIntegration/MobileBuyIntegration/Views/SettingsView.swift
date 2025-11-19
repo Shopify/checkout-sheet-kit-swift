@@ -130,9 +130,6 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
 
-                    NavigationLink(destination: WebPixelsEventsView()) {
-                        Text("Web pixel events")
-                    }
                     NavigationLink(destination: LogsView()) {
                         Text("Logs")
                     }

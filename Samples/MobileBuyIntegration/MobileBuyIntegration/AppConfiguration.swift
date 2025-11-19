@@ -34,9 +34,6 @@ public final class AppConfiguration: ObservableObject {
     /// Prefill buyer information
     @AppStorage("useVaultedState_forcedToTrue") public var useVaultedState: Bool = true
 
-    /// Logger to retain Web Pixel events
-    let webPixelsLogger = FileLogger("analytics.txt")
-
     // Configure ShopifyAcceleratedCheckouts
     let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: InfoDictionary.shared.domain,

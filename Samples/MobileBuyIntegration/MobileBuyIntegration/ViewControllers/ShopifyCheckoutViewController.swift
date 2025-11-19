@@ -123,17 +123,4 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         OSLogger.shared.debug("[EmbeddedCheckout] Checkout failed: \(error.localizedDescription)")
         dismiss(animated: true)
     }
-
-    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        var eventName: String?
-
-        switch event {
-        case let .standardEvent(event):
-            eventName = event.name
-        case let .customEvent(event):
-            eventName = event.name
-        }
-
-        OSLogger.shared.debug("[EmbeddedCheckout] Pixel event: \(eventName ?? "")")
-    }
 }

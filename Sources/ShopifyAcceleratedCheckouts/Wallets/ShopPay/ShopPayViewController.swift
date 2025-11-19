@@ -85,8 +85,4 @@ extension ShopPayViewController: CheckoutDelegate {
     func checkoutDidClickLink(url: URL) {
         eventHandlers.checkoutDidClickLink?(url)
     }
-
-    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        eventHandlers.checkoutDidEmitWebPixelEvent?(event)
-    }
 }

@@ -30,7 +30,6 @@
     - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
     - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
   - [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
-    - [Integrating with Web Pixels, monitoring behavioral data](#integrating-with-web-pixels-monitoring-behavioral-data)
   - [Error handling](#error-handling)
     - [`CheckoutError`](#checkouterror)
   - [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
@@ -155,9 +154,6 @@ struct ContentView: View {
            }
            .onFail { error in
              handleError(error)
-           }
-           .onPixelEvent { event in
-             handlePixelEvent(event)
            }
            .onLinkClick { url in
               if UIApplication.shared.canOpenURL(url) {
@@ -447,67 +443,8 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
     //  - web (`http:`)
     // and is being directed outside the application.
   }
-
-  // Issued when the Checkout has emit a standard or custom Web Pixel event.
-  // Note that the event must be handled by the consuming app, and will not be sent from inside the checkout.
-  // See below for more information.
-  func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-    switch event {
-      case .standardEvent(let standardEvent):
-        recordAnalyticsEvent(standardEvent)
-      case .customEvent(let customEvent):
-        recordAnalyticsEvent(customEvent)
-    }
-  }
 }
 ```
-
-### Integrating with Web Pixels, monitoring behavioral data
-
-App developers can use [lifecycle events](#monitoring-the-lifecycle-of-a-checkout-session) to monitor and log the status of a checkout session.
-
-For behavioural monitoring, Checkout Web Pixel [standard](https://shopify.dev/docs/api/web-pixels-api/standard-events) and [custom](https://shopify.dev/docs/api/web-pixels-api/emitting-data) events will be relayed back to your application through the `checkoutDidEmitWebPixelEvent` delegate hook. App developers should only subscribe to pixel events if they have proper levels of consent from merchants/buyers and are responsible for adherence to Apple's privacy policy and local regulations like GDPR and ePrivacy directive before disseminating these events to first-party and third-party systems.
-
-Here's how you might intercept these events:
-
-```swift
-class MyViewController: UIViewController {
-  private func sendEventToAnalytics(event: StandardEvent) {
-    // Send standard event to third-party providers
-  }
-
-  private func sendEventToAnalytics(event: CustomEvent) {
-    // Send custom event to third-party providers
-  }
-
-  private func recordAnalyticsEvent(standardEvent: StandardEvent) {
-    if hasPermissionToCaptureEvents() {
-      sendEventToAnalytics(event: standardEvent)
-    }
-  }
-
-  private func recordAnalyticsEvent(customEvent: CustomEvent) {
-    if hasPermissionToCaptureEvents() {
-      sendEventToAnalytics(event: CustomEvent)
-    }
-  }
-}
-
-extension MyViewController: ShopifyCheckoutSheetKitDelegate {
-  func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-    switch event {
-      case .standardEvent(let standardEvent):
-        recordAnalyticsEvent(standardEvent: standardEvent)
-      case .customEvent(let customEvent):
-        recordAnalyticsEvent(customEvent: customEvent)
-    }
-  }
-}
-```
-
-> [!NOTE]
-> You may need to augment these events with customer/session information derived from app state.
-> The `customData` attribute of CustomPixelEvent can take on any shape. As such, this attribute will be returned as a String. Client applications should define a custom data type and deserialize the `customData` string into that type.
 
 ## Error handling
 
@@ -520,7 +457,6 @@ There are some caveats to note when this scenario occurs:
 
 1. The checkout experience may look different to buyers. Though the sheet kit will attempt to load any checkout customizations for the storefront, there is no guarantee they will show in recovery mode.
 2. The `checkoutDidComplete(event:)` will be emitted with partial data. Invocations will only receive the order ID via `event.orderConfirmation.order.id`.
-3. `checkoutDidEmitWebPixelEvent` lifecycle methods will **not** be emitted.
 
 Should you wish to opt-out of this fallback experience entirely, you can do so by adding a `shouldRecoverFromError(error:)` method to your delegate controller. Errors given to the `checkoutDidFail(error:)` lifecycle method, will contain an `isRecoverable` property by default indicating whether the request should be retried or not.
 

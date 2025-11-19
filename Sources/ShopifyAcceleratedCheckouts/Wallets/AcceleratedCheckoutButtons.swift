@@ -272,28 +272,6 @@ extension AcceleratedCheckoutButtons {
         return newView
     }
 
-    /// Adds an action to perform when a web pixel event is emitted.
-    ///
-    /// Use this modifier to handle web pixel events:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onWebPixelEvent { event in
-    ///         // Track analytics event
-    ///         Analytics.track(event)
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when a pixel event is emitted
-    /// - Returns: A view with the web pixel event handler set
-    public func onWebPixelEvent(_ action: @escaping (PixelEvent) -> Void)
-        -> AcceleratedCheckoutButtons
-    {
-        var newView = self
-        newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
-        return newView
-    }
-
     /// Adds an action to perform when the render state changes.
     ///
     /// Use this modifier to handle render state changes:

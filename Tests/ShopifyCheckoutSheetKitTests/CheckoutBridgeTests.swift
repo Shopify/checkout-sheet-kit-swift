@@ -214,42 +214,6 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("M5V 1M7", address?.postalCode)
     }
 
-    func testDecodeSupportsWebPixelsEvent() throws {
-        let mock = WKScriptMessageMock(body: """
-        {
-            "jsonrpc": "2.0",
-            "id": "test-id",
-            "method": "webPixels",
-            "params": {
-                "name": "page_viewed",
-                "event": {
-                    "id": "123",
-                    "name": "page_viewed",
-                    "type": "standard",
-                    "timestamp": "2024-01-04T09:48:53.358Z",
-                    "data": {},
-                    "context": {}
-                }
-            }
-        }
-        """, webView: mockWebView)
-
-        let result = try CheckoutBridge.decode(mock)
-
-        guard let pixelsRequest = result as? WebPixelsRequest else {
-            XCTFail("Expected WebPixelsRequest, got \(result)")
-            return
-        }
-
-        guard case let .standardEvent(standardEvent) = pixelsRequest.pixelEvent else {
-            XCTFail("Expected standardEvent")
-            return
-        }
-
-        XCTAssertEqual("page_viewed", standardEvent.name)
-        XCTAssertEqual("123", standardEvent.id)
-    }
-
     func testDecodeSupportsCheckoutCardChangeRequested() throws {
         let mock = WKScriptMessageMock(body: """
         {

@@ -231,17 +231,4 @@ final class ApplePayIntegrationTests: XCTestCase {
         XCTAssertTrue(callbackInvoked, "checkoutDidClickLink callback should be invoked")
         XCTAssertEqual(receivedURL, testURL, "URL should be passed to callback")
     }
-
-    @MainActor
-    func testCheckoutDidEmitWebPixelEventDelegateIntegration() async {
-        let viewController = ApplePayViewController(
-            identifier: .cart(cartID: "gid://Shopify/Cart/test-cart"),
-            configuration: mockConfiguration
-        )
-
-        viewController.onCheckoutWebPixelEvent = { _ in
-        }
-
-        XCTAssertNotNil(viewController.onCheckoutWebPixelEvent, "Web pixel event callback should be set")
-    }
 }

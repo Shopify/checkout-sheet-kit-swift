@@ -32,6 +32,4 @@ class ExampleDelegate: CheckoutDelegate {
     func checkoutDidFail(error _: ShopifyCheckoutSheetKit.CheckoutError) {}
 
     func checkoutDidClickContactLink(url _: URL) {}
-
-    func checkoutDidEmitWebPixelEvent(event _: ShopifyCheckoutSheetKit.PixelEvent) {}
 }

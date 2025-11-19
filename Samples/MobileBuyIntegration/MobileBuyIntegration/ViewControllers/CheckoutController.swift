@@ -76,19 +76,6 @@ extension CheckoutController: CheckoutDelegate {
         OSLogger.shared.debug("[CheckoutDelegate] Checkout failed: \(error.localizedDescription)")
     }
 
-    func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        var eventName: String?
-
-        switch event {
-        case let .standardEvent(event):
-            eventName = event.name
-        case let .customEvent(event):
-            eventName = event.name
-        }
-
-        OSLogger.shared.debug("[CheckoutDelegate] Pixel event: \(eventName ?? "")")
-    }
-
     func checkoutDidRequestAddressChange(event: AddressChangeRequested) {
         OSLogger.shared.debug("[CheckoutDelegate] Address change intent received for addressType: \(event.params.addressType)")
 

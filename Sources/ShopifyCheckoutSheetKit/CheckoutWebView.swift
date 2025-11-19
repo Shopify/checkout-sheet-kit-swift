@@ -31,7 +31,6 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidClickLink(url: URL)
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
-    func checkoutViewDidEmitWebPixelEvent(event: PixelEvent)
     func checkoutViewDidRequestAddressChange(event: AddressChangeRequested)
     func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested)
 }
@@ -283,10 +282,6 @@ extension CheckoutWebView: WKScriptMessageHandler {
             viewDelegate.checkoutViewDidToggleModal(
                 modalVisible: modalRequest.params.modalVisible
             )
-
-        case let pixelsRequest as WebPixelsRequest:
-            guard let event = pixelsRequest.pixelEvent else { return }
-            viewDelegate.checkoutViewDidEmitWebPixelEvent(event: event)
 
         case let addressRequest as AddressChangeRequested:
             OSLogger.shared.info(

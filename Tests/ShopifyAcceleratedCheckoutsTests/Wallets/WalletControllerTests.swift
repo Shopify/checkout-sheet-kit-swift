@@ -59,7 +59,6 @@ final class WalletControllerTests: XCTestCase {
         func checkoutDidCancel() {}
         func shouldRecoverFromError(error: CheckoutError) -> Bool { return error.isRecoverable }
         func checkoutDidClickLink(url _: URL) {}
-        func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
     }
 
     // MARK: - fetchCartByCheckoutIdentifier Tests - Cart Identifier
