@@ -209,6 +209,10 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
 extension CheckoutWebViewController: CheckoutWebViewDelegate {
     func checkoutViewDidStartNavigation() {}
 
+    func checkoutViewDidStart(event: CheckoutStartEvent) {
+        delegate?.checkoutDidStart(event: event)
+    }
+
     func checkoutViewDidFinishNavigation() {
         initialNavigation = false
         progressBar.stopAnimating()

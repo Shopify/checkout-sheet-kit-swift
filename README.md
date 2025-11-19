@@ -146,6 +146,10 @@ struct ContentView: View {
            .closeButtonTintColor(.red)
 
            /// Lifecycle events
+           .onStart { event in
+             // Access initial cart state
+             print("Checkout started with cart: \(event.cart.id)")
+           }
            .onCancel {
              isPresented = false
            }
@@ -406,6 +410,11 @@ You can use the `ShopifyCheckoutSheetKitDelegate` protocol to register callbacks
 
 ```swift
 extension MyViewController: ShopifyCheckoutSheetKitDelegate {
+  func checkoutDidStart(event: CheckoutStartEvent) {
+    // Called when the checkout starts, providing the initial cart state.
+    // Use this to track analytics, update UI, etc.
+  }
+
   func checkoutDidComplete(event: CheckoutCompletedEvent) {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.

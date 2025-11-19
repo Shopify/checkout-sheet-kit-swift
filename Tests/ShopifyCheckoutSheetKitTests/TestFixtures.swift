@@ -92,6 +92,22 @@ func createTestOrderConfirmation(
 // MARK: - Event Fixtures
 
 /**
+ Creates a test CheckoutStartEvent instance with sensible defaults.
+
+ Example:
+ ```swift
+ let event = createTestCheckoutStartEvent(
+     cart: createTestCart(totalAmount: "50.00")
+ )
+ ```
+ */
+func createTestCheckoutStartEvent(
+    cart: Cart? = nil
+) -> CheckoutStartEvent {
+    CheckoutStartEvent(cart: cart ?? createTestCart())
+}
+
+/**
  Creates a test CheckoutCompletedEvent instance with sensible defaults.
 
  Example:
@@ -155,6 +171,29 @@ func createTestCartJSON(
         "discountAllocations": [],
         "delivery": {
             "addresses": []
+        }
+    }
+    """
+}
+
+/**
+ Creates a JSON-RPC message string for checkout.start with sensible defaults.
+
+ Example:
+ ```swift
+ let json = createCheckoutStartJSON(cartId: "cart-789")
+ ```
+ */
+func createCheckoutStartJSON(
+    cartId: String = "gid://shopify/Cart/test-cart-123",
+    totalAmount: String = "10.00"
+) -> String {
+    """
+    {
+        "jsonrpc": "2.0",
+        "method": "checkout.start",
+        "params": {
+            "cart": \(createTestCartJSON(id: cartId, totalAmount: totalAmount))
         }
     }
     """

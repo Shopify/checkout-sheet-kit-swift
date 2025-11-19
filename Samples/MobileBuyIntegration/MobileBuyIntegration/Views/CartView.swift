@@ -125,6 +125,9 @@ struct CartView: View {
                     ShopifyCheckout(checkout: url)
                         // .auth(token: "your-auth-token-here") // Uncomment to add authentication
                         .colorScheme(.automatic)
+                        .onStart { event in
+                            print("Checkout started with cart ID: \(event.cart.id)")
+                        }
                         .onCancel {
                             showCheckoutSheet = false
                         }

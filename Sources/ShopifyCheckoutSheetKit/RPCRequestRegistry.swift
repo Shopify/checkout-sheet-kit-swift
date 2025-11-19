@@ -32,7 +32,8 @@ enum RPCRequestRegistry {
         CheckoutCardChangeRequested.self,
         CheckoutCompleteRequest.self,
         CheckoutErrorRequest.self,
-        CheckoutModalToggledRequest.self
+        CheckoutModalToggledRequest.self,
+        CheckoutStartRequest.self
     ]
 
     /// Find the request type for a given method name
