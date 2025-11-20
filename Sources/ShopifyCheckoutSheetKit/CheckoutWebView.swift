@@ -33,7 +33,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidRequestAddressChange(event: AddressChangeRequested)
-    func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested)
+    func checkoutViewDidRequestPaymentMethodChange(event: PaymentMethodChangeStart)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
@@ -142,7 +142,7 @@ public class CheckoutWebView: WKWebView {
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".
         configuration.allowsInlineMediaPlayback = true
-        
+
         self.options = options
 
         if recovery {
@@ -292,11 +292,11 @@ extension CheckoutWebView: WKScriptMessageHandler {
             )
             viewDelegate.checkoutViewDidRequestAddressChange(event: addressRequest)
 
-        case let cardRequest as CheckoutCardChangeRequested:
+        case let paymentMethodRequest as PaymentMethodChangeStart:
             OSLogger.shared.info(
-                "Card change intent event received"
+                "Payment method change intent event received"
             )
-            viewDelegate.checkoutViewDidRequestCardChange(event: cardRequest)
+            viewDelegate.checkoutViewDidRequestPaymentMethodChange(event: paymentMethodRequest)
 
         case let errorRequest as CheckoutErrorRequest:
             handleCheckoutError(errorRequest)

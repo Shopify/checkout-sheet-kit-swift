@@ -48,8 +48,8 @@ public protocol CheckoutDelegate: AnyObject {
     /// Tells the delegate that the checkout is requesting address change intent (e.g., for native address picker)
     func checkoutDidRequestAddressChange(event: AddressChangeRequested)
 
-    /// Tells the delegate that the checkout is requesting card change intent (e.g., for native card picker)
-    func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested)
+    /// Tells the delegate that the checkout is requesting payment method change intent (e.g., for native payment method picker)
+    func checkoutDidRequestPaymentMethodChange(event: PaymentMethodChangeStart)
 }
 
 extension CheckoutDelegate {
@@ -77,7 +77,7 @@ extension CheckoutDelegate {
         /// No-op by default
     }
 
-    public func checkoutDidRequestCardChange(event _: CheckoutCardChangeRequested) {
+    public func checkoutDidRequestPaymentMethodChange(event _: PaymentMethodChangeStart) {
         /// No-op by default
     }
 
