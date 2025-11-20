@@ -130,8 +130,8 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         return self
     }
 
-    @discardableResult public func onPaymentChangeIntent(_ action: @escaping (CheckoutCardChangeRequested) -> Void) -> Self {
-        delegate.onPaymentChangeRequested = action
+    @discardableResult public func onPaymentMethodChange(_ action: @escaping (PaymentMethodChangeStart) -> Void) -> Self {
+        delegate.onPaymentMethodChange = action
         return self
     }
 
@@ -189,8 +189,8 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
         onAddressChangeStart?(event)
     }
 
-    public func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested) {
-        onPaymentChangeRequested?(event)
+    public func checkoutDidRequestPaymentMethodChange(event: PaymentMethodChangeStart) {
+        onPaymentMethodChange?(event)
     }
 }
 

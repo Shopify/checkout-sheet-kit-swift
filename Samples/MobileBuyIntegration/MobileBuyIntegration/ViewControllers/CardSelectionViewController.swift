@@ -30,11 +30,11 @@ struct CardOption {
     let last4: String
     let brand: String
     let useDeliveryAddress: Bool
-    let billingAddress: CheckoutCardChangeResult.BillingAddress?
+    let billingAddress: CartDeliveryAddress?
 }
 
 class CardSelectionViewController: UIViewController {
-    private let event: CheckoutCardChangeRequested
+    private let event: PaymentMethodChangeStart
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -53,13 +53,13 @@ class CardSelectionViewController: UIViewController {
             last4: "5555",
             brand: "mastercard",
             useDeliveryAddress: false,
-            billingAddress: CheckoutCardChangeResult.BillingAddress(
+            billingAddress: CartDeliveryAddress(
+                firstName: "John",
+                lastName: "Smith",
                 address1: "123 Main St",
                 address2: "Suite 100",
                 city: "New York",
                 countryCode: "US",
-                firstName: "John",
-                lastName: "Smith",
                 phone: "+1-555-0100",
                 provinceCode: "NY",
                 zip: "10001"
@@ -70,12 +70,12 @@ class CardSelectionViewController: UIViewController {
             last4: "3737",
             brand: "american_express",
             useDeliveryAddress: false,
-            billingAddress: CheckoutCardChangeResult.BillingAddress(
+            billingAddress: CartDeliveryAddress(
+                firstName: "Jane",
+                lastName: "Doe",
                 address1: "456 Oak Ave",
                 city: "San Francisco",
                 countryCode: "US",
-                firstName: "Jane",
-                lastName: "Doe",
                 phone: "+1-555-0200",
                 provinceCode: "CA",
                 zip: "94102"
@@ -83,7 +83,7 @@ class CardSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: CheckoutCardChangeRequested) {
+    init(event: PaymentMethodChangeStart) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
 
@@ -147,17 +147,17 @@ class CardSelectionViewController: UIViewController {
     @objc private func confirmSelection() {
         let selectedCard = cardOptions[selectedIndex]
 
-        let card = CheckoutCardChangeResult.Card(
+        let card = PaymentMethodChangeResult.Card(
             last4: selectedCard.last4,
             brand: selectedCard.brand
         )
 
-        let billing = CheckoutCardChangeResult.BillingInfo(
+        let billing = PaymentMethodChangeResult.BillingInfo(
             useDeliveryAddress: selectedCard.useDeliveryAddress,
             address: selectedCard.billingAddress
         )
 
-        let result = CheckoutCardChangeResult(card: card, billing: billing)
+        let result = PaymentMethodChangeResult(card: card, billing: billing)
 
         do {
             try event.respondWith(payload: result)

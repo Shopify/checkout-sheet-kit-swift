@@ -263,8 +263,8 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         delegate?.checkoutDidStartAddressChange(event: event)
     }
 
-    func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested) {
-        delegate?.checkoutDidRequestCardChange(event: event)
+    func checkoutViewDidRequestPaymentMethodChange(event: PaymentMethodChangeStart) {
+        delegate?.checkoutDidRequestPaymentMethodChange(event: event)
     }
 
     func checkoutViewDidStartSubmit(event: CheckoutSubmitStart) {

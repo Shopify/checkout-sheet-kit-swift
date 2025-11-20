@@ -208,12 +208,12 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", addressRequest.params.cart.id)
     }
 
-    func testDecodeSupportsCheckoutCardChangeRequested() throws {
+    func testDecodeSupportsPaymentMethodChangeStart() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
             "id": "card-change-123",
-            "method": "checkout.cardChangeRequested",
+            "method": "checkout.paymentMethodChangeStart",
             "params": {
                 "currentCard": {
                     "last4": "4242",
@@ -225,8 +225,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let cardRequest = result as? CheckoutCardChangeRequested else {
-            XCTFail("Expected CheckoutCardChangeRequested, got \(result)")
+        guard let cardRequest = result as? PaymentMethodChangeStart else {
+            XCTFail("Expected PaymentMethodChangeStart, got \(result)")
             return
         }
 
@@ -236,12 +236,12 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("visa", cardRequest.params.currentCard?.brand)
     }
 
-    func testDecodeSupportsCheckoutCardChangeRequestedWithoutCurrentCard() throws {
+    func testDecodeSupportsPaymentMethodChangeStartWithoutCurrentCard() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
             "id": "card-change-456",
-            "method": "checkout.cardChangeRequested",
+            "method": "checkout.paymentMethodChangeStart",
             "params": {
                 "currentCard": null
             }
@@ -250,8 +250,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let cardRequest = result as? CheckoutCardChangeRequested else {
-            XCTFail("Expected CheckoutCardChangeRequested, got \(result)")
+        guard let cardRequest = result as? PaymentMethodChangeStart else {
+            XCTFail("Expected PaymentMethodChangeStart, got \(result)")
             return
         }
 
