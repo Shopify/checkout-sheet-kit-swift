@@ -24,8 +24,8 @@
 import Foundation
 import WebKit
 
-public final class CheckoutCardChangeRequested: BaseRPCRequest<CheckoutCardChangeRequestedParams, CheckoutCardChangeResult> {
-    override public static var method: String { "checkout.cardChangeRequested" }
+public final class PaymentMethodChangeStart: BaseRPCRequest<PaymentMethodChangeStartParams, PaymentMethodChangeResult> {
+    override public static var method: String { "checkout.paymentMethodChangeStart" }
 
     override public func validate(payload: ResponsePayload) throws {
         let card = payload.card
@@ -52,7 +52,7 @@ public final class CheckoutCardChangeRequested: BaseRPCRequest<CheckoutCardChang
     }
 }
 
-public struct CheckoutCardChangeRequestedParams: Codable {
+public struct PaymentMethodChangeStartParams: Codable {
     public let currentCard: CurrentCard?
 
     public struct CurrentCard: Codable {
@@ -61,7 +61,7 @@ public struct CheckoutCardChangeRequestedParams: Codable {
     }
 }
 
-public struct CheckoutCardChangeResult: Codable {
+public struct PaymentMethodChangeResult: Codable {
     public let card: Card
     public let billing: BillingInfo
 
@@ -82,48 +82,11 @@ public struct CheckoutCardChangeResult: Codable {
 
     public struct BillingInfo: Codable {
         public let useDeliveryAddress: Bool
-        public let address: BillingAddress?
+        public let address: CartDeliveryAddress?
 
-        public init(useDeliveryAddress: Bool, address: BillingAddress? = nil) {
+        public init(useDeliveryAddress: Bool, address: CartDeliveryAddress? = nil) {
             self.useDeliveryAddress = useDeliveryAddress
             self.address = address
-        }
-    }
-
-    public struct BillingAddress: Codable {
-        public let address1: String?
-        public let address2: String?
-        public let city: String?
-        public let company: String?
-        public let countryCode: String?
-        public let firstName: String?
-        public let lastName: String?
-        public let phone: String?
-        public let provinceCode: String?
-        public let zip: String?
-
-        public init(
-            address1: String? = nil,
-            address2: String? = nil,
-            city: String? = nil,
-            company: String? = nil,
-            countryCode: String? = nil,
-            firstName: String? = nil,
-            lastName: String? = nil,
-            phone: String? = nil,
-            provinceCode: String? = nil,
-            zip: String? = nil
-        ) {
-            self.address1 = address1
-            self.address2 = address2
-            self.city = city
-            self.company = company
-            self.countryCode = countryCode
-            self.firstName = firstName
-            self.lastName = lastName
-            self.phone = phone
-            self.provinceCode = provinceCode
-            self.zip = zip
         }
     }
 }
