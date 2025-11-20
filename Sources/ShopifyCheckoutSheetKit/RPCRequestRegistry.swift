@@ -29,7 +29,7 @@ enum RPCRequestRegistry {
     /// Array of all supported request types
     static let requestTypes: [any RPCRequest.Type] = [
         AddressChangeRequested.self,
-        CheckoutCardChangeRequested.self,
+        PaymentMethodChangeStart.self,
         CheckoutCompleteRequest.self,
         CheckoutErrorRequest.self,
         CheckoutModalToggledRequest.self,
