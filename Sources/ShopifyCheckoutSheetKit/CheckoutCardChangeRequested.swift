@@ -31,22 +31,22 @@ public final class CheckoutCardChangeRequested: BaseRPCRequest<CheckoutCardChang
         let card = payload.card
 
         guard card.last4.count == 4 else {
-            throw EventResponseError.validationFailed("Card last4 must be exactly 4 digits")
+            throw CheckoutEventResponseError.validationFailed("Card last4 must be exactly 4 digits")
         }
 
         guard !card.brand.isEmpty else {
-            throw EventResponseError.validationFailed("Card brand cannot be empty")
+            throw CheckoutEventResponseError.validationFailed("Card brand cannot be empty")
         }
 
         let billing = payload.billing
 
         if !billing.useDeliveryAddress {
             guard let address = billing.address else {
-                throw EventResponseError.validationFailed("Billing address is required when useDeliveryAddress is false")
+                throw CheckoutEventResponseError.validationFailed("Billing address is required when useDeliveryAddress is false")
             }
 
             if let countryCode = address.countryCode, countryCode.isEmpty {
-                throw EventResponseError.validationFailed("Country code cannot be empty")
+                throw CheckoutEventResponseError.validationFailed("Country code cannot be empty")
             }
         }
     }

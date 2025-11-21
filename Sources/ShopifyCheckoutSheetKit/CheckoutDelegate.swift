@@ -45,8 +45,11 @@ public protocol CheckoutDelegate: AnyObject {
     /// This includes email address or telephone number via `mailto:` or `tel:` or `http` links directed outside the application.
     func checkoutDidClickLink(url: URL)
 
-    /// Tells the delegate that the checkout is requesting address change intent (e.g., for native address picker)
-    func checkoutDidRequestAddressChange(event: AddressChangeRequested)
+    /// Tells the delegate that the checkout has started an address change flow.
+    ///
+    /// This event is only emitted when native address selection is enabled for the authenticated app.
+    /// When triggered, you can present a native address picker and respond with updated address data.
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart)
 
     /// Tells the delegate that the checkout is requesting card change intent (e.g., for native card picker)
     func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested)
@@ -73,7 +76,7 @@ extension CheckoutDelegate {
         return error.isRecoverable
     }
 
-    public func checkoutDidRequestAddressChange(event _: AddressChangeRequested) {
+    public func checkoutDidStartAddressChange(event _: CheckoutAddressChangeStart) {
         /// No-op by default
     }
 
