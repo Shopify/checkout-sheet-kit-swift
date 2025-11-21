@@ -163,7 +163,7 @@ struct CartView: View {
                                 let addressInput = CartSelectableAddressInput(address: hardcodedAddress, selected: true)
                                 let delivery = CartDeliveryInput(addresses: [addressInput])
                                 let cart = CartInput(delivery: delivery)
-                                let response = AddressChangeStartResponsePayload(cart: cart)
+                                let response = CheckoutAddressChangeStartResponsePayload(cart: cart)
 
                                 print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
                                 do {

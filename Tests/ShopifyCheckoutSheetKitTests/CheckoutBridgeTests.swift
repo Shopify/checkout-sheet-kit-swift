@@ -168,7 +168,7 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertTrue(modalRequest.params.modalVisible)
     }
 
-    func testDecodeSupportsAddressChangeStart() throws {
+    func testDecodeSupportsCheckoutAddressChangeStart() throws {
         let mock = WKScriptMessageMock(body: """
         {
           "jsonrpc":"2.0",
@@ -198,8 +198,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let addressRequest = result as? AddressChangeStart else {
-            XCTFail("Expected AddressChangeStart, got \(result)")
+        guard let addressRequest = result as? CheckoutAddressChangeStart else {
+            XCTFail("Expected CheckoutAddressChangeStart, got \(result)")
             return
         }
 

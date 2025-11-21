@@ -76,7 +76,7 @@ extension CheckoutController: CheckoutDelegate {
         OSLogger.shared.debug("[CheckoutDelegate] Checkout failed: \(error.localizedDescription)")
     }
 
-    func checkoutDidStartAddressChange(event: AddressChangeStart) {
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
         OSLogger.shared.debug("[CheckoutDelegate] Address change start received for addressType: \(event.params.addressType)")
 
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
@@ -101,7 +101,7 @@ extension CheckoutController: CheckoutDelegate {
                 )
             )
 
-            let response = AddressChangeStartResponsePayload(cart: cartInput)
+            let response = CheckoutAddressChangeStartResponsePayload(cart: cartInput)
 
             OSLogger.shared.debug("[CheckoutDelegate] Responding with hardcoded Toronto address via CartInput")
             do {

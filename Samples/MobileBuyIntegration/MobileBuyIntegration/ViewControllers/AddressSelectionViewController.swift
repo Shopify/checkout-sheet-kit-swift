@@ -31,7 +31,7 @@ struct AddressOption {
 }
 
 class AddressSelectionViewController: UIViewController {
-    private let event: AddressChangeStart
+    private let event: CheckoutAddressChangeStart
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -86,7 +86,7 @@ class AddressSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: AddressChangeStart) {
+    init(event: CheckoutAddressChangeStart) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
     }
@@ -150,7 +150,7 @@ class AddressSelectionViewController: UIViewController {
             )
         )
 
-        let response = AddressChangeStartResponsePayload(cart: cartInput)
+        let response = CheckoutAddressChangeStartResponsePayload(cart: cartInput)
 
         do {
             try event.respondWith(payload: response)

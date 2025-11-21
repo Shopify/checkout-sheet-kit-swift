@@ -32,7 +32,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidClickLink(url: URL)
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
-    func checkoutViewDidStartAddressChange(event: AddressChangeStart)
+    func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStart)
     func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested)
 }
 
@@ -286,7 +286,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 modalVisible: modalRequest.params.modalVisible
             )
 
-        case let addressRequest as AddressChangeStart:
+        case let addressRequest as CheckoutAddressChangeStart:
             OSLogger.shared.info(
                 "Address change start event received: \(addressRequest.params.addressType)"
             )

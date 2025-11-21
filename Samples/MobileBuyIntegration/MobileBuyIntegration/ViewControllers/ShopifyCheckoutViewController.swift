@@ -88,7 +88,7 @@ class ShopifyCheckoutViewController: UIViewController {
 }
 
 extension ShopifyCheckoutViewController: CheckoutDelegate {
-    func checkoutDidStartAddressChange(event: AddressChangeStart) {
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
         OSLogger.shared.debug(
             "[EmbeddedCheckout] Address change start received for addressType: \(event.params.addressType)"
         )

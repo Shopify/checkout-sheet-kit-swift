@@ -24,7 +24,7 @@
 import Foundation
 import WebKit
 
-public final class AddressChangeStart: BaseRPCRequest<AddressChangeStartParams, AddressChangeStartResponsePayload> {
+public final class CheckoutAddressChangeStart: BaseRPCRequest<CheckoutAddressChangeStartParams, CheckoutAddressChangeStartResponsePayload> {
     override public static var method: String { "checkout.addressChangeStart" }
 
     override public func validate(payload: ResponsePayload) throws {
@@ -46,12 +46,12 @@ public final class AddressChangeStart: BaseRPCRequest<AddressChangeStartParams, 
     }
 }
 
-public struct AddressChangeStartParams: Codable {
+public struct CheckoutAddressChangeStartParams: Codable {
     public let addressType: String
     public let cart: Cart
 }
 
-public struct AddressChangeStartResponsePayload: Codable {
+public struct CheckoutAddressChangeStartResponsePayload: Codable {
     public let cart: CartInput?
     public let errors: [ResponseError]?
 

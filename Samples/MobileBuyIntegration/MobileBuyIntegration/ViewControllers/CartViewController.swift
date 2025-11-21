@@ -570,7 +570,7 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    func checkoutDidStartAddressChange(event: AddressChangeStart) {
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             let address = CartDeliveryAddressInput(
@@ -593,12 +593,12 @@ extension CartViewController: CheckoutDelegate {
                 )
             )
 
-            let response = AddressChangeStartResponsePayload(cart: cartInput)
+            let response = CheckoutAddressChangeStartResponsePayload(cart: cartInput)
 
             do {
                 try event.respondWith(payload: response)
             } catch {
-                print("[AddressChangeStart]: Failed to respondWith ")
+                print("[CheckoutAddressChangeStart]: Failed to respondWith ")
             }
         }
     }

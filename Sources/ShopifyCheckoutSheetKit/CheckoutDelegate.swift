@@ -46,7 +46,7 @@ public protocol CheckoutDelegate: AnyObject {
     func checkoutDidClickLink(url: URL)
 
     /// Tells the delegate that the checkout has started an address change flow (e.g., for native address picker)
-    func checkoutDidStartAddressChange(event: AddressChangeStart)
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart)
 
     /// Tells the delegate that the checkout is requesting card change intent (e.g., for native card picker)
     func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested)
@@ -73,7 +73,7 @@ extension CheckoutDelegate {
         return error.isRecoverable
     }
 
-    public func checkoutDidStartAddressChange(event _: AddressChangeStart) {
+    public func checkoutDidStartAddressChange(event _: CheckoutAddressChangeStart) {
         /// No-op by default
     }
 
