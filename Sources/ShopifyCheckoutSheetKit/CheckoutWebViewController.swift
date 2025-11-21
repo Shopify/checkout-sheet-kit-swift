@@ -263,8 +263,8 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         delegate?.checkoutDidRequestAddressChange(event: event)
     }
 
-    func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested) {
-        delegate?.checkoutDidRequestCardChange(event: event)
+    func checkoutViewDidRequestPaymentMethodChange(event: PaymentMethodChangeStart) {
+        delegate?.checkoutDidRequestPaymentMethodChange(event: event)
     }
 
     private func isRecoverableError() -> Bool {

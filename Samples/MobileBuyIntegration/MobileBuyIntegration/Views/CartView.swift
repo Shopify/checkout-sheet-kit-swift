@@ -175,6 +175,31 @@ struct CartView: View {
                                 }
                             }
                         }
+                        .onPaymentMethodChange { event in
+                            print("🎉 SwiftUI: Payment method change intent received")
+
+                            // Respond with hardcoded payment method after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                let card = PaymentMethodChangeResult.Card(
+                                    last4: "1234",
+                                    brand: "visa"
+                                )
+
+                                let billing = PaymentMethodChangeResult.BillingInfo(
+                                    useDeliveryAddress: true,
+                                    address: nil
+                                )
+
+                                let response = PaymentMethodChangeResult(card: card, billing: billing)
+
+                                print("🎉 SwiftUI: Responding with hardcoded Visa ending in 1234")
+                                do {
+                                    try event.respondWith(payload: response)
+                                } catch {
+                                    print("Failed to respond with payment method change")
+                                }
+                            }
+                        }
                         .edgesIgnoringSafeArea(.all)
                 }
             }
