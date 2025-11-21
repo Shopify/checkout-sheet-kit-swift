@@ -312,3 +312,104 @@ public enum DiscountValue: Codable {
         }
     }
 }
+
+// MARK: - Cart Input Types
+
+/// Cart input types for updating cart state from embedder responses
+public struct CartInput: Codable {
+    public let delivery: CartDeliveryInput?
+    public let buyerIdentity: CartBuyerIdentityInput?
+    public let discountCodes: [String]?
+
+    public init(
+        delivery: CartDeliveryInput? = nil,
+        buyerIdentity: CartBuyerIdentityInput? = nil,
+        discountCodes: [String]? = nil
+    ) {
+        self.delivery = delivery
+        self.buyerIdentity = buyerIdentity
+        self.discountCodes = discountCodes
+    }
+}
+
+public struct CartDeliveryInput: Codable {
+    public let addresses: [CartSelectableAddressInput]?
+
+    public init(addresses: [CartSelectableAddressInput]? = nil) {
+        self.addresses = addresses
+    }
+}
+
+public struct CartSelectableAddressInput: Codable {
+    public let address: CartDeliveryAddressInput
+    public let oneTimeUse: Bool?
+    public let selected: Bool?
+
+    public init(address: CartDeliveryAddressInput, oneTimeUse: Bool? = nil, selected: Bool? = nil) {
+        self.address = address
+        self.oneTimeUse = oneTimeUse
+        self.selected = selected
+    }
+}
+
+public struct CartDeliveryAddressInput: Codable {
+    public let address1: String?
+    public let address2: String?
+    public let city: String?
+    public let company: String?
+    public let countryCode: String?
+    public let firstName: String?
+    public let lastName: String?
+    public let phone: String?
+    public let provinceCode: String?
+    public let zip: String?
+
+    public init(
+        firstName: String? = nil,
+        lastName: String? = nil,
+        address1: String? = nil,
+        address2: String? = nil,
+        city: String? = nil,
+        company: String? = nil,
+        countryCode: String? = nil,
+        phone: String? = nil,
+        provinceCode: String? = nil,
+        zip: String? = nil
+    ) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.address1 = address1
+        self.address2 = address2
+        self.city = city
+        self.company = company
+        self.countryCode = countryCode
+        self.phone = phone
+        self.provinceCode = provinceCode
+        self.zip = zip
+    }
+}
+
+public struct CartBuyerIdentityInput: Codable {
+    public let email: String?
+    public let phone: String?
+    public let countryCode: String?
+
+    public init(email: String? = nil, phone: String? = nil, countryCode: String? = nil) {
+        self.email = email
+        self.phone = phone
+        self.countryCode = countryCode
+    }
+}
+
+/// Application-level error in cart response payload
+public struct ResponseError: Codable {
+    public let code: String
+    public let message: String
+    public let fieldTarget: String?
+
+    public init(code: String, message: String, fieldTarget: String? = nil) {
+        self.code = code
+        self.message = message
+        self.fieldTarget = fieldTarget
+    }
+}
