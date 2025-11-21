@@ -259,8 +259,8 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         navigationController.setNavigationBarHidden(modalVisible, animated: true)
     }
 
-    func checkoutViewDidRequestAddressChange(event: AddressChangeRequested) {
-        delegate?.checkoutDidRequestAddressChange(event: event)
+    func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStart) {
+        delegate?.checkoutDidStartAddressChange(event: event)
     }
 
     func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested) {

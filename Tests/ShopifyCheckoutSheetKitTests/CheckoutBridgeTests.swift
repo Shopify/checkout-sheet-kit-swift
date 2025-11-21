@@ -90,7 +90,7 @@ class CheckoutBridgeTests: XCTestCase {
         {
             "jsonrpc": "2.0",
             "id": "test-id",
-            "method": "checkout.addressChangeRequested",
+            "method": "checkout.addressChangeStart",
             "params": {
                 "addressType": "shipping"
             }
@@ -168,30 +168,29 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertTrue(modalRequest.params.modalVisible)
     }
 
-    func testDecodeSupportsAddressChangeRequested() throws {
+    func testDecodeSupportsCheckoutAddressChangeStart() throws {
         let mock = WKScriptMessageMock(body: """
         {
           "jsonrpc":"2.0",
           "id":"2fee28d3-e10f-4f5e-b6e5-e63c061029b3",
-          "method":"checkout.addressChangeRequested",
+          "method":"checkout.addressChangeStart",
           "params":{
             "addressType":"shipping",
-            "selectedAddress":{
-              "city":"Toronto",
-              "countryCode":"CA",
-              "postalCode":"M5V 1M7",
-              "address1":"650 King Street",
-              "address2":"Shopify HQ",
-              "firstName":"Evelyn",
-              "lastName":"Hartley",
-              "name":"Evelyn",
-              "zoneCode":"ON",
-              "phone":"1-888-746-7439",
-              "oneTimeUse":false,
-              "coordinates":{
-                "latitude":45.416311,
-                "longitude":-75.68683
-              }
+            "cart":{
+              "id":"gid://shopify/Cart/test-cart-123",
+              "lines":[],
+              "cost":{
+                "subtotalAmount":{"amount":"100.00","currencyCode":"USD"},
+                "totalAmount":{"amount":"100.00","currencyCode":"USD"}
+              },
+              "buyerIdentity":{
+                "email":"test@example.com"
+              },
+              "deliveryGroups":[],
+              "discountCodes":[],
+              "appliedGiftCards":[],
+              "discountAllocations":[],
+              "delivery":{"addresses":[]}
             }
           }
         }
@@ -199,19 +198,14 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let addressRequest = result as? AddressChangeRequested else {
-            XCTFail("Expected AddressChangeRequested, got \(result)")
+        guard let addressRequest = result as? CheckoutAddressChangeStart else {
+            XCTFail("Expected CheckoutAddressChangeStart, got \(result)")
             return
         }
 
         XCTAssertEqual("2fee28d3-e10f-4f5e-b6e5-e63c061029b3", addressRequest.id)
         XCTAssertEqual("shipping", addressRequest.params.addressType)
-
-        let address = addressRequest.params.selectedAddress
-        XCTAssertNotNil(address)
-        XCTAssertEqual("Toronto", address?.city)
-        XCTAssertEqual("CA", address?.countryCode)
-        XCTAssertEqual("M5V 1M7", address?.postalCode)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", addressRequest.params.cart.id)
     }
 
     func testDecodeSupportsCheckoutCardChangeRequested() throws {

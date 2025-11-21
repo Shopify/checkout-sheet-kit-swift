@@ -27,11 +27,11 @@ import UIKit
 
 struct AddressOption {
     let label: String
-    let address: CartDeliveryAddress
+    let address: CartDeliveryAddressInput
 }
 
 class AddressSelectionViewController: UIViewController {
-    private let event: AddressChangeRequested
+    private let event: CheckoutAddressChangeStart
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -40,12 +40,13 @@ class AddressSelectionViewController: UIViewController {
     private let addressOptions: [AddressOption] = [
         AddressOption(
             label: "Default",
-            address: CartDeliveryAddress(
+            address: CartDeliveryAddressInput(
                 firstName: InfoDictionary.shared.firstName,
                 lastName: InfoDictionary.shared.lastName,
                 address1: InfoDictionary.shared.address1,
                 address2: InfoDictionary.shared.address2,
                 city: InfoDictionary.shared.city,
+                company: nil,
                 countryCode: InfoDictionary.shared.country,
                 phone: InfoDictionary.shared.phone,
                 provinceCode: InfoDictionary.shared.province,
@@ -55,7 +56,7 @@ class AddressSelectionViewController: UIViewController {
 
         AddressOption(
             label: "Happy path lane",
-            address: CartDeliveryAddress(
+            address: CartDeliveryAddressInput(
                 firstName: "Evelyn",
                 lastName: "Hartley",
                 address1: "89 Haight Street",
@@ -71,7 +72,7 @@ class AddressSelectionViewController: UIViewController {
         /// causing the address form to 'unroll' back in checkout
         AddressOption(
             label: "Broken Address Ave",
-            address: CartDeliveryAddress(
+            address: CartDeliveryAddressInput(
                 firstName: "Evelyn",
                 lastName: "Hartley",
                 address1: "Broken Address",
@@ -85,7 +86,7 @@ class AddressSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: AddressChangeRequested) {
+    init(event: CheckoutAddressChangeStart) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
     }
@@ -139,10 +140,17 @@ class AddressSelectionViewController: UIViewController {
     }
 
     @objc private func confirmSelection() {
-        let selectedAddress = addressOptions[selectedIndex].address
-        let addressInput = CartSelectableAddress(address: .deliveryAddress(selectedAddress))
-        let delivery = CartDelivery(addresses: [addressInput])
-        let response = DeliveryAddressChangePayload(delivery: delivery)
+        let address = addressOptions[selectedIndex].address
+
+        let cartInput = CartInput(
+            delivery: CartDeliveryInput(
+                addresses: [
+                    CartSelectableAddressInput(address: address, selected: true)
+                ]
+            )
+        )
+
+        let response = CheckoutAddressChangeStartResponsePayload(cart: cartInput)
 
         do {
             try event.respondWith(payload: response)

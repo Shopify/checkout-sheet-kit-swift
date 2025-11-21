@@ -28,7 +28,7 @@ import WebKit
 enum RPCRequestRegistry {
     /// Array of all supported request types
     static let requestTypes: [any RPCRequest.Type] = [
-        AddressChangeRequested.self,
+        CheckoutAddressChangeStart.self,
         CheckoutCardChangeRequested.self,
         CheckoutCompleteRequest.self,
         CheckoutErrorRequest.self,
