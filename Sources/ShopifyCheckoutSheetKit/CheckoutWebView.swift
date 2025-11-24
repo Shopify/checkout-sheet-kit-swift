@@ -302,8 +302,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
             handleCheckoutError(errorRequest)
 
         // Ignore unsupported requests
-        case is UnsupportedRequest:
-            OSLogger.shared.debug("Unsupported request: \(String(describing: request.id))")
+        case let unsupportedRequest as UnsupportedRequest:
+            OSLogger.shared.debug("Unsupported request: \(unsupportedRequest.actualMethod) (id: \(String(describing: request.id)))")
 
         default:
             OSLogger.shared.debug(
