@@ -142,7 +142,7 @@ public class CheckoutWebView: WKWebView {
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".
         configuration.allowsInlineMediaPlayback = true
-        
+
         self.options = options
 
         if recovery {
