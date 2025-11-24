@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Use Homebrew's swiftformat explicitly to avoid PATH conflicts
+SWIFTFORMAT="/opt/homebrew/bin/swiftformat"
+
 # Check for verbose flag
 VERBOSE=false
 if [[ "$*" == *"--verbose"* ]]; then
@@ -40,8 +43,8 @@ if ! which swiftlint >/dev/null; then
 fi
 
 # Check for SwiftFormat
-if ! which swiftformat >/dev/null; then
-    echo "⚠️ WARN: SwiftFormat not installed"
+if [ ! -f "$SWIFTFORMAT" ]; then
+    echo "⚠️ WARN: SwiftFormat not installed at $SWIFTFORMAT"
     print_install_instructions
     exit 1
 fi
@@ -70,11 +73,11 @@ echo ""
 
 # Run SwiftFormat
 if [[ "$MODE" == "fix" ]]; then
-    swiftformat . $QUIET_FLAG
+    "$SWIFTFORMAT" . $QUIET_FLAG
     FORMAT_STATUS=$?
-else 
-    swiftformat . $QUIET_FLAG --lint
-    FORMAT_STATUS=$? 
+else
+    "$SWIFTFORMAT" . $QUIET_FLAG --lint
+    FORMAT_STATUS=$?
 fi
 
 if [ $FORMAT_STATUS -eq 0 ]; then
