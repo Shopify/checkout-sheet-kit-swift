@@ -312,3 +312,145 @@ public enum DiscountValue: Codable {
         }
     }
 }
+
+// MARK: - Cart Input Types
+
+/// Cart input types for updating cart state from embedder responses.
+///
+/// Mirrors the [Storefront API CartInput](https://shopify.dev/docs/api/storefront/latest/input-objects/CartInput).
+public struct CartInput: Codable {
+    /// The delivery-related fields for the cart.
+    public let delivery: CartDeliveryInput?
+
+    /// The customer associated with the cart.
+    public let buyerIdentity: CartBuyerIdentityInput?
+
+    /// The case-insensitive discount codes that the customer added at checkout.
+    public let discountCodes: [String]?
+
+    public init(
+        delivery: CartDeliveryInput? = nil,
+        buyerIdentity: CartBuyerIdentityInput? = nil,
+        discountCodes: [String]? = nil
+    ) {
+        self.delivery = delivery
+        self.buyerIdentity = buyerIdentity
+        self.discountCodes = discountCodes
+    }
+}
+
+/// Delivery-related fields for the cart.
+public struct CartDeliveryInput: Codable {
+    /// Selectable addresses presented to the buyer.
+    public let addresses: [CartSelectableAddressInput]?
+
+    public init(addresses: [CartSelectableAddressInput]? = nil) {
+        self.addresses = addresses
+    }
+}
+
+/// A selectable delivery address with optional selection settings.
+public struct CartSelectableAddressInput: Codable {
+    /// Exactly one kind of delivery address.
+    public let address: CartDeliveryAddressInput
+
+    /// Whether this address is selected as the active delivery address.
+    public let selected: Bool?
+
+    public init(address: CartDeliveryAddressInput, selected: Bool? = nil) {
+        self.address = address
+        self.selected = selected
+    }
+}
+
+/// A delivery address for a cart.
+///
+/// Based on [Storefront API MailingAddressInput](https://shopify.dev/docs/api/storefront/latest/input-objects/MailingAddressInput).
+public struct CartDeliveryAddressInput: Codable {
+    /// The first line of the address. Typically the street address or PO Box number.
+    public let address1: String?
+
+    /// The second line of the address. Typically the number of the apartment, suite, or unit.
+    public let address2: String?
+
+    /// The name of the city, district, village, or town.
+    public let city: String?
+
+    /// The name of the customer's company or organization.
+    public let company: String?
+
+    /// The two-letter country code (ISO 3166-1 alpha-2 format, e.g., "US", "CA").
+    public let countryCode: String?
+
+    /// The first name of the customer.
+    public let firstName: String?
+
+    /// The last name of the customer.
+    public let lastName: String?
+
+    /// The phone number for the address. Formatted using E.164 standard (e.g., +16135551111).
+    public let phone: String?
+
+    /// The code for the region of the address, such as the province or state (e.g., "ON" for Ontario, or "CA" for California).
+    public let provinceCode: String?
+
+    /// The zip or postal code of the address.
+    public let zip: String?
+
+    public init(
+        firstName: String? = nil,
+        lastName: String? = nil,
+        address1: String? = nil,
+        address2: String? = nil,
+        city: String? = nil,
+        company: String? = nil,
+        countryCode: String? = nil,
+        phone: String? = nil,
+        provinceCode: String? = nil,
+        zip: String? = nil
+    ) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.address1 = address1
+        self.address2 = address2
+        self.city = city
+        self.company = company
+        self.countryCode = countryCode
+        self.phone = phone
+        self.provinceCode = provinceCode
+        self.zip = zip
+    }
+}
+
+/// The customer associated with the cart.
+///
+/// Based on [Storefront API CartBuyerIdentityInput](https://shopify.dev/docs/api/storefront/latest/input-objects/CartBuyerIdentityInput).
+public struct CartBuyerIdentityInput: Codable {
+    /// The email address of the buyer that is interacting with the cart / checkout.
+    public let email: String?
+
+    /// The phone number of the buyer that is interacting with the cart / checkout.
+    public let phone: String?
+
+    /// The country where the buyer is located. Two-letter country code (ISO 3166-1 alpha-2, e.g. US, GB, CA).
+    public let countryCode: String?
+
+    public init(email: String? = nil, phone: String? = nil, countryCode: String? = nil) {
+        self.email = email
+        self.phone = phone
+        self.countryCode = countryCode
+    }
+}
+
+/// Application-level error in cart response payload
+public struct ResponseError: Codable {
+    public let code: String
+    public let message: String
+    public let fieldTarget: String?
+
+    public init(code: String, message: String, fieldTarget: String? = nil) {
+        self.code = code
+        self.message = message
+        self.fieldTarget = fieldTarget
+    }
+}

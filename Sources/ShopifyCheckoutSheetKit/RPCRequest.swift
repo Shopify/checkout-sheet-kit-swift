@@ -194,15 +194,15 @@ extension RPCRequest {
     /// Decodes into RespondableEvent.RPCResponse Codable
     func decode(from responseData: String) throws -> ResponsePayload {
         guard let data = responseData.data(using: .utf8) else {
-            throw EventResponseError.invalidEncoding
+            throw CheckoutEventResponseError.invalidEncoding
         }
 
         do {
             return try JSONDecoder().decode(ResponsePayload.self, from: data)
         } catch let error as DecodingError {
-            throw EventResponseError.decodingFailed(formatDecodingError(error))
+            throw CheckoutEventResponseError.decodingFailed(formatDecodingError(error))
         } catch {
-            throw EventResponseError.decodingFailed(error.localizedDescription)
+            throw CheckoutEventResponseError.decodingFailed(error.localizedDescription)
         }
     }
 
@@ -213,7 +213,7 @@ extension RPCRequest {
     public func validate(payload _: ResponsePayload) throws {}
 }
 
-public enum EventResponseError: Error {
+public enum CheckoutEventResponseError: Error {
     case invalidEncoding
     case decodingFailed(String)
     case validationFailed(String)

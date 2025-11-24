@@ -32,7 +32,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidClickLink(url: URL)
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
-    func checkoutViewDidRequestAddressChange(event: AddressChangeRequested)
+    func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStart)
     func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested)
 }
 
@@ -142,7 +142,7 @@ public class CheckoutWebView: WKWebView {
         /// Some external payment providers require ID verification which trigger the camera
         /// This configuration option prevents the camera from opening as a "Live Broadcast".
         configuration.allowsInlineMediaPlayback = true
-        
+
         self.options = options
 
         if recovery {
@@ -286,11 +286,11 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 modalVisible: modalRequest.params.modalVisible
             )
 
-        case let addressRequest as AddressChangeRequested:
+        case let addressRequest as CheckoutAddressChangeStart:
             OSLogger.shared.info(
-                "Address change intent event received: \(addressRequest.params.addressType)"
+                "Address change start event received: \(addressRequest.params.addressType)"
             )
-            viewDelegate.checkoutViewDidRequestAddressChange(event: addressRequest)
+            viewDelegate.checkoutViewDidStartAddressChange(event: addressRequest)
 
         case let cardRequest as CheckoutCardChangeRequested:
             OSLogger.shared.info(

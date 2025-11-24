@@ -76,12 +76,12 @@ extension CheckoutController: CheckoutDelegate {
         OSLogger.shared.debug("[CheckoutDelegate] Checkout failed: \(error.localizedDescription)")
     }
 
-    func checkoutDidRequestAddressChange(event: AddressChangeRequested) {
-        OSLogger.shared.debug("[CheckoutDelegate] Address change intent received for addressType: \(event.params.addressType)")
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
+        OSLogger.shared.debug("[CheckoutDelegate] Address change start received for addressType: \(event.params.addressType)")
 
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            let hardcodedAddress = CartDeliveryAddress(
+            let address = CartDeliveryAddressInput(
                 firstName: "John",
                 lastName: "Doe",
                 address1: "123 Test Street",
@@ -93,15 +93,21 @@ extension CheckoutController: CheckoutDelegate {
                 zip: "M5V 1A1"
             )
 
-            let addressInput = CartSelectableAddress(address: .deliveryAddress(hardcodedAddress))
-            let delivery = CartDelivery(addresses: [addressInput])
-            let response = DeliveryAddressChangePayload(delivery: delivery)
+            let cartInput = CartInput(
+                delivery: CartDeliveryInput(
+                    addresses: [
+                        CartSelectableAddressInput(address: address, selected: true)
+                    ]
+                )
+            )
 
-            OSLogger.shared.debug("[CheckoutDelegate] Responding with hardcoded Toronto address")
+            let response = CheckoutAddressChangeStartResponsePayload(cart: cartInput)
+
+            OSLogger.shared.debug("[CheckoutDelegate] Responding with hardcoded Toronto address via CartInput")
             do {
                 try event.respondWith(payload: response)
             } catch {
-                OSLogger.shared.error("[CheckoutDelegate] Failed to respond to address change intent: \(error)")
+                OSLogger.shared.error("[CheckoutDelegate] Failed to respond to address change start: \(error)")
             }
         }
     }
