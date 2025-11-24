@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Use Homebrew's swiftformat explicitly to avoid PATH conflicts
-SWIFTFORMAT="/opt/homebrew/bin/swiftformat"
+SWIFTFORMAT="$(brew --prefix)/bin/swiftformat"
 
 # Check for verbose flag
 VERBOSE=false
