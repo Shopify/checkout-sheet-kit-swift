@@ -24,69 +24,52 @@
 import Foundation
 import WebKit
 
-public final class PaymentMethodChangeStart: BaseRPCRequest<PaymentMethodChangeStartParams, PaymentMethodChangeResult> {
+public final class PaymentMethodChangeStart: BaseRPCRequest<PaymentMethodChangeStartParams, PaymentMethodChangeStartResponsePayload> {
     override public static var method: String { "checkout.paymentMethodChangeStart" }
 
     override public func validate(payload: ResponsePayload) throws {
-        let card = payload.card
-
-        guard card.last4.count == 4 else {
-            throw CheckoutEventResponseError.validationFailed("Card last4 must be exactly 4 digits")
+        guard let cart = payload.cart else {
+            return
         }
 
-        guard !card.brand.isEmpty else {
-            throw CheckoutEventResponseError.validationFailed("Card brand cannot be empty")
+        guard let instruments = cart.paymentInstruments, !instruments.isEmpty else {
+            return
         }
 
-        let billing = payload.billing
-
-        if !billing.useDeliveryAddress {
-            guard let address = billing.address else {
-                throw CheckoutEventResponseError.validationFailed("Billing address is required when useDeliveryAddress is false")
+        for (index, instrument) in instruments.enumerated() {
+            guard instrument.lastDigits.count == 4 else {
+                throw CheckoutEventResponseError.validationFailed(
+                    "Payment instrument lastDigits must be exactly 4 characters at index \(index)"
+                )
             }
 
-            if let countryCode = address.countryCode, countryCode.isEmpty {
-                throw CheckoutEventResponseError.validationFailed("Country code cannot be empty")
+            guard instrument.expiryMonth >= 1, instrument.expiryMonth <= 12 else {
+                throw CheckoutEventResponseError.validationFailed(
+                    "Payment instrument expiryMonth must be between 1 and 12 at index \(index)"
+                )
+            }
+
+            if let countryCode = instrument.billingAddress.countryCode, !countryCode.isEmpty {
+                guard countryCode.count == 2 else {
+                    throw CheckoutEventResponseError.validationFailed(
+                        "Country code must be exactly 2 characters (ISO 3166-1 alpha-2) at index \(index), got: '\(countryCode)'"
+                    )
+                }
             }
         }
     }
 }
 
 public struct PaymentMethodChangeStartParams: Codable {
-    public let currentCard: CurrentCard?
-
-    public struct CurrentCard: Codable {
-        public let last4: String
-        public let brand: String
-    }
+    public let cart: Cart
 }
 
-public struct PaymentMethodChangeResult: Codable {
-    public let card: Card
-    public let billing: BillingInfo
+public struct PaymentMethodChangeStartResponsePayload: Codable {
+    public let cart: CartInput?
+    public let errors: [ResponseError]?
 
-    public init(card: Card, billing: BillingInfo) {
-        self.card = card
-        self.billing = billing
-    }
-
-    public struct Card: Codable {
-        public let last4: String
-        public let brand: String
-
-        public init(last4: String, brand: String) {
-            self.last4 = last4
-            self.brand = brand
-        }
-    }
-
-    public struct BillingInfo: Codable {
-        public let useDeliveryAddress: Bool
-        public let address: CartDeliveryAddress?
-
-        public init(useDeliveryAddress: Bool, address: CartDeliveryAddress? = nil) {
-            self.useDeliveryAddress = useDeliveryAddress
-            self.address = address
-        }
+    public init(cart: CartInput? = nil, errors: [ResponseError]? = nil) {
+        self.cart = cart
+        self.errors = errors
     }
 }

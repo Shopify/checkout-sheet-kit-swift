@@ -51,6 +51,7 @@ public struct Cart: Codable {
     public let appliedGiftCards: [AppliedGiftCard]
     public let discountAllocations: [CartDiscountAllocation]
     public let delivery: CartDelivery
+    public let paymentInstruments: [CartPaymentInstrument]
 }
 
 public struct CartLine: Codable {
@@ -180,6 +181,30 @@ public enum CartDeliveryMethodType: String, Codable {
 public enum CartDeliveryGroupType: String, Codable {
     case subscription = "SUBSCRIPTION"
     case oneTimePurchase = "ONE_TIME_PURCHASE"
+}
+
+public enum CardBrand: String, Codable {
+    case visa = "VISA"
+    case mastercard = "MASTERCARD"
+    case americanExpress = "AMERICAN_EXPRESS"
+    case discover = "DISCOVER"
+    case dinersClub = "DINERS_CLUB"
+    case jcb = "JCB"
+    case maestro = "MAESTRO"
+    case unknown = "UNKNOWN"
+}
+
+public enum PaymentMethodType: String, Codable {
+    case creditCard = "CREDIT_CARD"
+    case debitCard = "DEBIT_CARD"
+    case wallet = "WALLET"
+    case deferredPayment = "DEFERRED_PAYMENT"
+    case localPayment = "LOCAL_PAYMENT"
+    case other = "OTHER"
+}
+
+public struct CartPaymentInstrument: Codable {
+    public let identifier: String
 }
 
 public struct CartDelivery: Codable {
@@ -328,14 +353,19 @@ public struct CartInput: Codable {
     /// The case-insensitive discount codes that the customer added at checkout.
     public let discountCodes: [String]?
 
+    /// Payment instruments for the cart.
+    public let paymentInstruments: [CartPaymentInstrumentInput]?
+
     public init(
         delivery: CartDeliveryInput? = nil,
         buyerIdentity: CartBuyerIdentityInput? = nil,
-        discountCodes: [String]? = nil
+        discountCodes: [String]? = nil,
+        paymentInstruments: [CartPaymentInstrumentInput]? = nil
     ) {
         self.delivery = delivery
         self.buyerIdentity = buyerIdentity
         self.discountCodes = discountCodes
+        self.paymentInstruments = paymentInstruments
     }
 }
 
@@ -439,6 +469,34 @@ public struct CartBuyerIdentityInput: Codable {
         self.email = email
         self.phone = phone
         self.countryCode = countryCode
+    }
+}
+
+public struct CartPaymentInstrumentInput: Codable {
+    public let identifier: String
+    public let lastDigits: String
+    public let cardHolderName: String
+    public let brand: CardBrand
+    public let expiryMonth: Int
+    public let expiryYear: Int
+    public let billingAddress: CartDeliveryAddressInput
+
+    public init(
+        identifier: String,
+        lastDigits: String,
+        cardHolderName: String,
+        brand: CardBrand,
+        expiryMonth: Int,
+        expiryYear: Int,
+        billingAddress: CartDeliveryAddressInput
+    ) {
+        self.identifier = identifier
+        self.lastDigits = lastDigits
+        self.cardHolderName = cardHolderName
+        self.brand = brand
+        self.expiryMonth = expiryMonth
+        self.expiryYear = expiryYear
+        self.billingAddress = billingAddress
     }
 }
 

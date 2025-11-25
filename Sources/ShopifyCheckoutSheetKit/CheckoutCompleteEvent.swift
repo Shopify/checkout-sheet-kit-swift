@@ -53,7 +53,8 @@ func createEmptyCheckoutCompleteEvent(id: String? = "") -> CheckoutCompleteEvent
             discountCodes: [],
             appliedGiftCards: [],
             discountAllocations: [],
-            delivery: CartDelivery(addresses: [])
+            delivery: CartDelivery(addresses: []),
+            paymentInstruments: []
         )
     )
 }

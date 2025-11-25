@@ -27,10 +27,13 @@ import UIKit
 
 struct CardOption {
     let label: String
+    let identifier: String
     let last4: String
-    let brand: String
-    let useDeliveryAddress: Bool
-    let billingAddress: CartDeliveryAddress?
+    let brand: CardBrand
+    let cardHolderName: String
+    let expiryMonth: Int
+    let expiryYear: Int
+    let billingAddress: CartDeliveryAddressInput
 }
 
 class CardSelectionViewController: UIViewController {
@@ -43,17 +46,32 @@ class CardSelectionViewController: UIViewController {
     private let cardOptions: [CardOption] = [
         CardOption(
             label: "Visa ending in 4242",
+            identifier: "card-visa-4242",
             last4: "4242",
-            brand: "visa",
-            useDeliveryAddress: true,
-            billingAddress: nil
+            brand: .visa,
+            cardHolderName: "John Smith",
+            expiryMonth: 12,
+            expiryYear: 2026,
+            billingAddress: CartDeliveryAddressInput(
+                firstName: "John",
+                lastName: "Smith",
+                address1: "123 Main St",
+                city: "New York",
+                countryCode: "US",
+                phone: "+1-555-0100",
+                provinceCode: "NY",
+                zip: "10001"
+            )
         ),
         CardOption(
             label: "Mastercard ending in 5555",
+            identifier: "card-mc-5555",
             last4: "5555",
-            brand: "mastercard",
-            useDeliveryAddress: false,
-            billingAddress: CartDeliveryAddress(
+            brand: .mastercard,
+            cardHolderName: "John Smith",
+            expiryMonth: 6,
+            expiryYear: 2027,
+            billingAddress: CartDeliveryAddressInput(
                 firstName: "John",
                 lastName: "Smith",
                 address1: "123 Main St",
@@ -67,10 +85,13 @@ class CardSelectionViewController: UIViewController {
         ),
         CardOption(
             label: "Amex ending in 3737",
+            identifier: "card-amex-3737",
             last4: "3737",
-            brand: "american_express",
-            useDeliveryAddress: false,
-            billingAddress: CartDeliveryAddress(
+            brand: .americanExpress,
+            cardHolderName: "Jane Doe",
+            expiryMonth: 3,
+            expiryYear: 2028,
+            billingAddress: CartDeliveryAddressInput(
                 firstName: "Jane",
                 lastName: "Doe",
                 address1: "456 Oak Ave",
@@ -87,9 +108,9 @@ class CardSelectionViewController: UIViewController {
         self.event = event
         super.init(nibName: nil, bundle: nil)
 
-        // If current card is provided, try to select it
-        if let currentCard = event.params.currentCard {
-            for (index, option) in cardOptions.enumerated() where option.last4 == currentCard.last4 {
+        // If payment instruments exist, try to select the first one
+        if let firstInstrument = event.params.cart.paymentInstruments.first {
+            for (index, option) in cardOptions.enumerated() where option.identifier == firstInstrument.identifier {
                 selectedIndex = index
                 break
             }
@@ -147,17 +168,19 @@ class CardSelectionViewController: UIViewController {
     @objc private func confirmSelection() {
         let selectedCard = cardOptions[selectedIndex]
 
-        let card = PaymentMethodChangeResult.Card(
-            last4: selectedCard.last4,
-            brand: selectedCard.brand
+        let paymentInstrument = CartPaymentInstrumentInput(
+            identifier: selectedCard.identifier,
+            lastDigits: selectedCard.last4,
+            cardHolderName: selectedCard.cardHolderName,
+            brand: selectedCard.brand,
+            expiryMonth: selectedCard.expiryMonth,
+            expiryYear: selectedCard.expiryYear,
+            billingAddress: selectedCard.billingAddress
         )
 
-        let billing = PaymentMethodChangeResult.BillingInfo(
-            useDeliveryAddress: selectedCard.useDeliveryAddress,
-            address: selectedCard.billingAddress
+        let result = PaymentMethodChangeStartResponsePayload(
+            cart: CartInput(paymentInstruments: [paymentInstrument])
         )
-
-        let result = PaymentMethodChangeResult(card: card, billing: billing)
 
         do {
             try event.respondWith(payload: result)
@@ -283,14 +306,9 @@ class CardCell: UITableViewCell {
         cardImageView.image = UIImage(systemName: imageName)
         cardImageView.tintColor = .label
 
-        // Set billing details
-        if option.useDeliveryAddress {
-            detailsLabel.text = "Use delivery address for billing"
-        } else if let address = option.billingAddress {
-            detailsLabel.text = "\(address.city ?? ""), \(address.provinceCode ?? "") \(address.zip ?? "")"
-        } else {
-            detailsLabel.text = "Custom billing address"
-        }
+        // Set billing details from address
+        let address = option.billingAddress
+        detailsLabel.text = "\(address.city ?? ""), \(address.provinceCode ?? "") \(address.zip ?? "")"
 
         radioButtonInner.isHidden = !isSelected
 
@@ -303,13 +321,13 @@ class CardCell: UITableViewCell {
         }
     }
 
-    private func getCardImageName(for brand: String) -> String {
-        switch brand.lowercased() {
-        case "visa":
+    private func getCardImageName(for brand: CardBrand) -> String {
+        switch brand {
+        case .visa:
             return "creditcard"
-        case "mastercard":
+        case .mastercard:
             return "creditcard.fill"
-        case "american_express", "amex":
+        case .americanExpress:
             return "creditcard.and.123"
         default:
             return "creditcard"

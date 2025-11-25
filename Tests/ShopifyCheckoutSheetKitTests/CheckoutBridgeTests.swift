@@ -190,7 +190,8 @@ class CheckoutBridgeTests: XCTestCase {
               "discountCodes":[],
               "appliedGiftCards":[],
               "discountAllocations":[],
-              "delivery":{"addresses":[]}
+              "delivery":{"addresses":[]},
+              "paymentInstruments":[]
             }
           }
         }
@@ -215,10 +216,7 @@ class CheckoutBridgeTests: XCTestCase {
             "id": "card-change-123",
             "method": "checkout.paymentMethodChangeStart",
             "params": {
-                "currentCard": {
-                    "last4": "4242",
-                    "brand": "visa"
-                }
+                "cart": \(createTestCartJSON())
             }
         }
         """, webView: mockWebView)
@@ -231,19 +229,31 @@ class CheckoutBridgeTests: XCTestCase {
         }
 
         XCTAssertEqual("card-change-123", cardRequest.id)
-        XCTAssertNotNil(cardRequest.params.currentCard)
-        XCTAssertEqual("4242", cardRequest.params.currentCard?.last4)
-        XCTAssertEqual("visa", cardRequest.params.currentCard?.brand)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", cardRequest.params.cart.id)
     }
 
-    func testDecodeSupportsPaymentMethodChangeStartWithoutCurrentCard() throws {
+    func testDecodeSupportsPaymentMethodChangeStartWithPaymentInstruments() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
             "id": "card-change-456",
             "method": "checkout.paymentMethodChangeStart",
             "params": {
-                "currentCard": null
+                "cart": {
+                    "id": "gid://shopify/Cart/test-cart-456",
+                    "lines": [],
+                    "cost": {
+                        "subtotalAmount": { "amount": "10.00", "currencyCode": "USD" },
+                        "totalAmount": { "amount": "10.00", "currencyCode": "USD" }
+                    },
+                    "buyerIdentity": { "email": null, "phone": null, "customer": null, "countryCode": "US" },
+                    "deliveryGroups": [],
+                    "discountCodes": [],
+                    "appliedGiftCards": [],
+                    "discountAllocations": [],
+                    "delivery": { "addresses": [] },
+                    "paymentInstruments": [{ "identifier": "instrument-123" }]
+                }
             }
         }
         """, webView: mockWebView)
@@ -256,7 +266,9 @@ class CheckoutBridgeTests: XCTestCase {
         }
 
         XCTAssertEqual("card-change-456", cardRequest.id)
-        XCTAssertNil(cardRequest.params.currentCard)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.params.cart.id)
+        XCTAssertEqual(1, cardRequest.params.cart.paymentInstruments.count)
+        XCTAssertEqual("instrument-123", cardRequest.params.cart.paymentInstruments.first?.identifier)
     }
 
     func testDecodeSupportsCheckoutStart() throws {

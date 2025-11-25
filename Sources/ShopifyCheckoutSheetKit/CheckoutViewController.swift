@@ -155,7 +155,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onFail: ((CheckoutError) -> Void)?
     var onLinkClick: ((URL) -> Void)?
     var onAddressChangeStart: ((CheckoutAddressChangeStart) -> Void)?
-    var onPaymentChangeRequested: ((CheckoutCardChangeRequested) -> Void)?
+    var onPaymentMethodChange: ((PaymentMethodChangeStart) -> Void)?
 
     public func checkoutDidStart(event: CheckoutStartEvent) {
         onStart?(event)

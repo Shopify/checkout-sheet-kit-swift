@@ -180,17 +180,27 @@ struct CartView: View {
 
                             // Respond with hardcoded payment method after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                let card = PaymentMethodChangeResult.Card(
-                                    last4: "1234",
-                                    brand: "visa"
+                                let paymentInstrument = CartPaymentInstrumentInput(
+                                    identifier: "card-visa-1234",
+                                    lastDigits: "1234",
+                                    cardHolderName: "John Smith",
+                                    brand: .visa,
+                                    expiryMonth: 12,
+                                    expiryYear: 2026,
+                                    billingAddress: CartDeliveryAddressInput(
+                                        firstName: "John",
+                                        lastName: "Smith",
+                                        address1: "123 Main St",
+                                        city: "Vancouver",
+                                        countryCode: "CA",
+                                        provinceCode: "BC",
+                                        zip: "V6B 1A1"
+                                    )
                                 )
 
-                                let billing = PaymentMethodChangeResult.BillingInfo(
-                                    useDeliveryAddress: true,
-                                    address: nil
+                                let response = PaymentMethodChangeStartResponsePayload(
+                                    cart: CartInput(paymentInstruments: [paymentInstrument])
                                 )
-
-                                let response = PaymentMethodChangeResult(card: card, billing: billing)
 
                                 print("🎉 SwiftUI: Responding with hardcoded Visa ending in 1234")
                                 do {
