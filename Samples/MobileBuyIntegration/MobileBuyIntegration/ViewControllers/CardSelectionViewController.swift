@@ -37,7 +37,7 @@ struct CardOption {
 }
 
 class CardSelectionViewController: UIViewController {
-    private let event: PaymentMethodChangeStart
+    private let event: CheckoutPaymentMethodChangeStart
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -104,7 +104,7 @@ class CardSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: PaymentMethodChangeStart) {
+    init(event: CheckoutPaymentMethodChangeStart) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
 
@@ -178,7 +178,7 @@ class CardSelectionViewController: UIViewController {
             billingAddress: selectedCard.billingAddress
         )
 
-        let result = PaymentMethodChangeStartResponsePayload(
+        let result = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(paymentInstruments: [paymentInstrument])
         )
 

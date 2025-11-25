@@ -24,7 +24,7 @@
 import Foundation
 import WebKit
 
-public final class PaymentMethodChangeStart: BaseRPCRequest<PaymentMethodChangeStartParams, PaymentMethodChangeStartResponsePayload> {
+public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload> {
     override public static var method: String { "checkout.paymentMethodChangeStart" }
 
     override public func validate(payload: ResponsePayload) throws {
@@ -60,11 +60,11 @@ public final class PaymentMethodChangeStart: BaseRPCRequest<PaymentMethodChangeS
     }
 }
 
-public struct PaymentMethodChangeStartParams: Codable {
+public struct CheckoutPaymentMethodChangeStartParams: Codable {
     public let cart: Cart
 }
 
-public struct PaymentMethodChangeStartResponsePayload: Codable {
+public struct CheckoutPaymentMethodChangeStartResponsePayload: Codable {
     public let cart: CartInput?
     public let errors: [ResponseError]?
 

@@ -92,7 +92,7 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
         // Mock implementation - could add expectations here if needed for testing
     }
 
-    func checkoutViewDidRequestPaymentMethodChange(event _: PaymentMethodChangeStart) {
+    func checkoutViewDidRequestPaymentMethodChange(event _: CheckoutPaymentMethodChangeStart) {
         // No-op for tests unless explicitly asserted
     }
 

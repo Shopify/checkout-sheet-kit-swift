@@ -209,7 +209,7 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", addressRequest.params.cart.id)
     }
 
-    func testDecodeSupportsPaymentMethodChangeStart() throws {
+    func testDecodeSupportsCheckoutPaymentMethodChangeStart() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
@@ -223,8 +223,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let cardRequest = result as? PaymentMethodChangeStart else {
-            XCTFail("Expected PaymentMethodChangeStart, got \(result)")
+        guard let cardRequest = result as? CheckoutPaymentMethodChangeStart else {
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
             return
         }
 
@@ -232,7 +232,7 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", cardRequest.params.cart.id)
     }
 
-    func testDecodeSupportsPaymentMethodChangeStartWithPaymentInstruments() throws {
+    func testDecodeSupportsCheckoutPaymentMethodChangeStartWithPaymentInstruments() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
@@ -260,8 +260,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let cardRequest = result as? PaymentMethodChangeStart else {
-            XCTFail("Expected PaymentMethodChangeStart, got \(result)")
+        guard let cardRequest = result as? CheckoutPaymentMethodChangeStart else {
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
             return
         }
 

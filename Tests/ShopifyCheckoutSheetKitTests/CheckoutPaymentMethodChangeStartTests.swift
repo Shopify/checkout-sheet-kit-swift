@@ -24,12 +24,12 @@
 @testable import ShopifyCheckoutSheetKit
 import XCTest
 
-class PaymentMethodChangeStartTests: XCTestCase {
+class CheckoutPaymentMethodChangeStartTests: XCTestCase {
     // MARK: - Validation Tests
 
     func testValidateAcceptsValidPaymentInstrument() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput()
@@ -42,14 +42,14 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateAcceptsNilCart() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(cart: nil)
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(cart: nil)
 
         XCTAssertNoThrow(try request.validate(payload: payload))
     }
 
     func testValidateAcceptsNilPaymentInstruments() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(paymentInstruments: nil)
         )
 
@@ -58,7 +58,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateAcceptsEmptyPaymentInstruments() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(paymentInstruments: [])
         )
 
@@ -67,7 +67,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateRejectsInvalidLastDigits() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(lastDigits: "123")
@@ -86,7 +86,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateRejectsInvalidExpiryMonthTooLow() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(expiryMonth: 0)
@@ -105,7 +105,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateRejectsInvalidExpiryMonthTooHigh() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(expiryMonth: 13)
@@ -124,7 +124,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateRejectsInvalidCountryCode() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(countryCode: "USA")
@@ -144,7 +144,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateIncludesIndexInErrorMessage() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(),
@@ -164,7 +164,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateAcceptsMultipleValidPaymentInstruments() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(identifier: "card-1"),
@@ -179,7 +179,7 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     func testValidateAcceptsNilCountryCode() throws {
         let request = createRequest()
-        let payload = PaymentMethodChangeStartResponsePayload(
+        let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(countryCode: nil)
@@ -192,9 +192,9 @@ class PaymentMethodChangeStartTests: XCTestCase {
 
     // MARK: - Helper Methods
 
-    private func createRequest() -> PaymentMethodChangeStart {
-        let params = PaymentMethodChangeStartParams(cart: createTestCart())
-        return PaymentMethodChangeStart(id: nil, params: params)
+    private func createRequest() -> CheckoutPaymentMethodChangeStart {
+        let params = CheckoutPaymentMethodChangeStartParams(cart: createTestCart())
+        return CheckoutPaymentMethodChangeStart(id: nil, params: params)
     }
 
     private func createTestPaymentInstrumentInput(
