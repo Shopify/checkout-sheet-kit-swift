@@ -295,9 +295,9 @@ extension CheckoutWebView: WKScriptMessageHandler {
 
         case let paymentMethodRequest as CheckoutPaymentMethodChangeStart:
             OSLogger.shared.info(
-                "Payment method change intent event received"
+                "Payment method change start event received"
             )
-            viewDelegate.checkoutViewDidRequestPaymentMethodChange(event: paymentMethodRequest)
+            viewDelegate.checkoutViewDidStartPaymentMethodChange(event: paymentMethodRequest)
 
         case let submitRequest as CheckoutSubmitStart:
             OSLogger.shared.info(

@@ -175,8 +175,8 @@ struct CartView: View {
                                 }
                             }
                         }
-                        .onPaymentMethodChange { event in
-                            print("🎉 SwiftUI: Payment method change intent received")
+                        .onPaymentMethodChangeStart { event in
+                            print("🎉 SwiftUI: Payment method change start received")
 
                             // Respond with hardcoded payment method after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -198,7 +198,7 @@ struct CartView: View {
                                     )
                                 )
 
-                                let response = PaymentMethodChangeStartResponsePayload(
+                                let response = CheckoutPaymentMethodChangeStartResponsePayload(
                                     cart: CartInput(paymentInstruments: [paymentInstrument])
                                 )
 

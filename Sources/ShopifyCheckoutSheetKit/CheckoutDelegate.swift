@@ -86,7 +86,7 @@ extension CheckoutDelegate {
         /// No-op by default
     }
 
-    public func checkoutDidRequestPaymentMethodChange(event _: CheckoutPaymentMethodChangeStart) {
+    public func checkoutDidStartPaymentMethodChange(event _: CheckoutPaymentMethodChangeStart) {
         /// No-op by default
     }
 

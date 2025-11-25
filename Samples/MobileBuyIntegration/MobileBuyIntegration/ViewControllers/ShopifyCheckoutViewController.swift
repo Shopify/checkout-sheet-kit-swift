@@ -99,9 +99,9 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         // consumers can push onto the navigation stack
     }
 
-    func checkoutDidRequestPaymentMethodChange(event: CheckoutPaymentMethodChangeStart) {
+    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart) {
         OSLogger.shared.debug(
-            "[EmbeddedCheckout] Payment method change intent received"
+            "[EmbeddedCheckout] Payment method change start received"
         )
 
         let cardViewController = CardSelectionViewController(event: event)
