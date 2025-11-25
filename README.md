@@ -154,7 +154,7 @@ struct ContentView: View {
              isPresented = false
            }
            .onComplete { event in
-             handleCompletedEvent(event)
+             handleCompleteEvent(event)
            }
            .onFail { error in
              handleError(error)
@@ -196,7 +196,7 @@ For SwiftUI, use the `.auth()` modifier:
 ShopifyCheckout(checkout: checkoutURL)
   .auth(token: jwtToken)
   .onComplete { event in
-    handleCompletedEvent(event)
+    handleCompleteEvent(event)
   }
 ```
 
