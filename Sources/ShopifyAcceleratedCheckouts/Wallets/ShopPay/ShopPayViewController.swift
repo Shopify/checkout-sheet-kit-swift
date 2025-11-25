@@ -63,7 +63,7 @@ class ShopPayViewController: WalletController {
 
 @available(iOS 16.0, *)
 extension ShopPayViewController: CheckoutDelegate {
-    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+    func checkoutDidComplete(event: CheckoutCompleteEvent) {
         eventHandlers.checkoutDidComplete?(event)
     }
 

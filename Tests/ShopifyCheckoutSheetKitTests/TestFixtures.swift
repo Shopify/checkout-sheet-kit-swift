@@ -108,21 +108,21 @@ func createTestCheckoutStartEvent(
 }
 
 /**
- Creates a test CheckoutCompletedEvent instance with sensible defaults.
+ Creates a test CheckoutCompleteEvent instance with sensible defaults.
 
  Example:
  ```swift
- let event = createTestCheckoutCompletedEvent(
+ let event = createTestCheckoutCompleteEvent(
      orderConfirmation: createTestOrderConfirmation(orderId: "order-456"),
      cart: createTestCart(totalAmount: "100.00")
  )
  ```
  */
-func createTestCheckoutCompletedEvent(
+func createTestCheckoutCompleteEvent(
     cart: Cart? = nil,
     orderConfirmation: OrderConfirmation? = nil
-) -> CheckoutCompletedEvent {
-    CheckoutCompletedEvent(
+) -> CheckoutCompleteEvent {
+    CheckoutCompleteEvent(
         orderConfirmation: orderConfirmation ?? createTestOrderConfirmation(),
         cart: cart ?? createTestCart()
     )

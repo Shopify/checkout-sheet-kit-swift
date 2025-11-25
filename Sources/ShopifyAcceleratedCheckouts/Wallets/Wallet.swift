@@ -32,7 +32,7 @@ public enum Wallet: String {
 
 /// Event handlers for wallet buttons
 public struct EventHandlers {
-    public var checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)?
+    public var checkoutDidComplete: ((CheckoutCompleteEvent) -> Void)?
     public var checkoutDidFail: ((CheckoutError) -> Void)?
     public var checkoutDidCancel: (() -> Void)?
     public var shouldRecoverFromError: ((CheckoutError) -> Bool)?
@@ -40,7 +40,7 @@ public struct EventHandlers {
     public var renderStateDidChange: ((RenderState) -> Void)?
 
     public init(
-        checkoutDidComplete: ((CheckoutCompletedEvent) -> Void)? = nil,
+        checkoutDidComplete: ((CheckoutCompleteEvent) -> Void)? = nil,
         checkoutDidFail: ((CheckoutError) -> Void)? = nil,
         checkoutDidCancel: (() -> Void)? = nil,
         shouldRecoverFromError: ((CheckoutError) -> Bool)? = nil,

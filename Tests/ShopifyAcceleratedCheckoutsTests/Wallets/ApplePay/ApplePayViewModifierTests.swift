@@ -70,7 +70,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
     func testOnSuccessModifier() {
         var successCallbackInvoked = false
-        let successAction = { (_: CheckoutCompletedEvent) in
+        let successAction = { (_: CheckoutCompleteEvent) in
             successCallbackInvoked = true
         }
 
@@ -82,7 +82,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with success modifier")
 
-        successAction(createEmptyCheckoutCompletedEvent())
+        successAction(createEmptyCheckoutCompleteEvent())
         XCTAssertTrue(successCallbackInvoked, "Success callback should be invoked when called")
     }
 
@@ -90,10 +90,10 @@ final class ApplePayViewModifierTests: XCTestCase {
         var firstCallbackInvoked = false
         var secondCallbackInvoked = false
 
-        let firstAction = { (_: CheckoutCompletedEvent) in
+        let firstAction = { (_: CheckoutCompleteEvent) in
             firstCallbackInvoked = true
         }
-        let secondAction = { (_: CheckoutCompletedEvent) in
+        let secondAction = { (_: CheckoutCompleteEvent) in
             secondCallbackInvoked = true
         }
 
@@ -105,7 +105,7 @@ final class ApplePayViewModifierTests: XCTestCase {
             .environmentObject(mockShopSettings)
 
         // The second handler should replace the first
-        secondAction(createEmptyCheckoutCompletedEvent())
+        secondAction(createEmptyCheckoutCompleteEvent())
         XCTAssertFalse(firstCallbackInvoked, "First callback should not be invoked")
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
@@ -134,10 +134,10 @@ final class ApplePayViewModifierTests: XCTestCase {
         var firstCallbackInvoked = false
         var secondCallbackInvoked = false
 
-        _ = { (_: CheckoutCompletedEvent) in
+        _ = { (_: CheckoutCompleteEvent) in
             firstCallbackInvoked = true
         }
-        let secondAction = { (_: CheckoutCompletedEvent) in
+        let secondAction = { (_: CheckoutCompleteEvent) in
             secondCallbackInvoked = true
         }
 
@@ -149,7 +149,7 @@ final class ApplePayViewModifierTests: XCTestCase {
             .environmentObject(mockShopSettings)
 
         // The second handler should replace the first
-        secondAction(createEmptyCheckoutCompletedEvent())
+        secondAction(createEmptyCheckoutCompleteEvent())
         XCTAssertFalse(firstCallbackInvoked, "First callback should not be invoked")
         XCTAssertTrue(secondCallbackInvoked, "Second callback should be invoked")
     }
@@ -180,7 +180,7 @@ final class ApplePayViewModifierTests: XCTestCase {
         var successInvoked = false
         var errorInvoked = false
 
-        let successAction = { (_: CheckoutCompletedEvent) in
+        let successAction = { (_: CheckoutCompleteEvent) in
             successInvoked = true
         }
         let errorAction = { (_: CheckoutError) in
@@ -196,7 +196,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with both modifiers")
 
-        successAction(createEmptyCheckoutCompletedEvent())
+        successAction(createEmptyCheckoutCompleteEvent())
         XCTAssertTrue(successInvoked, "Success callback should be invoked")
         XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
 
@@ -222,7 +222,7 @@ final class ApplePayViewModifierTests: XCTestCase {
         var errorInvoked = false
         var cancelInvoked = false
 
-        let successAction = { (_: CheckoutCompletedEvent) in successInvoked = true }
+        let successAction = { (_: CheckoutCompleteEvent) in successInvoked = true }
         let errorAction = { (_: CheckoutError) in errorInvoked = true }
         let cancelAction = { cancelInvoked = true }
 
@@ -236,7 +236,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with all modifiers")
 
-        successAction(createEmptyCheckoutCompletedEvent())
+        successAction(createEmptyCheckoutCompleteEvent())
         XCTAssertTrue(successInvoked, "Success callback should be invoked")
         XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
         XCTAssertFalse(cancelInvoked, "Cancel callback should not be invoked")

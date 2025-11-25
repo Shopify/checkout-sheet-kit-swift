@@ -415,7 +415,7 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
     // Use this to track analytics, update UI, etc.
   }
 
-  func checkoutDidComplete(event: CheckoutCompletedEvent) {
+  func checkoutDidComplete(event: CheckoutCompleteEvent) {
     // Called when the checkout was completed successfully by the buyer.
     // Use this to update UI, reset cart state, etc.
   }

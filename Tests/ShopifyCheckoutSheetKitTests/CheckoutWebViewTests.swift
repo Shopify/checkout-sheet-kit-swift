@@ -292,7 +292,7 @@ class CheckoutWebViewTests: XCTestCase {
             recovery = createRecoveryView()
             let didCompleteCheckoutExpectation = expectation(description: "checkoutViewDidCompleteCheckout was called")
 
-            mockDelegate.didEmitCheckoutCompletedEventExpectation = didCompleteCheckoutExpectation
+            mockDelegate.didEmitCheckoutCompleteEventExpectation = didCompleteCheckoutExpectation
             recovery.viewDelegate = mockDelegate
 
             recovery.load(checkout: URL(string: url)!)

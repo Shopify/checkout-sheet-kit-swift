@@ -113,7 +113,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
             "[EmbeddedCheckout] Checkout started. Cart ID: \(event.cart.id)")
     }
 
-    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+    func checkoutDidComplete(event: CheckoutCompleteEvent) {
         OSLogger.shared.debug(
             "[EmbeddedCheckout] Checkout completed. Order ID: \(event.orderConfirmation.order.id)")
         dismiss(animated: true)

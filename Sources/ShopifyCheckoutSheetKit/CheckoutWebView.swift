@@ -27,7 +27,7 @@ import WebKit
 protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidStartNavigation()
     func checkoutViewDidStart(event: CheckoutStartEvent)
-    func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent)
+    func checkoutViewDidCompleteCheckout(event: CheckoutCompleteEvent)
     func checkoutViewDidFinishNavigation()
     func checkoutViewDidClickLink(url: URL)
     func checkoutViewDidFailWithError(error: CheckoutError)
@@ -218,7 +218,7 @@ public class CheckoutWebView: WKWebView {
             if let url = change.newValue as? URL {
                 if CheckoutURL(from: url).isConfirmationPage() {
                     self.viewDelegate?.checkoutViewDidCompleteCheckout(
-                        event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
+                        event: createEmptyCheckoutCompleteEvent(id: getOrderIdFromQuery(url: url)))
                     navigationObserver?.invalidate()
                 }
             }

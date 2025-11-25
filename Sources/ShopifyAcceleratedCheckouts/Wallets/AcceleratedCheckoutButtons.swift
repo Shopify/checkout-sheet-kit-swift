@@ -182,7 +182,7 @@ extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when checkout succeeds
     /// - Returns: A view with the checkout success handler set
-    public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void)
+    public func onComplete(_ action: @escaping (CheckoutCompleteEvent) -> Void)
         -> AcceleratedCheckoutButtons
     {
         var newView = self

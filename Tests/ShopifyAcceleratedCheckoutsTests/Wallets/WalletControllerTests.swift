@@ -54,7 +54,7 @@ final class WalletControllerTests: XCTestCase {
     }
 
     class MockCheckoutDelegate: CheckoutDelegate {
-        func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
+        func checkoutDidComplete(event _: CheckoutCompleteEvent) {}
         func checkoutDidFail(error _: CheckoutError) {}
         func checkoutDidCancel() {}
         func shouldRecoverFromError(error: CheckoutError) -> Bool { return error.isRecoverable }

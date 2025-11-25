@@ -160,7 +160,7 @@ final class ApplePayIntegrationTests: XCTestCase {
 
     func testCallbackPersistenceAcrossViewUpdates() async {
         var successCount = 0
-        let successHandler = { (_: CheckoutCompletedEvent) in
+        let successHandler = { (_: CheckoutCompleteEvent) in
             successCount += 1
         }
 

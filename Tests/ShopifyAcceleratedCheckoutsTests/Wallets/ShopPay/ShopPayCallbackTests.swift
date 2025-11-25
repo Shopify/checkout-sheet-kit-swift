@@ -79,7 +79,7 @@ final class ShopPayCallbackTests: XCTestCase {
                 }
             )
 
-            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+            let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
             viewController.eventHandlers.checkoutDidComplete?(mockEvent)
         }
 
@@ -89,7 +89,7 @@ final class ShopPayCallbackTests: XCTestCase {
     func testSuccessCallbackNotInvokedWhenNil() {
         XCTAssertNil(viewController.eventHandlers.checkoutDidComplete)
 
-        let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+        let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
         viewController.eventHandlers.checkoutDidComplete?(mockEvent) // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
@@ -160,7 +160,7 @@ final class ShopPayCallbackTests: XCTestCase {
             checkoutDidComplete: { _ in completeInvoked = true }
         )
 
-        let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+        let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
         viewController.eventHandlers.checkoutDidComplete?(mockEvent)
 
         XCTAssertTrue(completeInvoked, "Complete callback should be invoked")
