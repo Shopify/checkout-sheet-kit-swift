@@ -157,26 +157,9 @@ class CartManager: ObservableObject {
             throw Errors.invariant(message: "cart.id should be defined")
         }
 
-        guard let address = contact.postalAddress else {
-            throw Errors.invariant(message: "contact.postalAddress is nil")
-        }
-
-        let shippingAddress = StorefrontInputFactory.shared.createMailingAddressInput(
-            contact: contact,
-            address: address
-        )
-
-        let deliveryAddressPreferencesInput = Input(
-            orNull: [
-                Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: shippingAddress))
-            ]
-        )
-
         let buyerIdentityInput = StorefrontInputFactory.shared.createCartBuyerIdentityInput(
             // During ApplePay `contact.emailAddress` is nil until `didAuthorizePayment`
-            email: contact.emailAddress,
-            deliveryAddressPreferencesInput: deliveryAddressPreferencesInput
+            email: contact.emailAddress
         )
 
         let mutation = Storefront.buildMutation(
@@ -207,12 +190,65 @@ class CartManager: ObservableObject {
             }
 
             self.cart = cart
-            isDirty = true
 
+            if contact.postalAddress != nil {
+                return try await performCartDeliveryAddressesAdd(contact: contact)
+            }
+
+            isDirty = true
             return cart
         } catch {
             throw Errors.apiErrors(requestName: "cartBuyerIdentityUpdate", message: "\(error)")
         }
+    }
+
+    func performCartDeliveryAddressesAdd(
+        addresses: [Storefront.CartSelectableAddressInput]
+    ) async throws -> Storefront.Cart {
+        guard let cartId = cart?.id else {
+            throw Errors.invariant(message: "cart.id should be defined")
+        }
+
+        let mutation = Storefront.buildMutation(
+            inContext: CartManager.ContextDirective
+        ) {
+            $0.cartDeliveryAddressesAdd(cartId: cartId, addresses: addresses) {
+                $0.cart { $0.cartManagerFragment() }.userErrors { $0.code().message() }
+            }
+        }
+
+        do {
+            guard
+                let payload = try await client.executeAsync(mutation: mutation)
+                .cartDeliveryAddressesAdd
+            else { throw CartManager.Errors.payloadUnwrap }
+
+            guard payload.userErrors.isEmpty else {
+                throw CartManager.Errors.invariant(
+                    message: CartManager.userErrorMessage(errors: payload.userErrors)
+                )
+            }
+
+            guard let cart = payload.cart else {
+                throw Errors.invariant(message: "returned cart is nil")
+            }
+
+            self.cart = cart
+            isDirty = true
+
+            return cart
+        } catch {
+            throw Errors.apiErrors(requestName: "cartDeliveryAddressesAdd", message: "\(error)")
+        }
+    }
+
+    func performCartDeliveryAddressesAdd(
+        contact: PKContact
+    ) async throws -> Storefront.Cart {
+        let addresses = StorefrontInputFactory.shared.createSelectableAddressesFromContact(
+            contact: contact
+        )
+        return try await performCartDeliveryAddressesAdd(addresses: addresses)
     }
 
     private func performCartCreate(items: [GraphQL.ID] = []) async throws -> Storefront.Cart {
@@ -240,8 +276,14 @@ class CartManager: ObservableObject {
             }
 
             self.cart = cart
-            isDirty = true
 
+            // Add delivery addresses separately using the new mutation if vaulted state is enabled
+            if appConfiguration.useVaultedState {
+                let addresses = StorefrontInputFactory.shared.createDeliveryAddresses()
+                return try await performCartDeliveryAddressesAdd(addresses: addresses)
+            }
+
+            isDirty = true
             return cart
         } catch {
             throw Errors.apiErrors(requestName: "cartCreate", message: "\(error)")
@@ -277,10 +319,44 @@ class CartManager: ObservableObject {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
+            // Add delivery addresses separately using the new mutation if vaulted state is enabled
+            if appConfiguration.useVaultedState {
+                let addresses = StorefrontInputFactory.shared.createDeliveryAddresses()
+                return try await addDeliveryAddressesToCart(cartId: cart.id, addresses: addresses)
+            }
+
             return cart
         } catch {
             throw Errors.apiErrors(requestName: "createBuyNowCart", message: "\(error)")
         }
+    }
+
+    private static func addDeliveryAddressesToCart(
+        cartId: GraphQL.ID,
+        addresses: [Storefront.CartSelectableAddressInput]
+    ) async throws -> Storefront.Cart {
+        let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
+            $0.cartDeliveryAddressesAdd(cartId: cartId, addresses: addresses) {
+                $0.cart { $0.cartManagerFragment() }.userErrors { $0.code().message() }
+            }
+        }
+
+        guard
+            let payload = try await StorefrontClient.shared.executeAsync(mutation: mutation)
+            .cartDeliveryAddressesAdd
+        else { throw CartManager.Errors.payloadUnwrap }
+
+        guard payload.userErrors.isEmpty else {
+            throw CartManager.Errors.invariant(
+                message: CartManager.userErrorMessage(errors: payload.userErrors)
+            )
+        }
+
+        guard let cart = payload.cart else {
+            throw Errors.invariant(message: "returned cart is nil")
+        }
+
+        return cart
     }
 }
 
