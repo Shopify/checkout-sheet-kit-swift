@@ -30,8 +30,13 @@ class MockWebView: CheckoutWebView {
 
     var evaluateJavaScriptExpectation: XCTestExpectation?
 
+    var capturedJavaScript: String?
+
     override func evaluateJavaScript(_ javaScriptString: String) async throws -> Any {
-        if javaScriptString == expectedScript {
+        capturedJavaScript = javaScriptString
+        if !javaScriptString.isEmpty {
+            evaluateJavaScriptExpectation?.fulfill()
+        } else if javaScriptString == expectedScript {
             evaluateJavaScriptExpectation?.fulfill()
         }
         return true

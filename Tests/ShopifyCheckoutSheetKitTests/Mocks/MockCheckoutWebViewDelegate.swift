@@ -95,4 +95,8 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
     func checkoutViewDidRequestCardChange(event _: CheckoutCardChangeRequested) {
         // No-op for tests unless explicitly asserted
     }
+
+    func checkoutViewDidStartSubmit(event _: CheckoutSubmitStart) {
+        // No-op for tests unless explicitly asserted
+    }
 }

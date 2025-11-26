@@ -25,6 +25,40 @@
 import XCTest
 
 class CheckoutSubmitStartTests: XCTestCase {
+    // MARK: - Response Tests
+
+    func testRespondWithSendsJavaScriptToWebView() throws {
+        let mockWebView = MockWebView()
+        let params = CheckoutSubmitStartParams(
+            cart: createTestCart(),
+            checkout: Checkout(id: "test-checkout-123")
+        )
+        let request = CheckoutSubmitStart(id: "test-id-456", params: params)
+        request.webview = mockWebView
+
+        let payload = CheckoutSubmitStartResponsePayload(payment: nil, cart: nil, errors: nil)
+
+        let expectation = expectation(description: "JavaScript executed")
+        mockWebView.evaluateJavaScriptExpectation = expectation
+
+        try request.respondWith(payload: payload)
+
+        waitForExpectations(timeout: 2.0)
+
+        // Verify the JavaScript was executed and contains the expected JSON-RPC response
+        XCTAssertNotNil(mockWebView.capturedJavaScript, "JavaScript should have been executed")
+
+        let capturedJS = mockWebView.capturedJavaScript ?? ""
+
+        // Verify the response contains expected JSON-RPC fields
+        XCTAssertTrue(capturedJS.contains("window.postMessage"), "Should call window.postMessage")
+        XCTAssertTrue(capturedJS.contains("\"jsonrpc\":\"2.0\""), "Should include JSON-RPC version")
+        XCTAssertTrue(capturedJS.contains("\"id\":\"test-id-456\""), "Should include request ID")
+        XCTAssertTrue(capturedJS.contains("\"result\""), "Should include result field")
+    }
+
+    // MARK: - Decoding Tests
+
     func testDecodesCheckoutSessionId() throws {
         let json = """
         {
