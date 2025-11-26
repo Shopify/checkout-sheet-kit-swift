@@ -181,7 +181,7 @@ struct CartView: View {
                             // Respond with hardcoded payment method after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                 let paymentInstrument = CartPaymentInstrumentInput(
-                                    identifier: "card-visa-1234",
+                                    externalReference: "card-visa-1234",
                                     lastDigits: "1234",
                                     cardHolderName: "John Smith",
                                     brand: .visa,

@@ -204,7 +204,7 @@ public enum PaymentMethodType: String, Codable {
 }
 
 public struct CartPaymentInstrument: Codable {
-    public let identifier: String
+    public let externalReference: String
 }
 
 public struct CartDelivery: Codable {
@@ -473,7 +473,7 @@ public struct CartBuyerIdentityInput: Codable {
 }
 
 public struct CartPaymentInstrumentInput: Codable {
-    public let identifier: String
+    public let externalReference: String
     public let lastDigits: String
     public let cardHolderName: String
     public let brand: CardBrand
@@ -482,7 +482,7 @@ public struct CartPaymentInstrumentInput: Codable {
     public let billingAddress: CartDeliveryAddressInput
 
     public init(
-        identifier: String,
+        externalReference: String,
         lastDigits: String,
         cardHolderName: String,
         brand: CardBrand,
@@ -490,7 +490,7 @@ public struct CartPaymentInstrumentInput: Codable {
         expiryYear: Int,
         billingAddress: CartDeliveryAddressInput
     ) {
-        self.identifier = identifier
+        self.externalReference = externalReference
         self.lastDigits = lastDigits
         self.cardHolderName = cardHolderName
         self.brand = brand

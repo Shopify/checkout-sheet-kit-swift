@@ -110,7 +110,8 @@ class CardSelectionViewController: UIViewController {
 
         // If payment instruments exist, try to select the first one
         if let firstInstrument = event.params.cart.paymentInstruments.first {
-            for (index, option) in cardOptions.enumerated() where option.identifier == firstInstrument.identifier {
+            for (index, option) in cardOptions
+                .enumerated() where option.identifier == firstInstrument.externalReference {
                 selectedIndex = index
                 break
             }
@@ -169,7 +170,7 @@ class CardSelectionViewController: UIViewController {
         let selectedCard = cardOptions[selectedIndex]
 
         let paymentInstrument = CartPaymentInstrumentInput(
-            identifier: selectedCard.identifier,
+            externalReference: selectedCard.identifier,
             lastDigits: selectedCard.last4,
             cardHolderName: selectedCard.cardHolderName,
             brand: selectedCard.brand,
