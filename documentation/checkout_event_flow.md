@@ -17,10 +17,10 @@ This note walks through how the SDK turns a JavaScript bridge message into a str
 2. **Message emission** – Web checkout JavaScript posts a UTF-8 JSON string describing an event (for example, `{"name": "completed", "body": "{...}"}`).
 3. **Forwarding into Swift** – `MessageHandler.userContentController(_:didReceive:)` forwards the message to the `CheckoutWebView` instance.
 4. **Decoding** – Inside `CheckoutWebView.userContentController`, the payload is parsed via `CheckoutBridge.decode(_:)`, yielding a `CheckoutBridge.WebEvent`.
-   - For a `"completed"` event, `CheckoutCompletedEventDecoder` reads the embedded JSON body and creates a strongly typed `CheckoutCompletedEvent`.
+   - For a `"completed"` event, `CheckoutCompleteEventDecoder` reads the embedded JSON body and creates a strongly typed `CheckoutCompleteEvent`.
 5. **View delegate callback** – `CheckoutWebView` switches on the decoded `WebEvent` case and invokes `viewDelegate?.checkoutViewDidCompleteCheckout(event:)`.
 6. **Controller hand-off** – `CheckoutWebViewController`, acting as the view delegate, handles UI side effects (confetti, cache management) and forwards the event to its `delegate` through `delegate?.checkoutDidComplete(event:)`.
-7. **Consumer delivery** – The host app implements `CheckoutDelegate` (or configures the SwiftUI `ShopifyCheckout` closures inside `CheckoutDelegateWrapper`) to receive the final, fully decoded `CheckoutCompletedEvent`.
+7. **Consumer delivery** – The host app implements `CheckoutDelegate` (or configures the SwiftUI `ShopifyCheckout` closures inside `CheckoutDelegateWrapper`) to receive the final, fully decoded `CheckoutCompleteEvent`.
 
 ## Flow Diagram
 

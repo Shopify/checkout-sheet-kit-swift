@@ -61,7 +61,7 @@ class CheckoutController: UIViewController {
 }
 
 extension CheckoutController: CheckoutDelegate {
-    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+    func checkoutDidComplete(event: CheckoutCompleteEvent) {
         OSLogger.shared.debug(
             "[CheckoutDelegate] Checkout completed. Order ID: \(event.orderConfirmation.order.id)")
         CartManager.shared.resetCart()

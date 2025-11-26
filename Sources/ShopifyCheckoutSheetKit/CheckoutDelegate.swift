@@ -30,7 +30,7 @@ public protocol CheckoutDelegate: AnyObject {
     func checkoutDidStart(event: CheckoutStartEvent)
 
     /// Tells the delegate that the checkout successfully completed, returning a completed event with order details
-    func checkoutDidComplete(event: CheckoutCompletedEvent)
+    func checkoutDidComplete(event: CheckoutCompleteEvent)
 
     /// Tells the delegate that the checkout was cancelled by the buyer.
     func checkoutDidCancel()
@@ -60,7 +60,7 @@ extension CheckoutDelegate {
         /// No-op by default
     }
 
-    public func checkoutDidComplete(event _: CheckoutCompletedEvent) {
+    public func checkoutDidComplete(event _: CheckoutCompleteEvent) {
         /// No-op by default
     }
 

@@ -27,7 +27,7 @@ import XCTest
 class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
     var startEventReceived: CheckoutStartEvent?
 
-    var completedEventReceived: CheckoutCompletedEvent?
+    var completedEventReceived: CheckoutCompleteEvent?
 
     var errorReceived: CheckoutError?
 
@@ -47,7 +47,7 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
 
     var didToggleModalExpectation: XCTestExpectation?
 
-    var didEmitCheckoutCompletedEventExpectation: XCTestExpectation?
+    var didEmitCheckoutCompleteEventExpectation: XCTestExpectation?
 
     func checkoutViewDidStartNavigation() {
         didStartNavigationExpectation?.fulfill()
@@ -83,9 +83,9 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
         didToggleModalExpectation?.fulfill()
     }
 
-    func checkoutViewDidCompleteCheckout(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
+    func checkoutViewDidCompleteCheckout(event: ShopifyCheckoutSheetKit.CheckoutCompleteEvent) {
         completedEventReceived = event
-        didEmitCheckoutCompletedEventExpectation?.fulfill()
+        didEmitCheckoutCompleteEventExpectation?.fulfill()
     }
 
     func checkoutViewDidStartAddressChange(event _: CheckoutAddressChangeStart) {

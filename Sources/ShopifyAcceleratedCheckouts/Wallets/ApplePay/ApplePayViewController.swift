@@ -57,7 +57,7 @@ class ApplePayViewController: WalletController, PayController {
     /// }
     /// ```
     @MainActor
-    public var onCheckoutComplete: ((CheckoutCompletedEvent) -> Void)?
+    public var onCheckoutComplete: ((CheckoutCompleteEvent) -> Void)?
 
     /// Callback invoked when an error occurs during the checkout process.
     /// This closure is called on the main thread when the payment fails.
@@ -212,7 +212,7 @@ class ApplePayViewController: WalletController, PayController {
 
 @available(iOS 16.0, *)
 extension ApplePayViewController: CheckoutDelegate {
-    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+    func checkoutDidComplete(event: CheckoutCompleteEvent) {
         Task { @MainActor in
             self.onCheckoutComplete?(event)
             try await authorizationDelegate.transition(to: .completed)

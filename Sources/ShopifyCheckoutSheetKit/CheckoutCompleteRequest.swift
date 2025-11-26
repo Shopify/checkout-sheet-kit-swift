@@ -25,6 +25,6 @@ import Foundation
 import WebKit
 
 /// Request for checkout completion events
-public final class CheckoutCompleteRequest: BaseRPCRequest<CheckoutCompletedEvent, EmptyResponse> {
+public final class CheckoutCompleteRequest: BaseRPCRequest<CheckoutCompleteEvent, EmptyResponse> {
     override public static var method: String { "checkout.complete" }
 }

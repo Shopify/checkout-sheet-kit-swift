@@ -25,7 +25,7 @@
 import XCTest
 
 class ExampleDelegate: CheckoutDelegate {
-    func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {}
+    func checkoutDidComplete(event _: ShopifyCheckoutSheetKit.CheckoutCompleteEvent) {}
 
     func checkoutDidCancel() {}
 

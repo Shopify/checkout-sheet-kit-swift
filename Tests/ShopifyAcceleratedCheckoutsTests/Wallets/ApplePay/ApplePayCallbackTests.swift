@@ -100,7 +100,7 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         await MainActor.run {
-            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+            let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
             viewController.onCheckoutComplete?(mockEvent)
         }
 
@@ -113,7 +113,7 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         await MainActor.run {
-            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+            let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
             viewController.onCheckoutComplete?(mockEvent) // Should not crash
         }
 
@@ -251,7 +251,7 @@ final class ApplePayCallbackTests: XCTestCase {
 
         for i in 0 ..< iterations {
             if i % 3 == 0 {
-                let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+                let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
                 viewController.onCheckoutComplete?(mockEvent)
             } else if i % 3 == 1 {
                 let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
@@ -288,7 +288,7 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         await MainActor.run {
-            let mockEvent = createEmptyCheckoutCompletedEvent(id: "test-order-123")
+            let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
             viewController.onCheckoutComplete?(mockEvent)
         }
 

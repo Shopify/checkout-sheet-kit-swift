@@ -79,8 +79,8 @@ class ShopifyCheckoutTests: XCTestCase {
 
     func testOnComplete() {
         var actionCalled = false
-        var actionData: CheckoutCompletedEvent?
-        let event = createEmptyCheckoutCompletedEvent()
+        var actionData: CheckoutCompleteEvent?
+        let event = createEmptyCheckoutCompleteEvent()
 
         checkoutSheet.onComplete { event in
             actionCalled = true

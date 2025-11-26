@@ -40,7 +40,7 @@ class MockCheckoutDelegate: CheckoutDelegate {
         checkoutDidCancelCalled = true
     }
 
-    func checkoutDidComplete(event _: CheckoutCompletedEvent) {
+    func checkoutDidComplete(event _: CheckoutCompleteEvent) {
         checkoutDidCompleteCalled = true
     }
 
@@ -56,7 +56,7 @@ class MockCheckoutDelegate: CheckoutDelegate {
 class DefaultCheckoutDelegate: CheckoutDelegate {
     func checkoutDidFail(error _: CheckoutError) {}
     func checkoutDidCancel() {}
-    func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
+    func checkoutDidComplete(event _: CheckoutCompleteEvent) {}
     func checkoutDidClickLink(url _: URL) {}
 
     func shouldRecoverFromError(error: CheckoutError) -> Bool {

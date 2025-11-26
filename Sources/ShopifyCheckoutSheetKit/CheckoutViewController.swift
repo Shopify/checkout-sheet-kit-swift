@@ -106,7 +106,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         return self
     }
 
-    @discardableResult public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> Self {
+    @discardableResult public func onComplete(_ action: @escaping (CheckoutCompleteEvent) -> Void) -> Self {
         delegate.onComplete = action
         return self
     }
@@ -150,7 +150,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
 
 public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onStart: ((CheckoutStartEvent) -> Void)?
-    var onComplete: ((CheckoutCompletedEvent) -> Void)?
+    var onComplete: ((CheckoutCompleteEvent) -> Void)?
     var onCancel: (() -> Void)?
     var onFail: ((CheckoutError) -> Void)?
     var onLinkClick: ((URL) -> Void)?
@@ -165,7 +165,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
         onFail?(error)
     }
 
-    public func checkoutDidComplete(event: CheckoutCompletedEvent) {
+    public func checkoutDidComplete(event: CheckoutCompleteEvent) {
         onComplete?(event)
     }
 
