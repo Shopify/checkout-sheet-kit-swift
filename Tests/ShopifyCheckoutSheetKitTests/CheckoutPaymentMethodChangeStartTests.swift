@@ -190,6 +190,119 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
         XCTAssertNoThrow(try request.validate(payload: payload))
     }
 
+    // MARK: - Codable Tests
+
+    func testDecodeResponsePayloadWithPaymentInstruments() throws {
+        let json = createTestPaymentMethodChangeStartResponseJSON(
+            cart: createTestCartInputJSON(
+                paymentInstruments: [createTestPaymentInstrumentInputJSON()]
+            )
+        )
+        let data = json.data(using: .utf8)!
+
+        let payload = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartResponsePayload.self, from: data)
+
+        XCTAssertNotNil(payload.cart)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.count, 1)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.identifier, "instrument-123")
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.lastDigits, "4242")
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.cardHolderName, "John Doe")
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.brand, .visa)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.expiryMonth, 12)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.expiryYear, 2025)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.billingAddress.countryCode, "US")
+    }
+
+    func testDecodeResponsePayloadWithNilCart() throws {
+        let json = """
+        {
+            "cart": null
+        }
+        """
+        let data = json.data(using: .utf8)!
+
+        let payload = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartResponsePayload.self, from: data)
+
+        XCTAssertNil(payload.cart)
+        XCTAssertNil(payload.errors)
+    }
+
+    func testDecodeResponsePayloadWithEmptyObject() throws {
+        let json = "{}"
+        let data = json.data(using: .utf8)!
+
+        let payload = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartResponsePayload.self, from: data)
+
+        XCTAssertNil(payload.cart)
+        XCTAssertNil(payload.errors)
+    }
+
+    func testDecodeResponsePayloadWithErrors() throws {
+        let json = createTestPaymentMethodChangeStartResponseJSON(
+            errors: [createTestResponseErrorJSON(code: "INVALID_CARD", message: "Card declined")]
+        )
+        let data = json.data(using: .utf8)!
+
+        let payload = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartResponsePayload.self, from: data)
+
+        XCTAssertNil(payload.cart)
+        XCTAssertEqual(payload.errors?.count, 1)
+        XCTAssertEqual(payload.errors?.first?.code, "INVALID_CARD")
+        XCTAssertEqual(payload.errors?.first?.message, "Card declined")
+        XCTAssertNil(payload.errors?.first?.fieldTarget)
+    }
+
+    func testDecodeResponsePayloadWithErrorsAndFieldTarget() throws {
+        let json = createTestPaymentMethodChangeStartResponseJSON(
+            errors: [createTestResponseErrorJSON(code: "INVALID_EXPIRY", message: "Invalid expiry date", fieldTarget: "expiryMonth")]
+        )
+        let data = json.data(using: .utf8)!
+
+        let payload = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartResponsePayload.self, from: data)
+
+        XCTAssertEqual(payload.errors?.first?.fieldTarget, "expiryMonth")
+    }
+
+    func testDecodePaymentInstrumentWithAllBillingAddressFields() throws {
+        let json = createTestPaymentInstrumentInputJSONWithFullAddress()
+        let data = json.data(using: .utf8)!
+
+        let instrument = try JSONDecoder().decode(CartPaymentInstrumentInput.self, from: data)
+
+        XCTAssertEqual(instrument.billingAddress.firstName, "John")
+        XCTAssertEqual(instrument.billingAddress.lastName, "Doe")
+        XCTAssertEqual(instrument.billingAddress.address1, "123 Main St")
+        XCTAssertEqual(instrument.billingAddress.address2, "Apt 4")
+        XCTAssertEqual(instrument.billingAddress.city, "New York")
+        XCTAssertEqual(instrument.billingAddress.company, "Acme Inc")
+        XCTAssertEqual(instrument.billingAddress.countryCode, "US")
+        XCTAssertEqual(instrument.billingAddress.phone, "+16135551111")
+        XCTAssertEqual(instrument.billingAddress.provinceCode, "NY")
+        XCTAssertEqual(instrument.billingAddress.zip, "10001")
+    }
+
+    func testDecodePaymentInstrumentBrandEnum() throws {
+        let brands = [
+            ("VISA", CardBrand.visa),
+            ("MASTERCARD", CardBrand.mastercard),
+            ("AMERICAN_EXPRESS", CardBrand.americanExpress),
+            ("DISCOVER", CardBrand.discover),
+            ("DINERS_CLUB", CardBrand.dinersClub),
+            ("JCB", CardBrand.jcb),
+            ("MAESTRO", CardBrand.maestro),
+            ("UNKNOWN", CardBrand.unknown)
+        ]
+
+        for (jsonBrand, expectedBrand) in brands {
+            let json = createTestPaymentInstrumentInputJSON(brand: jsonBrand)
+            let data = json.data(using: .utf8)!
+
+            let instrument = try JSONDecoder().decode(CartPaymentInstrumentInput.self, from: data)
+
+            XCTAssertEqual(instrument.brand, expectedBrand, "Failed for brand: \(jsonBrand)")
+        }
+    }
+
     // MARK: - Helper Methods
 
     private func createRequest() -> CheckoutPaymentMethodChangeStart {
