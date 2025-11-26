@@ -53,6 +53,12 @@ public protocol CheckoutDelegate: AnyObject {
 
     /// Tells the delegate that the checkout is requesting card change intent (e.g., for native card picker)
     func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested)
+
+    /// Tells the delegate that the buyer has attempted to submit the checkout.
+    ///
+    /// This event is only emitted when native payment delegation is configured for the authenticated app.
+    /// When triggered, you can provide payment tokens, update cart data, or handle custom submission logic.
+    func checkoutDidStartSubmit(event: CheckoutSubmitStart)
 }
 
 extension CheckoutDelegate {
@@ -81,6 +87,10 @@ extension CheckoutDelegate {
     }
 
     public func checkoutDidRequestCardChange(event _: CheckoutCardChangeRequested) {
+        /// No-op by default
+    }
+
+    public func checkoutDidStartSubmit(event _: CheckoutSubmitStart) {
         /// No-op by default
     }
 

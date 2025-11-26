@@ -1,0 +1,723 @@
+From 8cb563397b4d95e5b49e1213ea270227a3977582 Mon Sep 17 00:00:00 2001
+From: Michael Xu <michael.xu@shopify.com>
+Date: Fri, 21 Nov 2025 17:16:01 -0500
+Subject: [PATCH] Add checkout.completeAttempt event
+
+---
+ .../shared/embed/embed-client.test.ts         |  23 +++
+ .../entrypoints/shared/embed/embed-client.ts  |  12 ++
+ .../shared/embed/embed-for-browser.test.ts    | 112 ++++++++++++-
+ .../shared/embed/embed-for-browser.ts         |  25 +++
+ .../mappers/2025-10/message-builders.test.ts  | 148 ++++++++++++++++++
+ .../embed/mappers/2025-10/message-builders.ts |  24 +++
+ .../shared/embed/mappers/2025-10/types.ts     |  21 +++
+ .../mappers/2025-10/v2025-10-mapper.test.ts   |  45 ++++++
+ .../embed/mappers/2025-10/v2025-10-mapper.ts  |   7 +
+ .../app/entrypoints/shared/embed/types.ts     |  10 +-
+ .../clients/checkout-web/app/shared/embed.ts  |  19 +++
+ .../checkout-web/app/tests/utilities/embed.ts |   6 +
+ 12 files changed, 450 insertions(+), 2 deletions(-)
+
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.test.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.test.ts
+index 232d0398646314..c9a3336254cab9 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.test.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.test.ts
+@@ -178,6 +178,29 @@ describe('EmbedClient', () => {
+     });
+   });
+ 
++  describe('submitStart', () => {
++    it('sends checkout.submitStart event via MessageBus', async () => {
++      const embedClient = new EmbedClient(createTestClientOptions());
++
++      await embedClient.submitStart();
++
++      expect(mockBusSend).toHaveBeenCalledWith(
++        expect.objectContaining({
++          type: 'checkout.submitStart',
++        }),
++        {timeoutMs: 120000},
++      );
++    });
++
++    it('propagates errors from MessageBus', async () => {
++      mockBusSend.mockRejectedValue(new Error('Request failed'));
++
++      const embedClient = new EmbedClient(createTestClientOptions());
++
++      await expect(embedClient.submitStart()).rejects.toThrow('Request failed');
++    });
++  });
++
+   describe('receipt subscription', () => {
+     let embedClient: EmbedClient;
+     let receiptSignal: Signal<Receipt | undefined>;
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.ts
+index ab60c37235647d..df7a06aaca5442 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-client.ts
+@@ -19,6 +19,8 @@ import type {
+   CheckoutAddressChangeStartResponsePayload,
+   CheckoutPaymentMethodChangeStartEvent,
+   CheckoutPaymentMethodChangeStartResponsePayload,
++  CheckoutSubmitStartEvent,
++  CheckoutSubmitStartResponsePayload,
+ } from './types';
+ 
+ export interface EmbedClientOptions
+@@ -202,4 +204,14 @@ export class EmbedClient implements EmbedClientType {
+       timeoutMs: 120000,
+     });
+   }
++
++  async submitStart(): Promise<CheckoutSubmitStartResponsePayload | undefined> {
++    const event: CheckoutSubmitStartEvent = {
++      type: 'checkout.submitStart',
++    };
++
++    return this.#messageBus.send(event, {
++      timeoutMs: 120000,
++    });
++  }
+ }
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.test.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.test.ts
+index 117c01f4fc834f..66d7e23ff02c94 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.test.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.test.ts
+@@ -5,7 +5,11 @@ import {createProcessedReceipt} from '~/tests/utilities/receipt';
+ import {createProposal} from '~/tests/utilities/proposal';
+ import type {RequestInfoQuery_QueryRoot} from '~/graphql/queries/RequestInfoQuery.graphql';
+ 
+-import {EmbedForBrowser, EventDataSourceForEmbed} from './embed-for-browser';
++import {
++  EmbedForBrowser,
++  EventDataSourceForEmbed,
++  MissingCheckoutSessionIdError,
++} from './embed-for-browser';
+ 
+ function createEmbedData(
+   overrides: Partial<NonNullable<RequestInfoQuery_QueryRoot['embed']>> = {},
+@@ -91,6 +95,112 @@ const mockMobileSdkV8_1EventMessageMapper =
+ const mockMobileSdkV5_1EventMessageMapper =
+   mobileSchemaVersionMap['5.1'].eventMessageMapper;
+ 
++describe('EventDataSourceForEmbed', () => {
++  describe('getRequiredCheckoutSessionId', () => {
++    it('returns checkoutSessionIdentifier when it exists', () => {
++      const checkoutSessionIdentifier = 'test-checkout-session-123';
++      const dataSource = new EventDataSourceForEmbed({
++        cart: {proposal: createProposal({})},
++        receipt: signal(undefined),
++        source: {
++          sourceId: 'test-source-id',
++          type: 'checkout',
++          checkoutSessionIdentifier,
++        } as any,
++        errorLogger: {
++          notify: jest.fn(),
++          addOnError: jest.fn(),
++          removeOnError: jest.fn(),
++        } as any,
++        visitorConsent: {
++          analytics: true,
++          marketing: true,
++          preferences: false,
++          saleOfData: false,
++        },
++        locale: 'en',
++        isBuyerEventsEnabled: false,
++      });
++
++      expect(dataSource.getRequiredCheckoutSessionId()).toBe(
++        checkoutSessionIdentifier,
++      );
++    });
++
++    it('throws MissingCheckoutSessionIdError when checkoutSessionIdentifier is undefined', () => {
++      const dataSource = new EventDataSourceForEmbed({
++        cart: {proposal: createProposal({})},
++        receipt: signal(undefined),
++        source: {
++          sourceId: 'test-source-id',
++          type: 'checkout',
++          checkoutSessionIdentifier: undefined,
++        } as any,
++        errorLogger: {
++          notify: jest.fn(),
++          addOnError: jest.fn(),
++          removeOnError: jest.fn(),
++        } as any,
++        visitorConsent: {
++          analytics: true,
++          marketing: true,
++          preferences: false,
++          saleOfData: false,
++        },
++        locale: 'en',
++        isBuyerEventsEnabled: false,
++      });
++
++      expect(() => dataSource.getRequiredCheckoutSessionId()).toThrow(
++        MissingCheckoutSessionIdError,
++      );
++      expect(() => dataSource.getRequiredCheckoutSessionId()).toThrow(
++        'checkoutSessionIdentifier is required but was not available',
++      );
++    });
++
++    it('includes sourceId and sourceType in MissingCheckoutSessionIdError', () => {
++      const sourceId = 'my-source-id';
++      const sourceType = 'cart';
++      const dataSource = new EventDataSourceForEmbed({
++        cart: {proposal: createProposal({})},
++        receipt: signal(undefined),
++        source: {
++          sourceId,
++          type: sourceType,
++          checkoutSessionIdentifier: undefined,
++        } as any,
++        errorLogger: {
++          notify: jest.fn(),
++          addOnError: jest.fn(),
++          removeOnError: jest.fn(),
++        } as any,
++        visitorConsent: {
++          analytics: true,
++          marketing: true,
++          preferences: false,
++          saleOfData: false,
++        },
++        locale: 'en',
++        isBuyerEventsEnabled: false,
++      });
++
++      let thrownError: MissingCheckoutSessionIdError | undefined;
++      try {
++        dataSource.getRequiredCheckoutSessionId();
++      } catch (error) {
++        thrownError = error as MissingCheckoutSessionIdError;
++      }
++
++      expect(thrownError).toBeInstanceOf(MissingCheckoutSessionIdError);
++      expect(thrownError).toMatchObject({
++        sourceId,
++        sourceType,
++      });
++    });
++  });
++});
++
+ describe('EmbedForBrowser', () => {
+   const mockTelemetryClient = new TelemetryClientForTest();
+ 
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.ts
+index eb32f77cba7eda..09bed2c4becda1 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/embed-for-browser.ts
+@@ -79,6 +79,31 @@ export class EventDataSourceForEmbed {
+     };
+     this.errorLogger = options.errorLogger;
+   }
++
++  getRequiredCheckoutSessionId(): string {
++    const {checkoutSessionIdentifier} = this.context.source;
++
++    if (!checkoutSessionIdentifier) {
++      throw new MissingCheckoutSessionIdError(
++        this.context.source.sourceId,
++        this.context.source.type,
++      );
++    }
++
++    return checkoutSessionIdentifier;
++  }
++}
++
++export class MissingCheckoutSessionIdError extends Error {
++  constructor(
++    public readonly sourceId: string,
++    public readonly sourceType: string,
++  ) {
++    super(
++      'checkoutSessionIdentifier is required but was not available. This may indicate the GraphQL session field was not queried or the response has not been received.',
++    );
++    this.name = 'MissingCheckoutSessionIdError';
++  }
+ }
+ 
+ interface EmbedForBrowserOptions extends Embed {
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.test.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.test.ts
+index cf27ced1924557..a2273cb62acc78 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.test.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.test.ts
+@@ -27,6 +27,7 @@ import {
+   buildCheckoutCompleteMessage,
+   buildCheckoutAddressChangeRequestedMessage,
+   buildCheckoutPaymentMethodChangeStartMessage,
++  buildCheckoutSubmitStartMessage,
+   buildCartFromProposal,
+   buildCartFromReceipt,
+   buildCartLines,
+@@ -40,15 +41,18 @@ const createTestDataSource = ({
+   currentAddress,
+   processedReceipt,
+   sourceId = 'test-source-id',
++  checkoutSessionIdentifier = 'test-checkout-session-id',
+   locale = 'en',
+ }: {
+   currentAddress?: Address;
+   processedReceipt?: ProcessedReceipt;
+   sourceId?: string;
++  checkoutSessionIdentifier?: string;
+   locale?: string;
+ }) => {
+   const source = {
+     sourceId,
++    checkoutSessionIdentifier,
+     type: 'checkout',
+   } satisfies Source;
+   return new EventDataSourceForEmbed({
+@@ -2012,6 +2016,150 @@ describe('buildCheckoutPaymentMethodChangeStartMessage', () => {
+   });
+ });
+ 
++describe('buildCheckoutSubmitStartMessage', () => {
++  describe('JSON-RPC structure', () => {
++    it('should create a valid JSON-RPC request with correct structure', () => {
++      const checkoutSessionIdentifier = 'test-checkout-session-123';
++      const dataSource = createTestDataSource({checkoutSessionIdentifier});
++      const testId = 'test-request-id';
++
++      const message = buildCheckoutSubmitStartMessage(dataSource, testId);
++
++      expect(message).toStrictEqual({
++        jsonrpc: '2.0',
++        id: testId,
++        method: 'checkout.submitStart',
++        params: {
++          cart: expect.any(Object),
++          checkout: {
++            id: checkoutSessionIdentifier,
++          },
++        },
++      });
++    });
++
++    it('should generate a random ID when no ID is provided', () => {
++      const dataSource = createTestDataSource({});
++
++      const message1 = buildCheckoutSubmitStartMessage(dataSource);
++      const message2 = buildCheckoutSubmitStartMessage(dataSource);
++
++      expect(message1.id).not.toBe(message2.id);
++      expect(message1.id).toMatch(
++        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
++      );
++    });
++
++    it('should use the provided ID when specified', () => {
++      const customId = 'custom-submit-start-id-789';
++      const dataSource = createTestDataSource({});
++
++      const message = buildCheckoutSubmitStartMessage(dataSource, customId);
++
++      expect(message.id).toBe(customId);
++    });
++  });
++
++  describe('parameters', () => {
++    it('should include checkout.id from checkoutSessionIdentifier', () => {
++      const checkoutSessionIdentifier = 'checkout-session-abc-123';
++      const dataSource = createTestDataSource({checkoutSessionIdentifier});
++
++      const message = buildCheckoutSubmitStartMessage(dataSource);
++
++      expect(message.params.checkout).toStrictEqual({
++        id: checkoutSessionIdentifier,
++      });
++    });
++
++    it('should throw MissingCheckoutSessionIdError when checkoutSessionIdentifier is undefined', () => {
++      const dataSource = createTestDataSource({});
++      // Override the source to simulate undefined checkoutSessionIdentifier
++      (dataSource.context.source as any).checkoutSessionIdentifier = undefined;
++
++      expect(() => buildCheckoutSubmitStartMessage(dataSource)).toThrow(
++        'checkoutSessionIdentifier is required but was not available',
++      );
++    });
++
++    it('should build cart from negotiated context', () => {
++      const sourceId = 'test-cart-source-id';
++      const email = faker.internet.email();
++
++      const dataSource = createTestDataSource({
++        sourceId,
++      });
++
++      const proposal = dataSource.checkout.cart.proposal;
++      proposal.negotiated.value = {
++        ...proposal.negotiated.value,
++        contactInfo: {email},
++        merchandiseLines: {lines: [createMerchandise()]},
++      };
++
++      const message = buildCheckoutSubmitStartMessage(dataSource);
++
++      expect(message.params.cart).toMatchObject({
++        id: sourceId,
++        buyerIdentity: {
++          email,
++        },
++        lines: expect.any(Array),
++      });
++    });
++
++    it('should include cart with merchandise lines', () => {
++      const dataSource = createTestDataSource({});
++
++      const proposal = dataSource.checkout.cart.proposal;
++      proposal.negotiated.value = {
++        ...proposal.negotiated.value,
++        merchandiseLines: {
++          lines: [
++            createMerchandise({
++              id: 'product-123',
++              title: 'Test Product',
++              quantity: 2,
++              itemPrice: createMoneyAmount(10, 'USD'),
++              totalPrice: createMoneyAmount(20, 'USD'),
++              lineAllocations: [
++                {
++                  stableId: 'alloc-1',
++                  quantity: 2,
++                  totalAmountBeforeReductions: createMoneyAmount(20, 'USD'),
++                  totalAmountAfterLineDiscounts: createMoneyAmount(20, 'USD'),
++                  totalAmountAfterDiscounts: createMoneyAmount(20, 'USD'),
++                  checkoutPriceBeforeReductions: createMoneyAmount(20, 'USD'),
++                  checkoutPriceAfterDiscounts: createMoneyAmount(20, 'USD'),
++                  allocations: [],
++                  unitPrice: null,
++                },
++              ],
++            }),
++          ],
++        },
++      };
++
++      const message = buildCheckoutSubmitStartMessage(dataSource);
++
++      expect(message.params.cart.lines).toHaveLength(1);
++      expect(message.params.cart.lines[0]!).toMatchObject({
++        id: 'alloc-1',
++        quantity: 2,
++        merchandise: {
++          id: 'product-123',
++          title: 'Test Product',
++        },
++        cost: {
++          amountPerQuantity: {amount: '10.00', currencyCode: 'USD'},
++          totalAmount: {amount: '20.00', currencyCode: 'USD'},
++        },
++        discountAllocations: expect.any(Array),
++      });
++    });
++  });
++});
++
+ describe('buildCartLines', () => {
+   it('returns empty array when merchandiseLines is undefined', () => {
+     const result = buildCartLines(undefined);
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.ts
+index 4a37745e974100..ab2082d07f21bd 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/message-builders.ts
+@@ -33,6 +33,7 @@ import type {
+   CheckoutAddressChangeRequestedMessage,
+   CheckoutAddressChangeStartMessage,
+   CheckoutPaymentMethodChangeStartMessage,
++  CheckoutSubmitStartMessage,
+   CheckoutErrorMessage,
+   Cart,
+   CartAddressInput,
+@@ -160,6 +161,29 @@ export function buildCheckoutPaymentMethodChangeStartMessage(
+   };
+ }
+ 
++export function buildCheckoutSubmitStartMessage(
++  dataSource: EventDataSourceForEmbed,
++  id: string = crypto.randomUUID(),
++): CheckoutSubmitStartMessage {
++  const proposal = dataSource.checkout.cart.proposal;
++  const cart = buildCartFromProposal(
++    proposal,
++    dataSource.context.source.sourceId,
++  );
++
++  return {
++    jsonrpc: '2.0',
++    id,
++    method: 'checkout.submitStart',
++    params: {
++      cart,
++      checkout: {
++        id: dataSource.getRequiredCheckoutSessionId(),
++      },
++    },
++  };
++}
++
+ export function buildCheckoutErrorMessage(
+   event: CheckoutErrorEvent,
+ ): CheckoutErrorMessage {
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/types.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/types.ts
+index b22c2938061d04..90e69562238713 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/types.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/types.ts
+@@ -70,6 +70,27 @@ export interface CheckoutPaymentMethodChangeStartMessage
+   params: CheckoutPaymentMethodChangeStartPayload;
+ }
+ 
++// =============================================================================
++// CHECKOUT SUBMIT START TYPES
++// =============================================================================
++
++export interface CheckoutSubmitStartPayload {
++  cart: Cart;
++  checkout: {
++    id: string;
++  };
++}
++
++export interface CheckoutSubmitStartMessage
++  extends JSONRPCRequest<CheckoutSubmitStartPayload> {
++  method: 'checkout.submitStart';
++  params: CheckoutSubmitStartPayload;
++}
++
++// =============================================================================
++// RESPONSE ERROR TYPES
++// =============================================================================
++
+ export interface ResponseError {
+   code: string;
+   message: string;
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.test.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.test.ts
+index ed5391da1fa8b7..c38249f8c6d450 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.test.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.test.ts
+@@ -247,6 +247,30 @@ describe('V2025_10MessageMapper', () => {
+       expect(isJSONRPCRequest(message!)).toBe(true);
+     });
+ 
++    it('maps checkout.submitStart event to JSONRPC request', () => {
++      const mapper = new V2025_10MessageMapper(
++        createMapperOptions({isAuthenticated: true}),
++      );
++
++      const event = {
++        type: 'checkout.submitStart',
++      } as const;
++
++      const message = mapper.mapEvent(event);
++
++      expect(message).toMatchObject({
++        jsonrpc: '2.0',
++        method: 'checkout.submitStart',
++        params: expect.objectContaining({
++          cart: expect.any(Object),
++          checkout: expect.objectContaining({
++            id: expect.any(String),
++          }),
++        }),
++      });
++      expect(isJSONRPCRequest(message)).toBe(true);
++    });
++
+     it('returns undefined and logs for unsupported event types', () => {
+       const telemetryClient = new TelemetryClientForTest();
+       const mapper = new V2025_10MessageMapper(
+@@ -397,6 +421,27 @@ describe('V2025_10MessageMapper', () => {
+       expect(result).toStrictEqual(mockResponse);
+     });
+ 
++    it('passes through submitStart response as-is', () => {
++      const mapper = new V2025_10MessageMapper(
++        createMapperOptions({isAuthenticated: true}),
++      );
++
++      const mockResponse = {
++        paymentToken: 'tok_test_12345',
++        errors: [
++          {
++            code: 'PAYMENT_METHOD_UNSUPPORTED',
++            message: 'Payment method not supported',
++            fieldTarget: 'paymentMethod',
++          },
++        ],
++      };
++
++      const result = mapper.mapResponse('checkout.submitStart', mockResponse);
++
++      expect(result).toStrictEqual(mockResponse);
++    });
++
+     it('returns undefined and logs when response mapper is not implemented', () => {
+       const telemetryClient = new TelemetryClientForTest();
+       const mapper = new V2025_10MessageMapper(
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.ts
+index f7a19e9bd65f10..d05b63b57089ab 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/mappers/2025-10/v2025-10-mapper.ts
+@@ -11,6 +11,7 @@ import {
+   buildCheckoutAddressChangeStartMessage,
+   buildCheckoutPaymentMethodChangeStartMessage,
+   buildCheckoutCompleteMessage,
++  buildCheckoutSubmitStartMessage,
+   buildCheckoutStartMessage,
+   buildCheckoutErrorMessage,
+ } from './message-builders';
+@@ -29,6 +30,7 @@ export class V2025_10MessageMapper extends JSONRPCMessageMapper {
+     'checkout.addressChangeRequested',
+     'checkout.addressChangeStart',
+     'checkout.paymentMethodChangeStart',
++    'checkout.submitStart',
+   ]);
+ 
+   protected readonly eventsAllowedWithoutAuthentication: ReadonlySet<string> =
+@@ -39,6 +41,7 @@ export class V2025_10MessageMapper extends JSONRPCMessageMapper {
+       'checkout.addressChangeRequested',
+       'checkout.addressChangeStart',
+       'checkout.paymentMethodChangeStart',
++      'checkout.submitStart',
+     ]);
+ 
+   mapResponse<R>(
+@@ -52,6 +55,8 @@ export class V2025_10MessageMapper extends JSONRPCMessageMapper {
+         return response as R;
+       case 'checkout.paymentMethodChangeStart':
+         return response as R;
++      case 'checkout.submitStart':
++        return response as R;
+       default:
+         this.telemetryClient.log(
+           'message_mapper_response_not_implemented',
+@@ -88,6 +93,8 @@ export class V2025_10MessageMapper extends JSONRPCMessageMapper {
+         return buildCheckoutAddressChangeStartMessage(event, this.dataSource);
+       case 'checkout.paymentMethodChangeStart':
+         return buildCheckoutPaymentMethodChangeStartMessage(this.dataSource);
++      case 'checkout.submitStart':
++        return buildCheckoutSubmitStartMessage(this.dataSource);
+       default:
+         return undefined;
+     }
+diff --git a/areas/clients/checkout-web/app/entrypoints/shared/embed/types.ts b/areas/clients/checkout-web/app/entrypoints/shared/embed/types.ts
+index 3851f6afe23602..2a9fa90a30c5dd 100644
+--- a/areas/clients/checkout-web/app/entrypoints/shared/embed/types.ts
++++ b/areas/clients/checkout-web/app/entrypoints/shared/embed/types.ts
+@@ -3,6 +3,7 @@ import type {Address} from '~/utilities/addresses';
+ import type {
+   CheckoutAddressChangeStartResponsePayload,
+   CheckoutPaymentMethodChangeStartResponsePayload,
++  CheckoutSubmitStartResponsePayload,
+   CheckoutErrorCode,
+   EmbeddedCheckoutError,
+ } from '~/shared/embed';
+@@ -33,6 +34,10 @@ export interface CheckoutPaymentMethodChangeStartEvent extends BaseEvent {
+   type: 'checkout.paymentMethodChangeStart';
+ }
+ 
++export interface CheckoutSubmitStartEvent extends BaseEvent {
++  type: 'checkout.submitStart';
++}
++
+ export type {CheckoutErrorCode, EmbeddedCheckoutError};
+ 
+ export interface CheckoutErrorEvent extends BaseEvent {
+@@ -47,7 +52,8 @@ export type CheckoutEvent =
+   | CheckoutErrorEvent
+   | CheckoutAddressChangeRequestedEvent
+   | CheckoutAddressChangeStartEvent
+-  | CheckoutPaymentMethodChangeStartEvent;
++  | CheckoutPaymentMethodChangeStartEvent
++  | CheckoutSubmitStartEvent;
+ 
+ /**
+  * Maps checkout event types to their expected response types.
+@@ -62,6 +68,7 @@ export interface EventResponseMap {
+   'checkout.paymentMethodChangeStart':
+     | CheckoutPaymentMethodChangeStartResponsePayload
+     | undefined;
++  'checkout.submitStart': CheckoutSubmitStartResponsePayload | undefined;
+ }
+ 
+ /**
+@@ -103,6 +110,7 @@ export type {
+   ResponseErrorCode,
+   CheckoutAddressChangeStartResponsePayload,
+   CheckoutPaymentMethodChangeStartResponsePayload,
++  CheckoutSubmitStartResponsePayload,
+ } from '~/shared/embed';
+ 
+ /**
+diff --git a/areas/clients/checkout-web/app/shared/embed.ts b/areas/clients/checkout-web/app/shared/embed.ts
+index 0429a2e32c254e..7482e9bfa0723f 100644
+--- a/areas/clients/checkout-web/app/shared/embed.ts
++++ b/areas/clients/checkout-web/app/shared/embed.ts
+@@ -192,6 +192,18 @@ export interface CartInput {
+   paymentInstruments?: CartPaymentInstrumentInput[];
+ }
+ 
++/**
++ * Payment input structure, aligned with PAN despoit response payload.
++ * @token: Payment token which the PSP/merchant can process
++ * @tokenType: Type of the payment token, e.g. "card"
++ * @tokenProvider: Provider of payment token, e.g. "delegated"
++ */
++export interface CartPaymentTokenInput {
++  token: string;
++  tokenType: string;
++  tokenProvider: string;
++}
++
+ /**
+  * Cart response types for checkout events.
+  * These define the structure of responses from embedders for cart update events.
+@@ -233,6 +245,12 @@ export interface CheckoutPaymentMethodChangeStartResponsePayload {
+   errors?: ResponseError[];
+ }
+ 
++export interface CheckoutSubmitStartResponsePayload {
++  payment?: CartPaymentTokenInput;
++  cart?: CartInput;
++  errors?: ResponseError[];
++}
++
+ export interface EmbedClient {
+   readonly version: string;
+   complete(): Promise<undefined>;
+@@ -245,6 +263,7 @@ export interface EmbedClient {
+   paymentMethodChangeStart(): Promise<
+     CheckoutPaymentMethodChangeStartResponsePayload | undefined
+   >;
++  submitStart(): Promise<CheckoutSubmitStartResponsePayload | undefined>;
+ }
+ 
+ export interface Embed {
+diff --git a/areas/clients/checkout-web/app/tests/utilities/embed.ts b/areas/clients/checkout-web/app/tests/utilities/embed.ts
+index 8d261aae37c3e1..96c8900f72c77b 100644
+--- a/areas/clients/checkout-web/app/tests/utilities/embed.ts
++++ b/areas/clients/checkout-web/app/tests/utilities/embed.ts
+@@ -43,6 +43,12 @@ export class EmbedClientForTest implements jest.Mocked<EmbedClient> {
+     EmbedClient['paymentMethodChangeStart']
+   >;
+ 
++  submitStart = jest
++    .fn()
++    .mockImplementation(() => new Promise(() => {})) as jest.MockedFunction<
++    EmbedClient['submitStart']
++  >;
++
+   complete = jest.fn() as jest.MockedFunction<EmbedClient['complete']>;
+ 
+   error = jest.fn() as jest.MockedFunction<EmbedClient['error']>;

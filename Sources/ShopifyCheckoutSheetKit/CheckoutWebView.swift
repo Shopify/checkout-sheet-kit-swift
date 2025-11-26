@@ -34,6 +34,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStart)
     func checkoutViewDidRequestCardChange(event: CheckoutCardChangeRequested)
+    func checkoutViewDidStartSubmit(event: CheckoutSubmitStart)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
@@ -297,6 +298,12 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 "Card change intent event received"
             )
             viewDelegate.checkoutViewDidRequestCardChange(event: cardRequest)
+
+        case let submitRequest as CheckoutSubmitStart:
+            OSLogger.shared.info(
+                "Checkout submit start event received"
+            )
+            viewDelegate.checkoutViewDidStartSubmit(event: submitRequest)
 
         case let errorRequest as CheckoutErrorRequest:
             handleCheckoutError(errorRequest)

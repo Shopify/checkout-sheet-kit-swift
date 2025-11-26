@@ -454,3 +454,30 @@ public struct ResponseError: Codable {
         self.fieldTarget = fieldTarget
     }
 }
+
+// MARK: - Payment Token Types
+
+/// Payment token input structure for checkout submission.
+public struct CartPaymentTokenInput: Codable {
+    public let token: String
+    public let tokenType: String
+    public let tokenProvider: String
+
+    public init(token: String, tokenType: String, tokenProvider: String) {
+        self.token = token
+        self.tokenType = tokenType
+        self.tokenProvider = tokenProvider
+    }
+}
+
+// MARK: - Checkout Session
+
+/// Checkout session information.
+public struct Checkout: Codable {
+    /// The checkout session identifier
+    public let id: String
+
+    public init(id: String) {
+        self.id = id
+    }
+}
