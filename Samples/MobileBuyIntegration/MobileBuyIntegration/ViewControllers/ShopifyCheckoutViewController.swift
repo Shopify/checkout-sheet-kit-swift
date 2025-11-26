@@ -125,7 +125,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
     }
 
     func checkoutDidFail(error: CheckoutError) {
-        OSLogger.shared.debug("[EmbeddedCheckout] Checkout failed: \(error.localizedDescription)")
+        OSLogger.shared.debug("[EmbeddedCheckout] Checkout failed: \(error)")
         dismiss(animated: true)
     }
 
