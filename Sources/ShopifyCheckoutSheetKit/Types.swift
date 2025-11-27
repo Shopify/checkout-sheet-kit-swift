@@ -51,7 +51,7 @@ public struct Cart: Codable {
     public let appliedGiftCards: [AppliedGiftCard]
     public let discountAllocations: [CartDiscountAllocation]
     public let delivery: CartDelivery
-    public let paymentInstruments: [CartPaymentInstrument]
+    public let payment: CartPayment
 }
 
 public struct CartLine: Codable {
@@ -201,6 +201,10 @@ public enum PaymentMethodType: String, Codable {
     case deferredPayment = "DEFERRED_PAYMENT"
     case localPayment = "LOCAL_PAYMENT"
     case other = "OTHER"
+}
+
+public struct CartPayment: Codable {
+    public let instruments: [CartPaymentInstrument]
 }
 
 public struct CartPaymentInstrument: Codable {
@@ -472,30 +476,84 @@ public struct CartBuyerIdentityInput: Codable {
     }
 }
 
+public struct ExpiryInput: Codable {
+    public let month: Int
+    public let year: Int
+
+    public init(month: Int, year: Int) {
+        self.month = month
+        self.year = year
+    }
+}
+
+public struct CartPaymentInstrumentDisplayInput: Codable {
+    public let last4: String
+    public let brand: CardBrand
+    public let cardHolderName: String
+    public let expiry: ExpiryInput
+
+    public init(
+        last4: String,
+        brand: CardBrand,
+        cardHolderName: String,
+        expiry: ExpiryInput
+    ) {
+        self.last4 = last4
+        self.brand = brand
+        self.cardHolderName = cardHolderName
+        self.expiry = expiry
+    }
+}
+
+public struct MailingAddressInput: Codable {
+    public let address1: String?
+    public let address2: String?
+    public let city: String?
+    public let company: String?
+    public let countryCode: String?
+    public let firstName: String?
+    public let lastName: String?
+    public let phone: String?
+    public let provinceCode: String?
+    public let zip: String?
+
+    public init(
+        firstName: String? = nil,
+        lastName: String? = nil,
+        address1: String? = nil,
+        address2: String? = nil,
+        city: String? = nil,
+        company: String? = nil,
+        countryCode: String? = nil,
+        phone: String? = nil,
+        provinceCode: String? = nil,
+        zip: String? = nil
+    ) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.address1 = address1
+        self.address2 = address2
+        self.city = city
+        self.company = company
+        self.countryCode = countryCode
+        self.phone = phone
+        self.provinceCode = provinceCode
+        self.zip = zip
+    }
+}
+
 public struct CartPaymentInstrumentInput: Codable {
     public let externalReference: String
-    public let lastDigits: String
-    public let cardHolderName: String
-    public let brand: CardBrand
-    public let expiryMonth: Int
-    public let expiryYear: Int
-    public let billingAddress: CartDeliveryAddressInput
+    public let display: CartPaymentInstrumentDisplayInput
+    public let billingAddress: MailingAddressInput
 
     public init(
         externalReference: String,
-        lastDigits: String,
-        cardHolderName: String,
-        brand: CardBrand,
-        expiryMonth: Int,
-        expiryYear: Int,
-        billingAddress: CartDeliveryAddressInput
+        display: CartPaymentInstrumentDisplayInput,
+        billingAddress: MailingAddressInput
     ) {
         self.externalReference = externalReference
-        self.lastDigits = lastDigits
-        self.cardHolderName = cardHolderName
-        self.brand = brand
-        self.expiryMonth = expiryMonth
-        self.expiryYear = expiryYear
+        self.display = display
         self.billingAddress = billingAddress
     }
 }

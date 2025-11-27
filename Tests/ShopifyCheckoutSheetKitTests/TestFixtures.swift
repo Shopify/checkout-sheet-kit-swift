@@ -65,7 +65,7 @@ func createTestCart(
         appliedGiftCards: [],
         discountAllocations: [],
         delivery: CartDelivery(addresses: []),
-        paymentInstruments: paymentInstruments
+        payment: CartPayment(instruments: paymentInstruments)
     )
 }
 
@@ -174,7 +174,9 @@ func createTestCartJSON(
         "delivery": {
             "addresses": []
         },
-        "paymentInstruments": []
+        "payment": {
+            "instruments": []
+        }
     }
     """
 }
@@ -236,8 +238,8 @@ func createCheckoutCompleteJSON(
 // MARK: - Response Payload JSON Fixtures
 
 func createTestPaymentInstrumentInputJSON(
-    identifier: String = "instrument-123",
-    lastDigits: String = "4242",
+    externalReference: String = "instrument-123",
+    last4: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
     expiryMonth: Int = 12,
@@ -246,12 +248,16 @@ func createTestPaymentInstrumentInputJSON(
 ) -> String {
     """
     {
-        "identifier": "\(identifier)",
-        "lastDigits": "\(lastDigits)",
-        "cardHolderName": "\(cardHolderName)",
-        "brand": "\(brand)",
-        "expiryMonth": \(expiryMonth),
-        "expiryYear": \(expiryYear),
+        "externalReference": "\(externalReference)",
+        "display": {
+            "last4": "\(last4)",
+            "brand": "\(brand)",
+            "cardHolderName": "\(cardHolderName)",
+            "expiry": {
+                "month": \(expiryMonth),
+                "year": \(expiryYear)
+            }
+        },
         "billingAddress": {
             "countryCode": "\(countryCode)"
         }
@@ -260,8 +266,8 @@ func createTestPaymentInstrumentInputJSON(
 }
 
 func createTestPaymentInstrumentInputJSONWithFullAddress(
-    identifier: String = "instrument-123",
-    lastDigits: String = "4242",
+    externalReference: String = "instrument-123",
+    last4: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
     expiryMonth: Int = 12,
@@ -269,12 +275,16 @@ func createTestPaymentInstrumentInputJSONWithFullAddress(
 ) -> String {
     """
     {
-        "identifier": "\(identifier)",
-        "lastDigits": "\(lastDigits)",
-        "cardHolderName": "\(cardHolderName)",
-        "brand": "\(brand)",
-        "expiryMonth": \(expiryMonth),
-        "expiryYear": \(expiryYear),
+        "externalReference": "\(externalReference)",
+        "display": {
+            "last4": "\(last4)",
+            "brand": "\(brand)",
+            "cardHolderName": "\(cardHolderName)",
+            "expiry": {
+                "month": \(expiryMonth),
+                "year": \(expiryYear)
+            }
+        },
         "billingAddress": {
             "firstName": "John",
             "lastName": "Doe",

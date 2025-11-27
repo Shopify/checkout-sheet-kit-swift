@@ -191,7 +191,7 @@ class CheckoutBridgeTests: XCTestCase {
               "appliedGiftCards":[],
               "discountAllocations":[],
               "delivery":{"addresses":[]},
-              "paymentInstruments":[]
+              "payment":{"instruments":[]}
             }
           }
         }
@@ -252,7 +252,7 @@ class CheckoutBridgeTests: XCTestCase {
                     "appliedGiftCards": [],
                     "discountAllocations": [],
                     "delivery": { "addresses": [] },
-                    "paymentInstruments": [{ "identifier": "instrument-123" }]
+                    "payment": { "instruments": [{ "externalReference": "instrument-123" }] }
                 }
             }
         }
@@ -267,8 +267,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         XCTAssertEqual("card-change-456", cardRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.params.cart.id)
-        XCTAssertEqual(1, cardRequest.params.cart.paymentInstruments.count)
-        XCTAssertEqual("instrument-123", cardRequest.params.cart.paymentInstruments.first?.identifier)
+        XCTAssertEqual(1, cardRequest.params.cart.payment.instruments.count)
+        XCTAssertEqual("instrument-123", cardRequest.params.cart.payment.instruments.first?.externalReference)
     }
 
     func testDecodeSupportsCheckoutStart() throws {

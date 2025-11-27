@@ -65,12 +65,12 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
         XCTAssertNoThrow(try request.validate(payload: payload))
     }
 
-    func testValidateRejectsInvalidLastDigits() throws {
+    func testValidateRejectsInvalidLast4() throws {
         let request = createRequest()
         let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
-                    createTestPaymentInstrumentInput(lastDigits: "123")
+                    createTestPaymentInstrumentInput(last4: "123")
                 ]
             )
         )
@@ -80,7 +80,7 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
                 XCTFail("Expected validationFailed error, got \(error)")
                 return
             }
-            XCTAssertTrue(message.contains("lastDigits must be exactly 4 characters"))
+            XCTAssertTrue(message.contains("last4 must be exactly 4 characters"))
         }
     }
 
@@ -148,7 +148,7 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
             cart: CartInput(
                 paymentInstruments: [
                     createTestPaymentInstrumentInput(),
-                    createTestPaymentInstrumentInput(lastDigits: "12")
+                    createTestPaymentInstrumentInput(last4: "12")
                 ]
             )
         )
@@ -167,9 +167,9 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
         let payload = CheckoutPaymentMethodChangeStartResponsePayload(
             cart: CartInput(
                 paymentInstruments: [
-                    createTestPaymentInstrumentInput(identifier: "card-1"),
-                    createTestPaymentInstrumentInput(identifier: "card-2"),
-                    createTestPaymentInstrumentInput(identifier: "card-3")
+                    createTestPaymentInstrumentInput(externalReference: "card-1"),
+                    createTestPaymentInstrumentInput(externalReference: "card-2"),
+                    createTestPaymentInstrumentInput(externalReference: "card-3")
                 ]
             )
         )
@@ -204,12 +204,12 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
 
         XCTAssertNotNil(payload.cart)
         XCTAssertEqual(payload.cart?.paymentInstruments?.count, 1)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.identifier, "instrument-123")
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.lastDigits, "4242")
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.cardHolderName, "John Doe")
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.brand, .visa)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.expiryMonth, 12)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.expiryYear, 2025)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.externalReference, "instrument-123")
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.last4, "4242")
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.cardHolderName, "John Doe")
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.brand, .visa)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.expiry.month, 12)
+        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.expiry.year, 2025)
         XCTAssertEqual(payload.cart?.paymentInstruments?.first?.billingAddress.countryCode, "US")
     }
 
@@ -299,7 +299,7 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
 
             let instrument = try JSONDecoder().decode(CartPaymentInstrumentInput.self, from: data)
 
-            XCTAssertEqual(instrument.brand, expectedBrand, "Failed for brand: \(jsonBrand)")
+            XCTAssertEqual(instrument.display.brand, expectedBrand, "Failed for brand: \(jsonBrand)")
         }
     }
 
@@ -311,8 +311,8 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
     }
 
     private func createTestPaymentInstrumentInput(
-        identifier: String = "instrument-123",
-        lastDigits: String = "4242",
+        externalReference: String = "instrument-123",
+        last4: String = "4242",
         cardHolderName: String = "John Doe",
         brand: CardBrand = .visa,
         expiryMonth: Int = 12,
@@ -320,13 +320,14 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
         countryCode: String? = "US"
     ) -> CartPaymentInstrumentInput {
         CartPaymentInstrumentInput(
-            identifier: identifier,
-            lastDigits: lastDigits,
-            cardHolderName: cardHolderName,
-            brand: brand,
-            expiryMonth: expiryMonth,
-            expiryYear: expiryYear,
-            billingAddress: CartDeliveryAddressInput(countryCode: countryCode)
+            externalReference: externalReference,
+            display: CartPaymentInstrumentDisplayInput(
+                last4: last4,
+                brand: brand,
+                cardHolderName: cardHolderName,
+                expiry: ExpiryInput(month: expiryMonth, year: expiryYear)
+            ),
+            billingAddress: MailingAddressInput(countryCode: countryCode)
         )
     }
 }

@@ -37,13 +37,13 @@ public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaym
         }
 
         for (index, instrument) in instruments.enumerated() {
-            guard instrument.lastDigits.count == 4 else {
+            guard instrument.display.last4.count == 4 else {
                 throw CheckoutEventResponseError.validationFailed(
-                    "Payment instrument lastDigits must be exactly 4 characters at index \(index)"
+                    "Payment instrument last4 must be exactly 4 characters at index \(index)"
                 )
             }
 
-            guard instrument.expiryMonth >= 1, instrument.expiryMonth <= 12 else {
+            guard instrument.display.expiry.month >= 1, instrument.display.expiry.month <= 12 else {
                 throw CheckoutEventResponseError.validationFailed(
                     "Payment instrument expiryMonth must be between 1 and 12 at index \(index)"
                 )

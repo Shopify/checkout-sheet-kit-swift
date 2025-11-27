@@ -182,12 +182,13 @@ struct CartView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                 let paymentInstrument = CartPaymentInstrumentInput(
                                     externalReference: "card-visa-1234",
-                                    lastDigits: "1234",
-                                    cardHolderName: "John Smith",
-                                    brand: .visa,
-                                    expiryMonth: 12,
-                                    expiryYear: 2026,
-                                    billingAddress: CartDeliveryAddressInput(
+                                    display: CartPaymentInstrumentDisplayInput(
+                                        last4: "1234",
+                                        brand: .visa,
+                                        cardHolderName: "John Smith",
+                                        expiry: ExpiryInput(month: 12, year: 2026)
+                                    ),
+                                    billingAddress: MailingAddressInput(
                                         firstName: "John",
                                         lastName: "Smith",
                                         address1: "123 Main St",

@@ -33,7 +33,7 @@ struct CardOption {
     let cardHolderName: String
     let expiryMonth: Int
     let expiryYear: Int
-    let billingAddress: CartDeliveryAddressInput
+    let billingAddress: MailingAddressInput
 }
 
 class CardSelectionViewController: UIViewController {
@@ -52,7 +52,7 @@ class CardSelectionViewController: UIViewController {
             cardHolderName: "John Smith",
             expiryMonth: 12,
             expiryYear: 2026,
-            billingAddress: CartDeliveryAddressInput(
+            billingAddress: MailingAddressInput(
                 firstName: "John",
                 lastName: "Smith",
                 address1: "123 Main St",
@@ -71,7 +71,7 @@ class CardSelectionViewController: UIViewController {
             cardHolderName: "John Smith",
             expiryMonth: 6,
             expiryYear: 2027,
-            billingAddress: CartDeliveryAddressInput(
+            billingAddress: MailingAddressInput(
                 firstName: "John",
                 lastName: "Smith",
                 address1: "123 Main St",
@@ -91,7 +91,7 @@ class CardSelectionViewController: UIViewController {
             cardHolderName: "Jane Doe",
             expiryMonth: 3,
             expiryYear: 2028,
-            billingAddress: CartDeliveryAddressInput(
+            billingAddress: MailingAddressInput(
                 firstName: "Jane",
                 lastName: "Doe",
                 address1: "456 Oak Ave",
@@ -109,9 +109,10 @@ class CardSelectionViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
 
         // If payment instruments exist, try to select the first one
-        if let firstInstrument = event.params.cart.paymentInstruments.first {
+        if let firstInstrument = event.params.cart.payment.instruments.first {
             for (index, option) in cardOptions
-                .enumerated() where option.identifier == firstInstrument.externalReference {
+                .enumerated() where option.identifier == firstInstrument.externalReference
+            {
                 selectedIndex = index
                 break
             }
@@ -171,11 +172,12 @@ class CardSelectionViewController: UIViewController {
 
         let paymentInstrument = CartPaymentInstrumentInput(
             externalReference: selectedCard.identifier,
-            lastDigits: selectedCard.last4,
-            cardHolderName: selectedCard.cardHolderName,
-            brand: selectedCard.brand,
-            expiryMonth: selectedCard.expiryMonth,
-            expiryYear: selectedCard.expiryYear,
+            display: CartPaymentInstrumentDisplayInput(
+                last4: selectedCard.last4,
+                brand: selectedCard.brand,
+                cardHolderName: selectedCard.cardHolderName,
+                expiry: ExpiryInput(month: selectedCard.expiryMonth, year: selectedCard.expiryYear)
+            ),
             billingAddress: selectedCard.billingAddress
         )
 
