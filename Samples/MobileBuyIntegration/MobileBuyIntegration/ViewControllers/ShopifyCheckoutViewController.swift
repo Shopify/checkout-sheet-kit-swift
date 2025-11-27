@@ -128,4 +128,25 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         OSLogger.shared.debug("[EmbeddedCheckout] Checkout failed: \(error.localizedDescription)")
         dismiss(animated: true)
     }
+
+    func checkoutDidStartSubmit(event: CheckoutSubmitStart) {
+        // Respond with a test payment token after 1 second to simulate payment processing
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            let paymentToken = CartPaymentTokenInput(
+                token: "tok_test_123",
+                tokenType: "card",
+                tokenProvider: "delegated"
+            )
+
+            let response = CheckoutSubmitStartResponsePayload(payment: paymentToken)
+
+            OSLogger.shared.debug("[EmbeddedCheckout] Attempting to respond with test payment token")
+            do {
+                try event.respondWith(payload: response)
+                OSLogger.shared.debug("[EmbeddedCheckout] Successfully sent response")
+            } catch {
+                OSLogger.shared.error("[EmbeddedCheckout] Failed to respond to submit start: \(error)")
+            }
+        }
+    }
 }
