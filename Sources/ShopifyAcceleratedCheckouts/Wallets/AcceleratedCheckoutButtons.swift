@@ -266,7 +266,7 @@ extension AcceleratedCheckoutButtons {
     ///
     /// - Parameter action: The action to perform when a link is clicked
     /// - Returns: A view with the link click handler set
-    public func onClickLink(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
+    public func onLinkClick(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.eventHandlers.checkoutDidClickLink = action
         return newView
