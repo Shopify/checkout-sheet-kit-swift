@@ -56,7 +56,7 @@ struct ButtonSet: View {
                         .onCancel {
                             print("🚫 Checkout cancelled")
                         }
-                        .onClickLink { url in
+                        .onLinkClick { url in
                             print("🔗 Link clicked: \(url)")
                         }
                         .onRenderStateChange {
@@ -94,7 +94,7 @@ struct ButtonSet: View {
                         print("🔄 Variant - Should recover from error: \(error)")
                         return false // Example: don't recover for variant checkout
                     }
-                    .onClickLink { url in
+                    .onLinkClick { url in
                         print("🔗 Variant - Link clicked: \(url)")
                     }
                     .onRenderStateChange {
