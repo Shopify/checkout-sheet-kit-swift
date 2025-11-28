@@ -34,7 +34,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStart)
     func checkoutViewDidStartSubmit(event: CheckoutSubmitStart)
-    func checkoutViewDidRequestPaymentMethodChange(event: CheckoutPaymentMethodChangeStart)
+    func checkoutViewDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
