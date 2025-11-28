@@ -190,7 +190,8 @@ class CheckoutBridgeTests: XCTestCase {
               "discountCodes":[],
               "appliedGiftCards":[],
               "discountAllocations":[],
-              "delivery":{"addresses":[]}
+              "delivery":{"addresses":[]},
+              "payment":{"instruments":[]}
             }
           }
         }
@@ -208,16 +209,50 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", addressRequest.params.cart.id)
     }
 
-    func testDecodeSupportsCheckoutCardChangeRequested() throws {
+    func testDecodeSupportsCheckoutPaymentMethodChangeStart() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
             "id": "card-change-123",
-            "method": "checkout.cardChangeRequested",
+            "method": "checkout.paymentMethodChangeStart",
             "params": {
-                "currentCard": {
-                    "last4": "4242",
-                    "brand": "visa"
+                "cart": \(createTestCartJSON())
+            }
+        }
+        """, webView: mockWebView)
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let cardRequest = result as? CheckoutPaymentMethodChangeStart else {
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
+            return
+        }
+
+        XCTAssertEqual("card-change-123", cardRequest.id)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", cardRequest.params.cart.id)
+    }
+
+    func testDecodeSupportsCheckoutPaymentMethodChangeStartWithPaymentInstruments() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "id": "card-change-456",
+            "method": "checkout.paymentMethodChangeStart",
+            "params": {
+                "cart": {
+                    "id": "gid://shopify/Cart/test-cart-456",
+                    "lines": [],
+                    "cost": {
+                        "subtotalAmount": { "amount": "10.00", "currencyCode": "USD" },
+                        "totalAmount": { "amount": "10.00", "currencyCode": "USD" }
+                    },
+                    "buyerIdentity": { "email": null, "phone": null, "customer": null, "countryCode": "US" },
+                    "deliveryGroups": [],
+                    "discountCodes": [],
+                    "appliedGiftCards": [],
+                    "discountAllocations": [],
+                    "delivery": { "addresses": [] },
+                    "payment": { "instruments": [{ "externalReference": "instrument-123" }] }
                 }
             }
         }
@@ -225,38 +260,15 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let cardRequest = result as? CheckoutCardChangeRequested else {
-            XCTFail("Expected CheckoutCardChangeRequested, got \(result)")
-            return
-        }
-
-        XCTAssertEqual("card-change-123", cardRequest.id)
-        XCTAssertNotNil(cardRequest.params.currentCard)
-        XCTAssertEqual("4242", cardRequest.params.currentCard?.last4)
-        XCTAssertEqual("visa", cardRequest.params.currentCard?.brand)
-    }
-
-    func testDecodeSupportsCheckoutCardChangeRequestedWithoutCurrentCard() throws {
-        let mock = WKScriptMessageMock(body: """
-        {
-            "jsonrpc": "2.0",
-            "id": "card-change-456",
-            "method": "checkout.cardChangeRequested",
-            "params": {
-                "currentCard": null
-            }
-        }
-        """, webView: mockWebView)
-
-        let result = try CheckoutBridge.decode(mock)
-
-        guard let cardRequest = result as? CheckoutCardChangeRequested else {
-            XCTFail("Expected CheckoutCardChangeRequested, got \(result)")
+        guard let cardRequest = result as? CheckoutPaymentMethodChangeStart else {
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
             return
         }
 
         XCTAssertEqual("card-change-456", cardRequest.id)
-        XCTAssertNil(cardRequest.params.currentCard)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.params.cart.id)
+        XCTAssertEqual(1, cardRequest.params.cart.payment.instruments.count)
+        XCTAssertEqual("instrument-123", cardRequest.params.cart.payment.instruments.first?.externalReference)
     }
 
     func testDecodeSupportsCheckoutStart() throws {
@@ -336,6 +348,9 @@ class CheckoutBridgeTests: XCTestCase {
                         "discountAllocations": [],
                         "delivery": {
                             "addresses": []
+                        },
+                        "payment": {
+                            "instruments": []
                         }
                     },
                     "checkout": {

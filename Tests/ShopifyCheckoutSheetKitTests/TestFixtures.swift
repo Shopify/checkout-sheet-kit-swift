@@ -44,7 +44,8 @@ func createTestCart(
     subtotalAmount: String = "10.00",
     totalAmount: String = "10.00",
     currencyCode: String = "USD",
-    email: String? = nil
+    email: String? = nil,
+    paymentInstruments: [CartPaymentInstrument] = []
 ) -> Cart {
     Cart(
         id: id,
@@ -63,7 +64,8 @@ func createTestCart(
         discountCodes: [],
         appliedGiftCards: [],
         discountAllocations: [],
-        delivery: CartDelivery(addresses: [])
+        delivery: CartDelivery(addresses: []),
+        payment: CartPayment(instruments: paymentInstruments)
     )
 }
 
@@ -171,6 +173,9 @@ func createTestCartJSON(
         "discountAllocations": [],
         "delivery": {
             "addresses": []
+        },
+        "payment": {
+            "instruments": []
         }
     }
     """
@@ -228,4 +233,139 @@ func createCheckoutCompleteJSON(
         }
     }
     """
+}
+
+// MARK: - Response Payload JSON Fixtures
+
+func createTestPaymentInstrumentInputJSON(
+    externalReference: String = "instrument-123",
+    last4: String = "4242",
+    cardHolderName: String = "John Doe",
+    brand: String = "VISA",
+    expiryMonth: Int = 12,
+    expiryYear: Int = 2025,
+    countryCode: String = "US"
+) -> String {
+    """
+    {
+        "externalReference": "\(externalReference)",
+        "display": {
+            "last4": "\(last4)",
+            "brand": "\(brand)",
+            "cardHolderName": "\(cardHolderName)",
+            "expiry": {
+                "month": \(expiryMonth),
+                "year": \(expiryYear)
+            }
+        },
+        "billingAddress": {
+            "countryCode": "\(countryCode)"
+        }
+    }
+    """
+}
+
+func createTestPaymentInstrumentInputJSONWithFullAddress(
+    externalReference: String = "instrument-123",
+    last4: String = "4242",
+    cardHolderName: String = "John Doe",
+    brand: String = "VISA",
+    expiryMonth: Int = 12,
+    expiryYear: Int = 2025
+) -> String {
+    """
+    {
+        "externalReference": "\(externalReference)",
+        "display": {
+            "last4": "\(last4)",
+            "brand": "\(brand)",
+            "cardHolderName": "\(cardHolderName)",
+            "expiry": {
+                "month": \(expiryMonth),
+                "year": \(expiryYear)
+            }
+        },
+        "billingAddress": {
+            "firstName": "John",
+            "lastName": "Doe",
+            "address1": "123 Main St",
+            "address2": "Apt 4",
+            "city": "New York",
+            "company": "Acme Inc",
+            "countryCode": "US",
+            "phone": "+16135551111",
+            "provinceCode": "NY",
+            "zip": "10001"
+        }
+    }
+    """
+}
+
+func createTestResponseErrorJSON(
+    code: String = "INVALID_INPUT",
+    message: String = "An error occurred",
+    fieldTarget: String? = nil
+) -> String {
+    if let fieldTarget {
+        return """
+        {
+            "code": "\(code)",
+            "message": "\(message)",
+            "fieldTarget": "\(fieldTarget)"
+        }
+        """
+    } else {
+        return """
+        {
+            "code": "\(code)",
+            "message": "\(message)"
+        }
+        """
+    }
+}
+
+func createTestCartInputJSON(
+    paymentInstruments: [String]? = nil
+) -> String {
+    if let instruments = paymentInstruments {
+        let instrumentsJSON = instruments.joined(separator: ",\n        ")
+        return """
+        {
+            "paymentInstruments": [
+                \(instrumentsJSON)
+            ]
+        }
+        """
+    } else {
+        return """
+        {
+        }
+        """
+    }
+}
+
+func createTestPaymentMethodChangeStartResponseJSON(
+    cart: String? = nil,
+    errors: [String]? = nil
+) -> String {
+    var parts: [String] = []
+
+    if let cart {
+        parts.append("\"cart\": \(cart)")
+    }
+
+    if let errors {
+        let errorsJSON = errors.joined(separator: ",\n        ")
+        parts.append("""
+        "errors": [
+                \(errorsJSON)
+            ]
+        """)
+    }
+
+    if parts.isEmpty {
+        return "{}"
+    }
+
+    return "{\n    \(parts.joined(separator: ",\n    "))\n}"
 }

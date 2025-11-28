@@ -27,14 +27,17 @@ import UIKit
 
 struct CardOption {
     let label: String
+    let identifier: String
     let last4: String
-    let brand: String
-    let useDeliveryAddress: Bool
-    let billingAddress: CheckoutCardChangeResult.BillingAddress?
+    let brand: CardBrand
+    let cardHolderName: String
+    let expiryMonth: Int
+    let expiryYear: Int
+    let billingAddress: CartMailingAddressInput
 }
 
 class CardSelectionViewController: UIViewController {
-    private let event: CheckoutCardChangeRequested
+    private let event: CheckoutPaymentMethodChangeStart
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -43,23 +46,38 @@ class CardSelectionViewController: UIViewController {
     private let cardOptions: [CardOption] = [
         CardOption(
             label: "Visa ending in 4242",
+            identifier: "card-visa-4242",
             last4: "4242",
-            brand: "visa",
-            useDeliveryAddress: true,
-            billingAddress: nil
+            brand: .visa,
+            cardHolderName: "John Smith",
+            expiryMonth: 12,
+            expiryYear: 2026,
+            billingAddress: CartMailingAddressInput(
+                firstName: "John",
+                lastName: "Smith",
+                address1: "123 Main St",
+                city: "New York",
+                countryCode: "US",
+                phone: "+1-555-0100",
+                provinceCode: "NY",
+                zip: "10001"
+            )
         ),
         CardOption(
             label: "Mastercard ending in 5555",
+            identifier: "card-mc-5555",
             last4: "5555",
-            brand: "mastercard",
-            useDeliveryAddress: false,
-            billingAddress: CheckoutCardChangeResult.BillingAddress(
+            brand: .mastercard,
+            cardHolderName: "John Smith",
+            expiryMonth: 6,
+            expiryYear: 2027,
+            billingAddress: CartMailingAddressInput(
+                firstName: "John",
+                lastName: "Smith",
                 address1: "123 Main St",
                 address2: "Suite 100",
                 city: "New York",
                 countryCode: "US",
-                firstName: "John",
-                lastName: "Smith",
                 phone: "+1-555-0100",
                 provinceCode: "NY",
                 zip: "10001"
@@ -67,15 +85,18 @@ class CardSelectionViewController: UIViewController {
         ),
         CardOption(
             label: "Amex ending in 3737",
+            identifier: "card-amex-3737",
             last4: "3737",
-            brand: "american_express",
-            useDeliveryAddress: false,
-            billingAddress: CheckoutCardChangeResult.BillingAddress(
+            brand: .americanExpress,
+            cardHolderName: "Jane Doe",
+            expiryMonth: 3,
+            expiryYear: 2028,
+            billingAddress: CartMailingAddressInput(
+                firstName: "Jane",
+                lastName: "Doe",
                 address1: "456 Oak Ave",
                 city: "San Francisco",
                 countryCode: "US",
-                firstName: "Jane",
-                lastName: "Doe",
                 phone: "+1-555-0200",
                 provinceCode: "CA",
                 zip: "94102"
@@ -83,13 +104,15 @@ class CardSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: CheckoutCardChangeRequested) {
+    init(event: CheckoutPaymentMethodChangeStart) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
 
-        // If current card is provided, try to select it
-        if let currentCard = event.params.currentCard {
-            for (index, option) in cardOptions.enumerated() where option.last4 == currentCard.last4 {
+        // If payment instruments exist, try to select the first one
+        if let firstInstrument = event.params.cart.payment.instruments.first {
+            for (index, option) in cardOptions
+                .enumerated() where option.identifier == firstInstrument.externalReference
+            {
                 selectedIndex = index
                 break
             }
@@ -147,17 +170,20 @@ class CardSelectionViewController: UIViewController {
     @objc private func confirmSelection() {
         let selectedCard = cardOptions[selectedIndex]
 
-        let card = CheckoutCardChangeResult.Card(
-            last4: selectedCard.last4,
-            brand: selectedCard.brand
+        let paymentInstrument = CartPaymentInstrumentInput(
+            externalReference: selectedCard.identifier,
+            display: CartPaymentInstrumentDisplayInput(
+                last4: selectedCard.last4,
+                brand: selectedCard.brand,
+                cardHolderName: selectedCard.cardHolderName,
+                expiry: ExpiryInput(month: selectedCard.expiryMonth, year: selectedCard.expiryYear)
+            ),
+            billingAddress: selectedCard.billingAddress
         )
 
-        let billing = CheckoutCardChangeResult.BillingInfo(
-            useDeliveryAddress: selectedCard.useDeliveryAddress,
-            address: selectedCard.billingAddress
+        let result = CheckoutPaymentMethodChangeStartResponsePayload(
+            cart: CartInput(paymentInstruments: [paymentInstrument])
         )
-
-        let result = CheckoutCardChangeResult(card: card, billing: billing)
 
         do {
             try event.respondWith(payload: result)
@@ -283,14 +309,9 @@ class CardCell: UITableViewCell {
         cardImageView.image = UIImage(systemName: imageName)
         cardImageView.tintColor = .label
 
-        // Set billing details
-        if option.useDeliveryAddress {
-            detailsLabel.text = "Use delivery address for billing"
-        } else if let address = option.billingAddress {
-            detailsLabel.text = "\(address.city ?? ""), \(address.provinceCode ?? "") \(address.zip ?? "")"
-        } else {
-            detailsLabel.text = "Custom billing address"
-        }
+        // Set billing details from address
+        let address = option.billingAddress
+        detailsLabel.text = "\(address.city ?? ""), \(address.provinceCode ?? "") \(address.zip ?? "")"
 
         radioButtonInner.isHidden = !isSelected
 
@@ -303,13 +324,13 @@ class CardCell: UITableViewCell {
         }
     }
 
-    private func getCardImageName(for brand: String) -> String {
-        switch brand.lowercased() {
-        case "visa":
+    private func getCardImageName(for brand: CardBrand) -> String {
+        switch brand {
+        case .visa:
             return "creditcard"
-        case "mastercard":
+        case .mastercard:
             return "creditcard.fill"
-        case "american_express", "amex":
+        case .americanExpress:
             return "creditcard.and.123"
         default:
             return "creditcard"

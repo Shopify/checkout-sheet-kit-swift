@@ -22,39 +22,22 @@
  */
 
 import Foundation
+import WebKit
 
-public struct CheckoutCompleteEvent: Codable {
-    public let orderConfirmation: OrderConfirmation
+public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload> {
+    override public static var method: String { "checkout.paymentMethodChangeStart" }
+}
+
+public struct CheckoutPaymentMethodChangeStartParams: Codable {
     public let cart: Cart
 }
 
-func createEmptyCheckoutCompleteEvent(id: String? = "") -> CheckoutCompleteEvent {
-    return CheckoutCompleteEvent(
-        orderConfirmation: OrderConfirmation(
-            url: nil,
-            order: OrderConfirmation.Order(id: id ?? ""),
-            number: nil,
-            isFirstOrder: false
-        ),
-        cart: Cart(
-            id: "",
-            lines: [],
-            cost: CartCost(
-                subtotalAmount: Money(amount: "", currencyCode: ""),
-                totalAmount: Money(amount: "", currencyCode: "")
-            ),
-            buyerIdentity: CartBuyerIdentity(
-                email: nil,
-                phone: nil,
-                customer: nil,
-                countryCode: nil
-            ),
-            deliveryGroups: [],
-            discountCodes: [],
-            appliedGiftCards: [],
-            discountAllocations: [],
-            delivery: CartDelivery(addresses: []),
-            payment: .init(instruments: [])
-        )
-    )
+public struct CheckoutPaymentMethodChangeStartResponsePayload: Codable {
+    public let cart: CartInput?
+    public let errors: [ResponseError]?
+
+    public init(cart: CartInput? = nil, errors: [ResponseError]? = nil) {
+        self.cart = cart
+        self.errors = errors
+    }
 }

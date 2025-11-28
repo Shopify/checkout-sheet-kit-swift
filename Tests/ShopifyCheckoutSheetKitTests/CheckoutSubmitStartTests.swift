@@ -74,7 +74,8 @@ class CheckoutSubmitStartTests: XCTestCase {
                 "discountCodes": [],
                 "appliedGiftCards": [],
                 "discountAllocations": [],
-                "delivery": {"addresses": []}
+                "delivery": {"addresses": []},
+                "payment": {"instruments": []}
             },
             "checkout": {
                 "id": "checkout-session-123"

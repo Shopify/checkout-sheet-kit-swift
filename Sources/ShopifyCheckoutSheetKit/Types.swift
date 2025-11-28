@@ -51,6 +51,7 @@ public struct Cart: Codable {
     public let appliedGiftCards: [AppliedGiftCard]
     public let discountAllocations: [CartDiscountAllocation]
     public let delivery: CartDelivery
+    public let payment: CartPayment
 }
 
 public struct CartLine: Codable {
@@ -180,6 +181,34 @@ public enum CartDeliveryMethodType: String, Codable {
 public enum CartDeliveryGroupType: String, Codable {
     case subscription = "SUBSCRIPTION"
     case oneTimePurchase = "ONE_TIME_PURCHASE"
+}
+
+public enum CardBrand: String, Codable {
+    case visa = "VISA"
+    case mastercard = "MASTERCARD"
+    case americanExpress = "AMERICAN_EXPRESS"
+    case discover = "DISCOVER"
+    case dinersClub = "DINERS_CLUB"
+    case jcb = "JCB"
+    case maestro = "MAESTRO"
+    case unknown = "UNKNOWN"
+}
+
+public enum PaymentMethodType: String, Codable {
+    case creditCard = "CREDIT_CARD"
+    case debitCard = "DEBIT_CARD"
+    case wallet = "WALLET"
+    case deferredPayment = "DEFERRED_PAYMENT"
+    case localPayment = "LOCAL_PAYMENT"
+    case other = "OTHER"
+}
+
+public struct CartPayment: Codable {
+    public let instruments: [CartPaymentInstrument]
+}
+
+public struct CartPaymentInstrument: Codable {
+    public let externalReference: String
 }
 
 public struct CartDelivery: Codable {
@@ -328,14 +357,19 @@ public struct CartInput: Codable {
     /// The case-insensitive discount codes that the customer added at checkout.
     public let discountCodes: [String]?
 
+    /// Payment instruments for the cart.
+    public let paymentInstruments: [CartPaymentInstrumentInput]?
+
     public init(
         delivery: CartDeliveryInput? = nil,
         buyerIdentity: CartBuyerIdentityInput? = nil,
-        discountCodes: [String]? = nil
+        discountCodes: [String]? = nil,
+        paymentInstruments: [CartPaymentInstrumentInput]? = nil
     ) {
         self.delivery = delivery
         self.buyerIdentity = buyerIdentity
         self.discountCodes = discountCodes
+        self.paymentInstruments = paymentInstruments
     }
 }
 
@@ -439,6 +473,57 @@ public struct CartBuyerIdentityInput: Codable {
         self.email = email
         self.phone = phone
         self.countryCode = countryCode
+    }
+}
+
+public struct ExpiryInput: Codable {
+    public let month: Int
+    public let year: Int
+
+    public init(month: Int, year: Int) {
+        self.month = month
+        self.year = year
+    }
+}
+
+public struct CartPaymentInstrumentDisplayInput: Codable {
+    public let last4: String
+    public let brand: CardBrand
+    public let cardHolderName: String
+    public let expiry: ExpiryInput
+
+    public init(
+        last4: String,
+        brand: CardBrand,
+        cardHolderName: String,
+        expiry: ExpiryInput
+    ) {
+        self.last4 = last4
+        self.brand = brand
+        self.cardHolderName = cardHolderName
+        self.expiry = expiry
+    }
+}
+
+/// This doesn't follow the Storefront API design so we are aliasing to an existing conforming shape
+/// Differences to SF API include:
+///  - province -> provinceCode
+///  - country -> countryCode
+public typealias CartMailingAddressInput = CartDeliveryAddressInput
+
+public struct CartPaymentInstrumentInput: Codable {
+    public let externalReference: String
+    public let display: CartPaymentInstrumentDisplayInput
+    public let billingAddress: CartMailingAddressInput
+
+    public init(
+        externalReference: String,
+        display: CartPaymentInstrumentDisplayInput,
+        billingAddress: CartMailingAddressInput
+    ) {
+        self.externalReference = externalReference
+        self.display = display
+        self.billingAddress = billingAddress
     }
 }
 

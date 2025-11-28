@@ -175,6 +175,42 @@ struct CartView: View {
                                 }
                             }
                         }
+                        .onPaymentMethodChangeStart { event in
+                            print("🎉 SwiftUI: Payment method change start received")
+
+                            // Respond with hardcoded payment method after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                let paymentInstrument = CartPaymentInstrumentInput(
+                                    externalReference: "card-visa-1234",
+                                    display: CartPaymentInstrumentDisplayInput(
+                                        last4: "1234",
+                                        brand: .visa,
+                                        cardHolderName: "John Smith",
+                                        expiry: ExpiryInput(month: 12, year: 2026)
+                                    ),
+                                    billingAddress: CartMailingAddressInput(
+                                        firstName: "John",
+                                        lastName: "Smith",
+                                        address1: "123 Main St",
+                                        city: "Vancouver",
+                                        countryCode: "CA",
+                                        provinceCode: "BC",
+                                        zip: "V6B 1A1"
+                                    )
+                                )
+
+                                let response = CheckoutPaymentMethodChangeStartResponsePayload(
+                                    cart: CartInput(paymentInstruments: [paymentInstrument])
+                                )
+
+                                print("🎉 SwiftUI: Responding with hardcoded Visa ending in 1234")
+                                do {
+                                    try event.respondWith(payload: response)
+                                } catch {
+                                    print("Failed to respond with payment method change")
+                                }
+                            }
+                        }
                         .edgesIgnoringSafeArea(.all)
                 }
             }

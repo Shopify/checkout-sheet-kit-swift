@@ -99,9 +99,9 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         // consumers can push onto the navigation stack
     }
 
-    func checkoutDidRequestCardChange(event: CheckoutCardChangeRequested) {
+    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart) {
         OSLogger.shared.debug(
-            "[EmbeddedCheckout] Card change intent received"
+            "[EmbeddedCheckout] Payment method change start received"
         )
 
         let cardViewController = CardSelectionViewController(event: event)
@@ -125,7 +125,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
     }
 
     func checkoutDidFail(error: CheckoutError) {
-        OSLogger.shared.debug("[EmbeddedCheckout] Checkout failed: \(error.localizedDescription)")
+        OSLogger.shared.debug("[EmbeddedCheckout] Checkout failed: \(error)")
         dismiss(animated: true)
     }
 
