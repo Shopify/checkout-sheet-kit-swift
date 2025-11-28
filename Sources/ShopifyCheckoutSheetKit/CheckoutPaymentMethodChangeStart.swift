@@ -26,38 +26,6 @@ import WebKit
 
 public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload> {
     override public static var method: String { "checkout.paymentMethodChangeStart" }
-
-    override public func validate(payload: ResponsePayload) throws {
-        guard let cart = payload.cart else {
-            return
-        }
-
-        guard let instruments = cart.paymentInstruments, !instruments.isEmpty else {
-            return
-        }
-
-        for (index, instrument) in instruments.enumerated() {
-            guard instrument.display.last4.count == 4 else {
-                throw CheckoutEventResponseError.validationFailed(
-                    "Payment instrument last4 must be exactly 4 characters at index \(index)"
-                )
-            }
-
-            guard instrument.display.expiry.month >= 1, instrument.display.expiry.month <= 12 else {
-                throw CheckoutEventResponseError.validationFailed(
-                    "Payment instrument expiryMonth must be between 1 and 12 at index \(index)"
-                )
-            }
-
-            if let countryCode = instrument.billingAddress.countryCode, !countryCode.isEmpty {
-                guard countryCode.count == 2 else {
-                    throw CheckoutEventResponseError.validationFailed(
-                        "Country code must be exactly 2 characters (ISO 3166-1 alpha-2) at index \(index), got: '\(countryCode)'"
-                    )
-                }
-            }
-        }
-    }
 }
 
 public struct CheckoutPaymentMethodChangeStartParams: Codable {
