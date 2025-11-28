@@ -33,7 +33,7 @@ struct CardOption {
     let cardHolderName: String
     let expiryMonth: Int
     let expiryYear: Int
-    let billingAddress: MailingAddressInput
+    let billingAddress: CartMailingAddressInput
 }
 
 class CardSelectionViewController: UIViewController {
@@ -52,7 +52,7 @@ class CardSelectionViewController: UIViewController {
             cardHolderName: "John Smith",
             expiryMonth: 12,
             expiryYear: 2026,
-            billingAddress: MailingAddressInput(
+            billingAddress: CartMailingAddressInput(
                 firstName: "John",
                 lastName: "Smith",
                 address1: "123 Main St",
@@ -71,7 +71,7 @@ class CardSelectionViewController: UIViewController {
             cardHolderName: "John Smith",
             expiryMonth: 6,
             expiryYear: 2027,
-            billingAddress: MailingAddressInput(
+            billingAddress: CartMailingAddressInput(
                 firstName: "John",
                 lastName: "Smith",
                 address1: "123 Main St",
@@ -91,7 +91,7 @@ class CardSelectionViewController: UIViewController {
             cardHolderName: "Jane Doe",
             expiryMonth: 3,
             expiryYear: 2028,
-            billingAddress: MailingAddressInput(
+            billingAddress: CartMailingAddressInput(
                 firstName: "Jane",
                 lastName: "Doe",
                 address1: "456 Oak Ave",

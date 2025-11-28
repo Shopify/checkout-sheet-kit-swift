@@ -188,7 +188,7 @@ struct CartView: View {
                                         cardHolderName: "John Smith",
                                         expiry: ExpiryInput(month: 12, year: 2026)
                                     ),
-                                    billingAddress: MailingAddressInput(
+                                    billingAddress: CartMailingAddressInput(
                                         firstName: "John",
                                         lastName: "Smith",
                                         address1: "123 Main St",

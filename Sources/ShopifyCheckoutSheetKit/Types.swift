@@ -505,52 +505,21 @@ public struct CartPaymentInstrumentDisplayInput: Codable {
     }
 }
 
-public struct MailingAddressInput: Codable {
-    public let address1: String?
-    public let address2: String?
-    public let city: String?
-    public let company: String?
-    public let countryCode: String?
-    public let firstName: String?
-    public let lastName: String?
-    public let phone: String?
-    public let provinceCode: String?
-    public let zip: String?
-
-    public init(
-        firstName: String? = nil,
-        lastName: String? = nil,
-        address1: String? = nil,
-        address2: String? = nil,
-        city: String? = nil,
-        company: String? = nil,
-        countryCode: String? = nil,
-        phone: String? = nil,
-        provinceCode: String? = nil,
-        zip: String? = nil
-    ) {
-        self.firstName = firstName
-        self.lastName = lastName
-        self.address1 = address1
-        self.address2 = address2
-        self.city = city
-        self.company = company
-        self.countryCode = countryCode
-        self.phone = phone
-        self.provinceCode = provinceCode
-        self.zip = zip
-    }
-}
+/// This doesn't follow the Storefront API design so we are aliasing to an existing conforming shape
+/// Differences to SF API include:
+///  - province -> provinceCode
+///  - country -> countryCode
+public typealias CartMailingAddressInput = CartDeliveryAddressInput
 
 public struct CartPaymentInstrumentInput: Codable {
     public let externalReference: String
     public let display: CartPaymentInstrumentDisplayInput
-    public let billingAddress: MailingAddressInput
+    public let billingAddress: CartMailingAddressInput
 
     public init(
         externalReference: String,
         display: CartPaymentInstrumentDisplayInput,
-        billingAddress: MailingAddressInput
+        billingAddress: CartMailingAddressInput
     ) {
         self.externalReference = externalReference
         self.display = display
