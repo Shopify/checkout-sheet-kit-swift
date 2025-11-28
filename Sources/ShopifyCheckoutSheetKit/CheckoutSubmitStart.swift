@@ -34,11 +34,11 @@ public struct CheckoutSubmitStartParams: Codable {
 }
 
 public struct CheckoutSubmitStartResponsePayload: Codable {
-    public let payment: CartPaymentTokenInput?
+    public let payment: PaymentTokenInput?
     public let cart: CartInput?
     public let errors: [ResponseError]?
 
-    public init(payment: CartPaymentTokenInput? = nil, cart: CartInput? = nil, errors: [ResponseError]? = nil) {
+    public init(payment: PaymentTokenInput? = nil, cart: CartInput? = nil, errors: [ResponseError]? = nil) {
         self.payment = payment
         self.cart = cart
         self.errors = errors

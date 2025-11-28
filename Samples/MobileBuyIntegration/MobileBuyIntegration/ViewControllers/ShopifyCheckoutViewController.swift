@@ -132,7 +132,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
     func checkoutDidStartSubmit(event: CheckoutSubmitStart) {
         // Respond with a test payment token after 1 second to simulate payment processing
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            let paymentToken = CartPaymentTokenInput(
+            let paymentToken = PaymentTokenInput(
                 token: "tok_test_123",
                 tokenType: "card",
                 tokenProvider: "delegated"

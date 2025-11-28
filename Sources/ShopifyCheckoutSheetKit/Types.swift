@@ -458,7 +458,7 @@ public struct ResponseError: Codable {
 // MARK: - Payment Token Types
 
 /// Payment token input structure for checkout submission.
-public struct CartPaymentTokenInput: Codable {
+public struct PaymentTokenInput: Codable {
     public let token: String
     public let tokenType: String
     public let tokenProvider: String
