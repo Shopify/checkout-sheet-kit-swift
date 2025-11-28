@@ -267,6 +267,10 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         delegate?.checkoutDidRequestCardChange(event: event)
     }
 
+    func checkoutViewDidStartSubmit(event: CheckoutSubmitStart) {
+        delegate?.checkoutDidStartSubmit(event: event)
+    }
+
     private func isRecoverableError() -> Bool {
         /// Reuse of multipass tokens will cause 422 errors. A new token must be generated
         return !CheckoutURL(from: checkoutURL).isMultipassURL()

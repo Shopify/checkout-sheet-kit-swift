@@ -302,4 +302,61 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("gid://shopify/Order/test-order-123", completeRequest.params.orderConfirmation.order.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", completeRequest.params.cart.id)
     }
+
+    func testDecodeSupportsCheckoutSubmitStart() throws {
+        let mock = WKScriptMessageMock(
+            body: """
+            {
+                "jsonrpc": "2.0",
+                "method": "checkout.submitStart",
+                "id": "submit-123",
+                "params": {
+                    "cart": {
+                        "id": "gid://shopify/Cart/test-cart-456",
+                        "lines": [],
+                        "cost": {
+                            "subtotalAmount": {
+                                "amount": "100.00",
+                                "currencyCode": "USD"
+                            },
+                            "totalAmount": {
+                                "amount": "100.00",
+                                "currencyCode": "USD"
+                            }
+                        },
+                        "buyerIdentity": {
+                            "email": "buyer@example.com",
+                            "phone": null,
+                            "customer": null,
+                            "countryCode": "US"
+                        },
+                        "deliveryGroups": [],
+                        "discountCodes": [],
+                        "appliedGiftCards": [],
+                        "discountAllocations": [],
+                        "delivery": {
+                            "addresses": []
+                        }
+                    },
+                    "checkout": {
+                        "id": "checkout-session-789"
+                    }
+                }
+            }
+            """,
+            webView: mockWebView
+        )
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let submitRequest = result as? CheckoutSubmitStart else {
+            XCTFail("Expected CheckoutSubmitStart, got \(result)")
+            return
+        }
+
+        XCTAssertEqual("submit-123", submitRequest.id)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-456", submitRequest.params.cart.id)
+        XCTAssertEqual("checkout-session-789", submitRequest.params.checkout.id)
+        XCTAssertEqual("buyer@example.com", submitRequest.params.cart.buyerIdentity.email)
+    }
 }

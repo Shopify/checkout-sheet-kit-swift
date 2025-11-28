@@ -21,20 +21,26 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@testable import ShopifyCheckoutSheetKit
+import Foundation
 import WebKit
-import XCTest
 
-class MockWebView: CheckoutWebView {
-    var evaluateJavaScriptExpectation: XCTestExpectation?
+public final class CheckoutSubmitStart: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload> {
+    override public static var method: String { "checkout.submitStart" }
+}
 
-    var capturedJavaScript: String?
+public struct CheckoutSubmitStartParams: Codable {
+    public let cart: Cart
+    public let checkout: Checkout
+}
 
-    override func evaluateJavaScript(_ javaScriptString: String) async throws -> Any {
-        capturedJavaScript = javaScriptString
-        if !javaScriptString.isEmpty {
-            evaluateJavaScriptExpectation?.fulfill()
-        }
-        return true
+public struct CheckoutSubmitStartResponsePayload: Codable {
+    public let payment: PaymentTokenInput?
+    public let cart: CartInput?
+    public let errors: [ResponseError]?
+
+    public init(payment: PaymentTokenInput? = nil, cart: CartInput? = nil, errors: [ResponseError]? = nil) {
+        self.payment = payment
+        self.cart = cart
+        self.errors = errors
     }
 }

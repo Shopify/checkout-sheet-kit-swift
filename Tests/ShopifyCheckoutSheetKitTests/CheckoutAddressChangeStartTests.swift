@@ -25,6 +25,49 @@
 import XCTest
 
 class CheckoutAddressChangeStartTests: XCTestCase {
+    // MARK: - Response Tests
+
+    func testRespondWithSendsJavaScriptToWebView() throws {
+        let mockWebView = MockWebView()
+        let params = CheckoutAddressChangeStartParams(
+            addressType: "shipping",
+            cart: createTestCart()
+        )
+        let request = CheckoutAddressChangeStart(id: "test-id-789", params: params)
+        request.webview = mockWebView
+
+        let payload = CheckoutAddressChangeStartResponsePayload(
+            cart: CartInput(
+                delivery: CartDeliveryInput(
+                    addresses: [
+                        CartSelectableAddressInput(
+                            address: CartDeliveryAddressInput(countryCode: "US")
+                        )
+                    ]
+                )
+            )
+        )
+
+        let expectation = expectation(description: "JavaScript executed")
+        mockWebView.evaluateJavaScriptExpectation = expectation
+
+        try request.respondWith(payload: payload)
+
+        waitForExpectations(timeout: 2.0)
+
+        // Verify the JavaScript was executed and contains the expected JSON-RPC response
+        XCTAssertNotNil(mockWebView.capturedJavaScript, "JavaScript should have been executed")
+
+        let capturedJS = mockWebView.capturedJavaScript ?? ""
+
+        // Verify the response contains expected JSON-RPC fields
+        XCTAssertTrue(capturedJS.contains("window.postMessage"), "Should call window.postMessage")
+        XCTAssertTrue(capturedJS.contains("\"jsonrpc\":\"2.0\""), "Should include JSON-RPC version")
+        XCTAssertTrue(capturedJS.contains("\"id\":\"test-id-789\""), "Should include request ID")
+        XCTAssertTrue(capturedJS.contains("\"result\""), "Should include result field")
+        XCTAssertTrue(capturedJS.contains("\"cart\""), "Should include cart in result")
+    }
+
     // MARK: - Validation Tests
 
     func testValidateAcceptsValid2CharacterCountryCode() throws {
