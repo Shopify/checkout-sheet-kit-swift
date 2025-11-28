@@ -348,6 +348,9 @@ class CheckoutBridgeTests: XCTestCase {
                         "discountAllocations": [],
                         "delivery": {
                             "addresses": []
+                        },
+                        "payment": {
+                            "instruments": []
                         }
                     },
                     "checkout": {
