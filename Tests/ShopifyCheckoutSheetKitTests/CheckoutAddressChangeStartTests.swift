@@ -276,6 +276,6 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     private func createRequest() -> CheckoutAddressChangeStart {
         let params = CheckoutAddressChangeStartParams(addressType: "shipping", cart: createTestCart())
-        return CheckoutAddressChangeStart(id: nil, params: params)
+        return CheckoutAddressChangeStart(id: "test-id", params: params)
     }
 }

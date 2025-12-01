@@ -29,7 +29,18 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     public typealias Params = P
     public typealias ResponsePayload = R
 
-    public let id: String
+    /// The request ID (non-null for requests that can be responded to)
+    private let _id: String
+
+    /// Public accessor that exposes non-nullable id for CheckoutRequest protocol
+    public var id: String { _id }
+
+    /// The JSON-RPC version (always "2.0")
+    var jsonrpc: String { "2.0" }
+
+    /// Whether this is a notification (always false for BaseRPCRequest - requests have IDs)
+    var isNotification: Bool { false }
+
     /// The parameters from the RPC request.
     /// Internal - subclasses should expose specific properties from params.
     internal let params: Params
@@ -40,9 +51,12 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
         fatalError("Subclasses must override method")
     }
 
-    /// Required initializer that all RPC requests must implement
-    public required init(id: String, params: Params) {
-        self.id = id
+    /// Required initializer for RPCRequest protocol (accepts optional id for wire format)
+    public required init(id: String?, params: Params) {
+        guard let id = id else {
+            fatalError("BaseRPCRequest requires non-null id. Use notification event classes for events without id.")
+        }
+        self._id = id
         self.params = params
         webview = nil
     }
@@ -55,19 +69,30 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     /// Respond with a typed payload
     public func respondWith(payload: ResponsePayload) throws {
         guard let webview else { return }
+        guard !isNotification else { return }
 
         // Validate first
         try validate(payload: payload)
 
         // Encode and send
         let response = RPCResponse(id: id, result: payload)
-        let encoder = JSONEncoder()
-        let responseData = try encoder.encode(response)
-        guard let responseJson = String(data: responseData, encoding: .utf8) else {
-            return
-        }
 
-        CheckoutBridge.sendResponse(webview, messageBody: responseJson)
+        do {
+            let encoder = JSONEncoder()
+            let responseData = try encoder.encode(response)
+            guard let responseJson = String(data: responseData, encoding: .utf8) else {
+                OSLogger.shared.error(
+                    "[BaseRPCRequest] sendResponse method: \(Self.method), id: \(id) failed to encode response string"
+                )
+                return
+            }
+
+            CheckoutBridge.sendResponse(webview, messageBody: responseJson)
+        } catch {
+            OSLogger.shared.error(
+                "[BaseRPCRequest] sendResponse method: \(Self.method), id: \(id) encoding error: \(error)"
+            )
+        }
     }
 
     /// Respond with a JSON string
@@ -79,6 +104,9 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
         do {
             let payload = try JSONDecoder().decode(ResponsePayload.self, from: data)
             try respondWith(payload: payload)
+        } catch let error as CheckoutEventResponseError {
+            // Re-throw validation errors from respondWith(payload:)
+            throw error
         } catch let error as DecodingError {
             throw CheckoutEventResponseError.decodingFailed(formatDecodingError(error))
         } catch {
@@ -89,15 +117,26 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     /// Respond with an error
     public func respondWith(error: String) throws {
         guard let webview else { return }
+        guard !isNotification else { return }
 
         let response = RPCResponse<ResponsePayload>(id: id, error: error)
-        let encoder = JSONEncoder()
-        let responseData = try encoder.encode(response)
-        guard let responseJson = String(data: responseData, encoding: .utf8) else {
-            return
-        }
 
-        CheckoutBridge.sendResponse(webview, messageBody: responseJson)
+        do {
+            let encoder = JSONEncoder()
+            let responseData = try encoder.encode(response)
+            guard let responseJson = String(data: responseData, encoding: .utf8) else {
+                OSLogger.shared.error(
+                    "[BaseRPCRequest] sendResponse error method: \(Self.method), id: \(id) failed to encode error response string"
+                )
+                return
+            }
+
+            CheckoutBridge.sendResponse(webview, messageBody: responseJson)
+        } catch {
+            OSLogger.shared.error(
+                "[BaseRPCRequest] sendResponse error method: \(Self.method), id: \(id) encoding error: \(error)"
+            )
+        }
     }
 }
 

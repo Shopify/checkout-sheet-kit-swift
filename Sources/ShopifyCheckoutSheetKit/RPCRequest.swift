@@ -75,10 +75,10 @@ protocol RPCRequest: AnyObject, Decodable {
     /// A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".
     var jsonrpc: String { get }
 
-    /// An identifier established by the Client that MUST contain a String, Number, or NULL value if included.
-    /// If it is not included it is assumed to be a notification.
-    /// The value SHOULD normally not be Null [1] and Numbers SHOULD NOT contain fractional parts [2]
-    var id: String? { get }
+    /// An identifier established by the Client.
+    /// Request events (bidirectional, expect response) always have an id.
+    /// Notification events (unidirectional) don't extend RPCRequest and have no id.
+    var id: String { get }
 
     /// The params from the JSON-RPC request
     /// Internal - subclasses should expose specific properties from params

@@ -23,21 +23,42 @@
 
 import Foundation
 
-/// Base protocol for all checkout events (notifications and requests)
+/// Base protocol for all checkout events.
+///
+/// Checkout events are messages sent from the checkout web experience to your app.
+/// Events can be either notifications (one-way messages) or requests (expecting a response).
+///
+/// Examples of notification events: `CheckoutStartEvent`, `CheckoutCompleteEvent`
 public protocol CheckoutNotification {
     /// The method name that identifies this event type
     /// e.g., "checkout.start", "checkout.addressChangeStart"
     var method: String { get }
 }
 
-/// Protocol for checkout events that expect a response (bidirectional)
+/// Protocol for checkout events that require a response from your app.
+///
+/// Request events represent bidirectional communication where the checkout is waiting
+/// for your app to provide data or complete an operation before continuing.
+///
+/// Examples: `CheckoutAddressChangeStart`, `CheckoutSubmitStart`, `CheckoutPaymentMethodChangeStart`
+///
+/// Each concrete event class provides a strongly-typed `respondWith(payload:)` method for
+/// responding with the appropriate payload type. You must respond to allow the checkout to continue.
 public protocol CheckoutRequest: CheckoutNotification {
     /// Unique identifier for this request, used to correlate responses
     var id: String { get }
 
-    /// Respond with a JSON string payload
+    /// Respond with a JSON string payload.
+    ///
+    /// Primarily used for language bindings (e.g., React Native). Most Swift applications
+    /// should use the strongly-typed `respondWith(payload:)` method defined on concrete event classes.
+    ///
+    /// - Parameter jsonString: A JSON string matching the expected response format for this event type
+    /// - Throws: `CheckoutEventResponseError` if the JSON cannot be decoded or validated
     func respondWith(json jsonString: String) throws
 
-    /// Respond with an error message
+    /// Respond with an error message if the operation cannot be completed.
+    ///
+    /// - Parameter error: A description of the error that occurred
     func respondWith(error: String) throws
 }
