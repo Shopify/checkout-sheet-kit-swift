@@ -30,7 +30,9 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     public typealias ResponsePayload = R
 
     public let id: String?
-    public let params: Params
+    /// The parameters from the RPC request.
+    /// Internal - subclasses should expose specific properties from params.
+    internal let params: Params
     public weak var webview: WKWebView?
 
     /// Subclasses must override this to provide their method name
@@ -48,6 +50,56 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     /// Default validation does nothing - subclasses can override
     public func validate(payload _: ResponsePayload) throws {
         // Subclasses can override if they need validation
+    }
+
+    /// Respond with a typed payload
+    public func respondWith(payload: ResponsePayload) throws {
+        guard let webview else { return }
+        guard id != nil else { return } // Don't respond to notifications
+
+        // Validate first
+        try validate(payload: payload)
+
+        // Encode and send
+        let response = RPCResponse(id: id, result: payload)
+        let encoder = JSONEncoder()
+        let responseData = try encoder.encode(response)
+        guard let responseJson = String(data: responseData, encoding: .utf8) else {
+            return
+        }
+
+        CheckoutBridge.sendResponse(webview, messageBody: responseJson)
+    }
+
+    /// Respond with a JSON string
+    public func respondWith(json jsonString: String) throws {
+        guard let data = jsonString.data(using: .utf8) else {
+            throw CheckoutEventResponseError.invalidEncoding
+        }
+
+        do {
+            let payload = try JSONDecoder().decode(ResponsePayload.self, from: data)
+            try respondWith(payload: payload)
+        } catch let error as DecodingError {
+            throw CheckoutEventResponseError.decodingFailed(formatDecodingError(error))
+        } catch {
+            throw CheckoutEventResponseError.decodingFailed(error.localizedDescription)
+        }
+    }
+
+    /// Respond with an error
+    public func respondWith(error: String) throws {
+        guard let webview else { return }
+        guard id != nil else { return } // Don't respond to notifications
+
+        let response = RPCResponse<ResponsePayload>(id: id, error: error)
+        let encoder = JSONEncoder()
+        let responseData = try encoder.encode(response)
+        guard let responseJson = String(data: responseData, encoding: .utf8) else {
+            return
+        }
+
+        CheckoutBridge.sendResponse(webview, messageBody: responseJson)
     }
 }
 

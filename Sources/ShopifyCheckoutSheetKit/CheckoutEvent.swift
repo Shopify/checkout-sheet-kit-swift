@@ -22,28 +22,23 @@
  */
 
 import Foundation
-import WebKit
 
-public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload>, CheckoutRequest {
-    override public static var method: String { "checkout.paymentMethodChangeStart" }
-
-    // CheckoutRequest conformance - expose method as instance property
-    public var method: String { Self.method }
-
-    // Flattened properties from params
-    public var cart: Cart { params.cart }
+/// Base protocol for all checkout events (notifications and requests)
+public protocol CheckoutNotification {
+    /// The method name that identifies this event type
+    /// e.g., "checkout.start", "checkout.addressChangeStart"
+    var method: String { get }
 }
 
-public struct CheckoutPaymentMethodChangeStartParams: Codable {
-    public let cart: Cart
-}
+/// Protocol for checkout events that expect a response (bidirectional)
+public protocol CheckoutRequest: CheckoutNotification {
+    /// Unique identifier for this request, used to correlate responses
+    /// For bidirectional events, this should always be present (non-null)
+    var id: String? { get }
 
-public struct CheckoutPaymentMethodChangeStartResponsePayload: Codable {
-    public let cart: CartInput?
-    public let errors: [ResponseError]?
+    /// Respond with a JSON string payload
+    func respondWith(json jsonString: String) throws
 
-    public init(cart: CartInput? = nil, errors: [ResponseError]? = nil) {
-        self.cart = cart
-        self.errors = errors
-    }
+    /// Respond with an error message
+    func respondWith(error: String) throws
 }

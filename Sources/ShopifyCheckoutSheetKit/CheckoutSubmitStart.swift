@@ -24,8 +24,15 @@
 import Foundation
 import WebKit
 
-public final class CheckoutSubmitStart: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload> {
+public final class CheckoutSubmitStart: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload>, CheckoutRequest {
     override public static var method: String { "checkout.submitStart" }
+
+    // CheckoutRequest conformance - expose method as instance property
+    public var method: String { Self.method }
+
+    // Flattened properties from params
+    public var cart: Cart { params.cart }
+    public var checkout: Checkout { params.checkout }
 }
 
 public struct CheckoutSubmitStartParams: Codable {

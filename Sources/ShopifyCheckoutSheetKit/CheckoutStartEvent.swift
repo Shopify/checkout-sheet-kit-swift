@@ -25,6 +25,8 @@ import Foundation
 
 /// Event triggered when checkout starts.
 /// Provides the initial cart state at the beginning of the checkout flow.
-public struct CheckoutStartEvent: Codable {
+public struct CheckoutStartEvent: Codable, CheckoutNotification {
     public let cart: Cart
+
+    public var method: String { "checkout.start" }
 }

@@ -23,9 +23,11 @@
 
 import Foundation
 
-public struct CheckoutCompleteEvent: Codable {
+public struct CheckoutCompleteEvent: Codable, CheckoutNotification {
     public let orderConfirmation: OrderConfirmation
     public let cart: Cart
+
+    public var method: String { "checkout.complete" }
 }
 
 func createEmptyCheckoutCompleteEvent(id: String? = "") -> CheckoutCompleteEvent {

@@ -63,7 +63,8 @@ public class RPCResponse<Payload: Codable>: Codable {
 
 /// (Web) The Client is defined as the origin of Request objects and the handler of Response objects.
 /// (Native) The Server is defined as the origin of Response objects and the handler of Request objects.
-public protocol RPCRequest: AnyObject, Decodable {
+/// Internal protocol - SDK consumers should use CheckoutRequest protocol instead
+protocol RPCRequest: AnyObject, Decodable {
     /// MetaData associated with the type of the request from Checkout
     associatedtype Params: Decodable
 
@@ -80,6 +81,7 @@ public protocol RPCRequest: AnyObject, Decodable {
     var id: String? { get }
 
     /// The params from the JSON-RPC request
+    /// Internal - subclasses should expose specific properties from params
     var params: Params { get }
 
     /// 4 Request object - https://www.jsonrpc.org/specification
@@ -137,57 +139,6 @@ extension RPCRequest {
         }
 
         return envelope
-    }
-
-    /// React Native bridge will send a string to decode into Payload
-    public func respondWith(json jsonString: String) throws {
-        do {
-            guard let payload = try? decode(from: jsonString) else {
-                return try respondWith(error: jsonString)
-            }
-            let response = Response(id: id, result: payload)
-            try respondWith(response: response)
-        } catch {
-            OSLogger.shared.error(
-                "[RPCRequest] respondWith(json:) failed to decode method: \(Self.method), id: \(String(describing: id)), error: \(error)"
-            )
-        }
-    }
-
-    public func respondWith(payload: ResponsePayload) throws {
-        let response = Response(id: id, result: payload)
-        try respondWith(response: response)
-    }
-
-    public func respondWith(error: String) throws {
-        let response = Response(id: id, error: error)
-        try respondWith(response: response)
-    }
-
-    public func respondWith(response: Response) throws {
-        guard let webview else { return }
-        guard !isNotification else { return }
-
-        if let result = response.result {
-            try validate(payload: result)
-        }
-
-        do {
-            let encoder = JSONEncoder()
-            let responseData = try encoder.encode(response)
-            guard let responseJson = String(data: responseData, encoding: .utf8) else {
-                OSLogger.shared.error(
-                    "[RPCRequest] sendResponse method: \(Self.method), id: \(String(describing: id)) failed to encode response string"
-                )
-                return
-            }
-
-            CheckoutBridge.sendResponse(webview, messageBody: responseJson)
-        } catch {
-            OSLogger.shared.error(
-                "[RPCRequest] sendResponse method: \(Self.method), id: \(String(describing: id)) encoding error: \(error)"
-            )
-        }
     }
 
     /// `from` should be a .utf8 encoded json string
