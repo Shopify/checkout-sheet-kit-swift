@@ -116,9 +116,33 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard result is UnsupportedRequest else {
+        guard let unsupportedRequest = result as? UnsupportedRequest else {
             return XCTFail("expected UnsupportedRequest, got \(result)")
         }
+
+        XCTAssertEqual(unsupportedRequest.actualMethod, "unknown")
+        XCTAssertFalse(unsupportedRequest.isNotification, "Request with id should not be a notification")
+        XCTAssertEqual(unsupportedRequest.id, "test-id")
+    }
+
+    func testDecodeHandlesUnsupportedNotificationEventsGracefully() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "method": "unknown.notification",
+            "params": {}
+        }
+        """, webView: mockWebView)
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let unsupportedRequest = result as? UnsupportedRequest else {
+            return XCTFail("expected UnsupportedRequest, got \(result)")
+        }
+
+        XCTAssertEqual(unsupportedRequest.actualMethod, "unknown.notification")
+        XCTAssertTrue(unsupportedRequest.isNotification, "Event without id should be a notification")
+        XCTAssertEqual(unsupportedRequest.id, "", "Notification should return empty string for id")
     }
 
     func testDecodeSupportsCheckoutExpiredError() throws {

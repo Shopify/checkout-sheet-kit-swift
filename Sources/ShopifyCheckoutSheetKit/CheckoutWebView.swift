@@ -310,11 +310,12 @@ extension CheckoutWebView: WKScriptMessageHandler {
 
         // Ignore unsupported requests
         case let unsupportedRequest as UnsupportedRequest:
-            OSLogger.shared.debug("Unsupported request: \(unsupportedRequest.actualMethod) (id: \(String(describing: request.id)))")
+            let idInfo = unsupportedRequest.isNotification ? "notification (no id)" : "request (id: \(unsupportedRequest.id))"
+            OSLogger.shared.debug("Unsupported event: \(unsupportedRequest.actualMethod) (\(idInfo))")
 
         default:
             OSLogger.shared.debug(
-                "Unknown request type received \(String(describing: request.id))"
+                "Unknown request type received (id: \(request.id))"
             )
         }
     }

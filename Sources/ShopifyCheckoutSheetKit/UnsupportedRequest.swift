@@ -76,22 +76,45 @@ public struct UnsupportedParams: Decodable {
 }
 
 /// Request handler for unsupported/unknown event methods
-public final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyResponse> {
+///
+/// This is a special case that handles both:
+/// - Unsupported request events (with id) - though we can't respond meaningfully
+/// - Unsupported notification events (without id) - just logged and ignored
+///
+/// Unlike other RPCRequest types, UnsupportedRequest allows id to be nil because
+/// we can't distinguish between requests and notifications for unknown methods.
+public final class UnsupportedRequest: RPCRequest {
     /// The actual method name that was received
     public let actualMethod: String
 
-    /// We use a placeholder method name since this handles any unknown method
-    override public static var method: String { "__unsupported__" }
+    /// Optional id - will be nil for notification-style events, non-nil for request-style events
+    private let _id: String?
 
-    /// Custom initializer that captures the actual method name
-    public init(id: String?, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
-        self.actualMethod = actualMethod
-        super.init(id: id, params: params)
+    /// We use a placeholder method name since this handles any unknown method
+    public static var method: String { "__unsupported__" }
+
+    // RPCRequest conformance
+    public var id: String {
+        // For UnsupportedRequest, we allow nil ids (notifications)
+        // Return empty string as fallback to satisfy non-nullable requirement
+        _id ?? ""
     }
 
-    /// Required initializer from protocol
-    public required init(id: String?, params: UnsupportedParams) {
-        actualMethod = "__unknown__"
-        super.init(id: id, params: params)
+    public var jsonrpc: String { "2.0" }
+    public var isNotification: Bool { _id == nil }
+
+    /// Custom initializer that captures the actual method name
+    public init(id: String?, actualMethod: String) {
+        self._id = id
+        self.actualMethod = actualMethod
+    }
+
+    // Stub response methods - UnsupportedRequests are never responded to
+    public func respondWith(json jsonString: String) throws {
+        // No-op: we don't know how to respond to unsupported methods
+    }
+
+    public func respondWith(error: String) throws {
+        // No-op: we don't know how to respond to unsupported methods
     }
 }
