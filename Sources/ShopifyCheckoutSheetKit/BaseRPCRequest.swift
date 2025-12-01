@@ -33,7 +33,7 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     /// The parameters from the RPC request.
     /// Internal - subclasses should expose specific properties from params.
     internal let params: Params
-    public weak var webview: WKWebView?
+    internal weak var webview: WKWebView?
 
     /// Subclasses must override this to provide their method name
     public class var method: String {

@@ -75,7 +75,7 @@ public struct UnsupportedParams: Decodable {
     }
 }
 
-/// Request handler for unsupported/unknown JSON-RPC methods
+/// Request handler for unsupported/unknown event methods
 public final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyResponse> {
     /// The actual method name that was received
     public let actualMethod: String
