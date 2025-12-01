@@ -76,8 +76,9 @@ protocol RPCRequest: AnyObject, Decodable {
     var jsonrpc: String { get }
 
     /// An identifier established by the Client.
-    /// Request events (bidirectional, expect response) always have an id.
-    /// Notification events (unidirectional) don't extend RPCRequest and have no id.
+    /// All RPCRequest types represent request events (bidirectional, expect response) and always have an id.
+    /// Notification events (unidirectional, no response expected) are separate types that conform only
+    /// to CheckoutNotification and don't have an id field.
     var id: String { get }
 
     /// The params from the JSON-RPC request
@@ -106,8 +107,6 @@ struct RPCEnvelope<Params: Decodable>: Decodable {
 
 extension RPCRequest {
     public var jsonrpc: String { "2.0" }
-
-    public var isNotification: Bool { id == nil }
 
     /// Default Decodable implementation for all RPCRequest types
     public init(from decoder: Decoder) throws {
