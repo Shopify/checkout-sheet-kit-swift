@@ -53,10 +53,10 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
 
     /// Required initializer for RPCRequest protocol (accepts optional id for wire format)
     public required init(id: String?, params: Params) {
-        guard let id = id else {
+        guard let id else {
             fatalError("BaseRPCRequest requires non-null id. Use notification event classes for events without id.")
         }
-        self._id = id
+        _id = id
         self.params = params
         webview = nil
     }
