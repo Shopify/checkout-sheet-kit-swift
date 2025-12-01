@@ -29,7 +29,7 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     public typealias Params = P
     public typealias ResponsePayload = R
 
-    public let id: String?
+    public let id: String
     /// The parameters from the RPC request.
     /// Internal - subclasses should expose specific properties from params.
     internal let params: Params
@@ -41,7 +41,7 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     }
 
     /// Required initializer that all RPC requests must implement
-    public required init(id: String?, params: Params) {
+    public required init(id: String, params: Params) {
         self.id = id
         self.params = params
         webview = nil
@@ -55,7 +55,6 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     /// Respond with a typed payload
     public func respondWith(payload: ResponsePayload) throws {
         guard let webview else { return }
-        guard id != nil else { return } // Don't respond to notifications
 
         // Validate first
         try validate(payload: payload)
@@ -90,7 +89,6 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     /// Respond with an error
     public func respondWith(error: String) throws {
         guard let webview else { return }
-        guard id != nil else { return } // Don't respond to notifications
 
         let response = RPCResponse<ResponsePayload>(id: id, error: error)
         let encoder = JSONEncoder()

@@ -33,8 +33,7 @@ public protocol CheckoutNotification {
 /// Protocol for checkout events that expect a response (bidirectional)
 public protocol CheckoutRequest: CheckoutNotification {
     /// Unique identifier for this request, used to correlate responses
-    /// For bidirectional events, this should always be present (non-null)
-    var id: String? { get }
+    var id: String { get }
 
     /// Respond with a JSON string payload
     func respondWith(json jsonString: String) throws
