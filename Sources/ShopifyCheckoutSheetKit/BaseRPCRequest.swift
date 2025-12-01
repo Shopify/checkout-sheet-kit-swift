@@ -48,7 +48,7 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     }
 
     /// Default validation does nothing - subclasses can override
-    public func validate(payload _: ResponsePayload) throws {
+    internal func validate(payload _: ResponsePayload) throws {
         // Subclasses can override if they need validation
     }
 
