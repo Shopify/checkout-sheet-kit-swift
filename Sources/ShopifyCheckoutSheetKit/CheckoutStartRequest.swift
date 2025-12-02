@@ -24,7 +24,7 @@
 import Foundation
 import WebKit
 
-/// Request for checkout start events
-public final class CheckoutStartRequest: BaseRPCRequest<CheckoutStartEvent, EmptyResponse> {
+/// Notification for checkout start events
+public final class CheckoutStartRequest: BaseRPCNotification<CheckoutStartEvent> {
     override public static var method: String { "checkout.start" }
 }

@@ -311,7 +311,6 @@ class CheckoutBridgeTests: XCTestCase {
             return
         }
 
-        XCTAssertNil(startRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", startRequest.params.cart.id)
         XCTAssertEqual("100.00", startRequest.params.cart.cost.totalAmount.amount)
         XCTAssertEqual("USD", startRequest.params.cart.cost.totalAmount.currencyCode)
@@ -334,7 +333,6 @@ class CheckoutBridgeTests: XCTestCase {
             return
         }
 
-        XCTAssertNil(completeRequest.id)
         XCTAssertEqual("gid://shopify/Order/test-order-123", completeRequest.params.orderConfirmation.order.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", completeRequest.params.cart.id)
     }

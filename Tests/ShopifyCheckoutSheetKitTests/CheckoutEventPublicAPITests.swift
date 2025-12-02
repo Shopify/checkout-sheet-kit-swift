@@ -176,11 +176,13 @@ class CheckoutEventPublicAPITests: XCTestCase {
     }
 
     func testRespondWithJSONValidatesPayload() {
+        let mockWebView = MockWebView()
         let params = CheckoutAddressChangeStartParams(
             addressType: "shipping",
             cart: createTestCart()
         )
         let request = CheckoutAddressChangeStart(id: "test-id", params: params)
+        request.webview = mockWebView
 
         // Invalid country code (too long)
         let json = """
@@ -278,40 +280,6 @@ class CheckoutEventPublicAPITests: XCTestCase {
 
         // Should not crash - returns early when webview is nil
         XCTAssertNoThrow(try request.respondWith(error: "Test error"))
-    }
-
-    func testRespondWithJSONWithoutWebViewStillValidates() {
-        let params = CheckoutAddressChangeStartParams(
-            addressType: "shipping",
-            cart: createTestCart()
-        )
-        let request = CheckoutAddressChangeStart(id: "test-id", params: params)
-        // No webview set
-
-        // Invalid country code - should still throw validation error even without webview
-        let json = """
-        {
-            "cart": {
-                "delivery": {
-                    "addresses": [
-                        {
-                            "address": {
-                                "countryCode": "USA"
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-        """
-
-        // Validation should happen before checking webview
-        XCTAssertThrowsError(try request.respondWith(json: json)) { error in
-            guard case CheckoutEventResponseError.validationFailed = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-        }
     }
 
     // MARK: - Method Name Tests

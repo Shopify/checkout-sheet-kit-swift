@@ -24,9 +24,9 @@
 import Foundation
 import WebKit
 
-/// Protocol to enable type-erased decoding of RPC requests
+/// Protocol to enable type-erased decoding of RPC messages
 protocol TypeErasedRPCDecodable {
-    static func decodeErased(from data: Data) throws -> any RPCRequest
+    static func decodeErased(from data: Data) throws -> any RPCMessage
 }
 
 /// Response to be decoded to a string for transport over CheckoutBridge
@@ -61,27 +61,21 @@ public class RPCResponse<Payload: Codable>: Codable {
     }
 }
 
-/// (Web) The Client is defined as the origin of Request objects and the handler of Response objects.
-/// (Native) The Server is defined as the origin of Response objects and the handler of Request objects.
-/// Internal protocol - SDK consumers should use CheckoutRequest protocol instead
-protocol RPCRequest: AnyObject, Decodable {
-    /// MetaData associated with the type of the request from Checkout
+/// Base protocol for all RPC messages (both requests and notifications).
+///
+/// This protocol represents the common behavior shared by all JSON-RPC 2.0 messages
+/// from the checkout web experience, whether they are requests (bidirectional, with id)
+/// or notifications (unidirectional, without id).
+///
+/// Internal protocol - SDK consumers should use CheckoutNotification or CheckoutRequest protocols.
+protocol RPCMessage: AnyObject, Decodable {
+    /// Parameters associated with this message from Checkout
     associatedtype Params: Decodable
-
-    /// Expected data structure to send in response
-    associatedtype ResponsePayload: Codable
-    typealias Response = RPCResponse<ResponsePayload>
 
     /// A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".
     var jsonrpc: String { get }
 
-    /// An identifier established by the Client.
-    /// All RPCRequest types represent request events (bidirectional, expect response) and always have an id.
-    /// Notification events (unidirectional, no response expected) are separate types that conform only
-    /// to CheckoutNotification and don't have an id field.
-    var id: String { get }
-
-    /// The params from the JSON-RPC request
+    /// The params from the JSON-RPC message
     /// Internal - subclasses should expose specific properties from params
     var params: Params { get }
 
@@ -89,13 +83,57 @@ protocol RPCRequest: AnyObject, Decodable {
     /// A String containing the name of the method to be invoked. Method names that begin with the word rpc followed by a period character (U+002E or ASCII 46) are reserved for rpc-internal methods and extensions and MUST NOT be used for anything else.
     static var method: String { get }
 
-    // 4.1 Notification - https://www.jsonrpc.org/specification
+    /// 4.1 Notification - https://www.jsonrpc.org/specification
     var isNotification: Bool { get }
 
     var webview: WKWebView? { get set }
 
-    /// Required initializer for creating requests from decoded params
+    /// Required initializer for creating messages from decoded params
     init(id: String?, params: Params)
+}
+
+/// Protocol for RPC request messages (bidirectional, with id, expects response).
+///
+/// Request events represent bidirectional communication where the checkout is waiting
+/// for the app to provide data or complete an operation before continuing.
+///
+/// Examples: checkout.addressChangeStart, checkout.submitStart, checkout.paymentMethodChangeStart
+///
+/// Internal protocol - SDK consumers should use CheckoutRequest protocol instead.
+protocol RPCRequest: RPCMessage {
+    /// Expected data structure to send in response
+    associatedtype ResponsePayload: Codable
+    typealias Response = RPCResponse<ResponsePayload>
+
+    /// An identifier established by the Client.
+    /// Request events always have an id to correlate responses.
+    var id: String { get }
+
+    /// Respond with a JSON string payload.
+    ///
+    /// Primarily used for language bindings (e.g., React Native). Most Swift applications
+    /// should use the strongly-typed `respondWith(payload:)` method defined on concrete event classes.
+    ///
+    /// - Parameter jsonString: A JSON string matching the expected response format for this event type
+    /// - Throws: `CheckoutEventResponseError` if the JSON cannot be decoded or validated
+    func respondWith(json jsonString: String) throws
+
+    /// Respond with an error message if the operation cannot be completed.
+    ///
+    /// - Parameter error: A description of the error that occurred
+    func respondWith(error: String) throws
+}
+
+/// Protocol for RPC notification messages (unidirectional, no id, no response).
+///
+/// Notification events are one-way messages from the checkout to the app that do not
+/// expect a response. They inform the app of state changes or events.
+///
+/// Examples: checkout.start, checkout.complete
+///
+/// Internal protocol - SDK consumers should use CheckoutNotification protocol instead.
+protocol RPCNotification: RPCMessage {
+    // Notifications don't have id or response methods
 }
 
 struct RPCEnvelope<Params: Decodable>: Decodable {
@@ -105,10 +143,10 @@ struct RPCEnvelope<Params: Decodable>: Decodable {
     let params: Params
 }
 
-extension RPCRequest {
+extension RPCMessage {
     public var jsonrpc: String { "2.0" }
 
-    /// Default Decodable implementation for all RPCRequest types
+    /// Default Decodable implementation for all RPCMessage types
     public init(from decoder: Decoder) throws {
         let envelope = try RPCEnvelope<Params>(from: decoder)
 
@@ -139,7 +177,9 @@ extension RPCRequest {
 
         return envelope
     }
+}
 
+extension RPCRequest {
     /// `from` should be a .utf8 encoded json string
     /// Decodes into RespondableEvent.RPCResponse Codable
     func decode(from responseData: String) throws -> ResponsePayload {

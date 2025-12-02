@@ -75,15 +75,15 @@ public struct UnsupportedParams: Decodable {
     }
 }
 
-/// Request handler for unsupported/unknown event methods
+/// Message handler for unsupported/unknown event methods
 ///
 /// This is a special case that handles both:
 /// - Unsupported request events (with id) - though we can't respond meaningfully
 /// - Unsupported notification events (without id) - just logged and ignored
 ///
-/// Unlike other RPCRequest types, UnsupportedRequest allows id to be nil because
+/// Unlike other RPCMessage types, UnsupportedRequest allows id to be nil because
 /// we can't distinguish between requests and notifications for unknown methods.
-public final class UnsupportedRequest: RPCRequest {
+public final class UnsupportedRequest: RPCMessage {
     public typealias Params = UnsupportedParams
     public typealias ResponsePayload = EmptyResponse
 
@@ -119,16 +119,18 @@ public final class UnsupportedRequest: RPCRequest {
     /// Required initializer from protocol
     public required init(id: String?, params: UnsupportedParams) {
         _id = id
-        self.actualMethod = "__unknown__"
+        actualMethod = "__unknown__"
         self.params = params
     }
 
     // Stub response methods - UnsupportedRequests are never responded to
-    public func respondWith(json jsonString: String) throws {
+    // swiftlint:disable:next unused_parameter
+    public func respondWith(json _: String) throws {
         // No-op: we don't know how to respond to unsupported methods
     }
 
-    public func respondWith(error: String) throws {
+    // swiftlint:disable:next unused_parameter
+    public func respondWith(error _: String) throws {
         // No-op: we don't know how to respond to unsupported methods
     }
 }

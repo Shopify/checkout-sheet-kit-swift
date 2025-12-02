@@ -24,10 +24,10 @@
 import Foundation
 import WebKit
 
-/// Registry of all supported RPC request types
+/// Registry of all supported RPC message types (both requests and notifications)
 enum RPCRequestRegistry {
-    /// Array of all supported request types
-    static let requestTypes: [any RPCRequest.Type] = [
+    /// Array of all supported message types
+    static let messageTypes: [any RPCMessage.Type] = [
         CheckoutAddressChangeStart.self,
         CheckoutPaymentMethodChangeStart.self,
         CheckoutCompleteRequest.self,
@@ -37,28 +37,28 @@ enum RPCRequestRegistry {
         CheckoutSubmitStart.self
     ]
 
-    /// Find the request type for a given method name
-    /// for:method corresponds to RPCRequest.method
+    /// Find the message type for a given method name
+    /// for:method corresponds to RPCMessage.method
     /// for:method is used to select correct Decoder
-    static func requestType(for method: String) -> (any RPCRequest.Type)? {
-        return requestTypes.first { $0.method == method }
+    static func messageType(for method: String) -> (any RPCMessage.Type)? {
+        return messageTypes.first { $0.method == method }
     }
 
-    /// Decode the appropriate request type for a given method
-    /// for:method corresponds to RPCRequest.method
+    /// Decode the appropriate message type for a given method
+    /// for:method corresponds to RPCMessage.method
     /// for:method is used to select correct Decoder
-    static func decode(for method: String, from data: Data, webview: WKWebView) throws -> (any RPCRequest)? {
-        guard let requestType = requestTypes.first(where: { $0.method == method }) else {
+    static func decode(for method: String, from data: Data, webview: WKWebView) throws -> (any RPCMessage)? {
+        guard let messageType = messageTypes.first(where: { $0.method == method }) else {
             return nil
         }
 
         // Cast to our type-erased protocol and decode
-        guard let decodableType = requestType as? any TypeErasedRPCDecodable.Type else {
+        guard let decodableType = messageType as? any TypeErasedRPCDecodable.Type else {
             return nil
         }
 
-        let request = try decodableType.decodeErased(from: data)
-        request.webview = webview
-        return request
+        let message = try decodableType.decodeErased(from: data)
+        message.webview = webview
+        return message
     }
 }

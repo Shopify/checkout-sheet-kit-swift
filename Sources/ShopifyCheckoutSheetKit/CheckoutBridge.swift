@@ -75,7 +75,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         }
     }
 
-    static func decode(_ message: WKScriptMessage) throws -> any RPCRequest {
+    static func decode(_ message: WKScriptMessage) throws -> any RPCMessage {
         guard let body = message.body as? String, let data = body.data(using: .utf8) else {
             throw BridgeError.invalidBridgeEvent()
         }

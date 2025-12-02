@@ -24,7 +24,27 @@
 import Foundation
 import WebKit
 
-/// Notification for checkout completion events
-public final class CheckoutCompleteRequest: BaseRPCNotification<CheckoutCompleteEvent> {
-    override public static var method: String { "checkout.complete" }
+/// Base class for all RPC notification implementations
+///
+/// Notifications are one-way messages from the checkout to the app that do not expect a response.
+/// Unlike requests, notifications do not have an `id` field in the JSON-RPC payload.
+///
+/// This class extends `BaseRPCMessage` and adds notification-specific behavior:
+/// - No `id` field (returns empty string to satisfy protocol)
+/// - Stub response methods (no-ops, notifications don't respond)
+///
+/// Examples: checkout.start, checkout.complete
+public class BaseRPCNotification<P: Decodable>: BaseRPCMessage<P>, RPCNotification {
+    public typealias ResponsePayload = EmptyResponse
+
+    /// Whether this is a notification (always true for BaseRPCNotification)
+    override public var isNotification: Bool { true }
+
+    /// Required initializer for RPCNotification protocol
+    /// Notifications receive nil for id in the JSON, which we ignore
+    public required init(id _: String?, params: Params) {
+        super.init(params: params, webview: nil)
+    }
 }
+
+// TypeErasedRPCDecodable conformance is inherited from BaseRPCMessage

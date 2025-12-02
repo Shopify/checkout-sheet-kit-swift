@@ -549,6 +549,120 @@ public func checkoutDidClickLink(url: URL) {
 
 See the [Samples](Samples) directory for a handful of sample iOS applications and a guide to get started.
 
+## Architecture
+
+### RPC Message Hierarchy
+
+The SDK uses a protocol-oriented architecture to handle JSON-RPC 2.0 messages from the checkout web experience. The design separates requests (bidirectional, with response) from notifications (unidirectional, fire-and-forget) while eliminating code duplication through a shared base class.
+
+```mermaid
+classDiagram
+    %% Protocol Layer (internal - enables type erasure)
+    class RPCMessage {
+        <<protocol>>
+        +jsonrpc: String
+        +method: String
+        +params: Params
+        +isNotification: Bool
+        +webview: WKWebView?
+    }
+    note for RPCMessage "Base protocol for all messages.\nEnables heterogeneous collections\nvia type erasure (any RPCMessage)"
+
+    class RPCRequest {
+        <<protocol>>
+        +id: String
+        +respondWith(payload:)
+        +respondWith(json:)
+        +respondWith(error:)
+    }
+    note for RPCRequest "Request protocol for bidirectional\ncommunication. Checkout waits\nfor app response to continue."
+
+    class RPCNotification {
+        <<protocol>>
+    }
+    note for RPCNotification "Notification protocol for\none-way messages. No response\nexpected or required."
+
+    %% Abstract Base Class (eliminates duplication)
+    class BaseRPCMessage~P~ {
+        <<abstract>>
+        #params: P
+        #webview: WKWebView?
+        +jsonrpc: String
+        +method: String
+        +isNotification: Bool*
+        +init(id: String?, params: P)
+    }
+    note for BaseRPCMessage~P~ "Shared base class containing\nall common implementation.\nEliminates duplication between\nrequests and notifications."
+
+    %% Concrete Base Classes
+    class BaseRPCRequest~P, R~ {
+        -_id: String
+        +id: String
+        +isNotification: Bool = false
+        +respondWith(payload: R)
+        +respondWith(json: String)
+        +respondWith(error: String)
+        #validate(payload: R)
+    }
+    note for BaseRPCRequest~P, R~ "Base for all request events.\nP = params type\nR = response payload type"
+
+    class BaseRPCNotification~P~ {
+        +isNotification: Bool = true
+    }
+    note for BaseRPCNotification~P~ "Base for all notification events.\nSimple - just marks isNotification\nas true. No id or response methods."
+
+    %% Concrete Implementations (examples)
+    class CheckoutStartRequest {
+        +cart: Cart
+    }
+    note for CheckoutStartRequest "Notification: Checkout started.\nNo response needed."
+
+    class CheckoutCompleteRequest {
+        +orderId: String
+        +orderConfirmation: OrderConfirmation
+    }
+    note for CheckoutCompleteRequest "Notification: Checkout completed.\nNo response needed."
+
+    class CheckoutAddressChangeStart {
+        +deliveryAddress: MailingAddress
+        +respondWith(payload: [MailingAddress])
+    }
+    note for CheckoutAddressChangeStart "Request: Address validation.\nApp responds with validated\naddress suggestions."
+
+    class CheckoutSubmitStart {
+        +respondWith(payload: EmptyResponse)
+        +respondWith(error: String)
+    }
+    note for CheckoutSubmitStart "Request: Submit validation.\nApp can block or allow submission.\nUseful for inventory checks."
+
+    %% Relationships
+    RPCMessage <|-- RPCRequest
+    RPCMessage <|-- RPCNotification
+    RPCMessage <|.. BaseRPCMessage~P~
+    BaseRPCMessage~P~ <|-- BaseRPCRequest~P, R~
+    BaseRPCMessage~P~ <|-- BaseRPCNotification~P~
+    RPCRequest <|.. BaseRPCRequest~P, R~
+    RPCNotification <|.. BaseRPCNotification~P~
+    BaseRPCNotification~P~ <|-- CheckoutStartRequest
+    BaseRPCNotification~P~ <|-- CheckoutCompleteRequest
+    BaseRPCRequest~P, R~ <|-- CheckoutAddressChangeStart
+    BaseRPCRequest~P, R~ <|-- CheckoutSubmitStart
+```
+
+#### Design Rationale
+
+**Why Protocols?** Swift's generic type system requires type erasure to store different generic types in the same collection. The protocol layer (`RPCMessage`, `RPCRequest`, `RPCNotification`) provides a non-generic interface that enables heterogeneous collections like `[any RPCMessage.Type]` in the registry.
+
+**Why Base Class?** Both requests and notifications share significant common behavior (params storage, webview reference, JSON-RPC metadata). The abstract `BaseRPCMessage` class eliminates this duplication while allowing specialized subclasses for each message type.
+
+**Why Split Request/Notification?** JSON-RPC 2.0 distinguishes between:
+- **Requests**: Bidirectional messages with an `id` that expect a response (e.g., address validation, submit hooks)
+- **Notifications**: Unidirectional messages without an `id` that don't expect a response (e.g., lifecycle events)
+
+This separation ensures type safety—notifications cannot accidentally be given response methods, and requests always have a non-null `id`.
+
+**Internal Protocols**: All protocols are marked `internal` to hide RPC implementation details from SDK consumers, who only interact with the public `CheckoutDelegate` protocol and concrete event types.
+
 ## Contributing
 
 We welcome code contributions, feature requests, and reporting of issues. Please see [guidelines and instructions](.github/CONTRIBUTING.md).

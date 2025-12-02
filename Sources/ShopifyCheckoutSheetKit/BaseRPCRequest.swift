@@ -25,40 +25,31 @@ import Foundation
 import WebKit
 
 /// Base class for all RPC request implementations
-public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
-    public typealias Params = P
+///
+/// Request events represent bidirectional communication where the checkout is waiting
+/// for the app to provide data or complete an operation before continuing.
+///
+/// This class extends `BaseRPCMessage` and adds request-specific behavior:
+/// - Storage for the request `id` field
+/// - Implementation of response methods
+/// - Validation logic for responses
+public class BaseRPCRequest<P: Decodable, R: Codable>: BaseRPCMessage<P>, RPCRequest {
     public typealias ResponsePayload = R
 
-    /// The request ID (non-null for requests that can be responded to)
+    /// The request ID - always non-null for request events
     private let _id: String
 
-    /// Public accessor that exposes non-nullable id for CheckoutRequest protocol
+    /// Public accessor for the request ID
     public var id: String { _id }
 
-    /// The JSON-RPC version (always "2.0")
-    var jsonrpc: String { "2.0" }
-
     /// Whether this is a notification (always false for BaseRPCRequest - requests have IDs)
-    var isNotification: Bool { false }
+    override public var isNotification: Bool { false }
 
-    /// The parameters from the RPC request.
-    /// Internal - subclasses should expose specific properties from params.
-    internal let params: Params
-    internal weak var webview: WKWebView?
-
-    /// Subclasses must override this to provide their method name
-    public class var method: String {
-        fatalError("Subclasses must override method")
-    }
-
-    /// Required initializer for RPCRequest protocol (accepts optional id for wire format)
+    /// Required initializer for RPCRequest protocol
     public required init(id: String?, params: Params) {
-        guard let id else {
-            fatalError("BaseRPCRequest requires non-null id. Use notification event classes for events without id.")
-        }
-        _id = id
-        self.params = params
-        webview = nil
+        // Request events must have an id - if nil, use empty string as fallback
+        _id = id ?? ""
+        super.init(params: params, webview: nil)
     }
 
     /// Default validation does nothing - subclasses can override
@@ -140,10 +131,4 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     }
 }
 
-// MARK: - TypeErasedRPCDecodable conformance
-
-extension BaseRPCRequest: TypeErasedRPCDecodable {
-    static func decodeErased(from data: Data) throws -> any RPCRequest {
-        return try JSONDecoder().decode(Self.self, from: data)
-    }
-}
+// TypeErasedRPCDecodable conformance is inherited from BaseRPCMessage
