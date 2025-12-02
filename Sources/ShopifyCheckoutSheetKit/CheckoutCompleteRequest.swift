@@ -24,7 +24,38 @@
 import Foundation
 import WebKit
 
-/// Notification for checkout completion events
-public final class CheckoutCompleteRequest: BaseRPCNotification<CheckoutCompleteEvent> {
-    override public static var method: String { "checkout.complete" }
+/// Notification for checkout completion events.
+///
+/// This event is triggered when checkout completes successfully.
+/// It's a one-way notification that does not require a response.
+public final class CheckoutCompleteRequest: CheckoutNotification, RPCMessage {
+    private let rpcNotification: BaseRPCNotification<CheckoutCompleteEvent>
+
+    public static let method: String = "checkout.complete"
+    public var method: String { Self.method }
+    public var params: CheckoutCompleteEvent { rpcNotification.params }
+
+    internal init(rpcNotification: BaseRPCNotification<CheckoutCompleteEvent>) {
+        self.rpcNotification = rpcNotification
+    }
+
+    // MARK: - RPCMessage conformance
+
+    internal var jsonrpc: String { rpcNotification.jsonrpc }
+    internal var isNotification: Bool { rpcNotification.isNotification }
+    internal var webview: WKWebView? {
+        get { rpcNotification.webview }
+        set { rpcNotification.webview = newValue }
+    }
+
+    internal required init(id: String?, params: CheckoutCompleteEvent) {
+        self.rpcNotification = BaseRPCNotification(id: id, params: params)
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+extension CheckoutCompleteRequest: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCMessage {
+        return try JSONDecoder().decode(CheckoutCompleteRequest.self, from: data)
+    }
 }

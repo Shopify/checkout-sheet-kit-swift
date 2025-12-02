@@ -24,7 +24,38 @@
 import Foundation
 import WebKit
 
-/// Notification for checkout start events
-public final class CheckoutStartRequest: BaseRPCNotification<CheckoutStartEvent> {
-    override public static var method: String { "checkout.start" }
+/// Notification for checkout start events.
+///
+/// This event is triggered when checkout begins.
+/// It's a one-way notification that does not require a response.
+public final class CheckoutStartRequest: CheckoutNotification, RPCMessage {
+    private let rpcNotification: BaseRPCNotification<CheckoutStartEvent>
+
+    public static let method: String = "checkout.start"
+    public var method: String { Self.method }
+    public var params: CheckoutStartEvent { rpcNotification.params }
+
+    internal init(rpcNotification: BaseRPCNotification<CheckoutStartEvent>) {
+        self.rpcNotification = rpcNotification
+    }
+
+    // MARK: - RPCMessage conformance
+
+    internal var jsonrpc: String { rpcNotification.jsonrpc }
+    internal var isNotification: Bool { rpcNotification.isNotification }
+    internal var webview: WKWebView? {
+        get { rpcNotification.webview }
+        set { rpcNotification.webview = newValue }
+    }
+
+    internal required init(id: String?, params: CheckoutStartEvent) {
+        self.rpcNotification = BaseRPCNotification(id: id, params: params)
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+extension CheckoutStartRequest: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCMessage {
+        return try JSONDecoder().decode(CheckoutStartRequest.self, from: data)
+    }
 }

@@ -36,11 +36,37 @@ public struct CheckoutErrorParams: Decodable {
 }
 
 /// Request for checkout error events
-public final class CheckoutErrorRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse> {
-    override public static var method: String { "error" }
+public final class CheckoutErrorRequest: RPCMessage {
+    private let rpcRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse>
 
-    /// Convenience getter to access the first error
+    public static let method: String = "error"
+    public var params: CheckoutErrorParams { rpcRequest.params }
+
     public var firstError: CheckoutErrorEvent? {
         return params.errors.first
+    }
+
+    internal init(rpcRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse>) {
+        self.rpcRequest = rpcRequest
+    }
+
+    // MARK: - RPCMessage conformance
+
+    internal var jsonrpc: String { rpcRequest.jsonrpc }
+    internal var isNotification: Bool { rpcRequest.isNotification }
+    internal var webview: WKWebView? {
+        get { rpcRequest.webview }
+        set { rpcRequest.webview = newValue }
+    }
+
+    internal required init(id: String?, params: CheckoutErrorParams) {
+        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+extension CheckoutErrorRequest: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCMessage {
+        return try JSONDecoder().decode(CheckoutErrorRequest.self, from: data)
     }
 }

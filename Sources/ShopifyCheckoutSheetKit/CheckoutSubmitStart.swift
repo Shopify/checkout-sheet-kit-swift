@@ -24,11 +24,53 @@
 import Foundation
 import WebKit
 
-public final class CheckoutSubmitStart: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload>, CheckoutRequest {
-    override public static var method: String { "checkout.submitStart" }
+/// RPC request for checkout submit start events.
+///
+/// This event is triggered when the buyer initiates checkout submission.
+/// The app can respond with payment token or cart updates.
+public final class CheckoutSubmitStart: CheckoutRequest, RPCMessage {
+    private let rpcRequest: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload>
 
-    // CheckoutRequest conformance - expose method as instance property
+    public static let method: String = "checkout.submitStart"
     public var method: String { Self.method }
+    public var id: String { rpcRequest.id }
+    public var params: CheckoutSubmitStartParams { rpcRequest.params }
+
+    internal init(rpcRequest: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload>) {
+        self.rpcRequest = rpcRequest
+    }
+
+    // MARK: - RPCMessage conformance
+
+    internal var jsonrpc: String { rpcRequest.jsonrpc }
+    internal var isNotification: Bool { rpcRequest.isNotification }
+    internal var webview: WKWebView? {
+        get { rpcRequest.webview }
+        set { rpcRequest.webview = newValue }
+    }
+
+    internal required init(id: String?, params: CheckoutSubmitStartParams) {
+        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+    }
+
+    public func respondWith(payload: CheckoutSubmitStartResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
+
+    public func respondWith(error: String) throws {
+        try rpcRequest.respondWith(error: error)
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+extension CheckoutSubmitStart: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCMessage {
+        return try JSONDecoder().decode(CheckoutSubmitStart.self, from: data)
+    }
 }
 
 public struct CheckoutSubmitStartParams: Codable {

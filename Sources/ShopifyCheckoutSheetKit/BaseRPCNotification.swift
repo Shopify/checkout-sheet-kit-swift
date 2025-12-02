@@ -24,24 +24,15 @@
 import Foundation
 import WebKit
 
-/// Base class for all RPC notification implementations
+/// Base class for all RPC notification implementations.
 ///
-/// Notifications are one-way messages from the checkout to the app that do not expect a response.
-/// Unlike requests, notifications do not have an `id` field in the JSON-RPC payload.
-///
-/// This class extends `BaseRPCMessage` and overrides `isNotification` to return true.
-/// Notifications have no `id` field and do not have response methods.
-///
-/// Examples: checkout.start, checkout.complete
-public class BaseRPCNotification<P: Decodable>: BaseRPCMessage<P> {
-    public typealias ResponsePayload = EmptyResponse
+/// Notifications are one-way messages that do not expect a response.
+/// Unlike requests, they have no `id` field.
+internal class BaseRPCNotification<P: Decodable>: BaseRPCMessage<P> {
+    internal typealias ResponsePayload = EmptyResponse
+    override var isNotification: Bool { true }
 
-    /// Whether this is a notification (always true for BaseRPCNotification)
-    override public var isNotification: Bool { true }
-
-    /// Required initializer for RPCMessage protocol
-    /// Notifications receive nil for id in the JSON, which we ignore
-    public required init(id _: String?, params: Params) {
+    internal required init(id _: String?, params: Params) {
         super.init(params: params, webview: nil)
     }
 }

@@ -24,41 +24,34 @@
 import Foundation
 import WebKit
 
-/// Base class for all RPC request implementations
+/// Base class for all RPC request implementations.
 ///
-/// Request events represent bidirectional communication where the checkout is waiting
-/// for the app to provide data or complete an operation before continuing.
-///
-/// This class extends `BaseRPCMessage` and adds request-specific behavior:
-/// - Storage for the request `id` field
-/// - Implementation of response methods
-/// - Validation logic for responses
-public class BaseRPCRequest<P: Decodable, R: Codable>: BaseRPCMessage<P>, RPCRequest {
-    public typealias ResponsePayload = R
+/// Requests are bidirectional - the checkout waits for the app to respond.
+internal class BaseRPCRequest<P: Decodable, R: Codable>: BaseRPCMessage<P>, RPCRequest {
+    internal typealias ResponsePayload = R
 
-    /// The request ID - always non-null for request events
     private let _id: String
+    internal var id: String { _id }
+    override var isNotification: Bool { false }
+    internal var validator: ((ResponsePayload) throws -> Void)?
 
-    /// Public accessor for the request ID
-    public var id: String { _id }
-
-    /// Whether this is a notification (always false for BaseRPCRequest - requests have IDs)
-    override public var isNotification: Bool { false }
-
-    /// Required initializer for RPCRequest protocol
-    public required init(id: String?, params: Params) {
-        // Request events must have an id - if nil, use empty string as fallback
+    internal required init(id: String?, params: Params) {
         _id = id ?? ""
         super.init(params: params, webview: nil)
     }
 
-    /// Default validation does nothing - subclasses can override
-    internal func validate(payload _: ResponsePayload) throws {
-        // Subclasses can override if they need validation
+    internal init(id: String, params: Params, validator: ((ResponsePayload) throws -> Void)? = nil) {
+        _id = id
+        self.validator = validator
+        super.init(params: params, webview: nil)
+    }
+
+    internal func validate(payload: ResponsePayload) throws {
+        try validator?(payload)
     }
 
     /// Respond with a typed payload
-    public func respondWith(payload: ResponsePayload) throws {
+    internal func respondWith(payload: ResponsePayload) throws {
         guard let webview else { return }
         guard !isNotification else { return }
 
@@ -87,7 +80,7 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: BaseRPCMessage<P>, RPCReq
     }
 
     /// Respond with a JSON string
-    public func respondWith(json jsonString: String) throws {
+    internal func respondWith(json jsonString: String) throws {
         guard let data = jsonString.data(using: .utf8) else {
             throw CheckoutEventResponseError.invalidEncoding
         }
@@ -106,7 +99,7 @@ public class BaseRPCRequest<P: Decodable, R: Codable>: BaseRPCMessage<P>, RPCReq
     }
 
     /// Respond with an error
-    public func respondWith(error: String) throws {
+    internal func respondWith(error: String) throws {
         guard let webview else { return }
         guard !isNotification else { return }
 

@@ -25,7 +25,7 @@ import Foundation
 import WebKit
 
 /// Protocol to enable type-erased decoding of RPC messages
-protocol TypeErasedRPCDecodable {
+internal protocol TypeErasedRPCDecodable {
     static func decodeErased(from data: Data) throws -> any RPCMessage
 }
 
@@ -67,8 +67,8 @@ public class RPCResponse<Payload: Codable>: Codable {
 /// from the checkout web experience, whether they are requests (bidirectional, with id)
 /// or notifications (unidirectional, without id).
 ///
-/// Internal protocol - SDK consumers should use CheckoutNotification or CheckoutRequest protocols.
-protocol RPCMessage: AnyObject, Decodable {
+/// SDK consumers should use CheckoutNotification or CheckoutRequest protocols.
+internal protocol RPCMessage: AnyObject, Decodable {
     /// Parameters associated with this message from Checkout
     associatedtype Params: Decodable
 
@@ -99,8 +99,8 @@ protocol RPCMessage: AnyObject, Decodable {
 ///
 /// Examples: checkout.addressChangeStart, checkout.submitStart, checkout.paymentMethodChangeStart
 ///
-/// Internal protocol - SDK consumers should use CheckoutRequest protocol instead.
-protocol RPCRequest: RPCMessage {
+/// SDK consumers should use CheckoutRequest protocol instead.
+internal protocol RPCRequest: RPCMessage {
     /// Expected data structure to send in response
     associatedtype ResponsePayload: Codable
     typealias Response = RPCResponse<ResponsePayload>

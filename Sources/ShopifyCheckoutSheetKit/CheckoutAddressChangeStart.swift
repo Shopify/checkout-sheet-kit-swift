@@ -24,13 +24,55 @@
 import Foundation
 import WebKit
 
-public final class CheckoutAddressChangeStart: BaseRPCRequest<CheckoutAddressChangeStartParams, CheckoutAddressChangeStartResponsePayload>, CheckoutRequest {
-    override public static var method: String { "checkout.addressChangeStart" }
+/// RPC request for address change start events from checkout.
+///
+/// This event is triggered when the buyer initiates an address change in checkout.
+/// The app can respond with updated address information.
+public final class CheckoutAddressChangeStart: CheckoutRequest, RPCMessage {
+    private let rpcRequest: BaseRPCRequest<CheckoutAddressChangeStartParams, CheckoutAddressChangeStartResponsePayload>
 
-    // CheckoutRequest conformance - expose method as instance property
+    public static let method: String = "checkout.addressChangeStart"
     public var method: String { Self.method }
 
-    override public func validate(payload: ResponsePayload) throws {
+    public var id: String { rpcRequest.id }
+    public var params: CheckoutAddressChangeStartParams { rpcRequest.params }
+
+    internal init(rpcRequest: BaseRPCRequest<CheckoutAddressChangeStartParams, CheckoutAddressChangeStartResponsePayload>) {
+        self.rpcRequest = rpcRequest
+        self.rpcRequest.validator = { [weak self] payload in
+            try self?.validate(payload: payload)
+        }
+    }
+
+    // MARK: - RPCMessage conformance
+
+    internal var jsonrpc: String { rpcRequest.jsonrpc }
+    internal var isNotification: Bool { rpcRequest.isNotification }
+    internal var webview: WKWebView? {
+        get { rpcRequest.webview }
+        set { rpcRequest.webview = newValue }
+    }
+
+    internal required init(id: String?, params: CheckoutAddressChangeStartParams) {
+        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+        self.rpcRequest.validator = { [weak self] payload in
+            try self?.validate(payload: payload)
+        }
+    }
+
+    public func respondWith(payload: CheckoutAddressChangeStartResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
+
+    public func respondWith(error: String) throws {
+        try rpcRequest.respondWith(error: error)
+    }
+
+    internal func validate(payload: CheckoutAddressChangeStartResponsePayload) throws {
         guard let cart = payload.cart else {
             return
         }
@@ -52,6 +94,13 @@ public final class CheckoutAddressChangeStart: BaseRPCRequest<CheckoutAddressCha
                 )
             }
         }
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+extension CheckoutAddressChangeStart: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCMessage {
+        return try JSONDecoder().decode(CheckoutAddressChangeStart.self, from: data)
     }
 }
 

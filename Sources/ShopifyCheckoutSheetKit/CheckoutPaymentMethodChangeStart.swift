@@ -24,11 +24,53 @@
 import Foundation
 import WebKit
 
-public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload>, CheckoutRequest {
-    override public static var method: String { "checkout.paymentMethodChangeStart" }
+/// RPC request for payment method change start events from checkout.
+///
+/// This event is triggered when the buyer initiates a payment method change in checkout.
+/// The app can respond with updated payment method information.
+public final class CheckoutPaymentMethodChangeStart: CheckoutRequest, RPCMessage {
+    private let rpcRequest: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload>
 
-    // CheckoutRequest conformance - expose method as instance property
+    public static let method: String = "checkout.paymentMethodChangeStart"
     public var method: String { Self.method }
+    public var id: String { rpcRequest.id }
+    public var params: CheckoutPaymentMethodChangeStartParams { rpcRequest.params }
+
+    internal init(rpcRequest: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload>) {
+        self.rpcRequest = rpcRequest
+    }
+
+    // MARK: - RPCMessage conformance
+
+    internal var jsonrpc: String { rpcRequest.jsonrpc }
+    internal var isNotification: Bool { rpcRequest.isNotification }
+    internal var webview: WKWebView? {
+        get { rpcRequest.webview }
+        set { rpcRequest.webview = newValue }
+    }
+
+    internal required init(id: String?, params: CheckoutPaymentMethodChangeStartParams) {
+        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+    }
+
+    public func respondWith(payload: CheckoutPaymentMethodChangeStartResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
+
+    public func respondWith(error: String) throws {
+        try rpcRequest.respondWith(error: error)
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+extension CheckoutPaymentMethodChangeStart: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCMessage {
+        return try JSONDecoder().decode(CheckoutPaymentMethodChangeStart.self, from: data)
+    }
 }
 
 public struct CheckoutPaymentMethodChangeStartParams: Codable {

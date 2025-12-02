@@ -41,6 +41,33 @@ public struct CheckoutModalToggledParams: Decodable {
 }
 
 /// Request for checkout modal toggle events
-public final class CheckoutModalToggledRequest: BaseRPCRequest<CheckoutModalToggledParams, EmptyResponse> {
-    override public static var method: String { "checkoutBlockingEvent" }
+public final class CheckoutModalToggledRequest: RPCMessage {
+    private let rpcRequest: BaseRPCRequest<CheckoutModalToggledParams, EmptyResponse>
+
+    public static let method: String = "checkoutBlockingEvent"
+    public var params: CheckoutModalToggledParams { rpcRequest.params }
+
+    internal init(rpcRequest: BaseRPCRequest<CheckoutModalToggledParams, EmptyResponse>) {
+        self.rpcRequest = rpcRequest
+    }
+
+    // MARK: - RPCMessage conformance
+
+    internal var jsonrpc: String { rpcRequest.jsonrpc }
+    internal var isNotification: Bool { rpcRequest.isNotification }
+    internal var webview: WKWebView? {
+        get { rpcRequest.webview }
+        set { rpcRequest.webview = newValue }
+    }
+
+    internal required init(id: String?, params: CheckoutModalToggledParams) {
+        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+    }
+}
+
+// MARK: - TypeErasedRPCDecodable conformance
+extension CheckoutModalToggledRequest: TypeErasedRPCDecodable {
+    static func decodeErased(from data: Data) throws -> any RPCMessage {
+        return try JSONDecoder().decode(CheckoutModalToggledRequest.self, from: data)
+    }
 }

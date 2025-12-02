@@ -24,53 +24,36 @@
 import Foundation
 import WebKit
 
-/// Abstract base class for all RPC message implementations.
+/// Base class for all RPC message implementations.
 ///
-/// This class contains all shared behavior between requests (bidirectional, with id)
-/// and notifications (unidirectional, without id). Subclasses specialize for each type:
+/// Messages can be requests (bidirectional, with id) or notifications (unidirectional, without id).
+/// Subclasses specialize for each type:
 /// - `BaseRPCRequest` for request events (checkout.addressChangeStart, etc.)
 /// - `BaseRPCNotification` for notification events (checkout.start, checkout.complete)
-///
-/// This base class eliminates code duplication and provides a single source of truth
-/// for common RPC message behavior.
-public class BaseRPCMessage<P: Decodable>: RPCMessage {
-    public typealias Params = P
+internal class BaseRPCMessage<P: Decodable>: RPCMessage {
+    internal typealias Params = P
 
     /// The JSON-RPC version (always "2.0")
-    public var jsonrpc: String { "2.0" }
+    var jsonrpc: String { "2.0" }
 
     /// Whether this is a notification - subclasses must override
-    public var isNotification: Bool {
+    var isNotification: Bool {
         fatalError("Subclasses must override isNotification")
     }
 
-    /// The parameters from the RPC message.
-    /// Public - external developers access state via params namespace.
-    public let params: Params
-
-    /// Weak reference to the WebView for sending responses
+    internal let params: Params
     internal weak var webview: WKWebView?
 
-    /// Subclasses must override this to provide their method name
-    public class var method: String {
+    internal class var method: String {
         fatalError("Subclasses must override method")
     }
 
-    /// Internal initializer used by subclasses
-    /// - Parameters:
-    ///   - params: The decoded parameters for this message
-    ///   - webview: Optional webview reference (set by registry after decoding)
     internal init(params: Params, webview: WKWebView? = nil) {
         self.params = params
         self.webview = webview
     }
 
-    /// Required initializer for RPCMessage protocol
-    /// Subclasses must implement this to handle wire-format decoding
-    /// - Parameters:
-    ///   - id: Optional id from JSON (present for requests, nil for notifications)
-    ///   - params: The decoded parameters
-    public required init(id _: String?, params: Params) {
+    internal required init(id _: String?, params: Params) {
         self.params = params
         webview = nil
     }
