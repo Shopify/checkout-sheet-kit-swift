@@ -124,18 +124,6 @@ protocol RPCRequest: RPCMessage {
     func respondWith(error: String) throws
 }
 
-/// Protocol for RPC notification messages (unidirectional, no id, no response).
-///
-/// Notification events are one-way messages from the checkout to the app that do not
-/// expect a response. They inform the app of state changes or events.
-///
-/// Examples: checkout.start, checkout.complete
-///
-/// Internal protocol - SDK consumers should use CheckoutNotification protocol instead.
-protocol RPCNotification: RPCMessage {
-    // Notifications don't have id or response methods
-}
-
 struct RPCEnvelope<Params: Decodable>: Decodable {
     let id: String?
     let jsonrpc: String

@@ -577,11 +577,6 @@ classDiagram
     }
     note for RPCRequest "Request protocol for bidirectional\ncommunication. Checkout waits\nfor app response to continue."
 
-    class RPCNotification {
-        <<protocol>>
-    }
-    note for RPCNotification "Notification protocol for\none-way messages. No response\nexpected or required."
-
     %% Abstract Base Class (eliminates duplication)
     class BaseRPCMessage~P~ {
         <<abstract>>
@@ -609,7 +604,7 @@ classDiagram
     class BaseRPCNotification~P~ {
         +isNotification: Bool = true
     }
-    note for BaseRPCNotification~P~ "Base for all notification events.\nSimple - just marks isNotification\nas true. No id or response methods."
+    note for BaseRPCNotification~P~ "Base for all notification events.\nSimple - just overrides isNotification\nto true. No id or response methods."
 
     %% Concrete Implementations (examples)
     class CheckoutStartRequest {
@@ -637,12 +632,10 @@ classDiagram
 
     %% Relationships
     RPCMessage <|-- RPCRequest
-    RPCMessage <|-- RPCNotification
     RPCMessage <|.. BaseRPCMessage~P~
     BaseRPCMessage~P~ <|-- BaseRPCRequest~P, R~
     BaseRPCMessage~P~ <|-- BaseRPCNotification~P~
     RPCRequest <|.. BaseRPCRequest~P, R~
-    RPCNotification <|.. BaseRPCNotification~P~
     BaseRPCNotification~P~ <|-- CheckoutStartRequest
     BaseRPCNotification~P~ <|-- CheckoutCompleteRequest
     BaseRPCRequest~P, R~ <|-- CheckoutAddressChangeStart
@@ -651,7 +644,7 @@ classDiagram
 
 #### Design Rationale
 
-**Why Protocols?** Swift's generic type system requires type erasure to store different generic types in the same collection. The protocol layer (`RPCMessage`, `RPCRequest`, `RPCNotification`) provides a non-generic interface that enables heterogeneous collections like `[any RPCMessage.Type]` in the registry.
+**Why Protocols?** Swift's generic type system requires type erasure to store different generic types in the same collection. The protocol layer (`RPCMessage` base + `RPCRequest` specialization) provides a non-generic interface that enables heterogeneous collections like `[any RPCMessage.Type]` in the registry.
 
 **Why Base Class?** Both requests and notifications share significant common behavior (params storage, webview reference, JSON-RPC metadata). The abstract `BaseRPCMessage` class eliminates this duplication while allowing specialized subclasses for each message type.
 
@@ -659,7 +652,7 @@ classDiagram
 - **Requests**: Bidirectional messages with an `id` that expect a response (e.g., address validation, submit hooks)
 - **Notifications**: Unidirectional messages without an `id` that don't expect a response (e.g., lifecycle events)
 
-This separation ensures type safety—notifications cannot accidentally be given response methods, and requests always have a non-null `id`.
+This separation is enforced through the class hierarchy: `BaseRPCRequest` adds the `id` property and response methods, while `BaseRPCNotification` is minimal and only overrides `isNotification` to return `true`. Type safety is achieved—requests always have a non-null `id` and response capabilities, while notifications do not.
 
 **Internal Protocols**: All protocols are marked `internal` to hide RPC implementation details from SDK consumers, who only interact with the public `CheckoutDelegate` protocol and concrete event types.
 
