@@ -49,11 +49,12 @@ public final class CheckoutCompleteRequest: CheckoutNotification, RPCMessage {
     }
 
     internal required init(id: String?, params: CheckoutCompleteEvent) {
-        self.rpcNotification = BaseRPCNotification(id: id, params: params)
+        rpcNotification = BaseRPCNotification(id: id, params: params)
     }
 }
 
 // MARK: - TypeErasedRPCDecodable conformance
+
 extension CheckoutCompleteRequest: TypeErasedRPCDecodable {
     static func decodeErased(from data: Data) throws -> any RPCMessage {
         return try JSONDecoder().decode(CheckoutCompleteRequest.self, from: data)

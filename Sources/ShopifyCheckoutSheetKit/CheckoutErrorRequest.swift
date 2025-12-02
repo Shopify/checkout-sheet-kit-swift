@@ -60,11 +60,12 @@ public final class CheckoutErrorRequest: RPCMessage {
     }
 
     internal required init(id: String?, params: CheckoutErrorParams) {
-        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+        rpcRequest = BaseRPCRequest(id: id, params: params)
     }
 }
 
 // MARK: - TypeErasedRPCDecodable conformance
+
 extension CheckoutErrorRequest: TypeErasedRPCDecodable {
     static func decodeErased(from data: Data) throws -> any RPCMessage {
         return try JSONDecoder().decode(CheckoutErrorRequest.self, from: data)

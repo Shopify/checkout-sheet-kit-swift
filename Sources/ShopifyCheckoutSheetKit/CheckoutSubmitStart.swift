@@ -50,7 +50,7 @@ public final class CheckoutSubmitStart: CheckoutRequest, RPCMessage {
     }
 
     internal required init(id: String?, params: CheckoutSubmitStartParams) {
-        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+        rpcRequest = BaseRPCRequest(id: id, params: params)
     }
 
     public func respondWith(payload: CheckoutSubmitStartResponsePayload) throws {
@@ -67,6 +67,7 @@ public final class CheckoutSubmitStart: CheckoutRequest, RPCMessage {
 }
 
 // MARK: - TypeErasedRPCDecodable conformance
+
 extension CheckoutSubmitStart: TypeErasedRPCDecodable {
     static func decodeErased(from data: Data) throws -> any RPCMessage {
         return try JSONDecoder().decode(CheckoutSubmitStart.self, from: data)

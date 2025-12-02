@@ -61,11 +61,12 @@ public final class CheckoutModalToggledRequest: RPCMessage {
     }
 
     internal required init(id: String?, params: CheckoutModalToggledParams) {
-        self.rpcRequest = BaseRPCRequest(id: id, params: params)
+        rpcRequest = BaseRPCRequest(id: id, params: params)
     }
 }
 
 // MARK: - TypeErasedRPCDecodable conformance
+
 extension CheckoutModalToggledRequest: TypeErasedRPCDecodable {
     static func decodeErased(from data: Data) throws -> any RPCMessage {
         return try JSONDecoder().decode(CheckoutModalToggledRequest.self, from: data)

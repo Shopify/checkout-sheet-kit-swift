@@ -54,8 +54,8 @@ public final class CheckoutAddressChangeStart: CheckoutRequest, RPCMessage {
     }
 
     internal required init(id: String?, params: CheckoutAddressChangeStartParams) {
-        self.rpcRequest = BaseRPCRequest(id: id, params: params)
-        self.rpcRequest.validator = { [weak self] payload in
+        rpcRequest = BaseRPCRequest(id: id, params: params)
+        rpcRequest.validator = { [weak self] payload in
             try self?.validate(payload: payload)
         }
     }
@@ -98,6 +98,7 @@ public final class CheckoutAddressChangeStart: CheckoutRequest, RPCMessage {
 }
 
 // MARK: - TypeErasedRPCDecodable conformance
+
 extension CheckoutAddressChangeStart: TypeErasedRPCDecodable {
     static func decodeErased(from data: Data) throws -> any RPCMessage {
         return try JSONDecoder().decode(CheckoutAddressChangeStart.self, from: data)
