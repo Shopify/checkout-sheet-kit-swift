@@ -45,8 +45,8 @@ public class BaseRPCMessage<P: Decodable>: RPCMessage {
     }
 
     /// The parameters from the RPC message.
-    /// Internal - subclasses should expose specific properties from params.
-    internal let params: Params
+    /// Public - external developers access state via params namespace.
+    public let params: Params
 
     /// Weak reference to the WebView for sending responses
     internal weak var webview: WKWebView?

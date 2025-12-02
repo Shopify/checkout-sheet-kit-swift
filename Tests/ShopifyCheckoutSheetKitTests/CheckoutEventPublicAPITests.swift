@@ -59,9 +59,9 @@ class CheckoutEventPublicAPITests: XCTestCase {
         XCTAssertEqual(id, "test-id-456")
     }
 
-    // MARK: - Flattened Property Accessor Tests
+    // MARK: - Params Property Accessor Tests
 
-    func testAddressChangeStartFlattenedProperties() {
+    func testAddressChangeStartParamsProperties() {
         let cart = createTestCart(id: "cart-789")
         let params = CheckoutAddressChangeStartParams(
             addressType: "billing",
@@ -69,31 +69,31 @@ class CheckoutEventPublicAPITests: XCTestCase {
         )
         let event = CheckoutAddressChangeStart(id: "test-id", params: params)
 
-        // Should be able to access properties directly without going through params
-        XCTAssertEqual(event.addressType, "billing")
-        XCTAssertEqual(event.cart.id, "cart-789")
+        // Should be able to access properties via params namespace
+        XCTAssertEqual(event.params.addressType, "billing")
+        XCTAssertEqual(event.params.cart.id, "cart-789")
         XCTAssertEqual(event.method, "checkout.addressChangeStart")
     }
 
-    func testSubmitStartFlattenedProperties() {
+    func testSubmitStartParamsProperties() {
         let cart = createTestCart(id: "cart-submit-123")
         let checkout = Checkout(id: "checkout-id-789")
         let params = CheckoutSubmitStartParams(cart: cart, checkout: checkout)
         let event = CheckoutSubmitStart(id: "submit-id", params: params)
 
-        // Should be able to access properties directly
-        XCTAssertEqual(event.cart.id, "cart-submit-123")
-        XCTAssertEqual(event.checkout.id, "checkout-id-789")
+        // Should be able to access properties via params namespace
+        XCTAssertEqual(event.params.cart.id, "cart-submit-123")
+        XCTAssertEqual(event.params.checkout.id, "checkout-id-789")
         XCTAssertEqual(event.method, "checkout.submitStart")
     }
 
-    func testPaymentMethodChangeStartFlattenedProperties() {
+    func testPaymentMethodChangeStartParamsProperties() {
         let cart = createTestCart(id: "cart-payment-456")
         let params = CheckoutPaymentMethodChangeStartParams(cart: cart)
         let event = CheckoutPaymentMethodChangeStart(id: "payment-id", params: params)
 
-        // Should be able to access properties directly
-        XCTAssertEqual(event.cart.id, "cart-payment-456")
+        // Should be able to access properties via params namespace
+        XCTAssertEqual(event.params.cart.id, "cart-payment-456")
         XCTAssertEqual(event.method, "checkout.paymentMethodChangeStart")
     }
 

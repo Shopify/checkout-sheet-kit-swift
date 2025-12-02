@@ -30,10 +30,6 @@ public final class CheckoutAddressChangeStart: BaseRPCRequest<CheckoutAddressCha
     // CheckoutRequest conformance - expose method as instance property
     public var method: String { Self.method }
 
-    // Flattened properties from params
-    public var addressType: String { params.addressType }
-    public var cart: Cart { params.cart }
-
     override public func validate(payload: ResponsePayload) throws {
         guard let cart = payload.cart else {
             return

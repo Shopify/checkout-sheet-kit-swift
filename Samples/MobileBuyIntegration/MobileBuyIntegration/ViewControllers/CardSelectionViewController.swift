@@ -109,7 +109,7 @@ class CardSelectionViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
 
         // If payment instruments exist, try to select the first one
-        if let firstInstrument = event.cart.payment.instruments.first {
+        if let firstInstrument = event.params.cart.payment.instruments.first {
             for (index, option) in cardOptions
                 .enumerated() where option.identifier == firstInstrument.externalReference
             {

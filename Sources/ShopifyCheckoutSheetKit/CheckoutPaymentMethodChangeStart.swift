@@ -29,9 +29,6 @@ public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaym
 
     // CheckoutRequest conformance - expose method as instance property
     public var method: String { Self.method }
-
-    // Flattened properties from params
-    public var cart: Cart { params.cart }
 }
 
 public struct CheckoutPaymentMethodChangeStartParams: Codable {
