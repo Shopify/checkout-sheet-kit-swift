@@ -84,6 +84,9 @@ public struct UnsupportedParams: Decodable {
 /// Unlike other RPCRequest types, UnsupportedRequest allows id to be nil because
 /// we can't distinguish between requests and notifications for unknown methods.
 public final class UnsupportedRequest: RPCRequest {
+    public typealias Params = UnsupportedParams
+    public typealias ResponsePayload = EmptyResponse
+
     /// The actual method name that was received
     public let actualMethod: String
 
@@ -103,10 +106,21 @@ public final class UnsupportedRequest: RPCRequest {
     public var jsonrpc: String { "2.0" }
     public var isNotification: Bool { _id == nil }
 
+    public let params: UnsupportedParams
+    public var webview: WKWebView?
+
     /// Custom initializer that captures the actual method name
-    public init(id: String?, actualMethod: String) {
-        self._id = id
+    public init(id: String?, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
+        _id = id
         self.actualMethod = actualMethod
+        self.params = params
+    }
+
+    /// Required initializer from protocol
+    public required init(id: String?, params: UnsupportedParams) {
+        _id = id
+        self.actualMethod = "__unknown__"
+        self.params = params
     }
 
     // Stub response methods - UnsupportedRequests are never responded to
