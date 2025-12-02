@@ -557,39 +557,52 @@ The SDK uses a protocol-oriented architecture to handle JSON-RPC 2.0 messages fr
 
 ```mermaid
 classDiagram
-    %% Protocol Layer (internal - enables type erasure)
+    %% Public API Layer (what SDK consumers see)
+    class CheckoutNotification {
+        <<public protocol>>
+        +method: String
+    }
+    note for CheckoutNotification "Public API for notification events.\nSDK consumers use this interface."
+
+    class CheckoutRequest {
+        <<public protocol>>
+        +id: String
+        +respondWith(json: String)
+        +respondWith(error: String)
+    }
+    note for CheckoutRequest "Public API for request events.\nExtends CheckoutNotification.\nSDK consumers use this interface."
+
+    %% Internal RPC Layer (hidden implementation)
     class RPCMessage {
-        <<protocol>>
+        <<internal protocol>>
         +jsonrpc: String
         +method: String
         +params: Params
         +isNotification: Bool
         +webview: WKWebView?
     }
-    note for RPCMessage "Base protocol for all messages.\nEnables heterogeneous collections\nvia type erasure (any RPCMessage)"
+    note for RPCMessage "Internal protocol for all messages.\nEnables type erasure and\nheterogeneous collections."
 
     class RPCRequest {
-        <<protocol>>
+        <<internal protocol>>
         +id: String
         +respondWith(payload:)
         +respondWith(json:)
         +respondWith(error:)
     }
-    note for RPCRequest "Request protocol for bidirectional\ncommunication. Checkout waits\nfor app response to continue."
+    note for RPCRequest "Internal protocol for requests.\nAdds response methods."
 
-    %% Abstract Base Class (eliminates duplication)
+    %% Abstract Base Classes
     class BaseRPCMessage~P~ {
         <<abstract>>
-        #params: P
+        +params: P
         #webview: WKWebView?
         +jsonrpc: String
         +method: String
         +isNotification: Bool*
-        +init(id: String?, params: P)
     }
-    note for BaseRPCMessage~P~ "Shared base class containing\nall common implementation.\nEliminates duplication between\nrequests and notifications."
+    note for BaseRPCMessage~P~ "Shared base class.\nContains all common implementation.\nElliminates duplication."
 
-    %% Concrete Base Classes
     class BaseRPCRequest~P, R~ {
         -_id: String
         +id: String
@@ -599,43 +612,51 @@ classDiagram
         +respondWith(error: String)
         #validate(payload: R)
     }
-    note for BaseRPCRequest~P, R~ "Base for all request events.\nP = params type\nR = response payload type"
+    note for BaseRPCRequest~P, R~ "Base for request events.\nP = params type\nR = response payload type"
 
     class BaseRPCNotification~P~ {
         +isNotification: Bool = true
     }
-    note for BaseRPCNotification~P~ "Base for all notification events.\nSimple - just overrides isNotification\nto true. No id or response methods."
+    note for BaseRPCNotification~P~ "Base for notification events.\nOverrides isNotification to true."
 
     %% Concrete Implementations (examples)
     class CheckoutStartRequest {
-        +cart: Cart
+        +params: CheckoutStartEvent
     }
-    note for CheckoutStartRequest "Notification: Checkout started.\nNo response needed."
+    note for CheckoutStartRequest "Notification: Checkout started.\nParams contain cart state."
 
     class CheckoutCompleteRequest {
-        +orderId: String
-        +orderConfirmation: OrderConfirmation
+        +params: CheckoutCompleteEvent
     }
-    note for CheckoutCompleteRequest "Notification: Checkout completed.\nNo response needed."
+    note for CheckoutCompleteRequest "Notification: Checkout completed.\nParams contain order confirmation."
 
     class CheckoutAddressChangeStart {
-        +deliveryAddress: MailingAddress
-        +respondWith(payload: [MailingAddress])
+        +params: CheckoutAddressChangeStartParams
+        +respondWith(payload: ResponsePayload)
     }
-    note for CheckoutAddressChangeStart "Request: Address validation.\nApp responds with validated\naddress suggestions."
+    note for CheckoutAddressChangeStart "Request: Address validation.\nParams contain addressType, cart.\nRespond with validated addresses."
 
     class CheckoutSubmitStart {
-        +respondWith(payload: EmptyResponse)
-        +respondWith(error: String)
+        +params: CheckoutSubmitStartParams
+        +respondWith(payload: ResponsePayload)
     }
-    note for CheckoutSubmitStart "Request: Submit validation.\nApp can block or allow submission.\nUseful for inventory checks."
+    note for CheckoutSubmitStart "Request: Submit validation.\nParams contain cart, checkout.\nRespond to allow/block submission."
 
-    %% Relationships
+    %% Relationships - Public API
+    CheckoutNotification <|-- CheckoutRequest
+
+    %% Relationships - Internal RPC
     RPCMessage <|-- RPCRequest
     RPCMessage <|.. BaseRPCMessage~P~
     BaseRPCMessage~P~ <|-- BaseRPCRequest~P, R~
     BaseRPCMessage~P~ <|-- BaseRPCNotification~P~
     RPCRequest <|.. BaseRPCRequest~P, R~
+
+    %% Relationships - Concrete → Public
+    CheckoutNotification <|.. BaseRPCNotification~P~
+    CheckoutRequest <|.. BaseRPCRequest~P, R~
+
+    %% Relationships - Concrete implementations
     BaseRPCNotification~P~ <|-- CheckoutStartRequest
     BaseRPCNotification~P~ <|-- CheckoutCompleteRequest
     BaseRPCRequest~P, R~ <|-- CheckoutAddressChangeStart
@@ -644,7 +665,15 @@ classDiagram
 
 #### Design Rationale
 
-**Why Protocols?** Swift's generic type system requires type erasure to store different generic types in the same collection. The protocol layer (`RPCMessage` base + `RPCRequest` specialization) provides a non-generic interface that enables heterogeneous collections like `[any RPCMessage.Type]` in the registry.
+**Two-Layer Architecture**: The design separates public API from internal implementation:
+- **Public Layer** (`CheckoutNotification`, `CheckoutRequest`) - Clean, simple interface for SDK consumers
+- **Internal RPC Layer** (`RPCMessage`, `RPCRequest`, base classes) - Hidden JSON-RPC 2.0 implementation
+
+This separation ensures SDK consumers never see RPC implementation details, while internally we maintain proper protocol adherence and code reusability.
+
+**Why Two Protocol Layers?** Each serves a different purpose:
+- **Public protocols** - Define the SDK's public contract. Simple, stable API for app developers.
+- **Internal protocols** - Enable type erasure (`any RPCMessage`) for heterogeneous collections in the registry, and provide RPC-specific requirements like `jsonrpc` version and `webview` reference.
 
 **Why Base Class?** Both requests and notifications share significant common behavior (params storage, webview reference, JSON-RPC metadata). The abstract `BaseRPCMessage` class eliminates this duplication while allowing specialized subclasses for each message type.
 
@@ -652,9 +681,11 @@ classDiagram
 - **Requests**: Bidirectional messages with an `id` that expect a response (e.g., address validation, submit hooks)
 - **Notifications**: Unidirectional messages without an `id` that don't expect a response (e.g., lifecycle events)
 
-This separation is enforced through the class hierarchy: `BaseRPCRequest` adds the `id` property and response methods, while `BaseRPCNotification` is minimal and only overrides `isNotification` to return `true`. Type safety is achieved—requests always have a non-null `id` and response capabilities, while notifications do not.
+This separation is enforced at both layers: public protocols (`CheckoutRequest` vs `CheckoutNotification`) and internal implementation (`BaseRPCRequest` vs `BaseRPCNotification`). Type safety is achieved—requests always have a non-null `id` and response capabilities, while notifications do not.
 
-**Internal Protocols**: All protocols are marked `internal` to hide RPC implementation details from SDK consumers, who only interact with the public `CheckoutDelegate` protocol and concrete event types.
+**Params Namespace**: Event data is accessed via `event.params.cart` rather than `event.cart`. This provides clear separation between:
+- **State** (in `params`): Data from checkout like cart, addresses, etc.
+- **Behavior** (on event): Methods like `respondWith(payload:)`, properties like `id`, `method`
 
 ## Contributing
 
