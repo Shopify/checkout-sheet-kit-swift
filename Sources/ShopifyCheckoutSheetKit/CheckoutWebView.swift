@@ -262,8 +262,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
         guard let viewDelegate else { return }
 
         do {
-            let request = try CheckoutBridge.decode(message)
-            handleBridgeRequest(request, viewDelegate: viewDelegate)
+            let rpcMessage = try CheckoutBridge.decode(message)
+            handleBridgeRequest(rpcMessage, viewDelegate: viewDelegate)
         } catch {
             OSLogger.shared.error(
                 "[CheckoutWebView]: Failed to decode event: \(error.localizedDescription)"
@@ -272,8 +272,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
         }
     }
 
-    private func handleBridgeRequest(_ request: any RPCRequest, viewDelegate: CheckoutWebViewDelegate) {
-        switch request {
+    private func handleBridgeRequest(_ message: any RPCMessage, viewDelegate: CheckoutWebViewDelegate) {
+        switch message {
         case let startRequest as CheckoutStartRequest:
             OSLogger.shared.info("Checkout start event received")
             viewDelegate.checkoutViewDidStart(event: startRequest.params)
@@ -315,7 +315,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
 
         default:
             OSLogger.shared.debug(
-                "Unknown request type received (id: \(request.id))"
+                "Unknown message type received"
             )
         }
     }
