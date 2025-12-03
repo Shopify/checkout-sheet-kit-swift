@@ -42,10 +42,7 @@ extension CheckoutNotification {
 
 /// Internal protocol for type-erased event decoding.
 /// Allows the registry to decode events without knowing their concrete types.
-internal protocol CheckoutEventDecodable {
-    /// The method name that identifies this event type
-    static var method: String { get }
-
+internal protocol CheckoutEventDecodable: CheckoutNotification {
     /// Decode an event from data with optional webview
     /// Returns nil if the event requires a webview but none is provided
     static func decodeEvent(from data: Data, webview: WKWebView?) throws -> Any?
@@ -71,7 +68,7 @@ extension CheckoutNotification where Self: Decodable {
 
 /// Default decodeEvent implementation for notification events.
 /// Notification events don't require a webview.
-extension CheckoutEventDecodable where Self: CheckoutNotification & Decodable {
+extension CheckoutEventDecodable where Self: Decodable {
     internal static func decodeEvent(from data: Data, webview: WKWebView?) throws -> Any? {
         return try Self.decode(from: data)
     }

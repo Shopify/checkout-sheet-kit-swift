@@ -89,7 +89,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
             guard
                 let webview = message.webView,
-                let event = try RPCRequestRegistry.decode(
+                let request = try RPCRequestRegistry.decode(
                     for: extractor.method,
                     from: data,
                     webview: webview
@@ -99,7 +99,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
                 return UnsupportedRequest(id: envelope.id, actualMethod: envelope.method)
             }
 
-            return event
+            return request
         } catch {
             throw BridgeError.invalidBridgeEvent(error)
         }
