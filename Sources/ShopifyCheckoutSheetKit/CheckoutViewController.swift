@@ -130,7 +130,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         return self
     }
 
-    @discardableResult public func onPaymentMethodChangeStart(_ action: @escaping (CheckoutPaymentMethodChangeStart) -> Void) -> Self {
+    @discardableResult public func onPaymentMethodChangeStart(_ action: @escaping (CheckoutPaymentMethodChangeStartEvent) -> Void) -> Self {
         delegate.onPaymentMethodChangeStart = action
         return self
     }
@@ -155,7 +155,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onFail: ((CheckoutError) -> Void)?
     var onLinkClick: ((URL) -> Void)?
     var onAddressChangeStart: ((CheckoutAddressChangeStartEvent) -> Void)?
-    var onPaymentMethodChangeStart: ((CheckoutPaymentMethodChangeStart) -> Void)?
+    var onPaymentMethodChangeStart: ((CheckoutPaymentMethodChangeStartEvent) -> Void)?
 
     public func checkoutDidStart(event: CheckoutStartEvent) {
         onStart?(event)
@@ -189,7 +189,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
         onAddressChangeStart?(event)
     }
 
-    public func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart) {
+    public func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent) {
         onPaymentMethodChangeStart?(event)
     }
 }

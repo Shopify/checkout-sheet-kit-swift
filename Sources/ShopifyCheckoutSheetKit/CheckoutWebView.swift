@@ -34,7 +34,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidToggleModal(modalVisible: Bool)
     func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStartEvent)
     func checkoutViewDidStartSubmit(event: CheckoutSubmitStartEvent)
-    func checkoutViewDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart)
+    func checkoutViewDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
@@ -290,7 +290,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
             )
             viewDelegate.checkoutViewDidStartAddressChange(event: addressRequest)
 
-        case let paymentMethodRequest as CheckoutPaymentMethodChangeStart:
+        case let paymentMethodRequest as CheckoutPaymentMethodChangeStartEvent:
             OSLogger.shared.info(
                 "Payment method change start event received"
             )

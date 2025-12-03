@@ -29,7 +29,7 @@ enum EventRegistry {
     /// Array of all supported event types that conform to CheckoutEventDecodable
     static let eventTypes: [any CheckoutEventDecodable.Type] = [
         CheckoutAddressChangeStartEvent.self,
-        CheckoutPaymentMethodChangeStart.self,
+        CheckoutPaymentMethodChangeStartEvent.self,
         CheckoutCompleteEvent.self,
         CheckoutStartEvent.self,
         CheckoutSubmitStartEvent.self

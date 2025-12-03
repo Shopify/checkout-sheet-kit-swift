@@ -58,7 +58,7 @@ public protocol CheckoutDelegate: AnyObject {
     func checkoutDidStartSubmit(event: CheckoutSubmitStartEvent)
 
     /// Tells the delegate that the checkout is requesting payment method change intent (e.g., for native payment method picker)
-    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart)
+    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent)
 }
 
 extension CheckoutDelegate {
@@ -86,7 +86,7 @@ extension CheckoutDelegate {
         /// No-op by default
     }
 
-    public func checkoutDidStartPaymentMethodChange(event _: CheckoutPaymentMethodChangeStart) {
+    public func checkoutDidStartPaymentMethodChange(event _: CheckoutPaymentMethodChangeStartEvent) {
         /// No-op by default
     }
 

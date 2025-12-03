@@ -99,7 +99,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         // consumers can push onto the navigation stack
     }
 
-    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart) {
+    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent) {
         OSLogger.shared.debug(
             "[EmbeddedCheckout] Payment method change start received"
         )

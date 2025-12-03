@@ -24,14 +24,14 @@
 @testable import ShopifyCheckoutSheetKit
 import XCTest
 
-class CheckoutAddressChangeStartTests: XCTestCase {
+class CheckoutAddressChangeStartEventTests: XCTestCase {
     // MARK: - Response Tests
 
     func testRespondWithSendsJavaScriptToWebView() throws {
         let mockWebView = MockWebView()
         let request = try createRequest(webview: mockWebView)
 
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -77,7 +77,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateAcceptsValid2CharacterCountryCode() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -94,7 +94,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateRejectsEmptyCountryCode() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -117,7 +117,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateRejectsNilCountryCode() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -140,7 +140,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateRejects1CharacterCountryCode() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -164,7 +164,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateRejects3CharacterCountryCode() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -188,7 +188,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateRejectsEmptyAddressesList() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(addresses: [])
             )
@@ -205,7 +205,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateRejectsNilAddressesList() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(addresses: nil)
             )
@@ -222,7 +222,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateIncludesIndexInErrorMessage() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -249,14 +249,14 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     func testValidateAllowsNilCart() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(cart: nil)
+        let payload = CheckoutAddressChangeStartEventResponsePayload(cart: nil)
 
         XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
     }
 
     func testValidateAcceptsMultipleValidAddresses() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
+        let payload = CheckoutAddressChangeStartEventResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -279,7 +279,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
 
     // MARK: - Helper Methods
 
-    private func createRequest(webview: MockWebView? = nil) throws -> CheckoutAddressChangeStart {
+    private func createRequest(webview: MockWebView? = nil) throws -> CheckoutAddressChangeStartEvent {
         let jsonString = """
         {
             "jsonrpc": "2.0",
@@ -292,7 +292,7 @@ class CheckoutAddressChangeStartTests: XCTestCase {
         }
         """
         let data = jsonString.data(using: .utf8)!
-        let request = try CheckoutAddressChangeStart.decode(from: data, webview: webview ?? MockWebView())
+        let request = try CheckoutAddressChangeStartEvent.decode(from: data, webview: webview ?? MockWebView())
         return request
     }
 }
