@@ -26,7 +26,7 @@ import WebKit
 
 /// Internal RPC request class for submit start
 internal class CheckoutSubmitStartRPCRequest: BaseRPCRequest<
-    CheckoutSubmitStart.Params,
+    CheckoutSubmitStartEvent.Params,
     CheckoutSubmitStartResponsePayload
 > {
     override class var method: String { "checkout.submitStart" }
@@ -34,12 +34,16 @@ internal class CheckoutSubmitStartRPCRequest: BaseRPCRequest<
 
 /// Event triggered when the checkout submit process starts.
 /// This allows native apps to provide payment tokens or modify the cart before submission.
-public struct CheckoutSubmitStart: CheckoutRequestInternal, CheckoutRequestDecodable {
+public struct CheckoutSubmitStartEvent: CheckoutRequestInternal, CheckoutRequestDecodable {
     public typealias ResponsePayload = CheckoutSubmitStartResponsePayload
 
     public static let method = "checkout.submitStart"
 
-    public var id: String { rpcRequest.id ?? "" }
+    /// Request ID for correlating responses.
+    /// Force-unwrapped because request events must have an ID per JSON-RPC 2.0.
+    /// If this crashes, the WebView sent a malformed request.
+    /// TODO: Emit a checkout error event instead of crashing for better recovery.
+    public var id: String { rpcRequest.id! }
     public var cart: Cart { rpcRequest.params.cart }
     public var checkout: Checkout { rpcRequest.params.checkout }
 
@@ -49,17 +53,17 @@ public struct CheckoutSubmitStart: CheckoutRequestInternal, CheckoutRequestDecod
         self.rpcRequest = rpcRequest
     }
 
-    var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
+    var internalRPCRequest: (any RPCRequest)? { rpcRequest }
 
     internal struct Params: Codable {
         let cart: Cart
         let checkout: Checkout
     }
 
-    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutSubmitStart {
+    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutSubmitStartEvent {
         let rpcRequest = try JSONDecoder().decode(CheckoutSubmitStartRPCRequest.self, from: data)
         rpcRequest.webview = webview
-        return CheckoutSubmitStart(rpcRequest: rpcRequest)
+        return CheckoutSubmitStartEvent(rpcRequest: rpcRequest)
     }
 }
 

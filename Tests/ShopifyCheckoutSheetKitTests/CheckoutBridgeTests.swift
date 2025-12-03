@@ -199,7 +199,7 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let addressRequest = result as? CheckoutAddressChangeStart else {
+        guard let addressRequest = result as? CheckoutAddressChangeStartEvent else {
             XCTFail("Expected CheckoutAddressChangeStart, got \(result)")
             return
         }
@@ -362,7 +362,7 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let submitRequest = result as? CheckoutSubmitStart else {
+        guard let submitRequest = result as? CheckoutSubmitStartEvent else {
             XCTFail("Expected CheckoutSubmitStart, got \(result)")
             return
         }

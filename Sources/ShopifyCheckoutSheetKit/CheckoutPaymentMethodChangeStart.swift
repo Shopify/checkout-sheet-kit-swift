@@ -25,7 +25,7 @@ import Foundation
 import WebKit
 
 /// Internal RPC request class for payment method change
-internal class CheckoutPaymentMethodChangeStartRPCRequest: BaseRPCRequest<
+internal class CheckoutPaymentMethodChangeStartRPCRequestEvent: BaseRPCRequest<
     CheckoutPaymentMethodChangeStart.Params,
     CheckoutPaymentMethodChangeStartResponsePayload
 > {
@@ -39,23 +39,27 @@ public struct CheckoutPaymentMethodChangeStart: CheckoutRequestInternal, Checkou
 
     public static let method = "checkout.paymentMethodChangeStart"
 
-    public var id: String { rpcRequest.id ?? "" }
+    /// Request ID for correlating responses.
+    /// Force-unwrapped because request events must have an ID per JSON-RPC 2.0.
+    /// If this crashes, the WebView sent a malformed request.
+    /// TODO: Emit a checkout error event instead of crashing for better recovery.
+    public var id: String { rpcRequest.id! }
     public var cart: Cart { rpcRequest.params.cart }
 
-    internal let rpcRequest: CheckoutPaymentMethodChangeStartRPCRequest
+    internal let rpcRequest: CheckoutPaymentMethodChangeStartRPCRequestEvent
 
-    internal init(rpcRequest: CheckoutPaymentMethodChangeStartRPCRequest) {
+    internal init(rpcRequest: CheckoutPaymentMethodChangeStartRPCRequestEvent) {
         self.rpcRequest = rpcRequest
     }
 
-    var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
+    var internalRPCRequest: (any RPCRequest)? { rpcRequest }
 
     internal struct Params: Codable {
         let cart: Cart
     }
 
     internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutPaymentMethodChangeStart {
-        let rpcRequest = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartRPCRequest.self, from: data)
+        let rpcRequest = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartRPCRequestEvent.self, from: data)
         rpcRequest.webview = webview
         return CheckoutPaymentMethodChangeStart(rpcRequest: rpcRequest)
     }

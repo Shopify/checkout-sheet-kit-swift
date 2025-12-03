@@ -76,7 +76,7 @@ extension CheckoutController: CheckoutDelegate {
         OSLogger.shared.debug("[CheckoutDelegate] Checkout failed: \(error.localizedDescription)")
     }
 
-    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStartEvent) {
         OSLogger.shared.debug("[CheckoutDelegate] Address change start received for addressType: \(event.addressType)")
 
         // Respond with a hardcoded address after 2 seconds to simulate native address picker

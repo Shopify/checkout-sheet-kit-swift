@@ -125,7 +125,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
     ///
     /// This event is only emitted when native address selection is enabled for the authenticated app.
     /// When triggered, you can present a native address picker and respond with updated address data.
-    @discardableResult public func onAddressChangeStart(_ action: @escaping (CheckoutAddressChangeStart) -> Void) -> Self {
+    @discardableResult public func onAddressChangeStart(_ action: @escaping (CheckoutAddressChangeStartEvent) -> Void) -> Self {
         delegate.onAddressChangeStart = action
         return self
     }
@@ -154,7 +154,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onCancel: (() -> Void)?
     var onFail: ((CheckoutError) -> Void)?
     var onLinkClick: ((URL) -> Void)?
-    var onAddressChangeStart: ((CheckoutAddressChangeStart) -> Void)?
+    var onAddressChangeStart: ((CheckoutAddressChangeStartEvent) -> Void)?
     var onPaymentMethodChangeStart: ((CheckoutPaymentMethodChangeStart) -> Void)?
 
     public func checkoutDidStart(event: CheckoutStartEvent) {
@@ -185,7 +185,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
         }
     }
 
-    public func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
+    public func checkoutDidStartAddressChange(event: CheckoutAddressChangeStartEvent) {
         onAddressChangeStart?(event)
     }
 

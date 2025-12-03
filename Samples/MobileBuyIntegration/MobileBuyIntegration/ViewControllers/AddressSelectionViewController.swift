@@ -31,7 +31,7 @@ struct AddressOption {
 }
 
 class AddressSelectionViewController: UIViewController {
-    private let event: CheckoutAddressChangeStart
+    private let event: CheckoutAddressChangeStartEvent
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -100,7 +100,7 @@ class AddressSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: CheckoutAddressChangeStart) {
+    init(event: CheckoutAddressChangeStartEvent) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
     }

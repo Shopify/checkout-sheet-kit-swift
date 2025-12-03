@@ -32,8 +32,8 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidClickLink(url: URL)
     func checkoutViewDidFailWithError(error: CheckoutError)
     func checkoutViewDidToggleModal(modalVisible: Bool)
-    func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStart)
-    func checkoutViewDidStartSubmit(event: CheckoutSubmitStart)
+    func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStartEvent)
+    func checkoutViewDidStartSubmit(event: CheckoutSubmitStartEvent)
     func checkoutViewDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart)
 }
 
@@ -284,7 +284,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
             viewDelegate.checkoutViewDidCompleteCheckout(event: completeEvent)
 
         // Request events (CheckoutRequest)
-        case let addressRequest as CheckoutAddressChangeStart:
+        case let addressRequest as CheckoutAddressChangeStartEvent:
             OSLogger.shared.info(
                 "Address change start event received: \(addressRequest.addressType)"
             )
@@ -296,7 +296,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
             )
             viewDelegate.checkoutViewDidStartPaymentMethodChange(event: paymentMethodRequest)
 
-        case let submitRequest as CheckoutSubmitStart:
+        case let submitRequest as CheckoutSubmitStartEvent:
             OSLogger.shared.info(
                 "Checkout submit start event received"
             )

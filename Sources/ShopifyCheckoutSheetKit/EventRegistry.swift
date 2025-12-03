@@ -28,11 +28,11 @@ import WebKit
 enum EventRegistry {
     /// Array of all supported event types that conform to CheckoutEventDecodable
     static let eventTypes: [any CheckoutEventDecodable.Type] = [
-        CheckoutAddressChangeStart.self,
+        CheckoutAddressChangeStartEvent.self,
         CheckoutPaymentMethodChangeStart.self,
         CheckoutCompleteEvent.self,
         CheckoutStartEvent.self,
-        CheckoutSubmitStart.self
+        CheckoutSubmitStartEvent.self
     ]
 
     /// Decode the appropriate event type for a given method

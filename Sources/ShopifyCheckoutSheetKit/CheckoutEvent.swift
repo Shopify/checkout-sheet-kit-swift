@@ -32,6 +32,8 @@ public protocol CheckoutNotification {
     static var method: String { get }
 
     /// Instance accessor for the method name.
+    /// While technically redundant for structs, this improves developer experience
+    /// by making the method property visible in autocomplete when working with event instances.
     var method: String { get }
 }
 
@@ -121,15 +123,15 @@ public protocol CheckoutRequest: CheckoutNotification {
 internal protocol CheckoutRequestInternal: CheckoutRequest {
     /// Internal accessor to the RPC request for delegation.
     /// Implementations should return their `rpcRequest` property.
-    var _internalRPCRequest: (any RPCRequest)? { get }
+    var internalRPCRequest: (any RPCRequest)? { get }
 }
 
 /// Default implementations for respond methods.
 /// All request events can use these to delegate to their internal RPC request.
 extension CheckoutRequestInternal {
     public func respondWith(payload: ResponsePayload) throws {
-        guard let rpc = _internalRPCRequest else {
-            return
+        guard let rpc = internalRPCRequest else {
+            throw CheckoutEventResponseError.internalError("Internal RPC request is nil")
         }
         // Encode payload to JSON and use the type-erased respondWith(json:) method
         let encoder = JSONEncoder()
@@ -141,15 +143,15 @@ extension CheckoutRequestInternal {
     }
 
     public func respondWith(json jsonString: String) throws {
-        guard let rpc = _internalRPCRequest else {
-            return
+        guard let rpc = internalRPCRequest else {
+            throw CheckoutEventResponseError.internalError("Internal RPC request is nil")
         }
         try rpc.respondWith(json: jsonString)
     }
 
     public func respondWith(error: String) throws {
-        guard let rpc = _internalRPCRequest else {
-            return
+        guard let rpc = internalRPCRequest else {
+            throw CheckoutEventResponseError.internalError("Internal RPC request is nil")
         }
         try rpc.respondWith(error: error)
     }

@@ -71,7 +71,7 @@ class CheckoutSubmitStartTests: XCTestCase {
 
     // MARK: - Helper Methods
 
-    private func createRequest(webview: MockWebView? = nil, checkoutId: String = "test-checkout-123") throws -> CheckoutSubmitStart {
+    private func createRequest(webview: MockWebView? = nil, checkoutId: String = "test-checkout-123") throws -> CheckoutSubmitStartEvent {
         let jsonString = """
         {
             "jsonrpc": "2.0",
@@ -86,7 +86,7 @@ class CheckoutSubmitStartTests: XCTestCase {
         }
         """
         let data = jsonString.data(using: .utf8)!
-        let request = try CheckoutSubmitStart.decode(from: data, webview: webview ?? MockWebView())
+        let request = try CheckoutSubmitStartEvent.decode(from: data, webview: webview ?? MockWebView())
         return request
     }
 }

@@ -26,7 +26,7 @@ import WebKit
 
 /// Internal RPC request class for address change validation
 internal class CheckoutAddressChangeStartRPCRequest: BaseRPCRequest<
-    CheckoutAddressChangeStart.Params,
+    CheckoutAddressChangeStartEvent.Params,
     CheckoutAddressChangeStartResponsePayload
 > {
     override class var method: String { "checkout.addressChangeStart" }
@@ -58,12 +58,16 @@ internal class CheckoutAddressChangeStartRPCRequest: BaseRPCRequest<
 
 /// Event triggered when the checkout requests address change.
 /// This allows native apps to provide address selection.
-public struct CheckoutAddressChangeStart: CheckoutRequestInternal, CheckoutRequestDecodable {
+public struct CheckoutAddressChangeStartEvent: CheckoutRequestInternal, CheckoutRequestDecodable {
     public typealias ResponsePayload = CheckoutAddressChangeStartResponsePayload
 
     public static let method = "checkout.addressChangeStart"
 
-    public var id: String { rpcRequest.id ?? "" }
+    /// Request ID for correlating responses.
+    /// Force-unwrapped because request events must have an ID per JSON-RPC 2.0.
+    /// If this crashes, the WebView sent a malformed request.
+    /// TODO: Emit a checkout error event instead of crashing for better recovery.
+    public var id: String { rpcRequest.id! }
     public var addressType: String { rpcRequest.params.addressType }
     public var cart: Cart { rpcRequest.params.cart }
 
@@ -73,17 +77,17 @@ public struct CheckoutAddressChangeStart: CheckoutRequestInternal, CheckoutReque
         self.rpcRequest = rpcRequest
     }
 
-    var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
+    var internalRPCRequest: (any RPCRequest)? { rpcRequest }
 
     internal struct Params: Codable {
         let addressType: String
         let cart: Cart
     }
 
-    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutAddressChangeStart {
+    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutAddressChangeStartEvent {
         let rpcRequest = try JSONDecoder().decode(CheckoutAddressChangeStartRPCRequest.self, from: data)
         rpcRequest.webview = webview
-        return CheckoutAddressChangeStart(rpcRequest: rpcRequest)
+        return CheckoutAddressChangeStartEvent(rpcRequest: rpcRequest)
     }
 }
 
