@@ -24,18 +24,16 @@
 import Foundation
 import WebKit
 
-let METHOD = "checkout.submitStart"
-
 /// Event triggered when the checkout submit process starts.
 /// This allows native apps to provide payment tokens or modify the cart before submission.
 public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodable {
     public typealias Params = CheckoutSubmitStartParams
     public typealias ResponsePayload = CheckoutSubmitStartResponsePayload
 
-    public static let method = METHOD
+    public static let method = "checkout.submitStart"
 
     internal final class SubmitStartRequest: BaseRPCRequest<Params, ResponsePayload> {
-        override static var method: String { METHOD }
+        override static var method: String { CheckoutSubmitStartEvent.method }
     }
 
     typealias Request = SubmitStartRequest
