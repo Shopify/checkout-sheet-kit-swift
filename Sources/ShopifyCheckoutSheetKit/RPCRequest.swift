@@ -138,9 +138,7 @@ extension RPCRequest {
     /// React Native bridge will send a string to decode into Payload
     func respondWith(json jsonString: String) throws {
         do {
-            guard let payload = try? decode(from: jsonString) else {
-                return try respondWith(error: jsonString)
-            }
+            let payload = try decode(from: jsonString)
             let response = Response(id: id, result: payload)
             try respondWith(response: response)
         } catch {
@@ -152,11 +150,6 @@ extension RPCRequest {
 
     func respondWith(payload: ResponsePayload) throws {
         let response = Response(id: id, result: payload)
-        try respondWith(response: response)
-    }
-
-    func respondWith(error: String) throws {
-        let response = Response(id: id, error: error)
         try respondWith(response: response)
     }
 

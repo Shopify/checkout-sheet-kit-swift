@@ -117,9 +117,4 @@ public protocol CheckoutRequest: CheckoutNotification {
     ///
     /// - Parameter jsonString: A JSON string representing the response payload
     func respondWith(json jsonString: String) throws
-
-    /// Respond with an error message.
-    ///
-    /// - Parameter error: The error message
-    func respondWith(error: String) throws
 }

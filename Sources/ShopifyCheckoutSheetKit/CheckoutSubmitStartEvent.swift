@@ -53,10 +53,6 @@ public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodabl
     public func respondWith(json jsonString: String) throws {
         try rpcRequest.respondWith(json: jsonString)
     }
-
-    public func respondWith(error: String) throws {
-        try rpcRequest.respondWith(error: error)
-    }
 }
 
 public struct CheckoutSubmitStartParams: Codable {

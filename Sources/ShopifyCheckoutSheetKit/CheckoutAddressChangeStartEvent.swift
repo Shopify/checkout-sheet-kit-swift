@@ -24,21 +24,19 @@
 import Foundation
 import WebKit
 
-fileprivate let METHOD = "checkout.paymentMethodChangeStart"
-
 /// Event triggered when the checkout requests address change.
 /// This allows native apps to provide address selection.
 public struct CheckoutAddressChangeStartEvent: CheckoutRequest, CheckoutRequestDecodable {
     public typealias Params = CheckoutAddressChangeStartParams
     public typealias ResponsePayload = CheckoutAddressChangeStartResponsePayload
+    public static let method = "checkout.addressChangeStart"
     internal final class AddressChangeRequest: BaseRPCRequest<Params, ResponsePayload> {
-        override static var method: String { METHOD }
+        override static var method: String { CheckoutAddressChangeStartEvent.method }
     }
 
     typealias Request = AddressChangeRequest
     var rpcRequest: Request
 
-    public static let method = METHOD
     
     public var id: String { rpcRequest.id }
     public var addressType: String { rpcRequest.params.addressType }
@@ -51,12 +49,6 @@ public struct CheckoutAddressChangeStartEvent: CheckoutRequest, CheckoutRequestD
     public func respondWith(json jsonString: String) throws {
         try rpcRequest.respondWith(json: jsonString)
     }
-
-    public func respondWith(error: String) throws {
-        try rpcRequest.respondWith(error: error)
-    }
-
-
 }
 
 public struct CheckoutAddressChangeStartParams: Codable {

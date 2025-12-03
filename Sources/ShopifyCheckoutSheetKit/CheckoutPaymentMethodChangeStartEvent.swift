@@ -24,15 +24,13 @@
 import Foundation
 import WebKit
 
-fileprivate let METHOD = "checkout.paymentMethodChangeStart"
-
 /// Event triggered when the checkout requests payment method change.
 /// This allows native apps to provide payment method selection.
 public struct CheckoutPaymentMethodChangeStartEvent: CheckoutRequest, CheckoutRequestDecodable {
     public typealias Params = CheckoutPaymentMethodChangeStartParams
     public typealias ResponsePayload = CheckoutPaymentMethodChangeStartResponsePayload
 
-    public static let method = METHOD
+    public static let method = "checkout.paymentMethodChangeStart"
 
     internal final class PaymentMethodChangeRequest: BaseRPCRequest<Params, ResponsePayload> {
         override static var method: String { METHOD }
@@ -51,10 +49,6 @@ public struct CheckoutPaymentMethodChangeStartEvent: CheckoutRequest, CheckoutRe
 
     public func respondWith(json jsonString: String) throws {
         try rpcRequest.respondWith(json: jsonString)
-    }
-
-    public func respondWith(error: String) throws {
-        try rpcRequest.respondWith(error: error)
     }
 }
 
