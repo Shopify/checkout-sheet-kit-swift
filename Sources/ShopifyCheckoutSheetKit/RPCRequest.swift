@@ -50,12 +50,12 @@ internal class RPCResponse<Payload: Codable>: Codable {
     /// The value for this member MUST be an Object as defined in section 5.1.
     var error: String?
 
-    init(id: String , result: Payload? = nil) {
+    init(id: String, result: Payload? = nil) {
         self.id = id
         self.result = result
     }
 
-    init(id: String , error: String? = nil) {
+    init(id: String, error: String? = nil) {
         self.id = id
         self.error = error
     }
@@ -101,7 +101,6 @@ struct RPCEnvelope<Params: Decodable>: Decodable {
 
 extension RPCRequest {
     var jsonrpc: String { "2.0" }
-
 
     /// Default Decodable implementation for all RPCRequest types
     init(from decoder: Decoder) throws {

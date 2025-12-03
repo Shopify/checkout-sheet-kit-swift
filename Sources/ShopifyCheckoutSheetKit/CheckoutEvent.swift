@@ -26,7 +26,7 @@ import WebKit
 
 /// Base protocol for all checkout events (notifications and requests).
 /// All checkout events have a method name that identifies their type.
-public protocol CheckoutNotification : Decodable {
+public protocol CheckoutNotification: Decodable {
     /// The method name that identifies this event type.
     /// e.g., "checkout.start", "checkout.addressChangeStart"
     static var method: String { get }
@@ -42,13 +42,13 @@ extension CheckoutNotification {
     public var method: String { Self.method }
 }
 
-/// Internal protocol for type-erased event decoding.
-/// Allows the registry to decode events without knowing their concrete types.
-//internal protocol CheckoutEventDecodable: CheckoutNotification {
+// Internal protocol for type-erased event decoding.
+// Allows the registry to decode events without knowing their concrete types.
+// internal protocol CheckoutEventDecodable: CheckoutNotification {
 //    /// Decode an event from data with optional webview
 //    /// Returns nil if the event requires a webview but none is provided
 ////    static func decodeEvent(from data: Data, webview: WKWebView?) throws -> Any?
-//}
+// }
 
 /// Default decode implementation for notification events.
 /// Eliminates boilerplate for simple one-way events.
@@ -66,18 +66,18 @@ extension CheckoutNotification {
 
         return envelope.params
     }
-    
+
 //    internal static func decode(from data: Data, webview: WKWebView?) throws -> Self {
 //        return try decode(from: data)
 //    }
 }
 
 /// Protocol for request events that have decode(from:webview:) methods
-internal protocol CheckoutRequestDecodable : CheckoutNotification {
+internal protocol CheckoutRequestDecodable: CheckoutNotification {
     associatedtype Params: Decodable
     associatedtype ResponsePayload: Codable
     associatedtype Request: BaseRPCRequest<Params, ResponsePayload>
-    
+
     static func decode(from data: Data, webview: WKWebView) throws -> Self
     init(rpcRequest: Request)
     var rpcRequest: Request { get }
@@ -87,8 +87,8 @@ extension CheckoutRequestDecodable {
     internal static func decode(from data: Data, webview: WKWebView) throws -> Self {
         let rpcRequest = try JSONDecoder().decode(Request.self, from: data)
         rpcRequest.webview = webview
-        
-        return Self.init(rpcRequest: rpcRequest)
+
+        return Self(rpcRequest: rpcRequest)
     }
 }
 
@@ -101,7 +101,7 @@ public protocol CheckoutRequest: CheckoutNotification {
     associatedtype Params: Decodable
     associatedtype ResponsePayload: Codable
 //    associatedtype Request: BaseRPCRequest<Params, ResponsePayload>
-    
+
     /// The type of response payload this request expects
 
     /// Unique identifier for this request, used to correlate responses.

@@ -37,7 +37,6 @@ public struct CheckoutAddressChangeStartEvent: CheckoutRequest, CheckoutRequestD
     typealias Request = AddressChangeRequest
     var rpcRequest: Request
 
-    
     public var id: String { rpcRequest.id }
     public var addressType: String { rpcRequest.params.addressType }
     public var cart: Cart { rpcRequest.params.cart }

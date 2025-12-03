@@ -33,7 +33,7 @@ public struct CheckoutPaymentMethodChangeStartEvent: CheckoutRequest, CheckoutRe
     public static let method = "checkout.paymentMethodChangeStart"
 
     internal final class PaymentMethodChangeRequest: BaseRPCRequest<Params, ResponsePayload> {
-        override static var method: String { METHOD }
+        override static var method: String { CheckoutPaymentMethodChangeStartEvent.method }
     }
 
     typealias Request = PaymentMethodChangeRequest

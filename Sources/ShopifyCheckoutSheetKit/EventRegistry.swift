@@ -30,14 +30,14 @@ enum EventRegistry {
     static let eventTypes: [any CheckoutRequestDecodable.Type] = [
         CheckoutAddressChangeStartEvent.self,
         CheckoutPaymentMethodChangeStartEvent.self,
-        CheckoutSubmitStartEvent.self,
+        CheckoutSubmitStartEvent.self
     ]
 
     static let notifications: [any CheckoutNotification.Type] = [
         CheckoutCompleteEvent.self,
-        CheckoutStartEvent.self,
+        CheckoutStartEvent.self
     ]
-    
+
     /// Decode the appropriate event type for a given method
     /// Returns either a CheckoutNotification or a CheckoutRequest
     /// Returns nil if the method is unsupported or if a request event lacks required webview
