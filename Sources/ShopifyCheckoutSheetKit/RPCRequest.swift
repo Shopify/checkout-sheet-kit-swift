@@ -217,7 +217,6 @@ public enum CheckoutEventResponseError: Error {
     case invalidEncoding
     case decodingFailed(String)
     case validationFailed(String)
-    case internalError(String)
 }
 
 func formatDecodingError(_ error: DecodingError) -> String {
