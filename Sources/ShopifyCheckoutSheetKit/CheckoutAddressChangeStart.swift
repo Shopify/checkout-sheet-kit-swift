@@ -24,10 +24,14 @@
 import Foundation
 import WebKit
 
-public final class CheckoutAddressChangeStart: BaseRPCRequest<CheckoutAddressChangeStartParams, CheckoutAddressChangeStartResponsePayload> {
-    override public static var method: String { "checkout.addressChangeStart" }
+/// Internal RPC request class for address change validation
+internal final class CheckoutAddressChangeStartRPCRequest: BaseRPCRequest<
+    CheckoutAddressChangeStart.Params,
+    CheckoutAddressChangeStartResponsePayload
+> {
+    override class var method: String { "checkout.addressChangeStart" }
 
-    override public func validate(payload: ResponsePayload) throws {
+    override func validate(payload: CheckoutAddressChangeStartResponsePayload) throws {
         guard let cart = payload.cart else {
             return
         }
@@ -52,9 +56,42 @@ public final class CheckoutAddressChangeStart: BaseRPCRequest<CheckoutAddressCha
     }
 }
 
-public struct CheckoutAddressChangeStartParams: Codable {
-    public let addressType: String
-    public let cart: Cart
+/// Event triggered when the checkout requests address change.
+/// This allows native apps to provide address selection.
+public struct CheckoutAddressChangeStart: CheckoutRequestInternal, CheckoutRequestDecodable {
+    public typealias ResponsePayload = CheckoutAddressChangeStartResponsePayload
+
+    public static let method = "checkout.addressChangeStart"
+
+    /// Internal RPC request for handling responses
+    internal let rpcRequest: CheckoutAddressChangeStartRPCRequest
+
+    /// Unique identifier for this request
+    public var id: String { rpcRequest.id ?? "" }
+
+    /// The type of address being changed (e.g., "shipping", "billing")
+    public var addressType: String { rpcRequest.params.addressType }
+
+    /// The current cart state
+    public var cart: Cart { rpcRequest.params.cart }
+
+    internal init(rpcRequest: CheckoutAddressChangeStartRPCRequest) {
+        self.rpcRequest = rpcRequest
+    }
+
+    // CheckoutRequest conformance - provides access to internal RPC for delegation
+    var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
+
+    internal struct Params: Codable {
+        let addressType: String
+        let cart: Cart
+    }
+
+    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutAddressChangeStart {
+        let rpcRequest = try JSONDecoder().decode(CheckoutAddressChangeStartRPCRequest.self, from: data)
+        rpcRequest.webview = webview
+        return CheckoutAddressChangeStart(rpcRequest: rpcRequest)
+    }
 }
 
 public struct CheckoutAddressChangeStartResponsePayload: Codable {

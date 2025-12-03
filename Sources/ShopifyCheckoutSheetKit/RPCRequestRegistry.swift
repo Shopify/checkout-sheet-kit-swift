@@ -24,41 +24,45 @@
 import Foundation
 import WebKit
 
-/// Registry of all supported RPC request types
+/// Registry of all supported checkout event types
 enum RPCRequestRegistry {
-    /// Array of all supported request types
-    static let requestTypes: [any RPCRequest.Type] = [
+    /// Array of all supported event types that conform to CheckoutEventDecodable
+    static let eventTypes: [any CheckoutEventDecodable.Type] = [
+        // Notification events
+        CheckoutStartEvent.self,
+        CheckoutCompleteEvent.self,
+
+        // Request events
         CheckoutAddressChangeStart.self,
-        CheckoutPaymentMethodChangeStart.self,
-        CheckoutCompleteRequest.self,
-        CheckoutErrorRequest.self,
-        CheckoutModalToggledRequest.self,
-        CheckoutStartRequest.self,
-        CheckoutSubmitStart.self
+        CheckoutSubmitStart.self,
+        CheckoutPaymentMethodChangeStart.self
     ]
 
-    /// Find the request type for a given method name
-    /// for:method corresponds to RPCRequest.method
-    /// for:method is used to select correct Decoder
-    static func requestType(for method: String) -> (any RPCRequest.Type)? {
-        return requestTypes.first { $0.method == method }
-    }
-
-    /// Decode the appropriate request type for a given method
-    /// for:method corresponds to RPCRequest.method
-    /// for:method is used to select correct Decoder
-    static func decode(for method: String, from data: Data, webview: WKWebView) throws -> (any RPCRequest)? {
-        guard let requestType = requestTypes.first(where: { $0.method == method }) else {
-            return nil
+    /// Decode the appropriate event type for a given method
+    /// Returns either a CheckoutNotification or a CheckoutRequest
+    /// Returns nil if the method is unsupported or if a request event lacks required webview
+    static func decode(for method: String, from data: Data, webview: WKWebView?) throws -> Any? {
+        // Try to find matching event type using type-erased registry
+        if let eventType = eventTypes.first(where: { $0.method == method }) {
+            return try eventType.decodeEvent(from: data, webview: webview)
         }
 
-        // Cast to our type-erased protocol and decode
-        guard let decodableType = requestType as? any TypeErasedRPCDecodable.Type else {
+        // Legacy RPC events (kept for internal compatibility)
+        switch method {
+        case CheckoutErrorRequest.method:
+            guard let webview = webview else { return nil }
+            let request = try CheckoutErrorRequest.decodeErased(from: data)
+            request.webview = webview
+            return request
+
+        case CheckoutModalToggledRequest.method:
+            guard let webview = webview else { return nil }
+            let request = try CheckoutModalToggledRequest.decodeErased(from: data)
+            request.webview = webview
+            return request
+
+        default:
             return nil
         }
-
-        let request = try decodableType.decodeErased(from: data)
-        request.webview = webview
-        return request
     }
 }

@@ -77,7 +77,7 @@ extension CheckoutController: CheckoutDelegate {
     }
 
     func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
-        OSLogger.shared.debug("[CheckoutDelegate] Address change start received for addressType: \(event.params.addressType)")
+        OSLogger.shared.debug("[CheckoutDelegate] Address change start received for addressType: \(event.addressType)")
 
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {

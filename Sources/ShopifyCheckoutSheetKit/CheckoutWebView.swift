@@ -262,8 +262,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
         guard let viewDelegate else { return }
 
         do {
-            let request = try CheckoutBridge.decode(message)
-            handleBridgeRequest(request, viewDelegate: viewDelegate)
+            let event = try CheckoutBridge.decode(message)
+            handleBridgeEvent(event, viewDelegate: viewDelegate)
         } catch {
             OSLogger.shared.error(
                 "[CheckoutWebView]: Failed to decode event: \(error.localizedDescription)"
@@ -272,24 +272,21 @@ extension CheckoutWebView: WKScriptMessageHandler {
         }
     }
 
-    private func handleBridgeRequest(_ request: any RPCRequest, viewDelegate: CheckoutWebViewDelegate) {
-        switch request {
-        case let startRequest as CheckoutStartRequest:
+    private func handleBridgeEvent(_ event: Any, viewDelegate: CheckoutWebViewDelegate) {
+        switch event {
+        // Notification events (CheckoutNotification)
+        case let startEvent as CheckoutStartEvent:
             OSLogger.shared.info("Checkout start event received")
-            viewDelegate.checkoutViewDidStart(event: startRequest.params)
+            viewDelegate.checkoutViewDidStart(event: startEvent)
 
-        case let completeRequest as CheckoutCompleteRequest:
+        case let completeEvent as CheckoutCompleteEvent:
             OSLogger.shared.info("Checkout completed event received")
-            viewDelegate.checkoutViewDidCompleteCheckout(event: completeRequest.params)
+            viewDelegate.checkoutViewDidCompleteCheckout(event: completeEvent)
 
-        case let modalRequest as CheckoutModalToggledRequest:
-            viewDelegate.checkoutViewDidToggleModal(
-                modalVisible: modalRequest.params.modalVisible
-            )
-
+        // Request events (CheckoutRequest)
         case let addressRequest as CheckoutAddressChangeStart:
             OSLogger.shared.info(
-                "Address change start event received: \(addressRequest.params.addressType)"
+                "Address change start event received: \(addressRequest.addressType)"
             )
             viewDelegate.checkoutViewDidStartAddressChange(event: addressRequest)
 
@@ -305,16 +302,22 @@ extension CheckoutWebView: WKScriptMessageHandler {
             )
             viewDelegate.checkoutViewDidStartSubmit(event: submitRequest)
 
+        // Legacy internal RPC events
+        case let modalRequest as CheckoutModalToggledRequest:
+            viewDelegate.checkoutViewDidToggleModal(
+                modalVisible: modalRequest.params.modalVisible
+            )
+
         case let errorRequest as CheckoutErrorRequest:
             handleCheckoutError(errorRequest)
 
         // Ignore unsupported requests
         case let unsupportedRequest as UnsupportedRequest:
-            OSLogger.shared.debug("Unsupported request: \(unsupportedRequest.actualMethod) (id: \(String(describing: request.id)))")
+            OSLogger.shared.debug("Unsupported request: \(unsupportedRequest.actualMethod) (id: \(String(describing: unsupportedRequest.id)))")
 
         default:
             OSLogger.shared.debug(
-                "Unknown request type received \(String(describing: request.id))"
+                "Unknown event type received"
             )
         }
     }

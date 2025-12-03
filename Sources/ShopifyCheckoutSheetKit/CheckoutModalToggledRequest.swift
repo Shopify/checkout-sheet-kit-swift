@@ -25,22 +25,22 @@ import Foundation
 import WebKit
 
 /// Parameters for modal toggle events - contains visibility state
-public struct CheckoutModalToggledParams: Decodable {
-    public let modalVisible: Bool
+internal struct CheckoutModalToggledParams: Decodable {
+    let modalVisible: Bool
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         // The params is a string "true" or "false" directly
         let container = try decoder.singleValueContainer()
         let visibleString = try container.decode(String.self)
         modalVisible = Bool(visibleString) ?? false
     }
 
-    public init(modalVisible: Bool) {
+    init(modalVisible: Bool) {
         self.modalVisible = modalVisible
     }
 }
 
 /// Request for checkout modal toggle events
-public final class CheckoutModalToggledRequest: BaseRPCRequest<CheckoutModalToggledParams, EmptyResponse> {
-    override public static var method: String { "checkoutBlockingEvent" }
+internal final class CheckoutModalToggledRequest: BaseRPCRequest<CheckoutModalToggledParams, EmptyResponse> {
+    override static var method: String { "checkoutBlockingEvent" }
 }

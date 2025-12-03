@@ -24,13 +24,50 @@
 import Foundation
 import WebKit
 
-public final class CheckoutSubmitStart: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload> {
-    override public static var method: String { "checkout.submitStart" }
+/// Internal RPC request class for submit start
+internal final class CheckoutSubmitStartRPCRequest: BaseRPCRequest<
+    CheckoutSubmitStart.Params,
+    CheckoutSubmitStartResponsePayload
+> {
+    override class var method: String { "checkout.submitStart" }
 }
 
-public struct CheckoutSubmitStartParams: Codable {
-    public let cart: Cart
-    public let checkout: Checkout
+/// Event triggered when the checkout submit process starts.
+/// This allows native apps to provide payment tokens or modify the cart before submission.
+public struct CheckoutSubmitStart: CheckoutRequestInternal, CheckoutRequestDecodable {
+    public typealias ResponsePayload = CheckoutSubmitStartResponsePayload
+
+    public static let method = "checkout.submitStart"
+
+    /// Internal RPC request for handling responses
+    internal let rpcRequest: CheckoutSubmitStartRPCRequest
+
+    /// Unique identifier for this request
+    public var id: String { rpcRequest.id ?? "" }
+
+    /// The current cart state
+    public var cart: Cart { rpcRequest.params.cart }
+
+    /// The current checkout state
+    public var checkout: Checkout { rpcRequest.params.checkout }
+
+    internal init(rpcRequest: CheckoutSubmitStartRPCRequest) {
+        self.rpcRequest = rpcRequest
+    }
+
+    // CheckoutRequest conformance - provides access to internal RPC for delegation
+    var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
+
+    internal struct Params: Codable {
+        let cart: Cart
+        let checkout: Checkout
+    }
+
+    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutSubmitStart {
+        let rpcRequest = try JSONDecoder().decode(CheckoutSubmitStartRPCRequest.self, from: data)
+        rpcRequest.webview = webview
+        return CheckoutSubmitStart(rpcRequest: rpcRequest)
+    }
 }
 
 public struct CheckoutSubmitStartResponsePayload: Codable {

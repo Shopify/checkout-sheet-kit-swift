@@ -25,10 +25,10 @@ import Foundation
 import WebKit
 
 /// Parameters for error events - array of error events
-public struct CheckoutErrorParams: Decodable {
-    public let errors: [CheckoutErrorEvent]
+internal struct CheckoutErrorParams: Decodable {
+    let errors: [CheckoutErrorEvent]
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         // The params is an array directly
         let container = try decoder.singleValueContainer()
         errors = try container.decode([CheckoutErrorEvent].self)
@@ -36,11 +36,11 @@ public struct CheckoutErrorParams: Decodable {
 }
 
 /// Request for checkout error events
-public final class CheckoutErrorRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse> {
-    override public static var method: String { "error" }
+internal final class CheckoutErrorRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse> {
+    override static var method: String { "error" }
 
     /// Convenience getter to access the first error
-    public var firstError: CheckoutErrorEvent? {
+    var firstError: CheckoutErrorEvent? {
         return params.errors.first
     }
 }

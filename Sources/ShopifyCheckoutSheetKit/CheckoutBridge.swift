@@ -75,7 +75,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         }
     }
 
-    static func decode(_ message: WKScriptMessage) throws -> any RPCRequest {
+    static func decode(_ message: WKScriptMessage) throws -> Any {
         guard let body = message.body as? String, let data = body.data(using: .utf8) else {
             throw BridgeError.invalidBridgeEvent()
         }
@@ -89,7 +89,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
             guard
                 let webview = message.webView,
-                let request = try RPCRequestRegistry.decode(
+                let event = try RPCRequestRegistry.decode(
                     for: extractor.method,
                     from: data,
                     webview: webview
@@ -99,7 +99,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
                 return UnsupportedRequest(id: envelope.id, actualMethod: envelope.method)
             }
 
-            return request
+            return event
         } catch {
             throw BridgeError.invalidBridgeEvent(error)
         }

@@ -566,3 +566,13 @@ public struct Checkout: Codable {
         self.id = id
     }
 }
+
+// MARK: - Internal RPC Envelope Types
+
+/// Generic envelope for decoding checkout notification events (one-way messages).
+/// Used internally to parse JSON-RPC notification messages.
+internal struct CheckoutNotificationEnvelope<T: Decodable>: Decodable {
+    let jsonrpc: String
+    let method: String
+    let params: T
+}

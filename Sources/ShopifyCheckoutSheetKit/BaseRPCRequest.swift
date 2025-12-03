@@ -25,28 +25,28 @@ import Foundation
 import WebKit
 
 /// Base class for all RPC request implementations
-public class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
-    public typealias Params = P
-    public typealias ResponsePayload = R
+internal class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
+    typealias Params = P
+    typealias ResponsePayload = R
 
-    public let id: String?
-    public let params: Params
-    public weak var webview: WKWebView?
+    let id: String?
+    let params: Params
+    weak var webview: WKWebView?
 
     /// Subclasses must override this to provide their method name
-    public class var method: String {
+    class var method: String {
         fatalError("Subclasses must override method")
     }
 
     /// Required initializer that all RPC requests must implement
-    public required init(id: String?, params: Params) {
+    required init(id: String?, params: Params) {
         self.id = id
         self.params = params
         webview = nil
     }
 
     /// Default validation does nothing - subclasses can override
-    public func validate(payload _: ResponsePayload) throws {
+    func validate(payload _: ResponsePayload) throws {
         // Subclasses can override if they need validation
     }
 }

@@ -24,12 +24,46 @@
 import Foundation
 import WebKit
 
-public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload> {
-    override public static var method: String { "checkout.paymentMethodChangeStart" }
+/// Internal RPC request class for payment method change
+internal final class CheckoutPaymentMethodChangeStartRPCRequest: BaseRPCRequest<
+    CheckoutPaymentMethodChangeStart.Params,
+    CheckoutPaymentMethodChangeStartResponsePayload
+> {
+    override class var method: String { "checkout.paymentMethodChangeStart" }
 }
 
-public struct CheckoutPaymentMethodChangeStartParams: Codable {
-    public let cart: Cart
+/// Event triggered when the checkout requests payment method change.
+/// This allows native apps to provide payment method selection.
+public struct CheckoutPaymentMethodChangeStart: CheckoutRequestInternal, CheckoutRequestDecodable {
+    public typealias ResponsePayload = CheckoutPaymentMethodChangeStartResponsePayload
+
+    public static let method = "checkout.paymentMethodChangeStart"
+
+    /// Internal RPC request for handling responses
+    internal let rpcRequest: CheckoutPaymentMethodChangeStartRPCRequest
+
+    /// Unique identifier for this request
+    public var id: String { rpcRequest.id ?? "" }
+
+    /// The current cart state
+    public var cart: Cart { rpcRequest.params.cart }
+
+    internal init(rpcRequest: CheckoutPaymentMethodChangeStartRPCRequest) {
+        self.rpcRequest = rpcRequest
+    }
+
+    // CheckoutRequest conformance - provides access to internal RPC for delegation
+    var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
+
+    internal struct Params: Codable {
+        let cart: Cart
+    }
+
+    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutPaymentMethodChangeStart {
+        let rpcRequest = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartRPCRequest.self, from: data)
+        rpcRequest.webview = webview
+        return CheckoutPaymentMethodChangeStart(rpcRequest: rpcRequest)
+    }
 }
 
 public struct CheckoutPaymentMethodChangeStartResponsePayload: Codable {

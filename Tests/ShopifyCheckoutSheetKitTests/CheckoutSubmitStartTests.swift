@@ -29,12 +29,7 @@ class CheckoutSubmitStartTests: XCTestCase {
 
     func testRespondWithSendsJavaScriptToWebView() throws {
         let mockWebView = MockWebView()
-        let params = CheckoutSubmitStartParams(
-            cart: createTestCart(),
-            checkout: Checkout(id: "test-checkout-123")
-        )
-        let request = CheckoutSubmitStart(id: "test-id-456", params: params)
-        request.webview = mockWebView
+        let request = try createRequest(webview: mockWebView)
 
         let payload = CheckoutSubmitStartResponsePayload(payment: nil, cart: nil, errors: nil)
 
@@ -57,35 +52,41 @@ class CheckoutSubmitStartTests: XCTestCase {
         XCTAssertTrue(capturedJS.contains("\"result\""), "Should include result field")
     }
 
+    func testCartIsFlattened() throws {
+        let request = try createRequest()
+        XCTAssertNotNil(request.cart, "cart should be accessible directly")
+    }
+
+    func testCheckoutIsFlattened() throws {
+        let request = try createRequest()
+        XCTAssertNotNil(request.checkout, "checkout should be accessible directly")
+    }
+
     // MARK: - Decoding Tests
 
     func testDecodesCheckoutSessionId() throws {
-        let json = """
+        let request = try createRequest(checkoutId: "checkout-session-123")
+        XCTAssertEqual(request.checkout.id, "checkout-session-123")
+    }
+
+    // MARK: - Helper Methods
+
+    private func createRequest(webview: MockWebView? = nil, checkoutId: String = "test-checkout-123") throws -> CheckoutSubmitStart {
+        let jsonString = """
         {
-            "cart": {
-                "id": "gid://shopify/Cart/test-cart-789",
-                "lines": [],
-                "cost": {
-                    "subtotalAmount": {"amount": "75.00", "currencyCode": "CAD"},
-                    "totalAmount": {"amount": "75.00", "currencyCode": "CAD"}
-                },
-                "buyerIdentity": {},
-                "deliveryGroups": [],
-                "discountCodes": [],
-                "appliedGiftCards": [],
-                "discountAllocations": [],
-                "delivery": {"addresses": []},
-                "payment": {"instruments": []}
-            },
-            "checkout": {
-                "id": "checkout-session-123"
+            "jsonrpc": "2.0",
+            "id": "test-id-456",
+            "method": "checkout.submitStart",
+            "params": {
+                "cart": \(createTestCartJSON()),
+                "checkout": {
+                    "id": "\(checkoutId)"
+                }
             }
         }
         """
-
-        let data = json.data(using: .utf8)!
-        let params = try JSONDecoder().decode(CheckoutSubmitStartParams.self, from: data)
-
-        XCTAssertEqual(params.checkout.id, "checkout-session-123")
+        let data = jsonString.data(using: .utf8)!
+        let request = try CheckoutSubmitStart.decode(from: data, webview: webview ?? MockWebView())
+        return request
     }
 }
