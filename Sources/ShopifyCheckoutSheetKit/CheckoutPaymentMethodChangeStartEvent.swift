@@ -24,21 +24,13 @@
 import Foundation
 import WebKit
 
-/// Internal RPC request class for payment method change
-internal class CheckoutPaymentMethodChangeStartRPCRequestEvent: BaseRPCRequest<
-    CheckoutPaymentMethodChangeStart.Params,
-    CheckoutPaymentMethodChangeStartResponsePayload
-> {
-    override class var method: String { "checkout.paymentMethodChangeStart" }
-}
-
 /// Event triggered when the checkout requests payment method change.
 /// This allows native apps to provide payment method selection.
-public struct CheckoutPaymentMethodChangeStart: CheckoutRequest, CheckoutRequestDecodable {
+public struct CheckoutPaymentMethodChangeStartEvent: CheckoutRequest, CheckoutRequestDecodable {
+    public typealias Params = CheckoutPaymentMethodChangeStartParams
     public typealias ResponsePayload = CheckoutPaymentMethodChangeStartResponsePayload
 
     public static let method = "checkout.paymentMethodChangeStart"
-
     /// Request ID for correlating responses.
     /// Force-unwrapped because request events must have an ID per JSON-RPC 2.0.
     /// If this crashes, the WebView sent a malformed request.
@@ -46,9 +38,9 @@ public struct CheckoutPaymentMethodChangeStart: CheckoutRequest, CheckoutRequest
     public var id: String { rpcRequest.id! }
     public var cart: Cart { rpcRequest.params.cart }
 
-    internal let rpcRequest: CheckoutPaymentMethodChangeStartRPCRequestEvent
+    internal let rpcRequest: Request
 
-    internal init(rpcRequest: CheckoutPaymentMethodChangeStartRPCRequestEvent) {
+    internal init(rpcRequest: Request) {
         self.rpcRequest = rpcRequest
     }
 
@@ -64,15 +56,15 @@ public struct CheckoutPaymentMethodChangeStart: CheckoutRequest, CheckoutRequest
         try rpcRequest.respondWith(error: error)
     }
 
-    internal struct Params: Codable {
-        let cart: Cart
-    }
-
-    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutPaymentMethodChangeStart {
-        let rpcRequest = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartRPCRequestEvent.self, from: data)
+    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutPaymentMethodChangeStartEvent {
+        let rpcRequest = try JSONDecoder().decode(Request.self, from: data)
         rpcRequest.webview = webview
-        return CheckoutPaymentMethodChangeStart(rpcRequest: rpcRequest)
+        return CheckoutPaymentMethodChangeStartEvent(rpcRequest: rpcRequest)
     }
+}
+
+public struct CheckoutPaymentMethodChangeStartParams: Codable {
+    let cart: Cart
 }
 
 public struct CheckoutPaymentMethodChangeStartResponsePayload: Codable {

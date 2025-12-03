@@ -24,17 +24,10 @@
 import Foundation
 import WebKit
 
-/// Internal RPC request class for submit start
-internal class CheckoutSubmitStartRPCRequest: BaseRPCRequest<
-    CheckoutSubmitStartEvent.Params,
-    CheckoutSubmitStartResponsePayload
-> {
-    override class var method: String { "checkout.submitStart" }
-}
-
 /// Event triggered when the checkout submit process starts.
 /// This allows native apps to provide payment tokens or modify the cart before submission.
 public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodable {
+    public typealias Params = CheckoutSubmitStartParams
     public typealias ResponsePayload = CheckoutSubmitStartResponsePayload
 
     public static let method = "checkout.submitStart"
@@ -47,9 +40,9 @@ public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodabl
     public var cart: Cart { rpcRequest.params.cart }
     public var checkout: Checkout { rpcRequest.params.checkout }
 
-    internal let rpcRequest: CheckoutSubmitStartRPCRequest
+    internal let rpcRequest: Request
 
-    internal init(rpcRequest: CheckoutSubmitStartRPCRequest) {
+    internal init(rpcRequest: Request) {
         self.rpcRequest = rpcRequest
     }
 
@@ -65,16 +58,16 @@ public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodabl
         try rpcRequest.respondWith(error: error)
     }
 
-    internal struct Params: Codable {
-        let cart: Cart
-        let checkout: Checkout
-    }
-
     internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutSubmitStartEvent {
-        let rpcRequest = try JSONDecoder().decode(CheckoutSubmitStartRPCRequest.self, from: data)
+        let rpcRequest = try JSONDecoder().decode(Request.self, from: data)
         rpcRequest.webview = webview
         return CheckoutSubmitStartEvent(rpcRequest: rpcRequest)
     }
+}
+
+public struct CheckoutSubmitStartParams: Codable {
+    let cart: Cart
+    let checkout: Checkout
 }
 
 public struct CheckoutSubmitStartResponsePayload: Codable {

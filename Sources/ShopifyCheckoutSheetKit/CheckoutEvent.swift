@@ -96,8 +96,10 @@ extension CheckoutRequestDecodable {
 /// responses back. Examples include address selection, payment method changes,
 /// and submit interception.
 public protocol CheckoutRequest: CheckoutNotification {
-    /// The type of response payload this request expects
+    associatedtype Params: Decodable
     associatedtype ResponsePayload: Codable
+
+    /// The type of response payload this request expects
 
     /// Unique identifier for this request, used to correlate responses.
     var id: String { get }
@@ -119,3 +121,6 @@ public protocol CheckoutRequest: CheckoutNotification {
     func respondWith(error: String) throws
 }
 
+extension CheckoutRequest {
+    internal typealias Request = BaseRPCRequest<Params, ResponsePayload>
+}
