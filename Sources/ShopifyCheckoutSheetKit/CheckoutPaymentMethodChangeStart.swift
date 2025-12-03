@@ -34,7 +34,7 @@ internal class CheckoutPaymentMethodChangeStartRPCRequestEvent: BaseRPCRequest<
 
 /// Event triggered when the checkout requests payment method change.
 /// This allows native apps to provide payment method selection.
-public struct CheckoutPaymentMethodChangeStart: CheckoutRequestInternal, CheckoutRequestDecodable {
+public struct CheckoutPaymentMethodChangeStart: CheckoutRequest, CheckoutRequestDecodable {
     public typealias ResponsePayload = CheckoutPaymentMethodChangeStartResponsePayload
 
     public static let method = "checkout.paymentMethodChangeStart"
@@ -52,7 +52,17 @@ public struct CheckoutPaymentMethodChangeStart: CheckoutRequestInternal, Checkou
         self.rpcRequest = rpcRequest
     }
 
-    var internalRPCRequest: (any RPCRequest)? { rpcRequest }
+    public func respondWith(payload: ResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
+
+    public func respondWith(error: String) throws {
+        try rpcRequest.respondWith(error: error)
+    }
 
     internal struct Params: Codable {
         let cart: Cart

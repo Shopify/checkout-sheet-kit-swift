@@ -34,7 +34,7 @@ internal class CheckoutSubmitStartRPCRequest: BaseRPCRequest<
 
 /// Event triggered when the checkout submit process starts.
 /// This allows native apps to provide payment tokens or modify the cart before submission.
-public struct CheckoutSubmitStartEvent: CheckoutRequestInternal, CheckoutRequestDecodable {
+public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodable {
     public typealias ResponsePayload = CheckoutSubmitStartResponsePayload
 
     public static let method = "checkout.submitStart"
@@ -53,7 +53,17 @@ public struct CheckoutSubmitStartEvent: CheckoutRequestInternal, CheckoutRequest
         self.rpcRequest = rpcRequest
     }
 
-    var internalRPCRequest: (any RPCRequest)? { rpcRequest }
+    public func respondWith(payload: ResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
+
+    public func respondWith(error: String) throws {
+        try rpcRequest.respondWith(error: error)
+    }
 
     internal struct Params: Codable {
         let cart: Cart

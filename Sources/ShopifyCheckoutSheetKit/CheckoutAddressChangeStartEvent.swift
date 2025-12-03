@@ -58,7 +58,7 @@ internal class CheckoutAddressChangeStartRPCRequest: BaseRPCRequest<
 
 /// Event triggered when the checkout requests address change.
 /// This allows native apps to provide address selection.
-public struct CheckoutAddressChangeStartEvent: CheckoutRequestInternal, CheckoutRequestDecodable {
+public struct CheckoutAddressChangeStartEvent: CheckoutRequest, CheckoutRequestDecodable {
     public typealias ResponsePayload = CheckoutAddressChangeStartResponsePayload
 
     public static let method = "checkout.addressChangeStart"
@@ -77,7 +77,17 @@ public struct CheckoutAddressChangeStartEvent: CheckoutRequestInternal, Checkout
         self.rpcRequest = rpcRequest
     }
 
-    var internalRPCRequest: (any RPCRequest)? { rpcRequest }
+    public func respondWith(payload: ResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
+
+    public func respondWith(error: String) throws {
+        try rpcRequest.respondWith(error: error)
+    }
 
     internal struct Params: Codable {
         let addressType: String

@@ -183,6 +183,9 @@ class AddressSelectionViewController: UIViewController {
             case .invalidEncoding:
                 OSLogger.shared.error("[AddressSelection] Invalid encoding")
                 showError(message: "Invalid encoding")
+            case .internalError(_):
+                OSLogger.shared.error("[AddressSelection] Internal error")
+                showError(message: "Internal error")
             }
             // Stay on screen so user can select a different address
         } catch {
