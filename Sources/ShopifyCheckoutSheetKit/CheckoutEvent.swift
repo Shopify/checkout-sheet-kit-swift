@@ -69,8 +69,8 @@ extension CheckoutNotification where Self: Decodable {
 /// Default decodeEvent implementation for notification events.
 /// Notification events don't require a webview.
 extension CheckoutEventDecodable where Self: Decodable {
-    internal static func decodeEvent(from data: Data, webview: WKWebView?) throws -> Any? {
-        return try Self.decode(from: data)
+    internal static func decodeEvent(from data: Data, webview _: WKWebView?) throws -> Any? {
+        return try decode(from: data)
     }
 }
 
@@ -83,7 +83,7 @@ internal protocol CheckoutRequestDecodable: CheckoutEventDecodable {
 /// Request events require a webview and return nil if it's missing.
 extension CheckoutRequestDecodable {
     internal static func decodeEvent(from data: Data, webview: WKWebView?) throws -> Any? {
-        guard let webview = webview else { return nil }
+        guard let webview else { return nil }
         return try Self.decode(from: data, webview: webview)
     }
 }

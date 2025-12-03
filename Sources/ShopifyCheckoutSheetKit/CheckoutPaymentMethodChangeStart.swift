@@ -25,7 +25,7 @@ import Foundation
 import WebKit
 
 /// Internal RPC request class for payment method change
-internal final class CheckoutPaymentMethodChangeStartRPCRequest: BaseRPCRequest<
+internal class CheckoutPaymentMethodChangeStartRPCRequest: BaseRPCRequest<
     CheckoutPaymentMethodChangeStart.Params,
     CheckoutPaymentMethodChangeStartResponsePayload
 > {
@@ -39,20 +39,15 @@ public struct CheckoutPaymentMethodChangeStart: CheckoutRequestInternal, Checkou
 
     public static let method = "checkout.paymentMethodChangeStart"
 
-    /// Internal RPC request for handling responses
-    internal let rpcRequest: CheckoutPaymentMethodChangeStartRPCRequest
-
-    /// Unique identifier for this request
     public var id: String { rpcRequest.id ?? "" }
-
-    /// The current cart state
     public var cart: Cart { rpcRequest.params.cart }
+
+    internal let rpcRequest: CheckoutPaymentMethodChangeStartRPCRequest
 
     internal init(rpcRequest: CheckoutPaymentMethodChangeStartRPCRequest) {
         self.rpcRequest = rpcRequest
     }
 
-    // CheckoutRequest conformance - provides access to internal RPC for delegation
     var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
 
     internal struct Params: Codable {

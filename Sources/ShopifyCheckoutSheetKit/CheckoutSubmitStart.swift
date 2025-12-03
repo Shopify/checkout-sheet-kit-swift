@@ -25,7 +25,7 @@ import Foundation
 import WebKit
 
 /// Internal RPC request class for submit start
-internal final class CheckoutSubmitStartRPCRequest: BaseRPCRequest<
+internal class CheckoutSubmitStartRPCRequest: BaseRPCRequest<
     CheckoutSubmitStart.Params,
     CheckoutSubmitStartResponsePayload
 > {
@@ -39,23 +39,16 @@ public struct CheckoutSubmitStart: CheckoutRequestInternal, CheckoutRequestDecod
 
     public static let method = "checkout.submitStart"
 
-    /// Internal RPC request for handling responses
-    internal let rpcRequest: CheckoutSubmitStartRPCRequest
-
-    /// Unique identifier for this request
     public var id: String { rpcRequest.id ?? "" }
-
-    /// The current cart state
     public var cart: Cart { rpcRequest.params.cart }
-
-    /// The current checkout state
     public var checkout: Checkout { rpcRequest.params.checkout }
+
+    internal let rpcRequest: CheckoutSubmitStartRPCRequest
 
     internal init(rpcRequest: CheckoutSubmitStartRPCRequest) {
         self.rpcRequest = rpcRequest
     }
 
-    // CheckoutRequest conformance - provides access to internal RPC for delegation
     var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
 
     internal struct Params: Codable {

@@ -25,7 +25,7 @@ import Foundation
 import WebKit
 
 /// Internal RPC request class for address change validation
-internal final class CheckoutAddressChangeStartRPCRequest: BaseRPCRequest<
+internal class CheckoutAddressChangeStartRPCRequest: BaseRPCRequest<
     CheckoutAddressChangeStart.Params,
     CheckoutAddressChangeStartResponsePayload
 > {
@@ -63,23 +63,16 @@ public struct CheckoutAddressChangeStart: CheckoutRequestInternal, CheckoutReque
 
     public static let method = "checkout.addressChangeStart"
 
-    /// Internal RPC request for handling responses
-    internal let rpcRequest: CheckoutAddressChangeStartRPCRequest
-
-    /// Unique identifier for this request
     public var id: String { rpcRequest.id ?? "" }
-
-    /// The type of address being changed (e.g., "shipping", "billing")
     public var addressType: String { rpcRequest.params.addressType }
-
-    /// The current cart state
     public var cart: Cart { rpcRequest.params.cart }
+
+    internal let rpcRequest: CheckoutAddressChangeStartRPCRequest
 
     internal init(rpcRequest: CheckoutAddressChangeStartRPCRequest) {
         self.rpcRequest = rpcRequest
     }
 
-    // CheckoutRequest conformance - provides access to internal RPC for delegation
     var _internalRPCRequest: (any RPCRequest)? { rpcRequest }
 
     internal struct Params: Codable {

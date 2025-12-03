@@ -50,13 +50,13 @@ enum RPCRequestRegistry {
         // Legacy RPC events (kept for internal compatibility)
         switch method {
         case CheckoutErrorRequest.method:
-            guard let webview = webview else { return nil }
+            guard let webview else { return nil }
             let request = try CheckoutErrorRequest.decodeErased(from: data)
             request.webview = webview
             return request
 
         case CheckoutModalToggledRequest.method:
-            guard let webview = webview else { return nil }
+            guard let webview else { return nil }
             let request = try CheckoutModalToggledRequest.decodeErased(from: data)
             request.webview = webview
             return request
