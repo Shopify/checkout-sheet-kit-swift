@@ -88,9 +88,9 @@ class ShopifyCheckoutViewController: UIViewController {
 }
 
 extension ShopifyCheckoutViewController: CheckoutDelegate {
-    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStartEvent) {
         OSLogger.shared.debug(
-            "[EmbeddedCheckout] Address change start received for addressType: \(event.params.addressType)"
+            "[EmbeddedCheckout] Address change start received for addressType: \(event.addressType)"
         )
 
         let addressViewController = AddressSelectionViewController(event: event)
@@ -99,7 +99,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         // consumers can push onto the navigation stack
     }
 
-    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStart) {
+    func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent) {
         OSLogger.shared.debug(
             "[EmbeddedCheckout] Payment method change start received"
         )
@@ -129,7 +129,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
         dismiss(animated: true)
     }
 
-    func checkoutDidStartSubmit(event: CheckoutSubmitStart) {
+    func checkoutDidStartSubmit(event: CheckoutSubmitStartEvent) {
         // Respond with a test payment token after 1 second to simulate payment processing
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let paymentToken = PaymentTokenInput(

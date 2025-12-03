@@ -24,13 +24,38 @@
 import Foundation
 import WebKit
 
-public final class CheckoutSubmitStart: BaseRPCRequest<CheckoutSubmitStartParams, CheckoutSubmitStartResponsePayload> {
-    override public static var method: String { "checkout.submitStart" }
+/// Event triggered when the checkout submit process starts.
+/// This allows native apps to provide payment tokens or modify the cart before submission.
+public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodable {
+    public typealias Params = CheckoutSubmitStartParams
+    public typealias ResponsePayload = CheckoutSubmitStartResponsePayload
+
+    public static let method = "checkout.submitStart"
+
+    internal final class SubmitStartRequest: BaseRPCRequest<Params, ResponsePayload> {
+        override static var method: String { CheckoutSubmitStartEvent.method }
+    }
+
+    typealias Request = SubmitStartRequest
+
+    public var id: String { rpcRequest.id }
+    public var cart: Cart { rpcRequest.params.cart }
+    public var checkout: Checkout { rpcRequest.params.checkout }
+
+    internal let rpcRequest: Request
+
+    public func respondWith(payload: ResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
 }
 
 public struct CheckoutSubmitStartParams: Codable {
-    public let cart: Cart
-    public let checkout: Checkout
+    let cart: Cart
+    let checkout: Checkout
 }
 
 public struct CheckoutSubmitStartResponsePayload: Codable {

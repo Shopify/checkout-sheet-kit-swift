@@ -24,17 +24,12 @@
 @testable import ShopifyCheckoutSheetKit
 import XCTest
 
-class CheckoutAddressChangeStartTests: XCTestCase {
+class CheckoutAddressChangeStartEventTests: XCTestCase {
     // MARK: - Response Tests
 
     func testRespondWithSendsJavaScriptToWebView() throws {
         let mockWebView = MockWebView()
-        let params = CheckoutAddressChangeStartParams(
-            addressType: "shipping",
-            cart: createTestCart()
-        )
-        let request = CheckoutAddressChangeStart(id: "test-id-789", params: params)
-        request.webview = mockWebView
+        let request = try createRequest(webview: mockWebView)
 
         let payload = CheckoutAddressChangeStartResponsePayload(
             cart: CartInput(
@@ -68,10 +63,20 @@ class CheckoutAddressChangeStartTests: XCTestCase {
         XCTAssertTrue(capturedJS.contains("\"cart\""), "Should include cart in result")
     }
 
+    func testAddressTypeIsFlattened() throws {
+        let request = try createRequest()
+        XCTAssertEqual(request.addressType, "shipping", "addressType should be accessible directly")
+    }
+
+    func testCartIsFlattened() throws {
+        let request = try createRequest()
+        XCTAssertNotNil(request.cart, "cart should be accessible directly")
+    }
+
     // MARK: - Validation Tests
 
     func testValidateAcceptsValid2CharacterCountryCode() throws {
-        let request = createRequest()
+        let request = try createRequest()
         let payload = CheckoutAddressChangeStartResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
@@ -84,173 +89,18 @@ class CheckoutAddressChangeStartTests: XCTestCase {
             )
         )
 
-        XCTAssertNoThrow(try request.validate(payload: payload))
-    }
-
-    func testValidateRejectsEmptyCountryCode() throws {
-        let request = createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("Country code is required"))
-        }
-    }
-
-    func testValidateRejectsNilCountryCode() throws {
-        let request = createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: nil)
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("Country code is required"))
-        }
-    }
-
-    func testValidateRejects1CharacterCountryCode() throws {
-        let request = createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "U")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("must be exactly 2 characters"))
-            XCTAssertTrue(message.contains("got: 'U'"))
-        }
-    }
-
-    func testValidateRejects3CharacterCountryCode() throws {
-        let request = createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "USA")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("must be exactly 2 characters"))
-            XCTAssertTrue(message.contains("got: 'USA'"))
-        }
-    }
-
-    func testValidateRejectsEmptyAddressesList() throws {
-        let request = createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(addresses: [])
-            )
-        )
-
-        XCTAssertThrowsError(try request.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("At least one address is required"))
-        }
-    }
-
-    func testValidateRejectsNilAddressesList() throws {
-        let request = createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(addresses: nil)
-            )
-        )
-
-        XCTAssertThrowsError(try request.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("At least one address is required"))
-        }
-    }
-
-    func testValidateIncludesIndexInErrorMessage() throws {
-        let request = createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "US")
-                        ),
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "CAN")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("at index 1"))
-            XCTAssertTrue(message.contains("got: 'CAN'"))
-        }
+        XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
     }
 
     func testValidateAllowsNilCart() throws {
-        let request = createRequest()
+        let request = try createRequest()
         let payload = CheckoutAddressChangeStartResponsePayload(cart: nil)
 
-        XCTAssertNoThrow(try request.validate(payload: payload))
+        XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
     }
 
     func testValidateAcceptsMultipleValidAddresses() throws {
-        let request = createRequest()
+        let request = try createRequest()
         let payload = CheckoutAddressChangeStartResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
@@ -269,13 +119,25 @@ class CheckoutAddressChangeStartTests: XCTestCase {
             )
         )
 
-        XCTAssertNoThrow(try request.validate(payload: payload))
+        XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
     }
 
     // MARK: - Helper Methods
 
-    private func createRequest() -> CheckoutAddressChangeStart {
-        let params = CheckoutAddressChangeStartParams(addressType: "shipping", cart: createTestCart())
-        return CheckoutAddressChangeStart(id: nil, params: params)
+    private func createRequest(webview: MockWebView? = nil) throws -> CheckoutAddressChangeStartEvent {
+        let jsonString = """
+        {
+            "jsonrpc": "2.0",
+            "id": "test-id-789",
+            "method": "checkout.addressChangeStart",
+            "params": {
+                "addressType": "shipping",
+                "cart": \(createTestCartJSON())
+            }
+        }
+        """
+        let data = jsonString.data(using: .utf8)!
+        let request = try CheckoutAddressChangeStartEvent.decode(from: data, webview: webview ?? MockWebView())
+        return request
     }
 }

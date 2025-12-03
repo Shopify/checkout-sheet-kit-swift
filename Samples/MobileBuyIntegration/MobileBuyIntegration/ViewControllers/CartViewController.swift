@@ -570,7 +570,7 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStart) {
+    func checkoutDidStartAddressChange(event: CheckoutAddressChangeStartEvent) {
         // Respond with a hardcoded address after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             let address = CartDeliveryAddressInput(

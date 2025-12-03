@@ -24,15 +24,38 @@
 import Foundation
 import WebKit
 
-public final class CheckoutPaymentMethodChangeStart: BaseRPCRequest<CheckoutPaymentMethodChangeStartParams, CheckoutPaymentMethodChangeStartResponsePayload> {
-    override public static var method: String { "checkout.paymentMethodChangeStart" }
+/// Event triggered when the checkout requests address change.
+/// This allows native apps to provide address selection.
+public struct CheckoutAddressChangeStartEvent: CheckoutRequest, CheckoutRequestDecodable {
+    public typealias Params = CheckoutAddressChangeStartParams
+    public typealias ResponsePayload = CheckoutAddressChangeStartResponsePayload
+    public static let method = "checkout.addressChangeStart"
+    internal final class AddressChangeRequest: BaseRPCRequest<Params, ResponsePayload> {
+        override static var method: String { CheckoutAddressChangeStartEvent.method }
+    }
+
+    typealias Request = AddressChangeRequest
+    var rpcRequest: Request
+
+    public var id: String { rpcRequest.id }
+    public var addressType: String { rpcRequest.params.addressType }
+    public var cart: Cart { rpcRequest.params.cart }
+
+    public func respondWith(payload: ResponsePayload) throws {
+        try rpcRequest.respondWith(payload: payload)
+    }
+
+    public func respondWith(json jsonString: String) throws {
+        try rpcRequest.respondWith(json: jsonString)
+    }
 }
 
-public struct CheckoutPaymentMethodChangeStartParams: Codable {
-    public let cart: Cart
+public struct CheckoutAddressChangeStartParams: Codable {
+    let addressType: String
+    let cart: Cart
 }
 
-public struct CheckoutPaymentMethodChangeStartResponsePayload: Codable {
+public struct CheckoutAddressChangeStartResponsePayload: Codable {
     public let cart: CartInput?
     public let errors: [ResponseError]?
 

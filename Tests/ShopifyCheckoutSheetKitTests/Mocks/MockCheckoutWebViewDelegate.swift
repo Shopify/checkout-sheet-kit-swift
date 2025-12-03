@@ -88,15 +88,15 @@ class MockCheckoutWebViewDelegate: CheckoutWebViewDelegate {
         didEmitCheckoutCompleteEventExpectation?.fulfill()
     }
 
-    func checkoutViewDidStartAddressChange(event _: CheckoutAddressChangeStart) {
+    func checkoutViewDidStartAddressChange(event _: CheckoutAddressChangeStartEvent) {
         // Mock implementation - could add expectations here if needed for testing
     }
 
-    func checkoutViewDidStartPaymentMethodChange(event _: CheckoutPaymentMethodChangeStart) {
+    func checkoutViewDidStartPaymentMethodChange(event _: CheckoutPaymentMethodChangeStartEvent) {
         // No-op for tests unless explicitly asserted
     }
 
-    func checkoutViewDidStartSubmit(event _: CheckoutSubmitStart) {
+    func checkoutViewDidStartSubmit(event _: CheckoutSubmitStartEvent) {
         // No-op for tests unless explicitly asserted
     }
 }

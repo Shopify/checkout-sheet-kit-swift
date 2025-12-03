@@ -25,13 +25,13 @@ import Foundation
 import WebKit
 
 /// Empty response for requests that don't return data
-public struct EmptyResponse: Codable {}
+internal struct EmptyResponse: Codable {}
 
 /// Parameters for unsupported/unknown methods - captures raw JSON
-public struct UnsupportedParams: Decodable {
-    public let raw: [String: Any]
+internal struct UnsupportedParams: Decodable {
+    let raw: [String: Any]
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         // Try to capture the raw JSON as a dictionary
         // If it fails, just use an empty dictionary
         if let container = try? decoder.singleValueContainer(),
@@ -43,7 +43,7 @@ public struct UnsupportedParams: Decodable {
         }
     }
 
-    public init(raw: [String: Any] = [:]) {
+    init(raw: [String: Any] = [:]) {
         self.raw = raw
     }
 
@@ -76,21 +76,21 @@ public struct UnsupportedParams: Decodable {
 }
 
 /// Request handler for unsupported/unknown JSON-RPC methods
-public final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyResponse> {
+internal final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyResponse> {
     /// The actual method name that was received
-    public let actualMethod: String
+    let actualMethod: String
 
     /// We use a placeholder method name since this handles any unknown method
-    override public static var method: String { "__unsupported__" }
+    override static var method: String { "__unsupported__" }
 
     /// Custom initializer that captures the actual method name
-    public init(id: String?, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
+    init(id: String, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
         self.actualMethod = actualMethod
         super.init(id: id, params: params)
     }
 
     /// Required initializer from protocol
-    public required init(id: String?, params: UnsupportedParams) {
+    required init(id: String, params: UnsupportedParams) {
         actualMethod = "__unknown__"
         super.init(id: id, params: params)
     }

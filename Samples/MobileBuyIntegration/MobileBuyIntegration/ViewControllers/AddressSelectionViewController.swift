@@ -31,7 +31,7 @@ struct AddressOption {
 }
 
 class AddressSelectionViewController: UIViewController {
-    private let event: CheckoutAddressChangeStart
+    private let event: CheckoutAddressChangeStartEvent
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -100,7 +100,7 @@ class AddressSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: CheckoutAddressChangeStart) {
+    init(event: CheckoutAddressChangeStartEvent) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
     }
@@ -174,9 +174,6 @@ class AddressSelectionViewController: UIViewController {
         } catch let error as CheckoutEventResponseError {
             // Handle specific SDK validation errors
             switch error {
-            case let .validationFailed(message):
-                OSLogger.shared.error("[AddressSelection] Validation failed: \(message)")
-                showError(message: "Validation failed: \(message)")
             case let .decodingFailed(message):
                 OSLogger.shared.error("[AddressSelection] Decoding failed: \(message)")
                 showError(message: "Decoding failed: \(message)")

@@ -37,7 +37,7 @@ struct CardOption {
 }
 
 class CardSelectionViewController: UIViewController {
-    private let event: CheckoutPaymentMethodChangeStart
+    private let event: CheckoutPaymentMethodChangeStartEvent
     private var selectedIndex: Int = 0
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -104,12 +104,12 @@ class CardSelectionViewController: UIViewController {
         )
     ]
 
-    init(event: CheckoutPaymentMethodChangeStart) {
+    init(event: CheckoutPaymentMethodChangeStartEvent) {
         self.event = event
         super.init(nibName: nil, bundle: nil)
 
         // If payment instruments exist, try to select the first one
-        if let firstInstrument = event.params.cart.payment.instruments.first {
+        if let firstInstrument = event.cart.payment.instruments.first {
             for (index, option) in cardOptions
                 .enumerated() where option.identifier == firstInstrument.externalReference
             {

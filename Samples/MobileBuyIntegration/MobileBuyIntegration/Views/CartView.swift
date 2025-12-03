@@ -143,7 +143,7 @@ struct CartView: View {
                         }
                         .onAddressChangeStart { event in
                             print(
-                                "🎉 SwiftUI: Address change intent received for addressType: \(event.params.addressType)"
+                                "🎉 SwiftUI: Address change intent received for addressType: \(event.addressType)"
                             )
 
                             // Respond with hardcoded address after 2 seconds

@@ -199,14 +199,14 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let addressRequest = result as? CheckoutAddressChangeStart else {
+        guard let addressRequest = result as? CheckoutAddressChangeStartEvent else {
             XCTFail("Expected CheckoutAddressChangeStart, got \(result)")
             return
         }
 
         XCTAssertEqual("2fee28d3-e10f-4f5e-b6e5-e63c061029b3", addressRequest.id)
-        XCTAssertEqual("shipping", addressRequest.params.addressType)
-        XCTAssertEqual("gid://shopify/Cart/test-cart-123", addressRequest.params.cart.id)
+        XCTAssertEqual("shipping", addressRequest.addressType)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", addressRequest.cart.id)
     }
 
     func testDecodeSupportsCheckoutPaymentMethodChangeStart() throws {
@@ -223,13 +223,13 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let cardRequest = result as? CheckoutPaymentMethodChangeStart else {
+        guard let cardRequest = result as? CheckoutPaymentMethodChangeStartEvent else {
             XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
             return
         }
 
         XCTAssertEqual("card-change-123", cardRequest.id)
-        XCTAssertEqual("gid://shopify/Cart/test-cart-123", cardRequest.params.cart.id)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", cardRequest.cart.id)
     }
 
     func testDecodeSupportsCheckoutPaymentMethodChangeStartWithPaymentInstruments() throws {
@@ -260,15 +260,15 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let cardRequest = result as? CheckoutPaymentMethodChangeStart else {
+        guard let cardRequest = result as? CheckoutPaymentMethodChangeStartEvent else {
             XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
             return
         }
 
         XCTAssertEqual("card-change-456", cardRequest.id)
-        XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.params.cart.id)
-        XCTAssertEqual(1, cardRequest.params.cart.payment.instruments.count)
-        XCTAssertEqual("instrument-123", cardRequest.params.cart.payment.instruments.first?.externalReference)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.cart.id)
+        XCTAssertEqual(1, cardRequest.cart.payment.instruments.count)
+        XCTAssertEqual("instrument-123", cardRequest.cart.payment.instruments.first?.externalReference)
     }
 
     func testDecodeSupportsCheckoutStart() throws {
@@ -282,16 +282,15 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let startRequest = result as? CheckoutStartRequest else {
-            XCTFail("Expected CheckoutStartRequest, got \(result)")
+        guard let startEvent = result as? CheckoutStartEvent else {
+            XCTFail("Expected CheckoutStartEvent, got \(result)")
             return
         }
 
-        XCTAssertNil(startRequest.id)
-        XCTAssertEqual("gid://shopify/Cart/test-cart-123", startRequest.params.cart.id)
-        XCTAssertEqual("100.00", startRequest.params.cart.cost.totalAmount.amount)
-        XCTAssertEqual("USD", startRequest.params.cart.cost.totalAmount.currencyCode)
-        XCTAssertEqual("test@example.com", startRequest.params.cart.buyerIdentity.email)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", startEvent.cart.id)
+        XCTAssertEqual("100.00", startEvent.cart.cost.totalAmount.amount)
+        XCTAssertEqual("USD", startEvent.cart.cost.totalAmount.currencyCode)
+        XCTAssertEqual("test@example.com", startEvent.cart.buyerIdentity.email)
     }
 
     func testDecodeSupportsCheckoutComplete() throws {
@@ -305,14 +304,13 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let completeRequest = result as? CheckoutCompleteRequest else {
-            XCTFail("Expected CheckoutCompleteRequest, got \(result)")
+        guard let completeEvent = result as? CheckoutCompleteEvent else {
+            XCTFail("Expected CheckoutCompleteEvent, got \(result)")
             return
         }
 
-        XCTAssertNil(completeRequest.id)
-        XCTAssertEqual("gid://shopify/Order/test-order-123", completeRequest.params.orderConfirmation.order.id)
-        XCTAssertEqual("gid://shopify/Cart/test-cart-123", completeRequest.params.cart.id)
+        XCTAssertEqual("gid://shopify/Order/test-order-123", completeEvent.orderConfirmation.order.id)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", completeEvent.cart.id)
     }
 
     func testDecodeSupportsCheckoutSubmitStart() throws {
@@ -364,14 +362,14 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let submitRequest = result as? CheckoutSubmitStart else {
+        guard let submitRequest = result as? CheckoutSubmitStartEvent else {
             XCTFail("Expected CheckoutSubmitStart, got \(result)")
             return
         }
 
         XCTAssertEqual("submit-123", submitRequest.id)
-        XCTAssertEqual("gid://shopify/Cart/test-cart-456", submitRequest.params.cart.id)
-        XCTAssertEqual("checkout-session-789", submitRequest.params.checkout.id)
-        XCTAssertEqual("buyer@example.com", submitRequest.params.cart.buyerIdentity.email)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-456", submitRequest.cart.id)
+        XCTAssertEqual("checkout-session-789", submitRequest.checkout.id)
+        XCTAssertEqual("buyer@example.com", submitRequest.cart.buyerIdentity.email)
     }
 }

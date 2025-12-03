@@ -23,7 +23,8 @@
 
 import Foundation
 
-public struct CheckoutCompleteEvent: Codable {
+public struct CheckoutCompleteEvent: CheckoutNotification {
+    public static let method = "checkout.complete"
     public let orderConfirmation: OrderConfirmation
     public let cart: Cart
 }
