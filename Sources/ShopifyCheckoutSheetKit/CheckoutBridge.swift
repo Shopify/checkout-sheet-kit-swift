@@ -120,7 +120,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
 // Handle unsupported methods
 struct UnsupportedEnvelope: Decodable {
-    let id: String?
+    let id: String
     let method: String
 }
 

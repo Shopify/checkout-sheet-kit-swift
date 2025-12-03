@@ -27,20 +27,26 @@ import WebKit
 /// Registry of all supported checkout event types
 enum EventRegistry {
     /// Array of all supported event types that conform to CheckoutEventDecodable
-    static let eventTypes: [any CheckoutEventDecodable.Type] = [
+    static let eventTypes: [any CheckoutRequestDecodable.Type] = [
         CheckoutAddressChangeStartEvent.self,
         CheckoutPaymentMethodChangeStartEvent.self,
-        CheckoutCompleteEvent.self,
-        CheckoutStartEvent.self,
-        CheckoutSubmitStartEvent.self
+        CheckoutSubmitStartEvent.self,
     ]
 
+    static let notifications: [any CheckoutNotification.Type] = [
+        CheckoutCompleteEvent.self,
+        CheckoutStartEvent.self,
+    ]
+    
     /// Decode the appropriate event type for a given method
     /// Returns either a CheckoutNotification or a CheckoutRequest
     /// Returns nil if the method is unsupported or if a request event lacks required webview
     static func decode(for method: String, from data: Data, webview: WKWebView?) throws -> Any? {
-        if let eventType = eventTypes.first(where: { $0.method == method }) {
-            return try eventType.decodeEvent(from: data, webview: webview)
+        if let eventType = eventTypes.first(where: { $0.method == method }), let webview {
+            return try eventType.decode(from: data, webview: webview)
+        }
+        if let eventType = notifications.first(where: { $0.method == method }) {
+            return try eventType.decode(from: data)
         }
 
         // Legacy events - these should be converted to CheckoutEventDecodables

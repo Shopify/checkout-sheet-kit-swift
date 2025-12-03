@@ -24,23 +24,27 @@
 import Foundation
 import WebKit
 
+let METHOD = "checkout.submitStart"
+
 /// Event triggered when the checkout submit process starts.
 /// This allows native apps to provide payment tokens or modify the cart before submission.
 public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodable {
     public typealias Params = CheckoutSubmitStartParams
     public typealias ResponsePayload = CheckoutSubmitStartResponsePayload
 
-    public static let method = "checkout.submitStart"
+    public static let method = METHOD
+
+    internal final class SubmitStartRequest: BaseRPCRequest<Params, ResponsePayload> {
+        override static var method: String { METHOD }
+    }
+
+    typealias Request = SubmitStartRequest
 
     public var id: String { rpcRequest.id }
     public var cart: Cart { rpcRequest.params.cart }
     public var checkout: Checkout { rpcRequest.params.checkout }
 
     internal let rpcRequest: Request
-
-    internal init(rpcRequest: Request) {
-        self.rpcRequest = rpcRequest
-    }
 
     public func respondWith(payload: ResponsePayload) throws {
         try rpcRequest.respondWith(payload: payload)
@@ -52,12 +56,6 @@ public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodabl
 
     public func respondWith(error: String) throws {
         try rpcRequest.respondWith(error: error)
-    }
-
-    internal static func decode(from data: Data, webview: WKWebView) throws -> CheckoutSubmitStartEvent {
-        let rpcRequest = try JSONDecoder().decode(Request.self, from: data)
-        rpcRequest.webview = webview
-        return CheckoutSubmitStartEvent(rpcRequest: rpcRequest)
     }
 }
 
