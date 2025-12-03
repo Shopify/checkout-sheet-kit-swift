@@ -28,4 +28,5 @@ import Foundation
 public struct CheckoutStartEvent: CheckoutNotification {
     public static let method = "checkout.start"
     public let cart: Cart
+    public let locale: String
 }
