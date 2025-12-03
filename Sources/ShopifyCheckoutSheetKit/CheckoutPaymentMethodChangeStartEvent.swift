@@ -31,11 +31,7 @@ public struct CheckoutPaymentMethodChangeStartEvent: CheckoutRequest, CheckoutRe
     public typealias ResponsePayload = CheckoutPaymentMethodChangeStartResponsePayload
 
     public static let method = "checkout.paymentMethodChangeStart"
-    /// Request ID for correlating responses.
-    /// Force-unwrapped because request events must have an ID per JSON-RPC 2.0.
-    /// If this crashes, the WebView sent a malformed request.
-    /// TODO: Emit a checkout error event instead of crashing for better recovery.
-    public var id: String { rpcRequest.id! }
+    public var id: String { rpcRequest.id }
     public var cart: Cart { rpcRequest.params.cart }
 
     internal let rpcRequest: Request

@@ -29,7 +29,7 @@ internal class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     typealias Params = P
     typealias ResponsePayload = R
 
-    let id: String?
+    let id: String
     let params: Params
     weak var webview: WKWebView?
 
@@ -39,15 +39,10 @@ internal class BaseRPCRequest<P: Decodable, R: Codable>: RPCRequest {
     }
 
     /// Required initializer that all RPC requests must implement
-    required init(id: String?, params: Params) {
+    required init(id: String, params: Params) {
         self.id = id
         self.params = params
         webview = nil
-    }
-
-    /// Default validation does nothing - subclasses can override
-    func validate(payload _: ResponsePayload) throws {
-        // Subclasses can override if they need validation
     }
 }
 

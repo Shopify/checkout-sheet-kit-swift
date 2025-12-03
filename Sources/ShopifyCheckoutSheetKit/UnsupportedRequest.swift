@@ -84,13 +84,13 @@ internal final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, Empty
     override static var method: String { "__unsupported__" }
 
     /// Custom initializer that captures the actual method name
-    init(id: String?, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
+    init(id: String, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
         self.actualMethod = actualMethod
         super.init(id: id, params: params)
     }
 
     /// Required initializer from protocol
-    required init(id: String?, params: UnsupportedParams) {
+    required init(id: String, params: UnsupportedParams) {
         actualMethod = "__unknown__"
         super.init(id: id, params: params)
     }

@@ -38,7 +38,7 @@ internal class RPCResponse<Payload: Codable>: Codable {
     /// It MUST be the same as the value of the id member in the Request Object.
     /// If there was an error in detecting the id in the Request object (e.g. Parse error/Invalid Request), it MUST be Null.
     /// Either the result member or error member MUST be included, but both members MUST NOT be included.
-    var id: String?
+    var id: String
 
     /// This member is REQUIRED on success.
     /// This member MUST NOT exist if there was an error invoking the method.
@@ -50,12 +50,12 @@ internal class RPCResponse<Payload: Codable>: Codable {
     /// The value for this member MUST be an Object as defined in section 5.1.
     var error: String?
 
-    init(id: String? = nil, result: Payload? = nil) {
+    init(id: String , result: Payload? = nil) {
         self.id = id
         self.result = result
     }
 
-    init(id: String? = nil, error: String? = nil) {
+    init(id: String , error: String? = nil) {
         self.id = id
         self.error = error
     }
@@ -77,7 +77,7 @@ internal protocol RPCRequest: AnyObject, Decodable {
     /// An identifier established by the Client that MUST contain a String, Number, or NULL value if included.
     /// If it is not included it is assumed to be a notification.
     /// The value SHOULD normally not be Null [1] and Numbers SHOULD NOT contain fractional parts [2]
-    var id: String? { get }
+    var id: String { get }
 
     /// The params from the JSON-RPC request
     var params: Params { get }
@@ -86,17 +86,14 @@ internal protocol RPCRequest: AnyObject, Decodable {
     /// A String containing the name of the method to be invoked. Method names that begin with the word rpc followed by a period character (U+002E or ASCII 46) are reserved for rpc-internal methods and extensions and MUST NOT be used for anything else.
     static var method: String { get }
 
-    // 4.1 Notification - https://www.jsonrpc.org/specification
-    var isNotification: Bool { get }
-
     var webview: WKWebView? { get set }
 
     /// Required initializer for creating requests from decoded params
-    init(id: String?, params: Params)
+    init(id: String, params: Params)
 }
 
 struct RPCEnvelope<Params: Decodable>: Decodable {
-    let id: String?
+    let id: String
     let jsonrpc: String
     let method: String
     let params: Params
@@ -105,7 +102,6 @@ struct RPCEnvelope<Params: Decodable>: Decodable {
 extension RPCRequest {
     var jsonrpc: String { "2.0" }
 
-    var isNotification: Bool { id == nil }
 
     /// Default Decodable implementation for all RPCRequest types
     init(from decoder: Decoder) throws {
@@ -166,7 +162,6 @@ extension RPCRequest {
 
     func respondWith(response: Response) throws {
         guard let webview else { return }
-        guard !isNotification else { return }
 
         if let result = response.result {
             try validate(payload: result)
@@ -216,7 +211,6 @@ extension RPCRequest {
 public enum CheckoutEventResponseError: Error {
     case invalidEncoding
     case decodingFailed(String)
-    case validationFailed(String)
 }
 
 func formatDecodingError(_ error: DecodingError) -> String {

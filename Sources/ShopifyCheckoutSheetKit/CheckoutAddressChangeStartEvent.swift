@@ -31,12 +31,8 @@ public struct CheckoutAddressChangeStartEvent: CheckoutRequest, CheckoutRequestD
     public typealias ResponsePayload = CheckoutAddressChangeStartResponsePayload
 
     public static let method = "checkout.addressChangeStart"
-
-    /// Request ID for correlating responses.
-    /// Force-unwrapped because request events must have an ID per JSON-RPC 2.0.
-    /// If this crashes, the WebView sent a malformed request.
-    /// TODO: Emit a checkout error event instead of crashing for better recovery.
-    public var id: String { rpcRequest.id! }
+    
+    public var id: String { rpcRequest.id }
     public var addressType: String { rpcRequest.params.addressType }
     public var cart: Cart { rpcRequest.params.cart }
 
