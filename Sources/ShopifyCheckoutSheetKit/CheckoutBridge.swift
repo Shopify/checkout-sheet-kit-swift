@@ -89,7 +89,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
             guard
                 let webview = message.webView,
-                let request = try RPCRequestRegistry.decode(
+                let request = try EventRegistry.decode(
                     for: extractor.method,
                     from: data,
                     webview: webview

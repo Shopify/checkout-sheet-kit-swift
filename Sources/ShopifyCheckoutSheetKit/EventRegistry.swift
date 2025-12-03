@@ -25,29 +25,25 @@ import Foundation
 import WebKit
 
 /// Registry of all supported checkout event types
-enum RPCRequestRegistry {
+enum EventRegistry {
     /// Array of all supported event types that conform to CheckoutEventDecodable
     static let eventTypes: [any CheckoutEventDecodable.Type] = [
-        // Notification events
-        CheckoutStartEvent.self,
-        CheckoutCompleteEvent.self,
-
-        // Request events
         CheckoutAddressChangeStart.self,
-        CheckoutSubmitStart.self,
-        CheckoutPaymentMethodChangeStart.self
+        CheckoutPaymentMethodChangeStart.self,
+        CheckoutCompleteEvent.self,
+        CheckoutStartEvent.self,
+        CheckoutSubmitStart.self
     ]
 
     /// Decode the appropriate event type for a given method
     /// Returns either a CheckoutNotification or a CheckoutRequest
     /// Returns nil if the method is unsupported or if a request event lacks required webview
     static func decode(for method: String, from data: Data, webview: WKWebView?) throws -> Any? {
-        // Try to find matching event type using type-erased registry
         if let eventType = eventTypes.first(where: { $0.method == method }) {
             return try eventType.decodeEvent(from: data, webview: webview)
         }
 
-        // Legacy RPC events (kept for internal compatibility)
+        // Legacy events - these should be converted to CheckoutEventDecodables
         switch method {
         case CheckoutErrorRequest.method:
             guard let webview else { return nil }
