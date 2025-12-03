@@ -104,9 +104,10 @@ func createTestOrderConfirmation(
  ```
  */
 func createTestCheckoutStartEvent(
-    cart: Cart? = nil
+    cart: Cart? = nil,
+    locale: String = "en-US"
 ) -> CheckoutStartEvent {
-    CheckoutStartEvent(cart: cart ?? createTestCart())
+    CheckoutStartEvent(cart: cart ?? createTestCart(), locale: locale)
 }
 
 /**
@@ -191,14 +192,16 @@ func createTestCartJSON(
  */
 func createCheckoutStartJSON(
     cartId: String = "gid://shopify/Cart/test-cart-123",
-    totalAmount: String = "10.00"
+    totalAmount: String = "10.00",
+    locale: String = "en-US"
 ) -> String {
     """
     {
         "jsonrpc": "2.0",
         "method": "checkout.start",
         "params": {
-            "cart": \(createTestCartJSON(id: cartId, totalAmount: totalAmount))
+            "cart": \(createTestCartJSON(id: cartId, totalAmount: totalAmount)),
+            "locale": "\(locale)"
         }
     }
     """

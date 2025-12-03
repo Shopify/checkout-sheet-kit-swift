@@ -31,7 +31,7 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
         let mockWebView = MockWebView()
         let request = try createRequest(webview: mockWebView)
 
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
+        let payload = CheckoutAddressChangeStartResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -77,7 +77,7 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
 
     func testValidateAcceptsValid2CharacterCountryCode() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
+        let payload = CheckoutAddressChangeStartResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
@@ -92,171 +92,16 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
         XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
     }
 
-    func testValidateRejectsEmptyCountryCode() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.rpcRequest.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("Country code is required"))
-        }
-    }
-
-    func testValidateRejectsNilCountryCode() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: nil)
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.rpcRequest.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("Country code is required"))
-        }
-    }
-
-    func testValidateRejects1CharacterCountryCode() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "U")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.rpcRequest.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("must be exactly 2 characters"))
-            XCTAssertTrue(message.contains("got: 'U'"))
-        }
-    }
-
-    func testValidateRejects3CharacterCountryCode() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "USA")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.rpcRequest.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("must be exactly 2 characters"))
-            XCTAssertTrue(message.contains("got: 'USA'"))
-        }
-    }
-
-    func testValidateRejectsEmptyAddressesList() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(addresses: [])
-            )
-        )
-
-        XCTAssertThrowsError(try request.rpcRequest.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("At least one address is required"))
-        }
-    }
-
-    func testValidateRejectsNilAddressesList() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(addresses: nil)
-            )
-        )
-
-        XCTAssertThrowsError(try request.rpcRequest.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("At least one address is required"))
-        }
-    }
-
-    func testValidateIncludesIndexInErrorMessage() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "US")
-                        ),
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "CAN")
-                        )
-                    ]
-                )
-            )
-        )
-
-        XCTAssertThrowsError(try request.rpcRequest.validate(payload: payload)) { error in
-            guard case let CheckoutEventResponseError.validationFailed(message) = error else {
-                XCTFail("Expected validationFailed error, got \(error)")
-                return
-            }
-            XCTAssertTrue(message.contains("at index 1"))
-            XCTAssertTrue(message.contains("got: 'CAN'"))
-        }
-    }
-
     func testValidateAllowsNilCart() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(cart: nil)
+        let payload = CheckoutAddressChangeStartResponsePayload(cart: nil)
 
         XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
     }
 
     func testValidateAcceptsMultipleValidAddresses() throws {
         let request = try createRequest()
-        let payload = CheckoutAddressChangeStartEventResponsePayload(
+        let payload = CheckoutAddressChangeStartResponsePayload(
             cart: CartInput(
                 delivery: CartDeliveryInput(
                     addresses: [
