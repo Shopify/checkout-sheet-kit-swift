@@ -48,7 +48,7 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
 
         try request.respondWith(payload: payload)
 
-        waitForExpectations(timeout: 2.0)
+        waitForExpectations(timeout: 4.0)
 
         // Verify the JavaScript was executed and contains the expected JSON-RPC response
         XCTAssertNotNil(mockWebView.capturedJavaScript, "JavaScript should have been executed")

@@ -65,3 +65,22 @@ public struct CheckoutPaymentMethodChangeStartResponsePayload: Codable {
         self.errors = errors
     }
 }
+
+// MARK: - Testing Support
+
+extension CheckoutPaymentMethodChangeStartEvent {
+    /// Creates a test instance for unit testing purposes.
+    /// - Parameters:
+    ///   - id: The request ID
+    ///   - cart: The cart associated with the payment method change
+    /// - Returns: A test instance of CheckoutPaymentMethodChangeStartEvent
+    /// - Note: Only use in test targets
+    public static func testInstance(
+        id: String,
+        cart: Cart
+    ) -> CheckoutPaymentMethodChangeStartEvent {
+        let params = CheckoutPaymentMethodChangeStartParams(cart: cart)
+        let request = PaymentMethodChangeRequest(id: id, params: params)
+        return CheckoutPaymentMethodChangeStartEvent(rpcRequest: request)
+    }
+}
