@@ -1,4 +1,4 @@
-Sources/ShopifyCheckoutSheetKit/CheckoutSubmitStartEvent.swift/*
+/*
  MIT License
 
  Copyright 2023 - Present, Shopify Inc.
