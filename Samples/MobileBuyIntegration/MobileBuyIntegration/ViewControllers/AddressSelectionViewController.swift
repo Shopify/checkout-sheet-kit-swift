@@ -252,6 +252,8 @@ class AddressCell: UITableViewCell {
 
         labelLabel.translatesAutoresizingMaskIntoConstraints = false
         labelLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        labelLabel.numberOfLines = 0
+        labelLabel.lineBreakMode = .byWordWrapping
 
         detailsLabel.translatesAutoresizingMaskIntoConstraints = false
         detailsLabel.font = UIFont.systemFont(ofSize: 14)
