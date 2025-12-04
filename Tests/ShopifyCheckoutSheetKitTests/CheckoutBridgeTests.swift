@@ -50,27 +50,23 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual(CheckoutBridge.messageHandler, "EmbeddedCheckoutProtocolConsumer")
     }
 
-    func testDecodeThrowsInvalidBridgeEventWhenNonStringBody() throws {
+    func testDecodeReturnsNilWhenNonStringBody() throws {
         let mock = WKScriptMessageMock(body: 1234)
 
-        XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-            guard case BridgeError.invalidBridgeEvent = error else {
-                return XCTFail("unexpected error thrown: \(error)")
-            }
-        }
+        let result = try? CheckoutBridge.decode(mock)
+
+        XCTAssertNil(result)
     }
 
-    func testDecodeThrowsInvalidBridgeEventWhenEmptyBody() throws {
+    func testDecodeReturnsNilWhenEmptyBody() throws {
         let mock = WKScriptMessageMock(body: "")
 
-        XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-            guard case BridgeError.invalidBridgeEvent = error else {
-                return XCTFail("unexpected error thrown: \(error)")
-            }
-        }
+        let result = try? CheckoutBridge.decode(mock)
+
+        XCTAssertNil(result)
     }
 
-    func testDecodeThrowsInvalidBridgeEventWhenNotJSONRPC() throws {
+    func testDecodeReturnsNilWhenMissingMethod() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "name": "test",
@@ -78,11 +74,47 @@ class CheckoutBridgeTests: XCTestCase {
         }
         """)
 
-        XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
-            guard case BridgeError.invalidBridgeEvent = error else {
-                return XCTFail("unexpected error thrown: \(error)")
+        let result = try? CheckoutBridge.decode(mock)
+
+        XCTAssertNil(result)
+    }
+
+    func testDecodeReturnsNilWhenParamsMalformed() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "id": "test-id",
+            "method": "checkout.addressChangeStart",
+            "params": {
+                "addressType": "shipping",
+                "cart": "not-an-object"
             }
         }
+        """, webView: mockWebView)
+
+        let result = try? CheckoutBridge.decode(mock)
+
+        XCTAssertNil(result)
+    }
+
+    func testDecodeReturnsNilWhenMissingRequiredField() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "id": "test-id",
+            "method": "checkout.addressChangeStart",
+            "params": {
+                "addressType": "shipping",
+                "cart": {
+                    "id": "gid://shopify/Cart/test-cart-123"
+                }
+            }
+        }
+        """, webView: mockWebView)
+
+        let result = try? CheckoutBridge.decode(mock)
+
+        XCTAssertNil(result)
     }
 
     func testDecodeReturnsUnsupportedRequestWhenWebViewIsNil() throws {
