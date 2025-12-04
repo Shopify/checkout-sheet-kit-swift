@@ -57,16 +57,16 @@ class CheckoutSubmitStartTests: XCTestCase {
         XCTAssertNotNil(request.cart, "cart should be accessible directly")
     }
 
-    func testCheckoutIsFlattened() throws {
+    func testSessionIdIsFlattened() throws {
         let request = try createRequest()
-        XCTAssertNotNil(request.checkout, "checkout should be accessible directly")
+        XCTAssertNotNil(request.sessionId, "sessionId should be accessible directly")
     }
 
     // MARK: - Decoding Tests
 
     func testDecodesCheckoutSessionId() throws {
         let request = try createRequest(checkoutId: "checkout-session-123")
-        XCTAssertEqual(request.checkout.id, "checkout-session-123")
+        XCTAssertEqual(request.sessionId, "checkout-session-123")
     }
 
     // MARK: - Helper Methods
@@ -79,9 +79,7 @@ class CheckoutSubmitStartTests: XCTestCase {
             "method": "checkout.submitStart",
             "params": {
                 "cart": \(createTestCartJSON()),
-                "checkout": {
-                    "id": "\(checkoutId)"
-                }
+                "sessionId": "\(checkoutId)"
             }
         }
         """
