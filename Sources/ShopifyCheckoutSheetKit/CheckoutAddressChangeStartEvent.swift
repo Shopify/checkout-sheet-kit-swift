@@ -64,3 +64,24 @@ public struct CheckoutAddressChangeStartResponsePayload: Codable {
         self.errors = errors
     }
 }
+
+// MARK: - Testing Support
+
+extension CheckoutAddressChangeStartEvent {
+    /// Creates a test instance for unit testing purposes.
+    /// - Parameters:
+    ///   - id: The request ID
+    ///   - addressType: The type of address being changed (e.g., "shipping", "billing")
+    ///   - cart: The cart associated with the address change
+    /// - Returns: A test instance of CheckoutAddressChangeStartEvent
+    /// - Note: Only use in test targets
+    public static func testInstance(
+        id: String,
+        addressType: String,
+        cart: Cart
+    ) -> CheckoutAddressChangeStartEvent {
+        let params = CheckoutAddressChangeStartParams(addressType: addressType, cart: cart)
+        let request = AddressChangeRequest(id: id, params: params)
+        return CheckoutAddressChangeStartEvent(rpcRequest: request)
+    }
+}

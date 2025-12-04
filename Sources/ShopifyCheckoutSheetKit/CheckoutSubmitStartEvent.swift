@@ -1,4 +1,4 @@
-/*
+Sources/ShopifyCheckoutSheetKit/CheckoutSubmitStartEvent.swift/*
  MIT License
 
  Copyright 2023 - Present, Shopify Inc.
@@ -67,5 +67,26 @@ public struct CheckoutSubmitStartResponsePayload: Codable {
         self.payment = payment
         self.cart = cart
         self.errors = errors
+    }
+}
+
+// MARK: - Testing Support
+
+extension CheckoutSubmitStartEvent {
+    /// Creates a test instance for unit testing purposes.
+    /// - Parameters:
+    ///   - id: The request ID
+    ///   - cart: The cart being submitted
+    ///   - checkout: The checkout session information
+    /// - Returns: A test instance of CheckoutSubmitStartEvent
+    /// - Note: Only use in test targets
+    public static func testInstance(
+        id: String,
+        cart: Cart,
+        checkout: Checkout
+    ) -> CheckoutSubmitStartEvent {
+        let params = CheckoutSubmitStartParams(cart: cart, checkout: checkout)
+        let request = SubmitStartRequest(id: id, params: params)
+        return CheckoutSubmitStartEvent(rpcRequest: request)
     }
 }
