@@ -555,7 +555,6 @@ public struct PaymentTokenInput: Codable {
     }
 }
 
-
 // MARK: - Internal RPC Envelope Types
 
 /// Generic envelope for decoding checkout notification events (one-way messages).
