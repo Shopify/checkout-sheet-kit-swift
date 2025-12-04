@@ -75,18 +75,18 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         }
     }
 
-    static func decode(_ message: WKScriptMessage) throws -> Any {
-        guard let body = message.body as? String, let data = body.data(using: .utf8) else {
-            throw BridgeError.invalidBridgeEvent()
-        }
+    static func decode(_ message: WKScriptMessage) throws -> Any? {
 
         do {
+            guard let body = message.body as? String, let data = body.data(using: .utf8) else {
+                throw BridgeError.invalidBridgeEvent()
+            }
             struct MethodExtractor: Decodable {
                 let method: String
             }
-
+            
             let extractor = try JSONDecoder().decode(MethodExtractor.self, from: data)
-
+            
             guard
                 let webview = message.webView,
                 let request = try EventRegistry.decode(
@@ -98,11 +98,18 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
                 let envelope = try JSONDecoder().decode(UnsupportedEnvelope.self, from: data)
                 return UnsupportedRequest(id: envelope.id, actualMethod: envelope.method)
             }
-
+            
             return request
+        } catch DecodingError.keyNotFound(let key, let context){
+            OSLogger.shared.info(
+                "CheckoutBridge.decode: \(context.debugDescription)\n\n Event Body:\(message.body)"
+            )
         } catch {
-            throw BridgeError.invalidBridgeEvent(error)
+            OSLogger.shared .info(
+                "CheckoutBridge.decode: \(error.localizedDescription)\n\n\t \(message.body)"
+            )
         }
+        return nil
     }
 
     static func dispatchMessageTemplate(body: String) -> String {
