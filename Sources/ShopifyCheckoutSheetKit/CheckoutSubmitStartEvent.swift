@@ -40,7 +40,7 @@ public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodabl
 
     public var id: String { rpcRequest.id }
     public var cart: Cart { rpcRequest.params.cart }
-    public var checkout: Checkout { rpcRequest.params.checkout }
+    public var sessionId: String { rpcRequest.params.sessionId }
 
     internal let rpcRequest: Request
 
@@ -55,7 +55,7 @@ public struct CheckoutSubmitStartEvent: CheckoutRequest, CheckoutRequestDecodabl
 
 public struct CheckoutSubmitStartParams: Codable {
     let cart: Cart
-    let checkout: Checkout
+    let sessionId: String
 }
 
 public struct CheckoutSubmitStartResponsePayload: Codable {
@@ -77,15 +77,15 @@ extension CheckoutSubmitStartEvent {
     /// - Parameters:
     ///   - id: The request ID
     ///   - cart: The cart being submitted
-    ///   - checkout: The checkout session information
+    ///   - sessionId: The checkout session identifier
     /// - Returns: A test instance of CheckoutSubmitStartEvent
     /// - Note: Only use in test targets
     public static func testInstance(
         id: String,
         cart: Cart,
-        checkout: Checkout
+        sessionId: String
     ) -> CheckoutSubmitStartEvent {
-        let params = CheckoutSubmitStartParams(cart: cart, checkout: checkout)
+        let params = CheckoutSubmitStartParams(cart: cart, sessionId: sessionId)
         let request = SubmitStartRequest(id: id, params: params)
         return CheckoutSubmitStartEvent(rpcRequest: request)
     }

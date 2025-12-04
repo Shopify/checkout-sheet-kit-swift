@@ -555,18 +555,6 @@ public struct PaymentTokenInput: Codable {
     }
 }
 
-// MARK: - Checkout Session
-
-/// Checkout session information.
-public struct Checkout: Codable {
-    /// The checkout session identifier
-    public let id: String
-
-    public init(id: String) {
-        self.id = id
-    }
-}
-
 // MARK: - Internal RPC Envelope Types
 
 /// Generic envelope for decoding checkout notification events (one-way messages).

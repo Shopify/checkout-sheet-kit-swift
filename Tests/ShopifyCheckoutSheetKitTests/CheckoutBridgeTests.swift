@@ -351,9 +351,7 @@ class CheckoutBridgeTests: XCTestCase {
                             "instruments": []
                         }
                     },
-                    "checkout": {
-                        "id": "checkout-session-789"
-                    }
+                    "sessionId": "checkout-session-789"
                 }
             }
             """,
@@ -369,7 +367,7 @@ class CheckoutBridgeTests: XCTestCase {
 
         XCTAssertEqual("submit-123", submitRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", submitRequest.cart.id)
-        XCTAssertEqual("checkout-session-789", submitRequest.checkout.id)
+        XCTAssertEqual("checkout-session-789", submitRequest.sessionId)
         XCTAssertEqual("buyer@example.com", submitRequest.cart.buyerIdentity.email)
     }
 }
