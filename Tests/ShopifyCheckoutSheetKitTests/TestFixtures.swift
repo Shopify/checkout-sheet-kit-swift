@@ -84,10 +84,10 @@ func createTestOrderConfirmation(
     url: String? = nil
 ) -> OrderConfirmation {
     OrderConfirmation(
-        url: url,
         order: OrderConfirmation.Order(id: orderId),
-        number: orderNumber,
-        isFirstOrder: isFirstOrder
+        isFirstOrder: isFirstOrder,
+        url: url,
+        number: orderNumber
     )
 }
 

@@ -28,13 +28,24 @@ import Foundation
 // Common data types shared between lifecycle events
 
 public struct OrderConfirmation: Codable {
-    public let url: String?
+    @NullEncodable public private(set) var url: String?
     public let order: Order
-    public let number: String?
+    @NullEncodable public private(set) var number: String?
     public let isFirstOrder: Bool
 
     public struct Order: Codable {
         public let id: String
+
+        public init(id: String) {
+            self.id = id
+        }
+    }
+
+    public init(order: Order, isFirstOrder: Bool, url: String? = nil, number: String? = nil) {
+        self.order = order
+        self.isFirstOrder = isFirstOrder
+        self.url = url
+        self.number = number
     }
 }
 
@@ -72,7 +83,7 @@ public struct CartLineMerchandise: Codable {
     public let id: String
     public let title: String
     public let product: Product
-    public let image: MerchandiseImage?
+    @NullEncodable public private(set) var image: MerchandiseImage?
     public let selectedOptions: [SelectedOption]
 
     public struct Product: Codable {
@@ -83,7 +94,12 @@ public struct CartLineMerchandise: Codable {
 
 public struct MerchandiseImage: Codable {
     public let url: String
-    public let altText: String?
+    @NullEncodable public private(set) var altText: String?
+
+    public init(url: String, altText: String? = nil) {
+        self.url = url
+        self.altText = altText
+    }
 }
 
 public struct SelectedOption: Codable {
@@ -126,48 +142,116 @@ public struct CartCost: Codable {
 }
 
 public struct CartBuyerIdentity: Codable {
-    public let email: String?
-    public let phone: String?
-    public let customer: Customer?
-    public let countryCode: String?
+    @NullEncodable public private(set) var email: String?
+    @NullEncodable public private(set) var phone: String?
+    @NullEncodable public private(set) var customer: Customer?
+    @NullEncodable public private(set) var countryCode: String?
+
+    public init(
+        email: String? = nil,
+        phone: String? = nil,
+        customer: Customer? = nil,
+        countryCode: String? = nil
+    ) {
+        self.email = email
+        self.phone = phone
+        self.customer = customer
+        self.countryCode = countryCode
+    }
 }
 
 public struct Customer: Codable {
-    public let id: String?
-    public let firstName: String?
-    public let lastName: String?
-    public let email: String?
-    public let phone: String?
+    @NullEncodable public private(set) var id: String?
+    @NullEncodable public private(set) var firstName: String?
+    @NullEncodable public private(set) var lastName: String?
+    @NullEncodable public private(set) var email: String?
+    @NullEncodable public private(set) var phone: String?
+
+    public init(
+        id: String? = nil,
+        firstName: String? = nil,
+        lastName: String? = nil,
+        email: String? = nil,
+        phone: String? = nil
+    ) {
+        self.id = id
+        self.firstName = firstName
+        self.lastName = lastName
+        self.email = email
+        self.phone = phone
+    }
 }
 
 public struct CartDeliveryGroup: Codable {
     public let deliveryAddress: MailingAddress
     public let deliveryOptions: [CartDeliveryOption]
-    public let selectedDeliveryOption: CartDeliveryOption?
+    @NullEncodable public private(set) var selectedDeliveryOption: CartDeliveryOption?
     public let groupType: CartDeliveryGroupType
 }
 
 public struct MailingAddress: Codable {
-    public let address1: String?
-    public let address2: String?
-    public let city: String?
-    public let province: String?
-    public let country: String?
-    public let countryCodeV2: String?
-    public let zip: String?
-    public let firstName: String?
-    public let lastName: String?
-    public let phone: String?
-    public let company: String?
+    @NullEncodable public private(set) var address1: String?
+    @NullEncodable public private(set) var address2: String?
+    @NullEncodable public private(set) var city: String?
+    @NullEncodable public private(set) var province: String?
+    @NullEncodable public private(set) var country: String?
+    @NullEncodable public private(set) var countryCodeV2: String?
+    @NullEncodable public private(set) var zip: String?
+    @NullEncodable public private(set) var firstName: String?
+    @NullEncodable public private(set) var lastName: String?
+    @NullEncodable public private(set) var phone: String?
+    @NullEncodable public private(set) var company: String?
+
+    public init(
+        address1: String? = nil,
+        address2: String? = nil,
+        city: String? = nil,
+        province: String? = nil,
+        country: String? = nil,
+        countryCodeV2: String? = nil,
+        zip: String? = nil,
+        firstName: String? = nil,
+        lastName: String? = nil,
+        phone: String? = nil,
+        company: String? = nil
+    ) {
+        self.address1 = address1
+        self.address2 = address2
+        self.city = city
+        self.province = province
+        self.country = country
+        self.countryCodeV2 = countryCodeV2
+        self.zip = zip
+        self.firstName = firstName
+        self.lastName = lastName
+        self.phone = phone
+        self.company = company
+    }
 }
 
 public struct CartDeliveryOption: Codable {
-    public let code: String?
-    public let title: String?
-    public let description: String?
+    @NullEncodable public private(set) var code: String?
+    @NullEncodable public private(set) var title: String?
+    @NullEncodable public private(set) var description: String?
     public let handle: String
     public let estimatedCost: Money
     public let deliveryMethodType: CartDeliveryMethodType
+
+    public init(
+        handle: String,
+        estimatedCost: Money,
+        deliveryMethodType: CartDeliveryMethodType,
+        code: String? = nil,
+        title: String? = nil,
+        description: String? = nil
+    ) {
+        self.handle = handle
+        self.estimatedCost = estimatedCost
+        self.deliveryMethodType = deliveryMethodType
+        self.code = code
+        self.title = title
+        self.description = description
+    }
 }
 
 public enum CartDeliveryMethodType: String, Codable {
@@ -247,16 +331,16 @@ public struct CartSelectableAddress: Codable {
 }
 
 public struct CartDeliveryAddress: Codable {
-    public let address1: String?
-    public let address2: String?
-    public let city: String?
-    public let company: String?
-    public let countryCode: String?
-    public let firstName: String?
-    public let lastName: String?
-    public let phone: String?
-    public let provinceCode: String?
-    public let zip: String?
+    @NullEncodable public private(set) var address1: String?
+    @NullEncodable public private(set) var address2: String?
+    @NullEncodable public private(set) var city: String?
+    @NullEncodable public private(set) var company: String?
+    @NullEncodable public private(set) var countryCode: String?
+    @NullEncodable public private(set) var firstName: String?
+    @NullEncodable public private(set) var lastName: String?
+    @NullEncodable public private(set) var phone: String?
+    @NullEncodable public private(set) var provinceCode: String?
+    @NullEncodable public private(set) var zip: String?
 
     public init(
         firstName: String? = nil,
@@ -349,16 +433,16 @@ public enum DiscountValue: Codable {
 /// Mirrors the [Storefront API CartInput](https://shopify.dev/docs/api/storefront/latest/input-objects/CartInput).
 public struct CartInput: Codable {
     /// The delivery-related fields for the cart.
-    public let delivery: CartDeliveryInput?
+    @NullEncodable public private(set) var delivery: CartDeliveryInput?
 
     /// The customer associated with the cart.
-    public let buyerIdentity: CartBuyerIdentityInput?
+    @NullEncodable public private(set) var buyerIdentity: CartBuyerIdentityInput?
 
     /// The case-insensitive discount codes that the customer added at checkout.
-    public let discountCodes: [String]?
+    @NullEncodable public private(set) var discountCodes: [String]?
 
     /// Payment instruments for the cart.
-    public let paymentInstruments: [CartPaymentInstrumentInput]?
+    @NullEncodable public private(set) var paymentInstruments: [CartPaymentInstrumentInput]?
 
     public init(
         delivery: CartDeliveryInput? = nil,
@@ -376,7 +460,7 @@ public struct CartInput: Codable {
 /// Delivery-related fields for the cart.
 public struct CartDeliveryInput: Codable {
     /// Selectable addresses presented to the buyer.
-    public let addresses: [CartSelectableAddressInput]?
+    @NullEncodable public private(set) var addresses: [CartSelectableAddressInput]?
 
     public init(addresses: [CartSelectableAddressInput]? = nil) {
         self.addresses = addresses
@@ -389,7 +473,7 @@ public struct CartSelectableAddressInput: Codable {
     public let address: CartDeliveryAddressInput
 
     /// Whether this address is selected as the active delivery address.
-    public let selected: Bool?
+    @NullEncodable public private(set) var selected: Bool?
 
     public init(address: CartDeliveryAddressInput, selected: Bool? = nil) {
         self.address = address
@@ -402,34 +486,34 @@ public struct CartSelectableAddressInput: Codable {
 /// Based on [Storefront API MailingAddressInput](https://shopify.dev/docs/api/storefront/latest/input-objects/MailingAddressInput).
 public struct CartDeliveryAddressInput: Codable {
     /// The first line of the address. Typically the street address or PO Box number.
-    public let address1: String?
+    @NullEncodable public private(set) var address1: String?
 
     /// The second line of the address. Typically the number of the apartment, suite, or unit.
-    public let address2: String?
+    @NullEncodable public private(set) var address2: String?
 
     /// The name of the city, district, village, or town.
-    public let city: String?
+    @NullEncodable public private(set) var city: String?
 
     /// The name of the customer's company or organization.
-    public let company: String?
+    @NullEncodable public private(set) var company: String?
 
     /// The two-letter country code (ISO 3166-1 alpha-2 format, e.g., "US", "CA").
-    public let countryCode: String?
+    @NullEncodable public private(set) var countryCode: String?
 
     /// The first name of the customer.
-    public let firstName: String?
+    @NullEncodable public private(set) var firstName: String?
 
     /// The last name of the customer.
-    public let lastName: String?
+    @NullEncodable public private(set) var lastName: String?
 
     /// The phone number for the address. Formatted using E.164 standard (e.g., +16135551111).
-    public let phone: String?
+    @NullEncodable public private(set) var phone: String?
 
     /// The code for the region of the address, such as the province or state (e.g., "ON" for Ontario, or "CA" for California).
-    public let provinceCode: String?
+    @NullEncodable public private(set) var provinceCode: String?
 
     /// The zip or postal code of the address.
-    public let zip: String?
+    @NullEncodable public private(set) var zip: String?
 
     public init(
         firstName: String? = nil,
@@ -461,13 +545,13 @@ public struct CartDeliveryAddressInput: Codable {
 /// Based on [Storefront API CartBuyerIdentityInput](https://shopify.dev/docs/api/storefront/latest/input-objects/CartBuyerIdentityInput).
 public struct CartBuyerIdentityInput: Codable {
     /// The email address of the buyer that is interacting with the cart / checkout.
-    public let email: String?
+    @NullEncodable public private(set) var email: String?
 
     /// The phone number of the buyer that is interacting with the cart / checkout.
-    public let phone: String?
+    @NullEncodable public private(set) var phone: String?
 
     /// The country where the buyer is located. Two-letter country code (ISO 3166-1 alpha-2, e.g. US, GB, CA).
-    public let countryCode: String?
+    @NullEncodable public private(set) var countryCode: String?
 
     public init(email: String? = nil, phone: String? = nil, countryCode: String? = nil) {
         self.email = email
@@ -531,7 +615,7 @@ public struct CartPaymentInstrumentInput: Codable {
 public struct ResponseError: Codable {
     public let code: String
     public let message: String
-    public let fieldTarget: String?
+    @NullEncodable public private(set) var fieldTarget: String?
 
     public init(code: String, message: String, fieldTarget: String? = nil) {
         self.code = code

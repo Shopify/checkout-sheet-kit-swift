@@ -56,8 +56,8 @@ public struct CheckoutAddressChangeStartParams: Codable {
 }
 
 public struct CheckoutAddressChangeStartResponsePayload: Codable {
-    public let cart: CartInput?
-    public let errors: [ResponseError]?
+    @NullEncodable public private(set) var cart: CartInput?
+    @NullEncodable public private(set) var errors: [ResponseError]?
 
     public init(cart: CartInput? = nil, errors: [ResponseError]? = nil) {
         self.cart = cart
