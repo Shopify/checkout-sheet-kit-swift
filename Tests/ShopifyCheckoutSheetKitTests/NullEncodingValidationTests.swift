@@ -39,66 +39,61 @@ class NullEncodingValidationTests: XCTestCase {
 
     func testCheckoutSubmitStartResponsePayloadEncodesAllKeys() throws {
         let mock = CheckoutSubmitStartResponsePayload()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "cart" : null,
           "errors" : null,
           "payment" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCheckoutAddressChangeStartResponsePayloadEncodesAllKeys() throws {
         let mock = CheckoutAddressChangeStartResponsePayload()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "cart" : null,
           "errors" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCheckoutPaymentMethodChangeStartResponsePayloadEncodesAllKeys() throws {
         let mock = CheckoutPaymentMethodChangeStartResponsePayload()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "cart" : null,
           "errors" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     // MARK: - Input Type Tests
 
     func testCartInputEncodesAllKeys() throws {
         let mock = CartInput()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "buyerIdentity" : null,
           "delivery" : null,
           "discountCodes" : null,
           "paymentInstruments" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCartDeliveryInputEncodesAllKeys() throws {
         let mock = CartDeliveryInput()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "addresses" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCartSelectableAddressInputEncodesAllKeys() throws {
         let mock = CartSelectableAddressInput(address: CartDeliveryAddressInput())
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "address" : {
             "address1" : null,
@@ -114,13 +109,12 @@ class NullEncodingValidationTests: XCTestCase {
           },
           "selected" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCartDeliveryAddressInputEncodesAllKeys() throws {
         let mock = CartDeliveryAddressInput()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "address1" : null,
           "address2" : null,
@@ -133,32 +127,29 @@ class NullEncodingValidationTests: XCTestCase {
           "provinceCode" : null,
           "zip" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCartBuyerIdentityInputEncodesAllKeys() throws {
         let mock = CartBuyerIdentityInput()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "countryCode" : null,
           "email" : null,
           "phone" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testResponseErrorEncodesAllKeys() throws {
         let mock = ResponseError(code: "TEST", message: "Test error")
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "code" : "TEST",
           "fieldTarget" : null,
           "message" : "Test error"
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     // MARK: - Data Type Tests
@@ -168,7 +159,7 @@ class NullEncodingValidationTests: XCTestCase {
             order: OrderConfirmation.Order(id: "test-order"),
             isFirstOrder: false
         )
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "isFirstOrder" : false,
           "number" : null,
@@ -177,37 +168,34 @@ class NullEncodingValidationTests: XCTestCase {
           },
           "url" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testMerchandiseImageEncodesAllKeys() throws {
         let mock = MerchandiseImage(url: "https://example.com/image.png")
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "altText" : null,
           "url" : "https://example.com/image.png"
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCartBuyerIdentityEncodesAllKeys() throws {
         let mock = CartBuyerIdentity()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "countryCode" : null,
           "customer" : null,
           "email" : null,
           "phone" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCustomerEncodesAllKeys() throws {
         let mock = Customer()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "email" : null,
           "firstName" : null,
@@ -215,13 +203,12 @@ class NullEncodingValidationTests: XCTestCase {
           "lastName" : null,
           "phone" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testMailingAddressEncodesAllKeys() throws {
         let mock = MailingAddress()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "address1" : null,
           "address2" : null,
@@ -235,13 +222,12 @@ class NullEncodingValidationTests: XCTestCase {
           "province" : null,
           "zip" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCartDeliveryAddressEncodesAllKeys() throws {
         let mock = CartDeliveryAddress()
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "address1" : null,
           "address2" : null,
@@ -254,8 +240,7 @@ class NullEncodingValidationTests: XCTestCase {
           "provinceCode" : null,
           "zip" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 
     func testCartDeliveryOptionEncodesAllKeys() throws {
@@ -264,7 +249,7 @@ class NullEncodingValidationTests: XCTestCase {
             estimatedCost: Money(amount: "10.00", currencyCode: "USD"),
             deliveryMethodType: .shipping
         )
-        let expected = """
+        XCTAssertEqual(try toString(mock), """
         {
           "code" : null,
           "deliveryMethodType" : "SHIPPING",
@@ -276,7 +261,6 @@ class NullEncodingValidationTests: XCTestCase {
           "handle" : "test-handle",
           "title" : null
         }
-        """
-        XCTAssertEqual(try toString(mock), expected)
+        """)
     }
 }
