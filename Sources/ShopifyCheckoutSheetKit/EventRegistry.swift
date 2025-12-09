@@ -35,6 +35,7 @@ enum EventRegistry {
 
     static let notifications: [any CheckoutNotification.Type] = [
         CheckoutCompleteEvent.self,
+        CheckoutErrorEvent.self,
         CheckoutStartEvent.self
     ]
 
@@ -51,12 +52,6 @@ enum EventRegistry {
 
         // Legacy events - these should be converted to CheckoutEventDecodables
         switch method {
-        case CheckoutErrorRequest.method:
-            guard let webview else { return nil }
-            let request = try CheckoutErrorRequest.decodeErased(from: data)
-            request.webview = webview
-            return request
-
         case CheckoutModalToggledRequest.method:
             guard let webview else { return nil }
             let request = try CheckoutModalToggledRequest.decodeErased(from: data)
