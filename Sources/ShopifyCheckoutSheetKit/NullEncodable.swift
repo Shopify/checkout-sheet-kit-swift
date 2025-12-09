@@ -23,37 +23,41 @@
 
 import Foundation
 
-public struct CheckoutCompleteEvent: CheckoutNotification {
-    public static let method = "checkout.complete"
-    public let orderConfirmation: OrderConfirmation
-    public let cart: Cart
+@propertyWrapper
+public struct NullEncodable<T: Codable>: Codable {
+    public var wrappedValue: T?
+
+    public init(wrappedValue: T?) {
+        self.wrappedValue = wrappedValue
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        if let value = wrappedValue {
+            try container.encode(value)
+        } else {
+            try container.encodeNil()
+        }
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() {
+            wrappedValue = nil
+        } else {
+            wrappedValue = try container.decode(T.self)
+        }
+    }
 }
 
-func createEmptyCheckoutCompleteEvent(id: String? = "") -> CheckoutCompleteEvent {
-    return CheckoutCompleteEvent(
-        orderConfirmation: OrderConfirmation(
-            order: OrderConfirmation.Order(id: id ?? ""),
-            isFirstOrder: false
-        ),
-        cart: Cart(
-            id: "",
-            lines: [],
-            cost: CartCost(
-                subtotalAmount: Money(amount: "", currencyCode: ""),
-                totalAmount: Money(amount: "", currencyCode: "")
-            ),
-            buyerIdentity: CartBuyerIdentity(
-                email: nil,
-                phone: nil,
-                customer: nil,
-                countryCode: nil
-            ),
-            deliveryGroups: [],
-            discountCodes: [],
-            appliedGiftCards: [],
-            discountAllocations: [],
-            delivery: CartDelivery(addresses: []),
-            payment: .init(instruments: [])
-        )
-    )
+extension KeyedDecodingContainer {
+    public func decode<T: Codable>(
+        _: NullEncodable<T>.Type,
+        forKey key: Key
+    ) throws -> NullEncodable<T> {
+        if let value = try decodeIfPresent(T.self, forKey: key) {
+            return NullEncodable(wrappedValue: value)
+        }
+        return NullEncodable(wrappedValue: nil)
+    }
 }
