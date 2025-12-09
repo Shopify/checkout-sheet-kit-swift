@@ -37,230 +37,263 @@ class NullEncodingValidationTests: XCTestCase {
 
     // MARK: - Response Payload Tests
 
-    func testCheckoutSubmitStartResponsePayloadEncodesAllKeys() throws {
-        let mock = CheckoutSubmitStartResponsePayload()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "cart" : null,
-          "errors" : null,
-          "payment" : null
-        }
-        """)
-    }
+    func test_encode_responsePayloads_includeAllNullableKeys() throws {
+        let testCases: [(name: String, instance: any Encodable, expected: String)] = [
+            (
+                "CheckoutSubmitStartResponsePayload",
+                CheckoutSubmitStartResponsePayload(),
+                """
+                {
+                  "cart" : null,
+                  "errors" : null,
+                  "payment" : null
+                }
+                """
+            ),
+            (
+                "CheckoutAddressChangeStartResponsePayload",
+                CheckoutAddressChangeStartResponsePayload(),
+                """
+                {
+                  "cart" : null,
+                  "errors" : null
+                }
+                """
+            ),
+            (
+                "CheckoutPaymentMethodChangeStartResponsePayload",
+                CheckoutPaymentMethodChangeStartResponsePayload(),
+                """
+                {
+                  "cart" : null,
+                  "errors" : null
+                }
+                """
+            )
+        ]
 
-    func testCheckoutAddressChangeStartResponsePayloadEncodesAllKeys() throws {
-        let mock = CheckoutAddressChangeStartResponsePayload()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "cart" : null,
-          "errors" : null
+        for (name, instance, expected) in testCases {
+            try XCTContext.runActivity(named: name) { _ in
+                XCTAssertEqual(try toString(instance), expected)
+            }
         }
-        """)
-    }
-
-    func testCheckoutPaymentMethodChangeStartResponsePayloadEncodesAllKeys() throws {
-        let mock = CheckoutPaymentMethodChangeStartResponsePayload()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "cart" : null,
-          "errors" : null
-        }
-        """)
     }
 
     // MARK: - Input Type Tests
 
-    func testCartInputEncodesAllKeys() throws {
-        let mock = CartInput()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "buyerIdentity" : null,
-          "delivery" : null,
-          "discountCodes" : null,
-          "paymentInstruments" : null
-        }
-        """)
-    }
+    func test_encode_inputTypes_includeAllNullableKeys() throws {
+        let testCases: [(name: String, instance: any Encodable, expected: String)] = [
+            (
+                "CartInput",
+                CartInput(),
+                """
+                {
+                  "buyerIdentity" : null,
+                  "delivery" : null,
+                  "discountCodes" : null,
+                  "paymentInstruments" : null
+                }
+                """
+            ),
+            (
+                "CartDeliveryInput",
+                CartDeliveryInput(),
+                """
+                {
+                  "addresses" : null
+                }
+                """
+            ),
+            (
+                "CartSelectableAddressInput",
+                CartSelectableAddressInput(address: CartDeliveryAddressInput()),
+                """
+                {
+                  "address" : {
+                    "address1" : null,
+                    "address2" : null,
+                    "city" : null,
+                    "company" : null,
+                    "countryCode" : null,
+                    "firstName" : null,
+                    "lastName" : null,
+                    "phone" : null,
+                    "provinceCode" : null,
+                    "zip" : null
+                  },
+                  "selected" : null
+                }
+                """
+            ),
+            (
+                "CartDeliveryAddressInput",
+                CartDeliveryAddressInput(),
+                """
+                {
+                  "address1" : null,
+                  "address2" : null,
+                  "city" : null,
+                  "company" : null,
+                  "countryCode" : null,
+                  "firstName" : null,
+                  "lastName" : null,
+                  "phone" : null,
+                  "provinceCode" : null,
+                  "zip" : null
+                }
+                """
+            ),
+            (
+                "CartBuyerIdentityInput",
+                CartBuyerIdentityInput(),
+                """
+                {
+                  "countryCode" : null,
+                  "email" : null,
+                  "phone" : null
+                }
+                """
+            ),
+            (
+                "ResponseError",
+                ResponseError(code: "TEST", message: "Test error"),
+                """
+                {
+                  "code" : "TEST",
+                  "fieldTarget" : null,
+                  "message" : "Test error"
+                }
+                """
+            )
+        ]
 
-    func testCartDeliveryInputEncodesAllKeys() throws {
-        let mock = CartDeliveryInput()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "addresses" : null
+        for (name, instance, expected) in testCases {
+            try XCTContext.runActivity(named: name) { _ in
+                XCTAssertEqual(try toString(instance), expected)
+            }
         }
-        """)
-    }
-
-    func testCartSelectableAddressInputEncodesAllKeys() throws {
-        let mock = CartSelectableAddressInput(address: CartDeliveryAddressInput())
-        XCTAssertEqual(try toString(mock), """
-        {
-          "address" : {
-            "address1" : null,
-            "address2" : null,
-            "city" : null,
-            "company" : null,
-            "countryCode" : null,
-            "firstName" : null,
-            "lastName" : null,
-            "phone" : null,
-            "provinceCode" : null,
-            "zip" : null
-          },
-          "selected" : null
-        }
-        """)
-    }
-
-    func testCartDeliveryAddressInputEncodesAllKeys() throws {
-        let mock = CartDeliveryAddressInput()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "address1" : null,
-          "address2" : null,
-          "city" : null,
-          "company" : null,
-          "countryCode" : null,
-          "firstName" : null,
-          "lastName" : null,
-          "phone" : null,
-          "provinceCode" : null,
-          "zip" : null
-        }
-        """)
-    }
-
-    func testCartBuyerIdentityInputEncodesAllKeys() throws {
-        let mock = CartBuyerIdentityInput()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "countryCode" : null,
-          "email" : null,
-          "phone" : null
-        }
-        """)
-    }
-
-    func testResponseErrorEncodesAllKeys() throws {
-        let mock = ResponseError(code: "TEST", message: "Test error")
-        XCTAssertEqual(try toString(mock), """
-        {
-          "code" : "TEST",
-          "fieldTarget" : null,
-          "message" : "Test error"
-        }
-        """)
     }
 
     // MARK: - Data Type Tests
 
-    func testOrderConfirmationEncodesAllKeys() throws {
-        let mock = OrderConfirmation(
-            order: OrderConfirmation.Order(id: "test-order"),
-            isFirstOrder: false
-        )
-        XCTAssertEqual(try toString(mock), """
-        {
-          "isFirstOrder" : false,
-          "number" : null,
-          "order" : {
-            "id" : "test-order"
-          },
-          "url" : null
-        }
-        """)
-    }
+    func test_encode_dataTypes_includeAllNullableKeys() throws {
+        let testCases: [(name: String, instance: any Encodable, expected: String)] = [
+            (
+                "OrderConfirmation",
+                OrderConfirmation(
+                    order: OrderConfirmation.Order(id: "test-order"),
+                    isFirstOrder: false
+                ),
+                """
+                {
+                  "isFirstOrder" : false,
+                  "number" : null,
+                  "order" : {
+                    "id" : "test-order"
+                  },
+                  "url" : null
+                }
+                """
+            ),
+            (
+                "MerchandiseImage",
+                MerchandiseImage(url: "https://example.com/image.png"),
+                """
+                {
+                  "altText" : null,
+                  "url" : "https://example.com/image.png"
+                }
+                """
+            ),
+            (
+                "CartBuyerIdentity",
+                CartBuyerIdentity(),
+                """
+                {
+                  "countryCode" : null,
+                  "customer" : null,
+                  "email" : null,
+                  "phone" : null
+                }
+                """
+            ),
+            (
+                "Customer",
+                Customer(),
+                """
+                {
+                  "email" : null,
+                  "firstName" : null,
+                  "id" : null,
+                  "lastName" : null,
+                  "phone" : null
+                }
+                """
+            ),
+            (
+                "MailingAddress",
+                MailingAddress(),
+                """
+                {
+                  "address1" : null,
+                  "address2" : null,
+                  "city" : null,
+                  "company" : null,
+                  "country" : null,
+                  "countryCodeV2" : null,
+                  "firstName" : null,
+                  "lastName" : null,
+                  "phone" : null,
+                  "province" : null,
+                  "zip" : null
+                }
+                """
+            ),
+            (
+                "CartDeliveryAddress",
+                CartDeliveryAddress(),
+                """
+                {
+                  "address1" : null,
+                  "address2" : null,
+                  "city" : null,
+                  "company" : null,
+                  "countryCode" : null,
+                  "firstName" : null,
+                  "lastName" : null,
+                  "phone" : null,
+                  "provinceCode" : null,
+                  "zip" : null
+                }
+                """
+            ),
+            (
+                "CartDeliveryOption",
+                CartDeliveryOption(
+                    handle: "test-handle",
+                    estimatedCost: Money(amount: "10.00", currencyCode: "USD"),
+                    deliveryMethodType: .shipping
+                ),
+                """
+                {
+                  "code" : null,
+                  "deliveryMethodType" : "SHIPPING",
+                  "description" : null,
+                  "estimatedCost" : {
+                    "amount" : "10.00",
+                    "currencyCode" : "USD"
+                  },
+                  "handle" : "test-handle",
+                  "title" : null
+                }
+                """
+            )
+        ]
 
-    func testMerchandiseImageEncodesAllKeys() throws {
-        let mock = MerchandiseImage(url: "https://example.com/image.png")
-        XCTAssertEqual(try toString(mock), """
-        {
-          "altText" : null,
-          "url" : "https://example.com/image.png"
+        for (name, instance, expected) in testCases {
+            try XCTContext.runActivity(named: name) { _ in
+                XCTAssertEqual(try toString(instance), expected)
+            }
         }
-        """)
-    }
-
-    func testCartBuyerIdentityEncodesAllKeys() throws {
-        let mock = CartBuyerIdentity()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "countryCode" : null,
-          "customer" : null,
-          "email" : null,
-          "phone" : null
-        }
-        """)
-    }
-
-    func testCustomerEncodesAllKeys() throws {
-        let mock = Customer()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "email" : null,
-          "firstName" : null,
-          "id" : null,
-          "lastName" : null,
-          "phone" : null
-        }
-        """)
-    }
-
-    func testMailingAddressEncodesAllKeys() throws {
-        let mock = MailingAddress()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "address1" : null,
-          "address2" : null,
-          "city" : null,
-          "company" : null,
-          "country" : null,
-          "countryCodeV2" : null,
-          "firstName" : null,
-          "lastName" : null,
-          "phone" : null,
-          "province" : null,
-          "zip" : null
-        }
-        """)
-    }
-
-    func testCartDeliveryAddressEncodesAllKeys() throws {
-        let mock = CartDeliveryAddress()
-        XCTAssertEqual(try toString(mock), """
-        {
-          "address1" : null,
-          "address2" : null,
-          "city" : null,
-          "company" : null,
-          "countryCode" : null,
-          "firstName" : null,
-          "lastName" : null,
-          "phone" : null,
-          "provinceCode" : null,
-          "zip" : null
-        }
-        """)
-    }
-
-    func testCartDeliveryOptionEncodesAllKeys() throws {
-        let mock = CartDeliveryOption(
-            handle: "test-handle",
-            estimatedCost: Money(amount: "10.00", currencyCode: "USD"),
-            deliveryMethodType: .shipping
-        )
-        XCTAssertEqual(try toString(mock), """
-        {
-          "code" : null,
-          "deliveryMethodType" : "SHIPPING",
-          "description" : null,
-          "estimatedCost" : {
-            "amount" : "10.00",
-            "currencyCode" : "USD"
-          },
-          "handle" : "test-handle",
-          "title" : null
-        }
-        """)
     }
 }
