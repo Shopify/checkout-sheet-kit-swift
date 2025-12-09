@@ -86,8 +86,8 @@ class CheckoutWebViewControllerTests: XCTestCase {
     private let url = URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!
     private let multipassURL = URL(string: "http://shopify1.shopify.com/checkouts/cn/123?multipass=token")!
 
-    private let recoverableError = CheckoutError.checkoutUnavailable(message: "Test recoverable", code: .clientError(code: .unknown), recoverable: true)
-    private let nonRecoverableError = CheckoutError.checkoutExpired(message: "Test non-recoverable", code: .cartExpired, recoverable: false)
+    private let recoverableError = CheckoutError.checkoutUnavailable(message: "Test recoverable", code: .clientError(code: .unknown("test")), recoverable: true)
+    private let nonRecoverableError = CheckoutError.checkoutExpired(message: "Test non-recoverable", code: .cartCompleted, recoverable: false)
 
     func test_checkoutViewDidFailWithError_incrementsErrorCount() {
         let mockDelegate = MockCheckoutDelegate()
@@ -191,12 +191,12 @@ class CheckoutWebViewControllerTests: XCTestCase {
             ),
             TestCase(
                 name: "configurationError recoverable=true",
-                error: .configurationError(message: "Test config", code: .unknown, recoverable: true),
+                error: .configurationError(message: "Test config", code: .unknown("test"), recoverable: true),
                 expectedRecoverable: true
             ),
             TestCase(
                 name: "configurationError recoverable=false",
-                error: .configurationError(message: "Test config", code: .unknown, recoverable: false),
+                error: .configurationError(message: "Test config", code: .unknown("test"), recoverable: false),
                 expectedRecoverable: false
             ),
             TestCase(
@@ -211,12 +211,12 @@ class CheckoutWebViewControllerTests: XCTestCase {
             ),
             TestCase(
                 name: "checkoutExpired recoverable=true",
-                error: .checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: true),
+                error: .checkoutExpired(message: "Test expired", code: .cartCompleted, recoverable: true),
                 expectedRecoverable: true
             ),
             TestCase(
                 name: "checkoutExpired recoverable=false",
-                error: .checkoutExpired(message: "Test expired", code: .cartExpired, recoverable: false),
+                error: .checkoutExpired(message: "Test expired", code: .cartCompleted, recoverable: false),
                 expectedRecoverable: false
             )
         ]

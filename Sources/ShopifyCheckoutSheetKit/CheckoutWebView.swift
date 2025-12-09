@@ -308,8 +308,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 modalVisible: modalRequest.params.modalVisible
             )
 
-        case let errorRequest as CheckoutErrorRequest:
-            handleCheckoutError(errorRequest)
+        case let errorEvent as CheckoutErrorEvent:
+            handleCheckoutError(errorEvent)
 
         // Ignore unsupported requests
         case let unsupportedRequest as UnsupportedRequest:
@@ -322,43 +322,50 @@ extension CheckoutWebView: WKScriptMessageHandler {
         }
     }
 
-    fileprivate func handleCheckoutError(_ errorRequest: CheckoutErrorRequest) {
+    fileprivate func handleCheckoutError(_ errorEvent: CheckoutErrorEvent) {
         guard let viewDelegate else { return }
-        guard let error = errorRequest.firstError else { return }
-        let code = CheckoutErrorCode.from(error.code)
 
-        switch error.group {
-        case .configuration:
+        switch errorEvent.code {
+        case .storefrontPasswordRequired,
+             .customerAccountRequired,
+             .invalidPayload,
+             .invalidSignature,
+             .notAuthorized,
+             .payloadExpired:
             OSLogger.shared.error(
-                "Configuration error received: \(error.reason ?? "No message"), code: \(code)"
+                "Configuration error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
             viewDelegate.checkoutViewDidFailWithError(
-                error: .checkoutUnavailable(
-                    message: error.reason ?? "Storefront configuration error.",
-                    code: CheckoutUnavailable.clientError(code: code),
+                error: .configurationError(
+                    message: errorEvent.message,
+                    code: errorEvent.code,
                     recoverable: false
                 ))
-        case .unrecoverable:
-            OSLogger.shared.error(
-                "Checkout unavailable error received: \(error.reason ?? "No message"), code: \(code)"
-            )
-            viewDelegate.checkoutViewDidFailWithError(
-                error: .checkoutUnavailable(
-                    message: error.reason ?? "Checkout unavailable.",
-                    code: CheckoutUnavailable.clientError(code: code),
-                    recoverable: true
-                )
-            )
-        case .expired:
+
+        case .cartCompleted, .invalidCart:
             OSLogger.shared.info(
-                "Checkout expired error received: \(error.reason ?? "No message"), code: \(code)"
+                "Checkout expired error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
             viewDelegate.checkoutViewDidFailWithError(
                 error: .checkoutExpired(
-                    message: error.reason ?? "Checkout has expired.", code: code
+                    message: errorEvent.message,
+                    code: errorEvent.code
                 ))
-        default:
-            OSLogger.shared.error("Unknown error group received: \(error.group)")
+
+        case .killswitchEnabled,
+             .unrecoverableFailure,
+             .policyViolation,
+             .vaultedPaymentError,
+             .unknown:
+            OSLogger.shared.error(
+                "Checkout unavailable error received: \(errorEvent.message), code: \(errorEvent.code)"
+            )
+            viewDelegate.checkoutViewDidFailWithError(
+                error: .checkoutUnavailable(
+                    message: errorEvent.message,
+                    code: CheckoutUnavailable.clientError(code: errorEvent.code),
+                    recoverable: true
+                ))
         }
     }
 }
@@ -438,7 +445,7 @@ extension CheckoutWebView: WKNavigationDelegate {
                         error: .configurationError(
                             message:
                             "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
-                            code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false
+                            code: CheckoutErrorCode.unknown("CHECKOUT_LIQUID_NOT_MIGRATED"), recoverable: false
                         ))
                 } else {
                     viewDelegate?.checkoutViewDidFailWithError(
@@ -452,7 +459,7 @@ extension CheckoutWebView: WKNavigationDelegate {
                 OSLogger.shared.debug("Gone (410)")
                 viewDelegate?.checkoutViewDidFailWithError(
                     error: .checkoutExpired(
-                        message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired
+                        message: "Checkout has expired.", code: CheckoutErrorCode.invalidCart
                     ))
             case 500 ... 599:
                 OSLogger.shared.debug("Server error (5xx)")

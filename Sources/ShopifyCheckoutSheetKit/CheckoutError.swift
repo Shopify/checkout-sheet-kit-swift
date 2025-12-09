@@ -23,22 +23,59 @@
 
 import Foundation
 
-public enum CheckoutErrorCode: String, Codable {
-    case storefrontPasswordRequired = "storefront_password_required"
-    case checkoutLiquidNotMigrated = "checkout_liquid_not_migrated"
-    case cartExpired = "cart_expired"
-    case cartCompleted = "cart_completed"
-    case invalidCart = "invalid_cart"
-    case unknown
+public enum CheckoutErrorCode: Codable, Equatable {
+    case invalidPayload
+    case invalidSignature
+    case notAuthorized
+    case payloadExpired
+    case customerAccountRequired
+    case storefrontPasswordRequired
+    case cartCompleted
+    case invalidCart
+    case killswitchEnabled
+    case unrecoverableFailure
+    case policyViolation
+    case vaultedPaymentError
+    case unknown(String)
 
-    public static func from(_ code: String?) -> CheckoutErrorCode {
-        let fallback = CheckoutErrorCode.unknown
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
 
-        guard let errorCode = code else {
-            return fallback
+        switch rawValue {
+        case "INVALID_PAYLOAD": self = .invalidPayload
+        case "INVALID_SIGNATURE": self = .invalidSignature
+        case "NOT_AUTHORIZED": self = .notAuthorized
+        case "PAYLOAD_EXPIRED": self = .payloadExpired
+        case "CUSTOMER_ACCOUNT_REQUIRED": self = .customerAccountRequired
+        case "STOREFRONT_PASSWORD_REQUIRED": self = .storefrontPasswordRequired
+        case "CART_COMPLETED": self = .cartCompleted
+        case "INVALID_CART": self = .invalidCart
+        case "KILLSWITCH_ENABLED": self = .killswitchEnabled
+        case "UNRECOVERABLE_FAILURE": self = .unrecoverableFailure
+        case "POLICY_VIOLATION": self = .policyViolation
+        case "VAULTED_PAYMENT_ERROR": self = .vaultedPaymentError
+        default: self = .unknown(rawValue)
         }
+    }
 
-        return CheckoutErrorCode(rawValue: errorCode) ?? fallback
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .invalidPayload: try container.encode("INVALID_PAYLOAD")
+        case .invalidSignature: try container.encode("INVALID_SIGNATURE")
+        case .notAuthorized: try container.encode("NOT_AUTHORIZED")
+        case .payloadExpired: try container.encode("PAYLOAD_EXPIRED")
+        case .customerAccountRequired: try container.encode("CUSTOMER_ACCOUNT_REQUIRED")
+        case .storefrontPasswordRequired: try container.encode("STOREFRONT_PASSWORD_REQUIRED")
+        case .cartCompleted: try container.encode("CART_COMPLETED")
+        case .invalidCart: try container.encode("INVALID_CART")
+        case .killswitchEnabled: try container.encode("KILLSWITCH_ENABLED")
+        case .unrecoverableFailure: try container.encode("UNRECOVERABLE_FAILURE")
+        case .policyViolation: try container.encode("POLICY_VIOLATION")
+        case .vaultedPaymentError: try container.encode("VAULTED_PAYMENT_ERROR")
+        case .unknown(let value): try container.encode(value)
+        }
     }
 }
 
@@ -70,42 +107,22 @@ public enum CheckoutError: Swift.Error {
 
     public var isRecoverable: Bool {
         switch self {
-        case let .checkoutExpired(_, _, recoverable),
-             let .checkoutUnavailable(_, _, recoverable),
-             let .configurationError(_, _, recoverable),
-             let .sdkError(_, recoverable):
+        case .checkoutExpired(_, _, let recoverable),
+            .checkoutUnavailable(_, _, let recoverable),
+            .configurationError(_, _, let recoverable),
+            .sdkError(_, let recoverable):
             return recoverable
         }
     }
 }
 
-public enum CheckoutErrorGroup: String, Codable {
-    /// An authentication error
-    case authentication
-    /// A shop configuration error
-    case configuration
-    /// A terminal checkout error which cannot be handled
-    case unrecoverable
-    /// A checkout-related error, such as failure to receive a receipt or progress through checkout
-    case checkout
-    /// The checkout session has expired and is no longer available
-    case expired
-    /// The error sent by checkout is not supported
-    case unsupported
-}
+public struct CheckoutErrorEvent: CheckoutNotification {
+    public static let method = "checkout.error"
+    public let code: CheckoutErrorCode
+    public let message: String
 
-public struct CheckoutErrorEvent: Codable {
-    public let group: CheckoutErrorGroup
-    public let code: String?
-    public let flowType: String?
-    public let reason: String?
-    public let type: String?
-
-    public init(group: CheckoutErrorGroup, code: String? = nil, flowType: String? = nil, reason: String? = nil, type: String? = nil) {
-        self.group = group
+    public init(code: CheckoutErrorCode, message: String) {
         self.code = code
-        self.flowType = flowType
-        self.reason = reason
-        self.type = type
+        self.message = message
     }
 }

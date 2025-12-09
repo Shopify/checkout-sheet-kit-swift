@@ -327,7 +327,7 @@ final class ApplePayCallbackTests: XCTestCase {
     func testShouldRecoverFromErrorCallbackInvoked() async {
         let expectation = expectation(description: "shouldRecoverFromError callback should be invoked")
 
-        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .unknown), recoverable: true)
+        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .unknown("test")), recoverable: true)
         var capturedError: ShopifyCheckoutSheetKit.CheckoutError?
 
         viewController.onShouldRecoverFromError = { error in
@@ -353,7 +353,7 @@ final class ApplePayCallbackTests: XCTestCase {
             }
         }
 
-        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test", code: .clientError(code: .unknown), recoverable: true)
+        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test", code: .clientError(code: .unknown("test")), recoverable: true)
         let result = await MainActor.run {
             viewController.shouldRecoverFromError(error: testError)
         }
