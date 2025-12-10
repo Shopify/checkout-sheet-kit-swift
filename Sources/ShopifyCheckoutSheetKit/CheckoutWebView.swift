@@ -331,7 +331,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
              .invalidPayload,
              .invalidSignature,
              .notAuthorized,
-             .payloadExpired:
+             .payloadExpired,
+             .checkoutLiquidNotMigrated:
             OSLogger.shared.error(
                 "Configuration error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
@@ -355,8 +356,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
         case .killswitchEnabled,
              .unrecoverableFailure,
              .policyViolation,
-             .vaultedPaymentError,
-             .unknown:
+             .vaultedPaymentError:
             OSLogger.shared.error(
                 "Checkout unavailable error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
@@ -445,7 +445,7 @@ extension CheckoutWebView: WKNavigationDelegate {
                         error: .configurationError(
                             message:
                             "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
-                            code: CheckoutErrorCode.unknown("CHECKOUT_LIQUID_NOT_MIGRATED"), recoverable: false
+                            code: .checkoutLiquidNotMigrated, recoverable: false
                         ))
                 } else {
                     viewDelegate?.checkoutViewDidFailWithError(
