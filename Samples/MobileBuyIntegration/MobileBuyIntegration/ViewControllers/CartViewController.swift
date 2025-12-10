@@ -607,23 +607,23 @@ extension CartViewController: CheckoutDelegate {
         var errorMessage = ""
 
         /// Internal Checkout SDK error
-        if case let .sdkError(underlying, _) = error {
+        if case let .sdk(underlying, _) = error {
             errorMessage = "\(underlying.localizedDescription)"
         }
 
         /// Checkout unavailable error
-        if case let .checkoutUnavailable(message, code, _) = error {
+        if case let .unavailable(message, code, _) = error {
             errorMessage = message
             handleCheckoutUnavailable(message, code)
         }
 
         /// Storefront configuration error
-        if case let .configurationError(message, _, _) = error {
+        if case let .misconfiguration(message, _, _) = error {
             errorMessage = message
         }
 
         /// Checkout has expired, re-create cart to fetch a new checkout URL
-        if case let .checkoutExpired(message, _, _) = error {
+        if case let .expired(message, _, _) = error {
             errorMessage = message
         }
 
