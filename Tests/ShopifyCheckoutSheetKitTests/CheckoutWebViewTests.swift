@@ -354,30 +354,6 @@ class CheckoutWebViewTests: XCTestCase {
         }
     }
 
-    func testTreat404WithDeprecationHeader() {
-        view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
-        let link = view.url!
-        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
-
-        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
-        view.viewDelegate = mockDelegate
-
-        let urlResponse = HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: ["x-shopify-api-deprecated-reason": "checkout_liquid_not_supported"])!
-
-        let policy = view.handleResponse(urlResponse)
-        XCTAssertEqual(policy, .cancel)
-
-        waitForExpectations(timeout: 5) { _ in
-            switch self.mockDelegate.errorReceived {
-            case let .some(.configurationError(message, _, recoverable)):
-                XCTAssertEqual(message, "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.")
-                XCTAssertFalse(recoverable)
-            default:
-                XCTFail("Unhandled error case received")
-            }
-        }
-    }
-
     func test410responseOnCheckoutURLCodeDelegation() {
         view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
         let link = view.url!

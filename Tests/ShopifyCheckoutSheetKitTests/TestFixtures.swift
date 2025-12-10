@@ -131,6 +131,24 @@ func createTestCheckoutCompleteEvent(
     )
 }
 
+/**
+ Creates a test CheckoutErrorEvent instance with sensible defaults.
+
+ Example:
+ ```swift
+ let event = createTestCheckoutErrorEvent(
+     code: .cartCompleted,
+     message: "This checkout has already been completed"
+ )
+ ```
+ */
+func createTestCheckoutErrorEvent(
+    code: CheckoutErrorCode = .cartCompleted,
+    message: String = "An error occurred"
+) -> CheckoutErrorEvent {
+    CheckoutErrorEvent(code: code, message: message)
+}
+
 // MARK: - JSON Fixtures
 
 /**
@@ -233,6 +251,30 @@ func createCheckoutCompleteJSON(
                 "isFirstOrder": false
             },
             "cart": \(createTestCartJSON(id: cartId))
+        }
+    }
+    """
+}
+
+/**
+ Creates a JSON-RPC message string for checkout.error with sensible defaults.
+
+ Example:
+ ```swift
+ let json = createCheckoutErrorJSON(code: "CART_COMPLETED", message: "This checkout has already been completed")
+ ```
+ */
+func createCheckoutErrorJSON(
+    code: String = "CART_COMPLETED",
+    message: String = "An error occurred"
+) -> String {
+    """
+    {
+        "jsonrpc": "2.0",
+        "method": "checkout.error",
+        "params": {
+            "code": "\(code)",
+            "message": "\(message)"
         }
     }
     """

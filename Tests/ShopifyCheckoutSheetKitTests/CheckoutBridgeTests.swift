@@ -153,31 +153,24 @@ class CheckoutBridgeTests: XCTestCase {
         }
     }
 
-    func testDecodeSupportsCheckoutExpiredError() throws {
-        let mock = WKScriptMessageMock(body: """
-        {
-            "jsonrpc": "2.0",
-            "id": "test-id",
-            "method": "error",
-            "params": [{
-                "group": "expired",
-                "type": "invalidCart",
-                "reason": "Cart is invalid",
-                "flowType": "regular",
-                "code": "cart_expired"
-            }]
-        }
-        """, webView: mockWebView)
+    func testDecodeSupportsCheckoutError() throws {
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(
+                code: "CART_COMPLETED",
+                message: "This checkout has already been completed"
+            ),
+            webView: mockWebView
+        )
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let errorRequest = result as? CheckoutErrorRequest else {
-            XCTFail("Expected CheckoutErrorRequest, got \(result)")
+        guard let errorEvent = result as? CheckoutErrorEvent else {
+            XCTFail("Expected CheckoutErrorEvent, got \(result)")
             return
         }
 
-        XCTAssertEqual(errorRequest.firstError?.group, .expired)
-        XCTAssertEqual(errorRequest.firstError?.reason, "Cart is invalid")
+        XCTAssertEqual(errorEvent.code, .cartCompleted)
+        XCTAssertEqual(errorEvent.message, "This checkout has already been completed")
     }
 
     func testDecodeSupportsCheckoutModalToggled() throws {
