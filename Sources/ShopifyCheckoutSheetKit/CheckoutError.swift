@@ -61,6 +61,15 @@ public enum CheckoutError: Error {
         }
     }
 
+    public var message: String {
+        switch self {
+        case let .sdk(underlying, _): return underlying.localizedDescription
+        case let .expired(message, _, _): return message
+        case let .unavailable(message, _, _): return message
+        case let .misconfiguration(message, _, _): return message
+        }
+    }
+
     public enum ErrorCode: String, Codable {
         /// misconfiguration: recoverable:false
         case payloadExpired = "PAYLOAD_EXPIRED"
