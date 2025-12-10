@@ -603,7 +603,7 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
+    func checkoutDidFail(error: CheckoutError) {
         var errorMessage = ""
 
         /// Internal Checkout SDK error
@@ -634,7 +634,7 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    private func handleCheckoutUnavailable(_ message: String, _ code: CheckoutUnavailable) {
+    private func handleCheckoutUnavailable(_ message: String, _ code: CheckoutError.CheckoutUnavailable) {
         switch code {
         case let .clientError(clientErrorCode):
             print("[CheckoutUnavailable] (checkoutError)", message, clientErrorCode)
