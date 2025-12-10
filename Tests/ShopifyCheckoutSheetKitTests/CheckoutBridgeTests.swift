@@ -198,26 +198,6 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual(errorEvent.message, "This checkout has already been completed")
     }
 
-    func testDecodeSupportsCheckoutErrorWithUnknownCode() throws {
-        let mock = WKScriptMessageMock(
-            body: createCheckoutErrorJSON(
-                code: "FUTURE_ERROR_CODE",
-                message: "Some future error"
-            ),
-            webView: mockWebView
-        )
-
-        let result = try CheckoutBridge.decode(mock)
-
-        guard let errorEvent = result as? CheckoutErrorEvent else {
-            XCTFail("Expected CheckoutErrorEvent, got \(result)")
-            return
-        }
-
-        XCTAssertEqual(errorEvent.code, .unknown("FUTURE_ERROR_CODE"))
-        XCTAssertEqual(errorEvent.message, "Some future error")
-    }
-
     func testDecodeSupportsCheckoutModalToggled() throws {
         let mock = WKScriptMessageMock(body: """
         {

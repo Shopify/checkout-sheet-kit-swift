@@ -23,60 +23,20 @@
 
 import Foundation
 
-public enum CheckoutErrorCode: Codable, Equatable {
-    case invalidPayload
-    case invalidSignature
-    case notAuthorized
-    case payloadExpired
-    case customerAccountRequired
-    case storefrontPasswordRequired
-    case cartCompleted
-    case invalidCart
-    case killswitchEnabled
-    case unrecoverableFailure
-    case policyViolation
-    case vaultedPaymentError
-    case unknown(String)
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let rawValue = try container.decode(String.self)
-
-        switch rawValue {
-        case "INVALID_PAYLOAD": self = .invalidPayload
-        case "INVALID_SIGNATURE": self = .invalidSignature
-        case "NOT_AUTHORIZED": self = .notAuthorized
-        case "PAYLOAD_EXPIRED": self = .payloadExpired
-        case "CUSTOMER_ACCOUNT_REQUIRED": self = .customerAccountRequired
-        case "STOREFRONT_PASSWORD_REQUIRED": self = .storefrontPasswordRequired
-        case "CART_COMPLETED": self = .cartCompleted
-        case "INVALID_CART": self = .invalidCart
-        case "KILLSWITCH_ENABLED": self = .killswitchEnabled
-        case "UNRECOVERABLE_FAILURE": self = .unrecoverableFailure
-        case "POLICY_VIOLATION": self = .policyViolation
-        case "VAULTED_PAYMENT_ERROR": self = .vaultedPaymentError
-        default: self = .unknown(rawValue)
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .invalidPayload: try container.encode("INVALID_PAYLOAD")
-        case .invalidSignature: try container.encode("INVALID_SIGNATURE")
-        case .notAuthorized: try container.encode("NOT_AUTHORIZED")
-        case .payloadExpired: try container.encode("PAYLOAD_EXPIRED")
-        case .customerAccountRequired: try container.encode("CUSTOMER_ACCOUNT_REQUIRED")
-        case .storefrontPasswordRequired: try container.encode("STOREFRONT_PASSWORD_REQUIRED")
-        case .cartCompleted: try container.encode("CART_COMPLETED")
-        case .invalidCart: try container.encode("INVALID_CART")
-        case .killswitchEnabled: try container.encode("KILLSWITCH_ENABLED")
-        case .unrecoverableFailure: try container.encode("UNRECOVERABLE_FAILURE")
-        case .policyViolation: try container.encode("POLICY_VIOLATION")
-        case .vaultedPaymentError: try container.encode("VAULTED_PAYMENT_ERROR")
-        case .unknown(let value): try container.encode(value)
-        }
-    }
+public enum CheckoutErrorCode: String, Codable {
+    case invalidPayload = "INVALID_PAYLOAD"
+    case invalidSignature = "INVALID_SIGNATURE"
+    case notAuthorized = "NOT_AUTHORIZED"
+    case payloadExpired = "PAYLOAD_EXPIRED"
+    case customerAccountRequired = "CUSTOMER_ACCOUNT_REQUIRED"
+    case storefrontPasswordRequired = "STOREFRONT_PASSWORD_REQUIRED"
+    case cartCompleted = "CART_COMPLETED"
+    case invalidCart = "INVALID_CART"
+    case killswitchEnabled = "KILLSWITCH_ENABLED"
+    case unrecoverableFailure = "UNRECOVERABLE_FAILURE"
+    case policyViolation = "POLICY_VIOLATION"
+    case vaultedPaymentError = "VAULTED_PAYMENT_ERROR"
+    case checkoutLiquidNotMigrated = "CHECKOUT_LIQUID_NOT_MIGRATED"
 }
 
 public enum CheckoutUnavailable {
@@ -107,10 +67,10 @@ public enum CheckoutError: Swift.Error {
 
     public var isRecoverable: Bool {
         switch self {
-        case .checkoutExpired(_, _, let recoverable),
-            .checkoutUnavailable(_, _, let recoverable),
-            .configurationError(_, _, let recoverable),
-            .sdkError(_, let recoverable):
+        case let .checkoutExpired(_, _, recoverable),
+             let .checkoutUnavailable(_, _, recoverable),
+             let .configurationError(_, _, recoverable),
+             let .sdkError(_, recoverable):
             return recoverable
         }
     }
