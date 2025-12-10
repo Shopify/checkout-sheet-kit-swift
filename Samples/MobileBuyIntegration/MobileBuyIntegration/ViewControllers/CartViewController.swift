@@ -604,33 +604,14 @@ extension CartViewController: CheckoutDelegate {
     }
 
     func checkoutDidFail(error: CheckoutError) {
-        var errorMessage = ""
-
-        /// Internal Checkout SDK error
-        if case let .sdk(underlying, _) = error {
-            errorMessage = "\(underlying.localizedDescription)"
-        }
-
-        /// Checkout unavailable error
         if case let .unavailable(message, code, _) = error {
-            errorMessage = message
             handleCheckoutUnavailable(message, code)
         }
 
-        /// Storefront configuration error
-        if case let .misconfiguration(message, _, _) = error {
-            errorMessage = message
-        }
-
-        /// Checkout has expired, re-create cart to fetch a new checkout URL
-        if case let .expired(message, _, _) = error {
-            errorMessage = message
-        }
-
-        print(errorMessage, "Recoverable: \(error.isRecoverable)")
+        print(error.message, "Recoverable: \(error.isRecoverable)")
 
         if !error.isRecoverable {
-            handleUnrecoverableError(errorMessage)
+            handleUnrecoverableError(error.message)
         }
     }
 
