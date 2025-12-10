@@ -50,27 +50,27 @@ public enum CheckoutError: Swift.Error {
     /// Issued when an internal error within Shopify Checkout SDK
     /// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
     /// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
-    case sdkError(underlying: Swift.Error, recoverable: Bool = true)
+    case sdk(underlying: Swift.Error, recoverable: Bool = true)
 
     /// Issued when the storefront configuration has caused an error.
     /// Note that the Checkout Sheet Kit only supports stores migrated for extensibility.
-    case configurationError(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
+    case misconfiguration(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
 
     /// Issued when checkout has encountered a unrecoverable error (for example server side error)
     /// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
-    case checkoutUnavailable(message: String, code: CheckoutUnavailable, recoverable: Bool)
+    case unavailable(message: String, code: CheckoutUnavailable, recoverable: Bool)
 
     /// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
     /// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
     /// In event of checkoutExpired, a new checkout url will need to be generated
-    case checkoutExpired(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
+    case expired(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
 
     public var isRecoverable: Bool {
         switch self {
-        case let .checkoutExpired(_, _, recoverable),
-             let .checkoutUnavailable(_, _, recoverable),
-             let .configurationError(_, _, recoverable),
-             let .sdkError(_, recoverable):
+        case let .expired(_, _, recoverable),
+             let .unavailable(_, _, recoverable),
+             let .misconfiguration(_, _, recoverable),
+             let .sdk(_, recoverable):
             return recoverable
         }
     }

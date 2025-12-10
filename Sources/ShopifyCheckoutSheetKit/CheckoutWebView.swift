@@ -268,7 +268,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
             OSLogger.shared.error(
                 "[CheckoutWebView]: Failed to decode event: \(error.localizedDescription)"
             )
-            viewDelegate.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+            viewDelegate.checkoutViewDidFailWithError(error: .sdk(underlying: error))
         }
     }
 
@@ -337,7 +337,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 "Configuration error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
             viewDelegate.checkoutViewDidFailWithError(
-                error: .configurationError(
+                error: .misconfiguration(
                     message: errorEvent.message,
                     code: errorEvent.code,
                     recoverable: false
@@ -348,7 +348,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 "Checkout expired error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
             viewDelegate.checkoutViewDidFailWithError(
-                error: .checkoutExpired(
+                error: .expired(
                     message: errorEvent.message,
                     code: errorEvent.code
                 ))
@@ -361,7 +361,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 "Checkout unavailable error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
             viewDelegate.checkoutViewDidFailWithError(
-                error: .checkoutUnavailable(
+                error: .unavailable(
                     message: errorEvent.message,
                     code: CheckoutUnavailable.clientError(code: errorEvent.code),
                     recoverable: true
@@ -431,7 +431,7 @@ extension CheckoutWebView: WKNavigationDelegate {
             case 401:
                 OSLogger.shared.debug("Unauthorized access (401)")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
+                    error: .unavailable(
                         message: errorMessageForStatusCode,
                         code: CheckoutUnavailable.httpError(statusCode: statusCode),
                         recoverable: false
@@ -442,14 +442,14 @@ extension CheckoutWebView: WKNavigationDelegate {
                    reason.lowercased() == checkoutLiquidNotSupportedReason
                 {
                     viewDelegate?.checkoutViewDidFailWithError(
-                        error: .configurationError(
+                        error: .misconfiguration(
                             message:
                             "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
                             code: .checkoutLiquidNotMigrated, recoverable: false
                         ))
                 } else {
                     viewDelegate?.checkoutViewDidFailWithError(
-                        error: .checkoutUnavailable(
+                        error: .unavailable(
                             message: errorMessageForStatusCode,
                             code: CheckoutUnavailable.httpError(statusCode: statusCode),
                             recoverable: false
@@ -458,13 +458,13 @@ extension CheckoutWebView: WKNavigationDelegate {
             case 410:
                 OSLogger.shared.debug("Gone (410)")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutExpired(
+                    error: .expired(
                         message: "Checkout has expired.", code: CheckoutErrorCode.invalidCart
                     ))
             case 500 ... 599:
                 OSLogger.shared.debug("Server error (5xx)")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
+                    error: .unavailable(
                         message: errorMessageForStatusCode,
                         code: CheckoutUnavailable.httpError(statusCode: statusCode),
                         recoverable: allowRecoverable
@@ -472,7 +472,7 @@ extension CheckoutWebView: WKNavigationDelegate {
             default:
                 OSLogger.shared.debug("\(statusCode) error received")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
+                    error: .unavailable(
                         message: errorMessageForStatusCode,
                         code: CheckoutUnavailable.httpError(statusCode: statusCode),
                         recoverable: false
@@ -543,7 +543,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         viewDelegate?.checkoutViewDidFailWithError(
-            error: .sdkError(underlying: error, recoverable: !isRecovery)
+            error: .sdk(underlying: error, recoverable: !isRecovery)
         )
     }
 
