@@ -62,7 +62,7 @@ public struct Cart: Codable {
     public let appliedGiftCards: [AppliedGiftCard]
     public let discountAllocations: [CartDiscountAllocation]
     public let delivery: CartDelivery
-    public let payment: CartPayment
+    public let payment: CartPayment?
 }
 
 public struct CartLine: Codable {
@@ -288,11 +288,32 @@ public enum PaymentMethodType: String, Codable {
 }
 
 public struct CartPayment: Codable {
+    public let methods: [CartPaymentMethod]
+}
+
+public struct CartPaymentMethod: Codable {
     public let instruments: [CartPaymentInstrument]
 }
 
 public struct CartPaymentInstrument: Codable {
     public let externalReference: String
+    public let credentials: [CartCredential]
+}
+
+public enum CartCredential: Codable {
+    case remoteTokenPaymentCredential(RemoteTokenPaymentCredential)
+
+    public struct RemoteTokenPaymentCredential: Codable {
+        public let token: String
+        public let tokenType: String
+        public let tokenHandler: String
+
+        public init(token: String, tokenType: String, tokenHandler: String) {
+            self.token = token
+            self.tokenType = tokenType
+            self.tokenHandler = tokenHandler
+        }
+    }
 }
 
 public struct CartDelivery: Codable {
