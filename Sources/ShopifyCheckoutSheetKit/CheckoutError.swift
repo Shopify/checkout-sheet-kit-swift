@@ -88,9 +88,6 @@ public enum CheckoutError: Error {
         /// expired: recoverable:false
         case cartCompleted = "CART_COMPLETED"
         case invalidCart = "INVALID_CART"
-
-        /// deprecated?
-        case checkoutLiquidNotMigrated = "CHECKOUT_LIQUID_NOT_MIGRATED"
     }
 
     public enum CheckoutUnavailable {

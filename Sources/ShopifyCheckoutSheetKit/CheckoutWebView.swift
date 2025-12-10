@@ -38,7 +38,6 @@ protocol CheckoutWebViewDelegate: AnyObject {
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
-private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
 public class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
@@ -331,8 +330,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
              .invalidPayload,
              .invalidSignature,
              .notAuthorized,
-             .payloadExpired,
-             .checkoutLiquidNotMigrated:
+             .payloadExpired:
             OSLogger.shared.error(
                 "Configuration error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
@@ -438,23 +436,12 @@ extension CheckoutWebView: WKNavigationDelegate {
                     ))
             case 404:
                 OSLogger.shared.debug("Not found (404)")
-                if let reason = headers[deprecatedReasonHeader] as? String,
-                   reason.lowercased() == checkoutLiquidNotSupportedReason
-                {
-                    viewDelegate?.checkoutViewDidFailWithError(
-                        error: .misconfiguration(
-                            message:
-                            "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
-                            code: .checkoutLiquidNotMigrated, recoverable: false
-                        ))
-                } else {
-                    viewDelegate?.checkoutViewDidFailWithError(
-                        error: .unavailable(
-                            message: errorMessageForStatusCode,
-                            code: .httpError(statusCode: statusCode),
-                            recoverable: false
-                        ))
-                }
+                viewDelegate?.checkoutViewDidFailWithError(
+                    error: .unavailable(
+                        message: errorMessageForStatusCode,
+                        code: .httpError(statusCode: statusCode),
+                        recoverable: false
+                    ))
             case 410:
                 OSLogger.shared.debug("Gone (410)")
                 viewDelegate?.checkoutViewDidFailWithError(
