@@ -307,11 +307,24 @@ public enum CartCredential: Codable {
         public let token: String
         public let tokenType: String
         public let tokenHandler: String
+    }
 
-        public init(token: String, tokenType: String, tokenHandler: String) {
-            self.token = token
-            self.tokenType = tokenType
-            self.tokenHandler = tokenHandler
+    private enum CodingKeys: String, CodingKey {
+        case __typename
+    }
+
+    public init(from decoder: Decoder) throws {
+        let credential = try RemoteTokenPaymentCredential(from: decoder)
+        self = .remoteTokenPaymentCredential(credential)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .remoteTokenPaymentCredential(credential):
+            try container.encode("RemoteTokenPaymentCredential", forKey: .__typename)
+            try credential.encode(to: encoder)
         }
     }
 }

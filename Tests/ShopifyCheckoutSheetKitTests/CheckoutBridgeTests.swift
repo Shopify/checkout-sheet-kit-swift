@@ -223,7 +223,7 @@ class CheckoutBridgeTests: XCTestCase {
               "appliedGiftCards":[],
               "discountAllocations":[],
               "delivery":{"addresses":[]},
-              "payment":{"instruments":[]}
+              "payment":{"methods":[]}
             }
           }
         }
@@ -284,7 +284,14 @@ class CheckoutBridgeTests: XCTestCase {
                     "appliedGiftCards": [],
                     "discountAllocations": [],
                     "delivery": { "addresses": [] },
-                    "payment": { "instruments": [{ "externalReference": "instrument-123" }] }
+                    "payment": {
+                        "methods": [{
+                            "instruments": [{
+                                "externalReference": "instrument-123",
+                                "credentials": []
+                            }]
+                        }]
+                    }
                 }
             }
         }
@@ -299,8 +306,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         XCTAssertEqual("card-change-456", cardRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.cart.id)
-        XCTAssertEqual(1, cardRequest.cart.payment.instruments.count)
-        XCTAssertEqual("instrument-123", cardRequest.cart.payment.instruments.first?.externalReference)
+        XCTAssertEqual(1, cardRequest.cart.payment?.methods.count)
+        XCTAssertEqual("instrument-123", cardRequest.cart.payment?.methods.first?.instruments.first?.externalReference)
     }
 
     func testDecodeSupportsCheckoutStart() throws {
@@ -380,7 +387,7 @@ class CheckoutBridgeTests: XCTestCase {
                             "addresses": []
                         },
                         "payment": {
-                            "instruments": []
+                            "methods": []
                         }
                     },
                     "sessionId": "checkout-session-789"

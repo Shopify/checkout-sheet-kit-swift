@@ -45,7 +45,7 @@ func createTestCart(
     totalAmount: String = "10.00",
     currencyCode: String = "USD",
     email: String? = nil,
-    paymentInstruments: [CartPaymentInstrument] = []
+    paymentMethods: [CartPaymentMethod] = []
 ) -> Cart {
     Cart(
         id: id,
@@ -65,7 +65,7 @@ func createTestCart(
         appliedGiftCards: [],
         discountAllocations: [],
         delivery: CartDelivery(addresses: []),
-        payment: CartPayment(instruments: paymentInstruments)
+        payment: CartPayment(methods: paymentMethods)
     )
 }
 
@@ -176,7 +176,7 @@ func createTestCartJSON(
             "addresses": []
         },
         "payment": {
-            "instruments": []
+            "methods": []
         }
     }
     """
