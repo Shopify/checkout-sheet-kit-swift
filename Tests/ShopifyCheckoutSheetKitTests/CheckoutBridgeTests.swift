@@ -288,7 +288,13 @@ class CheckoutBridgeTests: XCTestCase {
                         "methods": [{
                             "instruments": [{
                                 "externalReferenceId": "instrument-123",
-                                "credentials": []
+                                "credentials": [{
+                                    "remoteTokenPaymentCredential": {
+                                        "token": "tok_abc123",
+                                        "tokenType": "merchant.token",
+                                        "tokenHandler": "merchant_psp"
+                                    }
+                                }]
                             }]
                         }]
                     }
@@ -308,6 +314,45 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.cart.id)
         XCTAssertEqual(1, cardRequest.cart.payment?.methods.count)
         XCTAssertEqual("instrument-123", cardRequest.cart.payment?.methods.first?.instruments.first?.externalReferenceId)
+
+        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = cardRequest.cart.payment?.methods.first?.instruments.first?.credentials?.first else {
+            XCTFail("Expected remoteTokenPaymentCredential")
+            return
+        }
+
+        XCTAssertEqual("tok_abc123", token)
+        XCTAssertEqual("merchant.token", tokenType)
+        XCTAssertEqual("merchant_psp", tokenHandler)
+    }
+
+    func testDecodeCartPaymentInstrumentWithCredentials() throws {
+        let json = """
+        [{
+            "externalReferenceId": "instrument-123",
+            "credentials": [{
+                "remoteTokenPaymentCredential": {
+                    "token": "tok_abc123",
+                    "tokenType": "merchant.token",
+                    "tokenHandler": "merchant_psp"
+                }
+            }]
+        }]
+        """
+
+        let data = json.data(using: .utf8)!
+        let instruments = try JSONDecoder().decode([CartPaymentInstrument].self, from: data)
+
+        XCTAssertEqual(1, instruments.count)
+        XCTAssertEqual("instrument-123", instruments.first?.externalReferenceId)
+
+        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = instruments.first?.credentials?.first else {
+            XCTFail("Expected remoteTokenPaymentCredential")
+            return
+        }
+
+        XCTAssertEqual("tok_abc123", token)
+        XCTAssertEqual("merchant.token", tokenType)
+        XCTAssertEqual("merchant_psp", tokenHandler)
     }
 
     func testDecodeSupportsCheckoutStart() throws {
