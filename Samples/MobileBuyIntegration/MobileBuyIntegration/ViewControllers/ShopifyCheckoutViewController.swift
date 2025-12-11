@@ -130,17 +130,41 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
     }
 
     func checkoutDidStartSubmit(event: CheckoutSubmitStartEvent) {
-        // Respond with a test payment token after 1 second to simulate payment processing
+        // Respond with updated cart containing payment credentials after 1 second
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            let paymentToken = PaymentTokenInput(
-                token: "tok_test_123",
-                tokenType: "card",
-                tokenProvider: "delegated"
+            let credential = CartCredential.remoteTokenPaymentCredential(
+                CartCredential.RemoteTokenPaymentCredential(
+                    token: "tok_test_123",
+                    tokenType: "card",
+                    tokenHandler: "delegated"
+                )
             )
 
-            let response = CheckoutSubmitStartResponsePayload(payment: paymentToken)
+            let instrument = CartPaymentInstrument(
+                externalReference: "payment-instrument-123",
+                credentials: [credential]
+            )
 
-            OSLogger.shared.debug("[EmbeddedCheckout] Attempting to respond with test payment token")
+            let paymentMethod = CartPaymentMethod(instruments: [instrument])
+            let payment = CartPayment(methods: [paymentMethod])
+
+            // Create updated cart with payment credentials
+            let updatedCart = Cart(
+                id: event.cart.id,
+                lines: event.cart.lines,
+                cost: event.cart.cost,
+                buyerIdentity: event.cart.buyerIdentity,
+                deliveryGroups: event.cart.deliveryGroups,
+                discountCodes: event.cart.discountCodes,
+                appliedGiftCards: event.cart.appliedGiftCards,
+                discountAllocations: event.cart.discountAllocations,
+                delivery: event.cart.delivery,
+                payment: payment
+            )
+
+            let response = CheckoutSubmitStartResponsePayload(cart: updatedCart)
+
+            OSLogger.shared.debug("[EmbeddedCheckout] Attempting to respond with payment credentials")
             do {
                 try event.respondWith(payload: response)
                 OSLogger.shared.debug("[EmbeddedCheckout] Successfully sent response")

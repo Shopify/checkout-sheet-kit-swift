@@ -45,8 +45,7 @@ class NullEncodingValidationTests: XCTestCase {
                 """
                 {
                   "cart" : null,
-                  "errors" : null,
-                  "payment" : null
+                  "errors" : null
                 }
                 """
             ),

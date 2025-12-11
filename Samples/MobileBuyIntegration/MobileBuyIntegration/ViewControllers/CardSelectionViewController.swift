@@ -109,7 +109,7 @@ class CardSelectionViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
 
         // If payment instruments exist, try to select the first one
-        if let firstInstrument = event.cart.payment.instruments.first {
+        if let firstInstrument = event.cart.payment?.methods.first?.instruments.first {
             for (index, option) in cardOptions
                 .enumerated() where option.identifier == firstInstrument.externalReference
             {
@@ -170,20 +170,27 @@ class CardSelectionViewController: UIViewController {
     @objc private func confirmSelection() {
         let selectedCard = cardOptions[selectedIndex]
 
-        let paymentInstrument = CartPaymentInstrumentInput(
-            externalReference: selectedCard.identifier,
-            display: CartPaymentInstrumentDisplayInput(
-                last4: selectedCard.last4,
-                brand: selectedCard.brand,
-                cardHolderName: selectedCard.cardHolderName,
-                expiry: ExpiryInput(month: selectedCard.expiryMonth, year: selectedCard.expiryYear)
-            ),
-            billingAddress: selectedCard.billingAddress
+        let instrument = CartPaymentInstrument(
+            externalReference: selectedCard.identifier
         )
 
-        let result = CheckoutPaymentMethodChangeStartResponsePayload(
-            cart: CartInput(paymentInstruments: [paymentInstrument])
+        let paymentMethod = CartPaymentMethod(instruments: [instrument])
+        let payment = CartPayment(methods: [paymentMethod])
+
+        let updatedCart = Cart(
+            id: event.cart.id,
+            lines: event.cart.lines,
+            cost: event.cart.cost,
+            buyerIdentity: event.cart.buyerIdentity,
+            deliveryGroups: event.cart.deliveryGroups,
+            discountCodes: event.cart.discountCodes,
+            appliedGiftCards: event.cart.appliedGiftCards,
+            discountAllocations: event.cart.discountAllocations,
+            delivery: event.cart.delivery,
+            payment: payment
         )
+
+        let result = CheckoutPaymentMethodChangeStartResponsePayload(cart: updatedCart)
 
         do {
             try event.respondWith(payload: result)

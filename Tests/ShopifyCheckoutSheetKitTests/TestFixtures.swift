@@ -327,26 +327,6 @@ func createTestResponseErrorJSON(
     }
 }
 
-func createTestCartInputJSON(
-    paymentInstruments: [String]? = nil
-) -> String {
-    if let instruments = paymentInstruments {
-        let instrumentsJSON = instruments.joined(separator: ",\n        ")
-        return """
-        {
-            "paymentInstruments": [
-                \(instrumentsJSON)
-            ]
-        }
-        """
-    } else {
-        return """
-        {
-        }
-        """
-    }
-}
-
 func createTestPaymentMethodChangeStartResponseJSON(
     cart: String? = nil,
     errors: [String]? = nil

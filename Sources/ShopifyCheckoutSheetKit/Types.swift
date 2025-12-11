@@ -63,6 +63,30 @@ public struct Cart: Codable {
     public let discountAllocations: [CartDiscountAllocation]
     public let delivery: CartDelivery
     public let payment: CartPayment?
+
+    public init(
+        id: String,
+        lines: [CartLine],
+        cost: CartCost,
+        buyerIdentity: CartBuyerIdentity,
+        deliveryGroups: [CartDeliveryGroup],
+        discountCodes: [CartDiscountCode],
+        appliedGiftCards: [AppliedGiftCard],
+        discountAllocations: [CartDiscountAllocation],
+        delivery: CartDelivery,
+        payment: CartPayment?
+    ) {
+        self.id = id
+        self.lines = lines
+        self.cost = cost
+        self.buyerIdentity = buyerIdentity
+        self.deliveryGroups = deliveryGroups
+        self.discountCodes = discountCodes
+        self.appliedGiftCards = appliedGiftCards
+        self.discountAllocations = discountAllocations
+        self.delivery = delivery
+        self.payment = payment
+    }
 }
 
 public struct CartLine: Codable {
@@ -289,15 +313,28 @@ public enum PaymentMethodType: String, Codable {
 
 public struct CartPayment: Codable {
     public let methods: [CartPaymentMethod]
+
+    public init(methods: [CartPaymentMethod]) {
+        self.methods = methods
+    }
 }
 
 public struct CartPaymentMethod: Codable {
     public let instruments: [CartPaymentInstrument]
+
+    public init(instruments: [CartPaymentInstrument]) {
+        self.instruments = instruments
+    }
 }
 
 public struct CartPaymentInstrument: Codable {
     public let externalReference: String
-    public let credentials: [CartCredential]
+    @NullEncodable public private(set) var credentials: [CartCredential]?
+
+    public init(externalReference: String, credentials: [CartCredential]? = nil) {
+        self.externalReference = externalReference
+        self.credentials = credentials
+    }
 }
 
 public enum CartCredential: Codable {
@@ -307,6 +344,12 @@ public enum CartCredential: Codable {
         public let token: String
         public let tokenType: String
         public let tokenHandler: String
+
+        public init(token: String, tokenType: String, tokenHandler: String) {
+            self.token = token
+            self.tokenType = tokenType
+            self.tokenHandler = tokenHandler
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

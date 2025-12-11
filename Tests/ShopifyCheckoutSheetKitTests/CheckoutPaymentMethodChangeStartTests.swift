@@ -25,27 +25,20 @@
 import XCTest
 
 class CheckoutPaymentMethodChangeStartTests: XCTestCase {
-    // MARK: - Codable Tests
+    // MARK: - Response Payload Codable Tests
 
-    func testDecodeResponsePayloadWithPaymentInstruments() throws {
-        let json = createTestPaymentMethodChangeStartResponseJSON(
-            cart: createTestCartInputJSON(
-                paymentInstruments: [createTestPaymentInstrumentInputJSON()]
-            )
-        )
+    func testDecodeResponsePayloadWithCart() throws {
+        let json = """
+        {
+            "cart": \(createTestCartJSON())
+        }
+        """
         let data = json.data(using: .utf8)!
 
         let payload = try JSONDecoder().decode(CheckoutPaymentMethodChangeStartResponsePayload.self, from: data)
 
         XCTAssertNotNil(payload.cart)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.count, 1)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.externalReference, "instrument-123")
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.last4, "4242")
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.cardHolderName, "John Doe")
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.brand, .visa)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.expiry.month, 12)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.display.expiry.year, 2025)
-        XCTAssertEqual(payload.cart?.paymentInstruments?.first?.billingAddress.countryCode, "US")
+        XCTAssertEqual(payload.cart?.id, "gid://shopify/Cart/test-cart-123")
     }
 
     func testDecodeResponsePayloadWithNilCart() throws {
@@ -98,7 +91,9 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
         XCTAssertEqual(payload.errors?.first?.fieldTarget, "expiryMonth")
     }
 
-    func testDecodePaymentInstrumentWithAllBillingAddressFields() throws {
+    // MARK: - CartPaymentInstrumentInput Codable Tests
+
+    func testDecodePaymentInstrumentInputWithAllBillingAddressFields() throws {
         let json = createTestPaymentInstrumentInputJSONWithFullAddress()
         let data = json.data(using: .utf8)!
 
@@ -116,7 +111,7 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
         XCTAssertEqual(instrument.billingAddress.zip, "10001")
     }
 
-    func testDecodePaymentInstrumentBrandEnum() throws {
+    func testDecodePaymentInstrumentInputBrandEnum() throws {
         let brands = [
             ("VISA", CardBrand.visa),
             ("MASTERCARD", CardBrand.mastercard),
