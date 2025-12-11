@@ -328,11 +328,11 @@ public struct CartPaymentMethod: Codable {
 }
 
 public struct CartPaymentInstrument: Codable {
-    public let externalReference: String
+    public let externalReferenceId: String
     @NullEncodable public private(set) var credentials: [CartCredential]?
 
-    public init(externalReference: String, credentials: [CartCredential]? = nil) {
-        self.externalReference = externalReference
+    public init(externalReferenceId: String, credentials: [CartCredential]? = nil) {
+        self.externalReferenceId = externalReferenceId
         self.credentials = credentials
     }
 }
@@ -673,16 +673,16 @@ public struct CartPaymentInstrumentDisplayInput: Codable {
 public typealias CartMailingAddressInput = CartDeliveryAddressInput
 
 public struct CartPaymentInstrumentInput: Codable {
-    public let externalReference: String
+    public let externalReferenceId: String
     public let display: CartPaymentInstrumentDisplayInput
     public let billingAddress: CartMailingAddressInput
 
     public init(
-        externalReference: String,
+        externalReferenceId: String,
         display: CartPaymentInstrumentDisplayInput,
         billingAddress: CartMailingAddressInput
     ) {
-        self.externalReference = externalReference
+        self.externalReferenceId = externalReferenceId
         self.display = display
         self.billingAddress = billingAddress
     }

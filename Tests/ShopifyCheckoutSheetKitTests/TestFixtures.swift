@@ -241,7 +241,7 @@ func createCheckoutCompleteJSON(
 // MARK: - Response Payload JSON Fixtures
 
 func createTestPaymentInstrumentInputJSON(
-    externalReference: String = "instrument-123",
+    externalReferenceId: String = "instrument-123",
     last4: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
@@ -251,7 +251,7 @@ func createTestPaymentInstrumentInputJSON(
 ) -> String {
     """
     {
-        "externalReference": "\(externalReference)",
+        "externalReferenceId": "\(externalReferenceId)",
         "display": {
             "last4": "\(last4)",
             "brand": "\(brand)",
@@ -269,7 +269,7 @@ func createTestPaymentInstrumentInputJSON(
 }
 
 func createTestPaymentInstrumentInputJSONWithFullAddress(
-    externalReference: String = "instrument-123",
+    externalReferenceId: String = "instrument-123",
     last4: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
@@ -278,7 +278,7 @@ func createTestPaymentInstrumentInputJSONWithFullAddress(
 ) -> String {
     """
     {
-        "externalReference": "\(externalReference)",
+        "externalReferenceId": "\(externalReferenceId)",
         "display": {
             "last4": "\(last4)",
             "brand": "\(brand)",

@@ -141,7 +141,7 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
             )
 
             let instrument = CartPaymentInstrument(
-                externalReference: "payment-instrument-123",
+                externalReferenceId: "payment-instrument-123",
                 credentials: [credential]
             )
 

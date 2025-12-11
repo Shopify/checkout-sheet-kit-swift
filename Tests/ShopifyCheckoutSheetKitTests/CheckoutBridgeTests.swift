@@ -287,7 +287,7 @@ class CheckoutBridgeTests: XCTestCase {
                     "payment": {
                         "methods": [{
                             "instruments": [{
-                                "externalReference": "instrument-123",
+                                "externalReferenceId": "instrument-123",
                                 "credentials": []
                             }]
                         }]
@@ -307,7 +307,7 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("card-change-456", cardRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.cart.id)
         XCTAssertEqual(1, cardRequest.cart.payment?.methods.count)
-        XCTAssertEqual("instrument-123", cardRequest.cart.payment?.methods.first?.instruments.first?.externalReference)
+        XCTAssertEqual("instrument-123", cardRequest.cart.payment?.methods.first?.instruments.first?.externalReferenceId)
     }
 
     func testDecodeSupportsCheckoutStart() throws {
