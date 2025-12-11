@@ -99,16 +99,16 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
 
         let instrument = try JSONDecoder().decode(CartPaymentInstrumentInput.self, from: data)
 
-        XCTAssertEqual(instrument.billingAddress.firstName, "John")
-        XCTAssertEqual(instrument.billingAddress.lastName, "Doe")
-        XCTAssertEqual(instrument.billingAddress.address1, "123 Main St")
-        XCTAssertEqual(instrument.billingAddress.address2, "Apt 4")
-        XCTAssertEqual(instrument.billingAddress.city, "New York")
-        XCTAssertEqual(instrument.billingAddress.company, "Acme Inc")
-        XCTAssertEqual(instrument.billingAddress.countryCode, "US")
-        XCTAssertEqual(instrument.billingAddress.phone, "+16135551111")
-        XCTAssertEqual(instrument.billingAddress.provinceCode, "NY")
-        XCTAssertEqual(instrument.billingAddress.zip, "10001")
+        XCTAssertEqual(instrument.billingAddress?.firstName, "John")
+        XCTAssertEqual(instrument.billingAddress?.lastName, "Doe")
+        XCTAssertEqual(instrument.billingAddress?.address1, "123 Main St")
+        XCTAssertEqual(instrument.billingAddress?.address2, "Apt 4")
+        XCTAssertEqual(instrument.billingAddress?.city, "New York")
+        XCTAssertEqual(instrument.billingAddress?.company, "Acme Inc")
+        XCTAssertEqual(instrument.billingAddress?.countryCode, "US")
+        XCTAssertEqual(instrument.billingAddress?.phone, "+16135551111")
+        XCTAssertEqual(instrument.billingAddress?.provinceCode, "NY")
+        XCTAssertEqual(instrument.billingAddress?.zip, "10001")
     }
 
     func testDecodePaymentInstrumentInputBrandEnum() throws {
@@ -129,7 +129,7 @@ class CheckoutPaymentMethodChangeStartTests: XCTestCase {
 
             let instrument = try JSONDecoder().decode(CartPaymentInstrumentInput.self, from: data)
 
-            XCTAssertEqual(instrument.display.brand, expectedBrand, "Failed for brand: \(jsonBrand)")
+            XCTAssertEqual(instrument.brand, expectedBrand, "Failed for brand: \(jsonBrand)")
         }
     }
 }

@@ -610,35 +610,6 @@ public struct CartBuyerIdentityInput: Codable {
     }
 }
 
-public struct ExpiryInput: Codable {
-    public let month: Int
-    public let year: Int
-
-    public init(month: Int, year: Int) {
-        self.month = month
-        self.year = year
-    }
-}
-
-public struct CartPaymentInstrumentDisplayInput: Codable {
-    public let last4: String
-    public let brand: CardBrand
-    public let cardHolderName: String
-    public let expiry: ExpiryInput
-
-    public init(
-        last4: String,
-        brand: CardBrand,
-        cardHolderName: String,
-        expiry: ExpiryInput
-    ) {
-        self.last4 = last4
-        self.brand = brand
-        self.cardHolderName = cardHolderName
-        self.expiry = expiry
-    }
-}
-
 /// This doesn't follow the Storefront API design so we are aliasing to an existing conforming shape
 /// Differences to SF API include:
 ///  - province -> provinceCode
@@ -647,16 +618,28 @@ public typealias CartMailingAddressInput = CartDeliveryAddressInput
 
 public struct CartPaymentInstrumentInput: Codable {
     public let externalReferenceId: String
-    public let display: CartPaymentInstrumentDisplayInput
-    public let billingAddress: CartMailingAddressInput
+    @NullEncodable public private(set) var lastDigits: String?
+    @NullEncodable public private(set) var brand: CardBrand?
+    @NullEncodable public private(set) var cardHolderName: String?
+    @NullEncodable public private(set) var month: Int?
+    @NullEncodable public private(set) var year: Int?
+    @NullEncodable public private(set) var billingAddress: CartMailingAddressInput?
 
     public init(
         externalReferenceId: String,
-        display: CartPaymentInstrumentDisplayInput,
-        billingAddress: CartMailingAddressInput
+        lastDigits: String? = nil,
+        brand: CardBrand? = nil,
+        cardHolderName: String? = nil,
+        month: Int? = nil,
+        year: Int? = nil,
+        billingAddress: CartMailingAddressInput? = nil
     ) {
         self.externalReferenceId = externalReferenceId
-        self.display = display
+        self.lastDigits = lastDigits
+        self.brand = brand
+        self.cardHolderName = cardHolderName
+        self.month = month
+        self.year = year
         self.billingAddress = billingAddress
     }
 }

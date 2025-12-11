@@ -242,25 +242,21 @@ func createCheckoutCompleteJSON(
 
 func createTestPaymentInstrumentInputJSON(
     externalReferenceId: String = "instrument-123",
-    last4: String = "4242",
+    lastDigits: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
-    expiryMonth: Int = 12,
-    expiryYear: Int = 2025,
+    month: Int = 12,
+    year: Int = 2025,
     countryCode: String = "US"
 ) -> String {
     """
     {
         "externalReferenceId": "\(externalReferenceId)",
-        "display": {
-            "last4": "\(last4)",
-            "brand": "\(brand)",
-            "cardHolderName": "\(cardHolderName)",
-            "expiry": {
-                "month": \(expiryMonth),
-                "year": \(expiryYear)
-            }
-        },
+        "lastDigits": "\(lastDigits)",
+        "brand": "\(brand)",
+        "cardHolderName": "\(cardHolderName)",
+        "month": \(month),
+        "year": \(year),
         "billingAddress": {
             "countryCode": "\(countryCode)"
         }
@@ -270,24 +266,20 @@ func createTestPaymentInstrumentInputJSON(
 
 func createTestPaymentInstrumentInputJSONWithFullAddress(
     externalReferenceId: String = "instrument-123",
-    last4: String = "4242",
+    lastDigits: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
-    expiryMonth: Int = 12,
-    expiryYear: Int = 2025
+    month: Int = 12,
+    year: Int = 2025
 ) -> String {
     """
     {
         "externalReferenceId": "\(externalReferenceId)",
-        "display": {
-            "last4": "\(last4)",
-            "brand": "\(brand)",
-            "cardHolderName": "\(cardHolderName)",
-            "expiry": {
-                "month": \(expiryMonth),
-                "year": \(expiryYear)
-            }
-        },
+        "lastDigits": "\(lastDigits)",
+        "brand": "\(brand)",
+        "cardHolderName": "\(cardHolderName)",
+        "month": \(month),
+        "year": \(year),
         "billingAddress": {
             "firstName": "John",
             "lastName": "Doe",
