@@ -51,6 +51,20 @@ public struct OrderConfirmation: Codable {
 
 // MARK: - Cart
 
+public enum Override<T> {
+    case keep
+    case override(T)
+}
+
+extension Override {
+    public func resolve(_ existing: T) -> T {
+        switch self {
+        case .keep: return existing
+        case let .override(new): return new
+        }
+    }
+}
+
 /// Represents a shopping cart in the checkout flow
 public struct Cart: Codable {
     public let id: String
@@ -86,6 +100,32 @@ public struct Cart: Codable {
         self.discountAllocations = discountAllocations
         self.delivery = delivery
         self.payment = payment
+    }
+
+    public func copy(
+        id: Override<String> = .keep,
+        lines: Override<[CartLine]> = .keep,
+        cost: Override<CartCost> = .keep,
+        buyerIdentity: Override<CartBuyerIdentity> = .keep,
+        deliveryGroups: Override<[CartDeliveryGroup]> = .keep,
+        discountCodes: Override<[CartDiscountCode]> = .keep,
+        appliedGiftCards: Override<[AppliedGiftCard]> = .keep,
+        discountAllocations: Override<[CartDiscountAllocation]> = .keep,
+        delivery: Override<CartDelivery> = .keep,
+        payment: Override<CartPayment?> = .keep
+    ) -> Cart {
+        Cart(
+            id: id.resolve(self.id),
+            lines: lines.resolve(self.lines),
+            cost: cost.resolve(self.cost),
+            buyerIdentity: buyerIdentity.resolve(self.buyerIdentity),
+            deliveryGroups: deliveryGroups.resolve(self.deliveryGroups),
+            discountCodes: discountCodes.resolve(self.discountCodes),
+            appliedGiftCards: appliedGiftCards.resolve(self.appliedGiftCards),
+            discountAllocations: discountAllocations.resolve(self.discountAllocations),
+            delivery: delivery.resolve(self.delivery),
+            payment: payment.resolve(self.payment)
+        )
     }
 }
 
@@ -374,9 +414,12 @@ public enum CartAddress: Codable {
 
 public struct CartSelectableAddress: Codable {
     public let address: CartAddress
+    /// Whether this address is selected as the active delivery address.
+    @NullEncodable public private(set) var selected: Bool?
 
-    public init(address: CartAddress) {
+    public init(address: CartAddress, selected: Bool) {
         self.address = address
+        self.selected = selected
     }
 }
 

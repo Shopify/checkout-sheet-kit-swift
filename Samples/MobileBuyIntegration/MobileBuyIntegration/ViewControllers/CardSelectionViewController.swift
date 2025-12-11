@@ -177,17 +177,8 @@ class CardSelectionViewController: UIViewController {
         let paymentMethod = CartPaymentMethod(instruments: [instrument])
         let payment = CartPayment(methods: [paymentMethod])
 
-        let updatedCart = Cart(
-            id: event.cart.id,
-            lines: event.cart.lines,
-            cost: event.cart.cost,
-            buyerIdentity: event.cart.buyerIdentity,
-            deliveryGroups: event.cart.deliveryGroups,
-            discountCodes: event.cart.discountCodes,
-            appliedGiftCards: event.cart.appliedGiftCards,
-            discountAllocations: event.cart.discountAllocations,
-            delivery: event.cart.delivery,
-            payment: payment
+        let updatedCart = event.cart.copy(
+            payment: .override(payment)
         )
 
         let result = CheckoutPaymentMethodChangeStartResponsePayload(cart: updatedCart)

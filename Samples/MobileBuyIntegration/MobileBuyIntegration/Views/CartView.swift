@@ -161,7 +161,8 @@ struct CartView: View {
                                 )
 
                                 let selectableAddress = CartSelectableAddress(
-                                    address: .deliveryAddress(hardcodedAddress)
+                                    address: .deliveryAddress(hardcodedAddress),
+                                    selected: true
                                 )
                                 let delivery = CartDelivery(addresses: [selectableAddress])
 

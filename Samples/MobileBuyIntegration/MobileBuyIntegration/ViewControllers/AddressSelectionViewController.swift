@@ -155,25 +155,15 @@ class AddressSelectionViewController: UIViewController {
 
     @objc private func confirmSelection() {
         let address = addressOptions[selectedIndex].address
-
-        let selectableAddress = CartSelectableAddress(address: .deliveryAddress(address))
-        let delivery = CartDelivery(addresses: [selectableAddress])
-
-        // Create updated cart with new delivery address
-        let updatedCart = Cart(
-            id: event.cart.id,
-            lines: event.cart.lines,
-            cost: event.cart.cost,
-            buyerIdentity: event.cart.buyerIdentity,
-            deliveryGroups: event.cart.deliveryGroups,
-            discountCodes: event.cart.discountCodes,
-            appliedGiftCards: event.cart.appliedGiftCards,
-            discountAllocations: event.cart.discountAllocations,
-            delivery: delivery,
-            payment: event.cart.payment
+        let selectableAddress = CartSelectableAddress(
+            address: .deliveryAddress(address),
+            selected: true
         )
-
-        let response = CheckoutAddressChangeStartResponsePayload(cart: updatedCart)
+        let deliveryAddresses = CartDelivery(addresses: [selectableAddress])
+        let cartCopy = event.cart.copy(
+            delivery: .override(deliveryAddresses)
+        )
+        let response = CheckoutAddressChangeStartResponsePayload(cart: cartCopy)
 
         do {
             // Respond to the event - validation happens here

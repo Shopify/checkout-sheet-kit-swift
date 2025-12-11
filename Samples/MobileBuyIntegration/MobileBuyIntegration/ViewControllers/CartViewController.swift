@@ -585,7 +585,7 @@ extension CartViewController: CheckoutDelegate {
                 zip: "H3B 2Y7"
             )
 
-            let selectableAddress = CartSelectableAddress(address: .deliveryAddress(address))
+            let selectableAddress = CartSelectableAddress(address: .deliveryAddress(address), selected: true)
             let delivery = CartDelivery(addresses: [selectableAddress])
 
             // Create updated cart with new delivery address
