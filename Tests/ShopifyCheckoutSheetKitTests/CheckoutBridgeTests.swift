@@ -117,7 +117,7 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    func testDecodeReturnsUnsupportedRequestWhenWebViewIsNil() throws {
+    func test_decode_whenWebViewIsNil_returnsUnsupportedRequest() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
@@ -131,12 +131,15 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard result is UnsupportedRequest else {
-            return XCTFail("expected UnsupportedRequest when webView is nil, got \(result)")
+        guard let unsupportedRequest = result as? UnsupportedRequest else {
+            return XCTFail("expected UnsupportedRequest when webView is nil, got \(String(describing: result))")
         }
+
+        XCTAssertEqual(unsupportedRequest.id, "test-id")
+        XCTAssertEqual(unsupportedRequest.method, "checkout.addressChangeStart")
     }
 
-    func testDecodeHandlesUnsupportedEventsGracefully() throws {
+    func test_decode_whenMethodUnknown_returnsUnsupportedRequest() throws {
         let mock = WKScriptMessageMock(body: """
         {
             "jsonrpc": "2.0",
@@ -148,9 +151,31 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard result is UnsupportedRequest else {
-            return XCTFail("expected UnsupportedRequest, got \(result)")
+        guard let unsupportedRequest = result as? UnsupportedRequest else {
+            return XCTFail("expected UnsupportedRequest, got \(String(describing: result))")
         }
+
+        XCTAssertEqual(unsupportedRequest.id, "test-id")
+        XCTAssertEqual(unsupportedRequest.method, "unknown")
+    }
+
+    func test_decode_whenIdIsNil_returnsUnsupportedRequestWithNilId() throws {
+        let mock = WKScriptMessageMock(body: """
+        {
+            "jsonrpc": "2.0",
+            "method": "some.unknown.method",
+            "params": {}
+        }
+        """, webView: mockWebView)
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let unsupportedRequest = result as? UnsupportedRequest else {
+            return XCTFail("expected UnsupportedRequest, got \(String(describing: result))")
+        }
+
+        XCTAssertNil(unsupportedRequest.id)
+        XCTAssertEqual(unsupportedRequest.method, "some.unknown.method")
     }
 
     func testDecodeSupportsCheckoutExpiredError() throws {
@@ -172,7 +197,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let errorRequest = result as? CheckoutErrorRequest else {
-            XCTFail("Expected CheckoutErrorRequest, got \(result)")
+            XCTFail("Expected CheckoutErrorRequest, got \(String(describing: result))")
             return
         }
 
@@ -193,7 +218,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let modalRequest = result as? CheckoutModalToggledRequest else {
-            XCTFail("Expected CheckoutModalToggledRequest, got \(result)")
+            XCTFail("Expected CheckoutModalToggledRequest, got \(String(describing: result))")
             return
         }
 
@@ -232,7 +257,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let addressRequest = result as? CheckoutAddressChangeStartEvent else {
-            XCTFail("Expected CheckoutAddressChangeStart, got \(result)")
+            XCTFail("Expected CheckoutAddressChangeStart, got \(String(describing: result))")
             return
         }
 
@@ -256,7 +281,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let cardRequest = result as? CheckoutPaymentMethodChangeStartEvent else {
-            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(String(describing: result))")
             return
         }
 
@@ -293,7 +318,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let cardRequest = result as? CheckoutPaymentMethodChangeStartEvent else {
-            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(String(describing: result))")
             return
         }
 
@@ -315,7 +340,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let startEvent = result as? CheckoutStartEvent else {
-            XCTFail("Expected CheckoutStartEvent, got \(result)")
+            XCTFail("Expected CheckoutStartEvent, got \(String(describing: result))")
             return
         }
 
@@ -337,7 +362,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let completeEvent = result as? CheckoutCompleteEvent else {
-            XCTFail("Expected CheckoutCompleteEvent, got \(result)")
+            XCTFail("Expected CheckoutCompleteEvent, got \(String(describing: result))")
             return
         }
 
@@ -393,7 +418,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let submitRequest = result as? CheckoutSubmitStartEvent else {
-            XCTFail("Expected CheckoutSubmitStart, got \(result)")
+            XCTFail("Expected CheckoutSubmitStart, got \(String(describing: result))")
             return
         }
 

@@ -77,7 +77,10 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
     static func decode(_ message: WKScriptMessage) throws -> Any? {
         do {
-            guard let body = message.body as? String, let data = body.data(using: .utf8) else {
+            guard
+                let body = message.body as? String,
+                let data = body.data(using: .utf8)
+            else {
                 throw BridgeError.invalidBridgeEvent()
             }
             struct MethodExtractor: Decodable {
@@ -94,18 +97,33 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
                     webview: webview
                 )
             else {
-                let envelope = try JSONDecoder().decode(UnsupportedEnvelope.self, from: data)
-                return UnsupportedRequest(id: envelope.id, actualMethod: envelope.method)
+                let request = try JSONDecoder().decode(UnsupportedRequest.self, from: data)
+                OSLogger.shared.info(
+                    """
+                    \(request)
+                    Id: \(String(describing: request.id))
+                    Method: \(request.method)
+                    """
+                )
+                return request
             }
 
             return request
-        } catch let DecodingError.keyNotFound(key, context) {
+        } catch let DecodingError.keyNotFound(_, context) {
             OSLogger.shared.info(
-                "CheckoutBridge.decode: \(context.debugDescription)\n\n Event Body:\(message.body)"
+                """
+                CheckoutBridge.decode() - DecodingError
+                \(context.debugDescription)
+                \(message.body)
+                """
             )
         } catch {
             OSLogger.shared.info(
-                "CheckoutBridge.decode: \(error.localizedDescription)\n\n\t \(message.body)"
+                """
+                CheckoutBridge.decode() - Unknown
+                \(error.localizedDescription)
+                \(message.body)
+                """
             )
         }
         return nil
@@ -122,12 +140,6 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         }
         """
     }
-}
-
-// Handle unsupported methods
-struct UnsupportedEnvelope: Decodable {
-    let id: String
-    let method: String
 }
 
 struct InstrumentationPayload: Codable {
