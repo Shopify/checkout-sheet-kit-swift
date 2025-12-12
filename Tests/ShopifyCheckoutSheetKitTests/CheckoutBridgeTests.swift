@@ -288,6 +288,20 @@ class CheckoutBridgeTests: XCTestCase {
                         "methods": [{
                             "instruments": [{
                                 "externalReferenceId": "instrument-123",
+                                "cardHolderName": "John Smith",
+                                "lastDigits": "4242",
+                                "month": 12,
+                                "year": 2025,
+                                "brand": "VISA",
+                                "billingAddress": {
+                                    "firstName": "John",
+                                    "lastName": "Smith",
+                                    "address1": "123 Main St",
+                                    "city": "Seattle",
+                                    "province": "WA",
+                                    "country": "US",
+                                    "zip": "98101"
+                                },
                                 "credentials": [{
                                     "remoteTokenPaymentCredential": {
                                         "token": "tok_abc123",
@@ -313,9 +327,23 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("card-change-456", cardRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.cart.id)
         XCTAssertEqual(1, cardRequest.cart.payment.methods.count)
-        XCTAssertEqual("instrument-123", cardRequest.cart.payment.methods.first?.instruments.first?.externalReferenceId)
 
-        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = cardRequest.cart.payment.methods.first?.instruments.first?.credentials?.first else {
+        let instrument = cardRequest.cart.payment.methods.first?.instruments.first
+        XCTAssertEqual("instrument-123", instrument?.externalReferenceId)
+        XCTAssertEqual("John Smith", instrument?.cardHolderName)
+        XCTAssertEqual("4242", instrument?.lastDigits)
+        XCTAssertEqual(12, instrument?.month)
+        XCTAssertEqual(2025, instrument?.year)
+        XCTAssertEqual(.visa, instrument?.brand)
+        XCTAssertEqual("John", instrument?.billingAddress?.firstName)
+        XCTAssertEqual("Smith", instrument?.billingAddress?.lastName)
+        XCTAssertEqual("123 Main St", instrument?.billingAddress?.address1)
+        XCTAssertEqual("Seattle", instrument?.billingAddress?.city)
+        XCTAssertEqual("WA", instrument?.billingAddress?.province)
+        XCTAssertEqual("US", instrument?.billingAddress?.country)
+        XCTAssertEqual("98101", instrument?.billingAddress?.zip)
+
+        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = instrument?.credentials?.first else {
             XCTFail("Expected remoteTokenPaymentCredential")
             return
         }
