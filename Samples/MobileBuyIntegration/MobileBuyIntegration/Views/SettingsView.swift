@@ -54,6 +54,7 @@ struct SettingsView: View {
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
     @State private var colorScheme: ColorScheme = .light
+    @State private var checkoutURL: String = ""
 
     var body: some View {
         NavigationView {
@@ -64,6 +65,19 @@ struct SettingsView: View {
                             ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
                         }
                     Toggle("Prefill buyer information", isOn: $config.useVaultedState)
+                }
+
+                Section(header: Text("Debug")) {
+                    TextField("Checkout URL", text: $checkoutURL)
+                        .textContentType(.URL)
+                        .autocapitalization(.none)
+                        .keyboardType(.URL)
+                    Button("Present") {
+                        if let url = URL(string: checkoutURL) {
+                            CheckoutController.shared?.present(checkout: url)
+                        }
+                    }
+                    .disabled(checkoutURL.isEmpty)
                 }
 
                 Section(header: Text("Universal Links")) {
