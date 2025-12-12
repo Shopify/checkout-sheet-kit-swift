@@ -272,7 +272,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
         }
     }
 
-    private func handleBridgeEvent(_ event: Any, viewDelegate: CheckoutWebViewDelegate) {
+    private func handleBridgeEvent(_ event: Any?, viewDelegate: CheckoutWebViewDelegate) {
         switch event {
         // Notification events (CheckoutNotification)
         case let startEvent as CheckoutStartEvent:

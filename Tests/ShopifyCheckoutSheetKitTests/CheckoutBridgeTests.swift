@@ -197,7 +197,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let errorRequest = result as? CheckoutErrorRequest else {
-            XCTFail("Expected CheckoutErrorRequest, got \(result)")
+            XCTFail("Expected CheckoutErrorRequest, got \(String(describing: result))")
             return
         }
 
@@ -218,7 +218,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let modalRequest = result as? CheckoutModalToggledRequest else {
-            XCTFail("Expected CheckoutModalToggledRequest, got \(result)")
+            XCTFail("Expected CheckoutModalToggledRequest, got \(String(describing: result))")
             return
         }
 
@@ -257,7 +257,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let addressRequest = result as? CheckoutAddressChangeStartEvent else {
-            XCTFail("Expected CheckoutAddressChangeStart, got \(result)")
+            XCTFail("Expected CheckoutAddressChangeStart, got \(String(describing: result))")
             return
         }
 
@@ -281,7 +281,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let cardRequest = result as? CheckoutPaymentMethodChangeStartEvent else {
-            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(String(describing: result))")
             return
         }
 
@@ -318,7 +318,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let cardRequest = result as? CheckoutPaymentMethodChangeStartEvent else {
-            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(result)")
+            XCTFail("Expected CheckoutPaymentMethodChangeStart, got \(String(describing: result))")
             return
         }
 
@@ -340,7 +340,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let startEvent = result as? CheckoutStartEvent else {
-            XCTFail("Expected CheckoutStartEvent, got \(result)")
+            XCTFail("Expected CheckoutStartEvent, got \(String(describing: result))")
             return
         }
 
@@ -362,7 +362,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let completeEvent = result as? CheckoutCompleteEvent else {
-            XCTFail("Expected CheckoutCompleteEvent, got \(result)")
+            XCTFail("Expected CheckoutCompleteEvent, got \(String(describing: result))")
             return
         }
 
@@ -418,7 +418,7 @@ class CheckoutBridgeTests: XCTestCase {
         let result = try CheckoutBridge.decode(mock)
 
         guard let submitRequest = result as? CheckoutSubmitStartEvent else {
-            XCTFail("Expected CheckoutSubmitStart, got \(result)")
+            XCTFail("Expected CheckoutSubmitStart, got \(String(describing: result))")
             return
         }
 

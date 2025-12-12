@@ -109,7 +109,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
             }
 
             return request
-        } catch let DecodingError.keyNotFound(key, context) {
+        } catch let DecodingError.keyNotFound(_, context) {
             OSLogger.shared.info(
                 """
                 CheckoutBridge.decode() - DecodingError
