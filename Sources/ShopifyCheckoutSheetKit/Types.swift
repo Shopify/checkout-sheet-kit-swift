@@ -76,7 +76,7 @@ public struct Cart: Codable {
     public let appliedGiftCards: [AppliedGiftCard]
     public let discountAllocations: [CartDiscountAllocation]
     public let delivery: CartDelivery
-    public let payment: CartPayment?
+    public let payment: CartPayment
 
     public init(
         id: String,
@@ -88,7 +88,7 @@ public struct Cart: Codable {
         appliedGiftCards: [AppliedGiftCard],
         discountAllocations: [CartDiscountAllocation],
         delivery: CartDelivery,
-        payment: CartPayment?
+        payment: CartPayment
     ) {
         self.id = id
         self.lines = lines
@@ -112,7 +112,7 @@ public struct Cart: Codable {
         appliedGiftCards: Override<[AppliedGiftCard]> = .keep,
         discountAllocations: Override<[CartDiscountAllocation]> = .keep,
         delivery: Override<CartDelivery> = .keep,
-        payment: Override<CartPayment?> = .keep
+        payment: Override<CartPayment> = .keep
     ) -> Cart {
         Cart(
             id: id.resolve(self.id),
@@ -272,7 +272,7 @@ public struct MailingAddress: Codable {
         city: String? = nil,
         province: String? = nil,
         country: String? = nil,
-        countryCodeV2: String? = nil,
+        countryCodeV2 _: String? = nil,
         zip: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
@@ -284,7 +284,6 @@ public struct MailingAddress: Codable {
         self.city = city
         self.province = province
         self.country = country
-        self.countryCodeV2 = countryCodeV2
         self.zip = zip
         self.firstName = firstName
         self.lastName = lastName
@@ -359,25 +358,92 @@ public struct CartPayment: Codable {
     }
 }
 
-public struct CartPaymentMethod: Codable {
-    public let instruments: [CartPaymentInstrument]
+public typealias CartPaymentMethod = CreditCardPaymentMethod
 
-    public init(instruments: [CartPaymentInstrument]) {
+public struct CreditCardPaymentMethod: Codable {
+    // swiftlint:disable:next identifier_name
+    public let __typename: String
+    public let instruments: [CreditCardPaymentInstrument]
+
+    private enum CodingKeys: String, CodingKey {
+        case __typename
+        case instruments
+    }
+
+    public init(instruments: [CreditCardPaymentInstrument]) {
+        __typename = "CreditCardPaymentMethod"
         self.instruments = instruments
     }
-}
 
-public struct CartPaymentInstrument: Codable {
-    public let externalReferenceId: String
-    @NullEncodable public private(set) var credentials: [CartCredential]?
-
-    public init(externalReferenceId: String, credentials: [CartCredential]? = nil) {
-        self.externalReferenceId = externalReferenceId
-        self.credentials = credentials
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        __typename = try container.decodeIfPresent(String.self, forKey: .__typename) ?? "CreditCardPaymentMethod"
+        instruments = try container.decode([CreditCardPaymentInstrument].self, forKey: .instruments)
     }
 }
 
-public enum CartCredential: Codable {
+public struct CreditCardPaymentInstrument: Codable {
+    // swiftlint:disable:next identifier_name
+    public let __typename: String
+    public let externalReferenceId: String
+    @NullEncodable public private(set) var cardHolderName: String?
+    @NullEncodable public private(set) var lastDigits: String?
+    @NullEncodable public private(set) var month: Int?
+    @NullEncodable public private(set) var year: Int?
+    @NullEncodable public private(set) var brand: CardBrand?
+    @NullEncodable public private(set) var billingAddress: MailingAddress?
+    @NullEncodable public private(set) var credentials: [PaymentCredential]?
+
+    private enum CodingKeys: String, CodingKey {
+        case __typename
+        case externalReferenceId
+        case cardHolderName
+        case lastDigits
+        case month
+        case year
+        case brand
+        case billingAddress
+        case credentials
+    }
+
+    public init(
+        externalReferenceId: String,
+        credentials: [PaymentCredential]? = nil,
+        cardHolderName: String? = nil,
+        lastDigits: String? = nil,
+        month: Int? = nil,
+        year: Int? = nil,
+        brand: CardBrand? = nil,
+        billingAddress: MailingAddress? = nil
+    ) {
+        __typename = "CreditCardPaymentInstrument"
+        self.externalReferenceId = externalReferenceId
+        self.credentials = credentials
+        self.cardHolderName = cardHolderName
+        self.lastDigits = lastDigits
+        self.month = month
+        self.year = year
+        self.brand = brand
+        self.billingAddress = billingAddress
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        __typename = try container.decodeIfPresent(String.self, forKey: .__typename) ?? "CreditCardPaymentInstrument"
+        externalReferenceId = try container.decode(String.self, forKey: .externalReferenceId)
+        _cardHolderName = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .cardHolderName))
+        _lastDigits = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .lastDigits))
+        _month = try NullEncodable(wrappedValue: container.decodeIfPresent(Int.self, forKey: .month))
+        _year = try NullEncodable(wrappedValue: container.decodeIfPresent(Int.self, forKey: .year))
+        _brand = try NullEncodable(wrappedValue: container.decodeIfPresent(CardBrand.self, forKey: .brand))
+        _billingAddress = try NullEncodable(wrappedValue: container.decodeIfPresent(MailingAddress.self, forKey: .billingAddress))
+        _credentials = try NullEncodable(wrappedValue: container.decodeIfPresent([PaymentCredential].self, forKey: .credentials))
+    }
+}
+
+public typealias CartPaymentInstrument = CreditCardPaymentInstrument
+
+public enum PaymentCredential: Codable {
     case remoteTokenPaymentCredential(
         token: String,
         tokenType: String,
@@ -414,12 +480,20 @@ public enum CartAddress: Codable {
 
 public struct CartSelectableAddress: Codable {
     public let address: CartAddress
-    /// Whether this address is selected as the active delivery address.
-    @NullEncodable public private(set) var selected: Bool?
+    public let oneTimeUse: Bool
+    public let selected: Bool
 
-    public init(address: CartAddress, selected: Bool) {
+    public init(address: CartAddress, selected: Bool, oneTimeUse: Bool = false) {
         self.address = address
         self.selected = selected
+        self.oneTimeUse = oneTimeUse
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        address = try container.decode(CartAddress.self, forKey: .address)
+        oneTimeUse = try container.decodeIfPresent(Bool.self, forKey: .oneTimeUse) ?? false
+        selected = try container.decodeIfPresent(Bool.self, forKey: .selected) ?? false
     }
 }
 
@@ -434,6 +508,19 @@ public struct CartDeliveryAddress: Codable {
     @NullEncodable public private(set) var phone: String?
     @NullEncodable public private(set) var provinceCode: String?
     @NullEncodable public private(set) var zip: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case address1
+        case address2
+        case city
+        case company
+        case countryCode
+        case firstName
+        case lastName
+        case phone
+        case provinceCode
+        case zip
+    }
 
     public init(
         firstName: String? = nil,
@@ -457,6 +544,20 @@ public struct CartDeliveryAddress: Codable {
         self.phone = phone
         self.provinceCode = provinceCode
         self.zip = zip
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        _address1 = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .address1))
+        _address2 = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .address2))
+        _city = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .city))
+        _company = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .company))
+        _countryCode = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .countryCode))
+        _firstName = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .firstName))
+        _lastName = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .lastName))
+        _phone = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .phone))
+        _provinceCode = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .provinceCode))
+        _zip = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .zip))
     }
 }
 

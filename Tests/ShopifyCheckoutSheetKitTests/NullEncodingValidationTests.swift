@@ -37,15 +37,14 @@ class NullEncodingValidationTests: XCTestCase {
 
     // MARK: - Response Payload Tests
 
-    func test_encode_responsePayloads_includeAllNullableKeys() throws {
+    func test_encode_responsePayloads_omitNilFields() throws {
         let testCases: [(name: String, instance: any Encodable, expected: String)] = [
             (
                 "CheckoutSubmitStartResponsePayload",
                 CheckoutSubmitStartResponsePayload(),
                 """
                 {
-                  "cart" : null,
-                  "errors" : null
+
                 }
                 """
             ),
@@ -54,8 +53,7 @@ class NullEncodingValidationTests: XCTestCase {
                 CheckoutAddressChangeStartResponsePayload(),
                 """
                 {
-                  "cart" : null,
-                  "errors" : null
+
                 }
                 """
             ),
@@ -64,8 +62,7 @@ class NullEncodingValidationTests: XCTestCase {
                 CheckoutPaymentMethodChangeStartResponsePayload(),
                 """
                 {
-                  "cart" : null,
-                  "errors" : null
+
                 }
                 """
             )

@@ -196,7 +196,7 @@ struct CartView: View {
 
                             // Respond with updated cart after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                let instrument = CartPaymentInstrument(
+                                let instrument = CreditCardPaymentInstrument(
                                     externalReferenceId: "card-visa-1234"
                                 )
 

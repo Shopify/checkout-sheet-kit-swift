@@ -132,13 +132,13 @@ extension ShopifyCheckoutViewController: CheckoutDelegate {
     func checkoutDidStartSubmit(event: CheckoutSubmitStartEvent) {
         // Respond with updated cart containing payment credentials after 1 second
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            let credential = CartCredential.remoteTokenPaymentCredential(
+            let credential = PaymentCredential.remoteTokenPaymentCredential(
                 token: "tok_test_123",
                 tokenType: "card",
                 tokenHandler: "delegated"
             )
 
-            let instrument = CartPaymentInstrument(
+            let instrument = CreditCardPaymentInstrument(
                 externalReferenceId: "payment-instrument-123",
                 credentials: [credential]
             )

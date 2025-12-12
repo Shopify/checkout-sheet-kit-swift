@@ -312,10 +312,10 @@ class CheckoutBridgeTests: XCTestCase {
 
         XCTAssertEqual("card-change-456", cardRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.cart.id)
-        XCTAssertEqual(1, cardRequest.cart.payment?.methods.count)
-        XCTAssertEqual("instrument-123", cardRequest.cart.payment?.methods.first?.instruments.first?.externalReferenceId)
+        XCTAssertEqual(1, cardRequest.cart.payment.methods.count)
+        XCTAssertEqual("instrument-123", cardRequest.cart.payment.methods.first?.instruments.first?.externalReferenceId)
 
-        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = cardRequest.cart.payment?.methods.first?.instruments.first?.credentials?.first else {
+        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = cardRequest.cart.payment.methods.first?.instruments.first?.credentials?.first else {
             XCTFail("Expected remoteTokenPaymentCredential")
             return
         }

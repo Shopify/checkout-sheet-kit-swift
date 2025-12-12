@@ -59,8 +59,8 @@ public struct CheckoutSubmitStartParams: Codable {
 }
 
 public struct CheckoutSubmitStartResponsePayload: Codable {
-    @NullEncodable public private(set) var cart: Cart?
-    @NullEncodable public private(set) var errors: [ResponseError]?
+    public private(set) var cart: Cart?
+    public private(set) var errors: [ResponseError]?
 
     public init(cart: Cart? = nil, errors: [ResponseError]? = nil) {
         self.cart = cart
