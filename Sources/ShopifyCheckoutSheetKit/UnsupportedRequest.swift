@@ -76,22 +76,8 @@ internal struct UnsupportedParams: Decodable {
 }
 
 /// Request handler for unsupported/unknown JSON-RPC methods
-internal final class UnsupportedRequest: BaseRPCRequest<UnsupportedParams, EmptyResponse> {
-    /// The actual method name that was received
-    let actualMethod: String
-
-    /// We use a placeholder method name since this handles any unknown method
-    override static var method: String { "__unsupported__" }
-
-    /// Custom initializer that captures the actual method name
-    init(id: String, actualMethod: String, params: UnsupportedParams = UnsupportedParams()) {
-        self.actualMethod = actualMethod
-        super.init(id: id, params: params)
-    }
-
-    /// Required initializer from protocol
-    required init(id: String, params: UnsupportedParams) {
-        actualMethod = "__unknown__"
-        super.init(id: id, params: params)
-    }
+/// This class may be used to represent Notification and Respondable events
+struct UnsupportedRequest: Codable {
+    public let id: String?
+    public let method: String
 }
