@@ -361,6 +361,8 @@ public struct CartPayment: Codable {
 public typealias CartPaymentMethod = CreditCardPaymentMethod
 
 public struct CreditCardPaymentMethod: Codable {
+    // swiftlint:disable:next identifier_name
+    public let __typename: String
     public let instruments: [CreditCardPaymentInstrument]
     private let __typename: String = "CreditCardPaymentMethod"
 
@@ -369,12 +371,26 @@ public struct CreditCardPaymentMethod: Codable {
         case __typename
     }
 
+    private enum CodingKeys: String, CodingKey {
+        case __typename
+        case instruments
+    }
+
     public init(instruments: [CreditCardPaymentInstrument]) {
+        __typename = "CreditCardPaymentMethod"
         self.instruments = instruments
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        __typename = try container.decodeIfPresent(String.self, forKey: .__typename) ?? "CreditCardPaymentMethod"
+        instruments = try container.decode([CreditCardPaymentInstrument].self, forKey: .instruments)
     }
 }
 
 public struct CreditCardPaymentInstrument: Codable {
+    // swiftlint:disable:next identifier_name
+    public let __typename: String
     public let externalReferenceId: String
     @NullEncodable public private(set) var cardHolderName: String?
     @NullEncodable public private(set) var lastDigits: String?
@@ -397,6 +413,18 @@ public struct CreditCardPaymentInstrument: Codable {
         case __typename
     }
 
+    private enum CodingKeys: String, CodingKey {
+        case __typename
+        case externalReferenceId
+        case cardHolderName
+        case lastDigits
+        case month
+        case year
+        case brand
+        case billingAddress
+        case credentials
+    }
+
     public init(
         externalReferenceId: String,
         credentials: [PaymentCredential]? = nil,
@@ -407,6 +435,7 @@ public struct CreditCardPaymentInstrument: Codable {
         brand: CardBrand? = nil,
         billingAddress: MailingAddress? = nil
     ) {
+        __typename = "CreditCardPaymentInstrument"
         self.externalReferenceId = externalReferenceId
         self.credentials = credentials
         self.cardHolderName = cardHolderName
@@ -415,6 +444,19 @@ public struct CreditCardPaymentInstrument: Codable {
         self.year = year
         self.brand = brand
         self.billingAddress = billingAddress
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        __typename = try container.decodeIfPresent(String.self, forKey: .__typename) ?? "CreditCardPaymentInstrument"
+        externalReferenceId = try container.decode(String.self, forKey: .externalReferenceId)
+        _cardHolderName = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .cardHolderName))
+        _lastDigits = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .lastDigits))
+        _month = try NullEncodable(wrappedValue: container.decodeIfPresent(Int.self, forKey: .month))
+        _year = try NullEncodable(wrappedValue: container.decodeIfPresent(Int.self, forKey: .year))
+        _brand = try NullEncodable(wrappedValue: container.decodeIfPresent(CardBrand.self, forKey: .brand))
+        _billingAddress = try NullEncodable(wrappedValue: container.decodeIfPresent(MailingAddress.self, forKey: .billingAddress))
+        _credentials = try NullEncodable(wrappedValue: container.decodeIfPresent([PaymentCredential].self, forKey: .credentials))
     }
 }
 
