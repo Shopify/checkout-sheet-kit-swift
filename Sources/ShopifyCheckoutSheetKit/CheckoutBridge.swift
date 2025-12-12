@@ -88,7 +88,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
             }
 
             let extractor = try JSONDecoder().decode(MethodExtractor.self, from: data)
-            
+
             guard
                 let webview = message.webView,
                 let request = try EventRegistry.decode(
