@@ -590,7 +590,7 @@ extension CartViewController: CheckoutDelegate {
 
             // Create updated cart with new delivery address
             let updatedCart = event.cart.copy(
-                delivery:.override(delivery)
+                delivery: .override(delivery)
             )
 
             let response = CheckoutAddressChangeStartResponsePayload(cart: updatedCart)
