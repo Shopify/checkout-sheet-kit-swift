@@ -31,7 +31,7 @@ class CheckoutSubmitStartTests: XCTestCase {
         let mockWebView = MockWebView()
         let request = try createRequest(webview: mockWebView)
 
-        let payload = CheckoutSubmitStartResponsePayload(payment: nil, cart: nil, errors: nil)
+        let payload = CheckoutSubmitStartResponsePayload(cart: nil, errors: nil)
 
         let expectation = expectation(description: "JavaScript executed")
         mockWebView.evaluateJavaScriptExpectation = expectation

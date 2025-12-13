@@ -45,7 +45,7 @@ func createTestCart(
     totalAmount: String = "10.00",
     currencyCode: String = "USD",
     email: String? = nil,
-    paymentInstruments: [CartPaymentInstrument] = []
+    paymentMethods: [CartPaymentMethod] = []
 ) -> Cart {
     Cart(
         id: id,
@@ -65,7 +65,7 @@ func createTestCart(
         appliedGiftCards: [],
         discountAllocations: [],
         delivery: CartDelivery(addresses: []),
-        payment: CartPayment(instruments: paymentInstruments)
+        payment: CartPayment(methods: paymentMethods)
     )
 }
 
@@ -176,7 +176,7 @@ func createTestCartJSON(
             "addresses": []
         },
         "payment": {
-            "instruments": []
+            "methods": []
         }
     }
     """
@@ -241,26 +241,22 @@ func createCheckoutCompleteJSON(
 // MARK: - Response Payload JSON Fixtures
 
 func createTestPaymentInstrumentInputJSON(
-    externalReference: String = "instrument-123",
-    last4: String = "4242",
+    externalReferenceId: String = "instrument-123",
+    lastDigits: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
-    expiryMonth: Int = 12,
-    expiryYear: Int = 2025,
+    month: Int = 12,
+    year: Int = 2025,
     countryCode: String = "US"
 ) -> String {
     """
     {
-        "externalReference": "\(externalReference)",
-        "display": {
-            "last4": "\(last4)",
-            "brand": "\(brand)",
-            "cardHolderName": "\(cardHolderName)",
-            "expiry": {
-                "month": \(expiryMonth),
-                "year": \(expiryYear)
-            }
-        },
+        "externalReferenceId": "\(externalReferenceId)",
+        "lastDigits": "\(lastDigits)",
+        "brand": "\(brand)",
+        "cardHolderName": "\(cardHolderName)",
+        "month": \(month),
+        "year": \(year),
         "billingAddress": {
             "countryCode": "\(countryCode)"
         }
@@ -269,25 +265,21 @@ func createTestPaymentInstrumentInputJSON(
 }
 
 func createTestPaymentInstrumentInputJSONWithFullAddress(
-    externalReference: String = "instrument-123",
-    last4: String = "4242",
+    externalReferenceId: String = "instrument-123",
+    lastDigits: String = "4242",
     cardHolderName: String = "John Doe",
     brand: String = "VISA",
-    expiryMonth: Int = 12,
-    expiryYear: Int = 2025
+    month: Int = 12,
+    year: Int = 2025
 ) -> String {
     """
     {
-        "externalReference": "\(externalReference)",
-        "display": {
-            "last4": "\(last4)",
-            "brand": "\(brand)",
-            "cardHolderName": "\(cardHolderName)",
-            "expiry": {
-                "month": \(expiryMonth),
-                "year": \(expiryYear)
-            }
-        },
+        "externalReferenceId": "\(externalReferenceId)",
+        "lastDigits": "\(lastDigits)",
+        "brand": "\(brand)",
+        "cardHolderName": "\(cardHolderName)",
+        "month": \(month),
+        "year": \(year),
         "billingAddress": {
             "firstName": "John",
             "lastName": "Doe",
@@ -322,26 +314,6 @@ func createTestResponseErrorJSON(
         {
             "code": "\(code)",
             "message": "\(message)"
-        }
-        """
-    }
-}
-
-func createTestCartInputJSON(
-    paymentInstruments: [String]? = nil
-) -> String {
-    if let instruments = paymentInstruments {
-        let instrumentsJSON = instruments.joined(separator: ",\n        ")
-        return """
-        {
-            "paymentInstruments": [
-                \(instrumentsJSON)
-            ]
-        }
-        """
-    } else {
-        return """
-        {
         }
         """
     }

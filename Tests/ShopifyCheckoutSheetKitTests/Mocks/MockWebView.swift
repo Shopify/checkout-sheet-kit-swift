@@ -30,11 +30,11 @@ class MockWebView: CheckoutWebView {
 
     var capturedJavaScript: String?
 
-    override func evaluateJavaScript(_ javaScriptString: String) async throws -> Any {
+    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, (any Error)?) -> Void)?) {
         capturedJavaScript = javaScriptString
         if !javaScriptString.isEmpty {
             evaluateJavaScriptExpectation?.fulfill()
         }
-        return true
+        completionHandler?(true, nil)
     }
 }

@@ -51,6 +51,20 @@ public struct OrderConfirmation: Codable {
 
 // MARK: - Cart
 
+public enum Override<T> {
+    case keep
+    case override(T)
+}
+
+extension Override {
+    public func resolve(_ existing: T) -> T {
+        switch self {
+        case .keep: return existing
+        case let .override(new): return new
+        }
+    }
+}
+
 /// Represents a shopping cart in the checkout flow
 public struct Cart: Codable {
     public let id: String
@@ -63,6 +77,56 @@ public struct Cart: Codable {
     public let discountAllocations: [CartDiscountAllocation]
     public let delivery: CartDelivery
     public let payment: CartPayment
+
+    public init(
+        id: String,
+        lines: [CartLine],
+        cost: CartCost,
+        buyerIdentity: CartBuyerIdentity,
+        deliveryGroups: [CartDeliveryGroup],
+        discountCodes: [CartDiscountCode],
+        appliedGiftCards: [AppliedGiftCard],
+        discountAllocations: [CartDiscountAllocation],
+        delivery: CartDelivery,
+        payment: CartPayment
+    ) {
+        self.id = id
+        self.lines = lines
+        self.cost = cost
+        self.buyerIdentity = buyerIdentity
+        self.deliveryGroups = deliveryGroups
+        self.discountCodes = discountCodes
+        self.appliedGiftCards = appliedGiftCards
+        self.discountAllocations = discountAllocations
+        self.delivery = delivery
+        self.payment = payment
+    }
+
+    public func copy(
+        id: Override<String> = .keep,
+        lines: Override<[CartLine]> = .keep,
+        cost: Override<CartCost> = .keep,
+        buyerIdentity: Override<CartBuyerIdentity> = .keep,
+        deliveryGroups: Override<[CartDeliveryGroup]> = .keep,
+        discountCodes: Override<[CartDiscountCode]> = .keep,
+        appliedGiftCards: Override<[AppliedGiftCard]> = .keep,
+        discountAllocations: Override<[CartDiscountAllocation]> = .keep,
+        delivery: Override<CartDelivery> = .keep,
+        payment: Override<CartPayment> = .keep
+    ) -> Cart {
+        Cart(
+            id: id.resolve(self.id),
+            lines: lines.resolve(self.lines),
+            cost: cost.resolve(self.cost),
+            buyerIdentity: buyerIdentity.resolve(self.buyerIdentity),
+            deliveryGroups: deliveryGroups.resolve(self.deliveryGroups),
+            discountCodes: discountCodes.resolve(self.discountCodes),
+            appliedGiftCards: appliedGiftCards.resolve(self.appliedGiftCards),
+            discountAllocations: discountAllocations.resolve(self.discountAllocations),
+            delivery: delivery.resolve(self.delivery),
+            payment: payment.resolve(self.payment)
+        )
+    }
 }
 
 public struct CartLine: Codable {
@@ -208,7 +272,7 @@ public struct MailingAddress: Codable {
         city: String? = nil,
         province: String? = nil,
         country: String? = nil,
-        countryCodeV2: String? = nil,
+        countryCodeV2 _: String? = nil,
         zip: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
@@ -220,7 +284,6 @@ public struct MailingAddress: Codable {
         self.city = city
         self.province = province
         self.country = country
-        self.countryCodeV2 = countryCodeV2
         self.zip = zip
         self.firstName = firstName
         self.lastName = lastName
@@ -288,11 +351,62 @@ public enum PaymentMethodType: String, Codable {
 }
 
 public struct CartPayment: Codable {
-    public let instruments: [CartPaymentInstrument]
+    public let methods: [CartPaymentMethod]
+
+    public init(methods: [CartPaymentMethod]) {
+        self.methods = methods
+    }
 }
 
-public struct CartPaymentInstrument: Codable {
-    public let externalReference: String
+public typealias CartPaymentMethod = CreditCardPaymentMethod
+
+public struct CreditCardPaymentMethod: Codable {
+    public let instruments: [CreditCardPaymentInstrument]
+
+    public init(instruments: [CreditCardPaymentInstrument]) {
+        self.instruments = instruments
+    }
+}
+
+public struct CreditCardPaymentInstrument: Codable {
+    public let externalReferenceId: String
+    @NullEncodable public private(set) var cardHolderName: String?
+    @NullEncodable public private(set) var lastDigits: String?
+    @NullEncodable public private(set) var month: Int?
+    @NullEncodable public private(set) var year: Int?
+    @NullEncodable public private(set) var brand: CardBrand?
+    @NullEncodable public private(set) var billingAddress: MailingAddress?
+    @NullEncodable public private(set) var credentials: [PaymentCredential]?
+
+    public init(
+        externalReferenceId: String,
+        credentials: [PaymentCredential]? = nil,
+        cardHolderName: String? = nil,
+        lastDigits: String? = nil,
+        month: Int? = nil,
+        year: Int? = nil,
+        brand: CardBrand? = nil,
+        billingAddress: MailingAddress? = nil
+    ) {
+        self.externalReferenceId = externalReferenceId
+        self.credentials = credentials
+        self.cardHolderName = cardHolderName
+        self.lastDigits = lastDigits
+        self.month = month
+        self.year = year
+        self.brand = brand
+        self.billingAddress = billingAddress
+    }
+}
+
+public typealias CartPaymentInstrument = CreditCardPaymentInstrument
+
+public enum PaymentCredential: Codable {
+    case remoteTokenPaymentCredential(
+        token: String,
+        tokenType: String,
+        tokenHandler: String
+    )
 }
 
 public struct CartDelivery: Codable {
@@ -324,9 +438,20 @@ public enum CartAddress: Codable {
 
 public struct CartSelectableAddress: Codable {
     public let address: CartAddress
+    public let oneTimeUse: Bool
+    public let selected: Bool
 
-    public init(address: CartAddress) {
+    public init(address: CartAddress, selected: Bool, oneTimeUse: Bool = false) {
         self.address = address
+        self.selected = selected
+        self.oneTimeUse = oneTimeUse
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        address = try container.decode(CartAddress.self, forKey: .address)
+        oneTimeUse = try container.decodeIfPresent(Bool.self, forKey: .oneTimeUse) ?? false
+        selected = try container.decodeIfPresent(Bool.self, forKey: .selected) ?? false
     }
 }
 
@@ -341,6 +466,19 @@ public struct CartDeliveryAddress: Codable {
     @NullEncodable public private(set) var phone: String?
     @NullEncodable public private(set) var provinceCode: String?
     @NullEncodable public private(set) var zip: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case address1
+        case address2
+        case city
+        case company
+        case countryCode
+        case firstName
+        case lastName
+        case phone
+        case provinceCode
+        case zip
+    }
 
     public init(
         firstName: String? = nil,
@@ -364,6 +502,20 @@ public struct CartDeliveryAddress: Codable {
         self.phone = phone
         self.provinceCode = provinceCode
         self.zip = zip
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        _address1 = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .address1))
+        _address2 = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .address2))
+        _city = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .city))
+        _company = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .company))
+        _countryCode = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .countryCode))
+        _firstName = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .firstName))
+        _lastName = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .lastName))
+        _phone = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .phone))
+        _provinceCode = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .provinceCode))
+        _zip = try NullEncodable(wrappedValue: container.decodeIfPresent(String.self, forKey: .zip))
     }
 }
 
@@ -560,35 +712,6 @@ public struct CartBuyerIdentityInput: Codable {
     }
 }
 
-public struct ExpiryInput: Codable {
-    public let month: Int
-    public let year: Int
-
-    public init(month: Int, year: Int) {
-        self.month = month
-        self.year = year
-    }
-}
-
-public struct CartPaymentInstrumentDisplayInput: Codable {
-    public let last4: String
-    public let brand: CardBrand
-    public let cardHolderName: String
-    public let expiry: ExpiryInput
-
-    public init(
-        last4: String,
-        brand: CardBrand,
-        cardHolderName: String,
-        expiry: ExpiryInput
-    ) {
-        self.last4 = last4
-        self.brand = brand
-        self.cardHolderName = cardHolderName
-        self.expiry = expiry
-    }
-}
-
 /// This doesn't follow the Storefront API design so we are aliasing to an existing conforming shape
 /// Differences to SF API include:
 ///  - province -> provinceCode
@@ -596,17 +719,29 @@ public struct CartPaymentInstrumentDisplayInput: Codable {
 public typealias CartMailingAddressInput = CartDeliveryAddressInput
 
 public struct CartPaymentInstrumentInput: Codable {
-    public let externalReference: String
-    public let display: CartPaymentInstrumentDisplayInput
-    public let billingAddress: CartMailingAddressInput
+    public let externalReferenceId: String
+    @NullEncodable public private(set) var lastDigits: String?
+    @NullEncodable public private(set) var brand: CardBrand?
+    @NullEncodable public private(set) var cardHolderName: String?
+    @NullEncodable public private(set) var month: Int?
+    @NullEncodable public private(set) var year: Int?
+    @NullEncodable public private(set) var billingAddress: CartMailingAddressInput?
 
     public init(
-        externalReference: String,
-        display: CartPaymentInstrumentDisplayInput,
-        billingAddress: CartMailingAddressInput
+        externalReferenceId: String,
+        lastDigits: String? = nil,
+        brand: CardBrand? = nil,
+        cardHolderName: String? = nil,
+        month: Int? = nil,
+        year: Int? = nil,
+        billingAddress: CartMailingAddressInput? = nil
     ) {
-        self.externalReference = externalReference
-        self.display = display
+        self.externalReferenceId = externalReferenceId
+        self.lastDigits = lastDigits
+        self.brand = brand
+        self.cardHolderName = cardHolderName
+        self.month = month
+        self.year = year
         self.billingAddress = billingAddress
     }
 }

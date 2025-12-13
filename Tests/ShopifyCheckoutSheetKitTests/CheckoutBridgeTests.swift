@@ -248,7 +248,7 @@ class CheckoutBridgeTests: XCTestCase {
               "appliedGiftCards":[],
               "discountAllocations":[],
               "delivery":{"addresses":[]},
-              "payment":{"instruments":[]}
+              "payment":{"methods":[]}
             }
           }
         }
@@ -309,7 +309,34 @@ class CheckoutBridgeTests: XCTestCase {
                     "appliedGiftCards": [],
                     "discountAllocations": [],
                     "delivery": { "addresses": [] },
-                    "payment": { "instruments": [{ "externalReference": "instrument-123" }] }
+                    "payment": {
+                        "methods": [{
+                            "instruments": [{
+                                "externalReferenceId": "instrument-123",
+                                "cardHolderName": "John Smith",
+                                "lastDigits": "4242",
+                                "month": 12,
+                                "year": 2025,
+                                "brand": "VISA",
+                                "billingAddress": {
+                                    "firstName": "John",
+                                    "lastName": "Smith",
+                                    "address1": "123 Main St",
+                                    "city": "Seattle",
+                                    "province": "WA",
+                                    "country": "US",
+                                    "zip": "98101"
+                                },
+                                "credentials": [{
+                                    "remoteTokenPaymentCredential": {
+                                        "token": "tok_abc123",
+                                        "tokenType": "merchant.token",
+                                        "tokenHandler": "merchant_psp"
+                                    }
+                                }]
+                            }]
+                        }]
+                    }
                 }
             }
         }
@@ -324,8 +351,61 @@ class CheckoutBridgeTests: XCTestCase {
 
         XCTAssertEqual("card-change-456", cardRequest.id)
         XCTAssertEqual("gid://shopify/Cart/test-cart-456", cardRequest.cart.id)
-        XCTAssertEqual(1, cardRequest.cart.payment.instruments.count)
-        XCTAssertEqual("instrument-123", cardRequest.cart.payment.instruments.first?.externalReference)
+        XCTAssertEqual(1, cardRequest.cart.payment.methods.count)
+
+        let instrument = cardRequest.cart.payment.methods.first?.instruments.first
+        XCTAssertEqual("instrument-123", instrument?.externalReferenceId)
+        XCTAssertEqual("John Smith", instrument?.cardHolderName)
+        XCTAssertEqual("4242", instrument?.lastDigits)
+        XCTAssertEqual(12, instrument?.month)
+        XCTAssertEqual(2025, instrument?.year)
+        XCTAssertEqual(.visa, instrument?.brand)
+        XCTAssertEqual("John", instrument?.billingAddress?.firstName)
+        XCTAssertEqual("Smith", instrument?.billingAddress?.lastName)
+        XCTAssertEqual("123 Main St", instrument?.billingAddress?.address1)
+        XCTAssertEqual("Seattle", instrument?.billingAddress?.city)
+        XCTAssertEqual("WA", instrument?.billingAddress?.province)
+        XCTAssertEqual("US", instrument?.billingAddress?.country)
+        XCTAssertEqual("98101", instrument?.billingAddress?.zip)
+
+        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = instrument?.credentials?.first else {
+            XCTFail("Expected remoteTokenPaymentCredential")
+            return
+        }
+
+        XCTAssertEqual("tok_abc123", token)
+        XCTAssertEqual("merchant.token", tokenType)
+        XCTAssertEqual("merchant_psp", tokenHandler)
+    }
+
+    func testDecodeCartPaymentInstrumentWithCredentials() throws {
+        let json = """
+        [{
+            "externalReferenceId": "instrument-123",
+            "credentials": [{
+                "remoteTokenPaymentCredential": {
+                    "token": "tok_abc123",
+                    "tokenType": "merchant.token",
+                    "tokenHandler": "merchant_psp"
+                }
+            }]
+        }]
+        """
+
+        let data = json.data(using: .utf8)!
+        let instruments = try JSONDecoder().decode([CartPaymentInstrument].self, from: data)
+
+        XCTAssertEqual(1, instruments.count)
+        XCTAssertEqual("instrument-123", instruments.first?.externalReferenceId)
+
+        guard case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler) = instruments.first?.credentials?.first else {
+            XCTFail("Expected remoteTokenPaymentCredential")
+            return
+        }
+
+        XCTAssertEqual("tok_abc123", token)
+        XCTAssertEqual("merchant.token", tokenType)
+        XCTAssertEqual("merchant_psp", tokenHandler)
     }
 
     func testDecodeSupportsCheckoutStart() throws {
@@ -405,7 +485,7 @@ class CheckoutBridgeTests: XCTestCase {
                             "addresses": []
                         },
                         "payment": {
-                            "instruments": []
+                            "methods": []
                         }
                     },
                     "sessionId": "checkout-session-789"
