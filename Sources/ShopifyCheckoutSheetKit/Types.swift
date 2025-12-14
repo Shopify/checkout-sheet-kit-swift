@@ -362,6 +362,12 @@ public typealias CartPaymentMethod = CreditCardPaymentMethod
 
 public struct CreditCardPaymentMethod: Codable {
     public let instruments: [CreditCardPaymentInstrument]
+    private let __typename: String = "CreditCardPaymentMethod"
+
+    private enum CodingKeys: String, CodingKey {
+        case instruments
+        case __typename
+    }
 
     public init(instruments: [CreditCardPaymentInstrument]) {
         self.instruments = instruments
@@ -377,6 +383,19 @@ public struct CreditCardPaymentInstrument: Codable {
     @NullEncodable public private(set) var brand: CardBrand?
     @NullEncodable public private(set) var billingAddress: MailingAddress?
     @NullEncodable public private(set) var credentials: [PaymentCredential]?
+    private let __typename: String = "CreditCardPaymentInstrument"
+
+    private enum CodingKeys: String, CodingKey {
+        case externalReferenceId
+        case cardHolderName
+        case lastDigits
+        case month
+        case year
+        case brand
+        case billingAddress
+        case credentials
+        case __typename
+    }
 
     public init(
         externalReferenceId: String,

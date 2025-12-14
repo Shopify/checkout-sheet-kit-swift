@@ -283,6 +283,52 @@ class NullEncodingValidationTests: XCTestCase {
                   "title" : null
                 }
                 """
+            ),
+            (
+                "CreditCardPaymentMethod",
+                CreditCardPaymentMethod(instruments: [
+                    CreditCardPaymentInstrument(externalReferenceId: "test-123")
+                ]),
+                """
+                {
+                  "__typename" : "CreditCardPaymentMethod",
+                  "instruments" : [
+                    {
+                      "__typename" : "CreditCardPaymentInstrument",
+                      "billingAddress" : null,
+                      "brand" : null,
+                      "cardHolderName" : null,
+                      "credentials" : null,
+                      "externalReferenceId" : "test-123",
+                      "lastDigits" : null,
+                      "month" : null,
+                      "year" : null
+                    }
+                  ]
+                }
+                """
+            ),
+            (
+                "CreditCardPaymentInstrument",
+                CreditCardPaymentInstrument(
+                    externalReferenceId: "test-456",
+                    cardHolderName: "John Doe",
+                    lastDigits: "4242",
+                    brand: .visa
+                ),
+                """
+                {
+                  "__typename" : "CreditCardPaymentInstrument",
+                  "billingAddress" : null,
+                  "brand" : "VISA",
+                  "cardHolderName" : "John Doe",
+                  "credentials" : null,
+                  "externalReferenceId" : "test-456",
+                  "lastDigits" : "4242",
+                  "month" : null,
+                  "year" : null
+                }
+                """
             )
         ]
 
