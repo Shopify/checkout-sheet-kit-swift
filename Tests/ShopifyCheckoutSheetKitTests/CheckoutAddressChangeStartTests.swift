@@ -32,15 +32,7 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
         let request = try createRequest(webview: mockWebView)
 
         let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "US")
-                        )
-                    ]
-                )
-            )
+            cart: createTestCart()
         )
 
         let expectation = expectation(description: "JavaScript executed")
@@ -75,18 +67,10 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
 
     // MARK: - Validation Tests
 
-    func testValidateAcceptsValid2CharacterCountryCode() throws {
+    func testValidateAcceptsCartWithDeliveryAddresses() throws {
         let request = try createRequest()
         let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "US")
-                        )
-                    ]
-                )
-            )
+            cart: createTestCart()
         )
 
         XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
@@ -95,29 +79,6 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
     func testValidateAllowsNilCart() throws {
         let request = try createRequest()
         let payload = CheckoutAddressChangeStartResponsePayload(cart: nil)
-
-        XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
-    }
-
-    func testValidateAcceptsMultipleValidAddresses() throws {
-        let request = try createRequest()
-        let payload = CheckoutAddressChangeStartResponsePayload(
-            cart: CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "US")
-                        ),
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "CA")
-                        ),
-                        CartSelectableAddressInput(
-                            address: CartDeliveryAddressInput(countryCode: "GB")
-                        )
-                    ]
-                )
-            )
-        )
 
         XCTAssertNoThrow(try request.rpcRequest.validate(payload: payload))
     }

@@ -37,16 +37,14 @@ class NullEncodingValidationTests: XCTestCase {
 
     // MARK: - Response Payload Tests
 
-    func test_encode_responsePayloads_includeAllNullableKeys() throws {
+    func test_encode_responsePayloads_omitNilFields() throws {
         let testCases: [(name: String, instance: any Encodable, expected: String)] = [
             (
                 "CheckoutSubmitStartResponsePayload",
                 CheckoutSubmitStartResponsePayload(),
                 """
                 {
-                  "cart" : null,
-                  "errors" : null,
-                  "payment" : null
+
                 }
                 """
             ),
@@ -55,8 +53,7 @@ class NullEncodingValidationTests: XCTestCase {
                 CheckoutAddressChangeStartResponsePayload(),
                 """
                 {
-                  "cart" : null,
-                  "errors" : null
+
                 }
                 """
             ),
@@ -65,103 +62,7 @@ class NullEncodingValidationTests: XCTestCase {
                 CheckoutPaymentMethodChangeStartResponsePayload(),
                 """
                 {
-                  "cart" : null,
-                  "errors" : null
-                }
-                """
-            )
-        ]
 
-        for (name, instance, expected) in testCases {
-            try XCTContext.runActivity(named: name) { _ in
-                XCTAssertEqual(try toString(instance), expected)
-            }
-        }
-    }
-
-    // MARK: - Input Type Tests
-
-    func test_encode_inputTypes_includeAllNullableKeys() throws {
-        let testCases: [(name: String, instance: any Encodable, expected: String)] = [
-            (
-                "CartInput",
-                CartInput(),
-                """
-                {
-                  "buyerIdentity" : null,
-                  "delivery" : null,
-                  "discountCodes" : null,
-                  "paymentInstruments" : null
-                }
-                """
-            ),
-            (
-                "CartDeliveryInput",
-                CartDeliveryInput(),
-                """
-                {
-                  "addresses" : null
-                }
-                """
-            ),
-            (
-                "CartSelectableAddressInput",
-                CartSelectableAddressInput(address: CartDeliveryAddressInput()),
-                """
-                {
-                  "address" : {
-                    "address1" : null,
-                    "address2" : null,
-                    "city" : null,
-                    "company" : null,
-                    "countryCode" : null,
-                    "firstName" : null,
-                    "lastName" : null,
-                    "phone" : null,
-                    "provinceCode" : null,
-                    "zip" : null
-                  },
-                  "selected" : null
-                }
-                """
-            ),
-            (
-                "CartDeliveryAddressInput",
-                CartDeliveryAddressInput(),
-                """
-                {
-                  "address1" : null,
-                  "address2" : null,
-                  "city" : null,
-                  "company" : null,
-                  "countryCode" : null,
-                  "firstName" : null,
-                  "lastName" : null,
-                  "phone" : null,
-                  "provinceCode" : null,
-                  "zip" : null
-                }
-                """
-            ),
-            (
-                "CartBuyerIdentityInput",
-                CartBuyerIdentityInput(),
-                """
-                {
-                  "countryCode" : null,
-                  "email" : null,
-                  "phone" : null
-                }
-                """
-            ),
-            (
-                "ResponseError",
-                ResponseError(code: "TEST", message: "Test error"),
-                """
-                {
-                  "code" : "TEST",
-                  "fieldTarget" : null,
-                  "message" : "Test error"
                 }
                 """
             )
@@ -285,6 +186,63 @@ class NullEncodingValidationTests: XCTestCase {
                   },
                   "handle" : "test-handle",
                   "title" : null
+                }
+                """
+            ),
+            (
+                "CreditCardPaymentMethod",
+                CreditCardPaymentMethod(instruments: [
+                    CreditCardPaymentInstrument(externalReferenceId: "test-123")
+                ]),
+                """
+                {
+                  "__typename" : "CreditCardPaymentMethod",
+                  "instruments" : [
+                    {
+                      "__typename" : "CreditCardPaymentInstrument",
+                      "billingAddress" : null,
+                      "brand" : null,
+                      "cardHolderName" : null,
+                      "credentials" : null,
+                      "externalReferenceId" : "test-123",
+                      "lastDigits" : null,
+                      "month" : null,
+                      "year" : null
+                    }
+                  ]
+                }
+                """
+            ),
+            (
+                "CreditCardPaymentInstrument",
+                CreditCardPaymentInstrument(
+                    externalReferenceId: "test-456",
+                    cardHolderName: "John Doe",
+                    lastDigits: "4242",
+                    brand: .visa
+                ),
+                """
+                {
+                  "__typename" : "CreditCardPaymentInstrument",
+                  "billingAddress" : null,
+                  "brand" : "VISA",
+                  "cardHolderName" : "John Doe",
+                  "credentials" : null,
+                  "externalReferenceId" : "test-456",
+                  "lastDigits" : "4242",
+                  "month" : null,
+                  "year" : null
+                }
+                """
+            ),
+            (
+                "ResponseError",
+                ResponseError(code: "TEST", message: "Test error"),
+                """
+                {
+                  "code" : "TEST",
+                  "fieldTarget" : null,
+                  "message" : "Test error"
                 }
                 """
             )

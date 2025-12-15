@@ -27,7 +27,7 @@ import UIKit
 
 struct AddressOption {
     let label: String
-    let address: CartDeliveryAddressInput
+    let address: CartDeliveryAddress
 }
 
 class AddressSelectionViewController: UIViewController {
@@ -40,7 +40,7 @@ class AddressSelectionViewController: UIViewController {
     private let addressOptions: [AddressOption] = [
         AddressOption(
             label: "Default",
-            address: CartDeliveryAddressInput(
+            address: CartDeliveryAddress(
                 firstName: InfoDictionary.shared.firstName,
                 lastName: InfoDictionary.shared.lastName,
                 address1: InfoDictionary.shared.address1,
@@ -56,7 +56,7 @@ class AddressSelectionViewController: UIViewController {
 
         AddressOption(
             label: "Happy path lane",
-            address: CartDeliveryAddressInput(
+            address: CartDeliveryAddress(
                 firstName: "Evelyn",
                 lastName: "Hartley",
                 address1: "89 Haight Street",
@@ -71,7 +71,7 @@ class AddressSelectionViewController: UIViewController {
         /// This address will cause SDK validation error (3-letter country code)
         AddressOption(
             label: "❌ Invalid - SDK validation (3-letter country code)",
-            address: CartDeliveryAddressInput(
+            address: CartDeliveryAddress(
                 firstName: "Test",
                 lastName: "Invalid",
                 address1: "123 Error Street",
@@ -86,7 +86,7 @@ class AddressSelectionViewController: UIViewController {
         /// This address will cause backend validation error (postcode invalid for country)
         AddressOption(
             label: "❌ Invalid - Backend validation (postcode invalid for country)",
-            address: CartDeliveryAddressInput(
+            address: CartDeliveryAddress(
                 firstName: "Evelyn",
                 lastName: "Hartley",
                 address1: "Broken Address",
@@ -155,16 +155,15 @@ class AddressSelectionViewController: UIViewController {
 
     @objc private func confirmSelection() {
         let address = addressOptions[selectedIndex].address
-
-        let cartInput = CartInput(
-            delivery: CartDeliveryInput(
-                addresses: [
-                    CartSelectableAddressInput(address: address, selected: true)
-                ]
-            )
+        let selectableAddress = CartSelectableAddress(
+            address: .deliveryAddress(address),
+            selected: true
         )
-
-        let response = CheckoutAddressChangeStartResponsePayload(cart: cartInput)
+        let deliveryAddresses = CartDelivery(addresses: [selectableAddress])
+        let cartCopy = event.cart.copy(
+            delivery: .override(deliveryAddresses)
+        )
+        let response = CheckoutAddressChangeStartResponsePayload(cart: cartCopy)
 
         do {
             // Respond to the event - validation happens here

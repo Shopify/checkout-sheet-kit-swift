@@ -146,9 +146,9 @@ struct CartView: View {
                                 "🎉 SwiftUI: Address change intent received for addressType: \(event.addressType)"
                             )
 
-                            // Respond with hardcoded address after 2 seconds
+                            // Respond with updated cart after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                let hardcodedAddress = CartDeliveryAddressInput(
+                                let hardcodedAddress = CartDeliveryAddress(
                                     firstName: "Jane",
                                     lastName: "Smith",
                                     address1: "456 SwiftUI Avenue",
@@ -160,10 +160,17 @@ struct CartView: View {
                                     zip: "V6B 1A1"
                                 )
 
-                                let addressInput = CartSelectableAddressInput(address: hardcodedAddress, selected: true)
-                                let delivery = CartDeliveryInput(addresses: [addressInput])
-                                let cart = CartInput(delivery: delivery)
-                                let response = CheckoutAddressChangeStartResponsePayload(cart: cart)
+                                let selectableAddress = CartSelectableAddress(
+                                    address: .deliveryAddress(hardcodedAddress),
+                                    selected: true
+                                )
+                                let delivery = CartDelivery(addresses: [selectableAddress])
+
+                                let updatedCart = event.cart.copy(
+                                    delivery: .override(delivery)
+                                )
+
+                                let response = CheckoutAddressChangeStartResponsePayload(cart: updatedCart)
 
                                 print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
                                 do {
@@ -178,30 +185,29 @@ struct CartView: View {
                         .onPaymentMethodChangeStart { event in
                             print("🎉 SwiftUI: Payment method change start received")
 
-                            // Respond with hardcoded payment method after 2 seconds
+                            // Respond with updated cart after 2 seconds
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                let paymentInstrument = CartPaymentInstrumentInput(
-                                    externalReference: "card-visa-1234",
-                                    display: CartPaymentInstrumentDisplayInput(
-                                        last4: "1234",
-                                        brand: .visa,
-                                        cardHolderName: "John Smith",
-                                        expiry: ExpiryInput(month: 12, year: 2026)
-                                    ),
-                                    billingAddress: CartMailingAddressInput(
-                                        firstName: "John",
-                                        lastName: "Smith",
-                                        address1: "123 Main St",
-                                        city: "Vancouver",
-                                        countryCode: "CA",
-                                        provinceCode: "BC",
-                                        zip: "V6B 1A1"
-                                    )
+                                let instrument = CreditCardPaymentInstrument(
+                                    externalReferenceId: "card-visa-1234"
                                 )
 
-                                let response = CheckoutPaymentMethodChangeStartResponsePayload(
-                                    cart: CartInput(paymentInstruments: [paymentInstrument])
+                                let paymentMethod = CartPaymentMethod(instruments: [instrument])
+                                let payment = CartPayment(methods: [paymentMethod])
+
+                                let updatedCart = Cart(
+                                    id: event.cart.id,
+                                    lines: event.cart.lines,
+                                    cost: event.cart.cost,
+                                    buyerIdentity: event.cart.buyerIdentity,
+                                    deliveryGroups: event.cart.deliveryGroups,
+                                    discountCodes: event.cart.discountCodes,
+                                    appliedGiftCards: event.cart.appliedGiftCards,
+                                    discountAllocations: event.cart.discountAllocations,
+                                    delivery: event.cart.delivery,
+                                    payment: payment
                                 )
+
+                                let response = CheckoutPaymentMethodChangeStartResponsePayload(cart: updatedCart)
 
                                 print("🎉 SwiftUI: Responding with hardcoded Visa ending in 1234")
                                 do {

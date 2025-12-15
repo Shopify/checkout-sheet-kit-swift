@@ -53,7 +53,7 @@ func createEmptyCheckoutCompleteEvent(id: String? = "") -> CheckoutCompleteEvent
             appliedGiftCards: [],
             discountAllocations: [],
             delivery: CartDelivery(addresses: []),
-            payment: .init(instruments: [])
+            payment: .init(methods: [])
         )
     )
 }

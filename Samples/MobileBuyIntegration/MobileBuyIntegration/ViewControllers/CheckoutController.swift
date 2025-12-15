@@ -79,9 +79,9 @@ extension CheckoutController: CheckoutDelegate {
     func checkoutDidStartAddressChange(event: CheckoutAddressChangeStartEvent) {
         OSLogger.shared.debug("[CheckoutDelegate] Address change start received for addressType: \(event.addressType)")
 
-        // Respond with a hardcoded address after 2 seconds to simulate native address picker
+        // Respond with updated cart after 2 seconds to simulate native address picker
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            let address = CartDeliveryAddressInput(
+            let address = CartDeliveryAddress(
                 firstName: "John",
                 lastName: "Doe",
                 address1: "123 Test Street",
@@ -93,17 +93,17 @@ extension CheckoutController: CheckoutDelegate {
                 zip: "M5V 1A1"
             )
 
-            let cartInput = CartInput(
-                delivery: CartDeliveryInput(
-                    addresses: [
-                        CartSelectableAddressInput(address: address, selected: true)
-                    ]
-                )
+            let selectableAddress = CartSelectableAddress(address: .deliveryAddress(address), selected: true)
+            let delivery = CartDelivery(addresses: [selectableAddress])
+
+            // Create updated cart with new delivery address
+            let updatedCart = event.cart.copy(
+                delivery: .override(delivery)
             )
 
-            let response = CheckoutAddressChangeStartResponsePayload(cart: cartInput)
+            let response = CheckoutAddressChangeStartResponsePayload(cart: updatedCart)
 
-            OSLogger.shared.debug("[CheckoutDelegate] Responding with hardcoded Toronto address via CartInput")
+            OSLogger.shared.debug("[CheckoutDelegate] Responding with hardcoded Toronto address")
             do {
                 try event.respondWith(payload: response)
             } catch {
