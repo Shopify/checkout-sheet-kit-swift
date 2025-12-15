@@ -166,17 +166,8 @@ struct CartView: View {
                                 )
                                 let delivery = CartDelivery(addresses: [selectableAddress])
 
-                                let updatedCart = Cart(
-                                    id: event.cart.id,
-                                    lines: event.cart.lines,
-                                    cost: event.cart.cost,
-                                    buyerIdentity: event.cart.buyerIdentity,
-                                    deliveryGroups: event.cart.deliveryGroups,
-                                    discountCodes: event.cart.discountCodes,
-                                    appliedGiftCards: event.cart.appliedGiftCards,
-                                    discountAllocations: event.cart.discountAllocations,
-                                    delivery: delivery,
-                                    payment: event.cart.payment
+                                let updatedCart = event.cart.copy(
+                                    delivery: .override(delivery)
                                 )
 
                                 let response = CheckoutAddressChangeStartResponsePayload(cart: updatedCart)
