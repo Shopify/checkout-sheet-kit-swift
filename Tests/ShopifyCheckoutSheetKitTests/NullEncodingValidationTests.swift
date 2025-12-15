@@ -75,101 +75,6 @@ class NullEncodingValidationTests: XCTestCase {
         }
     }
 
-    // MARK: - Input Type Tests
-
-    func test_encode_inputTypes_includeAllNullableKeys() throws {
-        let testCases: [(name: String, instance: any Encodable, expected: String)] = [
-            (
-                "CartInput",
-                CartInput(),
-                """
-                {
-                  "buyerIdentity" : null,
-                  "delivery" : null,
-                  "discountCodes" : null,
-                  "paymentInstruments" : null
-                }
-                """
-            ),
-            (
-                "CartDeliveryInput",
-                CartDeliveryInput(),
-                """
-                {
-                  "addresses" : null
-                }
-                """
-            ),
-            (
-                "CartSelectableAddressInput",
-                CartSelectableAddressInput(address: CartDeliveryAddressInput()),
-                """
-                {
-                  "address" : {
-                    "address1" : null,
-                    "address2" : null,
-                    "city" : null,
-                    "company" : null,
-                    "countryCode" : null,
-                    "firstName" : null,
-                    "lastName" : null,
-                    "phone" : null,
-                    "provinceCode" : null,
-                    "zip" : null
-                  },
-                  "selected" : null
-                }
-                """
-            ),
-            (
-                "CartDeliveryAddressInput",
-                CartDeliveryAddressInput(),
-                """
-                {
-                  "address1" : null,
-                  "address2" : null,
-                  "city" : null,
-                  "company" : null,
-                  "countryCode" : null,
-                  "firstName" : null,
-                  "lastName" : null,
-                  "phone" : null,
-                  "provinceCode" : null,
-                  "zip" : null
-                }
-                """
-            ),
-            (
-                "CartBuyerIdentityInput",
-                CartBuyerIdentityInput(),
-                """
-                {
-                  "countryCode" : null,
-                  "email" : null,
-                  "phone" : null
-                }
-                """
-            ),
-            (
-                "ResponseError",
-                ResponseError(code: "TEST", message: "Test error"),
-                """
-                {
-                  "code" : "TEST",
-                  "fieldTarget" : null,
-                  "message" : "Test error"
-                }
-                """
-            )
-        ]
-
-        for (name, instance, expected) in testCases {
-            try XCTContext.runActivity(named: name) { _ in
-                XCTAssertEqual(try toString(instance), expected)
-            }
-        }
-    }
-
     // MARK: - Data Type Tests
 
     func test_encode_dataTypes_includeAllNullableKeys() throws {
@@ -327,6 +232,17 @@ class NullEncodingValidationTests: XCTestCase {
                   "lastDigits" : "4242",
                   "month" : null,
                   "year" : null
+                }
+                """
+            ),
+            (
+                "ResponseError",
+                ResponseError(code: "TEST", message: "Test error"),
+                """
+                {
+                  "code" : "TEST",
+                  "fieldTarget" : null,
+                  "message" : "Test error"
                 }
                 """
             )

@@ -68,7 +68,7 @@ class CardSelectionViewController: UIViewController {
         CreditCardPaymentInstrument(
             externalReferenceId: "card-amex-3737",
             cardHolderName: "Jane Doe",
-             lastDigits: "3737",
+            lastDigits: "3737",
             month: 3,
             year: 2028,
             brand: .americanExpress,

@@ -390,7 +390,6 @@ public struct CreditCardPaymentInstrument: Codable {
     @NullEncodable public private(set) var credentials: [PaymentCredential]?
     private let __typename: String = "CreditCardPaymentInstrument"
 
-
     private enum CodingKeys: String, CodingKey {
         case __typename
         case externalReferenceId
@@ -616,7 +615,6 @@ public enum DiscountValue: Codable {
 }
 
 // MARK: - Cart Input Types
-
 
 /// This doesn't follow the Storefront API design so we are aliasing to an existing conforming shape
 /// Differences to SF API include:
