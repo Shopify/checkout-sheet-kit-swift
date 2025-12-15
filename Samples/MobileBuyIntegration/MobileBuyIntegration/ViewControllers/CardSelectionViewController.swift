@@ -25,6 +25,11 @@ import OSLog
 import ShopifyCheckoutSheetKit
 import UIKit
 
+struct CardOption {
+    let label: String
+    let instrument: CreditCardPaymentInstrument
+}
+
 class CardSelectionViewController: UIViewController {
     private let event: CheckoutPaymentMethodChangeStartEvent
     private var selectedIndex: Int = 0
@@ -32,73 +37,74 @@ class CardSelectionViewController: UIViewController {
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
     private let confirmButton = UIButton(type: .system)
 
-    private let cardOptions: [CreditCardPaymentInstrument] = [
-        CreditCardPaymentInstrument(
-            externalReferenceId: "card-visa-4242",
-            cardHolderName: "John Smith", lastDigits: "4242",
-            month: 12, year: 2026, brand: .visa,
-            billingAddress: MailingAddress(
-                address1: "123 Main St",
-                city: "New York",
-                province: "NY",
-                country: "US",
-                countryCodeV2: "US",
-                zip: "10001",
-                firstName: "John",
-                lastName: "Smith"
+    private let cardOptions: [CardOption] = [
+        CardOption(
+            label: "Valid: Visa",
+            instrument: CreditCardPaymentInstrument(
+                externalReferenceId: "card-visa-4242",
+                cardHolderName: "John Smith",
+                lastDigits: "4242",
+                month: 12,
+                year: 2028,
+                brand: .visa,
+                billingAddress: MailingAddress(
+                    address1: "123 Main St",
+                    city: "New York",
+                    province: "NY",
+                    country: "US",
+                    countryCodeV2: "US",
+                    zip: "10001",
+                    firstName: "John",
+                    lastName: "Smith"
+                )
             )
         ),
-        CreditCardPaymentInstrument(
-            externalReferenceId: "card-mc-5555",
-            cardHolderName: "John Smith", lastDigits: "5555",
-            month: 6,
-            year: 2027,
-            brand: .mastercard,
-            billingAddress: MailingAddress(
-                address1: "123 Main St",
-                city: "New York",
-                province: "NY",
-                country: "US",
-                countryCodeV2: "US",
-                zip: "10001",
-                firstName: "John",
-                lastName: "Smith"
+        CardOption(
+            label: "Invalid: Expired Card",
+            instrument: CreditCardPaymentInstrument(
+                externalReferenceId: "card-mc-5555",
+                cardHolderName: "John Smith",
+                lastDigits: "5555",
+                month: 6,
+                year: 2024,
+                brand: .mastercard,
+                billingAddress: MailingAddress(
+                    address1: "123 Main St",
+                    city: "New York",
+                    province: "NY",
+                    country: "US",
+                    countryCodeV2: "US",
+                    zip: "10001",
+                    firstName: "John",
+                    lastName: "Smith"
+                )
             )
         ),
-        CreditCardPaymentInstrument(
-            externalReferenceId: "card-amex-3737",
-            cardHolderName: "Jane Doe",
-            lastDigits: "3737",
-            month: 3,
-            year: 2028,
-            brand: .americanExpress,
-            billingAddress: MailingAddress(
-                address1: "456 Oak Ave",
-                city: "San Francisco",
-                province: "CA",
-                country: "US",
-                countryCodeV2: "US",
-                zip: "94102",
-                firstName: "Jane",
-                lastName: "Doe"
+        CardOption(
+            label: "Invalid: 3 Letter Country Code",
+            instrument: CreditCardPaymentInstrument(
+                externalReferenceId: "card-amex-3737",
+                cardHolderName: "Jane Doe",
+                lastDigits: "3737",
+                month: 3,
+                year: 2028,
+                brand: .americanExpress,
+                billingAddress: MailingAddress(
+                    address1: "456 Oak Ave",
+                    city: "San Francisco",
+                    province: "CA",
+                    country: "US",
+                    countryCodeV2: "US",
+                    zip: "94102",
+                    firstName: "Jane",
+                    lastName: "Doe"
+                )
             )
         ),
-        CreditCardPaymentInstrument(
-            externalReferenceId: "card-amex-3733",
-            cardHolderName: nil,
-            lastDigits: nil,
-            month: nil,
-            year: nil,
-            brand: nil,
-            billingAddress: MailingAddress(
-                address1: nil,
-                city: nil,
-                province: nil,
-                country: nil,
-                countryCodeV2: nil,
-                zip: nil,
-                firstName: nil,
-                lastName: nil
+        CardOption(
+            label: "Invalid: Nil fields",
+            instrument: CreditCardPaymentInstrument(
+                externalReferenceId: "card-unknown-0000"
             )
         )
     ]
@@ -107,10 +113,9 @@ class CardSelectionViewController: UIViewController {
         self.event = event
         super.init(nibName: nil, bundle: nil)
 
-        // If payment instruments exist, try to select the first one
         if let firstInstrument = event.cart.payment.methods.first?.instruments.first {
-            for (index, instrument) in cardOptions
-                .enumerated() where instrument.externalReferenceId == firstInstrument.externalReferenceId
+            for (index, option) in cardOptions
+                .enumerated() where option.instrument.externalReferenceId == firstInstrument.externalReferenceId
             {
                 selectedIndex = index
                 break
@@ -169,17 +174,7 @@ class CardSelectionViewController: UIViewController {
     @objc private func confirmSelection() {
         let selectedCard = cardOptions[selectedIndex]
 
-        let instrument = CreditCardPaymentInstrument(
-            externalReferenceId: selectedCard.externalReferenceId,
-            cardHolderName: selectedCard.cardHolderName,
-            lastDigits: selectedCard.lastDigits,
-            month: selectedCard.month,
-            year: selectedCard.year,
-            brand: selectedCard.brand,
-            billingAddress: selectedCard.billingAddress
-        )
-
-        let paymentMethod = CartPaymentMethod(instruments: [instrument])
+        let paymentMethod = CartPaymentMethod(instruments: [selectedCard.instrument])
         let payment = CartPayment(methods: [paymentMethod])
 
         let updatedCart = event.cart.copy(
@@ -304,16 +299,14 @@ class CardCell: UITableViewCell {
         ])
     }
 
-    func configure(with option: CreditCardPaymentInstrument, isSelected: Bool) {
-        labelLabel.text = option.brand?.rawValue
+    func configure(with option: CardOption, isSelected: Bool) {
+        labelLabel.text = option.label
 
-        // Set card brand image
-        let imageName = getCardImageName(for: option.brand)
+        let imageName = getCardImageName(for: option.instrument.brand)
         cardImageView.image = UIImage(systemName: imageName)
         cardImageView.tintColor = .label
 
-        // Set billing details from address
-        let address = option.billingAddress
+        let address = option.instrument.billingAddress
         detailsLabel.text = "\(address?.city ?? ""), \(address?.province ?? "") \(address?.zip ?? "")"
 
         radioButtonInner.isHidden = !isSelected
