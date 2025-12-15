@@ -39,13 +39,13 @@ class CardSelectionViewController: UIViewController {
             month: 12, year: 2026, brand: .visa,
             billingAddress: MailingAddress(
                 address1: "123 Main St",
-                address2: "New York",
-                city: "John",
-                province: "Smith",
+                city: "New York",
+                province: "NY",
                 country: "US",
                 countryCodeV2: "US",
-                zip: "NY",
-                firstName: "10001"
+                zip: "10001",
+                firstName: "John",
+                lastName: "Smith"
             )
         ),
         CreditCardPaymentInstrument(
@@ -56,18 +56,19 @@ class CardSelectionViewController: UIViewController {
             brand: .mastercard,
             billingAddress: MailingAddress(
                 address1: "123 Main St",
-                address2: "New York",
-                city: "John",
-                province: "Smith",
+                city: "New York",
+                province: "NY",
                 country: "US",
                 countryCodeV2: "US",
-                zip: "NY",
-                firstName: "10001"
+                zip: "10001",
+                firstName: "John",
+                lastName: "Smith"
             )
         ),
         CreditCardPaymentInstrument(
             externalReferenceId: "card-amex-3737",
-            cardHolderName: "Jane Doe", lastDigits: "3737",
+            cardHolderName: "Jane Doe",
+             lastDigits: "3737",
             month: 3,
             year: 2028,
             brand: .americanExpress,
@@ -80,6 +81,24 @@ class CardSelectionViewController: UIViewController {
                 zip: "94102",
                 firstName: "Jane",
                 lastName: "Doe"
+            )
+        ),
+        CreditCardPaymentInstrument(
+            externalReferenceId: "card-amex-3733",
+            cardHolderName: nil,
+            lastDigits: nil,
+            month: nil,
+            year: nil,
+            brand: nil,
+            billingAddress: MailingAddress(
+                address1: nil,
+                city: nil,
+                province: nil,
+                country: nil,
+                countryCodeV2: nil,
+                zip: nil,
+                firstName: nil,
+                lastName: nil
             )
         )
     ]
@@ -152,13 +171,6 @@ class CardSelectionViewController: UIViewController {
 
         let instrument = CreditCardPaymentInstrument(
             externalReferenceId: selectedCard.externalReferenceId,
-//            credentials: [
-//                .remoteTokenPaymentCredential(
-//                    token: "token",
-//                    tokenType: "tokentype",
-//                    tokenHandler: "tokenHandler"
-//                )
-//            ],
             cardHolderName: selectedCard.cardHolderName,
             lastDigits: selectedCard.lastDigits,
             month: selectedCard.month,
