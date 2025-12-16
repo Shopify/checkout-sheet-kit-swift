@@ -48,6 +48,9 @@ public class CheckoutWebView: WKWebView {
 
     var checkoutBridge: CheckoutBridgeProtocol.Type = CheckoutBridge.self
 
+    /// Manages pending outbound RPC requests and their continuations
+    let pendingRequests = PendingRequestManager()
+
     /// A reference to the view is needed when preload is deactivated in order to detach the bridge
     weak static var uncacheableViewRef: CheckoutWebView?
 
@@ -175,6 +178,11 @@ public class CheckoutWebView: WKWebView {
 
     deinit {
         OSLogger.shared.debug("De-allocating webview")
+
+        // Cancel any pending outbound requests to prevent continuation leaks
+        Task { [pendingRequests] in
+            await pendingRequests.cancelAll()
+        }
 
         if isRecovery {
             navigationObserver?.invalidate()
@@ -315,10 +323,32 @@ extension CheckoutWebView: WKScriptMessageHandler {
         case let unsupportedRequest as UnsupportedRequest:
             OSLogger.shared.debug("Unsupported request: \(unsupportedRequest.method) (id: \(String(describing: unsupportedRequest.id)))")
 
+        // RPC responses (responses to outbound requests from the kit)
+        case let rpcResponse as OutboundRPCResponseEnvelope:
+            handleOutboundRPCResponse(rpcResponse)
+
         default:
             OSLogger.shared.debug(
                 "Unknown event type received"
             )
+        }
+    }
+
+    /// Handles responses to outbound RPC requests (Kit → Checkout → Kit)
+    private func handleOutboundRPCResponse(_ response: OutboundRPCResponseEnvelope) {
+        OSLogger.shared.debug("Handling outbound RPC response: id=\(response.id)")
+
+        Task {
+            do {
+                let responseData = try JSONEncoder().encode(response)
+                let completed = await pendingRequests.complete(id: response.id, with: responseData)
+                if !completed {
+                    OSLogger.shared.debug("No pending request found for response id=\(response.id)")
+                }
+            } catch {
+                OSLogger.shared.error("Failed to encode RPC response: \(error.localizedDescription)")
+                await pendingRequests.fail(id: response.id, with: error)
+            }
         }
     }
 
@@ -637,6 +667,74 @@ extension CheckoutWebView {
 
         var isStale: Bool {
             abs(timestamp.timeIntervalSinceNow) >= timeout
+        }
+    }
+}
+
+// MARK: - Outbound Requests (Kit → Checkout)
+
+extension CheckoutWebView {
+    /// Sends a checkout submit request to checkout.
+    ///
+    /// This initiates the checkout submission process. If the cart contains payment credentials,
+    /// checkout will proceed to submit. If payment credentials are missing, checkout may respond
+    /// with a `submitStart` request to collect them.
+    ///
+    /// - Parameter cart: Optional cart with payment credentials attached to instruments.
+    ///   Pattern: `{ ...cart, payment: { ...cart.payment, methods: [...modified] } }`
+    ///   where instruments have credentials nested at `cart.payment.methods[*].instruments[*].credentials[*]`
+    /// - Returns: Response payload containing any validation errors from checkout.
+    /// - Throws: `OutboundRPCRequestError` if the request fails, is cancelled, or times out.
+    ///
+    /// Example usage:
+    /// ```swift
+    /// do {
+    ///     let response = try await checkoutWebView.submit(cart: cartWithCredentials)
+    ///     if let errors = response.errors, !errors.isEmpty {
+    ///         // Handle validation errors
+    ///     }
+    /// } catch {
+    ///     // Handle request failure
+    /// }
+    /// ```
+    public func submit(cart: Cart? = nil) async throws -> CheckoutSubmitResponsePayload {
+        let request = CheckoutSubmitRequest(cart: cart)
+
+        OSLogger.shared.info("Sending checkout submit request: id=\(request.id)")
+
+        // Get the raw response data from the pending request
+        let responseData: Data = try await withCheckedThrowingContinuation { continuation in
+            Task {
+                await pendingRequests.register(id: request.id, continuation: continuation)
+            }
+
+            do {
+                try CheckoutBridge.sendRequest(self, request: request)
+            } catch {
+                Task {
+                    await pendingRequests.fail(id: request.id, with: error)
+                }
+            }
+        }
+
+        // Decode the response envelope
+        let envelope = try JSONDecoder().decode(OutboundRPCResponseEnvelope.self, from: responseData)
+
+        // Check for RPC-level error
+        if let error = envelope.error {
+            throw OutboundRPCRequestError.rpcError(error)
+        }
+
+        // Decode the result payload
+        guard let result = envelope.result else {
+            return CheckoutSubmitResponsePayload(errors: nil)
+        }
+
+        do {
+            let resultData = try JSONEncoder().encode(result)
+            return try JSONDecoder().decode(CheckoutSubmitResponsePayload.self, from: resultData)
+        } catch {
+            throw OutboundRPCRequestError.decodingFailed(error)
         }
     }
 }

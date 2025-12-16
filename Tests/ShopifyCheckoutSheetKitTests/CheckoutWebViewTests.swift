@@ -648,6 +648,7 @@ class LoadedRequestObservableWebView: CheckoutWebView {
 class MockCheckoutBridge: CheckoutBridgeProtocol {
     static var instrumentCalled = false
     static var sendMessageCalled = false
+    static var sendRequestCalled = false
 
     static func instrument(_: WKWebView, _: InstrumentationPayload) {
         instrumentCalled = true
@@ -655,5 +656,9 @@ class MockCheckoutBridge: CheckoutBridgeProtocol {
 
     static func sendMessage(_: WKWebView, messageName _: String, messageBody _: String?) {
         sendMessageCalled = true
+    }
+
+    static func sendRequest<R: OutboundRPCRequest>(_: WKWebView, request _: R) throws {
+        sendRequestCalled = true
     }
 }

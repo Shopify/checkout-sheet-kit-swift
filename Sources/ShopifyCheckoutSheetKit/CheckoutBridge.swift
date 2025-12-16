@@ -32,6 +32,7 @@ enum BridgeError: Swift.Error {
 protocol CheckoutBridgeProtocol {
     static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload)
     static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?)
+    static func sendRequest<R: OutboundRPCRequest>(_ webView: WKWebView, request: R) throws
 }
 
 enum CheckoutBridge: CheckoutBridgeProtocol {
@@ -75,6 +76,42 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         }
     }
 
+    /// Sends an outbound RPC request to checkout
+    /// - Parameters:
+    ///   - webView: The webview to send the request through
+    ///   - request: The outbound RPC request to send
+    static func sendRequest<R: OutboundRPCRequest>(_ webView: WKWebView, request: R) throws {
+        let encoder = JSONEncoder()
+        let requestData = try encoder.encode(request)
+        guard let requestJson = String(data: requestData, encoding: .utf8) else {
+            throw OutboundRPCRequestError.encodingFailed(
+                NSError(domain: "CheckoutBridge", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to encode request to string"])
+            )
+        }
+
+        OSLogger.shared.debug("Sending outbound RPC request: method=\(R.method), id=\(request.id)")
+
+        DispatchQueue.main.async {
+            let script = """
+            (function() {
+                try {
+                    if (window && typeof window.postMessage === 'function') {
+                        window.postMessage(\(requestJson), '*');
+                    } else if (window && window.console && window.console.error) {
+                        window.console.error('window.postMessage is not available for outbound request.');
+                    }
+                } catch (error) {
+                    if (window && window.console && window.console.error) {
+                        window.console.error('Failed to send outbound request to checkout', error);
+                    }
+                }
+            })();
+            """
+
+            webView.evaluateJavaScript(script)
+        }
+    }
+
     static func decode(_ message: WKScriptMessage) throws -> Any? {
         do {
             guard
@@ -83,6 +120,14 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
             else {
                 throw BridgeError.invalidBridgeEvent()
             }
+
+            // First, check if this is an RPC response (has result/error, no method)
+            // This handles responses to outbound requests (Kit → Checkout → Kit)
+            if let rpcResponse = try? decodeAsRPCResponse(from: data) {
+                OSLogger.shared.debug("Decoded RPC response: id=\(rpcResponse.id)")
+                return rpcResponse
+            }
+
             struct MethodExtractor: Decodable {
                 let method: String
             }
@@ -127,6 +172,27 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
             )
         }
         return nil
+    }
+
+    /// Attempts to decode a message as an RPC response (response to an outbound request)
+    /// RPC responses have `result` or `error` fields but no `method` field
+    private static func decodeAsRPCResponse(from data: Data) throws -> OutboundRPCResponseEnvelope? {
+        // First check if this looks like a response (has id and result/error, no method)
+        struct ResponseChecker: Decodable {
+            let id: String?
+            let method: String?
+            let result: AnyCodable?
+            let error: OutboundRPCError?
+        }
+
+        let checker = try JSONDecoder().decode(ResponseChecker.self, from: data)
+
+        // It's a response if it has an id, no method, and has result or error
+        guard checker.id != nil, checker.method == nil, (checker.result != nil || checker.error != nil) else {
+            return nil
+        }
+
+        return try JSONDecoder().decode(OutboundRPCResponseEnvelope.self, from: data)
     }
 
     static func dispatchMessageTemplate(body: String) -> String {

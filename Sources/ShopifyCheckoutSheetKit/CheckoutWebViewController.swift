@@ -276,3 +276,37 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         return !CheckoutURL(from: checkoutURL).isMultipassURL()
     }
 }
+
+// MARK: - Outbound Requests (Kit → Checkout)
+
+extension CheckoutWebViewController {
+    /// Sends a checkout submit request to checkout.
+    ///
+    /// This initiates the checkout submission process. If the cart contains payment credentials,
+    /// checkout will proceed to submit. If payment credentials are missing, checkout may respond
+    /// with a `submitStart` request to collect them.
+    ///
+    /// - Parameter cart: Optional cart with payment credentials attached to instruments.
+    /// - Returns: Response payload containing any validation errors from checkout.
+    /// - Throws: `OutboundRPCRequestError` if the request fails, is cancelled, or times out.
+    ///
+    /// Example usage:
+    /// ```swift
+    /// func checkoutDidStartSubmit(event: CheckoutSubmitStartEvent) {
+    ///     Task {
+    ///         let cartWithCredentials = event.cart.copy(...)
+    ///         do {
+    ///             let response = try await checkoutViewController.submit(cart: cartWithCredentials)
+    ///             if let errors = response.errors, !errors.isEmpty {
+    ///                 // Handle validation errors
+    ///             }
+    ///         } catch {
+    ///             // Handle request failure
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    public func submit(cart: Cart? = nil) async throws -> CheckoutSubmitResponsePayload {
+        try await checkoutView.submit(cart: cart)
+    }
+}
