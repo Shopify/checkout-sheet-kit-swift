@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         ShopifyCheckoutSheetKit.configure {
             /// Checkout color scheme setting
-            $0.colorScheme = .web
+            $0.colorScheme = .automatic
 
             /// Customize progress bar color
             $0.tintColor = ColorPalette.primaryColor

@@ -183,7 +183,7 @@ extension URL {
 
     private func stripAuthenticationFromEmbed(_ embedValue: String) -> String {
         embedValue
-            .split(separator: ",")
+            .components(separatedBy: ",")
             .filter { !$0.starts(with: "\(EmbedFieldKey.authentication)=") }
             .joined(separator: ",")
     }
