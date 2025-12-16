@@ -196,10 +196,8 @@ class NullEncodingValidationTests: XCTestCase {
                 ]),
                 """
                 {
-                  "__typename" : "CreditCardPaymentMethod",
                   "instruments" : [
                     {
-                      "__typename" : "CreditCardPaymentInstrument",
                       "billingAddress" : null,
                       "brand" : null,
                       "cardHolderName" : null,
@@ -209,7 +207,8 @@ class NullEncodingValidationTests: XCTestCase {
                       "month" : null,
                       "year" : null
                     }
-                  ]
+                  ],
+                  "type" : "creditCard"
                 }
                 """
             ),
@@ -223,7 +222,6 @@ class NullEncodingValidationTests: XCTestCase {
                 ),
                 """
                 {
-                  "__typename" : "CreditCardPaymentInstrument",
                   "billingAddress" : null,
                   "brand" : "VISA",
                   "cardHolderName" : "John Doe",
