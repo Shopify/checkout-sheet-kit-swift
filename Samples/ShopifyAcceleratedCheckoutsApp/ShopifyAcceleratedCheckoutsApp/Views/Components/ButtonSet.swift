@@ -46,7 +46,7 @@ struct ButtonSet: View {
                         .applePayLabel(.plain)
                         .onComplete { event in
                             print(
-                                "✅ Checkout completed successfully. Order ID: \(event.orderDetails.id)"
+                                "✅ Checkout completed successfully. Order ID: \(event.orderConfirmation.order.id)"
                             )
                             onComplete()
                         }
@@ -93,7 +93,7 @@ struct ButtonSet: View {
                     .wallets([.applePay, .shopPay])
                     .onComplete { event in
                         print("✅ Variant checkout completed")
-                        print("   Order ID: \(event.orderDetails.id)")
+                        print("   Order ID: \(event.orderConfirmation.order.id)")
                     }
                     .onFail { error in
                         print("❌ Variant checkout failed: \(error)")

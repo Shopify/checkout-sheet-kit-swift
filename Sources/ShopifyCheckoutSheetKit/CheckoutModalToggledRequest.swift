@@ -22,20 +22,25 @@
  */
 
 import Foundation
+import WebKit
 
-class CheckoutCompletedEventDecoder {
-    func decode(from container: KeyedDecodingContainer<CheckoutBridge.WebEvent.CodingKeys>, using _: Decoder) -> CheckoutCompletedEvent {
-        do {
-            let messageBody = try container.decode(String.self, forKey: .body)
+/// Parameters for modal toggle events - contains visibility state
+public struct CheckoutModalToggledParams: Decodable {
+    public let modalVisible: Bool
 
-            guard let data = messageBody.data(using: .utf8) else {
-                return createEmptyCheckoutCompletedEvent()
-            }
-
-            return try JSONDecoder().decode(CheckoutCompletedEvent.self, from: data)
-        } catch {
-            OSLogger.shared.error("Error decoding \"completed\" event - \(error.localizedDescription)")
-            return createEmptyCheckoutCompletedEvent()
-        }
+    public init(from decoder: Decoder) throws {
+        // The params is a string "true" or "false" directly
+        let container = try decoder.singleValueContainer()
+        let visibleString = try container.decode(String.self)
+        modalVisible = Bool(visibleString) ?? false
     }
+
+    public init(modalVisible: Bool) {
+        self.modalVisible = modalVisible
+    }
+}
+
+/// Request for checkout modal toggle events
+public final class CheckoutModalToggledRequest: BaseRPCRequest<CheckoutModalToggledParams, EmptyResponse> {
+    override public static var method: String { "checkoutBlockingEvent" }
 }

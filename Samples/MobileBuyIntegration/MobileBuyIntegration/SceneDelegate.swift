@@ -85,23 +85,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
     }
 
-    private func setupControllers() {
-        /// Branding Logo
-        let logoImageView = UIImageView(image: UIImage(named: "logo"))
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.widthAnchor.constraint(equalToConstant: 90).isActive = true
+    private func makeLogoTitleView() -> UIImageView {
+        let imageView = UIImageView(image: UIImage(named: "logo"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.widthAnchor.constraint(equalToConstant: 90).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 32).isActive = true
+        return imageView
+    }
 
+    private func setupControllers() {
         /// Catalog grid view
         productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
         productGridController.tabBarItem.title = "Catalog"
-        productGridController.navigationItem.titleView = logoImageView
+        productGridController.navigationItem.titleView = makeLogoTitleView()
         catalogCartButton = createCartButtonWithBadge()
         productGridController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: catalogCartButton!)
 
         /// Product Gallery
         productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
         productGalleryController.tabBarItem.title = "Products"
-        productGalleryController.navigationItem.titleView = logoImageView
+        productGalleryController.navigationItem.titleView = makeLogoTitleView()
         galleryCartButton = createCartButtonWithBadge()
         productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: galleryCartButton!)
 
@@ -254,6 +258,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     public func presentCheckout(_ url: URL) {
         CheckoutController.shared?.present(checkout: url)
+    }
+
+    public func presentBuyNow(checkoutURL: URL) {
+        let embeddedCheckout = ShopifyCheckoutViewController(checkoutURL: checkoutURL)
+        let navController = UINavigationController(rootViewController: embeddedCheckout)
+        navController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+
+        window?.topMostViewController()?.present(navController, animated: true)
     }
 
     func navigateTo(_ screen: Screen) {

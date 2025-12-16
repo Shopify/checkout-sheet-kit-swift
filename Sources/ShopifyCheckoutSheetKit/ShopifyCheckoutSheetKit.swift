@@ -44,13 +44,13 @@ public func configure(_ block: (inout Configuration) -> Void) {
 }
 
 /// Preloads the checkout for faster presentation.
-public func preload(checkout url: URL) {
+public func preload(checkout url: URL, options: CheckoutOptions? = nil) {
     guard configuration.preloading.enabled else {
         return
     }
 
     CheckoutWebView.preloadingActivatedByClient = true
-    CheckoutWebView.for(checkout: url).load(checkout: url, isPreload: true)
+    CheckoutWebView.for(checkout: url, options: options).load(checkout: url, isPreload: true)
 }
 
 /// Invalidate the checkout cache from preload calls
@@ -60,18 +60,8 @@ public func invalidate() {
 
 /// Presents the checkout from a given `UIViewController`.
 @discardableResult
-public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, delegate: delegate)
-    from.present(viewController, animated: true)
-    return viewController
-}
-
-/// Internal function that presents the checkout from a given `UIViewController` with a specified entry point.
-/// This is only used by other modules such as ShopifyAcceleratedCheckouts.
-/// Consumers will use the public `present` function, and the UserAgent will *not* contain the entry field.
-@discardableResult
-package func present(checkout url: URL, from: UIViewController, entryPoint: MetaData.EntryPoint, delegate: CheckoutDelegate? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, delegate: delegate, entryPoint: entryPoint)
+public func present(checkout url: URL, from: UIViewController, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) -> CheckoutViewController {
+    let viewController = CheckoutViewController(checkout: url, delegate: delegate, options: options)
     from.present(viewController, animated: true)
     return viewController
 }

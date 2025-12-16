@@ -483,7 +483,7 @@ In the event of a checkout error occurring, the Checkout Kit _may_ attempt a ret
 There are some caveats to note when this scenario occurs:
 
 1. The checkout experience may look different to buyers. Though the sheet kit will attempt to load any checkout customizations for the storefront, there is no guarantee they will show in recovery mode.
-2. The `checkoutDidComplete(event:)` will be emitted with partial data. Invocations will only receive the order ID via `event.orderDetails.id`.
+2. The `checkoutDidComplete(event:)` will be emitted with partial data. Invocations will only receive the order ID via `event.orderConfirmation.order.id`.
 3. `checkoutDidEmitWebPixelEvent` lifecycle methods will **not** be emitted.
 
 Should you wish to opt-out of this fallback experience entirely, you can do so by adding a `shouldRecoverFromError(error:)` method to your delegate controller. Errors given to the `checkoutDidFail(error:)` lifecycle method, will contain an `isRecoverable` property by default indicating whether the request should be retried or not.

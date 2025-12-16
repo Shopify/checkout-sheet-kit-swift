@@ -37,6 +37,7 @@ struct ProductView: View {
     @State private var showingCart = false
     @State private var descriptionExpanded: Bool = false
     @State private var addedToCart: Bool = false
+    @State private var buyNowLoading = false
 
     init(product: Storefront.Product) {
         _product = State(initialValue: product)
@@ -130,6 +131,22 @@ struct ProductView: View {
                         .cornerRadius(DesignSystem.cornerRadius)
                         .disabled(!variant.availableForSale || loading)
 
+                        Button(action: buyNow) {
+                            HStack {
+                                Image(systemName: "bag.fill")
+                                    .font(.system(size: 14))
+                                Text(buyNowLoading ? "Loading..." : "Buy Now")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                        }
+                        .background(Color(red: 1.0, green: 0.6, blue: 0.0))
+                        .foregroundStyle(.white)
+                        .cornerRadius(DesignSystem.cornerRadius)
+                        .disabled(!variant.availableForSale || buyNowLoading)
+
                         if variant.availableForSale {
                             AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
                                 .wallets([.applePay])
@@ -170,6 +187,30 @@ struct ProductView: View {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 addedToCart = false
+            }
+        }
+    }
+
+    private func buyNow() {
+        _Concurrency.Task {
+            guard let variant = product.variants.nodes.first else { return }
+
+            buyNowLoading = true
+
+            do {
+                let cart = try await CartManager.createBuyNowCart(variantId: variant.id)
+                buyNowLoading = false
+
+                await MainActor.run {
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let sceneDelegate = windowScene.delegate as? SceneDelegate
+                    {
+                        sceneDelegate.presentBuyNow(checkoutURL: cart.checkoutUrl)
+                    }
+                }
+            } catch {
+                buyNowLoading = false
+                ShopifyCheckoutSheetKit.configuration.logger.log("Buy Now failed: \(error.localizedDescription)")
             }
         }
     }
