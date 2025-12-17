@@ -173,6 +173,28 @@ func createTestCheckoutPaymentMethodChangeStartEvent(
     )
 }
 
+/**
+ Creates a test CheckoutSubmitStartEvent instance with sensible defaults.
+
+ Example:
+ ```swift
+ let event = createTestCheckoutSubmitStartEvent(
+     cart: createTestCart(totalAmount: "75.00")
+ )
+ ```
+ */
+func createTestCheckoutSubmitStartEvent(
+    id: String = "test-request-123",
+    cart: Cart? = nil,
+    sessionId: String = "test-session-456"
+) -> CheckoutSubmitStartEvent {
+    CheckoutSubmitStartEvent.testInstance(
+        id: id,
+        cart: cart ?? createTestCart(),
+        sessionId: sessionId
+    )
+}
+
 // MARK: - JSON Fixtures
 
 /**
