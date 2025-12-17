@@ -348,7 +348,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
             viewDelegate.checkoutViewDidFailWithError(
                 error: .expired(
                     message: errorEvent.message,
-                    code: errorEvent.code
+                    code: errorEvent.code,
+                    recoverable: false
                 ))
 
         case .killswitchEnabled,
@@ -362,7 +363,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 error: .unavailable(
                     message: errorEvent.message,
                     code: .clientError(code: errorEvent.code),
-                    recoverable: true
+                    recoverable: false
                 ))
         }
     }
