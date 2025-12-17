@@ -28,6 +28,7 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
     public weak var delegate: CheckoutDelegate?
     var checkoutViewDidFailWithErrorCount = 0
     var checkoutView: CheckoutWebView
+    var navigationBarHidden: Bool = false
 
     lazy var progressBar: ProgressBarView = {
         let progressBar = ProgressBarView(frame: .zero)
@@ -97,6 +98,7 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        navigationController?.setNavigationBarHidden(navigationBarHidden, animated: animated)
         view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
     }
 
@@ -254,7 +256,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
     }
 
     func checkoutViewDidToggleModal(modalVisible: Bool) {
-        guard let navigationController else { return }
+        guard let navigationController, !navigationBarHidden else { return }
 
         navigationController.setNavigationBarHidden(modalVisible, animated: true)
     }

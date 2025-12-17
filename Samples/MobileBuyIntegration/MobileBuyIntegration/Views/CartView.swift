@@ -125,9 +125,11 @@ struct CartView: View {
                     ShopifyCheckout(checkout: url)
                         // .auth(token: "your-auth-token-here") // Uncomment to add authentication
                         .colorScheme(.automatic)
+                        .navigationBarHidden(true)
                         .onStart { event in
                             print("Checkout started with cart ID: \(event.cart.id)")
                         }
+
                         .onCancel {
                             showCheckoutSheet = false
                         }
@@ -182,6 +184,7 @@ struct CartView: View {
                                 }
                             }
                         }
+
                         .onPaymentMethodChangeStart { event in
                             print("🎉 SwiftUI: Payment method change start received")
 
@@ -217,6 +220,7 @@ struct CartView: View {
                                 }
                             }
                         }
+                        .presentationDragIndicator(.visible)
                         .edgesIgnoringSafeArea(.all)
                 }
             }

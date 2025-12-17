@@ -25,8 +25,14 @@ import SwiftUI
 import UIKit
 
 public class CheckoutViewController: UINavigationController {
-    public init(checkout url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
+    public init(
+        checkout url: URL,
+        delegate: CheckoutDelegate? = nil,
+        options: CheckoutOptions? = nil,
+        navigationBarHidden: Bool = true
+    ) {
         let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, options: options)
+        rootViewController.navigationBarHidden = navigationBarHidden
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
@@ -65,6 +71,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
     var checkoutURL: URL
     var delegate = CheckoutDelegateWrapper()
     var options: CheckoutOptions = .init()
+    var navigationBarHidden: Bool = false
 
     public init(checkout url: URL) {
         checkoutURL = url
@@ -75,7 +82,12 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
     }
 
     public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-        return CheckoutViewController(checkout: checkoutURL, delegate: delegate, options: options)
+        return CheckoutViewController(
+            checkout: checkoutURL,
+            delegate: delegate,
+            options: options,
+            navigationBarHidden: navigationBarHidden
+        )
     }
 
     public func updateUIViewController(_ uiViewController: CheckoutViewController, context _: Self.Context) {
@@ -144,6 +156,16 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         } else {
             view.options.authentication = .none
         }
+        return view
+    }
+
+    /// Sets the visibility of the UINavigationController navigation bar.
+    ///
+    /// You can use this in conjunction with `.presentationDragIndicator(.visible)`
+    /// to display an indicator to the user.
+    @discardableResult public func navigationBarHidden(_ hidden: Bool) -> Self {
+        var view = self
+        view.navigationBarHidden = hidden
         return view
     }
 }
