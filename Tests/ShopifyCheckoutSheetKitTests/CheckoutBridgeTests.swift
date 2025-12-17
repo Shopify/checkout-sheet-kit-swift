@@ -189,8 +189,8 @@ class CheckoutBridgeTests: XCTestCase {
 
         let result = try CheckoutBridge.decode(mock)
 
-        guard let errorRequest = result as? CheckoutErrorRequest else {
-            XCTFail("Expected CheckoutErrorRequest, got \(String(describing: result))")
+        guard let errorEvent = result as? CheckoutErrorEvent else {
+            XCTFail("Expected CheckoutErrorEvent, got \(String(describing: result))")
             return
         }
 

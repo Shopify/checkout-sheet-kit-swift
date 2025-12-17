@@ -207,7 +207,7 @@ func createTestCheckoutSubmitStartEvent(
  ```
  */
 func createTestCheckoutErrorEvent(
-    code: CheckoutErrorCode = .cartCompleted,
+    code: CheckoutError.ErrorCode = .cartCompleted,
     message: String = "An error occurred"
 ) -> CheckoutErrorEvent {
     CheckoutErrorEvent(code: code, message: message)

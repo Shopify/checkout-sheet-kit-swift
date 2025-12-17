@@ -136,7 +136,7 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         await MainActor.run {
-            let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+            let mockError = CheckoutError.sdk(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
             viewController.onCheckoutFail?(mockError)
         }
 
@@ -149,7 +149,7 @@ final class ApplePayCallbackTests: XCTestCase {
         }
 
         await MainActor.run {
-            let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+            let mockError = CheckoutError.sdk(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
             viewController.onCheckoutFail?(mockError) // Should not crash
         }
 
@@ -254,7 +254,7 @@ final class ApplePayCallbackTests: XCTestCase {
                 let mockEvent = createEmptyCheckoutCompleteEvent(id: "test-order-123")
                 viewController.onCheckoutComplete?(mockEvent)
             } else if i % 3 == 1 {
-                let mockError = CheckoutError.sdkError(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+                let mockError = CheckoutError.sdk(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
                 viewController.onCheckoutFail?(mockError)
             } else {
                 viewController.onCheckoutCancel?()
@@ -327,7 +327,7 @@ final class ApplePayCallbackTests: XCTestCase {
     func testShouldRecoverFromErrorCallbackInvoked() async {
         let expectation = expectation(description: "shouldRecoverFromError callback should be invoked")
 
-        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test error", code: .clientError(code: .cartCompleted), recoverable: true)
+        let testError = ShopifyCheckoutSheetKit.CheckoutError.unavailable(message: "Test error", code: .clientError(code: .cartCompleted), recoverable: true)
         var capturedError: ShopifyCheckoutSheetKit.CheckoutError?
 
         viewController.onShouldRecoverFromError = { error in
@@ -353,7 +353,7 @@ final class ApplePayCallbackTests: XCTestCase {
             }
         }
 
-        let testError = ShopifyCheckoutSheetKit.CheckoutError.checkoutUnavailable(message: "Test", code: .clientError(code: .cartCompleted), recoverable: true)
+        let testError = ShopifyCheckoutSheetKit.CheckoutError.unavailable(message: "Test", code: .clientError(code: .cartCompleted), recoverable: true)
         let result = await MainActor.run {
             viewController.shouldRecoverFromError(error: testError)
         }

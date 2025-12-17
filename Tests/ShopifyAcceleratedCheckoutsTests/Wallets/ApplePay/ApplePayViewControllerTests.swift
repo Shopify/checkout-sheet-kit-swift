@@ -224,7 +224,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
         XCTAssertNil(viewController.cart)
         XCTAssertNotNil(receivedError)
-        guard case let .sdkError(underlying, _) = receivedError else {
+        guard case let .sdk(underlying, _) = receivedError else {
             XCTFail("Expected sdkError, got: \(String(describing: receivedError))")
             return
         }
@@ -257,7 +257,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
         XCTAssertNil(viewController.cart)
         XCTAssertNotNil(receivedError)
-        guard case let .sdkError(underlying, _) = receivedError else {
+        guard case let .sdk(underlying, _) = receivedError else {
             XCTFail("Expected sdkError, got: \(String(describing: receivedError))")
             return
         }

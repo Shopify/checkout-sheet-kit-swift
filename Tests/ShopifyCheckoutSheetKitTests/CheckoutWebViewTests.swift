@@ -272,7 +272,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, _, recoverable)):
+            case let .some(.unavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "forbidden")
                 XCTAssertFalse(recoverable)
             default:
@@ -321,7 +321,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, _, recoverable)):
+            case let .some(.unavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "unauthorized")
                 XCTAssertFalse(recoverable)
             default:
@@ -345,7 +345,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, _, recoverable)):
+            case let .some(.unavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "not found")
                 XCTAssertFalse(recoverable)
             default:
@@ -369,7 +369,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutExpired(message, _, recoverable)):
+            case let .some(.expired(message, _, recoverable)):
                 XCTAssertEqual(message, "Checkout has expired.")
                 XCTAssertFalse(recoverable)
             default:
@@ -403,7 +403,7 @@ class CheckoutWebViewTests: XCTestCase {
                 }
 
                 switch receivedError {
-                case let .checkoutUnavailable(_, _, recoverable):
+                case let .unavailable(_, _, recoverable):
                     XCTAssertTrue(recoverable, "Error should be recoverable for status code \(statusCode)")
                 default:
                     XCTFail("Received incorrect `CheckoutError` case for status code \(statusCode)")
@@ -543,7 +543,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.sdkError(underlying, recoverable)):
+            case let .some(.sdk(underlying, recoverable)):
                 let nsError = underlying as NSError
                 XCTAssertEqual(nsError.domain, NSURLErrorDomain)
                 XCTAssertEqual(nsError.code, NSURLErrorTimedOut)
