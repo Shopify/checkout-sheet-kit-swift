@@ -29,6 +29,7 @@ import SwiftUI
 enum AppStorageKeys: String {
     case acceleratedCheckoutsLogLevel
     case checkoutSheetKitLogLevel
+    case showNativePayButton
 }
 
 struct SettingsView: View {
@@ -50,6 +51,9 @@ struct SettingsView: View {
         }
     }
 
+    @AppStorage(AppStorageKeys.showNativePayButton.rawValue)
+    var showNativePayButton: Bool = false
+
     @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
@@ -65,6 +69,7 @@ struct SettingsView: View {
                             ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
                         }
                     Toggle("Prefill buyer information", isOn: $config.useVaultedState)
+                    Toggle("Show native pay button", isOn: $showNativePayButton)
                 }
 
                 Section(header: Text("Debug")) {
