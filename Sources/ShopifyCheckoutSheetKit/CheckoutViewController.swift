@@ -25,7 +25,26 @@ import SwiftUI
 import UIKit
 
 public class CheckoutViewController: UINavigationController {
-    public init(checkout url: URL, delegate: CheckoutDelegate? = nil, options: CheckoutOptions? = nil) {
+    override public var isNavigationBarHidden: Bool {
+        get {
+            guard let webViewController = viewControllers.first as? CheckoutWebViewController else {
+                return false
+            }
+            return webViewController.navigationBarHidden
+        }
+        set {
+            guard let webViewController = viewControllers.first as? CheckoutWebViewController else {
+                return
+            }
+            webViewController.navigationBarHidden = newValue
+        }
+    }
+
+    public init(
+        checkout url: URL,
+        delegate: CheckoutDelegate? = nil,
+        options: CheckoutOptions? = nil
+    ) {
         let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, options: options)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
@@ -65,6 +84,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
     var checkoutURL: URL
     var delegate = CheckoutDelegateWrapper()
     var options: CheckoutOptions = .init()
+    var isNavigationBarHidden: Bool = false
 
     public init(checkout url: URL) {
         checkoutURL = url
@@ -75,7 +95,13 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
     }
 
     public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-        return CheckoutViewController(checkout: checkoutURL, delegate: delegate, options: options)
+        let viewController = CheckoutViewController(
+            checkout: checkoutURL,
+            delegate: delegate,
+            options: options
+        )
+        viewController.isNavigationBarHidden = isNavigationBarHidden
+        return viewController
     }
 
     public func updateUIViewController(_ uiViewController: CheckoutViewController, context _: Self.Context) {
@@ -92,6 +118,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         }
 
         webViewController.delegate = delegate
+        webViewController.navigationBarHidden = isNavigationBarHidden
     }
 
     /// Lifecycle methods
@@ -153,6 +180,16 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         } else {
             view.options.authentication = .none
         }
+        return view
+    }
+
+    /// Sets the visibility of the UINavigationController navigation bar.
+    ///
+    /// You can use this in conjunction with `.presentationDragIndicator(.visible)`
+    /// to display an indicator to the user.
+    @discardableResult public func navigationBarHidden(_ hidden: Bool) -> Self {
+        var view = self
+        view.isNavigationBarHidden = hidden
         return view
     }
 }

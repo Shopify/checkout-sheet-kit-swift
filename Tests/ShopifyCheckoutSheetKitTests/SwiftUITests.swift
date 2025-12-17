@@ -39,6 +39,23 @@ class CheckoutViewControllerTests: XCTestCase {
     func testInit() {
         XCTAssertNotNil(checkoutViewController)
     }
+
+    func testNavigationBarHiddenDefaultsToFalse() {
+        let viewController = CheckoutViewController(checkout: checkoutURL)
+        XCTAssertFalse(viewController.isNavigationBarHidden)
+    }
+
+    func testNavigationBarHiddenTrue() {
+        let viewController = CheckoutViewController(checkout: checkoutURL)
+        viewController.isNavigationBarHidden = true
+        XCTAssertTrue(viewController.isNavigationBarHidden)
+    }
+
+    func testNavigationBarHiddenFalse() {
+        let viewController = CheckoutViewController(checkout: checkoutURL)
+        viewController.isNavigationBarHidden = false
+        XCTAssertFalse(viewController.isNavigationBarHidden)
+    }
 }
 
 class ShopifyCheckoutTests: XCTestCase {
@@ -248,5 +265,19 @@ class CheckoutConfigurableTests: XCTestCase {
             XCTFail("Expected authentication to be .none after clearing, but was \(cleared.options.authentication)")
             return
         }
+    }
+
+    func testNavigationBarHiddenDefaultsToFalse() {
+        XCTAssertFalse(checkoutSheet.isNavigationBarHidden)
+    }
+
+    func testNavigationBarHiddenModifierTrue() {
+        let modified: ShopifyCheckout = checkoutSheet.navigationBarHidden(true)
+        XCTAssertTrue(modified.isNavigationBarHidden)
+    }
+
+    func testNavigationBarHiddenModifierFalse() {
+        let modified: ShopifyCheckout = checkoutSheet.navigationBarHidden(false)
+        XCTAssertFalse(modified.isNavigationBarHidden)
     }
 }
