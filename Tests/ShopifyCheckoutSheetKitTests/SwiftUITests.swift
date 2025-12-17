@@ -118,6 +118,20 @@ class ShopifyCheckoutTests: XCTestCase {
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
     }
+
+    func testOnSubmitStart() {
+        var actionCalled = false
+        var actionData: CheckoutSubmitStartEvent?
+        let event = createTestCheckoutSubmitStartEvent()
+
+        checkoutSheet.onSubmitStart { event in
+            actionCalled = true
+            actionData = event
+        }
+        checkoutSheet.delegate.checkoutDidStartSubmit(event: event)
+        XCTAssertTrue(actionCalled)
+        XCTAssertNotNil(actionData)
+    }
 }
 
 class CheckoutConfigurableTests: XCTestCase {
