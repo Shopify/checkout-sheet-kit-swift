@@ -311,14 +311,14 @@ class CheckoutBridgeTests: XCTestCase {
                     "delivery": { "addresses": [] },
                     "payment": {
                         "methods": [{
+                            "type": "creditCard",
                             "instruments": [{
                                 "externalReferenceId": "instrument-123",
                                 "credentials": [{
-                                    "remoteTokenPaymentCredential": {
-                                        "token": "tok_abc123",
-                                        "tokenType": "merchant.token",
-                                        "tokenHandler": "merchant_psp"
-                                    }
+                                    "type": "remoteToken",
+                                    "token": "tok_abc123",
+                                    "tokenType": "merchant.token",
+                                    "tokenHandler": "merchant_psp"
                                 }]
                             }]
                         }]
@@ -355,11 +355,10 @@ class CheckoutBridgeTests: XCTestCase {
         [{
             "externalReferenceId": "instrument-123",
             "credentials": [{
-                "remoteTokenPaymentCredential": {
-                    "token": "tok_abc123",
-                    "tokenType": "merchant.token",
-                    "tokenHandler": "merchant_psp"
-                }
+                "type": "remoteToken",
+                "token": "tok_abc123",
+                "tokenType": "merchant.token",
+                "tokenHandler": "merchant_psp"
             }]
         }]
         """

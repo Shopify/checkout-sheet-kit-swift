@@ -358,26 +358,51 @@ public struct CartPayment: Codable {
     }
 }
 
-public typealias CartPaymentMethod = CreditCardPaymentMethod
-
-public struct CreditCardPaymentMethod: Codable {
-    public let instruments: [CreditCardPaymentInstrument]
-    private let __typename: String = "CreditCardPaymentMethod"
+public enum CartPaymentMethod: Codable {
+    case creditCard(instruments: [CreditCardPaymentInstrument])
 
     private enum CodingKeys: String, CodingKey {
-        case __typename
-        case instruments
+        case type, instruments
+    }
+
+    private enum PaymentMethodType: String, Codable {
+        case creditCard
+    }
+
+    public var instruments: [CreditCardPaymentInstrument] {
+        switch self {
+        case let .creditCard(instruments):
+            return instruments
+        }
     }
 
     public init(instruments: [CreditCardPaymentInstrument]) {
-        self.instruments = instruments
+        self = .creditCard(instruments: instruments)
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        instruments = try container.decode([CreditCardPaymentInstrument].self, forKey: .instruments)
+        let type = try container.decode(PaymentMethodType.self, forKey: .type)
+
+        switch type {
+        case .creditCard:
+            let instruments = try container.decode([CreditCardPaymentInstrument].self, forKey: .instruments)
+            self = .creditCard(instruments: instruments)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .creditCard(instruments):
+            try container.encode(PaymentMethodType.creditCard, forKey: .type)
+            try container.encode(instruments, forKey: .instruments)
+        }
     }
 }
+
+public typealias CreditCardPaymentMethod = CartPaymentMethod
 
 public struct CreditCardPaymentInstrument: Codable {
     public let externalReferenceId: String
@@ -388,10 +413,8 @@ public struct CreditCardPaymentInstrument: Codable {
     @NullEncodable public private(set) var brand: CardBrand?
     @NullEncodable public private(set) var billingAddress: MailingAddress?
     @NullEncodable public private(set) var credentials: [PaymentCredential]?
-    private let __typename: String = "CreditCardPaymentInstrument"
 
     private enum CodingKeys: String, CodingKey {
-        case __typename
         case externalReferenceId
         case cardHolderName
         case lastDigits
@@ -443,6 +466,40 @@ public enum PaymentCredential: Codable {
         tokenType: String,
         tokenHandler: String
     )
+
+    private enum CodingKeys: String, CodingKey {
+        case type, token, tokenType, tokenHandler
+    }
+
+    private enum CredentialType: String, Codable {
+        case remoteToken
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(CredentialType.self, forKey: .type)
+
+        switch type {
+        case .remoteToken:
+            self = try .remoteTokenPaymentCredential(
+                token: container.decode(String.self, forKey: .token),
+                tokenType: container.decode(String.self, forKey: .tokenType),
+                tokenHandler: container.decode(String.self, forKey: .tokenHandler)
+            )
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .remoteTokenPaymentCredential(token, tokenType, tokenHandler):
+            try container.encode(CredentialType.remoteToken, forKey: .type)
+            try container.encode(token, forKey: .token)
+            try container.encode(tokenType, forKey: .tokenType)
+            try container.encode(tokenHandler, forKey: .tokenHandler)
+        }
+    }
 }
 
 public struct CartDelivery: Codable {
