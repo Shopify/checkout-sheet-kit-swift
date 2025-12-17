@@ -131,6 +131,48 @@ func createTestCheckoutCompleteEvent(
     )
 }
 
+/**
+ Creates a test CheckoutAddressChangeStartEvent instance with sensible defaults.
+
+ Example:
+ ```swift
+ let event = createTestCheckoutAddressChangeStartEvent(
+     addressType: "shipping"
+ )
+ ```
+ */
+func createTestCheckoutAddressChangeStartEvent(
+    id: String = "test-request-123",
+    addressType: String = "shipping",
+    cart: Cart? = nil
+) -> CheckoutAddressChangeStartEvent {
+    CheckoutAddressChangeStartEvent.testInstance(
+        id: id,
+        addressType: addressType,
+        cart: cart ?? createTestCart()
+    )
+}
+
+/**
+ Creates a test CheckoutPaymentMethodChangeStartEvent instance with sensible defaults.
+
+ Example:
+ ```swift
+ let event = createTestCheckoutPaymentMethodChangeStartEvent(
+     cart: createTestCart(totalAmount: "75.00")
+ )
+ ```
+ */
+func createTestCheckoutPaymentMethodChangeStartEvent(
+    id: String = "test-request-123",
+    cart: Cart? = nil
+) -> CheckoutPaymentMethodChangeStartEvent {
+    CheckoutPaymentMethodChangeStartEvent.testInstance(
+        id: id,
+        cart: cart ?? createTestCart()
+    )
+}
+
 // MARK: - JSON Fixtures
 
 /**

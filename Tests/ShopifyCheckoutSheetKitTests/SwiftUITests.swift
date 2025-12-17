@@ -118,6 +118,34 @@ class ShopifyCheckoutTests: XCTestCase {
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
     }
+
+    func testOnAddressChangeStart() {
+        var actionCalled = false
+        var actionData: CheckoutAddressChangeStartEvent?
+        let event = createTestCheckoutAddressChangeStartEvent()
+
+        checkoutSheet.onAddressChangeStart { event in
+            actionCalled = true
+            actionData = event
+        }
+        checkoutSheet.delegate.checkoutDidStartAddressChange(event: event)
+        XCTAssertTrue(actionCalled)
+        XCTAssertNotNil(actionData)
+    }
+
+    func testOnPaymentMethodChangeStart() {
+        var actionCalled = false
+        var actionData: CheckoutPaymentMethodChangeStartEvent?
+        let event = createTestCheckoutPaymentMethodChangeStartEvent()
+
+        checkoutSheet.onPaymentMethodChangeStart { event in
+            actionCalled = true
+            actionData = event
+        }
+        checkoutSheet.delegate.checkoutDidStartPaymentMethodChange(event: event)
+        XCTAssertTrue(actionCalled)
+        XCTAssertNotNil(actionData)
+    }
 }
 
 class CheckoutConfigurableTests: XCTestCase {
