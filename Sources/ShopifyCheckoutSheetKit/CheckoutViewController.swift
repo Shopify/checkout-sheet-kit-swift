@@ -123,6 +123,7 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
 
     /// Called when the checkout has started an address change flow.
     ///
+    /// This event is only emitted when native address selection is enabled for the authenticated app.
     /// When triggered, you can present a native address picker and respond with updated address data.
     @discardableResult public func onAddressChangeStart(_ action: @escaping (CheckoutAddressChangeStartEvent) -> Void) -> Self {
         delegate.onAddressChangeStart = action
