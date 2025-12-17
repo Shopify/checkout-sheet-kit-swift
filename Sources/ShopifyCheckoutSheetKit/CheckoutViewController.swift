@@ -135,6 +135,15 @@ public struct ShopifyCheckout: UIViewControllerRepresentable, CheckoutConfigurab
         return self
     }
 
+    /// Called when the buyer has attempted to submit the checkout.
+    ///
+    /// This event is only emitted when native payment delegation is configured for the authenticated app.
+    /// When triggered, you can provide payment credentials via `event.respondWith(payload:)`.
+    @discardableResult public func onSubmitStart(_ action: @escaping (CheckoutSubmitStartEvent) -> Void) -> Self {
+        delegate.onSubmitStart = action
+        return self
+    }
+
     /// Configuration methods
 
     @discardableResult public func auth(token: String?) -> Self {
@@ -156,6 +165,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
     var onLinkClick: ((URL) -> Void)?
     var onAddressChangeStart: ((CheckoutAddressChangeStartEvent) -> Void)?
     var onPaymentMethodChangeStart: ((CheckoutPaymentMethodChangeStartEvent) -> Void)?
+    var onSubmitStart: ((CheckoutSubmitStartEvent) -> Void)?
 
     public func checkoutDidStart(event: CheckoutStartEvent) {
         onStart?(event)
@@ -191,6 +201,10 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
 
     public func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent) {
         onPaymentMethodChangeStart?(event)
+    }
+
+    public func checkoutDidStartSubmit(event: CheckoutSubmitStartEvent) {
+        onSubmitStart?(event)
     }
 }
 
