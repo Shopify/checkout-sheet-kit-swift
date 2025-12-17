@@ -267,7 +267,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
             OSLogger.shared.error(
                 "[CheckoutWebView]: Failed to decode event: \(error.localizedDescription)"
             )
-            viewDelegate.checkoutViewDidFailWithError(error: .sdk(underlying: error))
+            viewDelegate.checkoutViewDidFailWithError(error: .internal(underlying: error))
         }
     }
 
@@ -531,7 +531,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         viewDelegate?.checkoutViewDidFailWithError(
-            error: .sdk(underlying: error, recoverable: !isRecovery)
+            error: .internal(underlying: error, recoverable: !isRecovery)
         )
     }
 

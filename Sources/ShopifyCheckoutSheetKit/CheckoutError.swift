@@ -36,7 +36,7 @@ public enum CheckoutError: Error {
     /// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
     /// if the issue persists, it is recommended to open a bug report in:
     /// http://github.com/Shopify/checkout-sheet-kit-swift/issues
-    case sdk(underlying: Error, recoverable: Bool = true)
+    case `internal`(underlying: Error, recoverable: Bool = true)
 
     /// Issued when the storefront configuration has caused an error.
     case misconfiguration(message: String, code: ErrorCode, recoverable: Bool = false)
@@ -56,14 +56,14 @@ public enum CheckoutError: Error {
         case let .expired(_, _, recoverable),
              let .unavailable(_, _, recoverable),
              let .misconfiguration(_, _, recoverable),
-             let .sdk(_, recoverable):
+             let .internal(_, recoverable):
             return recoverable
         }
     }
 
     public var message: String {
         switch self {
-        case let .sdk(underlying, _): return underlying.localizedDescription
+        case let .internal(underlying, _): return underlying.localizedDescription
         case let .expired(message, _, _): return message
         case let .unavailable(message, _, _): return message
         case let .misconfiguration(message, _, _): return message
