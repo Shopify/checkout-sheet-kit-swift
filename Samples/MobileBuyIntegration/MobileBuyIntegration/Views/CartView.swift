@@ -38,6 +38,7 @@ struct CartView: View {
     @State var isBusy: Bool = false
     @State var checkoutData: CheckoutData?
     @State var authToken: String? = nil
+    @State var isCheckoutLoading: Bool = false
 
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
@@ -121,108 +122,132 @@ struct CartView: View {
                 }
             }
             .sheet(item: $checkoutData) { data in
-                ShopifyCheckout(checkout: data.url)
-                    .auth(token: data.token)
-                    .colorScheme(.automatic)
-                    .navigationBarHidden(true)
-                    .onStart { event in
-                        print("Checkout started with cart ID: \(event.cart.id)")
-                    }
-
-                    .onCancel {
-                        checkoutData = nil
-                    }
-                    .onComplete { event in
-                        checkoutData = nil
-                        // Handle checkout completion
-                        print("Checkout completed with order ID: \(event.orderConfirmation.order.id)")
-                    }
-                    .onFail { error in
-                        checkoutData = nil
-                        // Handle checkout failure
-                        print("Checkout failed: \(error)")
-                    }
-                    .onAddressChangeStart { event in
-                        print(
-                            "🎉 SwiftUI: Address change intent received for addressType: \(event.addressType)"
-                        )
-
-                        // Respond with updated cart after 2 seconds
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            let hardcodedAddress = CartDeliveryAddress(
-                                firstName: "Jane",
-                                lastName: "Smith",
-                                address1: "456 SwiftUI Avenue",
-                                address2: "Suite 200",
-                                city: "Vancouver",
-                                countryCode: "CA",
-                                phone: "+1-604-555-0456",
-                                provinceCode: "BC",
-                                zip: "V6B 1A1"
+                ZStack {
+                    ShopifyCheckout(checkout: data.url)
+                        .auth(token: data.token)
+                        .colorScheme(.automatic)
+                        .navigationBarHidden(true)
+                        .onStart { event in
+                            print("Checkout started with cart ID: \(event.cart.id)")
+                            isCheckoutLoading = false
+                        }
+                        .onCancel {
+                            checkoutData = nil
+                            isCheckoutLoading = false
+                        }
+                        .onComplete { event in
+                            checkoutData = nil
+                            isCheckoutLoading = false
+                            // Handle checkout completion
+                            print("Checkout completed with order ID: \(event.orderConfirmation.order.id)")
+                        }
+                        .onFail { error in
+                            checkoutData = nil
+                            isCheckoutLoading = false
+                            // Handle checkout failure
+                            print("Checkout failed: \(error)")
+                        }
+                        .onAddressChangeStart { event in
+                            print(
+                                "🎉 SwiftUI: Address change intent received for addressType: \(event.addressType)"
                             )
 
-                            let selectableAddress = CartSelectableAddress(
-                                address: .deliveryAddress(hardcodedAddress),
-                                selected: true
-                            )
-                            let delivery = CartDelivery(addresses: [selectableAddress])
-
-                            let updatedCart = event.cart.copy(
-                                delivery: .override(delivery)
-                            )
-
-                            let response = CheckoutAddressChangeStartResponsePayload(cart: updatedCart)
-
-                            print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
-                            do {
-                                try event.respondWith(payload: response)
-                            } catch {
-                                print(
-                                    "Failed to respondwith: Responding with hardcoded Vancouver address"
+                            // Respond with updated cart after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                let hardcodedAddress = CartDeliveryAddress(
+                                    firstName: "Jane",
+                                    lastName: "Smith",
+                                    address1: "456 SwiftUI Avenue",
+                                    address2: "Suite 200",
+                                    city: "Vancouver",
+                                    countryCode: "CA",
+                                    phone: "+1-604-555-0456",
+                                    provinceCode: "BC",
+                                    zip: "V6B 1A1"
                                 )
+
+                                let selectableAddress = CartSelectableAddress(
+                                    address: .deliveryAddress(hardcodedAddress),
+                                    selected: true
+                                )
+                                let delivery = CartDelivery(addresses: [selectableAddress])
+
+                                let updatedCart = event.cart.copy(
+                                    delivery: .override(delivery)
+                                )
+
+                                let response = CheckoutAddressChangeStartResponsePayload(cart: updatedCart)
+
+                                print("🎉 SwiftUI: Responding with hardcoded Vancouver address")
+                                do {
+                                    try event.respondWith(payload: response)
+                                } catch {
+                                    print(
+                                        "Failed to respondwith: Responding with hardcoded Vancouver address"
+                                    )
+                                }
                             }
                         }
-                    }
+                        .onPaymentMethodChangeStart { event in
+                            print("🎉 SwiftUI: Payment method change start received")
 
-                    .onPaymentMethodChangeStart { event in
-                        print("🎉 SwiftUI: Payment method change start received")
+                            // Respond with updated cart after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                let instrument = CreditCardPaymentInstrument(
+                                    externalReferenceId: "card-visa-1234",
+                                    lastDigits: "1234",
+                                    brand: CardBrand.visa
+                                )
 
-                        // Respond with updated cart after 2 seconds
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            let instrument = CreditCardPaymentInstrument(
-                                externalReferenceId: "card-visa-1234",
-                                lastDigits: "1234",
-                                brand: CardBrand.visa
-                            )
+                                let paymentMethod = CartPaymentMethod(instruments: [instrument])
+                                let payment = CartPayment(methods: [paymentMethod])
 
-                            let paymentMethod = CartPaymentMethod(instruments: [instrument])
-                            let payment = CartPayment(methods: [paymentMethod])
+                                let updatedCart = Cart(
+                                    id: event.cart.id,
+                                    lines: event.cart.lines,
+                                    cost: event.cart.cost,
+                                    buyerIdentity: event.cart.buyerIdentity,
+                                    deliveryGroups: event.cart.deliveryGroups,
+                                    discountCodes: event.cart.discountCodes,
+                                    appliedGiftCards: event.cart.appliedGiftCards,
+                                    discountAllocations: event.cart.discountAllocations,
+                                    delivery: event.cart.delivery,
+                                    payment: payment
+                                )
 
-                            let updatedCart = Cart(
-                                id: event.cart.id,
-                                lines: event.cart.lines,
-                                cost: event.cart.cost,
-                                buyerIdentity: event.cart.buyerIdentity,
-                                deliveryGroups: event.cart.deliveryGroups,
-                                discountCodes: event.cart.discountCodes,
-                                appliedGiftCards: event.cart.appliedGiftCards,
-                                discountAllocations: event.cart.discountAllocations,
-                                delivery: event.cart.delivery,
-                                payment: payment
-                            )
+                                let response = CheckoutPaymentMethodChangeStartResponsePayload(cart: updatedCart)
 
-                            let response = CheckoutPaymentMethodChangeStartResponsePayload(cart: updatedCart)
-
-                            print("🎉 SwiftUI: Responding with hardcoded Visa ending in 1234")
-                            do {
-                                try event.respondWith(payload: response)
-                            } catch {
-                                print("Failed to respond with payment method change")
+                                print("🎉 SwiftUI: Responding with hardcoded Visa ending in 1234")
+                                do {
+                                    try event.respondWith(payload: response)
+                                } catch {
+                                    print("Failed to respond with payment method change")
+                                }
                             }
                         }
+                        .onAppear {
+                            isCheckoutLoading = true
+                        }
+
+                    if isCheckoutLoading {
+                        ZStack {
+                            Color.black.opacity(0.4)
+
+                            VStack {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(1.5)
+
+                                Text("Loading...")
+                                    .foregroundColor(.white)
+                                    .padding(.top, 20)
+                            }
+                        }
+                        .edgesIgnoringSafeArea(.all)
                     }
-                    .presentationDragIndicator(.visible)
-                    .edgesIgnoringSafeArea(.all)
+                }
+                .presentationDragIndicator(.visible)
+                .edgesIgnoringSafeArea(.all)
             }
         } else {
             EmptyState()
