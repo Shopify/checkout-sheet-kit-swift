@@ -25,8 +25,8 @@ import Foundation
 
 /// `CheckoutError` represents scenarios where Shopify Checkout may error
 ///
-/// Each error relates to a different portion of Web Shopify Checkout, except `.sdk` which is an internal swift error
-/// When the error is not `.sdk` it is useful to first confirm where the issue exists in your Storefront
+/// Each error relates to a different portion of Web Shopify Checkout, except `.internal` which is an internal swift error
+/// When the error is not `.internal` it is useful to first confirm where the issue exists in your Storefront
 /// within a browser, to exclude Checkout Kit from the investigation
 ///
 /// Every event has a "recoverable" property that indicates this error may be recoverable when retried in a fallback browser experience
