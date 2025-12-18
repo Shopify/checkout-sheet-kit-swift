@@ -49,6 +49,11 @@ class CartManager: ObservableObject {
     }
 
     public func preloadCheckout() {
+        /// No-op if checkout must authenticate first
+        if UserDefaults.standard.bool(forKey: AppStorageKeys.authenticate.rawValue) {
+            return
+        }
+
         /// Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
         if let url = cart?.checkoutUrl, isDirty {
             ShopifyCheckoutSheetKit.preload(checkout: url)

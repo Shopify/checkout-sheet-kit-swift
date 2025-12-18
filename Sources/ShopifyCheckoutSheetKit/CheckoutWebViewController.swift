@@ -105,6 +105,13 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
     override public func viewDidLoad() {
         super.viewDidLoad()
 
+        attachCheckoutView()
+        attachProgressBar()
+        observeProgressChanges(checkoutView)
+        loadCheckout()
+    }
+
+    func attachCheckoutView() {
         view.addSubview(checkoutView)
         NSLayoutConstraint.activate([
             checkoutView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -112,7 +119,9 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
             checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
 
+    func attachProgressBar() {
         view.addSubview(progressBar)
         NSLayoutConstraint.activate([
             progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -121,9 +130,6 @@ public class CheckoutWebViewController: UIViewController, UIAdaptivePresentation
             progressBar.heightAnchor.constraint(equalToConstant: 1)
         ])
         view.bringSubviewToFront(progressBar)
-
-        observeProgressChanges(checkoutView)
-        loadCheckout()
     }
 
     func observeProgressChanges(_ view: WKWebView) {

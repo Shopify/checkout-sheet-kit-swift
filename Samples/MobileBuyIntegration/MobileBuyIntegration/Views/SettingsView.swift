@@ -29,6 +29,8 @@ import SwiftUI
 enum AppStorageKeys: String {
     case acceleratedCheckoutsLogLevel
     case checkoutSheetKitLogLevel
+    case authenticate
+    case preloadingEnabled
 }
 
 struct SettingsView: View {
@@ -43,6 +45,9 @@ struct SettingsView: View {
         }
     }
 
+    @AppStorage(AppStorageKeys.authenticate.rawValue)
+    var authenticate: Bool = true
+
     @AppStorage(AppStorageKeys.acceleratedCheckoutsLogLevel.rawValue)
     var acceleratedCheckoutsLogLevel: LogLevel = .all {
         didSet {
@@ -50,7 +55,8 @@ struct SettingsView: View {
         }
     }
 
-    @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
+    @AppStorage(AppStorageKeys.preloadingEnabled.rawValue)
+    var preloadingEnabled: Bool = false
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
     @State private var colorScheme: ColorScheme = .light
@@ -59,12 +65,34 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("Features")) {
+                Section(header:
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Features")
+                        Text("Authentication and preloading are currently mutually exclusive. When enabled, checkout must re-authenticate before present.")
+                            .font(.caption)
+                    }
+                ) {
+                    Toggle("Authenticate", isOn: $authenticate)
+                        .onChange(of: authenticate) { newValue in
+                            if newValue {
+                                preloadingEnabled = false
+                            }
+                        }
+
                     Toggle("Preload checkout", isOn: $preloadingEnabled)
                         .onChange(of: preloadingEnabled) { newValue in
                             ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
+                            if newValue == true {
+                                authenticate = false
+                            }
                         }
                     Toggle("Prefill buyer information", isOn: $config.useVaultedState)
+
+                    HStack(alignment: .center) {
+                        Button("Clear cart") {
+                            CartManager.shared.resetCart()
+                        }
+                    }
                 }
 
                 Section(header: Text("Debug")) {
