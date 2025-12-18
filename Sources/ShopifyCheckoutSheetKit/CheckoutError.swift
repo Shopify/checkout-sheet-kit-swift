@@ -79,7 +79,7 @@ public enum CheckoutError: Error {
         case customerAccountRequired = "CUSTOMER_ACCOUNT_REQUIRED"
         case storefrontPasswordRequired = "STOREFRONT_PASSWORD_REQUIRED"
 
-        /// unavailable: recoverable:true
+        /// unavailable: recoverable:false
         case killswitchEnabled = "KILLSWITCH_ENABLED"
         case unrecoverableFailure = "UNRECOVERABLE_FAILURE"
         case policyViolation = "POLICY_VIOLATION"
