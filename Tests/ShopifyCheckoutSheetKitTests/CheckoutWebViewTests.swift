@@ -543,7 +543,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.sdk(underlying, recoverable)):
+            case let .some(.internal(underlying, recoverable)):
                 let nsError = underlying as NSError
                 XCTAssertEqual(nsError.domain, NSURLErrorDomain)
                 XCTAssertEqual(nsError.code, NSURLErrorTimedOut)

@@ -109,7 +109,7 @@ final class ShopPayCallbackTests: XCTestCase {
             }
         )
 
-        let mockError = CheckoutError.sdk(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+        let mockError = CheckoutError.internal(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
         viewController.eventHandlers.checkoutDidFail?(mockError)
 
         await fulfillment(of: [errorExpectation, callbackInvokedExpectation], timeout: 1.0)
@@ -118,7 +118,7 @@ final class ShopPayCallbackTests: XCTestCase {
     func testErrorCallbackNotInvokedWhenNil() {
         XCTAssertNil(viewController.eventHandlers.checkoutDidFail)
 
-        let mockError = CheckoutError.sdk(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+        let mockError = CheckoutError.internal(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
         viewController.eventHandlers.checkoutDidFail?(mockError) // Should not crash
 
         XCTAssertTrue(true, "Should not crash when callback is nil")
@@ -173,7 +173,7 @@ final class ShopPayCallbackTests: XCTestCase {
             checkoutDidFail: { _ in failInvoked = true }
         )
 
-        let mockError = CheckoutError.sdk(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
+        let mockError = CheckoutError.internal(underlying: NSError(domain: "TestError", code: 0, userInfo: nil), recoverable: false)
         viewController.eventHandlers.checkoutDidFail?(mockError)
 
         XCTAssertTrue(failInvoked, "Fail callback should be invoked")

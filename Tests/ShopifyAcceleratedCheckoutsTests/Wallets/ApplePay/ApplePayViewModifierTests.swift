@@ -170,7 +170,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         XCTAssertNotNil(view, "View should be created successfully with error modifier")
 
-        errorAction(CheckoutError.sdk(underlying: NSError(domain: "Test", code: 0)))
+        errorAction(CheckoutError.internal(underlying: NSError(domain: "Test", code: 0)))
         XCTAssertTrue(errorCallbackInvoked, "Error callback should be invoked when called")
     }
 
@@ -200,7 +200,7 @@ final class ApplePayViewModifierTests: XCTestCase {
         XCTAssertTrue(successInvoked, "Success callback should be invoked")
         XCTAssertFalse(errorInvoked, "Error callback should not be invoked")
 
-        errorAction(CheckoutError.sdk(underlying: NSError(domain: "Test", code: 0)))
+        errorAction(CheckoutError.internal(underlying: NSError(domain: "Test", code: 0)))
         XCTAssertTrue(errorInvoked, "Error callback should be invoked")
     }
 
@@ -243,7 +243,7 @@ final class ApplePayViewModifierTests: XCTestCase {
 
         // Reset
         successInvoked = false
-        errorAction(CheckoutError.sdk(underlying: NSError(domain: "Test", code: 0)))
+        errorAction(CheckoutError.internal(underlying: NSError(domain: "Test", code: 0)))
         XCTAssertFalse(successInvoked, "Success callback should not be invoked")
         XCTAssertTrue(errorInvoked, "Error callback should be invoked")
         XCTAssertFalse(cancelInvoked, "Cancel callback should not be invoked")

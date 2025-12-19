@@ -181,12 +181,12 @@ class CheckoutWebViewControllerTests: XCTestCase {
         let testCases: [TestCase] = [
             TestCase(
                 name: "sdk recoverable=true",
-                error: .sdk(underlying: NSError(domain: "test", code: 1), recoverable: true),
+                error: .internal(underlying: NSError(domain: "test", code: 1), recoverable: true),
                 expectedRecoverable: true
             ),
             TestCase(
                 name: "sdk recoverable=false",
-                error: .sdk(underlying: NSError(domain: "test", code: 1), recoverable: false),
+                error: .internal(underlying: NSError(domain: "test", code: 1), recoverable: false),
                 expectedRecoverable: false
             ),
             TestCase(
