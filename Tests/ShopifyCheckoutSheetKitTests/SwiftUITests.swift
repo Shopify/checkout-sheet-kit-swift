@@ -111,7 +111,7 @@ class ShopifyCheckoutTests: XCTestCase {
     func testOnFail() {
         var actionCalled = false
         var actionData: CheckoutError?
-        let error: CheckoutError = .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: false)
+        let error: CheckoutError = .unavailable(message: "error", code: .httpError(statusCode: 500), recoverable: false)
 
         checkoutSheet.onFail { failure in
             actionCalled = true

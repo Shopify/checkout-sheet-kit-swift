@@ -603,38 +603,19 @@ extension CartViewController: CheckoutDelegate {
         }
     }
 
-    func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
-        var errorMessage = ""
-
-        /// Internal Checkout SDK error
-        if case let .sdkError(underlying, _) = error {
-            errorMessage = "\(underlying.localizedDescription)"
-        }
-
-        /// Checkout unavailable error
-        if case let .checkoutUnavailable(message, code, _) = error {
-            errorMessage = message
+    func checkoutDidFail(error: CheckoutError) {
+        if case let .unavailable(message, code, _) = error {
             handleCheckoutUnavailable(message, code)
         }
 
-        /// Storefront configuration error
-        if case let .configurationError(message, _, _) = error {
-            errorMessage = message
-        }
-
-        /// Checkout has expired, re-create cart to fetch a new checkout URL
-        if case let .checkoutExpired(message, _, _) = error {
-            errorMessage = message
-        }
-
-        print(errorMessage, "Recoverable: \(error.isRecoverable)")
+        print(error.message, "Recoverable: \(error.isRecoverable)")
 
         if !error.isRecoverable {
-            handleUnrecoverableError(errorMessage)
+            handleUnrecoverableError(error.message)
         }
     }
 
-    private func handleCheckoutUnavailable(_ message: String, _ code: CheckoutUnavailable) {
+    private func handleCheckoutUnavailable(_ message: String, _ code: CheckoutError.CheckoutUnavailable) {
         switch code {
         case let .clientError(clientErrorCode):
             print("[CheckoutUnavailable] (checkoutError)", message, clientErrorCode)

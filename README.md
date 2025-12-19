@@ -46,7 +46,6 @@
 
 - Swift 5.7+
 - iOS SDK 13.0+
-- The SDK is not compatible with checkout.liquid. The Shopify Store must be migrated for extensibility
 
 ## Getting Started
 
@@ -428,21 +427,21 @@ extension MyViewController: ShopifyCheckoutSheetKitDelegate {
   func checkoutDidFail(error: CheckoutError) {
     // Called when the checkout encountered an error and has been aborted. The callback
     // provides a `CheckoutError` enum, with one of the following values:
+
     // Internal error: exception within the Checkout SDK code
-    // You can inspect and log the Erorr and stacktrace to identify the problem.
-    case sdkError(underlying: Swift.Error)
+    // You can inspect and log the Error and stacktrace to identify the problem.
+    case `internal`(underlying: Error)
 
     // Issued when the provided checkout URL results in an error related to shop configuration.
-    // Note: The SDK only supports stores migrated for extensibility.
-    case configurationError(message: String)
+    case misconfiguration(message: String, code: CheckoutError.ErrorCode)
 
     // Unavailable error: checkout cannot be initiated or completed, e.g. due to network or server-side error
     // The provided message describes the error and may be logged and presented to the buyer.
-    case checkoutUnavailable(message: String)
+    case unavailable(message: String, code: CheckoutError.CheckoutUnavailable)
 
     // Expired error: checkout session associated with provided checkoutURL is no longer available.
     // The provided message describes the error and may be logged and presented to the buyer.
-    case checkoutExpired(message: String)
+    case expired(message: String, code: CheckoutError.ErrorCode)
   }
 
   func checkoutDidClickLink(url: URL) {
@@ -477,15 +476,14 @@ func shouldRecoverFromError(error: CheckoutError) {
 
 ### `CheckoutError`
 
-| Type                                                            | Description                                | Recommendation                                                                                    |
-| --------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `.configurationError(code: .checkoutLiquidNotAvailable)`        | `checkout.liquid` is not supported.        | Please migrate to checkout extensibility.                                                         |
-| `.checkoutUnavailable(message: "Forbidden")`                    | Access to checkout is forbidden.           | This error is unrecoverable.                                                                      |
-| `.checkoutUnavailable(message: "Internal Server Error")`        | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                  |
-| `.checkoutUnavailable(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Kit for usage with password protected stores. |
-| `.checkoutExpired(message: "Checkout already completed")`       | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                              |
-| `.checkoutExpired(message: "Cart is empty")`                    | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                    |
-| `.sdkError(underlying:)`                                        | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible. URL.                           |
+| Type                                                       | Description                                | Recommendation                                                                                    |
+| ---------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `.unavailable(message: "Forbidden")`                       | Access to checkout is forbidden.           | This error is unrecoverable.                                                                      |
+| `.unavailable(message: "Internal Server Error")`           | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                  |
+| `.misconfiguration(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Kit for usage with password protected stores. |
+| `.expired(message: "Checkout already completed")`          | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                              |
+| `.expired(message: "Cart is empty")`                       | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                    |
+| `.internal(underlying:)`                                   | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible.                                |
 
 ## Integrating identity & customer accounts
 

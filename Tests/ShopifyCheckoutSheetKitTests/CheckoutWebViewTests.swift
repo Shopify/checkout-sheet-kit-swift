@@ -272,7 +272,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, _, recoverable)):
+            case let .some(.unavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "forbidden")
                 XCTAssertFalse(recoverable)
             default:
@@ -321,7 +321,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, _, recoverable)):
+            case let .some(.unavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "unauthorized")
                 XCTAssertFalse(recoverable)
             default:
@@ -345,32 +345,8 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, _, recoverable)):
+            case let .some(.unavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "not found")
-                XCTAssertFalse(recoverable)
-            default:
-                XCTFail("Unhandled error case received")
-            }
-        }
-    }
-
-    func testTreat404WithDeprecationHeader() {
-        view.load(checkout: URL(string: "http://shopify1.shopify.com/checkouts/cn/123")!)
-        let link = view.url!
-        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
-
-        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
-        view.viewDelegate = mockDelegate
-
-        let urlResponse = HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: ["x-shopify-api-deprecated-reason": "checkout_liquid_not_supported"])!
-
-        let policy = view.handleResponse(urlResponse)
-        XCTAssertEqual(policy, .cancel)
-
-        waitForExpectations(timeout: 5) { _ in
-            switch self.mockDelegate.errorReceived {
-            case let .some(.configurationError(message, _, recoverable)):
-                XCTAssertEqual(message, "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.")
                 XCTAssertFalse(recoverable)
             default:
                 XCTFail("Unhandled error case received")
@@ -393,7 +369,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutExpired(message, _, recoverable)):
+            case let .some(.expired(message, _, recoverable)):
                 XCTAssertEqual(message, "Checkout has expired.")
                 XCTAssertFalse(recoverable)
             default:
@@ -427,7 +403,7 @@ class CheckoutWebViewTests: XCTestCase {
                 }
 
                 switch receivedError {
-                case let .checkoutUnavailable(_, _, recoverable):
+                case let .unavailable(_, _, recoverable):
                     XCTAssertTrue(recoverable, "Error should be recoverable for status code \(statusCode)")
                 default:
                     XCTFail("Received incorrect `CheckoutError` case for status code \(statusCode)")
@@ -567,7 +543,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.sdkError(underlying, recoverable)):
+            case let .some(.internal(underlying, recoverable)):
                 let nsError = underlying as NSError
                 XCTAssertEqual(nsError.domain, NSURLErrorDomain)
                 XCTAssertEqual(nsError.code, NSURLErrorTimedOut)
@@ -629,6 +605,280 @@ class CheckoutWebViewTests: XCTestCase {
 
         XCTAssertEqual(sanitized, url.absoluteString)
     }
+
+    // MARK: - handleCheckoutError Tests
+
+    func test_handleCheckoutError_whenStorefrontPasswordRequired_thenMisconfiguration_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "STOREFRONT_PASSWORD_REQUIRED", message: "Storefront password is required"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .misconfiguration(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected misconfiguration error"); return
+            }
+            XCTAssertEqual(message, "Storefront password is required")
+            XCTAssertEqual(code, .storefrontPasswordRequired)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenCustomerAccountRequired_thenMisconfiguration_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "CUSTOMER_ACCOUNT_REQUIRED", message: "Customer must be logged in"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .misconfiguration(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected misconfiguration error"); return
+            }
+            XCTAssertEqual(message, "Customer must be logged in")
+            XCTAssertEqual(code, .customerAccountRequired)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenInvalidPayload_thenMisconfiguration_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "INVALID_PAYLOAD", message: "Invalid payload provided"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .misconfiguration(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected misconfiguration error"); return
+            }
+            XCTAssertEqual(message, "Invalid payload provided")
+            XCTAssertEqual(code, .invalidPayload)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenInvalidSignature_thenMisconfiguration_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "INVALID_SIGNATURE", message: "Invalid signature"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .misconfiguration(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected misconfiguration error"); return
+            }
+            XCTAssertEqual(message, "Invalid signature")
+            XCTAssertEqual(code, .invalidSignature)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenNotAuthorized_thenMisconfiguration_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "NOT_AUTHORIZED", message: "Not authorized"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .misconfiguration(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected misconfiguration error"); return
+            }
+            XCTAssertEqual(message, "Not authorized")
+            XCTAssertEqual(code, .notAuthorized)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenPayloadExpired_thenMisconfiguration_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "PAYLOAD_EXPIRED", message: "Payload has expired"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .misconfiguration(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected misconfiguration error"); return
+            }
+            XCTAssertEqual(message, "Payload has expired")
+            XCTAssertEqual(code, .payloadExpired)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenCartCompleted_thenExpired_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "CART_COMPLETED", message: "This checkout has already been completed"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .expired(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected expired error"); return
+            }
+            XCTAssertEqual(message, "This checkout has already been completed")
+            XCTAssertEqual(code, .cartCompleted)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenInvalidCart_thenExpired_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "INVALID_CART", message: "Cart is invalid"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .expired(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected expired error"); return
+            }
+            XCTAssertEqual(message, "Cart is invalid")
+            XCTAssertEqual(code, .invalidCart)
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenKillswitchEnabled_thenUnavailable_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "KILLSWITCH_ENABLED", message: "Checkout is temporarily disabled"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .unavailable(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected unavailable error"); return
+            }
+            XCTAssertEqual(message, "Checkout is temporarily disabled")
+            if case .clientError(code: .killswitchEnabled) = code {} else {
+                XCTFail("Expected clientError with killswitchEnabled code")
+            }
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenUnrecoverableFailure_thenUnavailable_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "UNRECOVERABLE_FAILURE", message: "An unrecoverable error occurred"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .unavailable(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected unavailable error"); return
+            }
+            XCTAssertEqual(message, "An unrecoverable error occurred")
+            if case .clientError(code: .unrecoverableFailure) = code {} else {
+                XCTFail("Expected clientError with unrecoverableFailure code")
+            }
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenPolicyViolation_thenUnavailable_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "POLICY_VIOLATION", message: "Policy violation detected"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .unavailable(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected unavailable error"); return
+            }
+            XCTAssertEqual(message, "Policy violation detected")
+            if case .clientError(code: .policyViolation) = code {} else {
+                XCTFail("Expected clientError with policyViolation code")
+            }
+            XCTAssertFalse(recoverable)
+        }
+    }
+
+    func test_handleCheckoutError_whenVaultedPaymentError_thenUnavailable_withRecoverableFalse() {
+        let delegate = MockCheckoutWebViewDelegate()
+        let expectation = expectation(description: "checkoutViewDidFailWithError was called")
+        delegate.didFailWithErrorExpectation = expectation
+        view.viewDelegate = delegate
+
+        let mock = WKScriptMessageMock(
+            body: createCheckoutErrorJSON(code: "VAULTED_PAYMENT_ERROR", message: "Payment method could not be processed"),
+            webView: view
+        )
+        view.userContentController(view.configuration.userContentController, didReceive: mock)
+
+        waitForExpectations(timeout: 1) { _ in
+            guard case let .unavailable(message, code, recoverable) = delegate.errorReceived else {
+                XCTFail("Expected unavailable error"); return
+            }
+            XCTAssertEqual(message, "Payment method could not be processed")
+            if case .clientError(code: .vaultedPaymentError) = code {} else {
+                XCTFail("Expected clientError with vaultedPaymentError code")
+            }
+            XCTAssertFalse(recoverable)
+        }
+    }
 }
 
 class LoadedRequestObservableWebView: CheckoutWebView {
@@ -655,5 +905,23 @@ class MockCheckoutBridge: CheckoutBridgeProtocol {
 
     static func sendMessage(_: WKWebView, messageName _: String, messageBody _: String?) {
         sendMessageCalled = true
+    }
+}
+
+class WKScriptMessageMock: WKScriptMessage {
+    private let _mockBody: Any
+    private let _mockWebView: WKWebView?
+
+    override var body: Any {
+        _mockBody
+    }
+
+    override var webView: WKWebView? {
+        _mockWebView
+    }
+
+    init(body: Any = "", webView: WKWebView? = nil) {
+        _mockBody = body
+        _mockWebView = webView
     }
 }

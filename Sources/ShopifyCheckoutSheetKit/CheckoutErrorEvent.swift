@@ -21,26 +21,13 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Foundation
-import WebKit
+public struct CheckoutErrorEvent: CheckoutNotification {
+    public static let method = "checkout.error"
+    public let code: CheckoutError.ErrorCode
+    public let message: String
 
-/// Parameters for error events - array of error events
-internal struct CheckoutErrorParams: Decodable {
-    let errors: [CheckoutErrorEvent]
-
-    init(from decoder: Decoder) throws {
-        // The params is an array directly
-        let container = try decoder.singleValueContainer()
-        errors = try container.decode([CheckoutErrorEvent].self)
-    }
-}
-
-/// Request for checkout error events
-internal final class CheckoutErrorRequest: BaseRPCRequest<CheckoutErrorParams, EmptyResponse> {
-    override static var method: String { "error" }
-
-    /// Convenience getter to access the first error
-    var firstError: CheckoutErrorEvent? {
-        return params.errors.first
+    public init(code: CheckoutError.ErrorCode, message: String) {
+        self.code = code
+        self.message = message
     }
 }

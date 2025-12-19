@@ -23,89 +23,75 @@
 
 import Foundation
 
-public enum CheckoutErrorCode: String, Codable {
-    case storefrontPasswordRequired = "storefront_password_required"
-    case checkoutLiquidNotMigrated = "checkout_liquid_not_migrated"
-    case cartExpired = "cart_expired"
-    case cartCompleted = "cart_completed"
-    case invalidCart = "invalid_cart"
-    case unknown
-
-    public static func from(_ code: String?) -> CheckoutErrorCode {
-        let fallback = CheckoutErrorCode.unknown
-
-        guard let errorCode = code else {
-            return fallback
-        }
-
-        return CheckoutErrorCode(rawValue: errorCode) ?? fallback
-    }
-}
-
-public enum CheckoutUnavailable {
-    case clientError(code: CheckoutErrorCode)
-    case httpError(statusCode: Int)
-}
-
-/// A type representing Shopify Checkout specific errors.
-/// "recoverable" indicates that though the request has failed, it should be retried in a fallback browser experience.
-public enum CheckoutError: Swift.Error {
+/// `CheckoutError` represents scenarios where Shopify Checkout may error
+///
+/// Each error relates to a different portion of Web Shopify Checkout, except `.internal` which is an internal swift error
+/// When the error is not `.internal` it is useful to first confirm where the issue exists in your Storefront
+/// within a browser, to exclude Checkout Kit from the investigation
+///
+/// Every event has a "recoverable" property that indicates this error may be recoverable when retried in a fallback browser experience
+/// This may have a degraded experience, implement CheckoutDelegate.shouldRecoverFromError to opt out
+public enum CheckoutError: Error {
     /// Issued when an internal error within Shopify Checkout SDK
     /// In event of an sdkError you could use the stacktrace to inform you of how to proceed,
-    /// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
-    case sdkError(underlying: Swift.Error, recoverable: Bool = true)
+    /// if the issue persists, it is recommended to open a bug report in:
+    /// http://github.com/Shopify/checkout-sheet-kit-swift/issues
+    case `internal`(underlying: Error, recoverable: Bool = true)
 
     /// Issued when the storefront configuration has caused an error.
-    /// Note that the Checkout Sheet Kit only supports stores migrated for extensibility.
-    case configurationError(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
+    case misconfiguration(message: String, code: ErrorCode, recoverable: Bool = false)
 
     /// Issued when checkout has encountered a unrecoverable error (for example server side error)
-    /// if the issue persists, it is recommended to open a bug report in http://github.com/Shopify/checkout-sheet-kit-swift
-    case checkoutUnavailable(message: String, code: CheckoutUnavailable, recoverable: Bool)
+    /// if the issue persists, it is recommended to open a bug report:
+    /// http://github.com/Shopify/checkout-sheet-kit-swift/issues
+    case unavailable(message: String, code: CheckoutUnavailable, recoverable: Bool)
 
     /// Issued when checkout is no longer available and will no longer be available with the checkout url supplied.
     /// This may happen when the user has paused on checkout for a long period (hours) and then attempted to proceed again with the same checkout url
     /// In event of checkoutExpired, a new checkout url will need to be generated
-    case checkoutExpired(message: String, code: CheckoutErrorCode, recoverable: Bool = false)
+    case expired(message: String, code: ErrorCode, recoverable: Bool = false)
 
     public var isRecoverable: Bool {
         switch self {
-        case let .checkoutExpired(_, _, recoverable),
-             let .checkoutUnavailable(_, _, recoverable),
-             let .configurationError(_, _, recoverable),
-             let .sdkError(_, recoverable):
+        case let .expired(_, _, recoverable),
+             let .unavailable(_, _, recoverable),
+             let .misconfiguration(_, _, recoverable),
+             let .internal(_, recoverable):
             return recoverable
         }
     }
-}
 
-public enum CheckoutErrorGroup: String, Codable {
-    /// An authentication error
-    case authentication
-    /// A shop configuration error
-    case configuration
-    /// A terminal checkout error which cannot be handled
-    case unrecoverable
-    /// A checkout-related error, such as failure to receive a receipt or progress through checkout
-    case checkout
-    /// The checkout session has expired and is no longer available
-    case expired
-    /// The error sent by checkout is not supported
-    case unsupported
-}
+    public var message: String {
+        switch self {
+        case let .internal(underlying, _): return underlying.localizedDescription
+        case let .expired(message, _, _): return message
+        case let .unavailable(message, _, _): return message
+        case let .misconfiguration(message, _, _): return message
+        }
+    }
 
-public struct CheckoutErrorEvent: Codable {
-    public let group: CheckoutErrorGroup
-    public let code: String?
-    public let flowType: String?
-    public let reason: String?
-    public let type: String?
+    public enum ErrorCode: String, Codable {
+        /// misconfiguration: recoverable:false
+        case payloadExpired = "PAYLOAD_EXPIRED"
+        case invalidPayload = "INVALID_PAYLOAD"
+        case invalidSignature = "INVALID_SIGNATURE"
+        case notAuthorized = "NOT_AUTHORIZED"
+        case customerAccountRequired = "CUSTOMER_ACCOUNT_REQUIRED"
+        case storefrontPasswordRequired = "STOREFRONT_PASSWORD_REQUIRED"
 
-    public init(group: CheckoutErrorGroup, code: String? = nil, flowType: String? = nil, reason: String? = nil, type: String? = nil) {
-        self.group = group
-        self.code = code
-        self.flowType = flowType
-        self.reason = reason
-        self.type = type
+        /// unavailable: recoverable:false
+        case killswitchEnabled = "KILLSWITCH_ENABLED"
+        case unrecoverableFailure = "UNRECOVERABLE_FAILURE"
+        case policyViolation = "POLICY_VIOLATION"
+        case vaultedPaymentError = "VAULTED_PAYMENT_ERROR"
+
+        /// expired: recoverable:false
+        case cartCompleted = "CART_COMPLETED"
+        case invalidCart = "INVALID_CART"
+    }
+
+    public enum CheckoutUnavailable {
+        case clientError(code: ErrorCode)
+        case httpError(statusCode: Int)
     }
 }

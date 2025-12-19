@@ -38,7 +38,6 @@ protocol CheckoutWebViewDelegate: AnyObject {
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
-private let checkoutLiquidNotSupportedReason = "checkout_liquid_not_supported"
 
 public class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
@@ -268,7 +267,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
             OSLogger.shared.error(
                 "[CheckoutWebView]: Failed to decode event: \(error.localizedDescription)"
             )
-            viewDelegate.checkoutViewDidFailWithError(error: .sdkError(underlying: error))
+            viewDelegate.checkoutViewDidFailWithError(error: .internal(underlying: error))
         }
     }
 
@@ -308,8 +307,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
                 modalVisible: modalRequest.params.modalVisible
             )
 
-        case let errorRequest as CheckoutErrorRequest:
-            handleCheckoutError(errorRequest)
+        case let errorEvent as CheckoutErrorEvent:
+            handleCheckoutError(errorEvent)
 
         // Ignore unsupported requests
         case let unsupportedRequest as UnsupportedRequest:
@@ -322,43 +321,50 @@ extension CheckoutWebView: WKScriptMessageHandler {
         }
     }
 
-    fileprivate func handleCheckoutError(_ errorRequest: CheckoutErrorRequest) {
+    fileprivate func handleCheckoutError(_ errorEvent: CheckoutErrorEvent) {
         guard let viewDelegate else { return }
-        guard let error = errorRequest.firstError else { return }
-        let code = CheckoutErrorCode.from(error.code)
 
-        switch error.group {
-        case .configuration:
+        switch errorEvent.code {
+        case .storefrontPasswordRequired,
+             .customerAccountRequired,
+             .invalidPayload,
+             .invalidSignature,
+             .notAuthorized,
+             .payloadExpired:
             OSLogger.shared.error(
-                "Configuration error received: \(error.reason ?? "No message"), code: \(code)"
+                "Configuration error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
             viewDelegate.checkoutViewDidFailWithError(
-                error: .checkoutUnavailable(
-                    message: error.reason ?? "Storefront configuration error.",
-                    code: CheckoutUnavailable.clientError(code: code),
+                error: .misconfiguration(
+                    message: errorEvent.message,
+                    code: errorEvent.code,
                     recoverable: false
                 ))
-        case .unrecoverable:
-            OSLogger.shared.error(
-                "Checkout unavailable error received: \(error.reason ?? "No message"), code: \(code)"
-            )
-            viewDelegate.checkoutViewDidFailWithError(
-                error: .checkoutUnavailable(
-                    message: error.reason ?? "Checkout unavailable.",
-                    code: CheckoutUnavailable.clientError(code: code),
-                    recoverable: true
-                )
-            )
-        case .expired:
+
+        case .cartCompleted, .invalidCart:
             OSLogger.shared.info(
-                "Checkout expired error received: \(error.reason ?? "No message"), code: \(code)"
+                "Checkout expired error received: \(errorEvent.message), code: \(errorEvent.code)"
             )
             viewDelegate.checkoutViewDidFailWithError(
-                error: .checkoutExpired(
-                    message: error.reason ?? "Checkout has expired.", code: code
+                error: .expired(
+                    message: errorEvent.message,
+                    code: errorEvent.code,
+                    recoverable: false
                 ))
-        default:
-            OSLogger.shared.error("Unknown error group received: \(error.group)")
+
+        case .killswitchEnabled,
+             .unrecoverableFailure,
+             .policyViolation,
+             .vaultedPaymentError:
+            OSLogger.shared.error(
+                "Checkout unavailable error received: \(errorEvent.message), code: \(errorEvent.code)"
+            )
+            viewDelegate.checkoutViewDidFailWithError(
+                error: .unavailable(
+                    message: errorEvent.message,
+                    code: .clientError(code: errorEvent.code),
+                    recoverable: false
+                ))
         }
     }
 }
@@ -424,50 +430,39 @@ extension CheckoutWebView: WKNavigationDelegate {
             case 401:
                 OSLogger.shared.debug("Unauthorized access (401)")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
+                    error: .unavailable(
                         message: errorMessageForStatusCode,
-                        code: CheckoutUnavailable.httpError(statusCode: statusCode),
+                        code: CheckoutError.CheckoutUnavailable.httpError(statusCode: statusCode),
                         recoverable: false
                     ))
             case 404:
                 OSLogger.shared.debug("Not found (404)")
-                if let reason = headers[deprecatedReasonHeader] as? String,
-                   reason.lowercased() == checkoutLiquidNotSupportedReason
-                {
-                    viewDelegate?.checkoutViewDidFailWithError(
-                        error: .configurationError(
-                            message:
-                            "Storefronts using checkout.liquid are not supported. Please upgrade to Checkout Extensibility.",
-                            code: CheckoutErrorCode.checkoutLiquidNotMigrated, recoverable: false
-                        ))
-                } else {
-                    viewDelegate?.checkoutViewDidFailWithError(
-                        error: .checkoutUnavailable(
-                            message: errorMessageForStatusCode,
-                            code: CheckoutUnavailable.httpError(statusCode: statusCode),
-                            recoverable: false
-                        ))
-                }
+                viewDelegate?.checkoutViewDidFailWithError(
+                    error: .unavailable(
+                        message: errorMessageForStatusCode,
+                        code: .httpError(statusCode: statusCode),
+                        recoverable: false
+                    ))
             case 410:
                 OSLogger.shared.debug("Gone (410)")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutExpired(
-                        message: "Checkout has expired.", code: CheckoutErrorCode.cartExpired
+                    error: .expired(
+                        message: "Checkout has expired.", code: CheckoutError.ErrorCode.invalidCart
                     ))
             case 500 ... 599:
                 OSLogger.shared.debug("Server error (5xx)")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
+                    error: .unavailable(
                         message: errorMessageForStatusCode,
-                        code: CheckoutUnavailable.httpError(statusCode: statusCode),
+                        code: .httpError(statusCode: statusCode),
                         recoverable: allowRecoverable
                     ))
             default:
                 OSLogger.shared.debug("\(statusCode) error received")
                 viewDelegate?.checkoutViewDidFailWithError(
-                    error: .checkoutUnavailable(
+                    error: .unavailable(
                         message: errorMessageForStatusCode,
-                        code: CheckoutUnavailable.httpError(statusCode: statusCode),
+                        code: .httpError(statusCode: statusCode),
                         recoverable: false
                     ))
             }
@@ -536,7 +531,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         viewDelegate?.checkoutViewDidFailWithError(
-            error: .sdkError(underlying: error, recoverable: !isRecovery)
+            error: .internal(underlying: error, recoverable: !isRecovery)
         )
     }
 
