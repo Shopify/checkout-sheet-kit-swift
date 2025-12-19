@@ -7,40 +7,42 @@
 
 **Note**: We're in the process of renaming "Checkout Sheet Kit" to "Checkout Kit." The dev docs and README already use the new name, while the package itself will be updated in an upcoming version.
 
-- [Shopify Checkout Kit - Swift](#shopify-checkout-sheet-kit---swift)
-  - [Requirements](#requirements)
-  - [Getting Started](#getting-started)
-    - [Package.swift](#packageswift)
-    - [Xcode](#xcode)
-    - [CocoaPods](#cocoapods)
-  - [Programmatic Usage](#programmatic-usage)
-  - [SwiftUI Usage](#swiftui-usage)
-  - [Configuration](#configuration)
-    - [`colorScheme`](#colorscheme)
-    - [`tintColor`](#tintcolor)
-    - [`backgroundColor`](#backgroundcolor)
-    - [`title`](#title)
-    - [`closeButtonTintColor`](#closebuttontintcolor)
-    - [SwiftUI Configuration](#swiftui-configuration)
-  - [Preloading](#preloading)
-    - [Important considerations](#important-considerations)
-    - [Flash Sales](#flash-sales)
-    - [When to preload](#when-to-preload)
-    - [Cache invalidation](#cache-invalidation)
-    - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
-    - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
-  - [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
-  - [Error handling](#error-handling)
-    - [`CheckoutError`](#checkouterror)
-  - [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
-    - [Cart: buyer bag, identity, and preferences](#cart-buyer-bag-identity-and-preferences)
-    - [Multipass](#multipass)
-    - [Shop Pay](#shop-pay)
-    - [Customer Account API](#customer-account-api)
-  - [Offsite Payments](#offsite-payments)
-  - [Explore the sample apps](#explore-the-sample-apps)
-  - [Contributing](#contributing)
-  - [License](#license)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+  - [Package.swift](#packageswift)
+  - [Xcode](#xcode)
+  - [CocoaPods](#cocoapods)
+- [Programmatic Usage](#programmatic-usage)
+- [SwiftUI Usage](#swiftui-usage)
+  - [Application Authentication](#application-authentication)
+    - [Programmatic Usage](#programmatic-usage-1)
+    - [SwiftUI Usage](#swiftui-usage-1)
+- [Configuration](#configuration)
+  - [`colorScheme`](#colorscheme)
+  - [`tintColor`](#tintcolor)
+  - [`backgroundColor`](#backgroundcolor)
+  - [`title`](#title)
+  - [`closeButtonTintColor`](#closebuttontintcolor)
+  - [SwiftUI Configuration](#swiftui-configuration)
+- [Preloading](#preloading)
+  - [Important considerations](#important-considerations)
+  - [Flash Sales](#flash-sales)
+  - [When to preload](#when-to-preload)
+  - [Cache invalidation](#cache-invalidation)
+  - [Lifecycle management for preloaded checkout](#lifecycle-management-for-preloaded-checkout)
+  - [Additional considerations for preloaded checkout](#additional-considerations-for-preloaded-checkout)
+- [Monitoring the lifecycle of a checkout session](#monitoring-the-lifecycle-of-a-checkout-session)
+- [Error handling](#error-handling)
+  - [`CheckoutError`](#checkouterror)
+- [Integrating identity \& customer accounts](#integrating-identity--customer-accounts)
+  - [Cart: buyer bag, identity, and preferences](#cart-buyer-bag-identity-and-preferences)
+  - [Multipass](#multipass)
+  - [Shop Pay](#shop-pay)
+  - [Customer Account API](#customer-account-api)
+- [Offsite Payments](#offsite-payments)
+- [Explore the sample apps](#explore-the-sample-apps)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Requirements
 
@@ -55,7 +57,7 @@ The SDK is an open-source [Swift Package library](https://www.swift.org/package-
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "3")
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "4")
 ]
 ```
 
@@ -71,7 +73,7 @@ For more details on managing Swift Package dependencies in Xcode, please see [Ap
 ### CocoaPods
 
 ```ruby
-pod "ShopifyCheckoutSheetKit", "~> 3"
+pod "ShopifyCheckoutSheetKit", "~> 4"
 ```
 
 For more information on CocoaPods, please see their [getting started guide](https://guides.cocoapods.org/using/getting-started.html).
@@ -476,14 +478,14 @@ func shouldRecoverFromError(error: CheckoutError) {
 
 ### `CheckoutError`
 
-| Type                                                       | Description                                | Recommendation                                                                                    |
-| ---------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `.unavailable(message: "Forbidden")`                       | Access to checkout is forbidden.           | This error is unrecoverable.                                                                      |
-| `.unavailable(message: "Internal Server Error")`           | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                                  |
+| Type                                                         | Description                                | Recommendation                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `.unavailable(message: "Forbidden")`                         | Access to checkout is forbidden.           | This error is unrecoverable.                                                                |
+| `.unavailable(message: "Internal Server Error")`             | An internal server error occurred.         | This error will be ephemeral. Try again shortly.                                            |
 | `.misconfiguration(message: "Storefront password required")` | Access to checkout is password restricted. | We are working on ways to enable the Checkout Kit for usage with password protected stores. |
-| `.expired(message: "Checkout already completed")`          | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                              |
-| `.expired(message: "Cart is empty")`                       | The cart session has expired.              | Create a new cart and open a new checkout URL.                                                    |
-| `.internal(underlying:)`                                   | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible.                                |
+| `.expired(message: "Checkout already completed")`            | The checkout has already been completed    | If this is incorrect, create a new cart and open a new checkout URL.                        |
+| `.expired(message: "Cart is empty")`                         | The cart session has expired.              | Create a new cart and open a new checkout URL.                                              |
+| `.internal(underlying:)`                                     | An error was thrown internally.            | Please open an issue in this repo with as much detail as possible.                          |
 
 ## Integrating identity & customer accounts
 
