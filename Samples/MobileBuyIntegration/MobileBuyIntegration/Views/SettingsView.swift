@@ -31,6 +31,7 @@ enum AppStorageKeys: String {
     case checkoutSheetKitLogLevel
     case authenticate
     case preloadingEnabled
+    case showNativePayButton
 }
 
 struct SettingsView: View {
@@ -57,6 +58,10 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageKeys.preloadingEnabled.rawValue)
     var preloadingEnabled: Bool = false
+
+    @AppStorage(AppStorageKeys.showNativePayButton.rawValue)
+    var showNativePayButton: Bool = false
+
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
     @State private var colorScheme: ColorScheme = .light
@@ -87,6 +92,7 @@ struct SettingsView: View {
                             }
                         }
                     Toggle("Prefill buyer information", isOn: $config.useVaultedState)
+                    Toggle("Show native pay button (BYOPB)", isOn: $showNativePayButton)
 
                     HStack(alignment: .center) {
                         Button("Clear cart") {

@@ -45,6 +45,9 @@ struct CartView: View {
     @AppStorage(AppStorageKeys.authenticate.rawValue)
     var authenticate: Bool = true
 
+    @AppStorage(AppStorageKeys.showNativePayButton.rawValue)
+    var showNativePayButton: Bool = false
+
     var body: some View {
         if let lines = cartManager.cart?.lines.nodes {
             ZStack(alignment: .bottom) {
@@ -121,7 +124,17 @@ struct CartView: View {
                 }
             }
             .sheet(item: $checkoutData) { data in
-                ShopifyCheckout(checkout: data.url)
+                if showNativePayButton {
+                    CheckoutWithPayButtonView(
+                        checkoutURL: data.url,
+                        isPresented: Binding(
+                            get: { checkoutData != nil },
+                            set: { if !$0 { checkoutData = nil } }
+                        ),
+                        showPayButton: true
+                    )
+                } else {
+                    ShopifyCheckout(checkout: data.url)
                     .auth(token: data.token)
                     .colorScheme(.automatic)
                     .navigationBarHidden(true)
@@ -223,6 +236,7 @@ struct CartView: View {
                     }
                     .presentationDragIndicator(.visible)
                     .edgesIgnoringSafeArea(.all)
+                }
             }
         } else {
             EmptyState()
