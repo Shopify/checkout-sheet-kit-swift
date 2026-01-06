@@ -59,6 +59,19 @@ public protocol CheckoutDelegate: AnyObject {
 
     /// Tells the delegate that the checkout is requesting payment method change intent (e.g., for native payment method picker)
     func checkoutDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent)
+
+    /// Tells the delegate that the primary action state has changed.
+    ///
+    /// This event is emitted when the checkout button state changes between enabled/disabled/loading,
+    /// or when the action changes between review/pay. Use this to update your custom checkout button
+    /// if implementing a "Bring Your Own Pay Button" experience.
+    ///
+    /// The button is enabled when all of the following conditions are met:
+    /// - Contact email or phone exists
+    /// - Shipping address is complete (if required)
+    /// - Payment method exists
+    /// - No blocking extensions are active
+    func checkoutDidChangePrimaryAction(event: CheckoutPrimaryActionChangeEvent)
 }
 
 extension CheckoutDelegate {
@@ -91,6 +104,10 @@ extension CheckoutDelegate {
     }
 
     public func checkoutDidStartSubmit(event _: CheckoutSubmitStartEvent) {
+        /// No-op by default
+    }
+
+    public func checkoutDidChangePrimaryAction(event _: CheckoutPrimaryActionChangeEvent) {
         /// No-op by default
     }
 

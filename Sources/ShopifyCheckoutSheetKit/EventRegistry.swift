@@ -36,6 +36,7 @@ enum EventRegistry {
     static let notifications: [any CheckoutNotification.Type] = [
         CheckoutCompleteEvent.self,
         CheckoutErrorEvent.self,
+        CheckoutPrimaryActionChangeEvent.self,
         CheckoutStartEvent.self
     ]
 

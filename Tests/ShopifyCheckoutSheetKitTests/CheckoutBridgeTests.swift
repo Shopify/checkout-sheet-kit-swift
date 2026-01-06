@@ -414,6 +414,34 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("gid://shopify/Cart/test-cart-123", completeEvent.cart.id)
     }
 
+    func testDecodeSupportsCheckoutPrimaryActionChange() throws {
+        let mock = WKScriptMessageMock(
+            body: """
+            {
+                "jsonrpc": "2.0",
+                "method": "checkout.primaryActionChange",
+                "params": {
+                    "state": "enabled",
+                    "action": "pay",
+                    "cart": \(createTestCartJSON())
+                }
+            }
+            """,
+            webView: mockWebView
+        )
+
+        let result = try CheckoutBridge.decode(mock)
+
+        guard let primaryActionEvent = result as? CheckoutPrimaryActionChangeEvent else {
+            XCTFail("Expected CheckoutPrimaryActionChangeEvent, got \(String(describing: result))")
+            return
+        }
+
+        XCTAssertEqual(primaryActionEvent.state, .enabled)
+        XCTAssertEqual(primaryActionEvent.action, .pay)
+        XCTAssertEqual("gid://shopify/Cart/test-cart-123", primaryActionEvent.cart.id)
+    }
+
     func testDecodeSupportsCheckoutSubmitStart() throws {
         let mock = WKScriptMessageMock(
             body: """

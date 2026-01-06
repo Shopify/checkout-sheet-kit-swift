@@ -35,6 +35,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
     func checkoutViewDidStartAddressChange(event: CheckoutAddressChangeStartEvent)
     func checkoutViewDidStartSubmit(event: CheckoutSubmitStartEvent)
     func checkoutViewDidStartPaymentMethodChange(event: CheckoutPaymentMethodChangeStartEvent)
+    func checkoutViewDidChangePrimaryAction(event: CheckoutPrimaryActionChangeEvent)
 }
 
 private let deprecatedReasonHeader = "x-shopify-api-deprecated-reason"
@@ -281,6 +282,12 @@ extension CheckoutWebView: WKScriptMessageHandler {
         case let completeEvent as CheckoutCompleteEvent:
             OSLogger.shared.info("Checkout completed event received")
             viewDelegate.checkoutViewDidCompleteCheckout(event: completeEvent)
+
+        case let primaryActionEvent as CheckoutPrimaryActionChangeEvent:
+            OSLogger.shared.info(
+                "Primary action change event received: state=\(primaryActionEvent.state), action=\(primaryActionEvent.action)"
+            )
+            viewDelegate.checkoutViewDidChangePrimaryAction(event: primaryActionEvent)
 
         // Request events (CheckoutRequest)
         case let addressRequest as CheckoutAddressChangeStartEvent:
