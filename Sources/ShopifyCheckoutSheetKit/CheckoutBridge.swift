@@ -58,10 +58,10 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
             let script = """
             (function() {
                 try {
-                    if (window && typeof window.postMessage === 'function') {
-                        window.postMessage(\(messageBody), '*');
+                    if (window && window.EmbeddedCheckoutProtocol && typeof window.EmbeddedCheckoutProtocol.postMessage === 'function') {
+                        window.EmbeddedCheckoutProtocol.postMessage(\(messageBody), '*');
                     } else if (window && window.console && window.console.error) {
-                        window.console.error('window.postMessage is not available.');
+                        window.console.error('window.EmbeddedCheckoutProtocol.postMessage is not available.');
                     }
                 } catch (error) {
                     if (window && window.console && window.console.error) {
