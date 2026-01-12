@@ -48,7 +48,7 @@ class CheckoutAddressChangeStartEventTests: XCTestCase {
         let capturedJS = mockWebView.capturedJavaScript ?? ""
 
         // Verify the response contains expected JSON-RPC fields
-        XCTAssertTrue(capturedJS.contains("window.postMessage"), "Should call window.postMessage")
+        XCTAssertTrue(capturedJS.contains("EmbeddedCheckoutProtocol.postMessage"), "Should call EmbeddedCheckoutProtocol.postMessage")
         XCTAssertTrue(capturedJS.contains("\"jsonrpc\":\"2.0\""), "Should include JSON-RPC version")
         XCTAssertTrue(capturedJS.contains("\"id\":\"test-id-789\""), "Should include request ID")
         XCTAssertTrue(capturedJS.contains("\"result\""), "Should include result field")
