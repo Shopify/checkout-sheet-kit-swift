@@ -46,39 +46,37 @@ struct AccountView: View {
 
 struct AuthenticatedAccountView: View {
     @ObservedObject var accountManager = CustomerAccountManager.shared
-    @State private var accessToken: String?
 
     var body: some View {
-        VStack(spacing: 0) {
-            if let email = accountManager.customerEmail {
-                HStack {
-                    Image(systemName: "person.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(Color(ColorPalette.primaryColor))
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "person.circle.fill")
+                .font(.system(size: 80))
+                .foregroundColor(Color(ColorPalette.primaryColor))
+
+            VStack(spacing: 8) {
+                Text("Signed In")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                if let email = accountManager.customerEmail {
                     Text(email)
                         .font(.subheadline)
-                    Spacer()
-                }
-                .padding()
-                .background(Color(.systemBackground))
-            }
-
-            if let token = accessToken, let url = URL(string: CustomerAccountManager.customerAccountUrl) {
-                CustomerAccountWebView(url: url, accessToken: token)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                VStack {
-                    ProgressView()
-                    Text("Loading account...")
                         .foregroundColor(.secondary)
-                        .padding(.top, 8)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                Text("Your checkout will be pre-filled with your account info.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                    .padding(.top, 8)
             }
 
-            Button(action: {
-                accountManager.logout()
-            }) {
+            Spacer()
+
+            Button(action: { accountManager.logout() }) {
                 HStack {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                     Text("Sign Out")
@@ -87,16 +85,9 @@ struct AuthenticatedAccountView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
             }
-            .background(Color(.systemBackground))
+            .padding(.bottom, 32)
         }
         .background(Color(.systemGroupedBackground))
-        .task {
-            do {
-                accessToken = try await accountManager.getValidAccessToken()
-            } catch {
-                print("Failed to get access token: \(error)")
-            }
-        }
     }
 }
 

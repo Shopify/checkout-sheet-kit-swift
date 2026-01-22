@@ -107,36 +107,6 @@ struct CustomerAccountLoginView: UIViewRepresentable {
     }
 }
 
-struct CustomerAccountWebView: UIViewRepresentable {
-    let url: URL
-    let accessToken: String
-
-    func makeUIView(context: Context) -> WKWebView {
-        let configuration = WKWebViewConfiguration()
-
-        let webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.navigationDelegate = context.coordinator
-
-        var request = URLRequest(url: url)
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        webView.load(request)
-
-        return webView
-    }
-
-    func updateUIView(_: WKWebView, context _: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-
-    class Coordinator: NSObject, WKNavigationDelegate {
-        func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
-            print("Account WebView navigation failed: \(error)")
-        }
-    }
-}
-
 struct LoginSheetView: View {
     @ObservedObject var accountManager = CustomerAccountManager.shared
     @Environment(\.dismiss) private var dismiss

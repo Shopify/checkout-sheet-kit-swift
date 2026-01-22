@@ -200,11 +200,35 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     func logout() {
+        let idToken = KeychainHelper.shared.getTokens()?.idToken
+
         KeychainHelper.shared.clearTokens()
         isAuthenticated = false
         customerEmail = nil
         codeVerifier = nil
         savedState = nil
+
+        CartManager.shared.resetCart()
+
+        if let idToken {
+            Task {
+                await performLogoutRequest(idTokenHint: idToken)
+            }
+        }
+    }
+
+    private func performLogoutRequest(idTokenHint: String) async {
+        guard var components = URLComponents(string: Self.logoutEndpoint) else { return }
+        components.queryItems = [
+            URLQueryItem(name: "id_token_hint", value: idTokenHint)
+        ]
+
+        guard let url = components.url else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        _ = try? await URLSession.shared.data(for: request)
     }
 
     func checkExistingSession() {
