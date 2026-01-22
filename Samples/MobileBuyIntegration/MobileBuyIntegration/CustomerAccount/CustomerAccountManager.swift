@@ -158,6 +158,8 @@ final class CustomerAccountManager: ObservableObject {
         isAuthenticated = true
         extractEmailFromIdToken(tokens.idToken)
 
+        CartManager.shared.resetCart()
+
         codeVerifier = nil
         savedState = nil
     }
