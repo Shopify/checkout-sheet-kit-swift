@@ -33,6 +33,17 @@ class InfoDictionary {
     let address1, address2, city, country, firstName, lastName, province, zip,
         email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
 
+    // Customer Account API (optional)
+    let customerAccountApiClientId: String?
+    let customerAccountApiShopId: String?
+
+    var customerAccountApiRedirectUri: String? {
+        guard let shopId = customerAccountApiShopId, !shopId.isEmpty else {
+            return nil
+        }
+        return "shop.\(shopId).app://callback"
+    }
+
     init() {
         guard
             let infoPlist = Bundle.main.infoDictionary,
@@ -70,5 +81,9 @@ class InfoDictionary {
         self.version = version
         self.buildNumber = buildNumber
         self.merchantIdentifier = merchantIdentifier
+
+        // Customer Account API configuration (optional)
+        customerAccountApiClientId = infoPlist["CustomerAccountApiClientId"] as? String
+        customerAccountApiShopId = infoPlist["CustomerAccountApiShopId"] as? String
     }
 }

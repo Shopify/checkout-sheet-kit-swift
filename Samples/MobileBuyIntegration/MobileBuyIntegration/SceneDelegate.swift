@@ -30,6 +30,7 @@ enum Screen: Int, CaseIterable {
     case catalog
     case products
     case cart
+    case account
     case settings
 }
 
@@ -42,6 +43,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let swiftUICartController = UIHostingController(rootView: CartView())
     let productGridController = UIHostingController(rootView: ProductGridView())
     let productGalleryController = UIHostingController(rootView: ProductGalleryView())
+    let accountController = UIHostingController(rootView: AccountView())
     let settingsController = UIHostingController(rootView: SettingsView())
 
     // Store cart button views for badge updates
@@ -67,6 +69,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         /// Cart screen
         viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: swiftUICartController)
+
+        /// Account screen
+        viewControllers[Screen.account.rawValue] = UINavigationController(rootViewController: accountController)
 
         /// Settings screen
         viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
@@ -114,9 +119,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         swiftUICartController.tabBarItem.title = "Cart"
         swiftUICartController.navigationItem.title = "Cart (SwiftUI)"
 
+        /// Account
+        accountController.tabBarItem.image = UIImage(systemName: "person.circle")
+        accountController.tabBarItem.title = "Log in"
+        subscribeToAuthStateChanges()
+
         /// Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
         settingsController.tabBarItem.title = "Settings"
+    }
+
+    private func subscribeToAuthStateChanges() {
+        CustomerAccountManager.shared.$isAuthenticated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isAuthenticated in
+                self?.accountController.tabBarItem.title = isAuthenticated ? "Account" : "Log in"
+                self?.accountController.tabBarItem.image = UIImage(
+                    systemName: isAuthenticated ? "person.circle.fill" : "person.circle"
+                )
+            }
+            .store(in: &cancellables)
     }
 
     @objc public func present() {
@@ -218,6 +240,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         {
             badgeLabel.text = badgeText
             badgeLabel.isHidden = !shouldShow
+        }
+    }
+
+    func scene(_: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+
+        if CustomerAccountManager.shared.handleCallback(url: url) {
+            return
         }
     }
 
