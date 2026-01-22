@@ -26,6 +26,7 @@ import WebKit
 
 struct CustomerAccountLoginView: UIViewRepresentable {
     let authorizationURL: URL
+    let callbackScheme: String
     let onCodeReceived: (String) -> Void
     let onCancel: () -> Void
 
@@ -42,14 +43,16 @@ struct CustomerAccountLoginView: UIViewRepresentable {
     func updateUIView(_: WKWebView, context _: Context) {}
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onCodeReceived: onCodeReceived, onCancel: onCancel)
+        Coordinator(callbackScheme: callbackScheme, onCodeReceived: onCodeReceived, onCancel: onCancel)
     }
 
     class Coordinator: NSObject, WKNavigationDelegate {
+        let callbackScheme: String
         let onCodeReceived: (String) -> Void
         let onCancel: () -> Void
 
-        init(onCodeReceived: @escaping (String) -> Void, onCancel: @escaping () -> Void) {
+        init(callbackScheme: String, onCodeReceived: @escaping (String) -> Void, onCancel: @escaping () -> Void) {
+            self.callbackScheme = callbackScheme
             self.onCodeReceived = onCodeReceived
             self.onCancel = onCancel
         }
@@ -64,7 +67,7 @@ struct CustomerAccountLoginView: UIViewRepresentable {
                 return
             }
 
-            if url.scheme == "shop.86942908764.app", url.host == "callback" {
+            if url.scheme == callbackScheme, url.host == "callback" {
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
                       let queryItems = components.queryItems
                 else {
@@ -112,12 +115,18 @@ struct LoginSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var authorizationURL: URL?
 
+    private var callbackScheme: String? {
+        guard let shopId = InfoDictionary.shared.customerAccountApiShopId else { return nil }
+        return "shop.\(shopId).app"
+    }
+
     var body: some View {
         NavigationView {
             Group {
-                if let url = authorizationURL {
+                if let url = authorizationURL, let scheme = callbackScheme {
                     CustomerAccountLoginView(
                         authorizationURL: url,
+                        callbackScheme: scheme,
                         onCodeReceived: { code in
                             Task {
                                 do {

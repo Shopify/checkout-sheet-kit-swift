@@ -17,7 +17,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>shop.86942908764.app</string>
+				<string>shop.$(CUSTOMER_ACCOUNT_API_SHOP_ID).app</string>
 			</array>
 		</dict>
 	</array>

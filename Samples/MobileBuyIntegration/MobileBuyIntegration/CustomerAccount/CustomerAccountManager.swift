@@ -54,14 +54,32 @@ enum CustomerAccountError: LocalizedError {
 final class CustomerAccountManager: ObservableObject {
     static let shared = CustomerAccountManager()
 
-    private static let shopId = "86942908764"
-    private static let clientId = "shp_33c68c51-8265-4d0b-bd93-7727f949262d"
-    private static let redirectUri = "shop.\(shopId).app://callback"
+    private let shopId: String?
+    private let clientId: String?
 
-    static let authorizationEndpoint = "https://shopify.com/authentication/\(shopId)/oauth/authorize"
-    static let tokenEndpoint = "https://shopify.com/authentication/\(shopId)/oauth/token"
-    static let logoutEndpoint = "https://shopify.com/authentication/\(shopId)/logout"
-    static let customerAccountUrl = "https://shopify.com/\(shopId)/account"
+    private var redirectUri: String? {
+        InfoDictionary.shared.customerAccountApiRedirectUri
+    }
+
+    private var callbackScheme: String? {
+        guard let shopId else { return nil }
+        return "shop.\(shopId).app"
+    }
+
+    var authorizationEndpoint: String? {
+        guard let shopId else { return nil }
+        return "https://shopify.com/authentication/\(shopId)/oauth/authorize"
+    }
+
+    var tokenEndpoint: String? {
+        guard let shopId else { return nil }
+        return "https://shopify.com/authentication/\(shopId)/oauth/token"
+    }
+
+    var logoutEndpoint: String? {
+        guard let shopId else { return nil }
+        return "https://shopify.com/authentication/\(shopId)/logout"
+    }
 
     @Published var isAuthenticated: Bool = false
     @Published var isLoading: Bool = false
@@ -71,6 +89,8 @@ final class CustomerAccountManager: ObservableObject {
     private var savedState: String?
 
     private init() {
+        shopId = InfoDictionary.shared.customerAccountApiShopId
+        clientId = InfoDictionary.shared.customerAccountApiClientId
         checkExistingSession()
     }
 
@@ -107,6 +127,10 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     func buildAuthorizationURL() -> URL? {
+        guard let authorizationEndpoint, let clientId, let redirectUri else {
+            return nil
+        }
+
         codeVerifier = generateCodeVerifier()
         savedState = generateState()
 
@@ -116,12 +140,12 @@ final class CustomerAccountManager: ObservableObject {
 
         let codeChallenge = generateCodeChallenge(for: verifier)
 
-        var components = URLComponents(string: Self.authorizationEndpoint)
+        var components = URLComponents(string: authorizationEndpoint)
         components?.queryItems = [
             URLQueryItem(name: "scope", value: "openid email customer-account-api:full"),
-            URLQueryItem(name: "client_id", value: Self.clientId),
+            URLQueryItem(name: "client_id", value: clientId),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "redirect_uri", value: Self.redirectUri),
+            URLQueryItem(name: "redirect_uri", value: redirectUri),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "code_challenge", value: codeChallenge),
             URLQueryItem(name: "code_challenge_method", value: "S256")
@@ -142,13 +166,17 @@ final class CustomerAccountManager: ObservableObject {
             throw CustomerAccountError.invalidAuthorizationCode
         }
 
+        guard let clientId, let redirectUri else {
+            throw CustomerAccountError.missingConfiguration
+        }
+
         isLoading = true
         defer { isLoading = false }
 
         let body: [String: String] = [
             "grant_type": "authorization_code",
-            "client_id": Self.clientId,
-            "redirect_uri": Self.redirectUri,
+            "client_id": clientId,
+            "redirect_uri": redirectUri,
             "code": code,
             "code_verifier": verifier
         ]
@@ -171,12 +199,16 @@ final class CustomerAccountManager: ObservableObject {
             throw CustomerAccountError.notAuthenticated
         }
 
+        guard let clientId else {
+            throw CustomerAccountError.missingConfiguration
+        }
+
         isLoading = true
         defer { isLoading = false }
 
         let body: [String: String] = [
             "grant_type": "refresh_token",
-            "client_id": Self.clientId,
+            "client_id": clientId,
             "refresh_token": refreshToken
         ]
 
@@ -220,7 +252,8 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     private func performLogoutRequest(idTokenHint: String) async {
-        guard var components = URLComponents(string: Self.logoutEndpoint) else { return }
+        guard let logoutEndpoint else { return }
+        guard var components = URLComponents(string: logoutEndpoint) else { return }
         components.queryItems = [
             URLQueryItem(name: "id_token_hint", value: idTokenHint)
         ]
@@ -254,7 +287,7 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     private func performTokenRequest(body: [String: String]) async throws -> OAuthTokenResult {
-        guard let url = URL(string: Self.tokenEndpoint) else {
+        guard let tokenEndpoint, let url = URL(string: tokenEndpoint) else {
             throw CustomerAccountError.tokenExchangeFailed("Invalid token endpoint URL")
         }
 
@@ -324,8 +357,9 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     func handleCallback(url: URL) -> Bool {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              components.scheme == "shop.86942908764.app",
+        guard let callbackScheme,
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              components.scheme == callbackScheme,
               components.host == "callback"
         else {
             return false
