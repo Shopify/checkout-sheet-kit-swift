@@ -22,6 +22,7 @@
  */
 
 import PassKit
+import ShopifyCheckoutSheetKit
 
 /// Encodes PassKit -> Storefront
 @available(iOS 16.0, *)
@@ -257,6 +258,13 @@ class PKEncoder {
             return contact?.name?.givenName
         }()
 
+        let phone: String? = {
+            if let phone = contact?.phoneNumber {
+                return phone.stringValue
+            }
+            return try? phoneNumber.get()
+        }()
+
         return .success(
             StorefrontAPI.Types.Address(
                 address1: addressLines[safe: 0],
@@ -265,7 +273,7 @@ class PKEncoder {
                 country: country,
                 firstName: contact?.name?.givenName,
                 lastName: lastName,
-                phone: contact?.phoneNumber?.stringValue,
+                phone: phone,
                 province: province,
                 zip: zip
             )
@@ -299,14 +307,27 @@ class PKEncoder {
     }
 
     var phoneNumber: Result<String, ShopifyAcceleratedCheckouts.Error> {
+        if let phoneNumber = configuration.common.customer?.phoneNumber, !phoneNumber.isEmpty {
+            if let biPhone = cart()?.buyerIdentity?.customer?.phone ?? cart()?.buyerIdentity?.phone,
+               !biPhone.isEmpty, biPhone != phoneNumber
+            {
+                OSLogger.shared.info("config.customer.phoneNumber overrides buyerIdentity phone")
+            }
+            return .success(phoneNumber)
+        }
+
+        if let phoneNumber = cart()?.buyerIdentity?.customer?.phone, !phoneNumber.isEmpty {
+            return .success(phoneNumber)
+        }
+
+        if let phoneNumber = cart()?.buyerIdentity?.phone, !phoneNumber.isEmpty {
+            return .success(phoneNumber)
+        }
+
         if let contact = try? shippingContact.get(),
            let phoneNumber = contact.phoneNumber?.stringValue,
            !phoneNumber.isEmpty
         {
-            return .success(phoneNumber)
-        }
-
-        if let phoneNumber = configuration.common.customer?.phoneNumber {
             return .success(phoneNumber)
         }
 
@@ -315,14 +336,27 @@ class PKEncoder {
 
     typealias Email = String
     var email: Result<Email, ShopifyAcceleratedCheckouts.Error> {
+        if let email = configuration.common.customer?.email, !email.isEmpty {
+            if let biEmail = cart()?.buyerIdentity?.customer?.email ?? cart()?.buyerIdentity?.email,
+               !biEmail.isEmpty, biEmail != email
+            {
+                OSLogger.shared.info("config.customer.email overrides buyerIdentity email")
+            }
+            return .success(email)
+        }
+
+        if let email = cart()?.buyerIdentity?.customer?.email, !email.isEmpty {
+            return .success(email)
+        }
+
+        if let email = cart()?.buyerIdentity?.email, !email.isEmpty {
+            return .success(email)
+        }
+
         if let contact = try? shippingContact.get(),
            let email = contact.emailAddress,
            !email.isEmpty
         {
-            return .success(email)
-        }
-
-        if let email = configuration.common.customer?.email {
             return .success(email)
         }
 
