@@ -99,7 +99,7 @@ public final class AppConfiguration: ObservableObject {
 
     let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
         merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
-        contactFields: [.email]
+        contactFields: []
     )
 }
 

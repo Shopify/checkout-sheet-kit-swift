@@ -75,10 +75,16 @@ extension ShopifyAcceleratedCheckouts.Customer {
         )
     }
 
-    static func testCustomer(email: String? = "test@shopify.com")
+    static func testCustomer(email: String = "test@shopify.com", phoneNumber: String = "+447777777777")
         -> ShopifyAcceleratedCheckouts.Customer
     {
-        return ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: "+447777777777")
+        return ShopifyAcceleratedCheckouts.Customer(email: email, phoneNumber: phoneNumber)
+    }
+
+    static func testAuthenticatedCustomer(accessToken: String = "test-access-token")
+        -> ShopifyAcceleratedCheckouts.Customer
+    {
+        return ShopifyAcceleratedCheckouts.Customer(customerAccessToken: accessToken)
     }
 }
 
@@ -225,6 +231,58 @@ extension StorefrontAPI.Cart {
                 totalAmount: StorefrontAPI.MoneyV2(
                     amount: Decimal(totalAmount), currencyCode: currencyCode
                 ),
+                subtotalAmount: nil,
+                totalTaxAmount: nil,
+                totalDutyAmount: nil
+            ),
+            discountCodes: [],
+            discountAllocations: []
+        )
+    }
+
+    static func testCartWithBuyerIdentity(
+        id: String = "gid://Shopify/Cart/test-cart-id",
+        email: String? = nil,
+        phone: String? = nil,
+        customerEmail: String? = nil,
+        customerPhone: String? = nil
+    ) -> StorefrontAPI.Cart {
+        let customer: StorefrontAPI.CartCustomer? = (customerEmail != nil || customerPhone != nil)
+            ? StorefrontAPI.CartCustomer(email: customerEmail, phone: customerPhone)
+            : nil
+
+        let buyerIdentity = StorefrontAPI.CartBuyerIdentity(
+            email: email,
+            phone: phone,
+            customer: customer
+        )
+
+        let deliveryOption = StorefrontAPI.CartDeliveryOption(
+            handle: "standard-shipping",
+            title: "Standard Shipping",
+            code: "STANDARD",
+            deliveryMethodType: .shipping,
+            description: "5-7 business days",
+            estimatedCost: StorefrontAPI.MoneyV2(amount: Decimal(5.00), currencyCode: "USD")
+        )
+
+        let deliveryGroup = StorefrontAPI.CartDeliveryGroup(
+            id: GraphQLScalars.ID("gid://shopify/CartDeliveryGroup/1"),
+            groupType: .oneTimePurchase,
+            deliveryOptions: [deliveryOption],
+            selectedDeliveryOption: nil
+        )
+
+        return StorefrontAPI.Cart(
+            id: GraphQLScalars.ID(id),
+            checkoutUrl: GraphQLScalars.URL(URL(string: "https://test-shop.myshopify.com/checkout")!),
+            totalQuantity: 1,
+            buyerIdentity: buyerIdentity,
+            deliveryGroups: StorefrontAPI.CartDeliveryGroupConnection(nodes: [deliveryGroup]),
+            delivery: nil,
+            lines: StorefrontAPI.BaseCartLineConnection(nodes: []),
+            cost: StorefrontAPI.CartCost(
+                totalAmount: StorefrontAPI.MoneyV2(amount: Decimal(100.0), currencyCode: "USD"),
                 subtotalAmount: nil,
                 totalTaxAmount: nil,
                 totalDutyAmount: nil

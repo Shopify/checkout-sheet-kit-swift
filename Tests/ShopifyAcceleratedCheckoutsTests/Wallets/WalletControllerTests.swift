@@ -73,7 +73,8 @@ final class WalletControllerTests: XCTestCase {
 
         controller = MockWalletController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         let result = try await controller.fetchCartByCheckoutIdentifier()
@@ -85,7 +86,8 @@ final class WalletControllerTests: XCTestCase {
 
         controller = MockWalletController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
@@ -108,7 +110,8 @@ final class WalletControllerTests: XCTestCase {
 
         controller = MockWalletController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
@@ -125,7 +128,8 @@ final class WalletControllerTests: XCTestCase {
 
         controller = MockWalletController(
             identifier: .variant(variantID: "gid://Shopify/ProductVariant/test-variant-id", quantity: 2),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         let result = try await controller.fetchCartByCheckoutIdentifier()
@@ -138,7 +142,8 @@ final class WalletControllerTests: XCTestCase {
 
         controller = MockWalletController(
             identifier: .variant(variantID: "gid://Shopify/ProductVariant/test-variant-id", quantity: 0),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         let result = try await controller.fetchCartByCheckoutIdentifier()
@@ -151,7 +156,8 @@ final class WalletControllerTests: XCTestCase {
 
         controller = MockWalletController(
             identifier: .variant(variantID: "gid://Shopify/ProductVariant/test-variant-id", quantity: 2),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
@@ -166,7 +172,8 @@ final class WalletControllerTests: XCTestCase {
     func test_fetchCartByCheckoutIdentifier_withInvariantIdentifier_shouldThrowError() async throws {
         controller = MockWalletController(
             identifier: .invariant(reason: "Invalid identifier"),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         await XCTAssertThrowsErrorAsync(try await controller.fetchCartByCheckoutIdentifier()) { error in
@@ -188,7 +195,8 @@ final class WalletControllerTests: XCTestCase {
     func test_present_withValidParameters_shouldSucceed() async throws {
         controller = MockWalletController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            storefront: mockStorefront
+            storefront: mockStorefront,
+            configuration: .testConfiguration
         )
 
         // Mock the top view controller

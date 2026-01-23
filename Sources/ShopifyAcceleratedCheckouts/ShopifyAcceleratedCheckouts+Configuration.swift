@@ -41,6 +41,7 @@ extension ShopifyAcceleratedCheckouts {
 
         /// Data to attach to the buyerIdentity during cart creation
         /// - Apple Pay sheet will skip requesting email/phone number fields if provided here
+        /// - Customer will *override* existing cart.buyerIdentity if you are using cartId
         ///
         /// See: https://shopify.dev/docs/api/storefront/latest/mutations/cartBuyerIdentityUpdate
         @Published public var customer: Customer?
@@ -76,6 +77,33 @@ extension ShopifyAcceleratedCheckouts {
         /// The customer access token to attribute an order to on `buyerIdentity`
         @Published public var customerAccessToken: String?
 
+        /// Creates a customer for authenticated Shopify users.
+        ///
+        /// Use this initializer when you have a customer access token from Shopify authentication.
+        /// The customer's email and phone will be fetched from their Shopify account.
+        ///
+        /// - Parameter customerAccessToken: The access token from Shopify customer authentication
+        public init(customerAccessToken: String) {
+            self.customerAccessToken = customerAccessToken
+            email = nil
+            phoneNumber = nil
+        }
+
+        /// Creates a customer for guest checkout or explicit contact override.
+        ///
+        /// Use this initializer when you want to pre-fill customer contact information
+        /// without Shopify authentication.
+        ///
+        /// - Parameters:
+        ///   - email: The customer's email address
+        ///   - phoneNumber: The customer's phone number
+        public init(email: String, phoneNumber: String) {
+            self.email = email
+            self.phoneNumber = phoneNumber
+            customerAccessToken = nil
+        }
+
+        @available(*, deprecated, message: "Use init(customerAccessToken:) for authenticated customers or init(email:phoneNumber:) for guests")
         public init(email: String?, phoneNumber: String?, customerAccessToken: String? = nil) {
             self.email = email
             self.phoneNumber = phoneNumber
