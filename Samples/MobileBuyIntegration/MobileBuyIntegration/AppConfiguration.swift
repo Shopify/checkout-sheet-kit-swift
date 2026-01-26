@@ -46,6 +46,11 @@ public final class AppConfiguration: ObservableObject {
 
     @Published public var buyerIdentityMode: BuyerIdentityMode = .guest {
         didSet {
+            if oldValue == .customerAccount, buyerIdentityMode != .customerAccount {
+                Task { @MainActor in
+                    CustomerAccountManager.shared.logout()
+                }
+            }
             UserDefaults.standard.set(buyerIdentityMode.rawValue, forKey: AppStorageKeys.buyerIdentityMode.rawValue)
             Task { @MainActor in
                 CartManager.shared.resetCart()
@@ -64,11 +69,32 @@ public final class AppConfiguration: ObservableObject {
         }
     }
 
-    // Configure ShopifyAcceleratedCheckouts
-    let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
-        storefrontDomain: InfoDictionary.shared.domain,
-        storefrontAccessToken: InfoDictionary.shared.accessToken
-    )
+    var customer: ShopifyAcceleratedCheckouts.Customer? {
+        switch buyerIdentityMode {
+        case .hardcoded:
+            return .init(
+                email: InfoDictionary.shared.email,
+                phoneNumber: InfoDictionary.shared.phone
+            )
+        case .customerAccount:
+            guard let token = KeychainHelper.shared.getTokens()?.accessToken else { return nil }
+            return .init(
+                email: nil,
+                phoneNumber: nil,
+                customerAccessToken: token
+            )
+        case .guest:
+            return nil
+        }
+    }
+
+    var acceleratedCheckoutsStorefrontConfig: ShopifyAcceleratedCheckouts.Configuration {
+        ShopifyAcceleratedCheckouts.Configuration(
+            storefrontDomain: InfoDictionary.shared.domain,
+            storefrontAccessToken: InfoDictionary.shared.accessToken,
+            customer: customer
+        )
+    }
 
     let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
         merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
