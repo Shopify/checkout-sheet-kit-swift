@@ -79,11 +79,7 @@ public final class AppConfiguration: ObservableObject {
             )
         case .customerAccount:
             guard let token = KeychainHelper.shared.getTokens()?.accessToken else { return nil }
-            return .init(
-                email: nil,
-                phoneNumber: nil,
-                customerAccessToken: token
-            )
+            return .init(customerAccessToken: token)
         case .guest:
             return nil
         }
@@ -99,7 +95,7 @@ public final class AppConfiguration: ObservableObject {
 
     let acceleratedCheckoutsApplePayConfig = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
         merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
-        contactFields: []
+        contactFields: [.email, .phone]
     )
 }
 
