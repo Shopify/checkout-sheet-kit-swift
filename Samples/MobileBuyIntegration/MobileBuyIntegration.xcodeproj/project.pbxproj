@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		2147F3E62B502AFD005546F3 /* checkout-sheet-kit-swift in Resources */ = {isa = PBXBuildFile; fileRef = 2147F3E52B502AFD005546F3 /* checkout-sheet-kit-swift */; };
 		4EA7F9B62A9D2B9D003276A1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7F9B42A9D2B9D003276A1 /* SettingsView.swift */; };
+		CB9A10012F5C100100AABBCC /* CustomerAccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9A10002F5C100100AABBCC /* CustomerAccountManager.swift */; };
+		CB9A10032F5C100200AABBCC /* CustomerAccountLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9A10022F5C100200AABBCC /* CustomerAccountLoginView.swift */; };
+		CB9A10052F5C100300AABBCC /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9A10042F5C100300AABBCC /* KeychainHelper.swift */; };
+		CB9A10072F5C100400AABBCC /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9A10062F5C100400AABBCC /* AccountView.swift */; };
 		4EBBA76B2A5F0CE200193E19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */; };
 		4EBBA76D2A5F0CE200193E19 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76C2A5F0CE200193E19 /* SceneDelegate.swift */; };
 		4EBBA76F2A5F0CE200193E19 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBBA76E2A5F0CE200193E19 /* ProductView.swift */; };
@@ -67,6 +71,10 @@
 		86250DE32AD5521C002E45C2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CB05E6BE2D4951D700466376 /* InfoDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDictionary.swift; sourceTree = "<group>"; };
 		CB05E6C32D4954E400466376 /* Storefront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefront.swift; sourceTree = "<group>"; };
+		CB9A10002F5C100100AABBCC /* CustomerAccountManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerAccountManager.swift; sourceTree = "<group>"; };
+		CB9A10022F5C100200AABBCC /* CustomerAccountLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerAccountLoginView.swift; sourceTree = "<group>"; };
+		CB9A10042F5C100300AABBCC /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		CB9A10062F5C100400AABBCC /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +137,7 @@
 				86250DE32AD5521C002E45C2 /* AppConfiguration.swift */,
 				4EBBA76A2A5F0CE200193E19 /* AppDelegate.swift */,
 				4EF54F232A6F456B00F5E407 /* CartManager.swift */,
+				CB9A100A2F5C100500AABBCC /* CustomerAccount */,
 				CB05E6BE2D4951D700466376 /* InfoDictionary.swift */,
 				CB05E6C22D4954DF00466376 /* Extensions */,
 				6A257A142AFBB06300610DA5 /* Logger.swift */,
@@ -179,6 +188,7 @@
 		CB05E6C72D4B81B200466376 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				CB9A10062F5C100400AABBCC /* AccountView.swift */,
 				6A2E77BF2CE6186F0067062D /* CartView.swift */,
 				6A2E77BD2CE606400067062D /* ProductGridView.swift */,
 				6A3467322B600E64007314A8 /* LogsView.swift */,
@@ -196,6 +206,16 @@
 				6A3393622CEF742200E89FAA /* CheckoutController.swift */,
 			);
 			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		CB9A100A2F5C100500AABBCC /* CustomerAccount */ = {
+			isa = PBXGroup;
+			children = (
+				CB9A10002F5C100100AABBCC /* CustomerAccountManager.swift */,
+				CB9A10022F5C100200AABBCC /* CustomerAccountLoginView.swift */,
+				CB9A10042F5C100300AABBCC /* KeychainHelper.swift */,
+			);
+			path = CustomerAccount;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -324,6 +344,10 @@
 				6A3467332B600E64007314A8 /* LogsView.swift in Sources */,
 				6A257A132AFBA78500610DA5 /* LogReader.swift in Sources */,
 				6A3393632CEF742500E89FAA /* CheckoutController.swift in Sources */,
+				CB9A10012F5C100100AABBCC /* CustomerAccountManager.swift in Sources */,
+				CB9A10032F5C100200AABBCC /* CustomerAccountLoginView.swift in Sources */,
+				CB9A10052F5C100300AABBCC /* KeychainHelper.swift in Sources */,
+				CB9A10072F5C100400AABBCC /* AccountView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

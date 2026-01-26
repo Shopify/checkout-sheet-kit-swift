@@ -133,6 +133,16 @@ struct CartView: View {
                         .edgesIgnoringSafeArea(.all)
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        cartManager.resetCart()
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                }
+            }
         } else {
             EmptyState()
         }

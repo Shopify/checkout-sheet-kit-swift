@@ -26,16 +26,8 @@ import WebKit
 import XCTest
 
 class CheckoutBridgeTests: XCTestCase {
-    class WKScriptMessageMock: WKScriptMessage {
-        private let _mockBody: Any
-
-        override var body: Any {
-            _mockBody
-        }
-
-        init(body: Any = "") {
-            _mockBody = body
-        }
+    struct MockScriptMessage: ScriptMessageBody {
+        let body: Any
     }
 
     func testReturnsStandardUserAgent() {
@@ -83,7 +75,7 @@ class CheckoutBridgeTests: XCTestCase {
     }
 
     func testDecodeThrowsInvalidBridgeEventWhenNonStringBody() throws {
-        let mock = WKScriptMessageMock(body: 1234)
+        let mock = MockScriptMessage(body: 1234)
 
         XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
             guard case BridgeError.invalidBridgeEvent = error else {
@@ -93,7 +85,7 @@ class CheckoutBridgeTests: XCTestCase {
     }
 
     func testDecodeThrowsInvalidBridgeEventWhenEmptyBody() throws {
-        let mock = WKScriptMessageMock(body: "")
+        let mock = MockScriptMessage(body: "")
 
         XCTAssertThrowsError(try CheckoutBridge.decode(mock)) { error in
             guard case BridgeError.invalidBridgeEvent = error else {
@@ -232,7 +224,7 @@ class CheckoutBridgeTests: XCTestCase {
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "\n", with: "")
 
-        let mock = WKScriptMessageMock(body: """
+        let mock = MockScriptMessage(body: """
         {
         	"name": "webPixels",
         	"body": "\(body)"
@@ -260,7 +252,7 @@ class CheckoutBridgeTests: XCTestCase {
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "\n", with: "")
 
-        let mock = WKScriptMessageMock(body: """
+        let mock = MockScriptMessage(body: """
         {
         	"name": "webPixels",
         	"body": "\(body)"
@@ -287,7 +279,7 @@ class CheckoutBridgeTests: XCTestCase {
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "\n", with: "")
 
-        let mock = WKScriptMessageMock(body: """
+        let mock = MockScriptMessage(body: """
         {
         	"name": "webPixels",
         	"body": "\(body)"
@@ -371,12 +363,12 @@ class CheckoutBridgeTests: XCTestCase {
             .replacingOccurrences(of: "\n", with: "")
     }
 
-    private func createErrorEventPayload(_ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
-        return WKScriptMessageMock(body: "{\"name\": \"error\",\"body\": \"\(createPayload(jsonString))\"}")
+    private func createErrorEventPayload(_ jsonString: String) -> MockScriptMessage {
+        return MockScriptMessage(body: "{\"name\": \"error\",\"body\": \"\(createPayload(jsonString))\"}")
     }
 
-    private func createEventPayload(name: String, _ jsonString: String) -> CheckoutBridgeTests.WKScriptMessageMock {
-        return WKScriptMessageMock(body: "{\"name\": \"\(name)\",\"body\": \"\(createPayload(jsonString))\"}")
+    private func createEventPayload(name: String, _ jsonString: String) -> MockScriptMessage {
+        return MockScriptMessage(body: "{\"name\": \"\(name)\",\"body\": \"\(createPayload(jsonString))\"}")
     }
 }
 

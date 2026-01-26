@@ -216,7 +216,11 @@ class CartManager: ObservableObject {
     }
 
     private func performCartCreate(items: [GraphQL.ID] = []) async throws -> Storefront.Cart {
-        let input = StorefrontInputFactory.shared.createCartInput(items)
+        var customerAccessToken: String?
+        if CustomerAccountManager.shared.isAuthenticated {
+            customerAccessToken = try? await CustomerAccountManager.shared.getValidAccessToken()
+        }
+        let input = StorefrontInputFactory.shared.createCartInput(items, customerAccessToken: customerAccessToken)
 
         let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
             $0.cartCreate(input: input) {
