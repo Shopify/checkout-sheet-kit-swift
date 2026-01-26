@@ -23,6 +23,7 @@
 
 import Foundation
 import Security
+import ShopifyCheckoutSheetKit
 
 struct OAuthTokenResult: Codable {
     let accessToken: String
@@ -53,8 +54,10 @@ struct OAuthTokenResult: Codable {
 final class KeychainHelper {
     static let shared = KeychainHelper()
 
+    private let logger = OSLogger(prefix: "Keychain", logLevel: ShopifyCheckoutSheetKit.configuration.logLevel)
     private let service = "com.shopify.mobilebuyintegration"
     private let tokensKey = "customer_account_tokens"
+    private let emailKey = "customer_account_email"
 
     private init() {}
 
@@ -120,5 +123,27 @@ final class KeychainHelper {
 
     func clearTokens() {
         delete(key: tokensKey)
+        delete(key: emailKey)
+        logger.debug("Cleared tokens and email from keychain")
+    }
+
+    func saveEmail(_ email: String?) {
+        guard let email, let data = email.data(using: .utf8) else {
+            delete(key: emailKey)
+            logger.debug("Cleared email from keychain (nil provided)")
+            return
+        }
+        save(key: emailKey, data: data)
+        logger.debug("Saved email to keychain: \(email)")
+    }
+
+    func getEmail() -> String? {
+        guard let data = read(key: emailKey) else {
+            logger.debug("No email found in keychain")
+            return nil
+        }
+        let email = String(data: data, encoding: .utf8)
+        logger.debug("Retrieved email from keychain: \(email ?? "nil")")
+        return email
     }
 }

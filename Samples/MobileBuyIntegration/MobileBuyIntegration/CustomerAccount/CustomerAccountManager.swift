@@ -23,6 +23,7 @@
 
 import CommonCrypto
 import Foundation
+import ShopifyCheckoutSheetKit
 
 enum CustomerAccountError: LocalizedError {
     case missingConfiguration
@@ -54,6 +55,7 @@ enum CustomerAccountError: LocalizedError {
 final class CustomerAccountManager: ObservableObject {
     static let shared = CustomerAccountManager()
 
+    private let logger = OSLogger(prefix: "CustomerAccount", logLevel: ShopifyCheckoutSheetKit.configuration.logLevel)
     private let shopId: String?
     private let clientId: String?
 
@@ -162,11 +164,15 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     func exchangeCodeForTokens(code: String) async throws {
+        logger.debug("Exchanging authorization code for tokens...")
+
         guard let verifier = codeVerifier else {
+            logger.error("No code verifier available")
             throw CustomerAccountError.invalidAuthorizationCode
         }
 
         guard let clientId, let redirectUri else {
+            logger.error("Missing client ID or redirect URI")
             throw CustomerAccountError.missingConfiguration
         }
 
@@ -182,6 +188,7 @@ final class CustomerAccountManager: ObservableObject {
         ]
 
         let tokens = try await performTokenRequest(body: body)
+        logger.debug("Token exchange successful, expires at: \(tokens.expiresAt)")
         KeychainHelper.shared.saveTokens(tokens)
         isAuthenticated = true
         extractEmailFromIdToken(tokens.idToken)
@@ -190,18 +197,27 @@ final class CustomerAccountManager: ObservableObject {
 
         codeVerifier = nil
         savedState = nil
+        logger.debug("Login complete, authenticated: \(isAuthenticated), email: \(customerEmail ?? "nil")")
     }
 
     func refreshAccessToken() async throws {
+        logger.debug("Starting token refresh...")
+
         guard let tokens = KeychainHelper.shared.getTokens(),
               let refreshToken = tokens.refreshToken
         else {
+            logger.error("No tokens or refresh token available")
             throw CustomerAccountError.notAuthenticated
         }
 
         guard let clientId else {
+            logger.error("Missing client ID configuration")
             throw CustomerAccountError.missingConfiguration
         }
+
+        let existingEmail = KeychainHelper.shared.getEmail()
+        let existingIdToken = tokens.idToken
+        logger.debug("Preserved existing email: \(existingEmail ?? "nil"), ID token present: \(existingIdToken != nil)")
 
         isLoading = true
         defer { isLoading = false }
@@ -213,27 +229,57 @@ final class CustomerAccountManager: ObservableObject {
         ]
 
         let newTokens = try await performTokenRequest(body: body)
-        KeychainHelper.shared.saveTokens(newTokens)
-        extractEmailFromIdToken(newTokens.idToken)
+        logger.debug("Token refresh successful, new expiry: \(newTokens.expiresAt)")
+
+        let tokensToSave = OAuthTokenResult(
+            accessToken: newTokens.accessToken,
+            refreshToken: newTokens.refreshToken ?? refreshToken,
+            expiresIn: newTokens.expiresIn,
+            idToken: newTokens.idToken ?? existingIdToken,
+            tokenType: newTokens.tokenType
+        )
+        KeychainHelper.shared.saveTokens(tokensToSave)
+        logger.debug("Saved tokens with ID token preserved: \(tokensToSave.idToken != nil)")
+
+        if let newIdToken = newTokens.idToken {
+            logger.debug("New ID token received, extracting email")
+            extractEmailFromIdToken(newIdToken)
+        } else if let existingEmail {
+            logger.debug("No new ID token, preserving existing email: \(existingEmail)")
+            customerEmail = existingEmail
+        } else if let existingIdToken {
+            logger.debug("No stored email but have original ID token, extracting...")
+            extractEmailFromIdToken(existingIdToken)
+        } else {
+            logger.error("No ID token in refresh response and no stored email or ID token")
+        }
     }
 
     func getValidAccessToken() async throws -> String {
+        logger.debug("Getting valid access token...")
+
         guard let tokens = KeychainHelper.shared.getTokens() else {
+            logger.error("No tokens available")
             throw CustomerAccountError.notAuthenticated
         }
 
         if tokens.isExpiringSoon {
+            logger.debug("Token expiring soon (expires at: \(tokens.expiresAt)), refreshing...")
             try await refreshAccessToken()
             guard let refreshedTokens = KeychainHelper.shared.getTokens() else {
+                logger.error("No tokens after refresh")
                 throw CustomerAccountError.notAuthenticated
             }
+            logger.debug("Returning refreshed access token")
             return refreshedTokens.accessToken
         }
 
+        logger.debug("Returning valid access token (expires at: \(tokens.expiresAt))")
         return tokens.accessToken
     }
 
     func logout() {
+        logger.debug("Logging out...")
         let idToken = KeychainHelper.shared.getTokens()?.idToken
 
         KeychainHelper.shared.clearTokens()
@@ -245,10 +291,12 @@ final class CustomerAccountManager: ObservableObject {
         CartManager.shared.resetCart()
 
         if let idToken {
+            logger.debug("Sending logout request to server")
             Task {
                 await performLogoutRequest(idTokenHint: idToken)
             }
         }
+        logger.debug("Logout complete")
     }
 
     private func performLogoutRequest(idTokenHint: String) async {
@@ -267,22 +315,38 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     func checkExistingSession() {
-        if let tokens = KeychainHelper.shared.getTokens() {
-            if !tokens.isExpired {
-                isAuthenticated = true
+        logger.debug("Checking existing session...")
+
+        guard let tokens = KeychainHelper.shared.getTokens() else {
+            logger.debug("No tokens found in keychain")
+            return
+        }
+
+        customerEmail = KeychainHelper.shared.getEmail()
+        logger.debug("Loaded email from keychain: \(customerEmail ?? "nil")")
+
+        if !tokens.isExpired {
+            logger.debug("Tokens valid, expires at: \(tokens.expiresAt)")
+            isAuthenticated = true
+            if customerEmail == nil {
+                logger.debug("No stored email, attempting extraction from ID token")
                 extractEmailFromIdToken(tokens.idToken)
-            } else if tokens.refreshToken != nil {
-                Task {
-                    do {
-                        try await refreshAccessToken()
-                        isAuthenticated = true
-                    } catch {
-                        logout()
-                    }
-                }
-            } else {
-                logout()
             }
+        } else if tokens.refreshToken != nil {
+            logger.debug("Access token expired, attempting refresh...")
+            Task {
+                do {
+                    try await refreshAccessToken()
+                    isAuthenticated = true
+                    logger.debug("Session restored after refresh")
+                } catch {
+                    logger.error("Refresh failed: \(error), logging out")
+                    logout()
+                }
+            }
+        } else {
+            logger.error("Token expired and no refresh token available, logging out")
+            logout()
         }
     }
 
@@ -333,10 +397,16 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     private func extractEmailFromIdToken(_ idToken: String?) {
-        guard let idToken else { return }
+        guard let idToken else {
+            logger.debug("extractEmailFromIdToken called with nil ID token")
+            return
+        }
 
         let parts = idToken.split(separator: ".")
-        guard parts.count == 3 else { return }
+        guard parts.count == 3 else {
+            logger.error("Invalid ID token format (expected 3 parts, got \(parts.count))")
+            return
+        }
 
         var payload = String(parts[1])
         while payload.count % 4 != 0 {
@@ -347,13 +417,25 @@ final class CustomerAccountManager: ObservableObject {
             .replacingOccurrences(of: "_", with: "/")
 
         guard let data = Data(base64Encoded: payload),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let email = json["email"] as? String
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         else {
+            logger.error("Failed to decode ID token payload")
             return
         }
 
+        logger.debug("ID Token payload claims:")
+        for (key, value) in json.sorted(by: { $0.key < $1.key }) {
+            logger.debug("  \(key): \(value)")
+        }
+
+        guard let email = json["email"] as? String else {
+            logger.error("No 'email' claim found in ID token")
+            return
+        }
+
+        logger.debug("Extracted email from ID token: \(email)")
         customerEmail = email
+        KeychainHelper.shared.saveEmail(email)
     }
 
     func handleCallback(url: URL) -> Bool {
@@ -386,7 +468,7 @@ final class CustomerAccountManager: ObservableObject {
             do {
                 try await exchangeCodeForTokens(code: code)
             } catch {
-                print("Failed to exchange code for tokens: \(error)")
+                logger.error("Failed to exchange code for tokens: \(error)")
             }
         }
 
