@@ -606,19 +606,34 @@ Create a configuration object that connects the accelerated checkout buttons to 
 ```swift
 import ShopifyAcceleratedCheckouts
 
+// For authenticated customers (logged in with Shopify account)
+let configuration = ShopifyAcceleratedCheckouts.Configuration(
+    storefrontDomain: "your-shop.myshopify.com",
+    storefrontAccessToken: "your-storefront-access-token",
+    customer: ShopifyAcceleratedCheckouts.Customer(
+        customerAccessToken: "customer-access-token"
+    )
+)
+
+// For guest customers (or explicit contact override)
 let configuration = ShopifyAcceleratedCheckouts.Configuration(
     storefrontDomain: "your-shop.myshopify.com",
     storefrontAccessToken: "your-storefront-access-token",
     customer: ShopifyAcceleratedCheckouts.Customer(
         email: "customer@example.com",
-        phoneNumber: "0123456789",
-        customerAccessToken: "optional-customer-access-token"
+        phoneNumber: "0123456789"
     )
 )
 ```
 
+> [!WARNING]
+> Do not provide both `customerAccessToken` and `email`/`phoneNumber` together. For authenticated customers, email and phone are fetched automatically from the Shopify account.
+
 > [!TIP]
 > Pass `nil` for `customer` when the buyer is anonymous, and update the configuration later when their details are known.
+
+> [!NOTE]
+> When using the cart ID flow, if customer contact information exists in both `config.customer` and the cart's `buyerIdentity`, the `config.customer` values take precedence.
 
 Configure Apple Pay with your merchant identifier, required contact fields, and any shipping restrictions.
 
