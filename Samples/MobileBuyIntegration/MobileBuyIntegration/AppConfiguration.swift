@@ -25,18 +25,46 @@ import Foundation
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 
+public enum BuyerIdentityMode: String, CaseIterable {
+    case guest
+    case hardcoded
+    case customerAccount
+
+    var displayName: String {
+        switch self {
+        case .guest: return "Guest"
+        case .hardcoded: return "Hardcoded"
+        case .customerAccount: return "Customer Account"
+        }
+    }
+}
+
 public final class AppConfiguration: ObservableObject {
     public var storefrontDomain: String = InfoDictionary.shared.domain
 
     @Published public var universalLinks = UniversalLinks()
 
-    /// Prefill buyer information
-    @Published public var useVaultedState: Bool = false
+    @Published public var buyerIdentityMode: BuyerIdentityMode = .guest {
+        didSet {
+            UserDefaults.standard.set(buyerIdentityMode.rawValue, forKey: AppStorageKeys.buyerIdentityMode.rawValue)
+            Task { @MainActor in
+                CartManager.shared.resetCart()
+            }
+        }
+    }
 
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
 
     /// Configure ShopifyAcceleratedCheckouts
+    init() {
+        if let savedMode = UserDefaults.standard.string(forKey: AppStorageKeys.buyerIdentityMode.rawValue),
+           let mode = BuyerIdentityMode(rawValue: savedMode)
+        {
+            buyerIdentityMode = mode
+        }
+    }
+
     let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: InfoDictionary.shared.domain,
         storefrontAccessToken: InfoDictionary.shared.accessToken

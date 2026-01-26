@@ -88,6 +88,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func subscribeToColorSchemeChanges() {
         // Subscribe to color scheme changes on the settings screen
         NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(navigateToAccountTab), name: .navigateToAccount, object: nil)
+    }
+
+    @objc private func navigateToAccountTab() {
+        navigateTo(.account)
     }
 
     private func setupControllers() {
@@ -319,6 +324,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 extension Notification.Name {
     static let colorSchemeChanged = Notification.Name("colorSchemeChanged")
+    static let navigateToAccount = Notification.Name("navigateToAccount")
 }
 
 extension Configuration.ColorScheme {
