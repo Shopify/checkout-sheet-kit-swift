@@ -224,18 +224,26 @@ struct BuyerIdentityDetails: View {
         case .customerAccount:
             if customerAccountManager.isAuthenticated {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("User: \(customerAccountManager.customerEmail ?? "Unknown")")
-                        .foregroundStyle(.secondary)
-                    if let expiresAt = expiresAtFormatted {
-                        Text("Expires: \(expiresAt)")
+                    Text("Changing Buyer Identity will log you out.")
+                        .foregroundStyle(.yellow)
+                        .padding(.bottom, 4)
+
+                    HStack {
+                        Text("User: \(customerAccountManager.customerEmail ?? "Unknown")")
                             .foregroundStyle(.secondary)
+
+                        Button("Change user") {
+                            NotificationCenter.default.post(name: .navigateToAccount, object: nil)
+                        }
+                        .foregroundStyle(.tint)
                     }
-                    Button("Change user") {
-                        NotificationCenter.default.post(name: .navigateToAccount, object: nil)
+
+                    if let expiresAt = expiresAtFormatted {
+                        Text("Expires: \(expiresAt)").foregroundStyle(.secondary)
                     }
-                    .foregroundStyle(.tint)
                 }
                 .font(.caption)
+
             } else {
                 HStack(spacing: 4) {
                     Text("Sign in on the")
