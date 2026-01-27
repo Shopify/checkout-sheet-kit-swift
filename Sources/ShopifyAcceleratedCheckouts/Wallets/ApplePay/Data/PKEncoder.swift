@@ -262,7 +262,7 @@ class PKEncoder {
             if let phone = contact?.phoneNumber {
                 return phone.stringValue
             }
-            return try? phoneNumber.get()
+            return try? self.phone.get()
         }()
 
         return .success(
@@ -306,29 +306,37 @@ class PKEncoder {
         )
     }
 
-    var phoneNumber: Result<String, ShopifyAcceleratedCheckouts.Error> {
-        if let phoneNumber = configuration.common.customer?.phoneNumber, !phoneNumber.isEmpty {
-            if let biPhone = cart()?.buyerIdentity?.customer?.phone ?? cart()?.buyerIdentity?.phone,
-               !biPhone.isEmpty, biPhone != phoneNumber
+    var phone: Result<String, ShopifyAcceleratedCheckouts.Error> {
+        let cart = cart()
+
+        if
+            let customerPhone = configuration.common.customer?.phoneNumber,
+            !customerPhone.isEmpty
+        {
+            if
+                let buyerIdentity = cart?.buyerIdentity,
+                let biPhone = buyerIdentity.customer?.phone ?? buyerIdentity.phone,
+                !biPhone.isEmpty,
+                biPhone != customerPhone
             {
                 OSLogger.shared.info("config.customer.phoneNumber overrides buyerIdentity phone")
             }
-            return .success(phoneNumber)
+            return .success(customerPhone)
         }
 
-        if let phoneNumber = cart()?.buyerIdentity?.customer?.phone, !phoneNumber.isEmpty {
-            return .success(phoneNumber)
+        if let phone = cart?.buyerIdentity?.customer?.phone, !phone.isEmpty {
+            return .success(phone)
         }
 
-        if let phoneNumber = cart()?.buyerIdentity?.phone, !phoneNumber.isEmpty {
-            return .success(phoneNumber)
+        if let phone = cart?.buyerIdentity?.phone, !phone.isEmpty {
+            return .success(phone)
         }
 
         if let contact = try? shippingContact.get(),
-           let phoneNumber = contact.phoneNumber?.stringValue,
-           !phoneNumber.isEmpty
+           let phone = contact.phoneNumber?.stringValue,
+           !phone.isEmpty
         {
-            return .success(phoneNumber)
+            return .success(phone)
         }
 
         return .failure(.invariant(expected: "phoneNumber"))
@@ -336,20 +344,25 @@ class PKEncoder {
 
     typealias Email = String
     var email: Result<Email, ShopifyAcceleratedCheckouts.Error> {
-        if let email = configuration.common.customer?.email, !email.isEmpty {
-            if let biEmail = cart()?.buyerIdentity?.customer?.email ?? cart()?.buyerIdentity?.email,
-               !biEmail.isEmpty, biEmail != email
+        let cart = cart()
+
+        if let customerEmail = configuration.common.customer?.email, !customerEmail.isEmpty {
+            if
+                let buyerIdentity = cart?.buyerIdentity,
+                let biEmail = buyerIdentity.customer?.email ?? buyerIdentity.email,
+                !biEmail.isEmpty,
+                biEmail != customerEmail
             {
                 OSLogger.shared.info("config.customer.email overrides buyerIdentity email")
             }
+            return .success(customerEmail)
+        }
+
+        if let email = cart?.buyerIdentity?.customer?.email, !email.isEmpty {
             return .success(email)
         }
 
-        if let email = cart()?.buyerIdentity?.customer?.email, !email.isEmpty {
-            return .success(email)
-        }
-
-        if let email = cart()?.buyerIdentity?.email, !email.isEmpty {
+        if let email = cart?.buyerIdentity?.email, !email.isEmpty {
             return .success(email)
         }
 

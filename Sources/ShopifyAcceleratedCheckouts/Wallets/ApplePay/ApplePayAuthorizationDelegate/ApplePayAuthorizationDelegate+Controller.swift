@@ -194,7 +194,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     id: cartID,
                     input: .init(
                         email: try? pkEncoder.email.get(),
-                        phoneNumber: try? pkEncoder.phoneNumber.get(),
+                        phoneNumber: try? pkEncoder.phone.get(),
                         customerAccessToken: configuration.common.customer?.customerAccessToken
                     )
                 )
