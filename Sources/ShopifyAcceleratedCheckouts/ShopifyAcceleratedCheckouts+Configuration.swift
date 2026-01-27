@@ -103,7 +103,7 @@ extension ShopifyAcceleratedCheckouts {
             customerAccessToken = nil
         }
 
-        @available(*, deprecated, message: "Use init(customerAccessToken:) for authenticated customers or init(email:phoneNumber:) for guests")
+        @available(*, deprecated, message: "Use init(customerAccessToken:) for customer accounts or init(email:phoneNumber:) for other users.")
         public init(email: String?, phoneNumber: String?, customerAccessToken: String? = nil) {
             self.email = email
             self.phoneNumber = phoneNumber
