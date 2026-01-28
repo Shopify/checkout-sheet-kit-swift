@@ -23,8 +23,8 @@
 
 @preconcurrency import Buy
 import Combine
-import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyAcceleratedCheckouts
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
 
@@ -533,7 +533,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 }
 
-extension CartViewController: CheckoutDelegate {
+extension CartViewController: @preconcurrency CheckoutDelegate {
     func checkoutDidComplete(event: ShopifyCheckoutSheetKit.CheckoutCompletedEvent) {
         resetCart()
 

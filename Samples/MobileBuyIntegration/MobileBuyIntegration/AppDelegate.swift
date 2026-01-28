@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyAcceleratedCheckouts
+@preconcurrency import ShopifyCheckoutSheetKit
 import UIKit
 
 func getLogLevel(key: String) -> LogLevel {

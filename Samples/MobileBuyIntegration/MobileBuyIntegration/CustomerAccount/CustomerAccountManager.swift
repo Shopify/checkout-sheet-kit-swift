@@ -23,7 +23,7 @@
 
 import CommonCrypto
 import Foundation
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyCheckoutSheetKit
 
 enum CustomerAccountError: LocalizedError {
     case missingConfiguration
