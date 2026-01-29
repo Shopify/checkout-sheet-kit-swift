@@ -23,9 +23,8 @@
 
 import Contacts
 import PassKit
-import XCTest
-
 @testable import ShopifyAcceleratedCheckouts
+import XCTest
 
 @available(iOS 17.0, *)
 class PKEncoderTests: XCTestCase {

@@ -208,7 +208,7 @@ final class ApplePayIntegrationTests: XCTestCase {
     // MARK: - New Delegate Method Integration Tests
 
     @MainActor
-    func testCheckoutDidClickLinkDelegateIntegration() async {
+    func testCheckoutDidClickLinkDelegateIntegration() async throws {
         var callbackInvoked = false
         var receivedURL: URL?
 
@@ -222,7 +222,7 @@ final class ApplePayIntegrationTests: XCTestCase {
             receivedURL = url
         }
 
-        let testURL = URL(string: "https://help.shopify.com/payment-terms")!
+        let testURL = try XCTUnwrap(URL(string: "https://help.shopify.com/payment-terms"))
         viewController.checkoutDidClickLink(url: testURL)
 
         // Wait for the async callback to complete
@@ -233,7 +233,7 @@ final class ApplePayIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testCheckoutDidEmitWebPixelEventDelegateIntegration() async {
+    func testCheckoutDidEmitWebPixelEventDelegateIntegration() {
         let viewController = ApplePayViewController(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart"),
             configuration: mockConfiguration

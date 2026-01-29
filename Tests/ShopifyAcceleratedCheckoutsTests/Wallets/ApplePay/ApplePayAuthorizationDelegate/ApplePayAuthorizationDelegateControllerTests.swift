@@ -23,10 +23,9 @@
 
 import Contacts
 import PassKit
+@testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import XCTest
-
-@testable import ShopifyAcceleratedCheckouts
 
 @available(iOS 17.0, *)
 @MainActor
@@ -62,7 +61,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
 
     // MARK: - Shipping Method Selection Logic Tests
 
-    func test_didSelectShippingMethod_withValidShippingMethod_shouldCompleteSuccessfully() async throws {
+    func test_didSelectShippingMethod_withValidShippingMethod_shouldCompleteSuccessfully() async {
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = "standard-shipping"
         shippingMethod.label = "Standard Shipping"
@@ -78,7 +77,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result.paymentSummaryItems, "Should have payment summary items")
     }
 
-    func test_didSelectShippingMethod_withFallbackLogic_shouldHandleInvalidMethods() async throws {
+    func test_didSelectShippingMethod_withFallbackLogic_shouldHandleInvalidMethods() async {
         let invalidMethod = PKShippingMethod()
         invalidMethod.identifier = "non-existent-method"
         invalidMethod.label = "Invalid Method"
@@ -112,7 +111,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
 
     // MARK: - Shipping Contact Update Logic Tests
 
-    func test_didSelectShippingContact_shouldClearShippingMethodsAndUpdateAddress() async throws {
+    func test_didSelectShippingContact_shouldClearShippingMethodsAndUpdateAddress() async {
         let contact = PKContact()
         contact.postalAddress = createPostalAddress()
 
@@ -125,7 +124,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result.shippingMethods, "Should have shipping methods array")
     }
 
-    func test_didSelectShippingContact_withCartStatePreservation_shouldHandleStateCorrectly() async throws {
+    func test_didSelectShippingContact_withCartStatePreservation_shouldHandleStateCorrectly() async {
         let contact = PKContact()
         contact.postalAddress = createPostalAddress()
 
@@ -372,7 +371,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(MockURLProtocol.lastOperation)
     }
 
-    func test_upsertShippingAddress_errorHandlingStrategy_shouldHandleRemoveFailures() async throws {
+    func test_upsertShippingAddress_errorHandlingStrategy_shouldHandleRemoveFailures() async {
         let address = StorefrontAPI.Address(
             address1: "123 Test Street",
             city: "Test City",
@@ -406,7 +405,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         return decoder
     }
 
-    func test_didSelectShippingMethod_whenMethodIsValid_shouldRetainSelection() async throws {
+    func test_didSelectShippingMethod_whenMethodIsValid_shouldRetainSelection() async {
         let valid = PKShippingMethod()
         valid.identifier = "valid-method"
         let other = PKShippingMethod()
@@ -424,7 +423,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertFalse(delegate.pkDecoder.paymentSummaryItems.isEmpty)
     }
 
-    func test_didSelectShippingMethod_whenMethodIsInvalid_shouldNotSetShippingMethod() async throws {
+    func test_didSelectShippingMethod_whenMethodIsInvalid_shouldNotSetShippingMethod() async {
         let firstAvailable = PKShippingMethod()
         firstAvailable.identifier = "first-available"
 
@@ -443,7 +442,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertEqual(result.status, .failure, "Should return failure status for invalid method")
     }
 
-    func test_didSelectShippingMethod_whenNoMethodsAvailable_shouldNotSetShippingMethod() async throws {
+    func test_didSelectShippingMethod_whenNoMethodsAvailable_shouldNotSetShippingMethod() async {
         let selected = PKShippingMethod()
         selected.identifier = "only-method"
 
@@ -459,7 +458,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertEqual(result.status, .failure, "Should return failure status when no methods available")
     }
 
-    func test_didSelectShippingMethod_withSelectedDeliveryOptionHandleError_shouldReturnFailureStatus() async throws {
+    func test_didSelectShippingMethod_withSelectedDeliveryOptionHandleError_shouldReturnFailureStatus() async {
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = nil
         shippingMethod.label = "Method Without ID"
@@ -473,7 +472,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
     }
 
-    func test_didSelectShippingMethod_withDeliveryGroupIDError_shouldReturnFailureStatus() async throws {
+    func test_didSelectShippingMethod_withDeliveryGroupIDError_shouldReturnFailureStatus() async {
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = "nonexistent-delivery-group"
         shippingMethod.label = "Invalid Delivery Group Method"
@@ -487,7 +486,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
     }
 
-    func test_didSelectShippingMethod_withCartSelectedDeliveryOptionsUpdateError_shouldReturnFailureStatus() async throws {
+    func test_didSelectShippingMethod_withCartSelectedDeliveryOptionsUpdateError_shouldReturnFailureStatus() async {
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = "standard-shipping"
         shippingMethod.label = "Standard Shipping"
@@ -504,7 +503,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
     }
 
-    func test_didSelectShippingMethod_withCartPrepareForCompletionError_shouldReturnFailureStatus() async throws {
+    func test_didSelectShippingMethod_withCartPrepareForCompletionError_shouldReturnFailureStatus() async {
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = "standard-shipping"
         shippingMethod.label = "Standard Shipping"
@@ -521,7 +520,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertNotNil(result.paymentSummaryItems, "Should still return payment summary items")
     }
 
-    func test_didSelectShippingMethod_withMappableCartUserError_shouldMaintainSuccessStatus() async throws {
+    func test_didSelectShippingMethod_withMappableCartUserError_shouldMaintainSuccessStatus() async {
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = "standard-shipping"
         shippingMethod.label = "Standard Shipping"
@@ -541,7 +540,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         XCTAssertTrue(result.errors.isEmpty, "Should not errors")
     }
 
-    func test_didSelectShippingMethod_withSetCartError_shouldReturnFailureStatus() async throws {
+    func test_didSelectShippingMethod_withSetCartError_shouldReturnFailureStatus() async {
         let shippingMethod = PKShippingMethod()
         shippingMethod.identifier = "standard-shipping"
         shippingMethod.label = "Standard Shipping"
@@ -659,8 +658,14 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
             }
         }
 
-        override class func canInit(with _: URLRequest) -> Bool { true }
-        override class func canonicalRequest(for req: URLRequest) -> URLRequest { req }
+        override class func canInit(with _: URLRequest) -> Bool {
+            true
+        }
+
+        override class func canonicalRequest(for req: URLRequest) -> URLRequest {
+            req
+        }
+
         override func startLoading() {
             let bodyStr = request.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? ""
             let ops = ["cartDeliveryAddressesAdd", "cartDeliveryAddressesRemove", "cartSelectedDeliveryOptionsUpdate", "cartPrepareForCompletion"]

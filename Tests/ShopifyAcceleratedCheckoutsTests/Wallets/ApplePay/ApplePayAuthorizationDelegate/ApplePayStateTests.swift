@@ -63,10 +63,10 @@ final class ApplePayStateTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .reset), "Should not allow appleSheetPresented -> reset")
     }
 
-    func test_canTransition_fromPaymentAuthorizedState_shouldAllowCartSubmissionAndFailureAndInterrupt() {
+    func test_canTransition_fromPaymentAuthorizedState_shouldAllowCartSubmissionAndFailureAndInterrupt() throws {
         let fromState = ApplePayState.paymentAuthorized(payment: .createMockPayment())
 
-        XCTAssertTrue(fromState.canTransition(to: ApplePayState.cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!)), "Should allow paymentAuthorized -> cartSubmittedForCompletion")
+        XCTAssertTrue(try fromState.canTransition(to: ApplePayState.cartSubmittedForCompletion(redirectURL: XCTUnwrap(URL(string: "https://example.com")))), "Should allow paymentAuthorized -> cartSubmittedForCompletion")
         XCTAssertTrue(fromState.canTransition(to: ApplePayState.paymentAuthorizationFailed(error: MockError.testError)), "Should allow paymentAuthorized -> paymentAuthorizationFailed")
         XCTAssertTrue(fromState.canTransition(to: ApplePayState.interrupt(reason: .currencyChanged)), "Should allow paymentAuthorized -> interrupt")
 
@@ -87,8 +87,8 @@ final class ApplePayStateTests: XCTestCase {
         XCTAssertFalse(fromState.canTransition(to: .appleSheetPresented), "Should not allow paymentAuthorizationFailed -> appleSheetPresented")
     }
 
-    func test_canTransition_fromCartSubmittedForCompletionState_shouldAllowOnlyCompleted() {
-        let fromState = ApplePayState.cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!)
+    func test_canTransition_fromCartSubmittedForCompletionState_shouldAllowOnlyCompleted() throws {
+        let fromState = try ApplePayState.cartSubmittedForCompletion(redirectURL: XCTUnwrap(URL(string: "https://example.com")))
 
         XCTAssertTrue(fromState.canTransition(to: .completed), "Should allow cartSubmittedForCompletion -> completed")
 
@@ -163,14 +163,14 @@ final class ApplePayStateTests: XCTestCase {
 
     // MARK: - Error State Transition Tests
 
-    func test_canTransition_fromAnyState_shouldAllowErrorStates() {
-        let allStates: [ApplePayState] = [
+    func test_canTransition_fromAnyState_shouldAllowErrorStates() throws {
+        let allStates: [ApplePayState] = try [
             .idle,
             .startPaymentRequest,
             .appleSheetPresented,
             .paymentAuthorized(payment: .createMockPayment()),
             .paymentAuthorizationFailed(error: MockError.testError),
-            .cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!),
+            .cartSubmittedForCompletion(redirectURL: XCTUnwrap(URL(string: "https://example.com"))),
             .interrupt(reason: .currencyChanged),
             .unexpectedError(error: MockError.testError),
             .terminalError(error: MockError.testError),
@@ -193,12 +193,12 @@ final class ApplePayStateTests: XCTestCase {
 
     // MARK: - End-to-End Flow Tests
 
-    func test_canTransition_throughTypicalSuccessFlow_shouldAllowAllTransitions() {
+    func test_canTransition_throughTypicalSuccessFlow_shouldAllowAllTransitions() throws {
         XCTAssertTrue(ApplePayState.idle.canTransition(to: .startPaymentRequest))
         XCTAssertTrue(ApplePayState.startPaymentRequest.canTransition(to: .appleSheetPresented))
         XCTAssertTrue(ApplePayState.appleSheetPresented.canTransition(to: .paymentAuthorized(payment: .createMockPayment())))
-        XCTAssertTrue(ApplePayState.paymentAuthorized(payment: .createMockPayment()).canTransition(to: .cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!)))
-        XCTAssertTrue(ApplePayState.cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!).canTransition(to: .completed))
+        XCTAssertTrue(try ApplePayState.paymentAuthorized(payment: .createMockPayment()).canTransition(to: .cartSubmittedForCompletion(redirectURL: XCTUnwrap(URL(string: "https://example.com")))))
+        XCTAssertTrue(try ApplePayState.cartSubmittedForCompletion(redirectURL: XCTUnwrap(URL(string: "https://example.com"))).canTransition(to: .completed))
         XCTAssertTrue(ApplePayState.completed.canTransition(to: .presentingCSK(url: URL(string: "https://example.com"))))
         XCTAssertTrue(ApplePayState.presentingCSK(url: URL(string: "https://example.com")).canTransition(to: .completed))
         XCTAssertTrue(ApplePayState.completed.canTransition(to: .reset))
@@ -237,14 +237,14 @@ final class ApplePayStateTests: XCTestCase {
 
     // MARK: - Edge Case Tests
 
-    func test_canTransition_withSelfTransition_shouldRejectForNonErrorStates() {
-        let nonErrorStates: [ApplePayState] = [
+    func test_canTransition_withSelfTransition_shouldRejectForNonErrorStates() throws {
+        let nonErrorStates: [ApplePayState] = try [
             .idle,
             .startPaymentRequest,
             .appleSheetPresented,
             .paymentAuthorized(payment: .createMockPayment()),
             .paymentAuthorizationFailed(error: MockError.testError),
-            .cartSubmittedForCompletion(redirectURL: URL(string: "https://example.com")!),
+            .cartSubmittedForCompletion(redirectURL: XCTUnwrap(URL(string: "https://example.com"))),
             .interrupt(reason: .currencyChanged),
             .presentingCSK(url: URL(string: "https://example.com")),
             .completed,

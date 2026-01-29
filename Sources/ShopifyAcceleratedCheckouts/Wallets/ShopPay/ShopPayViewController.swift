@@ -73,7 +73,7 @@ extension ShopPayViewController: CheckoutDelegate {
     }
 
     func checkoutDidCancel() {
-        /// x right button on CSK doesn't dismiss automatically
+        // x right button on CSK doesn't dismiss automatically
         checkoutViewController?.dismiss(animated: true)
         eventHandlers.checkoutDidCancel?()
     }

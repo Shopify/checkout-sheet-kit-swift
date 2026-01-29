@@ -106,13 +106,15 @@ class CheckoutViewDelegateTests: XCTestCase {
         XCTAssertFalse(viewController.checkoutView.isRecovery)
     }
 
-    func testDoesNotInstantiateRecoveryForMultipassURL() {
-        let controller = MockCheckoutWebViewController(
-            checkoutURL: URL(string: "https://checkout-sdk.myshopify.com/account/login/multipass/token")!, delegate: delegate
+    func testDoesNotInstantiateRecoveryForMultipassURL() throws {
+        let controller = try MockCheckoutWebViewController(
+            checkoutURL: XCTUnwrap(URL(string: "https://checkout-sdk.myshopify.com/account/login/multipass/token")), delegate: delegate
         )
 
-        controller.checkoutViewDidFailWithError(error:
-            .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: true))
+        controller.checkoutViewDidFailWithError(
+            error:
+            .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: true)
+        )
 
         XCTAssertFalse(controller.checkoutView.isRecovery)
     }
@@ -151,50 +153,50 @@ class CheckoutViewDelegateTests: XCTestCase {
         XCTAssertEqual(one, three)
     }
 
-    func testPresentationControllerDidDismissInvalidatesViewCache() {
+    func testPresentationControllerDidDismissInvalidatesViewCache() throws {
         let one = CheckoutWebView.for(checkout: checkoutURL)
         let two = CheckoutWebView.for(checkout: checkoutURL)
         XCTAssertEqual(one, two)
 
-        let presentationController = UIViewController().presentationController!
+        let presentationController = try XCTUnwrap(UIViewController().presentationController)
         viewController.presentationControllerDidDismiss(presentationController)
 
         let three = CheckoutWebView.for(checkout: checkoutURL)
         XCTAssertNotEqual(two, three)
     }
 
-    func testPresentationControllerDidDismissSavesCacheWhenActivatedByClient() {
+    func testPresentationControllerDidDismissSavesCacheWhenActivatedByClient() throws {
         CheckoutWebView.preloadingActivatedByClient = true
         let one = CheckoutWebView.for(checkout: checkoutURL)
         let two = CheckoutWebView.for(checkout: checkoutURL)
         XCTAssertEqual(one, two)
 
-        let presentationController = UIViewController().presentationController!
+        let presentationController = try XCTUnwrap(UIViewController().presentationController)
         viewController.presentationControllerDidDismiss(presentationController)
 
         let three = CheckoutWebView.for(checkout: checkoutURL)
         XCTAssertEqual(one, three)
     }
 
-    func testCheckoutViewDidClickLinkDoesNotInvalidateViewCache() {
+    func testCheckoutViewDidClickLinkDoesNotInvalidateViewCache() throws {
         let one = CheckoutWebView.for(checkout: checkoutURL)
         let two = CheckoutWebView.for(checkout: checkoutURL)
         XCTAssertEqual(one, two)
 
-        viewController.checkoutViewDidClickLink(url: URL(string: "https://shopify.com/anything")!)
+        try viewController.checkoutViewDidClickLink(url: XCTUnwrap(URL(string: "https://shopify.com/anything")))
 
         let three = CheckoutWebView.for(checkout: checkoutURL)
         XCTAssertEqual(two, three)
     }
 
-    func testCheckoutViewDidToggleModalAddsAndRemovesNavigationBar() {
-        XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
+    func testCheckoutViewDidToggleModalAddsAndRemovesNavigationBar() throws {
+        XCTAssertFalse(try XCTUnwrap(viewController.navigationController?.isNavigationBarHidden))
 
         viewController.checkoutViewDidToggleModal(modalVisible: true)
-        XCTAssertTrue(viewController.navigationController!.isNavigationBarHidden)
+        XCTAssertTrue(try XCTUnwrap(viewController.navigationController?.isNavigationBarHidden))
 
         viewController.checkoutViewDidToggleModal(modalVisible: false)
-        XCTAssertFalse(viewController.navigationController!.isNavigationBarHidden)
+        XCTAssertFalse(try XCTUnwrap(viewController.navigationController?.isNavigationBarHidden))
     }
 
     func testCheckoutViewDidStartNavigationShowsProgressBar() {

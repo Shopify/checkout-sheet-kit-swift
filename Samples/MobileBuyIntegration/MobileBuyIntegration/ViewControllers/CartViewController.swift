@@ -57,13 +57,13 @@ class CartItemCell: UITableViewCell {
     }
 
     private func setupViews() {
-        /// Title stack config
+        // Title stack config
         labelStackView.axis = .vertical
         labelStackView.alignment = .leading
         labelStackView.spacing = 4
         labelStackView.translatesAutoresizingMaskIntoConstraints = false
 
-        /// Quantity stack config
+        // Quantity stack config
         quantityStackView.axis = .horizontal
         quantityStackView.alignment = .center
         quantityStackView.spacing = 8
@@ -74,15 +74,15 @@ class CartItemCell: UITableViewCell {
         vendorLabel.textColor = .systemBlue
         vendorLabel.font = UIFont.systemFont(ofSize: 12)
 
-        /// Title / vendor
+        // Title / vendor
         labelStackView.addArrangedSubview(titleLabel)
         labelStackView.addArrangedSubview(vendorLabel)
 
-        /// Configure spinner
+        // Configure spinner
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.hidesWhenStopped = true
 
-        /// Quantity controls
+        // Quantity controls
         quantityStackView.addArrangedSubview(decreaseButton)
         quantityStackView.addArrangedSubview(activityIndicator)
         quantityStackView.addArrangedSubview(quantityLabel)
@@ -452,15 +452,15 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell = CartItemCell()
         cell.configure(with: variant, quantity: node.quantity)
         cell.onQuantityChange = { quantity in
-            /// Display loading state on row + disable checkout button
+            // Display loading state on row + disable checkout button
             cell.showLoading(true)
             self.checkoutButton.isEnabled = false
             self.setupCheckoutButtonContent() // Update button appearance for disabled state
 
-            /// Invalidate checkout cache to ensure correct number of items are shown on checkout
+            // Invalidate checkout cache to ensure correct number of items are shown on checkout
             ShopifyCheckoutSheetKit.invalidate()
 
-            /// Update cart quantities
+            // Update cart quantities
             _Concurrency.Task {
                 let cart = try await CartManager.shared.performCartLinesUpdate(id: node.id, quantity: quantity)
 
@@ -553,23 +553,23 @@ extension CartViewController: CheckoutDelegate {
     func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
         var errorMessage = ""
 
-        /// Internal Checkout SDK error
+        // Internal Checkout SDK error
         if case let .sdkError(underlying, _) = error {
             errorMessage = "\(underlying.localizedDescription)"
         }
 
-        /// Checkout unavailable error
+        // Checkout unavailable error
         if case let .checkoutUnavailable(message, code, _) = error {
             errorMessage = message
             handleCheckoutUnavailable(message, code)
         }
 
-        /// Storefront configuration error
+        // Storefront configuration error
         if case let .configurationError(message, _, _) = error {
             errorMessage = message
         }
 
-        /// Checkout has expired, re-create cart to fetch a new checkout URL
+        // Checkout has expired, re-create cart to fetch a new checkout URL
         if case let .checkoutExpired(message, _, _) = error {
             errorMessage = message
         }
@@ -620,7 +620,7 @@ extension CartViewController {
     }
 }
 
-// analytics examples
+/// analytics examples
 extension CartViewController {
     private func mapToGenericEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
         return AnalyticsEvent(
@@ -664,7 +664,7 @@ extension CartViewController {
     }
 }
 
-// example type, e.g. that may be defined by an analytics sdk
+/// example type, e.g. that may be defined by an analytics sdk
 struct AnalyticsEvent: Codable {
     var name = ""
     var userId = ""

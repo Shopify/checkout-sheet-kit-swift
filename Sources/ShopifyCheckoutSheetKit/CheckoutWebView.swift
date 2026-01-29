@@ -131,17 +131,17 @@ class CheckoutWebView: WKWebView {
 
     init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), recovery: Bool = false, entryPoint: MetaData.EntryPoint? = nil) {
         OSLogger.shared.debug("Initializing webview, recovery: \(recovery)")
-        /// Some external payment providers require ID verification which trigger the camera
-        /// This configuration option prevents the camera from opening as a "Live Broadcast".
+        // Some external payment providers require ID verification which trigger the camera
+        // This configuration option prevents the camera from opening as a "Live Broadcast".
         configuration.allowsInlineMediaPlayback = true
         self.entryPoint = entryPoint
 
         if recovery {
-            /// Uses a non-persistent, private cookie store to avoid cross-instance pollution
+            // Uses a non-persistent, private cookie store to avoid cross-instance pollution
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
             configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent(entryPoint: entryPoint)
         } else {
-            /// Set the User-Agent in non-recovery view
+            // Set the User-Agent in non-recovery view
             configuration.applicationNameForUserAgent = CheckoutBridge.applicationName(entryPoint: entryPoint)
         }
 
@@ -251,11 +251,11 @@ extension CheckoutWebView: WKScriptMessageHandler {
     func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         do {
             switch try CheckoutBridge.decode(message) {
-            /// Completed event
+            // Completed event
             case let .checkoutComplete(checkoutCompletedEvent):
                 OSLogger.shared.info("Checkout completed event received")
                 viewDelegate?.checkoutViewDidCompleteCheckout(event: checkoutCompletedEvent)
-            /// Error: Checkout unavailable
+            // Error: Checkout unavailable
             case let .checkoutUnavailable(message, code):
                 OSLogger.shared.error("Checkout unavailable error received: \(message ?? "No message"), code: \(code)")
                 viewDelegate?.checkoutViewDidFailWithError(
@@ -265,7 +265,7 @@ extension CheckoutWebView: WKScriptMessageHandler {
                         recoverable: true
                     )
                 )
-            /// Error: Storefront not configured properly
+            // Error: Storefront not configured properly
             case let .configurationError(message, code):
                 OSLogger.shared.error("Configuration error received: \(message ?? "No message"), code: \(code)")
                 viewDelegate?.checkoutViewDidFailWithError(error: .checkoutUnavailable(
@@ -273,14 +273,14 @@ extension CheckoutWebView: WKScriptMessageHandler {
                     code: CheckoutUnavailable.clientError(code: code),
                     recoverable: false
                 ))
-            /// Error: Checkout expired
+            // Error: Checkout expired
             case let .checkoutExpired(message, code):
                 OSLogger.shared.info("Checkout expired error received: \(message ?? "No message"), code: \(code)")
                 viewDelegate?.checkoutViewDidFailWithError(error: .checkoutExpired(message: message ?? "Checkout has expired.", code: code))
-            /// Checkout modal toggled
+            // Checkout modal toggled
             case let .checkoutModalToggled(modalVisible):
                 viewDelegate?.checkoutViewDidToggleModal(modalVisible: modalVisible)
-            /// Checkout web pixel event
+            // Checkout web pixel event
             case let .webPixels(event):
                 if let nonOptionalEvent = event {
                     viewDelegate?.checkoutViewDidEmitWebPixelEvent(event: nonOptionalEvent)
@@ -333,7 +333,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         if statusCode >= 400 {
-            /// Invalidate cache for any sort of error
+            // Invalidate cache for any sort of error
             CheckoutWebView.invalidate()
 
             OSLogger.shared.debug("Handling response for URL: \(response.url?.absoluteString ?? "unknown URL"), status code: \(statusCode)")
@@ -366,7 +366,8 @@ extension CheckoutWebView: WKNavigationDelegate {
                         message: errorMessageForStatusCode,
                         code: CheckoutUnavailable.httpError(statusCode: statusCode),
                         recoverable: false
-                    ))
+                    )
+                )
             }
 
             return .cancel
@@ -407,7 +408,8 @@ extension CheckoutWebView: WKNavigationDelegate {
                         value: Int(diff * 1000),
                         type: .histogram,
                         tags: ["preloading": preload]
-                    ))
+                    )
+                )
             }
         }
         checkoutDidLoad = true
@@ -421,7 +423,7 @@ extension CheckoutWebView: WKNavigationDelegate {
 
         OSLogger.shared.debug("WebView navigation failed with error: description:\(nsError.localizedDescription) domain:\(nsError.domain) code:\(nsError.code)")
 
-        /// Ignore cancelled redirects
+        // Ignore cancelled redirects
         if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
             OSLogger.shared.debug("Ignoring cancelled URL redirect. code:NSURLErrorCancelled")
             return

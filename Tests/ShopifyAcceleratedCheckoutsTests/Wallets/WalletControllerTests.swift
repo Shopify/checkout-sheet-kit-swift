@@ -57,7 +57,10 @@ final class WalletControllerTests: XCTestCase {
         func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
         func checkoutDidFail(error _: CheckoutError) {}
         func checkoutDidCancel() {}
-        func shouldRecoverFromError(error: CheckoutError) -> Bool { return error.isRecoverable }
+        func shouldRecoverFromError(error: CheckoutError) -> Bool {
+            return error.isRecoverable
+        }
+
         func checkoutDidClickLink(url _: URL) {}
         func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
     }
@@ -192,7 +195,7 @@ final class WalletControllerTests: XCTestCase {
         let mockViewController = await MainActor.run { UIViewController() }
         controller.mockTopViewController = mockViewController
 
-        let testURL = URL(string: "https://test.myshopify.com/checkout")!
+        let testURL = try XCTUnwrap(URL(string: "https://test.myshopify.com/checkout"))
 
         try await controller.present(url: testURL, delegate: mockDelegate)
 
