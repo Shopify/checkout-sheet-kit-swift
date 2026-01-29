@@ -150,7 +150,13 @@ class StorefrontInputFactory {
     }
 
     public func createCartInput(_ items: [GraphQL.ID] = [], customerAccessToken: String? = nil) -> Storefront.CartInput {
-        if appConfiguration.useVaultedState {
+        let lines = Input(orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) })
+
+        switch appConfiguration.buyerIdentityMode {
+        case .guest:
+            return Storefront.CartInput.create(lines: lines)
+
+        case .hardcoded:
             let deliveryAddress = Storefront.MailingAddressInput.create(
                 address1: Input(orNull: vaultedContactInfo.address1),
                 address2: Input(orNull: vaultedContactInfo.address2),
@@ -186,39 +192,18 @@ class StorefrontInputFactory {
                     )
                 )
             )
-        } else if let token = customerAccessToken {
+
+        case .customerAccount:
+            guard let token = customerAccessToken else {
+                return Storefront.CartInput.create(lines: lines)
+            }
             return Storefront.CartInput.create(
-                lines: Input(
-                    orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
-                ),
+                lines: lines,
                 buyerIdentity: Input(
                     orNull: Storefront.CartBuyerIdentityInput.create(
                         customerAccessToken: Input(orNull: token)
                     )
                 )
-            )
-        } else {
-            return Storefront.CartInput.create(
-                lines: Input(
-                    orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
-                )
-            )
-        }
-    }
-
-    public func createCartBuyerIdentityInput(
-        email: String?,
-        deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
-    ) -> Storefront.CartBuyerIdentityInput {
-        if appConfiguration.useVaultedState {
-            return Storefront.CartBuyerIdentityInput.create(
-                email: Input(orNull: vaultedContactInfo.email),
-                deliveryAddressPreferences: deliveryAddressPreferencesInput
-            )
-        } else {
-            return Storefront.CartBuyerIdentityInput.create(
-                email: Input(orNull: email),
-                deliveryAddressPreferences: deliveryAddressPreferencesInput
             )
         }
     }
