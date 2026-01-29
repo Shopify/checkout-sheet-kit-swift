@@ -163,7 +163,7 @@ struct ProductGridItem: View {
         }
     }
 
-    // Generate thumbnail URL for faster loading in grid view
+    /// Generate thumbnail URL for faster loading in grid view
     private func thumbnailURL(from originalURL: URL) -> URL {
         let urlString = originalURL.absoluteString
 

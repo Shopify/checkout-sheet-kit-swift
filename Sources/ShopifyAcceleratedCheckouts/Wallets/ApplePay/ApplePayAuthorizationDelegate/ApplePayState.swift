@@ -47,8 +47,8 @@ enum ApplePayState: Equatable {
     /// This occurs when cart api detects an issue that requires CSK intervention
     /// (e.g., out of stock items)
     case interrupt(
-        /// The payment sheet will be interrupted and the user will be redirected to the checkout
-        /// with the interrupt reason as a query parameter
+        // The payment sheet will be interrupted and the user will be redirected to the checkout
+        // with the interrupt reason as a query parameter
         reason: ErrorHandler.InterruptReason
     )
 
@@ -64,9 +64,9 @@ enum ApplePayState: Equatable {
     /// The cart has been converted to a checkout/order and we have a redirect URL
     /// This does not indicate that the payment has been processed successfully
     case cartSubmittedForCompletion(
-        /// URL after a SubmitSuccess from cartSubmitForCompletion
-        /// Should render the Thank You Page if payment processing etc. succeeds
-        /// Will render Checkout if any error causes the order creation to fail
+        // URL after a SubmitSuccess from cartSubmitForCompletion
+        // Should render the Thank You Page if payment processing etc. succeeds
+        // Will render Checkout if any error causes the order creation to fail
         redirectURL: URL
     )
 
@@ -107,11 +107,11 @@ enum ApplePayState: Equatable {
     func canTransition(to nextState: ApplePayState) -> Bool {
         switch (self, nextState) {
         case (.idle, .startPaymentRequest),
-             /// Occurs when TYP is dismissed, as state will transition to idle before closure
+             // Occurs when TYP is dismissed, as state will transition to idle before closure
              (.idle, .completed),
 
              (.startPaymentRequest, .appleSheetPresented),
-             /// Failing to construct paymentRequest or present payment sheet
+             // Failing to construct paymentRequest or present payment sheet
              (.startPaymentRequest, .reset),
              (.startPaymentRequest, .completed),
 
@@ -119,14 +119,14 @@ enum ApplePayState: Equatable {
              (.appleSheetPresented, .paymentAuthorizationFailed),
              (.appleSheetPresented, .interrupt),
 
-             /// User cancels the sheet
+             // User cancels the sheet
              (.appleSheetPresented, .completed),
 
              (.paymentAuthorized, .cartSubmittedForCompletion),
              (.paymentAuthorized, .paymentAuthorizationFailed),
              (.paymentAuthorized, .interrupt),
-             /// When userErrors throw in didAuthorizePayment
-             /// (e.g. cartBuyerIdentityUpdate no emojis) sheet should remain open
+             // When userErrors throw in didAuthorizePayment
+             // (e.g. cartBuyerIdentityUpdate no emojis) sheet should remain open
              (.paymentAuthorized, .appleSheetPresented),
 
              (.paymentAuthorizationFailed, .completed),

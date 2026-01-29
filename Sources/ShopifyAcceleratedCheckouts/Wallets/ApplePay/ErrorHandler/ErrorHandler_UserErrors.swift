@@ -54,12 +54,14 @@ extension ErrorHandler {
             case "addresses.0.address.deliveryAddress.firstName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.emojis.first_name".localizedString)
+                        message: "errors.emojis.first_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.lastName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.emojis.last_name".localizedString)
+                        message: "errors.emojis.last_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.address1":
                 return PaymentSheetAction.showError(errors: [
@@ -99,12 +101,14 @@ extension ErrorHandler {
             case "addresses.0.address.deliveryAddress.firstName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.html_tags.first_name".localizedString)
+                        message: "errors.html_tags.first_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.lastName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.html_tags.last_name".localizedString)
+                        message: "errors.html_tags.last_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.address1":
                 return PaymentSheetAction.showError(errors: [
@@ -137,12 +141,14 @@ extension ErrorHandler {
             case "addresses.0.address.deliveryAddress.firstName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.url.first_name".localizedString)
+                        message: "errors.url.first_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.lastName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.url.last_name".localizedString)
+                        message: "errors.url.last_name".localizedString
+                    )
                 ])
             default:
                 return PaymentSheetAction.interrupt(
@@ -154,17 +160,20 @@ extension ErrorHandler {
             case "addresses.0.address.deliveryAddress.firstName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.invalid.first_name".localizedString)
+                        message: "errors.invalid.first_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.lastName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.invalid.last_name".localizedString)
+                        message: "errors.invalid.last_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.phone":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
-                        message: "errors.invalid.phone".localizedString)
+                        message: "errors.invalid.phone".localizedString
+                    )
                 ])
             default:
                 return PaymentSheetAction.interrupt(
@@ -176,12 +185,14 @@ extension ErrorHandler {
             case "addresses.0.address.deliveryAddress.firstName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.missing.first_name".localizedString)
+                        message: "errors.missing.first_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.lastName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.missing.last_name".localizedString)
+                        message: "errors.missing.last_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.address1":
                 return PaymentSheetAction.showError(errors: [
@@ -214,7 +225,8 @@ extension ErrorHandler {
             case "addresses.0.address.deliveryAddress.phone":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
-                        message: "errors.missing.phone".localizedString)
+                        message: "errors.missing.phone".localizedString
+                    )
                 ])
             default:
                 return PaymentSheetAction.interrupt(
@@ -226,12 +238,14 @@ extension ErrorHandler {
             case "addresses.0.address.deliveryAddress.firstName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.too_long.first_name".localizedString)
+                        message: "errors.too_long.first_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.lastName":
                 return PaymentSheetAction.showError(errors: [
                     ApplePayAuthorizationDelegate.ValidationErrors.nameInvalid(
-                        message: "errors.too_long.last_name".localizedString)
+                        message: "errors.too_long.last_name".localizedString
+                    )
                 ])
             case "addresses.0.address.deliveryAddress.address1":
                 return PaymentSheetAction.showError(errors: [
@@ -268,7 +282,8 @@ extension ErrorHandler {
                     // Email field is visible, user can correct it
                     return PaymentSheetAction.showError(errors: [
                         ApplePayAuthorizationDelegate.ValidationErrors.emailInvalid(
-                            message: "errors.invalid.email".localizedString)
+                            message: "errors.invalid.email".localizedString
+                        )
                     ])
                 } else {
                     // Email field is not visible, user can't correct it, fallback to CSK
@@ -288,7 +303,8 @@ extension ErrorHandler {
                     // Phone field is visible, user can correct it
                     return PaymentSheetAction.showError(errors: [
                         ApplePayAuthorizationDelegate.ValidationErrors.phoneNumberInvalid(
-                            message: "errors.invalid.phone".localizedString)
+                            message: "errors.invalid.phone".localizedString
+                        )
                     ])
                 } else {
                     // Phone field is not visible, user can't correct it, fallback to CSK

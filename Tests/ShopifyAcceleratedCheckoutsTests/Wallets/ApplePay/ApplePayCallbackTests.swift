@@ -365,9 +365,9 @@ final class ApplePayCallbackTests: XCTestCase {
     // MARK: - checkoutDidClickLink Callback Tests
 
     @MainActor
-    func testCheckoutDidClickLinkCallbackInvoked() async {
+    func testCheckoutDidClickLinkCallbackInvoked() async throws {
         let expectation = expectation(description: "checkoutDidClickLink callback should be invoked")
-        let testURL = URL(string: "https://test-shop.myshopify.com/products/test")!
+        let testURL = try XCTUnwrap(URL(string: "https://test-shop.myshopify.com/products/test"))
         var capturedURL: URL?
 
         viewController.onCheckoutClickLink = { url in
@@ -381,12 +381,12 @@ final class ApplePayCallbackTests: XCTestCase {
         XCTAssertEqual(capturedURL, testURL, "URL should be passed to callback")
     }
 
-    func testCheckoutDidClickLinkCallbackNotInvokedWhenNil() async {
+    func testCheckoutDidClickLinkCallbackNotInvokedWhenNil() async throws {
         await MainActor.run {
             XCTAssertNil(viewController.onCheckoutClickLink)
         }
 
-        let testURL = URL(string: "https://test-shop.myshopify.com")!
+        let testURL = try XCTUnwrap(URL(string: "https://test-shop.myshopify.com"))
         await MainActor.run {
             viewController.checkoutDidClickLink(url: testURL) // Should not crash
         }
@@ -396,12 +396,12 @@ final class ApplePayCallbackTests: XCTestCase {
     }
 
     @MainActor
-    func testCheckoutDidClickLinkWithVariousURLs() async {
-        let testURLs = [
-            URL(string: "https://test-shop.myshopify.com/products/test")!,
-            URL(string: "https://external-site.com/page")!,
-            URL(string: "mailto:test@example.com")!,
-            URL(string: "tel:+1234567890")!
+    func testCheckoutDidClickLinkWithVariousURLs() async throws {
+        let testURLs = try [
+            XCTUnwrap(URL(string: "https://test-shop.myshopify.com/products/test")),
+            XCTUnwrap(URL(string: "https://external-site.com/page")),
+            XCTUnwrap(URL(string: "mailto:test@example.com")),
+            XCTUnwrap(URL(string: "tel:+1234567890"))
         ]
 
         let expectations = testURLs.map { _ in

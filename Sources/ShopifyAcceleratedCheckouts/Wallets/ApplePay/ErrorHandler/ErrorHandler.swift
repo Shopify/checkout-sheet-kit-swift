@@ -34,7 +34,7 @@ class ErrorHandler {
         case cartThrottled
         case notEnoughStock
         case other
-        // These errors are unhandled by Portable Wallets
+        /// These errors are unhandled by Portable Wallets
         case unhandled
 
         var queryParam: String? {

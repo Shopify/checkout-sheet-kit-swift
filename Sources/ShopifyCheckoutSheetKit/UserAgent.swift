@@ -43,7 +43,7 @@ public enum UserAgent {
 
     private static let baseUserAgent = "ShopifyCheckoutSDK/\(MetaData.version)"
 
-    // Shared format for CheckoutSheetKit and AcceleratedCheckouts
+    /// Shared format for CheckoutSheetKit and AcceleratedCheckouts
     package static func string(
         type: CheckoutType,
         colorScheme: ColorScheme,

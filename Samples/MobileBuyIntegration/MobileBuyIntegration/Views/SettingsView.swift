@@ -29,6 +29,7 @@ import SwiftUI
 enum AppStorageKeys: String {
     case acceleratedCheckoutsLogLevel
     case checkoutSheetKitLogLevel
+    case buyerIdentityMode
 }
 
 struct SettingsView: View {
@@ -63,8 +64,28 @@ struct SettingsView: View {
                         .onChange(of: preloadingEnabled) { newValue in
                             ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
                         }
-                    Toggle("Prefill buyer information", isOn: $config.useVaultedState)
                 }
+
+                Section(
+                    content: {
+                        Picker("Buyer Identity", selection: $config.buyerIdentityMode) {
+                            ForEach(BuyerIdentityMode.allCases, id: \.self) { mode in
+                                Text(mode.displayName).tag(mode)
+                            }
+                        }
+                        .pickerStyle(.menu)
+
+                        BuyerIdentityDetails(mode: config.buyerIdentityMode)
+                    },
+                    header: {
+                        Text("Authentication")
+                    },
+                    footer: {
+                        Text(
+                            "Prefills buyer identity at checkout.\nChanging this setting will clear your cart."
+                        )
+                    }
+                )
 
                 Section(header: Text("Universal Links")) {
                     Toggle("Handle Checkout URLs", isOn: $config.universalLinks.checkout)
@@ -177,6 +198,64 @@ struct SettingsView: View {
 
     private func currentVersion() -> String {
         return "\(InfoDictionary.shared.version) (\(InfoDictionary.shared.buildNumber))"
+    }
+}
+
+struct BuyerIdentityDetails: View {
+    let mode: BuyerIdentityMode
+    @ObservedObject var customerAccountManager = CustomerAccountManager.shared
+
+    private var expiresAtFormatted: String? {
+        guard let expiresAt = customerAccountManager.tokenExpiresAt else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: expiresAt)
+    }
+
+    var body: some View {
+        switch mode {
+        case .guest:
+            EmptyView()
+        case .hardcoded:
+            Text("Populates the Cart Buyer Identity with values from Storefront.xcconfig")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        case .customerAccount:
+            if customerAccountManager.isAuthenticated {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Changing Buyer Identity will log you out.")
+                        .foregroundStyle(.yellow)
+                        .padding(.bottom, 4)
+
+                    HStack {
+                        Text("User: \(customerAccountManager.customerEmail ?? "Unknown")")
+                            .foregroundStyle(.secondary)
+
+                        Button("Change user") {
+                            NotificationCenter.default.post(name: .navigateToAccount, object: nil)
+                        }
+                        .foregroundStyle(.tint)
+                    }
+
+                    if let expiresAt = expiresAtFormatted {
+                        Text("Expires: \(expiresAt)").foregroundStyle(.secondary)
+                    }
+                }
+                .font(.caption)
+
+            } else {
+                HStack(spacing: 4) {
+                    Text("Sign in on the")
+                        .foregroundStyle(.secondary)
+                    Button("Account tab") {
+                        NotificationCenter.default.post(name: .navigateToAccount, object: nil)
+                    }
+                    .foregroundStyle(.tint)
+                }
+                .font(.caption)
+            }
+        }
     }
 }
 

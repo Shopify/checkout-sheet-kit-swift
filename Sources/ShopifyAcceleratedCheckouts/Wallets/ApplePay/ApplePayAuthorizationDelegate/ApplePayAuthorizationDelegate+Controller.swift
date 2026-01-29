@@ -95,11 +95,11 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         pkEncoder.selectedPaymentMethod = paymentMethod
 
         do {
-            /// PassKit populates `paymentMethod.billingAddress` conditionally:
-            /// 1. This is the first call to `didSelectPaymentMethod`
-            ///    (users default card)
-            /// 2. The PKPaymentRequest doesn't request shipping info
-            ///    (we rely on country from `didSelectShippingContact` for calculating taxes)
+            // PassKit populates `paymentMethod.billingAddress` conditionally:
+            // 1. This is the first call to `didSelectPaymentMethod`
+            //    (users default card)
+            // 2. The PKPaymentRequest doesn't request shipping info
+            //    (we rely on country from `didSelectShippingContact` for calculating taxes)
             guard try pkDecoder.isShippingRequired() == false,
                   let billingPostalAddress = try? pkEncoder.billingPostalAddress.get(),
                   let country = billingPostalAddress.country
@@ -217,8 +217,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
                 try setCart(to: result.cart)
             } else {
-                /// If the cart is entirely digital updating with a complete billingAddress
-                /// allows us to resolve pending terms on taxes prior to cartPaymentUpdate
+                // If the cart is entirely digital updating with a complete billingAddress
+                // allows us to resolve pending terms on taxes prior to cartPaymentUpdate
                 guard
                     let billingPostalAddress = try? pkEncoder.billingPostalAddress.get()
                 else {
@@ -237,8 +237,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let totalAmount = try pkEncoder.totalAmount.get()
             let applePayPayment = try pkEncoder.applePayPayment.get()
 
-            /// Taxes may become pending again fail to resolve despite updating within the didUpdatePaymentMethod
-            /// So we retry one time to see if the error clears on retry
+            // Taxes may become pending again fail to resolve despite updating within the didUpdatePaymentMethod
+            // So we retry one time to see if the error clears on retry
             _ = try await Task.retrying(priority: nil, maxRetryCount: 1) {
                 try await self.controller.storefront.cartPaymentUpdate(
                     id: cartID,

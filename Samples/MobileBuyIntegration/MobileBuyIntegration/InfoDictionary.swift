@@ -29,7 +29,7 @@ import Foundation
 class InfoDictionary {
     static let shared = InfoDictionary()
 
-    // Required
+    /// Required
     let address1, address2, city, country, firstName, lastName, province, zip,
         email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
 

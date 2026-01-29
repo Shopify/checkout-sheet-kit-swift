@@ -25,34 +25,34 @@
 import XCTest
 
 class CheckoutURLTests: XCTestCase {
-    func testIsMultipassURL() {
-        let multipassURL = URL(string: "https://shopify.com/multipass")!
-        let nonMultipassURL = URL(string: "https://shopify.com/checkout")!
+    func testIsMultipassURL() throws {
+        let multipassURL = try XCTUnwrap(URL(string: "https://shopify.com/multipass"))
+        let nonMultipassURL = try XCTUnwrap(URL(string: "https://shopify.com/checkout"))
 
         XCTAssertTrue(CheckoutURL(from: multipassURL).isMultipassURL())
         XCTAssertFalse(CheckoutURL(from: nonMultipassURL).isMultipassURL())
     }
 
-    func testIsConfirmationPage() {
-        let confirmationURL = URL(string: "https://shopify.com/thank-you")!
-        let legacyConfirmationURL = URL(string: "https://shopify.com/thank_you")!
-        let nonConfirmationURL = URL(string: "https://shopify.com/checkout")!
+    func testIsConfirmationPage() throws {
+        let confirmationURL = try XCTUnwrap(URL(string: "https://shopify.com/thank-you"))
+        let legacyConfirmationURL = try XCTUnwrap(URL(string: "https://shopify.com/thank_you"))
+        let nonConfirmationURL = try XCTUnwrap(URL(string: "https://shopify.com/checkout"))
 
         XCTAssertTrue(CheckoutURL(from: confirmationURL).isConfirmationPage())
         XCTAssertTrue(CheckoutURL(from: legacyConfirmationURL).isConfirmationPage())
         XCTAssertFalse(CheckoutURL(from: nonConfirmationURL).isConfirmationPage())
     }
 
-    func testIsDeepLink() {
-        /// Invalid cases
-        let secureURL = URL(string: "https://shopify.com")!
-        let nonSecureURL = URL(string: "http://shopify.com")!
-        let blank = URL(string: "about:blank")!
+    func testIsDeepLink() throws {
+        // Invalid cases
+        let secureURL = try XCTUnwrap(URL(string: "https://shopify.com"))
+        let nonSecureURL = try XCTUnwrap(URL(string: "http://shopify.com"))
+        let blank = try XCTUnwrap(URL(string: "about:blank"))
 
-        /// Valid cases
-        let deeplink = URL(string: "app://deep/link")!
-        let deeplink2 = URL(string: "notes-app://")!
-        let deeplink3 = URL(string: "maps://?q=Cupertino")!
+        // Valid cases
+        let deeplink = try XCTUnwrap(URL(string: "app://deep/link"))
+        let deeplink2 = try XCTUnwrap(URL(string: "notes-app://"))
+        let deeplink3 = try XCTUnwrap(URL(string: "maps://?q=Cupertino"))
 
         XCTAssertFalse(CheckoutURL(from: secureURL).isDeepLink())
         XCTAssertFalse(CheckoutURL(from: nonSecureURL).isDeepLink())

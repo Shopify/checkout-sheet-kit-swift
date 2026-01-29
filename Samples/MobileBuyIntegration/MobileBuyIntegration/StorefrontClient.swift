@@ -37,7 +37,7 @@ class StorefrontClient: @unchecked Sendable {
                 apiKey: InfoDictionary.shared.accessToken
             )
 
-        /// Set the caching policy (1 hour)
+        // Set the caching policy (1 hour)
         client.cachePolicy = .cacheFirst(expireIn: 60 * 60)
     }
 
@@ -134,8 +134,7 @@ public struct StorefrontURL {
         if let match = url.path.range(
             of: pattern, options: .regularExpression, range: nil, locale: nil
         ) {
-            let slug = url.path[match].components(separatedBy: "/").last
-            return slug
+            return url.path[match].components(separatedBy: "/").last
         }
         return nil
     }
@@ -151,7 +150,13 @@ class StorefrontInputFactory {
     }
 
     public func createCartInput(_ items: [GraphQL.ID] = [], customerAccessToken: String? = nil) -> Storefront.CartInput {
-        if appConfiguration.useVaultedState {
+        let lines = Input(orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) })
+
+        switch appConfiguration.buyerIdentityMode {
+        case .guest:
+            return Storefront.CartInput.create(lines: lines)
+
+        case .hardcoded:
             let deliveryAddress = Storefront.MailingAddressInput.create(
                 address1: Input(orNull: vaultedContactInfo.address1),
                 address2: Input(orNull: vaultedContactInfo.address2),
@@ -167,54 +172,38 @@ class StorefrontInputFactory {
 
             let deliveryAddressPreferences = [
                 Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: deliveryAddress))
+                    deliveryAddress: Input(orNull: deliveryAddress)
+                )
             ]
 
             return Storefront.CartInput.create(
                 lines: Input(
                     orNull: items.map {
                         Storefront.CartLineInput.create(merchandiseId: $0)
-                    }),
+                    }
+                ),
                 buyerIdentity: Input(
                     orNull: Storefront.CartBuyerIdentityInput.create(
                         email: Input(orNull: vaultedContactInfo.email),
                         customerAccessToken: Input(orNull: customerAccessToken),
                         deliveryAddressPreferences: Input(
-                            orNull: deliveryAddressPreferences)
-                    ))
+                            orNull: deliveryAddressPreferences
+                        )
+                    )
+                )
             )
-        } else if let token = customerAccessToken {
+
+        case .customerAccount:
+            guard let token = customerAccessToken else {
+                return Storefront.CartInput.create(lines: lines)
+            }
             return Storefront.CartInput.create(
-                lines: Input(
-                    orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
-                ),
+                lines: lines,
                 buyerIdentity: Input(
                     orNull: Storefront.CartBuyerIdentityInput.create(
                         customerAccessToken: Input(orNull: token)
-                    ))
-            )
-        } else {
-            return Storefront.CartInput.create(
-                lines: Input(
-                    orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) }
+                    )
                 )
-            )
-        }
-    }
-
-    public func createCartBuyerIdentityInput(
-        email: String?,
-        deliveryAddressPreferencesInput: Input<[Storefront.DeliveryAddressInput]>
-    ) -> Storefront.CartBuyerIdentityInput {
-        if appConfiguration.useVaultedState {
-            return Storefront.CartBuyerIdentityInput.create(
-                email: Input(orNull: vaultedContactInfo.email),
-                deliveryAddressPreferences: deliveryAddressPreferencesInput
-            )
-        } else {
-            return Storefront.CartBuyerIdentityInput.create(
-                email: Input(orNull: email),
-                deliveryAddressPreferences: deliveryAddressPreferencesInput
             )
         }
     }

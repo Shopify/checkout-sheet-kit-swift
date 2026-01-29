@@ -88,14 +88,16 @@ extension StorefrontAPI {
                 "customerAccessToken": customerAccessToken,
                 "countryCode": countryCode
             ].compactMapValues { value in
-                /// Mapping empty strings to `nil` due to `buyerIdentityUpdate`
-                /// running validations on empty string results in unexpected violations
+                // Mapping empty strings to `nil` due to `buyerIdentityUpdate`
+                // running validations on empty string results in unexpected violations
                 guard let value else { return nil }
                 return value.isEmpty ? nil : value
             }
         }
 
-        var isEmpty: Bool { dictionary.isEmpty }
+        var isEmpty: Bool {
+            dictionary.isEmpty
+        }
 
         init(email: String? = nil, phoneNumber: String? = nil, customerAccessToken: String? = nil) {
             self.email = email
@@ -442,10 +444,12 @@ extension StorefrontAPI {
             return ready
         case let .throttled(throttled):
             throw GraphQLError.networkError(
-                "Cart preparation throttled. Poll after: \(throttled.pollAfter.date)")
+                "Cart preparation throttled. Poll after: \(throttled.pollAfter.date)"
+            )
         case let .notReady(notReady):
             let errorMessages = notReady.errors.map { "\($0.code): \($0.message)" }.joined(
-                separator: ", ")
+                separator: ", "
+            )
             throw GraphQLError.networkError("Cart not ready: \(errorMessages)")
         }
     }
@@ -478,14 +482,17 @@ extension StorefrontAPI {
             return success
         case let .failed(failed):
             let errorMessages = failed.errors.map { "\($0.code): \($0.message)" }.joined(
-                separator: ", ")
+                separator: ", "
+            )
             throw GraphQLError.networkError("Cart submission failed: \(errorMessages)")
         case let .alreadyAccepted(accepted):
             throw GraphQLError.networkError(
-                "Cart already accepted with attempt ID: \(accepted.attemptId)")
+                "Cart already accepted with attempt ID: \(accepted.attemptId)"
+            )
         case let .throttled(throttled):
             throw GraphQLError.networkError(
-                "Cart submission throttled. Poll after: \(throttled.pollAfter.date)")
+                "Cart submission throttled. Poll after: \(throttled.pollAfter.date)"
+            )
         }
     }
 }

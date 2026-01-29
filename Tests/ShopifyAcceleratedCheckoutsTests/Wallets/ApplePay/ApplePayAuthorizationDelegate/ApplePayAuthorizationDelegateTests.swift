@@ -22,10 +22,9 @@
  */
 
 import PassKit
+@testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import XCTest
-
-@testable import ShopifyAcceleratedCheckouts
 
 /// Tests focused on onPresentingCSK behavior and URL computation for different states
 @available(iOS 17.0, *)
@@ -121,24 +120,25 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         try await delegate.transition(to: .completed)
         guard case let .presentingCSK(url) = delegate.state else {
             XCTFail(
-                "Should transition to presentingCSK for error states, but got \(delegate.state)")
+                "Should transition to presentingCSK for error states, but got \(delegate.state)"
+            )
             return
         }
 
         XCTAssertEqual(
-            url!.absoluteString,
-            delegate.checkoutURL!.absoluteString,
+            try XCTUnwrap(url?.absoluteString),
+            try XCTUnwrap(delegate.checkoutURL?.absoluteString),
             "Should use checkout URL for error states"
         )
     }
 
-    func test_url_withDefaultState_shouldReturnCheckoutURL() async throws {
+    func test_url_withDefaultState_shouldReturnCheckoutURL() throws {
         XCTAssertEqual(delegate.state, .idle, "Should start in idle state")
 
         let defaultURL = delegate.createSheetKitURL(for: delegate.state)
         XCTAssertEqual(
-            defaultURL!.absoluteString,
-            delegate.checkoutURL!.absoluteString,
+            try XCTUnwrap(defaultURL?.absoluteString),
+            try XCTUnwrap(delegate.checkoutURL?.absoluteString),
             "Should return checkout URL for idle state"
         )
     }
@@ -155,8 +155,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         // The flow should be: .completed → onCompleted() → .presentingCSK → onPresentingCSK() → present()
         XCTAssertEqual(mockController.presentCallCount, 1, "CSK should be presented once")
         XCTAssertEqual(
-            mockController.presentCalledWith!.absoluteString,
-            checkoutURL!.absoluteString
+            mockController.presentCalledWith?.absoluteString,
+            checkoutURL?.absoluteString
         )
     }
 
@@ -195,7 +195,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
             let url = mockController.presentCalledWith
             XCTAssertTrue(
-                url!.absoluteString.contains(expectedParam) == true,
+                url?.absoluteString.contains(expectedParam) == true,
                 "URL should contain \(expectedParam) for \(reason) interrupt, but got: \(url!.absoluteString)"
             )
 
@@ -235,13 +235,13 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
             let url = testDelegate.createSheetKitURL(for: testDelegate.state)
 
             XCTAssertEqual(
-                url!.absoluteString,
+                try XCTUnwrap(url?.absoluteString),
                 expectedURL,
                 "\(reason) interrupt should use base checkout URL without query params, but got: \(url?.absoluteString ?? "nil")"
             )
 
             XCTAssertEqual(
-                mockController.presentCalledWith!.absoluteString,
+                try XCTUnwrap(mockController.presentCalledWith?.absoluteString),
                 expectedURL,
                 "Present should be called with url"
             )
@@ -303,9 +303,9 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
         try delegate.setCart(to: testCart)
 
-        XCTAssertEqual(mockController.cart!.id, testCart.id)
+        XCTAssertEqual(mockController.cart?.id, testCart.id)
         XCTAssertEqual(
-            delegate.checkoutURL!.absoluteString, testCart.checkoutUrl.url.absoluteString
+            delegate.checkoutURL?.absoluteString, testCart.checkoutUrl.url.absoluteString
         )
     }
 
@@ -416,7 +416,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     func test_onCompleted_withCartSubmittedForCompletion_shouldTransitionToPresentingCSKWithRedirectURL()
         async throws
     {
-        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+        let redirectURL = try XCTUnwrap(URL(string: "https://shop.example.com/thank-you"))
 
         // Follow valid state transitions: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorized -> cartSubmittedForCompletion
         try await delegate.transition(to: .startPaymentRequest)
@@ -485,7 +485,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     // MARK: onPresentingCSK()
 
     func test_onPresentingCSK_withValidURL_shouldCallPresentSuccessfully() async throws {
-        let testURL = URL(string: "https://test-shop.myshopify.com/checkout")!
+        let testURL = try XCTUnwrap(URL(string: "https://test-shop.myshopify.com/checkout"))
 
         // Transition to a state that leads to presentingCSK
         try await delegate.transition(to: .unexpectedError(error: NSError(domain: "test", code: 1)))
@@ -504,7 +504,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     func test_onPresentingCSK_withCartSubmittedForCompletion_shouldSkipPersonalDataRemoval()
         async throws
     {
-        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+        let redirectURL = try XCTUnwrap(URL(string: "https://shop.example.com/thank-you"))
 
         // Create a spy controller to track personal data removal calls
         let spyController = SpyPayController()
@@ -555,7 +555,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
 
         XCTAssertNotNil(url, "Should have valid URL")
         XCTAssertTrue(
-            url!.absoluteString.contains("wallet_currency_change=true") == true,
+            url?.absoluteString.contains("wallet_currency_change=true") == true,
             "Should contain query parameter"
         )
         XCTAssertEqual(mockController.presentCallCount, 1, "Should call present")
@@ -759,7 +759,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     // MARK: - Customer Info Attachment Tests
 
     func test_onPresentingCSK_fromCartSubmittedForCompletion_shouldNotModifyCustomerInfo() async throws {
-        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+        let redirectURL = try XCTUnwrap(URL(string: "https://shop.example.com/thank-you"))
 
         // Follow valid state transition path: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorized -> cartSubmittedForCompletion -> completed
         // The completed state will automatically transition to presentingCSK
@@ -773,8 +773,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         XCTAssertEqual(mockController.presentCalledWith, redirectURL)
     }
 
-    func test_createSheetKitURL_withInterruptReasonHavingQueryParam_shouldAppendQueryParam() {
-        let baseURL = URL(string: "https://shop.example.com/checkout")!
+    func test_createSheetKitURL_withInterruptReasonHavingQueryParam_shouldAppendQueryParam() throws {
+        let baseURL = try XCTUnwrap(URL(string: "https://shop.example.com/checkout"))
         delegate.checkoutURL = baseURL
 
         let interruptState = ApplePayState.interrupt(reason: .dynamicTax)
@@ -791,8 +791,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         )
     }
 
-    func test_createSheetKitURL_withInterruptReasonWithoutQueryParam_shouldReturnOriginalURL() {
-        let baseURL = URL(string: "https://shop.example.com/checkout")!
+    func test_createSheetKitURL_withInterruptReasonWithoutQueryParam_shouldReturnOriginalURL() throws {
+        let baseURL = try XCTUnwrap(URL(string: "https://shop.example.com/checkout"))
         delegate.checkoutURL = baseURL
 
         let interruptState = ApplePayState.interrupt(reason: .outOfStock)
@@ -801,8 +801,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         XCTAssertEqual(resultURL, baseURL, "URL should remain unchanged when interrupt reason has no query param")
     }
 
-    func test_createSheetKitURL_withCartSubmittedForCompletion_shouldReturnRedirectURL() {
-        let redirectURL = URL(string: "https://shop.example.com/thank-you")!
+    func test_createSheetKitURL_withCartSubmittedForCompletion_shouldReturnRedirectURL() throws {
+        let redirectURL = try XCTUnwrap(URL(string: "https://shop.example.com/thank-you"))
         let state = ApplePayState.cartSubmittedForCompletion(redirectURL: redirectURL)
 
         let resultURL = delegate.createSheetKitURL(for: state)
@@ -810,8 +810,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         XCTAssertEqual(resultURL, redirectURL)
     }
 
-    func test_createSheetKitURL_withNormalState_shouldReturnCheckoutURL() {
-        let baseURL = URL(string: "https://shop.example.com/checkout")!
+    func test_createSheetKitURL_withNormalState_shouldReturnCheckoutURL() throws {
+        let baseURL = try XCTUnwrap(URL(string: "https://shop.example.com/checkout"))
         delegate.checkoutURL = baseURL
 
         let resultURL = delegate.createSheetKitURL(for: .appleSheetPresented)

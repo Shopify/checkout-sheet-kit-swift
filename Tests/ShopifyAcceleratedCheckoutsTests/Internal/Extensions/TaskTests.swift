@@ -22,9 +22,8 @@
  */
 
 import Foundation
-import XCTest
-
 @testable import ShopifyAcceleratedCheckouts
+import XCTest
 
 enum TestError: Error {
     case expected
@@ -181,7 +180,7 @@ class TaskTests: XCTestCase {
         XCTAssertEqual(attempts, 3)
     }
 
-    // Flaky
+    /// Flaky
     func testTaskPropagatesCorrectError() async throws {
         do {
             _ = try await Task.retrying(clock: MockClock()) {
@@ -191,8 +190,7 @@ class TaskTests: XCTestCase {
             XCTFail("Task should have thrown")
         } catch {
             XCTAssertTrue(error is TestError)
-            // swiftlint:disable:next force_cast
-            let error = error as! TestError
+            let error = try XCTUnwrap(error as? TestError)
             guard case .different = error else {
                 XCTFail("Incorrect error thrown")
                 return

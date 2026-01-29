@@ -240,7 +240,7 @@ extension ApplePayViewController: CheckoutDelegate {
 
     func checkoutDidCancel() {
         Task { @MainActor in
-            /// x right button on CSK doesn't dismiss automatically
+            // x right button on CSK doesn't dismiss automatically
             checkoutViewController?.dismiss(animated: true)
             self.onCheckoutCancel?()
             try await authorizationDelegate.transition(to: .completed)

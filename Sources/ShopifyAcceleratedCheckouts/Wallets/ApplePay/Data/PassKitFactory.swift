@@ -73,46 +73,44 @@ class PassKitFactory {
 
         let deliveryOptionCombinations = cartesian(deliveryOptionsWithGroupType)
 
-        let builtDeliveryOptions =
-            deliveryOptionCombinations
-                .compactMap { deliveryOptions -> PKShippingMethod? in
-                    guard let first = deliveryOptions.first else {
-                        return nil
-                    }
-
-                    let aggregate = deliveryOptions.dropFirst().reduce(
-                        into: (
-                            amount: first.option.estimatedCost.amount,
-                            titles: [first.option.title],
-                            descriptions: [first.option.description]
-                        )
-                    ) { memo, current in
-                        memo.amount += current.option.estimatedCost.amount
-                        memo.descriptions.append(current.option.description)
-
-                        if current.groupType == .oneTimePurchase {
-                            memo.titles.insert(current.option.title, at: 0)
-                        } else {
-                            memo.titles.append(current.option.title)
-                        }
-                    }
-
-                    let title = aggregate.titles.compactMap { $0 }.joined(separator: " and ")
-                    let description = aggregate.descriptions.compactMap { $0 }.joined(
-                        separator: " and ")
-                    let handle = deliveryOptions.map { $0.option.handle }.joined(separator: ",")
-
-                    let shippingMethod = PKShippingMethod(
-                        label: title,
-                        amount: NSDecimalNumber(decimal: aggregate.amount)
-                    )
-
-                    shippingMethod.detail = description
-                    shippingMethod.identifier = handle
-                    return shippingMethod
+        return deliveryOptionCombinations
+            .compactMap { deliveryOptions -> PKShippingMethod? in
+                guard let first = deliveryOptions.first else {
+                    return nil
                 }
 
-        return builtDeliveryOptions
+                let aggregate = deliveryOptions.dropFirst().reduce(
+                    into: (
+                        amount: first.option.estimatedCost.amount,
+                        titles: [first.option.title],
+                        descriptions: [first.option.description]
+                    )
+                ) { memo, current in
+                    memo.amount += current.option.estimatedCost.amount
+                    memo.descriptions.append(current.option.description)
+
+                    if current.groupType == .oneTimePurchase {
+                        memo.titles.insert(current.option.title, at: 0)
+                    } else {
+                        memo.titles.append(current.option.title)
+                    }
+                }
+
+                let title = aggregate.titles.compactMap { $0 }.joined(separator: " and ")
+                let description = aggregate.descriptions.compactMap { $0 }.joined(
+                    separator: " and "
+                )
+                let handle = deliveryOptions.map { $0.option.handle }.joined(separator: ",")
+
+                let shippingMethod = PKShippingMethod(
+                    label: title,
+                    amount: NSDecimalNumber(decimal: aggregate.amount)
+                )
+
+                shippingMethod.detail = description
+                shippingMethod.identifier = handle
+                return shippingMethod
+            }
     }
 
     /// Represents a discount allocation for display purposes
@@ -393,7 +391,8 @@ class PassKitFactory {
             return PKPaymentSummaryItem(
                 label: label,
                 amount: NSDecimalNumber(
-                    decimal: group.selectedDeliveryOption?.estimatedCost.amount ?? 0),
+                    decimal: group.selectedDeliveryOption?.estimatedCost.amount ?? 0
+                ),
                 type: .final
             )
         }

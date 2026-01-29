@@ -116,7 +116,7 @@ final class GraphQLTypesTests: XCTestCase {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let response = try JSONDecoder().decode(GraphQLResponse<UserResponse>.self, from: data)
 
         XCTAssertNotNil(response.data)
@@ -146,7 +146,7 @@ final class GraphQLTypesTests: XCTestCase {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let response = try JSONDecoder().decode(GraphQLResponse<EmptyResponse>.self, from: data)
 
         XCTAssertNil(response.data)
@@ -179,7 +179,7 @@ final class GraphQLTypesTests: XCTestCase {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let response = try JSONDecoder().decode(GraphQLResponse<EmptyResponse>.self, from: data)
 
         XCTAssertNotNil(response.extensions)

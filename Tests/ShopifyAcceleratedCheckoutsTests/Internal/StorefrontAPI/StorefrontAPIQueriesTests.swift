@@ -200,7 +200,7 @@ final class StorefrontAPIQueriesTests: XCTestCase {
         XCTAssertEqual(cart?.lines.nodes.count, 1)
         XCTAssertEqual(cart?.lines.nodes.first?.quantity, 2)
         XCTAssertEqual(cart?.deliveryGroups.nodes.count, 1)
-        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "39.98")!)
+        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "39.98"))
     }
 
     func testCartQueryNotFound() async throws {
@@ -504,7 +504,7 @@ final class StorefrontAPIQueriesTests: XCTestCase {
         XCTAssertNotNil(cart)
         XCTAssertEqual(cart?.lines.nodes.count, 100)
         XCTAssertEqual(cart?.totalQuantity, 100)
-        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "1000.00")!)
+        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "1000.00"))
     }
 
     // MARK: - Request Validation Tests
