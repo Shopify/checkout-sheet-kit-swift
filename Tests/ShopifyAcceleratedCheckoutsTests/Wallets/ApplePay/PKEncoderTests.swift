@@ -445,7 +445,7 @@ class PKEncoderTests: XCTestCase {
         XCTAssertEqual(address.zip, "94105")
         XCTAssertEqual(address.province, "CA")
         XCTAssertEqual(address.country, "US")
-        XCTAssertEqual(address.phone, "7781234567")
+        XCTAssertEqual(address.phone, "+447777777777")
     }
 
     func testUsesGivenNameAsLastNameWhenFamilyNameMissing() throws {

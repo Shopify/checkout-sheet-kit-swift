@@ -174,10 +174,10 @@ class ApplePayViewControllerTests: XCTestCase {
 
     func test_configuration_whenInitialized_usesCorrectStorefront() {
         XCTAssertEqual(
-            viewController.configuration?.storefrontDomain,
+            viewController.configuration.storefrontDomain,
             "test-shop.myshopify.com"
         )
-        XCTAssertEqual(viewController.configuration?.storefrontAccessToken, "test-token")
+        XCTAssertEqual(viewController.configuration.storefrontAccessToken, "test-token")
     }
 
     func test_createOrfetchCart_whenCalled_usesFetchCartByCheckoutIdentifier() async throws {

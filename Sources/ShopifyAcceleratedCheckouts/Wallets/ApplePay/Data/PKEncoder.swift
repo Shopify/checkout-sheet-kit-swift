@@ -258,13 +258,6 @@ class PKEncoder {
             return contact?.name?.givenName
         }()
 
-        let phone: String? = {
-            if let phone = contact?.phoneNumber {
-                return phone.stringValue
-            }
-            return try? self.phone.get()
-        }()
-
         return .success(
             StorefrontAPI.Types.Address(
                 address1: addressLines[safe: 0],
@@ -273,7 +266,7 @@ class PKEncoder {
                 country: country,
                 firstName: contact?.name?.givenName,
                 lastName: lastName,
-                phone: phone,
+                phone: try? phone.get(),
                 province: province,
                 zip: zip
             )
@@ -319,7 +312,8 @@ class PKEncoder {
                 !biPhone.isEmpty,
                 biPhone != customerPhone
             {
-                OSLogger.shared.info("config.customer.phoneNumber overrides buyerIdentity phone")
+                ShopifyAcceleratedCheckouts.logger
+                    .info("config.customer.phoneNumber overrides buyerIdentity phone")
             }
             return .success(customerPhone)
         }
@@ -353,7 +347,8 @@ class PKEncoder {
                 !biEmail.isEmpty,
                 biEmail != customerEmail
             {
-                OSLogger.shared.info("config.customer.email overrides buyerIdentity email")
+                ShopifyAcceleratedCheckouts.logger
+                    .info("config.customer.email overrides buyerIdentity email")
             }
             return .success(customerEmail)
         }
