@@ -22,8 +22,8 @@
  */
 
 import Combine
-import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyAcceleratedCheckouts
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 
 enum AppStorageKeys: String {

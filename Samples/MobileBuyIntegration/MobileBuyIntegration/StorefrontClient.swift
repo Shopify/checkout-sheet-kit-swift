@@ -140,6 +140,7 @@ public struct StorefrontURL {
     }
 }
 
+@MainActor
 class StorefrontInputFactory {
     static let shared = StorefrontInputFactory()
 

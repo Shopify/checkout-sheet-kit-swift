@@ -26,7 +26,7 @@ import Foundation
 /**
  * Contains all of the values from the `info.plist`
  */
-class InfoDictionary {
+final class InfoDictionary: Sendable {
     static let shared = InfoDictionary()
 
     /// Required

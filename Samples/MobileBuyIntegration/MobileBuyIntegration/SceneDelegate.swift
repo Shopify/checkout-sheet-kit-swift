@@ -22,7 +22,7 @@
  */
 
 import Combine
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
 

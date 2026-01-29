@@ -22,8 +22,8 @@
  */
 
 @preconcurrency import Buy
-import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyAcceleratedCheckouts
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
 
@@ -182,6 +182,7 @@ struct ProductView: View {
     }
 }
 
+@MainActor
 class ProductCache: ObservableObject {
     static let shared = ProductCache()
     @Published public var cachedProduct: Storefront.Product?

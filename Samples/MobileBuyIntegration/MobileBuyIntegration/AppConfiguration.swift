@@ -39,6 +39,7 @@ public enum BuyerIdentityMode: String, CaseIterable {
     }
 }
 
+@MainActor
 public final class AppConfiguration: ObservableObject {
     public var storefrontDomain: String = InfoDictionary.shared.domain
 
@@ -99,6 +100,7 @@ public final class AppConfiguration: ObservableObject {
     )
 }
 
+@MainActor
 public var appConfiguration = AppConfiguration() {
     didSet {
         Task { @MainActor in
