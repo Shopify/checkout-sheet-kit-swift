@@ -491,4 +491,32 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.first, .startPaymentRequest)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
     }
+
+    // MARK: - Actor Isolation Tests (Double-Tap Race Condition)
+
+    func test_onPress_whenDoubleTapped_doesNotCrashFromConcurrentActorHops() async throws {
+        let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
+        mockStorefront.cartResult = .failure(expectedError)
+
+        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail should be called")
+        onCheckoutFailExpectation.expectedFulfillmentCount = 2
+
+        await MainActor.run {
+            viewController.onCheckoutFail = { _ in
+                onCheckoutFailExpectation.fulfill()
+            }
+        }
+
+        let vc = try XCTUnwrap(viewController)
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+        }
+
+        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
+    }
 }
