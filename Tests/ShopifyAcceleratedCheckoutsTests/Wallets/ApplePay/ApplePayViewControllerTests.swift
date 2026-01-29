@@ -507,7 +507,7 @@ class ApplePayViewControllerTests: XCTestCase {
             }
         }
 
-        let vc = viewController!
+        let vc = try XCTUnwrap(viewController)
         await withTaskGroup(of: Void.self) { group in
             group.addTask { await vc.onPress() }
             group.addTask { await vc.onPress() }
