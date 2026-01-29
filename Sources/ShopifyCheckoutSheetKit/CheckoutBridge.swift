@@ -31,11 +31,9 @@ extension WKScriptMessage: ScriptMessageBody {}
 
 enum BridgeError: Swift.Error {
     case invalidBridgeEvent(Swift.Error? = nil)
-    case unencodableInstrumentation(Swift.Error? = nil)
 }
 
 protocol CheckoutBridgeProtocol {
-    static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload)
     static func sendMessage(_ webView: WKWebView, messageName: String, messageBody: String?)
 }
 
@@ -79,12 +77,6 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         switch platform {
         case .reactNative:
             return .reactNative
-        }
-    }
-
-    static func instrument(_ webView: WKWebView, _ instrumentation: InstrumentationPayload) {
-        if let payload = instrumentation.toBridgeEvent() {
-            sendMessage(webView, messageName: "instrumentation", messageBody: payload)
         }
     }
 
@@ -186,23 +178,6 @@ extension CheckoutBridge {
     }
 }
 
-struct InstrumentationPayload: Codable {
-    var name: String
-    var value: Int
-    var type: InstrumentationType
-    var tags: [String: String] = [:]
-}
-
-enum InstrumentationType: String, Codable {
-    case histogram
-}
-
-extension InstrumentationPayload {
-    func toBridgeEvent() -> String? {
-        SdkToWebEvent(detail: self).toJson()
-    }
-}
-
 struct SdkToWebEvent<T: Codable>: Codable {
     var detail: T
 }
@@ -213,9 +188,7 @@ extension SdkToWebEvent {
             let jsonData = try JSONEncoder().encode(self)
             return String(data: jsonData, encoding: .utf8)
         } catch {
-            print(#function, BridgeError.unencodableInstrumentation(error))
+            return nil
         }
-
-        return nil
     }
 }
