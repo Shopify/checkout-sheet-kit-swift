@@ -37,7 +37,7 @@ class StorefrontClient: @unchecked Sendable {
                 apiKey: InfoDictionary.shared.accessToken
             )
 
-        /// Set the caching policy (1 hour)
+        // Set the caching policy (1 hour)
         client.cachePolicy = .cacheFirst(expireIn: 60 * 60)
     }
 
@@ -134,8 +134,7 @@ public struct StorefrontURL {
         if let match = url.path.range(
             of: pattern, options: .regularExpression, range: nil, locale: nil
         ) {
-            let slug = url.path[match].components(separatedBy: "/").last
-            return slug
+            return url.path[match].components(separatedBy: "/").last
         }
         return nil
     }
@@ -167,21 +166,25 @@ class StorefrontInputFactory {
 
             let deliveryAddressPreferences = [
                 Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: deliveryAddress))
+                    deliveryAddress: Input(orNull: deliveryAddress)
+                )
             ]
 
             return Storefront.CartInput.create(
                 lines: Input(
                     orNull: items.map {
                         Storefront.CartLineInput.create(merchandiseId: $0)
-                    }),
+                    }
+                ),
                 buyerIdentity: Input(
                     orNull: Storefront.CartBuyerIdentityInput.create(
                         email: Input(orNull: vaultedContactInfo.email),
                         customerAccessToken: Input(orNull: customerAccessToken),
                         deliveryAddressPreferences: Input(
-                            orNull: deliveryAddressPreferences)
-                    ))
+                            orNull: deliveryAddressPreferences
+                        )
+                    )
+                )
             )
         } else if let token = customerAccessToken {
             return Storefront.CartInput.create(
@@ -191,7 +194,8 @@ class StorefrontInputFactory {
                 buyerIdentity: Input(
                     orNull: Storefront.CartBuyerIdentityInput.create(
                         customerAccessToken: Input(orNull: token)
-                    ))
+                    )
+                )
             )
         } else {
             return Storefront.CartInput.create(

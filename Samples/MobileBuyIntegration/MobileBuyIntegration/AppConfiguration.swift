@@ -36,7 +36,7 @@ public final class AppConfiguration: ObservableObject {
     /// Logger to retain Web Pixel events
     let webPixelsLogger = FileLogger("analytics.txt")
 
-    // Configure ShopifyAcceleratedCheckouts
+    /// Configure ShopifyAcceleratedCheckouts
     let acceleratedCheckoutsStorefrontConfig = ShopifyAcceleratedCheckouts.Configuration(
         storefrontDomain: InfoDictionary.shared.domain,
         storefrontAccessToken: InfoDictionary.shared.accessToken

@@ -51,7 +51,7 @@ struct GraphQLResponseError: Decodable, Error {
         let cost: Int?
         let maxCost: Int?
 
-        // Custom decoding to handle additional fields
+        /// Custom decoding to handle additional fields
         private struct DynamicCodingKeys: CodingKey {
             var stringValue: String
             var intValue: Int?

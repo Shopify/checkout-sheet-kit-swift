@@ -49,7 +49,7 @@ class CartManager: ObservableObject {
     }
 
     public func preloadCheckout() {
-        /// Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
+        // Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
         if let url = cart?.checkoutUrl, isDirty {
             ShopifyCheckoutSheetKit.preload(checkout: url)
             markCartAsReady()
@@ -169,7 +169,8 @@ class CartManager: ObservableObject {
         let deliveryAddressPreferencesInput = Input(
             orNull: [
                 Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: shippingAddress))
+                    deliveryAddress: Input(orNull: shippingAddress)
+                )
             ]
         )
 

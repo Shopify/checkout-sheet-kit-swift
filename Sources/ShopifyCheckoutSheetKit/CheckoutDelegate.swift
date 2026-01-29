@@ -48,7 +48,7 @@ public protocol CheckoutDelegate: AnyObject {
 
 extension CheckoutDelegate {
     public func checkoutDidComplete(event _: CheckoutCompletedEvent) {
-        /// No-op by default
+        // No-op by default
     }
 
     public func checkoutDidClickLink(url: URL) {

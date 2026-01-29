@@ -26,8 +26,13 @@ import Foundation
 /// Container around a GraphQL language string.
 /// Includes necessary fragments for the operation.
 enum GraphQLDocument {
-    static func build(operation: Queries) -> String { _build(operation.rawValue) }
-    static func build(operation: Mutations) -> String { _build(operation.rawValue) }
+    static func build(operation: Queries) -> String {
+        _build(operation.rawValue)
+    }
+
+    static func build(operation: Mutations) -> String {
+        _build(operation.rawValue)
+    }
 
     private static func _build(_ operation: String) -> String {
         let analysis = analyzeFragments(in: operation)

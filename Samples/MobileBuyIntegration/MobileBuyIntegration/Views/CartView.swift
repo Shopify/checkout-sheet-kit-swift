@@ -23,10 +23,9 @@
 
 @preconcurrency import Buy
 import PassKit
-import SwiftUI
-
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
+import SwiftUI
 
 struct CartView: View {
     @State var cartCompleted: Bool = false
@@ -233,14 +232,14 @@ struct CartLines: View {
 
                             HStack(spacing: 20) {
                                 Button(action: {
-                                    /// Prevent multiple simulataneous calls
+                                    // Prevent multiple simulataneous calls
                                     guard node.quantity > 1, updating != node.id else {
                                         return
                                     }
 
                                     updating = node.id
 
-                                    /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
+                                    // Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                     ShopifyCheckoutSheetKit.invalidate()
 
                                     _Concurrency.Task {
@@ -270,14 +269,14 @@ struct CartLines: View {
 
                                 Button(
                                     action: {
-                                        /// Prevent multiple simulataneous calls
+                                        // Prevent multiple simulataneous calls
                                         guard updating != node.id else {
                                             return
                                         }
 
                                         updating = node.id
 
-                                        /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
+                                        // Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                         ShopifyCheckoutSheetKit.invalidate()
 
                                         _Concurrency.Task {

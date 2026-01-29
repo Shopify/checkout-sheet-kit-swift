@@ -51,7 +51,7 @@ class CheckoutSheetTests: XCTestCase {
         checkoutSheet = CheckoutSheet(checkout: checkoutURL)
     }
 
-    /// Lifecycle events
+    // Lifecycle events
 
     func testOnCancel() {
         var cancelActionCalled = false
@@ -107,7 +107,7 @@ class CheckoutSheetTests: XCTestCase {
         XCTAssertNotNil(actionData)
     }
 
-    func testOnLinkClick() {
+    func testOnLinkClick() throws {
         var actionCalled = false
         var actionData: URL?
 
@@ -115,7 +115,7 @@ class CheckoutSheetTests: XCTestCase {
             actionCalled = true
             actionData = url
         }
-        checkoutSheet.delegate.checkoutDidClickLink(url: URL(string: "https://shopify.com")!)
+        try checkoutSheet.delegate.checkoutDidClickLink(url: XCTUnwrap(URL(string: "https://shopify.com")))
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
     }
@@ -131,7 +131,7 @@ class CheckoutConfigurableTests: XCTestCase {
         checkoutSheet = CheckoutSheet(checkout: checkoutURL)
     }
 
-    /// Configuration modifiers
+    // Configuration modifiers
 
     func testBackgroundColor() {
         let color = UIColor.red

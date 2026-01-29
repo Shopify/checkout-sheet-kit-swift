@@ -123,7 +123,7 @@ class CheckoutBridgeTests: XCTestCase {
     }
 
     func testFailedDecodeReturnsEmptyEvent() throws {
-        /// Missing orderId, taxes, billingAddress
+        // Missing orderId, taxes, billingAddress
         let payload = "{\"orderDetails\":{\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}},\"token\":\"fake-token\"},\"paymentMethods\":[{\"type\":\"direct\",\"details\":{\"amount\":\"109.89\",\"currency\":\"CAD\",\"brand\":\"BOGUS\",\"lastFourDigits\":\"1\"}}],\"deliveries\":[{\"method\":\"SHIPPING\",\"details\":{\"location\":{\"city\":\"Calgary\",\"countryCode\":\"CA\",\"postalCode\":\"T1X 0L3\",\"address1\":\"The Cloak & Dagger\",\"address2\":\"1st Street Southeast\",\"firstName\":\"Test\",\"lastName\":\"McTest\",\"name\":\"Test\",\"zoneCode\":\"AB\",\"coordinates\":{\"latitude\":45.416311,\"longitude\":-75.68683}}}}]},\"orderId\":\"gid://shopify/OrderIdentity/19\",\"cart\":{\"lines\":[{\"quantity\":1,\"title\":\"Awesome Plastic Shoes\",\"price\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"merchandiseId\":\"gid://shopify/ProductVariant/1\",\"productId\":\"gid://shopify/Product/1\"}],\"price\":{\"total\":{\"amount\":109.89,\"currencyCode\":\"CAD\"},\"subtotal\":{\"amount\":87.99,\"currencyCode\":\"CAD\"},\"taxes\":{\"amount\":0,\"currencyCode\":\"CAD\"},\"shipping\":{\"amount\":21.9,\"currencyCode\":\"CAD\"}}}}"
 
         let event = createEventPayload(name: "completed", payload)
@@ -241,7 +241,7 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual("my_custom_event", customEvent.name)
 
         let decoder = JSONDecoder()
-        let customData = try decoder.decode(MyCustomData.self, from: customEvent.customData!.data(using: .utf8)!)
+        let customData = try decoder.decode(MyCustomData.self, from: XCTUnwrap(customEvent.customData?.data(using: .utf8)))
 
         XCTAssertEqual("attrVal", customData.wrapper.attr)
         XCTAssertEqual([1, 2, 3], customData.wrapper.attr2)
