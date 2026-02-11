@@ -1,26 +1,3 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 @testable import ShopifyCheckoutSheetKit
 import WebKit
 import XCTest
@@ -174,31 +151,6 @@ class CheckoutWebViewTests: XCTestCase {
         }
     }
 
-    func testObtainsOrderIDFromQuery() throws {
-        let urls = [
-            "http://shopify1.shopify.com/checkouts/c/12345/thank-you?order_id=1234",
-            "http://shopify1.shopify.com/checkouts/c/12345/thank_you?order_id=1234",
-            "http://shopify1.shopify.com/checkouts/c/12345/thank_you/completed?order_id=1234"
-        ]
-
-        for url in urls {
-            recovery = createRecoveryAgent()
-            let didCompleteCheckoutExpectation = expectation(description: "checkoutViewDidCompleteCheckout was called")
-
-            mockDelegate.didEmitCheckoutCompletedEventExpectation = didCompleteCheckoutExpectation
-            recovery.viewDelegate = mockDelegate
-
-            try recovery.load(checkout: XCTUnwrap(URL(string: url)))
-            let urlResponse = try XCTUnwrap(try HTTPURLResponse(url: XCTUnwrap(URL(string: url)), statusCode: 200, httpVersion: nil, headerFields: nil))
-
-            XCTAssertEqual(recovery.handleResponse(urlResponse), .allow)
-
-            waitForExpectations(timeout: 5) { _ in
-                XCTAssertEqual(self.mockDelegate.completedEventReceived?.orderDetails.id, "1234")
-            }
-        }
-    }
-
     func test401responseOnCheckoutURLCodeDelegation() throws {
         try view.load(checkout: XCTUnwrap(URL(string: "http://shopify1.shopify.com/checkouts/cn/123")))
         let link = try XCTUnwrap(view.url)
@@ -214,7 +166,7 @@ class CheckoutWebViewTests: XCTestCase {
 
         waitForExpectations(timeout: 5) { _ in
             switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(message, code, recoverable)):
+            case let .some(.checkoutUnavailable(message, _, recoverable)):
                 XCTAssertEqual(message, "unauthorized")
                 XCTAssertFalse(recoverable)
             default:
@@ -303,7 +255,6 @@ class CheckoutWebViewTests: XCTestCase {
                 }
             }
 
-            // Reset the delegate's expectations and error received state before the next iteration
             mockDelegate.didFailWithErrorExpectation = nil
             mockDelegate.errorReceived = nil
         }
@@ -390,7 +341,6 @@ class CheckoutWebViewTests: XCTestCase {
 
         try webView.load(
             checkout: XCTUnwrap(URL(string: "https://checkout-sdk.myshopify.io")),
-            // This is not respected if preloading is disabled at a config level
             isPreload: true
         )
 
@@ -456,6 +406,12 @@ class CheckoutWebViewTests: XCTestCase {
         view.webView(view, didFail: nil, withError: error)
 
         XCTAssertNil(mockDelegate.errorReceived)
+    }
+
+    func testBridgeHandlerIsSetOnWebView() {
+        let handler = MockBridgeHandler()
+        view.bridgeHandler = handler
+        XCTAssertNotNil(view.bridgeHandler)
     }
 }
 

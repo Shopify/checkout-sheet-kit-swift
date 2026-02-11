@@ -1,39 +1,14 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 @testable import ShopifyCheckoutSheetKit
 import XCTest
 
 class CheckoutViewControllerTests: XCTestCase {
     var checkoutURL: URL!
-    var delegate: CheckoutDelegateWrapper!
     var checkoutViewController: CheckoutViewController!
 
     override func setUp() {
         super.setUp()
         checkoutURL = URL(string: "https://www.shopify.com")
-        delegate = CheckoutDelegateWrapper()
-        checkoutViewController = CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+        checkoutViewController = CheckoutViewController(checkout: checkoutURL)
     }
 
     func testInit() {
@@ -51,30 +26,14 @@ class CheckoutSheetTests: XCTestCase {
         checkoutSheet = CheckoutSheet(checkout: checkoutURL)
     }
 
-    // Lifecycle events
-
     func testOnCancel() {
         var cancelActionCalled = false
 
-        checkoutSheet.onCancel {
+        let sheet = checkoutSheet.onCancel {
             cancelActionCalled = true
         }
-        checkoutSheet.delegate.checkoutDidCancel()
+        sheet.onCancelAction?()
         XCTAssertTrue(cancelActionCalled)
-    }
-
-    func testOnComplete() {
-        var actionCalled = false
-        var actionData: CheckoutCompletedEvent?
-        let event = createEmptyCheckoutCompletedEvent()
-
-        checkoutSheet.onComplete { event in
-            actionCalled = true
-            actionData = event
-        }
-        checkoutSheet.delegate.checkoutDidComplete(event: event)
-        XCTAssertTrue(actionCalled)
-        XCTAssertNotNil(actionData)
     }
 
     func testOnFail() {
@@ -82,42 +41,20 @@ class CheckoutSheetTests: XCTestCase {
         var actionData: CheckoutError?
         let error: CheckoutError = .checkoutUnavailable(message: "error", code: CheckoutUnavailable.httpError(statusCode: 500), recoverable: false)
 
-        checkoutSheet.onFail { failure in
+        let sheet = checkoutSheet.onFail { failure in
             actionCalled = true
             actionData = failure
         }
 
-        checkoutSheet.delegate.checkoutDidFail(error: error)
+        sheet.onFailAction?(error)
         XCTAssertTrue(actionCalled)
         XCTAssertNotNil(actionData)
     }
 
-    func testOnPixelEvent() {
-        var actionCalled = false
-        var actionData: PixelEvent?
-        let standardEvent = StandardEvent(context: nil, id: "testId", name: "checkout_started", timestamp: "2022-01-01T00:00:00Z", data: nil)
-        let pixelEvent = PixelEvent.standardEvent(standardEvent)
-
-        checkoutSheet.onPixelEvent { event in
-            actionCalled = true
-            actionData = event
-        }
-        checkoutSheet.delegate.checkoutDidEmitWebPixelEvent(event: pixelEvent)
-        XCTAssertTrue(actionCalled)
-        XCTAssertNotNil(actionData)
-    }
-
-    func testOnLinkClick() throws {
-        var actionCalled = false
-        var actionData: URL?
-
-        checkoutSheet.onLinkClick { url in
-            actionCalled = true
-            actionData = url
-        }
-        try checkoutSheet.delegate.checkoutDidClickLink(url: XCTUnwrap(URL(string: "https://shopify.com")))
-        XCTAssertTrue(actionCalled)
-        XCTAssertNotNil(actionData)
+    func testConnect() {
+        let handler = MockBridgeHandler()
+        let sheet = checkoutSheet.connect(handler)
+        XCTAssertNotNil(sheet.bridgeHandler)
     }
 }
 
@@ -130,8 +67,6 @@ class CheckoutConfigurableTests: XCTestCase {
         checkoutURL = URL(string: "https://www.shopify.com")
         checkoutSheet = CheckoutSheet(checkout: checkoutURL)
     }
-
-    // Configuration modifiers
 
     func testBackgroundColor() {
         let color = UIColor.red

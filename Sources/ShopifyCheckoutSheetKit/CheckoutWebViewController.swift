@@ -1,31 +1,11 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 import UIKit
 import WebKit
 
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
-    weak var delegate: CheckoutDelegate?
+    var onCancel: (() -> Void)?
+    var onFail: ((CheckoutError) -> Void)?
+    var bridgeHandler: (any CheckoutBridgeHandler)?
+
     var checkoutViewDidFailWithErrorCount = 0
     var checkoutView: CheckoutWebView
 
@@ -44,7 +24,6 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             var item: UIBarButtonItem
 
             if #available(iOS 26.0, *) {
-                // Liquid glass renders the icon inside a circular bubble by default
                 item = UIBarButtonItem(
                     image: UIImage(systemName: "xmark"),
                     style: .plain,
@@ -64,7 +43,6 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             return item
         }
 
-        // Use system default if no custom tint color was provided
         return UIBarButtonItem(
             barButtonSystemItem: .close,
             target: self,
@@ -76,13 +54,14 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+    public init(checkoutURL url: URL, bridgeHandler: (any CheckoutBridgeHandler)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
         checkoutURL = url
-        self.delegate = delegate
+        self.bridgeHandler = bridgeHandler
 
         let checkoutView = CheckoutWebView.for(checkout: url, entryPoint: entryPoint)
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.scrollView.contentInsetAdjustmentBehavior = .never
+        checkoutView.bridgeHandler = bridgeHandler
         self.checkoutView = checkoutView
 
         super.init(nibName: nil, bundle: nil)
@@ -179,7 +158,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             CheckoutWebView.invalidate()
         }
 
-        delegate?.checkoutDidCancel()
+        onCancel?()
     }
 
     package func presentFallbackViewController(url: URL) {
@@ -228,16 +207,10 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         }
     }
 
-    func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent) {
-        ConfettiCannon.fire(in: view)
-        CheckoutWebView.invalidate(disconnect: false)
-        delegate?.checkoutDidComplete(event: event)
-    }
-
     func checkoutViewDidFailWithError(error: CheckoutError) {
         checkoutViewDidFailWithErrorCount += 1
         CheckoutWebView.invalidate()
-        delegate?.checkoutDidFail(error: error)
+        onFail?(error)
 
         if shouldAttemptRecovery(for: error) {
             presentFallbackViewController(url: checkoutURL)
@@ -246,32 +219,18 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
         }
     }
 
-    /// When checkout fails to load we attempt to connect via
-    /// recovery mode *once* with CheckoutBridge disabled to avoid
-    /// excessive load on potentially degraded services.
     func shouldAttemptRecovery(for error: CheckoutError) -> Bool {
         let isWithinRetryLimit = checkoutViewDidFailWithErrorCount < 2
-        let delegateWantsRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
-
-        return isRecoverableError() && isWithinRetryLimit && delegateWantsRecovery
+        return isRecoverableError() && isWithinRetryLimit && error.isRecoverable
     }
 
     func checkoutViewDidClickLink(url: URL) {
-        delegate?.checkoutDidClickLink(url: url)
-    }
-
-    func checkoutViewDidToggleModal(modalVisible: Bool) {
-        guard let navigationController else { return }
-
-        navigationController.setNavigationBarHidden(modalVisible, animated: true)
-    }
-
-    func checkoutViewDidEmitWebPixelEvent(event: PixelEvent) {
-        delegate?.checkoutDidEmitWebPixelEvent(event: event)
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        }
     }
 
     private func isRecoverableError() -> Bool {
-        // Reuse of multipass tokens will cause 422 errors. A new token must be generated
         return !CheckoutURL(from: checkoutURL).isMultipassURL()
     }
 }

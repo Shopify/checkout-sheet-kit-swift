@@ -1,39 +1,16 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 import SwiftUI
 import UIKit
 
 public class CheckoutViewController: UINavigationController {
-    public init(checkout url: URL, delegate: CheckoutDelegate? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: nil)
+    public init(checkout url: URL, bridgeHandler: (any CheckoutBridgeHandler)? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, bridgeHandler: bridgeHandler, entryPoint: nil)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
     }
 
-    package init(checkout url: URL, delegate: CheckoutDelegate? = nil, entryPoint: MetaData.EntryPoint? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, delegate: delegate, entryPoint: entryPoint)
+    package init(checkout url: URL, bridgeHandler: (any CheckoutBridgeHandler)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, bridgeHandler: bridgeHandler, entryPoint: entryPoint)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
@@ -45,122 +22,62 @@ public class CheckoutViewController: UINavigationController {
     }
 }
 
-/// Deprecated
-extension CheckoutViewController {
-    @available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
-    public struct Representable: UIViewControllerRepresentable {
-        @Binding var checkoutURL: URL?
-
-        let delegate: CheckoutDelegate?
-
-        public init(checkout url: Binding<URL?>, delegate: CheckoutDelegate? = nil) {
-            _checkoutURL = url
-            self.delegate = delegate
-        }
-
-        public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-            return CheckoutViewController(checkout: checkoutURL!, delegate: delegate)
-        }
-
-        public func updateUIViewController(_: CheckoutViewController, context _: Self.Context) {}
-    }
-}
-
 public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable {
     public typealias UIViewControllerType = CheckoutViewController
 
     var checkoutURL: URL
-    var delegate = CheckoutDelegateWrapper()
+    var bridgeHandler: (any CheckoutBridgeHandler)?
+    var onCancelAction: (() -> Void)?
+    var onFailAction: ((CheckoutError) -> Void)?
 
     public init(checkout url: URL) {
         checkoutURL = url
 
-        // Programatic usage of the library will invalidate the cache each time the configuration changes.
-        // This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
         ShopifyCheckoutSheetKit.invalidateOnConfigurationChange = false
     }
 
     public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-        return CheckoutViewController(checkout: checkoutURL, delegate: delegate)
+        let viewController = CheckoutViewController(checkout: checkoutURL, bridgeHandler: bridgeHandler)
+        configureWebViewController(viewController)
+        return viewController
     }
 
     public func updateUIViewController(_ uiViewController: CheckoutViewController, context _: Self.Context) {
+        configureWebViewController(uiViewController)
+    }
+
+    private func configureWebViewController(_ navigationController: CheckoutViewController) {
         guard
-            let webViewController = uiViewController
+            let webViewController = navigationController
             .viewControllers
             .compactMap({ $0 as? CheckoutWebViewController })
             .first
         else {
-            OSLogger.shared.debug(
-                "[CheckoutViewController#updateUIViewController]: No ViewControllers matching CheckoutWebViewController \(uiViewController.viewControllers.map { String(describing: $0.self) }.joined(separator: ""))"
-            )
             return
         }
 
-        webViewController.delegate = delegate
+        webViewController.bridgeHandler = bridgeHandler
+        webViewController.checkoutView.bridgeHandler = bridgeHandler
+        webViewController.onCancel = onCancelAction
+        webViewController.onFail = onFailAction
     }
 
-    // Lifecycle methods
+    @discardableResult public func connect(_ handler: any CheckoutBridgeHandler) -> Self {
+        var copy = self
+        copy.bridgeHandler = handler
+        return copy
+    }
 
     @discardableResult public func onCancel(_ action: @escaping () -> Void) -> Self {
-        delegate.onCancel = action
-        return self
-    }
-
-    @discardableResult public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void) -> Self {
-        delegate.onComplete = action
-        return self
+        var copy = self
+        copy.onCancelAction = action
+        return copy
     }
 
     @discardableResult public func onFail(_ action: @escaping (CheckoutError) -> Void) -> Self {
-        delegate.onFail = action
-        return self
-    }
-
-    @discardableResult public func onPixelEvent(_ action: @escaping (PixelEvent) -> Void) -> Self {
-        delegate.onPixelEvent = action
-        return self
-    }
-
-    @discardableResult public func onLinkClick(_ action: @escaping (URL) -> Void) -> Self {
-        delegate.onLinkClick = action
-        return self
-    }
-}
-
-public class CheckoutDelegateWrapper: CheckoutDelegate {
-    var onComplete: ((CheckoutCompletedEvent) -> Void)?
-    var onCancel: (() -> Void)?
-    var onFail: ((CheckoutError) -> Void)?
-    var onPixelEvent: ((PixelEvent) -> Void)?
-    var onLinkClick: ((URL) -> Void)?
-
-    public func checkoutDidFail(error: CheckoutError) {
-        onFail?(error)
-    }
-
-    public func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        onPixelEvent?(event)
-    }
-
-    public func checkoutDidComplete(event: CheckoutCompletedEvent) {
-        onComplete?(event)
-    }
-
-    public func checkoutDidCancel() {
-        onCancel?()
-    }
-
-    public func checkoutDidClickLink(url: URL) {
-        if let onLinkClick {
-            onLinkClick(url)
-            return
-        }
-
-        // Use fallback behavior if callback is not provided
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        }
+        var copy = self
+        copy.onFailAction = action
+        return copy
     }
 }
 

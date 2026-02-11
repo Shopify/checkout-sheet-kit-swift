@@ -1,26 +1,3 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 @testable import ShopifyCheckoutSheetKit
 import WebKit
 import XCTest
@@ -30,7 +7,6 @@ class CheckoutViewDelegateTests: XCTestCase {
     private let checkoutURL = URL(string: "https://checkout-sdk.myshopify.com")!
     private var viewController: MockCheckoutWebViewController!
     private var navigationController: UINavigationController!
-    private var delegate = ExampleDelegate()
 
     override func setUp() {
         ShopifyCheckoutSheetKit.configure {
@@ -38,7 +14,7 @@ class CheckoutViewDelegateTests: XCTestCase {
             $0.title = customTitle ?? "Checkout"
         }
         viewController = MockCheckoutWebViewController(
-            checkoutURL: checkoutURL, delegate: delegate
+            checkoutURL: checkoutURL
         )
 
         navigationController = UINavigationController(rootViewController: viewController)
@@ -57,17 +33,6 @@ class CheckoutViewDelegateTests: XCTestCase {
         customTitle = "Custom title"
         setUp()
         XCTAssertEqual(viewController.title, "Custom title")
-    }
-
-    func testCheckoutViewDidCompleteCheckoutInvalidatesViewCache() {
-        let one = CheckoutWebView.for(checkout: checkoutURL)
-        let two = CheckoutWebView.for(checkout: checkoutURL)
-        XCTAssertEqual(one, two)
-
-        viewController.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent())
-
-        let three = CheckoutWebView.for(checkout: checkoutURL)
-        XCTAssertNotEqual(two, three)
     }
 
     func testCheckoutViewDidFailWithErrorInvalidatesViewCache() {
@@ -108,7 +73,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 
     func testDoesNotInstantiateRecoveryForMultipassURL() throws {
         let controller = try MockCheckoutWebViewController(
-            checkoutURL: XCTUnwrap(URL(string: "https://checkout-sdk.myshopify.com/account/login/multipass/token")), delegate: delegate
+            checkoutURL: XCTUnwrap(URL(string: "https://checkout-sdk.myshopify.com/account/login/multipass/token"))
         )
 
         controller.checkoutViewDidFailWithError(
@@ -178,27 +143,6 @@ class CheckoutViewDelegateTests: XCTestCase {
         XCTAssertEqual(one, three)
     }
 
-    func testCheckoutViewDidClickLinkDoesNotInvalidateViewCache() throws {
-        let one = CheckoutWebView.for(checkout: checkoutURL)
-        let two = CheckoutWebView.for(checkout: checkoutURL)
-        XCTAssertEqual(one, two)
-
-        try viewController.checkoutViewDidClickLink(url: XCTUnwrap(URL(string: "https://shopify.com/anything")))
-
-        let three = CheckoutWebView.for(checkout: checkoutURL)
-        XCTAssertEqual(two, three)
-    }
-
-    func testCheckoutViewDidToggleModalAddsAndRemovesNavigationBar() throws {
-        XCTAssertFalse(try XCTUnwrap(viewController.navigationController?.isNavigationBarHidden))
-
-        viewController.checkoutViewDidToggleModal(modalVisible: true)
-        XCTAssertTrue(try XCTUnwrap(viewController.navigationController?.isNavigationBarHidden))
-
-        viewController.checkoutViewDidToggleModal(modalVisible: false)
-        XCTAssertFalse(try XCTUnwrap(viewController.navigationController?.isNavigationBarHidden))
-    }
-
     func testCheckoutViewDidStartNavigationShowsProgressBar() {
         XCTAssertFalse(viewController.progressBar.isHidden)
         XCTAssertTrue(viewController.initialNavigation)
@@ -211,7 +155,7 @@ class CheckoutViewDelegateTests: XCTestCase {
 
     func testCloseButtonUsesSystemDefaultWhenTintColorIsNil() {
         ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = nil
-        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
+        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL)
 
         let closeButton = controller.navigationItem.rightBarButtonItem
         XCTAssertNotNil(closeButton)
@@ -222,7 +166,7 @@ class CheckoutViewDelegateTests: XCTestCase {
     func testCloseButtonUsesCustomImageAndTintWhenColorIsSet() {
         let customColor = UIColor.red
         ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = customColor
-        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
+        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL)
 
         let closeButton = controller.navigationItem.rightBarButtonItem
         XCTAssertNotNil(closeButton)
@@ -233,14 +177,9 @@ class CheckoutViewDelegateTests: XCTestCase {
 
     func testCloseButtonImageIsXMarkCircleFill() {
         ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = .blue
-        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL, delegate: delegate)
+        let controller = MockCheckoutWebViewController(checkoutURL: checkoutURL)
 
         let closeButton = controller.navigationItem.rightBarButtonItem
-        let expectedImage = UIImage(systemName: "xmark.circle.fill")
-
-        XCTAssertNotNil(closeButton?.image)
-        XCTAssertNotNil(expectedImage)
-        // Verify it's using custom image rather than system button item
         XCTAssertNotNil(closeButton?.image)
     }
 }
