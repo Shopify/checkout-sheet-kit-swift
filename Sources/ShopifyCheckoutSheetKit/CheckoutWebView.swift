@@ -112,7 +112,8 @@ class CheckoutWebView: WKWebView {
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
             configuration.applicationNameForUserAgent = CheckoutBridge.recoveryAgent(entryPoint: entryPoint)
         } else {
-            configuration.applicationNameForUserAgent = CheckoutBridge.applicationName(entryPoint: entryPoint)
+            // Sending this user agent makes checkout think we're subscribing to the old protocol
+//            configuration.applicationNameForUserAgent = CheckoutBridge.applicationName(entryPoint: entryPoint)
         }
 
         isRecovery = recovery
@@ -213,10 +214,6 @@ class CheckoutWebView: WKWebView {
             OSLogger.shared.info("Emitting presented event to checkout")
             CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
             presentedEventDidDispatch = true
-
-            if let ready = bridgeHandler?.readyMessage {
-                CheckoutBridge.sendProtocolMessage(self, ready)
-            }
         }
     }
 }
@@ -224,18 +221,38 @@ class CheckoutWebView: WKWebView {
 extension CheckoutWebView: WKScriptMessageHandler {
     func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let body = message.body as? String else {
-            OSLogger.shared.error("Bridge message body is not a string")
+            print("[ECP-DEBUG] message body is not a string, type: \(type(of: message.body))")
             return
         }
 
+        print("[ECP-DEBUG] raw message: \(body)")
+
+        if let data = body.data(using: .utf8),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            let method = json["method"] as? String ?? "nil"
+            let id = json["id"] as? String ?? "nil"
+            print("[ECP-DEBUG] method: \(method), id: \(id)")
+
+            if method == "ec.ready", let reqId = json["id"] as? String {
+                print("[ECP-DEBUG] responding to ec.ready with id: \(reqId)")
+                let response = "{\"jsonrpc\":\"2.0\",\"id\":\"\(reqId)\",\"result\":{}}"
+                CheckoutBridge.sendResponse(self, messageBody: response)
+            }
+        } else {
+            print("[ECP-DEBUG] failed to parse JSON from body")
+        }
+
         guard let handler = bridgeHandler else {
-            OSLogger.shared.debug("No bridge handler registered, ignoring message")
+            print("[ECP-DEBUG] no bridge handler registered")
             return
         }
 
         Task {
             if let response = await handler.handleMessage(body) {
-                CheckoutBridge.sendProtocolMessage(self, response)
+                print("[ECP-DEBUG] handler responded: \(response)")
+                CheckoutBridge.sendResponse(self, messageBody: response)
+            } else {
+                print("[ECP-DEBUG] handler returned nil for method")
             }
         }
     }
@@ -357,6 +374,31 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
         checkoutDidLoad = true
         timer = nil
+
+        #if DEBUG
+        let debugScript = """
+        (function() {
+            var info = {
+                hasECP: typeof window.EmbeddedCheckoutProtocol !== 'undefined',
+                ecpKeys: typeof window.EmbeddedCheckoutProtocol === 'object' ? Object.keys(window.EmbeddedCheckoutProtocol) : [],
+                hasWebkit: typeof window.webkit !== 'undefined',
+                hasMessageHandlers: typeof window.webkit?.messageHandlers !== 'undefined',
+                hasConsumer: typeof window.webkit?.messageHandlers?.EmbeddedCheckoutProtocolConsumer !== 'undefined',
+                hasMobileSDK: typeof window.MobileCheckoutSdk !== 'undefined',
+                url: window.location.href
+            };
+            return JSON.stringify(info);
+        })();
+        """
+        evaluateJavaScript(debugScript) { result, error in
+            if let error = error {
+                print("[ECP-DEBUG] JS eval error: \(error.localizedDescription)")
+            }
+            if let result = result {
+                print("[ECP-DEBUG] page state: \(result)")
+            }
+        }
+        #endif
     }
 
     func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {

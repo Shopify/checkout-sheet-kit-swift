@@ -11,7 +11,7 @@ protocol CheckoutBridgeProtocol {
 }
 
 enum CheckoutBridge: CheckoutBridgeProtocol {
-    static let messageHandler = "mobileCheckoutSdk"
+    static let messageHandler = "EmbeddedCheckoutProtocolConsumer"
 
     static var applicationName: String {
         return applicationName(entryPoint: nil)
@@ -70,8 +70,26 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         webView.evaluateJavaScript(script)
     }
 
-    static func sendProtocolMessage(_ webView: WKWebView, _ message: String) {
-        webView.evaluateJavaScript("window.postMessage(\(message), '*')")
+    static func sendResponse(_ webView: WKWebView, messageBody: String) {
+        DispatchQueue.main.async {
+            let script = """
+            (function() {
+                try {
+                    if (window.EmbeddedCheckoutProtocol && typeof window.EmbeddedCheckoutProtocol.postMessage === 'function') {
+                        window.EmbeddedCheckoutProtocol.postMessage(\(messageBody));
+                    } else if (window && window.console && window.console.error) {
+                        window.console.error('EmbeddedCheckoutProtocol.postMessage is not available.');
+                    }
+                } catch (error) {
+                    if (window && window.console && window.console.error) {
+                        window.console.error('Failed to post message to checkout', error);
+                    }
+                }
+            })();
+            """
+
+            webView.evaluateJavaScript(script)
+        }
     }
 
     static func dispatchMessageTemplate(body: String) -> String {
