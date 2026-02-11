@@ -1,27 +1,3 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-@preconcurrency import ShopifyAcceleratedCheckouts
 @preconcurrency import ShopifyCheckoutSheetKit
 import UIKit
 
@@ -42,33 +18,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _: UIApplication,
         willFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        let acceleratedCheckoutsLogLevel: LogLevel = getLogLevel(
-            key: AppStorageKeys.acceleratedCheckoutsLogLevel.rawValue
-        )
         let checkoutSheetKitLogLevel: LogLevel = getLogLevel(
             key: AppStorageKeys.checkoutSheetKitLogLevel.rawValue
         )
 
-        ShopifyAcceleratedCheckouts.logLevel = acceleratedCheckoutsLogLevel
-
         ShopifyCheckoutSheetKit.configure {
-            // Checkout color scheme setting
             $0.colorScheme = .automatic
-
-            // Customize progress bar color
             $0.tintColor = ColorPalette.primaryColor
-
-            // Enable preloading
             $0.preloading.enabled = true
-
-            // Optional logger used for internal purposes
             $0.logger = FileLogger("log.txt")
-
-            // Optional log level for Checkout Sheet Kit
             $0.logLevel = checkoutSheetKitLogLevel
         }
 
-        print("[MobileBuyIntegration] AcceleratedCheckout Log level set to \(acceleratedCheckoutsLogLevel)")
         print("[MobileBuyIntegration] CheckoutSheetKit Log level set to \(checkoutSheetKitLogLevel)")
 
         UIBarButtonItem.appearance().tintColor = ColorPalette.primaryColor

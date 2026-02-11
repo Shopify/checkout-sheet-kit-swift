@@ -22,7 +22,6 @@
  */
 
 import Combine
-@preconcurrency import ShopifyAcceleratedCheckouts
 @preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 
@@ -41,13 +40,6 @@ struct SettingsView: View {
             ShopifyCheckoutSheetKit.configure {
                 $0.logLevel = checkoutSheetKitLogLevel
             }
-        }
-    }
-
-    @AppStorage(AppStorageKeys.acceleratedCheckoutsLogLevel.rawValue)
-    var acceleratedCheckoutsLogLevel: LogLevel = .all {
-        didSet {
-            ShopifyAcceleratedCheckouts.logLevel = acceleratedCheckoutsLogLevel
         }
     }
 
@@ -121,21 +113,6 @@ struct SettingsView: View {
                 }
 
                 Section(header: Text("Logging")) {
-                    Picker(
-                        "Accelerated Checkouts",
-                        selection: Binding(
-                            get: { acceleratedCheckoutsLogLevel },
-                            set: { acceleratedCheckoutsLogLevel = $0 }
-                        )
-                    ) {
-                        ForEach(LogLevel.allCases, id: \.self) { level in
-                            Text(
-                                level.rawValue.capitalized(with: Locale.current)
-                            ).tag(level)
-                        }
-                    }
-                    .pickerStyle(.menu)
-
                     Picker(
                         "Checkout Sheet Kit",
                         selection: Binding(

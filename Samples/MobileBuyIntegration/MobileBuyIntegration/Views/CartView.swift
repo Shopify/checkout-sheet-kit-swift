@@ -1,29 +1,5 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 @preconcurrency import Buy
-import PassKit
-import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutProtocol
 import ShopifyCheckoutSheetKit
 import SwiftUI
 
@@ -34,7 +10,15 @@ struct CartView: View {
     @State var showCheckoutSheet: Bool = false
 
     @ObservedObject var cartManager: CartManager = .shared
-    @ObservedObject var config: AppConfiguration = appConfiguration
+
+    private let handler = CheckoutProtocol.Handler()
+        .on(CheckoutProtocol.start) { checkout in
+            print("[UCP] Checkout started: \(checkout.id)")
+        }
+        .on(CheckoutProtocol.complete) { checkout in
+            print("[UCP] Checkout completed: \(checkout.order?.id ?? "unknown")")
+            CartManager.shared.resetCart()
+        }
 
     var body: some View {
         if let lines = cartManager.cart?.lines.nodes {
@@ -47,24 +31,6 @@ struct CartView: View {
                 }
 
                 VStack(spacing: DesignSystem.buttonSpacing) {
-                    if let cartId = cartManager.cart?.id.rawValue {
-                        AcceleratedCheckoutButtons(cartID: cartId)
-                            .wallets([.shopPay, .applePay])
-                            .cornerRadius(DesignSystem.cornerRadius)
-                            .onComplete { _ in
-                                // Reset cart on successful checkout
-                                CartManager.shared.resetCart()
-                            }
-                            .onFail { error in
-                                print("Accelerated checkout failed: \(error)")
-                            }
-                            .onCancel {
-                                print("Accelerated checkout cancelled")
-                            }
-                            .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
-                            .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
-                    }
-
                     Button(
                         action: { showCheckoutSheet = true },
                         label: {
@@ -98,6 +64,7 @@ struct CartView: View {
             .sheet(isPresented: $showCheckoutSheet) {
                 if let url = cartManager.cart?.checkoutUrl {
                     CheckoutSheet(checkout: url)
+                        .connect(handler)
                         .colorScheme(.automatic)
                         .onCancel {
                             print("[ShopifyCheckoutKit] CANCEL")
@@ -108,26 +75,9 @@ struct CartView: View {
                                 isCompleted = false
                             }
                         }
-                        .onComplete { event in
-                            // Handle checkout completion
-                            print("[ShopifyCheckoutKit] COMPLETE - Checkout completed with order ID: \(event.orderDetails.id)")
-                            isCompleted = true
-                        }
                         .onFail { error in
                             showCheckoutSheet = false
-                            // Handle checkout failure
                             print("[ShopifyCheckoutKit] FAIL - Checkout failed: \(error)")
-                        }
-                        .onLinkClick { url in
-                            print("[ShopifyCheckoutKit] LINK CLICK - \(url)")
-                        }
-                        .onPixelEvent { event in
-                            switch event {
-                            case let .customEvent(event):
-                                print("[ShopifyCheckoutKit] PIXEL - \(String(describing: event.name))")
-                            case let .standardEvent(event):
-                                print("[ShopifyCheckoutKit] PIXEL - \(String(describing: event.name))")
-                            }
                         }
                         .edgesIgnoringSafeArea(.all)
                 }
@@ -232,14 +182,12 @@ struct CartLines: View {
 
                             HStack(spacing: 20) {
                                 Button(action: {
-                                    // Prevent multiple simulataneous calls
                                     guard node.quantity > 1, updating != node.id else {
                                         return
                                     }
 
                                     updating = node.id
 
-                                    // Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                     ShopifyCheckoutSheetKit.invalidate()
 
                                     _Concurrency.Task {
@@ -269,14 +217,12 @@ struct CartLines: View {
 
                                 Button(
                                     action: {
-                                        // Prevent multiple simulataneous calls
                                         guard updating != node.id else {
                                             return
                                         }
 
                                         updating = node.id
 
-                                        // Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                         ShopifyCheckoutSheetKit.invalidate()
 
                                         _Concurrency.Task {
