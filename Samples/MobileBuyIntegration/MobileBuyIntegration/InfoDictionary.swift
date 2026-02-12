@@ -101,9 +101,29 @@ extension URL {
         queryItems.append(URLQueryItem(name: "ec_version", value: "2026-01-11"))
         queryItems.append(URLQueryItem(name: "ec_delegate", value: "fulfillment.address_change,payment.instruments_change,payment.credential"))
         if let token = InfoDictionary.shared.ecAuthToken, !token.isEmpty {
+            Self.validateJWTExpiration(token)
             queryItems.append(URLQueryItem(name: "ec_auth", value: token))
         }
         components?.queryItems = queryItems
         return components?.url ?? self
+    }
+
+    private static func validateJWTExpiration(_ token: String) {
+        let segments = token.split(separator: ".")
+        guard segments.count == 3 else { return }
+
+        var base64 = String(segments[1])
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        while base64.count % 4 != 0 { base64.append("=") }
+
+        guard let data = Data(base64Encoded: base64),
+              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let exp = payload["exp"] as? TimeInterval
+        else { return }
+
+        if Date().timeIntervalSince1970 >= exp {
+            fatalError("EC_AUTH_TOKEN expired at \(Date(timeIntervalSince1970: exp)). Renew it in Storefront.xcconfig.")
+        }
     }
 }
