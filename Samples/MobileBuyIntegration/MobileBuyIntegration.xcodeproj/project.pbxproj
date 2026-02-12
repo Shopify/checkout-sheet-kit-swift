@@ -41,6 +41,7 @@
 		CB9A10032F5C100200AABBCC /* CustomerAccountLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9A10022F5C100200AABBCC /* CustomerAccountLoginView.swift */; };
 		CB9A10052F5C100300AABBCC /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9A10042F5C100300AABBCC /* KeychainHelper.swift */; };
 		CB9A10072F5C100400AABBCC /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9A10062F5C100400AABBCC /* AccountView.swift */; };
+		CBE9B3332F3DF82500E266EB /* ShopifyCheckoutProtocol in Frameworks */ = {isa = PBXBuildFile; productRef = CBE9B3322F3DF82500E266EB /* ShopifyCheckoutProtocol */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -90,6 +91,7 @@
 				CB1B10B52E4CDDB0001713F8 /* ShopifyCheckoutSheetKit in Frameworks */,
 				CB001E3A2F3CDBD600286F69 /* ShopifyCheckoutSheetKit in Frameworks */,
 				CB001E372F3CDBA600286F69 /* ShopifyCheckoutProtocol in Frameworks */,
+				CBE9B3332F3DF82500E266EB /* ShopifyCheckoutProtocol in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +249,7 @@
 				CB001E302F3CDA0300286F69 /* ShopifyCheckoutProtocol */,
 				CB001E362F3CDBA600286F69 /* ShopifyCheckoutProtocol */,
 				CB001E392F3CDBD600286F69 /* ShopifyCheckoutSheetKit */,
+				CBE9B3322F3DF82500E266EB /* ShopifyCheckoutProtocol */,
 			);
 			productName = MobileBuyIntegration;
 			productReference = 4EBBA7672A5F0CE200193E19 /* MobileBuyIntegration.app */;
@@ -280,8 +283,8 @@
 			mainGroup = 4EBBA75E2A5F0CE200193E19;
 			packageReferences = (
 				4EBBA7A12A5F0F5600193E19 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
-				CB001E352F3CDBA600286F69 /* XCLocalSwiftPackageReference "../../../kit-protocol/swift" */,
 				CB001E382F3CDBD600286F69 /* XCLocalSwiftPackageReference "../../../checkout-sheet-kit-swift" */,
+				CBE9B3312F3DF82500E266EB /* XCLocalSwiftPackageReference "../../../kit-protocol/languages/swift" */,
 			);
 			productRefGroup = 4EBBA7682A5F0CE200193E19 /* Products */;
 			projectDirPath = "";
@@ -588,13 +591,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		CB001E352F3CDBA600286F69 /* XCLocalSwiftPackageReference "../../../kit-protocol/swift" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../kit-protocol/swift";
-		};
 		CB001E382F3CDBD600286F69 /* XCLocalSwiftPackageReference "../../../checkout-sheet-kit-swift" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../../checkout-sheet-kit-swift";
+		};
+		CBE9B3312F3DF82500E266EB /* XCLocalSwiftPackageReference "../../../kit-protocol/languages/swift" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../kit-protocol/languages/swift";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -630,6 +633,10 @@
 		CB1B10B42E4CDDB0001713F8 /* ShopifyCheckoutSheetKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShopifyCheckoutSheetKit;
+		};
+		CBE9B3322F3DF82500E266EB /* ShopifyCheckoutProtocol */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShopifyCheckoutProtocol;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
