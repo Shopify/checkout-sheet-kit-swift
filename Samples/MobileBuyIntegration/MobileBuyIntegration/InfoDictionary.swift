@@ -37,6 +37,9 @@ final class InfoDictionary: Sendable {
     let customerAccountApiClientId: String?
     let customerAccountApiShopId: String?
 
+    // Embedded Checkout Protocol (optional)
+    let ecAuthToken: String?
+
     var customerAccountApiRedirectUri: String? {
         guard let shopId = customerAccountApiShopId, !shopId.isEmpty else {
             return nil
@@ -85,5 +88,22 @@ final class InfoDictionary: Sendable {
         // Customer Account API configuration (optional)
         customerAccountApiClientId = infoPlist["CustomerAccountApiClientId"] as? String
         customerAccountApiShopId = infoPlist["CustomerAccountApiShopId"] as? String
+
+        // Embedded Checkout Protocol configuration (optional)
+        ecAuthToken = infoPlist["EcAuthToken"] as? String
+    }
+}
+
+extension URL {
+    func appendingEcParams() -> URL {
+        var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
+        var queryItems = components?.queryItems ?? []
+        queryItems.append(URLQueryItem(name: "ec_version", value: "2026-01-11"))
+        queryItems.append(URLQueryItem(name: "ec_delegate", value: "fulfillment.address_change,payment.instruments_change,payment.credential"))
+        if let token = InfoDictionary.shared.ecAuthToken, !token.isEmpty {
+            queryItems.append(URLQueryItem(name: "ec_auth", value: token))
+        }
+        components?.queryItems = queryItems
+        return components?.url ?? self
     }
 }

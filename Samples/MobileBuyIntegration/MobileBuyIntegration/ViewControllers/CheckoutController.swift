@@ -30,7 +30,7 @@ class CheckoutController: UIViewController {
 
     public func present(checkout url: URL) {
         if let rootViewController = window?.topMostViewController() {
-            ShopifyCheckoutSheetKit.present(checkout: url, from: rootViewController, bridgeHandler: handler)
+            ShopifyCheckoutSheetKit.present(checkout: url.appendingEcParams(), from: rootViewController, bridgeHandler: handler)
             root = rootViewController
         }
     }
