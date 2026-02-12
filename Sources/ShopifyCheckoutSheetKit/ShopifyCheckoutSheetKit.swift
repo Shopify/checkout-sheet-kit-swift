@@ -59,15 +59,15 @@ public func invalidate() {
 }
 
 @discardableResult
-public func present(checkout url: URL, from: UIViewController, bridgeHandler: (any CheckoutCommunicationProtocol)? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, bridgeHandler: bridgeHandler)
+public func present(checkout url: URL, from: UIViewController, client: (any CheckoutCommunicationProtocol)? = nil) -> CheckoutViewController {
+    let viewController = CheckoutViewController(checkout: url, client: client)
     from.present(viewController, animated: true)
     return viewController
 }
 
 @discardableResult
-package func present(checkout url: URL, from: UIViewController, entryPoint: MetaData.EntryPoint, bridgeHandler: (any CheckoutCommunicationProtocol)? = nil) -> CheckoutViewController {
-    let viewController = CheckoutViewController(checkout: url, bridgeHandler: bridgeHandler, entryPoint: entryPoint)
+package func present(checkout url: URL, from: UIViewController, entryPoint: MetaData.EntryPoint, client: (any CheckoutCommunicationProtocol)? = nil) -> CheckoutViewController {
+    let viewController = CheckoutViewController(checkout: url, client: client, entryPoint: entryPoint)
     from.present(viewController, animated: true)
     return viewController
 }

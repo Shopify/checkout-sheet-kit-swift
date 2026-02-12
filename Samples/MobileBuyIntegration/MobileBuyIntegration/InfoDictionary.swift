@@ -37,7 +37,7 @@ final class InfoDictionary: Sendable {
     let customerAccountApiClientId: String?
     let customerAccountApiShopId: String?
 
-    // Embedded Checkout Protocol (optional)
+    /// Embedded Checkout Protocol (optional)
     let ecAuthToken: String?
 
     var customerAccountApiRedirectUri: String? {
@@ -115,7 +115,9 @@ extension URL {
         var base64 = String(segments[1])
             .replacingOccurrences(of: "-", with: "+")
             .replacingOccurrences(of: "_", with: "/")
-        while base64.count % 4 != 0 { base64.append("=") }
+        while base64.count % 4 != 0 {
+            base64.append("=")
+        }
 
         guard let data = Data(base64Encoded: base64),
               let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

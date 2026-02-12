@@ -126,7 +126,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     private var buttonStackView: UIStackView!
     private var checkoutButton: UIButton!
 
-    private let handler = CheckoutProtocol.Handler()
+    private let client = CheckoutProtocol.Client()
         .on(CheckoutProtocol.start) { checkout in
             print("[UCP] Checkout started: \(checkout.id)")
         }
@@ -377,7 +377,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc private func presentCheckout() {
         guard let url = CartManager.shared.cart?.checkoutUrl else { return }
 
-        ShopifyCheckoutSheetKit.present(checkout: url.appendingEcParams(), from: self, bridgeHandler: handler)
+        ShopifyCheckoutSheetKit.present(checkout: url.appendingEcParams(), from: self, client: client)
     }
 
     @objc private func resetCart() {

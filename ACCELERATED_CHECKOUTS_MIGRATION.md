@@ -20,17 +20,17 @@ AcceleratedCheckouts targets are temporarily disabled in `Package.swift` while t
 ### New Types
 | Type | Purpose |
 |------|---------|
-| `CheckoutCommunicationProtocol` protocol | `readyMessage: String?` + `handleMessage(_:) async -> String?` |
+| `CheckoutCommunicationProtocol` protocol | `readyMessage: String?` + `process(_:) async -> String?` |
 | `CheckoutBridge.sendProtocolMessage(_:_:)` | Sends JSON-RPC responses back to webview via `postMessage` |
 
 ### API Changes
 | Before | After |
 |--------|-------|
-| `CheckoutViewController(checkout:delegate:)` | `CheckoutViewController(checkout:bridgeHandler:)` |
+| `CheckoutViewController(checkout:delegate:)` | `CheckoutViewController(checkout:client:)` |
 | `CheckoutSheet.onComplete(_:)` | `CheckoutProtocol.Handler().on(.complete) { ... }` via `.connect()` |
 | `CheckoutSheet.onPixelEvent(_:)` | Protocol event subscriptions |
 | `CheckoutSheet.onLinkClick(_:)` | Handled internally by SDK (opens URL) |
-| `present(checkout:from:delegate:)` | `present(checkout:from:bridgeHandler:)` |
+| `present(checkout:from:delegate:)` | `present(checkout:from:client:)` |
 
 ## Migration Steps for AcceleratedCheckouts
 
@@ -40,11 +40,11 @@ AcceleratedCheckouts targets are temporarily disabled in `Package.swift` while t
 // Before
 func present(url: URL, delegate: CheckoutDelegate) async throws
 // After
-func present(url: URL, bridgeHandler: (any CheckoutCommunicationProtocol)?) async throws
+func present(url: URL, client: (any CheckoutCommunicationProtocol)?) async throws
 ```
 
 ### 2. ShopPayViewController
-Remove `CheckoutDelegate` conformance. Instead, create a `CheckoutProtocol.Handler` and pass it via `bridgeHandler`:
+Remove `CheckoutDelegate` conformance. Instead, create a `CheckoutProtocol.Handler` and pass it via `client`:
 ```swift
 // The ShopPayViewController should create and configure a protocol handler
 // that forwards events to its own callbacks

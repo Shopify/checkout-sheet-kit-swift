@@ -2,15 +2,15 @@ import SwiftUI
 import UIKit
 
 public class CheckoutViewController: UINavigationController {
-    public init(checkout url: URL, bridgeHandler: (any CheckoutCommunicationProtocol)? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, bridgeHandler: bridgeHandler, entryPoint: nil)
+    public init(checkout url: URL, client: (any CheckoutCommunicationProtocol)? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, client: client, entryPoint: nil)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
     }
 
-    package init(checkout url: URL, bridgeHandler: (any CheckoutCommunicationProtocol)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
-        let rootViewController = CheckoutWebViewController(checkoutURL: url, bridgeHandler: bridgeHandler, entryPoint: entryPoint)
+    package init(checkout url: URL, client: (any CheckoutCommunicationProtocol)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+        let rootViewController = CheckoutWebViewController(checkoutURL: url, client: client, entryPoint: entryPoint)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
@@ -26,7 +26,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     public typealias UIViewControllerType = CheckoutViewController
 
     var checkoutURL: URL
-    var bridgeHandler: (any CheckoutCommunicationProtocol)?
+    var client: (any CheckoutCommunicationProtocol)?
     var onCancelAction: (() -> Void)?
     var onFailAction: ((CheckoutError) -> Void)?
 
@@ -37,7 +37,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     }
 
     public func makeUIViewController(context _: Self.Context) -> CheckoutViewController {
-        let viewController = CheckoutViewController(checkout: checkoutURL, bridgeHandler: bridgeHandler)
+        let viewController = CheckoutViewController(checkout: checkoutURL, client: client)
         configureWebViewController(viewController)
         return viewController
     }
@@ -56,15 +56,15 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
             return
         }
 
-        webViewController.bridgeHandler = bridgeHandler
-        webViewController.checkoutView.bridgeHandler = bridgeHandler
+        webViewController.client = client
+        webViewController.checkoutView.client = client
         webViewController.onCancel = onCancelAction
         webViewController.onFail = onFailAction
     }
 
     @discardableResult public func connect(_ handler: any CheckoutCommunicationProtocol) -> Self {
         var copy = self
-        copy.bridgeHandler = handler
+        copy.client = handler
         return copy
     }
 

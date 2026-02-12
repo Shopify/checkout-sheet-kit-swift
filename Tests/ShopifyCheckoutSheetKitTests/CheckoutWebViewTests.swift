@@ -408,10 +408,10 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertNil(mockDelegate.errorReceived)
     }
 
-    func testBridgeHandlerIsSetOnWebView() {
-        let handler = MockBridgeHandler()
-        view.bridgeHandler = handler
-        XCTAssertNotNil(view.bridgeHandler)
+    func testClientIsSetOnWebView() {
+        let client = MockBridgeClient()
+        view.client = client
+        XCTAssertNotNil(view.client)
     }
 }
 

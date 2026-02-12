@@ -52,9 +52,9 @@ class CheckoutSheetTests: XCTestCase {
     }
 
     func testConnect() {
-        let handler = MockBridgeHandler()
-        let sheet = checkoutSheet.connect(handler)
-        XCTAssertNotNil(sheet.bridgeHandler)
+        let client = MockBridgeClient()
+        let sheet = checkoutSheet.connect(client)
+        XCTAssertNotNil(sheet.client)
     }
 }
 

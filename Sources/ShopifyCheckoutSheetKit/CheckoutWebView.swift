@@ -22,7 +22,7 @@ class CheckoutWebView: WKWebView {
 
     var isBridgeAttached = false
 
-    var bridgeHandler: (any CheckoutCommunicationProtocol)?
+    var client: (any CheckoutCommunicationProtocol)?
 
     var isRecovery = false {
         didSet {
@@ -228,7 +228,8 @@ extension CheckoutWebView: WKScriptMessageHandler {
         print("[ECP-DEBUG] raw message: \(body)")
 
         if let data = body.data(using: .utf8),
-           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        {
             let method = json["method"] as? String ?? "nil"
             let id = json["id"] as? String ?? "nil"
             print("[ECP-DEBUG] method: \(method), id: \(id)")
@@ -242,17 +243,17 @@ extension CheckoutWebView: WKScriptMessageHandler {
             print("[ECP-DEBUG] failed to parse JSON from body")
         }
 
-        guard let handler = bridgeHandler else {
-            print("[ECP-DEBUG] no bridge handler registered")
+        guard let client else {
+            print("[ECP-DEBUG] no bridge client registered")
             return
         }
 
         Task {
-            if let response = await handler.handleMessage(body) {
-                print("[ECP-DEBUG] handler responded: \(response)")
+            if let response = await client.process(body) {
+                print("[ECP-DEBUG] client responded: \(response)")
                 CheckoutBridge.sendResponse(self, messageBody: response)
             } else {
-                print("[ECP-DEBUG] handler returned nil for method")
+                print("[ECP-DEBUG] client returned nil for method")
             }
         }
     }
@@ -376,28 +377,28 @@ extension CheckoutWebView: WKNavigationDelegate {
         timer = nil
 
         #if DEBUG
-        let debugScript = """
-        (function() {
-            var info = {
-                hasECP: typeof window.EmbeddedCheckoutProtocol !== 'undefined',
-                ecpKeys: typeof window.EmbeddedCheckoutProtocol === 'object' ? Object.keys(window.EmbeddedCheckoutProtocol) : [],
-                hasWebkit: typeof window.webkit !== 'undefined',
-                hasMessageHandlers: typeof window.webkit?.messageHandlers !== 'undefined',
-                hasConsumer: typeof window.webkit?.messageHandlers?.EmbeddedCheckoutProtocolConsumer !== 'undefined',
-                hasMobileSDK: typeof window.MobileCheckoutSdk !== 'undefined',
-                url: window.location.href
-            };
-            return JSON.stringify(info);
-        })();
-        """
-        evaluateJavaScript(debugScript) { result, error in
-            if let error = error {
-                print("[ECP-DEBUG] JS eval error: \(error.localizedDescription)")
+            let debugScript = """
+            (function() {
+                var info = {
+                    hasECP: typeof window.EmbeddedCheckoutProtocol !== 'undefined',
+                    ecpKeys: typeof window.EmbeddedCheckoutProtocol === 'object' ? Object.keys(window.EmbeddedCheckoutProtocol) : [],
+                    hasWebkit: typeof window.webkit !== 'undefined',
+                    hasMessageHandlers: typeof window.webkit?.messageHandlers !== 'undefined',
+                    hasConsumer: typeof window.webkit?.messageHandlers?.EmbeddedCheckoutProtocolConsumer !== 'undefined',
+                    hasMobileSDK: typeof window.MobileCheckoutSdk !== 'undefined',
+                    url: window.location.href
+                };
+                return JSON.stringify(info);
+            })();
+            """
+            evaluateJavaScript(debugScript) { result, error in
+                if let error {
+                    print("[ECP-DEBUG] JS eval error: \(error.localizedDescription)")
+                }
+                if let result {
+                    print("[ECP-DEBUG] page state: \(result)")
+                }
             }
-            if let result = result {
-                print("[ECP-DEBUG] page state: \(result)")
-            }
-        }
         #endif
     }
 

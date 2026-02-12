@@ -1,4 +1,4 @@
 import ShopifyCheckoutProtocol
 import ShopifyCheckoutSheetKit
 
-extension CheckoutProtocol.Handler: CheckoutCommunicationProtocol {}
+extension CheckoutProtocol.Client: @retroactive CheckoutCommunicationProtocol {}

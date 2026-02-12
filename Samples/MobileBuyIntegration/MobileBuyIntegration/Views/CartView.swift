@@ -11,7 +11,7 @@ struct CartView: View {
 
     @ObservedObject var cartManager: CartManager = .shared
 
-    private let handler = CheckoutProtocol.Handler()
+    private let client = CheckoutProtocol.Client()
         .on(CheckoutProtocol.start) { checkout in
             print("[UCP] Checkout started: \(checkout.id)")
         }
@@ -64,7 +64,7 @@ struct CartView: View {
             .sheet(isPresented: $showCheckoutSheet) {
                 if let url = cartManager.cart?.checkoutUrl {
                     CheckoutSheet(checkout: url.appendingEcParams())
-                        .connect(handler)
+                        .connect(client)
                         .colorScheme(.automatic)
                         .onCancel {
                             print("[ShopifyCheckoutKit] CANCEL")

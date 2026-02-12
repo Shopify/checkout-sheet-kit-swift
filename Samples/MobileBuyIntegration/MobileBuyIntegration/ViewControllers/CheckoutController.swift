@@ -7,7 +7,7 @@ class CheckoutController: UIViewController {
     var window: UIWindow?
     var root: UIViewController?
 
-    private let handler = CheckoutProtocol.Handler()
+    private let client = CheckoutProtocol.Client()
         .on(CheckoutProtocol.start) { checkout in
             OSLogger.shared.debug("[UCP] Checkout started: \(checkout.id)")
         }
@@ -30,7 +30,7 @@ class CheckoutController: UIViewController {
 
     public func present(checkout url: URL) {
         if let rootViewController = window?.topMostViewController() {
-            ShopifyCheckoutSheetKit.present(checkout: url.appendingEcParams(), from: rootViewController, bridgeHandler: handler)
+            ShopifyCheckoutSheetKit.present(checkout: url.appendingEcParams(), from: rootViewController, client: client)
             root = rootViewController
         }
     }

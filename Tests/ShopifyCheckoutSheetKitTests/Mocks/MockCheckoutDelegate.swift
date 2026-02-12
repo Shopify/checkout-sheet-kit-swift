@@ -1,11 +1,11 @@
 @testable import ShopifyCheckoutSheetKit
 import XCTest
 
-struct MockBridgeHandler: CheckoutCommunicationProtocol {
+struct MockBridgeClient: CheckoutCommunicationProtocol {
     var responseMessage: String?
     var receivedMessages: [String] = []
 
-    func handleMessage(_ message: String) async -> String? {
+    func process(_: String) async -> String? {
         return responseMessage
     }
 }
