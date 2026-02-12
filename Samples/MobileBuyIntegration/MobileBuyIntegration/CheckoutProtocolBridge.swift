@@ -1,4 +1,4 @@
 import ShopifyCheckoutProtocol
 import ShopifyCheckoutSheetKit
 
-extension CheckoutProtocol.Handler: CheckoutBridgeHandler {}
+extension CheckoutProtocol.Handler: CheckoutCommunicationProtocol {}

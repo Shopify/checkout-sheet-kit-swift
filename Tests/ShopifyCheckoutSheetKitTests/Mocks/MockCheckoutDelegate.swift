@@ -1,8 +1,7 @@
 @testable import ShopifyCheckoutSheetKit
 import XCTest
 
-struct MockBridgeHandler: CheckoutBridgeHandler {
-    var readyMessage: String
+struct MockBridgeHandler: CheckoutCommunicationProtocol {
     var responseMessage: String?
     var receivedMessages: [String] = []
 

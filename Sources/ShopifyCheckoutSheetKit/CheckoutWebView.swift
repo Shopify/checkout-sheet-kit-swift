@@ -22,7 +22,7 @@ class CheckoutWebView: WKWebView {
 
     var isBridgeAttached = false
 
-    var bridgeHandler: (any CheckoutBridgeHandler)?
+    var bridgeHandler: (any CheckoutCommunicationProtocol)?
 
     var isRecovery = false {
         didSet {

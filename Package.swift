@@ -13,7 +13,7 @@ let package = Package(
             name: "ShopifyCheckoutSheetKit",
             targets: ["ShopifyCheckoutSheetKit"]
         ),
-        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutBridgeHandler
+        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutCommunicationProtocol
         // .library(
         //     name: "ShopifyAcceleratedCheckouts",
         //     targets: ["ShopifyAcceleratedCheckouts"]
@@ -29,7 +29,7 @@ let package = Package(
             dependencies: [],
             resources: [.process("Assets.xcassets")]
         ),
-        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutBridgeHandler
+        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutCommunicationProtocol
         // .target(
         //     name: "ShopifyAcceleratedCheckouts",
         //     dependencies: ["ShopifyCheckoutSheetKit"],
@@ -42,7 +42,7 @@ let package = Package(
                 .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
             ]
         ),
-        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutBridgeHandler
+        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutCommunicationProtocol
         // .testTarget(
         //     name: "ShopifyAcceleratedCheckoutsTests",
         //     dependencies: [

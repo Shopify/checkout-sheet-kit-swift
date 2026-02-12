@@ -4,7 +4,7 @@ import WebKit
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
     var onCancel: (() -> Void)?
     var onFail: ((CheckoutError) -> Void)?
-    var bridgeHandler: (any CheckoutBridgeHandler)?
+    var bridgeHandler: (any CheckoutCommunicationProtocol)?
 
     var checkoutViewDidFailWithErrorCount = 0
     var checkoutView: CheckoutWebView
@@ -54,7 +54,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
 
     // MARK: Initializers
 
-    public init(checkoutURL url: URL, bridgeHandler: (any CheckoutBridgeHandler)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+    public init(checkoutURL url: URL, bridgeHandler: (any CheckoutCommunicationProtocol)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
         checkoutURL = url
         self.bridgeHandler = bridgeHandler
 

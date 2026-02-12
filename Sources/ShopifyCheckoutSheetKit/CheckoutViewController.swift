@@ -2,14 +2,14 @@ import SwiftUI
 import UIKit
 
 public class CheckoutViewController: UINavigationController {
-    public init(checkout url: URL, bridgeHandler: (any CheckoutBridgeHandler)? = nil) {
+    public init(checkout url: URL, bridgeHandler: (any CheckoutCommunicationProtocol)? = nil) {
         let rootViewController = CheckoutWebViewController(checkoutURL: url, bridgeHandler: bridgeHandler, entryPoint: nil)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
         presentationController?.delegate = rootViewController
     }
 
-    package init(checkout url: URL, bridgeHandler: (any CheckoutBridgeHandler)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
+    package init(checkout url: URL, bridgeHandler: (any CheckoutCommunicationProtocol)? = nil, entryPoint: MetaData.EntryPoint? = nil) {
         let rootViewController = CheckoutWebViewController(checkoutURL: url, bridgeHandler: bridgeHandler, entryPoint: entryPoint)
         rootViewController.notifyPresented()
         super.init(rootViewController: rootViewController)
@@ -26,7 +26,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     public typealias UIViewControllerType = CheckoutViewController
 
     var checkoutURL: URL
-    var bridgeHandler: (any CheckoutBridgeHandler)?
+    var bridgeHandler: (any CheckoutCommunicationProtocol)?
     var onCancelAction: (() -> Void)?
     var onFailAction: ((CheckoutError) -> Void)?
 
@@ -62,7 +62,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
         webViewController.onFail = onFailAction
     }
 
-    @discardableResult public func connect(_ handler: any CheckoutBridgeHandler) -> Self {
+    @discardableResult public func connect(_ handler: any CheckoutCommunicationProtocol) -> Self {
         var copy = self
         copy.bridgeHandler = handler
         return copy

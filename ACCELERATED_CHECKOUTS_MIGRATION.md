@@ -1,4 +1,4 @@
-# AcceleratedCheckouts Migration to CheckoutBridgeHandler
+# AcceleratedCheckouts Migration to CheckoutCommunicationProtocol
 
 ## Status
 AcceleratedCheckouts targets are temporarily disabled in `Package.swift` while the core SDK migrates to the UCP bridge handler pattern.
@@ -8,7 +8,7 @@ AcceleratedCheckouts targets are temporarily disabled in `Package.swift` while t
 ### Removed Types
 | Type | Replacement |
 |------|-------------|
-| `CheckoutDelegate` protocol | `CheckoutBridgeHandler` protocol (raw string in/out) |
+| `CheckoutDelegate` protocol | `CheckoutCommunicationProtocol` protocol (raw string in/out) |
 | `CheckoutCompletedEvent` | Protocol library's `Checkout` model via `CheckoutProtocol.Handler` |
 | `PixelEvent`, `StandardEvent`, `CustomEvent` | Handled by protocol event subscriptions |
 | `CheckoutDelegateWrapper` | `CheckoutSheet.onCancel()` / `.onFail()` closures + `.connect(handler)` |
@@ -20,7 +20,7 @@ AcceleratedCheckouts targets are temporarily disabled in `Package.swift` while t
 ### New Types
 | Type | Purpose |
 |------|---------|
-| `CheckoutBridgeHandler` protocol | `readyMessage: String?` + `handleMessage(_:) async -> String?` |
+| `CheckoutCommunicationProtocol` protocol | `readyMessage: String?` + `handleMessage(_:) async -> String?` |
 | `CheckoutBridge.sendProtocolMessage(_:_:)` | Sends JSON-RPC responses back to webview via `postMessage` |
 
 ### API Changes
@@ -35,12 +35,12 @@ AcceleratedCheckouts targets are temporarily disabled in `Package.swift` while t
 ## Migration Steps for AcceleratedCheckouts
 
 ### 1. WalletController
-`WalletController.present(url:delegate:)` needs to accept `CheckoutBridgeHandler` instead of `CheckoutDelegate`:
+`WalletController.present(url:delegate:)` needs to accept `CheckoutCommunicationProtocol` instead of `CheckoutDelegate`:
 ```swift
 // Before
 func present(url: URL, delegate: CheckoutDelegate) async throws
 // After
-func present(url: URL, bridgeHandler: (any CheckoutBridgeHandler)?) async throws
+func present(url: URL, bridgeHandler: (any CheckoutCommunicationProtocol)?) async throws
 ```
 
 ### 2. ShopPayViewController
