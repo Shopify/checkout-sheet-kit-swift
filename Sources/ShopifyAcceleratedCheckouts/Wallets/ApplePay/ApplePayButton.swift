@@ -52,14 +52,18 @@ struct ApplePayButton: View {
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
 
+    private let client: (any CheckoutCommunicationProtocol)?
+
     public init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        client: (any CheckoutCommunicationProtocol)? = nil
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         self.cornerRadius = cornerRadius
+        self.client = client
     }
 
     var body: some View {
@@ -76,7 +80,8 @@ struct ApplePayButton: View {
                     shopSettings: shopSettings
                 ),
                 eventHandlers: eventHandlers,
-                cornerRadius: cornerRadius
+                cornerRadius: cornerRadius,
+                client: client
             )
         }
     }
@@ -102,6 +107,8 @@ struct Internal_ApplePayButton: View {
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
 
+    private let client: (any CheckoutCommunicationProtocol)?
+
     /// Initializes an Apple Pay button
     /// - Parameters:
     ///   - identifier: The identifier to use for checkout
@@ -113,20 +120,19 @@ struct Internal_ApplePayButton: View {
         label: PayWithApplePayButtonLabel,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        client: (any CheckoutCommunicationProtocol)? = nil
     ) {
         controller = ApplePayViewController(
             identifier: identifier,
-            configuration: configuration
+            configuration: configuration,
+            client: client
         )
         self.label = label
         self.cornerRadius = cornerRadius
-        controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
+        self.client = client
         controller.onCheckoutFail = eventHandlers.checkoutDidFail
         controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
-        controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
-        controller.onCheckoutClickLink = eventHandlers.checkoutDidClickLink
-        controller.onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
     }
 
     var body: some View {

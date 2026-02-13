@@ -151,13 +151,6 @@ class ApplePayViewControllerTests: XCTestCase {
 
     // MARK: - Callback Properties
 
-    @MainActor
-    func test_checkoutCallbacks_whenDefault_areNil() {
-        XCTAssertNil(viewController.onCheckoutComplete)
-        XCTAssertNil(viewController.onCheckoutFail)
-        XCTAssertNil(viewController.onCheckoutCancel)
-    }
-
     // MARK: - Delegate
 
     @MainActor
@@ -165,7 +158,7 @@ class ApplePayViewControllerTests: XCTestCase {
         let cancelCallbackExpectation = XCTestExpectation(description: "Cancel callback should be invoked")
         viewController.onCheckoutCancel = { cancelCallbackExpectation.fulfill() }
 
-        viewController.checkoutDidCancel()
+        viewController.onCheckoutCancel?()
 
         await fulfillment(of: [cancelCallbackExpectation], timeout: 1.0)
     }

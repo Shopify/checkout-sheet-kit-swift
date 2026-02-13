@@ -22,6 +22,7 @@
  */
 
 @preconcurrency import Buy
+import ShopifyAcceleratedCheckouts
 @preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
@@ -128,6 +129,29 @@ struct ProductView: View {
                         .foregroundStyle(.white)
                         .cornerRadius(DesignSystem.cornerRadius)
                         .disabled(!variant.availableForSale || loading)
+
+                        if variant.availableForSale {
+                            AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
+                                .wallets([.applePay])
+                                .onFail { error in
+                                    print("[AcceleratedCheckout] Failed: \(error)")
+                                }
+                                .onCancel {
+                                    print("[AcceleratedCheckout] Cancelled")
+                                }
+                                .environmentObject(
+                                    ShopifyAcceleratedCheckouts.Configuration(
+                                        storefrontDomain: InfoDictionary.shared.domain,
+                                        storefrontAccessToken: InfoDictionary.shared.accessToken
+                                    )
+                                )
+                                .environmentObject(
+                                    ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                                        merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
+                                        contactFields: [.email, .phone]
+                                    )
+                                )
+                        }
                     }.padding([.leading, .trailing], 15)
                 }
             }

@@ -27,6 +27,7 @@ import SwiftUI
 @available(iOS 16.0, *)
 class ShopPayViewController: WalletController {
     var eventHandlers: EventHandlers
+    var client: (any CheckoutCommunicationProtocol)?
 
     init(
         identifier: CheckoutIdentifier,
@@ -51,41 +52,11 @@ class ShopPayViewController: WalletController {
             guard let url = cart.checkoutUrl.url.appendQueryParam(name: "payment", value: "shop_pay") else {
                 throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "url")
             }
-            try await present(url: url, delegate: self)
+            try await present(url: url, client: client)
         } catch {
             let error = CheckoutError.sdkError(underlying: error)
             ShopifyAcceleratedCheckouts.logger.error("[present] Failed to create cart: \(error)")
             eventHandlers.checkoutDidFail?(error)
         }
-    }
-}
-
-@available(iOS 16.0, *)
-extension ShopPayViewController: CheckoutDelegate {
-    func checkoutDidComplete(event: CheckoutCompletedEvent) {
-        eventHandlers.checkoutDidComplete?(event)
-    }
-
-    func checkoutDidFail(error: CheckoutError) {
-        checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutDidFail?(error)
-    }
-
-    func checkoutDidCancel() {
-        // x right button on CSK doesn't dismiss automatically
-        checkoutViewController?.dismiss(animated: true)
-        eventHandlers.checkoutDidCancel?()
-    }
-
-    func shouldRecoverFromError(error: CheckoutError) -> Bool {
-        return eventHandlers.shouldRecoverFromError?(error) ?? error.isRecoverable
-    }
-
-    func checkoutDidClickLink(url: URL) {
-        eventHandlers.checkoutDidClickLink?(url)
-    }
-
-    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
-        eventHandlers.checkoutDidEmitWebPixelEvent?(event)
     }
 }

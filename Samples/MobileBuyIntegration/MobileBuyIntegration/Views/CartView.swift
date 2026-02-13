@@ -1,4 +1,5 @@
 @preconcurrency import Buy
+import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutProtocol
 import ShopifyCheckoutSheetKit
 import SwiftUI
@@ -31,6 +32,29 @@ struct CartView: View {
                 }
 
                 VStack(spacing: DesignSystem.buttonSpacing) {
+                    if let cartID = cartManager.cart?.id.rawValue {
+                        AcceleratedCheckoutButtons(cartID: cartID)
+                            .onFail { error in
+                                print("[AcceleratedCheckout] Failed: \(error)")
+                            }
+                            .onCancel {
+                                print("[AcceleratedCheckout] Cancelled")
+                            }
+                            .connect(client)
+                            .environmentObject(
+                                ShopifyAcceleratedCheckouts.Configuration(
+                                    storefrontDomain: InfoDictionary.shared.domain,
+                                    storefrontAccessToken: InfoDictionary.shared.accessToken
+                                )
+                            )
+                            .environmentObject(
+                                ShopifyAcceleratedCheckouts.ApplePayConfiguration(
+                                    merchantIdentifier: InfoDictionary.shared.merchantIdentifier,
+                                    contactFields: [.email, .phone]
+                                )
+                            )
+                    }
+
                     Button(
                         action: { showCheckoutSheet = true },
                         label: {

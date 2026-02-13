@@ -30,18 +30,14 @@ import XCTest
 final class WalletControllerTests: XCTestCase {
     var mockStorefront: TestStorefrontAPI!
     var controller: MockWalletController!
-    var mockDelegate: MockCheckoutDelegate!
-
     override func setUp() {
         super.setUp()
         mockStorefront = TestStorefrontAPI()
-        mockDelegate = MockCheckoutDelegate()
     }
 
     override func tearDown() {
         mockStorefront = nil
         controller = nil
-        mockDelegate = nil
         super.tearDown()
     }
 
@@ -53,16 +49,10 @@ final class WalletControllerTests: XCTestCase {
         }
     }
 
-    class MockCheckoutDelegate: CheckoutDelegate {
-        func checkoutDidComplete(event _: CheckoutCompletedEvent) {}
-        func checkoutDidFail(error _: CheckoutError) {}
-        func checkoutDidCancel() {}
-        func shouldRecoverFromError(error: CheckoutError) -> Bool {
-            return error.isRecoverable
+    struct MockClient: CheckoutCommunicationProtocol {
+        func process(_: String) async -> String? {
+            return nil
         }
-
-        func checkoutDidClickLink(url _: URL) {}
-        func checkoutDidEmitWebPixelEvent(event _: PixelEvent) {}
     }
 
     // MARK: - fetchCartByCheckoutIdentifier Tests - Cart Identifier
@@ -205,7 +195,7 @@ final class WalletControllerTests: XCTestCase {
 
         let testURL = try XCTUnwrap(URL(string: "https://test.myshopify.com/checkout"))
 
-        try await controller.present(url: testURL, delegate: mockDelegate)
+        try await controller.present(url: testURL, client: MockClient())
 
         XCTAssertNotNil(controller.checkoutViewController)
     }

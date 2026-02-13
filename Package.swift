@@ -12,16 +12,15 @@ let package = Package(
         .library(
             name: "ShopifyCheckoutSheetKit",
             targets: ["ShopifyCheckoutSheetKit"]
+        ),
+        .library(
+            name: "ShopifyAcceleratedCheckouts",
+            targets: ["ShopifyAcceleratedCheckouts"]
         )
-        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutCommunicationProtocol
-        // .library(
-        //     name: "ShopifyAcceleratedCheckouts",
-        //     targets: ["ShopifyAcceleratedCheckouts"]
-        // )
     ],
     dependencies: [
-        .package(url: "https://github.com/lukepistrol/SwiftLintPlugin", from: "0.2.2")
-        // .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0")
+        .package(url: "https://github.com/lukepistrol/SwiftLintPlugin", from: "0.2.2"),
+        .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0")
     ],
     targets: [
         .target(
@@ -29,29 +28,27 @@ let package = Package(
             dependencies: [],
             resources: [.process("Assets.xcassets")]
         ),
-        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutCommunicationProtocol
-        // .target(
-        //     name: "ShopifyAcceleratedCheckouts",
-        //     dependencies: ["ShopifyCheckoutSheetKit"],
-        //     resources: [.process("Localizable.xcstrings"), .process("Media.xcassets")]
-        // ),
+        .target(
+            name: "ShopifyAcceleratedCheckouts",
+            dependencies: ["ShopifyCheckoutSheetKit"],
+            resources: [.process("Localizable.xcstrings"), .process("Media.xcassets")]
+        ),
         .testTarget(
             name: "ShopifyCheckoutSheetKitTests",
             dependencies: ["ShopifyCheckoutSheetKit"],
             plugins: [
                 .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
             ]
+        ),
+        .testTarget(
+            name: "ShopifyAcceleratedCheckoutsTests",
+            dependencies: [
+                "ShopifyAcceleratedCheckouts",
+                .product(name: "ViewInspector", package: "ViewInspector")
+            ],
+            plugins: [
+                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
+            ]
         )
-        // TODO: [UCP Migration] Re-enable after migrating AcceleratedCheckouts to CheckoutCommunicationProtocol
-        // .testTarget(
-        //     name: "ShopifyAcceleratedCheckoutsTests",
-        //     dependencies: [
-        //         "ShopifyAcceleratedCheckouts",
-        //         .product(name: "ViewInspector", package: "ViewInspector")
-        //     ],
-        //     plugins: [
-        //         .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
-        //     ]
-        // )
     ]
 )

@@ -58,7 +58,7 @@ class WalletController: ObservableObject {
     }
 
     @MainActor
-    func present(url: URL, delegate: CheckoutDelegate) async throws {
+    func present(url: URL, client: (any CheckoutCommunicationProtocol)?) async throws {
         guard let topViewController = getTopViewController() else {
             throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "topViewController")
         }
@@ -66,7 +66,7 @@ class WalletController: ObservableObject {
             checkout: url,
             from: topViewController,
             entryPoint: .acceleratedCheckouts,
-            delegate: delegate
+            client: client
         )
     }
 

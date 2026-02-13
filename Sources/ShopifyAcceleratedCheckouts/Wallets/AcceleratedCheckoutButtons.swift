@@ -47,6 +47,7 @@ public struct AcceleratedCheckoutButtons: View {
     public var wallets: [Wallet] = [.shopPay, .applePay]
     var eventHandlers: EventHandlers = .init()
     var cornerRadius: CGFloat?
+    var client: (any CheckoutCommunicationProtocol)?
 
     /// The Apple Pay button label style
     private var applePayLabel: PayWithApplePayButtonLabel = .plain
@@ -93,14 +94,16 @@ public struct AcceleratedCheckoutButtons: View {
                             ApplePayButton(
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
-                                cornerRadius: cornerRadius
+                                cornerRadius: cornerRadius,
+                                client: client
                             )
                             .label(applePayLabel)
                         case .shopPay:
                             ShopPayButton(
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
-                                cornerRadius: cornerRadius
+                                cornerRadius: cornerRadius,
+                                client: client
                             )
                         }
                     }
@@ -168,28 +171,6 @@ extension AcceleratedCheckoutButtons {
         return newView
     }
 
-    /// Adds an action to perform when the checkout completes successfully.
-    ///
-    /// Use this modifier to handle successful checkout events:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onComplete { event in
-    ///         // Navigate to success screen with order ID
-    ///         showSuccessView(orderId: event.orderId)
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when checkout succeeds
-    /// - Returns: A view with the checkout success handler set
-    public func onComplete(_ action: @escaping (CheckoutCompletedEvent) -> Void)
-        -> AcceleratedCheckoutButtons
-    {
-        var newView = self
-        newView.eventHandlers.checkoutDidComplete = action
-        return newView
-    }
-
     /// Adds an action to perform when the checkout encounters an error.
     ///
     /// Use this modifier to handle checkout errors:
@@ -230,70 +211,6 @@ extension AcceleratedCheckoutButtons {
         return newView
     }
 
-    /// Adds an action to determine if checkout should recover from an error.
-    ///
-    /// Use this modifier to handle error recovery decisions:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onShouldRecoverFromError { error in
-    ///         // Return true to attempt recovery, false to fail
-    ///         return error.isRecoverable
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to determine if recovery should be attempted
-    /// - Returns: A view with the error recovery handler set
-    public func onShouldRecoverFromError(
-        _ action: @escaping (CheckoutError) -> Bool
-    ) -> AcceleratedCheckoutButtons {
-        var newView = self
-        newView.eventHandlers.shouldRecoverFromError = action
-        return newView
-    }
-
-    /// Adds an action to perform when a link is clicked during checkout.
-    ///
-    /// Use this modifier to handle link clicks:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onClickLink { url in
-    ///         // Handle external link
-    ///         UIApplication.shared.open(url)
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when a link is clicked
-    /// - Returns: A view with the link click handler set
-    public func onClickLink(_ action: @escaping (URL) -> Void) -> AcceleratedCheckoutButtons {
-        var newView = self
-        newView.eventHandlers.checkoutDidClickLink = action
-        return newView
-    }
-
-    /// Adds an action to perform when a web pixel event is emitted.
-    ///
-    /// Use this modifier to handle web pixel events:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onWebPixelEvent { event in
-    ///         // Track analytics event
-    ///         Analytics.track(event)
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when a pixel event is emitted
-    /// - Returns: A view with the web pixel event handler set
-    public func onWebPixelEvent(_ action: @escaping (PixelEvent) -> Void)
-        -> AcceleratedCheckoutButtons
-    {
-        var newView = self
-        newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
-        return newView
-    }
-
     /// Adds an action to perform when the render state changes.
     ///
     /// Use this modifier to handle render state changes:
@@ -319,6 +236,12 @@ extension AcceleratedCheckoutButtons {
     {
         var newView = self
         newView.eventHandlers.renderStateDidChange = action
+        return newView
+    }
+
+    public func connect(_ client: (any CheckoutCommunicationProtocol)?) -> AcceleratedCheckoutButtons {
+        var newView = self
+        newView.client = client
         return newView
     }
 }

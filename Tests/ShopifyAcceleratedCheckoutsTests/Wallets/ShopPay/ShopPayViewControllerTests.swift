@@ -54,16 +54,15 @@ final class ShopPayViewControllerTests: XCTestCase {
     class MockShopPayViewController: ShopPayViewController {
         var mockTopViewController: UIViewController?
         var mockStorefront: TestStorefrontAPI
-        var presentCalls: [(url: URL, delegate: CheckoutDelegate)] = []
+        var presentCalls: [(url: URL, client: (any CheckoutCommunicationProtocol)?)] = []
 
         override func getTopViewController() -> UIViewController? {
             return mockTopViewController
         }
 
-        /// Mocks the calls to ShopifyCheckoutSheetKit
         @MainActor
-        override func present(url: URL, delegate: CheckoutDelegate) async throws {
-            presentCalls.append((url: url, delegate: delegate))
+        override func present(url: URL, client: (any CheckoutCommunicationProtocol)?) async throws {
+            presentCalls.append((url: url, client: client))
         }
 
         init(
