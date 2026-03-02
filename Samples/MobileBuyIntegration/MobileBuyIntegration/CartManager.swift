@@ -21,72 +21,71 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Buy
+@preconcurrency import Apollo
+@preconcurrency import ApolloAPI
 import Combine
 import Foundation
 import PassKit
 import ShopifyCheckoutSheetKit
 
+protocol UserErrorDisplayable {
+    var message: String { get }
+}
+
+extension Storefront.CartUserErrorFragment: UserErrorDisplayable {}
+extension Storefront.CartCreateMutation.Data.CartCreate.UserError: UserErrorDisplayable {}
+extension Storefront.CartLinesAddMutation.Data.CartLinesAdd.UserError: UserErrorDisplayable {}
+extension Storefront.CartLinesUpdateMutation.Data.CartLinesUpdate.UserError: UserErrorDisplayable {}
+
 @MainActor
 class CartManager: ObservableObject {
-    static let shared = CartManager(client: .shared)
-    private static let ContextDirective = Storefront.InContextDirective(
-        country: Storefront.CountryCode.inferRegion()
-    )
+    static let shared = CartManager()
 
     // MARK: Properties
 
-    private let client: StorefrontClient
     public var redirectUrl: URL?
 
-    @Published var cart: Storefront.Cart?
+    @Published var cart: Storefront.CartFragment?
     @Published var isDirty: Bool = false
 
     // MARK: Initializers
 
-    init(client: StorefrontClient) {
-        self.client = client
-    }
+    init() {}
 
     public func preloadCheckout() {
-        // Only preload checkout if cart is dirty, meaning it has changes since checkout was last preloaded
-        if let url = cart?.checkoutUrl, isDirty {
+        if let url = cart?.checkoutURL, isDirty {
             ShopifyCheckoutSheetKit.preload(checkout: url)
             markCartAsReady()
         }
     }
 
-    /// The cart is "ready" when ShopifyCheckoutSheetKit.preload(checkoutUrl) has been called
-    /// The dirty state will be set to false to prevent  preloading again
     func markCartAsReady() {
         isDirty = false
     }
 
     // MARK: Cart Actions
 
-    /**
-     * Creates cart if no cart.id present, or adds line items to pre-existing cart
-     * Non-idempotent - subsequent calls for existing cartLine items will increase quantity by 1
-     */
-    func performCartLinesAdd(variant: GraphQL.ID) async throws -> Storefront.Cart {
+    func performCartLinesAdd(variant: String) async throws -> Storefront.CartFragment {
         guard let cartId = cart?.id else {
             return try await performCartCreate(items: [variant])
         }
 
-        let lines = [Storefront.CartLineInput.create(merchandiseId: variant)]
+        let lines = [Storefront.CartLineInput(merchandiseId: variant)]
+        let network = Network.shared
 
-        let mutation = Storefront.buildMutation(
-            inContext: CartManager.ContextDirective
-        ) {
-            $0.cartLinesAdd(cartId: cartId, lines: lines) {
-                $0.cart { $0.cartManagerFragment() }
-                    .userErrors { $0.code().message() }
-            }
-        }
+        let mutation = Storefront.CartLinesAddMutation(
+            cartId: cartId,
+            lines: lines,
+            country: network.countryCode,
+            language: network.languageCode
+        )
 
         do {
-            guard let payload = try await client.executeAsync(mutation: mutation).cartLinesAdd
-            else { throw CartManager.Errors.payloadUnwrap }
+            let data = try await performMutation(mutation)
+
+            guard let payload = data.cartLinesAdd else {
+                throw CartManager.Errors.payloadUnwrap
+            }
 
             guard payload.userErrors.isEmpty else {
                 throw CartManager.Errors.invariant(
@@ -94,41 +93,45 @@ class CartManager: ObservableObject {
                 )
             }
 
-            guard let cart = payload.cart else {
+            guard let cartData = payload.cart?.fragments.cartFragment else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            self.cart = cart
+            cart = cartData
             isDirty = true
 
-            return cart
+            return cartData
+        } catch let error as Errors {
+            throw error
         } catch {
             throw Errors.apiErrors(requestName: "cartLinesAdd", message: "\(error)")
         }
     }
 
-    func performCartLinesUpdate(id: GraphQL.ID, quantity: Int32) async throws -> Storefront.Cart {
+    func performCartLinesUpdate(id: String, quantity: Int) async throws -> Storefront.CartFragment {
         guard let cartId = cart?.id else {
             return try await performCartCreate(items: [id])
         }
 
         let lines = [
-            Storefront.CartLineUpdateInput.create(id: id, quantity: Input(orNull: quantity))
+            Storefront.CartLineUpdateInput(id: id, quantity: .some(quantity))
         ]
 
-        let mutation = Storefront.buildMutation(
-            inContext: CartManager.ContextDirective
-        ) {
-            $0.cartLinesUpdate(cartId: cartId, lines: lines) {
-                $0.cart { $0.cartManagerFragment() }
-                    .userErrors { $0.code().message() }
-            }
-        }
+        let network = Network.shared
+
+        let mutation = Storefront.CartLinesUpdateMutation(
+            cartId: cartId,
+            lines: lines,
+            country: network.countryCode,
+            language: network.languageCode
+        )
 
         do {
-            guard
-                let payload = try await client.executeAsync(mutation: mutation).cartLinesUpdate
-            else { throw CartManager.Errors.payloadUnwrap }
+            let data = try await performMutation(mutation)
+
+            guard let payload = data.cartLinesUpdate else {
+                throw CartManager.Errors.payloadUnwrap
+            }
 
             guard payload.userErrors.isEmpty else {
                 throw CartManager.Errors.invariant(
@@ -136,36 +139,41 @@ class CartManager: ObservableObject {
                 )
             }
 
-            guard let cart = payload.cart else {
+            guard let cartData = payload.cart?.fragments.cartFragment else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            self.cart = cart
+            cart = cartData
             isDirty = true
 
-            return cart
+            return cartData
+        } catch let error as Errors {
+            throw error
         } catch {
             throw Errors.apiErrors(requestName: "cartLinesUpdate", message: "\(error)")
         }
     }
 
-    private func performCartCreate(items: [GraphQL.ID] = []) async throws -> Storefront.Cart {
+    private func performCartCreate(items: [String] = []) async throws -> Storefront.CartFragment {
         var customerAccessToken: String?
         if CustomerAccountManager.shared.isAuthenticated {
             customerAccessToken = try? await CustomerAccountManager.shared.getValidAccessToken()
         }
         let input = StorefrontInputFactory.shared.createCartInput(items, customerAccessToken: customerAccessToken)
+        let network = Network.shared
 
-        let mutation = Storefront.buildMutation(inContext: CartManager.ContextDirective) {
-            $0.cartCreate(input: input) {
-                $0.cart { $0.cartManagerFragment() }
-                    .userErrors { $0.code().message() }
-            }
-        }
+        let mutation = Storefront.CartCreateMutation(
+            input: input,
+            country: network.countryCode,
+            language: network.languageCode
+        )
 
         do {
-            guard let payload = try await client.executeAsync(mutation: mutation).cartCreate
-            else { throw CartManager.Errors.payloadUnwrap }
+            let data = try await performMutation(mutation)
+
+            guard let payload = data.cartCreate else {
+                throw CartManager.Errors.payloadUnwrap
+            }
 
             guard payload.userErrors.isEmpty else {
                 throw CartManager.Errors.invariant(
@@ -173,16 +181,42 @@ class CartManager: ObservableObject {
                 )
             }
 
-            guard let cart = payload.cart else {
+            guard let cartData = payload.cart?.fragments.cartFragment else {
                 throw Errors.invariant(message: "cart returned nil")
             }
 
-            self.cart = cart
+            cart = cartData
             isDirty = true
 
-            return cart
+            return cartData
+        } catch let error as Errors {
+            throw error
         } catch {
             throw Errors.apiErrors(requestName: "cartCreate", message: "\(error)")
+        }
+    }
+
+    private func performMutation<T: GraphQLMutation>(_ mutation: T) async throws -> T.Data {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<T.Data, Error>) in
+            Network.shared.apollo.perform(mutation: mutation) { result in
+                switch result {
+                case let .success(response):
+                    if let data = response.data {
+                        continuation.resume(returning: data)
+                    } else if let errors = response.errors {
+                        continuation.resume(
+                            throwing: Errors.apiErrors(
+                                requestName: String(describing: T.self),
+                                message: errors.map { $0.message ?? "" }.joined(separator: ", ")
+                            )
+                        )
+                    } else {
+                        continuation.resume(throwing: Errors.payloadUnwrap)
+                    }
+                case let .failure(error):
+                    continuation.resume(throwing: error)
+                }
+            }
         }
     }
 
@@ -234,7 +268,7 @@ extension CartManager {
         }
     }
 
-    static func userErrorMessage(errors: [Storefront.CartUserError]) -> String {
-        return "userErrors should be [], received: \(String(describing: errors))"
+    static func userErrorMessage(errors: [some UserErrorDisplayable]) -> String {
+        return "userErrors should be [], received: \(errors.map { $0.message }.joined(separator: ", "))"
     }
 }

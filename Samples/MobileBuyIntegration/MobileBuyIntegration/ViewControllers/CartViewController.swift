@@ -21,12 +21,14 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Buy
+import ApolloAPI
 import Combine
 @preconcurrency import ShopifyAcceleratedCheckouts
 @preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
+
+typealias CartLineVariant = Storefront.CartLineFragment.Merchandise.AsProductVariant
 
 class CartItemCell: UITableViewCell {
     let titleLabel = UILabel()
@@ -38,9 +40,9 @@ class CartItemCell: UITableViewCell {
     let quantityStackView = UIStackView()
     let activityIndicator = UIActivityIndicatorView()
 
-    var onQuantityChange: ((_ quantity: Int32) -> Void)?
+    var onQuantityChange: ((_ quantity: Int) -> Void)?
 
-    private var quantity: Int32 = 0 {
+    private var quantity: Int = 0 {
         didSet {
             quantityLabel.text = "\(quantity)"
         }
@@ -57,13 +59,11 @@ class CartItemCell: UITableViewCell {
     }
 
     private func setupViews() {
-        // Title stack config
         labelStackView.axis = .vertical
         labelStackView.alignment = .leading
         labelStackView.spacing = 4
         labelStackView.translatesAutoresizingMaskIntoConstraints = false
 
-        // Quantity stack config
         quantityStackView.axis = .horizontal
         quantityStackView.alignment = .center
         quantityStackView.spacing = 8
@@ -74,15 +74,12 @@ class CartItemCell: UITableViewCell {
         vendorLabel.textColor = .systemBlue
         vendorLabel.font = UIFont.systemFont(ofSize: 12)
 
-        // Title / vendor
         labelStackView.addArrangedSubview(titleLabel)
         labelStackView.addArrangedSubview(vendorLabel)
 
-        // Configure spinner
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.hidesWhenStopped = true
 
-        // Quantity controls
         quantityStackView.addArrangedSubview(decreaseButton)
         quantityStackView.addArrangedSubview(activityIndicator)
         quantityStackView.addArrangedSubview(quantityLabel)
@@ -135,7 +132,7 @@ class CartItemCell: UITableViewCell {
         }
     }
 
-    func configure(with variant: Storefront.ProductVariant, quantity: Int32) {
+    func configure(with variant: CartLineVariant, quantity: Int) {
         titleLabel.text = variant.product.title
         vendorLabel.text = variant.product.vendor
         self.quantity = quantity
@@ -196,7 +193,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
-        // Create empty view
         emptyView = UIView()
         emptyView.translatesAutoresizingMaskIntoConstraints = false
         emptyView.backgroundColor = .systemBackground
@@ -208,17 +204,14 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
         emptyView.addSubview(emptyLabel)
 
-        // Create table view
         tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
         tableView.dataSource = self
 
-        // Create button container view
         buttonContainerView = UIView()
         buttonContainerView.backgroundColor = .systemBackground
 
-        // Create button stack view
         buttonStackView = UIStackView()
         buttonStackView.translatesAutoresizingMaskIntoConstraints = false
         buttonStackView.axis = .vertical
@@ -226,7 +219,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         buttonStackView.alignment = .fill
         buttonStackView.distribution = .fill
 
-        // Create checkout button
         checkoutButton = UIButton(type: .system)
         checkoutButton.translatesAutoresizingMaskIntoConstraints = false
         checkoutButton.setTitle("Check out", for: .normal)
@@ -234,32 +226,23 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         checkoutButton.backgroundColor = ColorPalette.primaryColor
         checkoutButton.setTitleColor(.white, for: .normal)
         checkoutButton.layer.cornerRadius = DesignSystem.cornerRadius
-        // Ensure corner radius is maintained for all states
         checkoutButton.layer.masksToBounds = true
-        // We'll set up custom layout for text and amount
         checkoutButton.contentHorizontalAlignment = .fill
         checkoutButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
         checkoutButton.addTarget(self, action: #selector(presentCheckout), for: .touchUpInside)
 
-        // Set up custom button content
         setupCheckoutButtonContent()
 
-        // Add checkout button to stack view
         buttonStackView.addArrangedSubview(checkoutButton)
 
-        // Add button stack to container view
         buttonContainerView.addSubview(buttonStackView)
 
-        // Set as table footer view (scrolls with table content)
         tableView.tableFooterView = buttonContainerView
 
-        // Add subviews
         view.addSubview(emptyView)
         view.addSubview(tableView)
 
-        // Setup constraints
         NSLayoutConstraint.activate([
-            // Empty view constraints
             emptyView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -268,40 +251,32 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             emptyLabel.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
             emptyLabel.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor),
 
-            // Table view constraints
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
 
-            // Button stack view constraints within container view
             buttonStackView.leadingAnchor.constraint(equalTo: buttonContainerView.leadingAnchor, constant: 16),
             buttonStackView.trailingAnchor.constraint(equalTo: buttonContainerView.trailingAnchor, constant: -16),
             buttonStackView.topAnchor.constraint(equalTo: buttonContainerView.topAnchor, constant: 32),
             buttonStackView.bottomAnchor.constraint(equalTo: buttonContainerView.bottomAnchor, constant: -16)
         ])
 
-        // Add accelerated checkout buttons
         setupAcceleratedCheckoutButtons()
 
-        // Update button container size
         updateButtonContainerSize()
     }
 
     private func setupCheckoutButtonContent() {
-        // Remove any existing custom views
         checkoutButton.subviews.forEach { $0.removeFromSuperview() }
 
-        // Update button background color based on enabled state
         checkoutButton.backgroundColor = checkoutButton.isEnabled ? ColorPalette.primaryColor : .lightGray
 
-        // Create container view
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.isUserInteractionEnabled = false
         checkoutButton.addSubview(containerView)
 
-        // Create labels
         let checkoutLabel = UILabel()
         checkoutLabel.text = "Check out"
         checkoutLabel.font = UIFont.boldSystemFont(ofSize: 17)
@@ -314,9 +289,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         totalLabel.textAlignment = .right
         totalLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        // Update total label text
         if let amount = CartManager.shared.cart?.cost.totalAmount,
-           let total = amount.formattedString()
+           let total = MoneyV2(amount: amount.amount, currencyCode: amount.currencyCode).formattedString()
         {
             totalLabel.text = total
         } else {
@@ -327,35 +301,29 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         containerView.addSubview(totalLabel)
 
         NSLayoutConstraint.activate([
-            // Container view constraints
             containerView.leadingAnchor.constraint(equalTo: checkoutButton.leadingAnchor, constant: 16),
             containerView.trailingAnchor.constraint(equalTo: checkoutButton.trailingAnchor, constant: -16),
             containerView.topAnchor.constraint(equalTo: checkoutButton.topAnchor, constant: 16),
             containerView.bottomAnchor.constraint(equalTo: checkoutButton.bottomAnchor, constant: -16),
 
-            // Checkout label constraints
             checkoutLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             checkoutLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
 
-            // Total label constraints
             totalLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
             totalLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             totalLabel.leadingAnchor.constraint(greaterThanOrEqualTo: checkoutLabel.trailingAnchor, constant: 8)
         ])
 
-        // Clear the button's default title since we're using custom labels
         checkoutButton.setTitle("", for: .normal)
     }
 
     private func setupAcceleratedCheckoutButtons() {
         guard let cartId = CartManager.shared.cart?.id else { return }
 
-        // Create accelerated checkout buttons
-        let acceleratedCheckoutButtonsView = AcceleratedCheckoutButtons(cartID: cartId.rawValue)
+        let acceleratedCheckoutButtonsView = AcceleratedCheckoutButtons(cartID: cartId)
             .wallets([.shopPay, .applePay])
             .cornerRadius(10)
             .onComplete { _ in
-                // Reset cart on successful checkout
                 CartManager.shared.resetCart()
             }
             .onFail { error in
@@ -367,29 +335,24 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             .environmentObject(appConfiguration.acceleratedCheckoutsStorefrontConfig)
             .environmentObject(appConfiguration.acceleratedCheckoutsApplePayConfig)
 
-        // Wrap in AnyView and create hosting controller
         let acceleratedCheckoutsController = UIHostingController(rootView: AnyView(acceleratedCheckoutButtonsView))
         acceleratedCheckoutsController.view.translatesAutoresizingMaskIntoConstraints = false
         acceleratedCheckoutsController.view.backgroundColor = UIColor.clear
 
-        // Set height constraint for accelerated checkout buttons (2 buttons: Apple Pay + Shop Pay)
         let heightConstraint = acceleratedCheckoutsController.view.heightAnchor.constraint(equalToConstant: 96)
-        heightConstraint.priority = UILayoutPriority(999) // High priority but not required
+        heightConstraint.priority = UILayoutPriority(999)
         heightConstraint.isActive = true
 
-        // Add to button stack view (at index 0 to appear above checkout button)
         addChild(acceleratedCheckoutsController)
         buttonStackView.insertArrangedSubview(acceleratedCheckoutsController.view, at: 0)
         acceleratedCheckoutsController.didMove(toParent: self)
 
         acceleratedCheckoutHostingController = acceleratedCheckoutsController
 
-        // Update button container size after adding buttons
         updateButtonContainerSize()
     }
 
     private func updateButtonContainerSize() {
-        // Calculate required height for the button container
         let checkoutButtonHeight: CGFloat = 48
         let acceleratedButtonHeight: CGFloat = acceleratedCheckoutHostingController != nil ? 96 : 0
         let spacing: CGFloat = acceleratedCheckoutHostingController != nil ? DesignSystem.buttonSpacing : 0
@@ -399,18 +362,14 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         let totalHeight = checkoutButtonHeight + acceleratedButtonHeight + spacing + totalPadding
 
-        // Set the frame for the button container with proper dimensions
         buttonContainerView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: totalHeight)
 
-        // Force layout update to ensure proper stacking
         buttonContainerView.layoutIfNeeded()
 
-        // Update the table view's footer
         tableView.tableFooterView = buttonContainerView
     }
 
     private func refreshAcceleratedCheckoutButtons() {
-        // Remove existing hosting controller if it exists
         if let hostingController = acceleratedCheckoutHostingController {
             buttonStackView.removeArrangedSubview(hostingController.view)
             hostingController.view.removeFromSuperview()
@@ -418,10 +377,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             acceleratedCheckoutHostingController = nil
         }
 
-        // Recreate with current cart
         setupAcceleratedCheckoutButtons()
 
-        // Update container size
         updateButtonContainerSize()
     }
 
@@ -430,7 +387,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         tableView.reloadData()
 
-        if let url = CartManager.shared.cart?.checkoutUrl {
+        if let url = CartManager.shared.cart?.checkoutURL {
             ShopifyCheckoutSheetKit.preload(checkout: url)
         }
     }
@@ -452,24 +409,23 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell = CartItemCell()
         cell.configure(with: variant, quantity: node.quantity)
         cell.onQuantityChange = { quantity in
-            // Display loading state on row + disable checkout button
             cell.showLoading(true)
             self.checkoutButton.isEnabled = false
-            self.setupCheckoutButtonContent() // Update button appearance for disabled state
+            self.setupCheckoutButtonContent()
 
-            // Invalidate checkout cache to ensure correct number of items are shown on checkout
             ShopifyCheckoutSheetKit.invalidate()
 
-            // Update cart quantities
             _Concurrency.Task {
                 let cart = try await CartManager.shared.performCartLinesUpdate(id: node.id, quantity: quantity)
 
                 cell.showLoading(false)
                 self.checkoutButton.isEnabled = true
-                self.setupCheckoutButtonContent() // Update button appearance for enabled state
+                self.setupCheckoutButtonContent()
                 cell.quantityLabel.text = "\(cart.lines.nodes[indexPath.item].quantity)"
 
-                ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
+                if let checkoutUrl = cart.checkoutURL {
+                    ShopifyCheckoutSheetKit.preload(checkout: checkoutUrl)
+                }
             }
         }
         return cell
@@ -489,24 +445,20 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             tableView.isHidden = totalQuantity <= 0
             checkoutButton.isHidden = totalQuantity <= 0
 
-            // Show/hide accelerated checkout buttons based on cart state
             acceleratedCheckoutHostingController?.view.isHidden = totalQuantity <= 0
 
-            // Refresh accelerated checkout buttons when cart changes
             if totalQuantity > 0 {
                 refreshAcceleratedCheckoutButtons()
             } else {
-                // Update container size when cart is empty
                 updateButtonContainerSize()
             }
 
-            // Update checkout button content with new cart total
             setupCheckoutButtonContent()
         }
     }
 
     @objc private func presentCheckout() {
-        guard let url = CartManager.shared.cart?.checkoutUrl else { return }
+        guard let url = CartManager.shared.cart?.checkoutURL else { return }
 
         ShopifyCheckoutSheetKit.present(checkout: url, from: self, delegate: self)
     }
@@ -515,7 +467,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         CartManager.shared.resetCart()
     }
 
-    private func node(at indexPath: IndexPath) -> BaseCartLine {
+    private func node(at indexPath: IndexPath) -> CartLineNode {
         guard let lines = CartManager.shared.cart?.lines.nodes else {
             fatalError("invald index path")
         }
@@ -523,10 +475,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         return lines[indexPath.item]
     }
 
-    private func variant(at indexPath: IndexPath) -> Storefront.ProductVariant {
-        guard
-            let variant = node(at: indexPath).merchandise as? Storefront.ProductVariant
-        else {
+    private func variant(at indexPath: IndexPath) -> CartLineVariant {
+        guard let variant = node(at: indexPath).merchandise.asProductVariant else {
             fatalError("invald index path")
         }
         return variant
@@ -553,23 +503,19 @@ extension CartViewController: @preconcurrency CheckoutDelegate {
     func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
         var errorMessage = ""
 
-        // Internal Checkout SDK error
         if case let .sdkError(underlying, _) = error {
             errorMessage = "\(underlying.localizedDescription)"
         }
 
-        // Checkout unavailable error
         if case let .checkoutUnavailable(message, code, _) = error {
             errorMessage = message
             handleCheckoutUnavailable(message, code)
         }
 
-        // Storefront configuration error
         if case let .configurationError(message, _, _) = error {
             errorMessage = message
         }
 
-        // Checkout has expired, re-create cart to fetch a new checkout URL
         if case let .checkoutExpired(message, _, _) = error {
             errorMessage = message
         }
@@ -620,7 +566,6 @@ extension CartViewController {
     }
 }
 
-/// analytics examples
 extension CartViewController {
     private func mapToGenericEvent(standardEvent: StandardEvent) -> AnalyticsEvent {
         return AnalyticsEvent(
@@ -654,17 +599,14 @@ extension CartViewController {
     }
 
     private func getUserId() -> String {
-        // return ID for user used in your existing analytics system
         return "123"
     }
 
     func recordAnalyticsEvent(_ event: AnalyticsEvent) {
-        // send the event to an analytics system, e.g. via an analytics sdk
         appConfiguration.webPixelsLogger.log(event.name)
     }
 }
 
-/// example type, e.g. that may be defined by an analytics sdk
 struct AnalyticsEvent: Codable {
     var name = ""
     var userId = ""

@@ -1,0 +1,29 @@
+{
+  "schemaNamespace" : "Storefront",
+  "input" : {
+    "operationSearchPaths" : [
+      "**/*.graphql"
+    ],
+    "schemaSearchPaths" : [
+      "**/*.graphqls"
+    ]
+  },
+  "output" : {
+    "testMocks" : {
+      "none" : {
+      }
+    },
+    "schemaTypes" : {
+      "path" : "./MobileBuyIntegration/Generated",
+      "moduleType" : {
+        "embeddedInTarget" : {
+          "name" : "MobileBuyIntegration"
+        }
+      }
+    },
+    "operations" : {
+      "inSchemaModule" : {
+      }
+    }
+  }
+}
