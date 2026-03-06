@@ -21,12 +21,13 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Buy
+import ApolloAPI
 import PassKit
-import SwiftUI
-
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
+import SwiftUI
+
+typealias CartLineNode = Storefront.CartFragment.Lines.Node
 
 struct CartView: View {
     @State var cartCompleted: Bool = false
@@ -48,12 +49,11 @@ struct CartView: View {
                 }
 
                 VStack(spacing: DesignSystem.buttonSpacing) {
-                    if let cartId = cartManager.cart?.id.rawValue {
+                    if let cartId = cartManager.cart?.id {
                         AcceleratedCheckoutButtons(cartID: cartId)
                             .wallets([.shopPay, .applePay])
                             .cornerRadius(DesignSystem.cornerRadius)
                             .onComplete { _ in
-                                // Reset cart on successful checkout
                                 CartManager.shared.resetCart()
                             }
                             .onFail { error in
@@ -74,7 +74,7 @@ struct CartView: View {
                                     .fontWeight(.bold)
                                 Spacer()
                                 if let amount = cartManager.cart?.cost.totalAmount,
-                                   let total = amount.formattedString()
+                                   let total = MoneyV2(amount: amount.amount, currencyCode: amount.currencyCode).formattedString()
                                 {
                                     Text(total)
                                         .fontWeight(.bold)
@@ -97,7 +97,7 @@ struct CartView: View {
                 preloadCheckout()
             }
             .sheet(isPresented: $showCheckoutSheet) {
-                if let url = cartManager.cart?.checkoutUrl {
+                if let url = cartManager.cart?.checkoutURL {
                     CheckoutSheet(checkout: url)
                         .colorScheme(.automatic)
                         .onCancel {
@@ -110,13 +110,11 @@ struct CartView: View {
                             }
                         }
                         .onComplete { event in
-                            // Handle checkout completion
                             print("[ShopifyCheckoutKit] COMPLETE - Checkout completed with order ID: \(event.orderDetails.id)")
                             isCompleted = true
                         }
                         .onFail { error in
                             showCheckoutSheet = false
-                            // Handle checkout failure
                             print("[ShopifyCheckoutKit] FAIL - Checkout failed: \(error)")
                         }
                         .onLinkClick { url in
@@ -153,9 +151,7 @@ struct CartView: View {
     }
 
     private func presentCheckout() {
-        guard let url = CartManager.shared.cart?.checkoutUrl else {
-            return
-        }
+        guard let url = CartManager.shared.cart?.checkoutURL else { return }
 
         CheckoutController.shared?.present(checkout: url)
     }
@@ -176,8 +172,8 @@ struct EmptyState: View {
 }
 
 struct CartLines: View {
-    var lines: [BaseCartLine]
-    @State var updating: GraphQL.ID? {
+    var lines: [CartLineNode]
+    @State var updating: String? {
         didSet {
             isBusy = updating != nil
         }
@@ -187,11 +183,11 @@ struct CartLines: View {
 
     var body: some View {
         ForEach(lines, id: \.id) { node in
-            let variant = node.merchandise as? Storefront.ProductVariant
+            let variant = node.merchandise.asProductVariant
 
             HStack {
-                if let imageUrl = variant?.product.featuredImage?.url {
-                    AsyncImage(url: imageUrl) { phase in
+                if let imageUrl = variant?.product.featuredImage?.url, let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { phase in
                         switch phase {
                         case .empty:
                             ProgressView()
@@ -224,7 +220,7 @@ struct CartLines: View {
                         .font(.body)
                         .foregroundColor(Color(ColorPalette.primaryColor))
 
-                    if let price = variant?.price.formattedString() {
+                    if let variant, let price = MoneyV2(amount: variant.price.amount, currencyCode: variant.price.currencyCode).formattedString() {
                         HStack {
                             Text("\(price)")
                                 .foregroundColor(.gray)
@@ -233,14 +229,11 @@ struct CartLines: View {
 
                             HStack(spacing: 20) {
                                 Button(action: {
-                                    /// Prevent multiple simulataneous calls
                                     guard node.quantity > 1, updating != node.id else {
                                         return
                                     }
-
                                     updating = node.id
 
-                                    /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                     ShopifyCheckoutSheetKit.invalidate()
 
                                     _Concurrency.Task {
@@ -270,14 +263,12 @@ struct CartLines: View {
 
                                 Button(
                                     action: {
-                                        /// Prevent multiple simulataneous calls
                                         guard updating != node.id else {
                                             return
                                         }
 
                                         updating = node.id
 
-                                        /// Invalidate the cart cache to ensure the correct item quantity is reflected on checkout
                                         ShopifyCheckoutSheetKit.invalidate()
 
                                         _Concurrency.Task {
@@ -288,7 +279,9 @@ struct CartLines: View {
                                             CartManager.shared.cart = cart
                                             updating = nil
 
-                                            ShopifyCheckoutSheetKit.preload(checkout: cart.checkoutUrl)
+                                            if let checkoutUrl = cart.checkoutURL {
+                                                ShopifyCheckoutSheetKit.preload(checkout: checkoutUrl)
+                                            }
                                         }
                                     },
                                     label: {

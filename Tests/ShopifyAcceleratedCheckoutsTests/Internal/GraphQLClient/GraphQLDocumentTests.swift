@@ -21,9 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import XCTest
-
 @testable import ShopifyAcceleratedCheckouts
+import XCTest
 
 final class GraphQLDocumentTests: XCTestCase {
     // MARK: - Fragment Detection Tests
@@ -181,15 +180,16 @@ final class GraphQLDocumentTests: XCTestCase {
         )
     }
 
-    func testFragmentOrderingForSingleDirectReference() {
+    func testFragmentOrderingForSingleDirectReference() throws {
         // Query with single direct reference (cart query)
         let document = GraphQLDocument.build(operation: .cart)
 
         // CartFragment should come first, then its dependencies
-        let cartFragmentRange = document.range(of: "fragment CartFragment")!
-        let cartLineFragmentRange = document.range(of: "fragment CartLineFragment")!
-        let cartDeliveryGroupFragmentRange = document.range(
-            of: "fragment CartDeliveryGroupFragment")!
+        let cartFragmentRange = try XCTUnwrap(document.range(of: "fragment CartFragment"))
+        let cartLineFragmentRange = try XCTUnwrap(document.range(of: "fragment CartLineFragment"))
+        let cartDeliveryGroupFragmentRange = try XCTUnwrap(document.range(
+            of: "fragment CartDeliveryGroupFragment"
+        ))
 
         XCTAssertTrue(
             cartFragmentRange.lowerBound < cartLineFragmentRange.lowerBound,
@@ -202,7 +202,7 @@ final class GraphQLDocumentTests: XCTestCase {
 
         // Verify the first fragment is the directly referenced one
         let lines = document.split(separator: "\n")
-        let firstFragmentLineIndex = lines.firstIndex { $0.starts(with: "fragment") }!
+        let firstFragmentLineIndex = try XCTUnwrap(lines.firstIndex { $0.starts(with: "fragment") })
         let firstFragmentLine = String(lines[firstFragmentLineIndex])
         XCTAssertTrue(
             firstFragmentLine.contains("fragment CartFragment"),
@@ -210,15 +210,16 @@ final class GraphQLDocumentTests: XCTestCase {
         )
     }
 
-    func testFragmentOrderingForMultipleDirectReferences() {
+    func testFragmentOrderingForMultipleDirectReferences() throws {
         let document = GraphQLDocument.build(operation: .cartCreate)
 
         // Both CartFragment and CartUserErrorFragment are directly referenced
-        let cartFragmentRange = document.range(of: "fragment CartFragment")!
-        let userErrorFragmentRange = document.range(of: "fragment CartUserErrorFragment")!
-        let cartLineFragmentRange = document.range(of: "fragment CartLineFragment")!
-        let cartDeliveryGroupFragmentRange = document.range(
-            of: "fragment CartDeliveryGroupFragment")!
+        let cartFragmentRange = try XCTUnwrap(document.range(of: "fragment CartFragment"))
+        let userErrorFragmentRange = try XCTUnwrap(document.range(of: "fragment CartUserErrorFragment"))
+        let cartLineFragmentRange = try XCTUnwrap(document.range(of: "fragment CartLineFragment"))
+        let cartDeliveryGroupFragmentRange = try XCTUnwrap(document.range(
+            of: "fragment CartDeliveryGroupFragment"
+        ))
 
         // Direct references should come before their dependencies
         XCTAssertTrue(

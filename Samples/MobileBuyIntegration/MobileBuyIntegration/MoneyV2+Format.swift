@@ -21,18 +21,31 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Buy
+import ApolloAPI
 import Foundation
 
-extension Storefront.MoneyV2 {
+struct MoneyV2 {
+    let amount: String
+    let currencyCode: String
+
     func formattedString() -> String? {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
-        formatter.currencyCode = currencyCode.rawValue
-        return isFree() ? "Free" : formatter.string(from: NSDecimalNumber(decimal: amount))
+        formatter.currencyCode = currencyCode
+        guard let decimal = Decimal(string: amount) else { return nil }
+        return decimal == 0 ? "Free" : formatter.string(from: NSDecimalNumber(decimal: decimal))
     }
+}
 
-    func isFree() -> Bool {
-        return amount == 0
+extension MoneyV2 {
+    init(amount: String, currencyCode: GraphQLEnum<Storefront.CurrencyCode>) {
+        self.amount = amount
+        self.currencyCode = currencyCode.rawValue
+    }
+}
+
+extension Storefront.CartFragment {
+    var checkoutURL: URL? {
+        URL(string: checkoutUrl)
     }
 }

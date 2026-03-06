@@ -114,12 +114,12 @@ class CheckoutErrorEventDecoder {
         do {
             let messageBody = try container.decode(String.self, forKey: .body)
 
-            /// Failure to decode will trigger the catch block
+            // Failure to decode will trigger the catch block
             let data = messageBody.data(using: .utf8)
 
             let events = try JSONDecoder().decode([CheckoutErrorEvent].self, from: data!)
 
-            /// Failure to find an event in the payload array will trigger the catch block
+            // Failure to find an event in the payload array will trigger the catch block
             return events.first!
         } catch {
             OSLogger.shared.error("Error decoding \"error\" event - \(error.localizedDescription)")

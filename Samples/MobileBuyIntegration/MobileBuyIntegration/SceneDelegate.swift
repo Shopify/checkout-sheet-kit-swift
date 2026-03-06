@@ -22,7 +22,7 @@
  */
 
 import Combine
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
 
@@ -61,19 +61,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         var viewControllers: [UIViewController?] = Array(repeating: nil, count: Screen.allCases.count)
 
-        /// Catalog screen
+        // Catalog screen
         viewControllers[Screen.catalog.rawValue] = UINavigationController(rootViewController: productGridController)
 
-        /// Product gallery screen
+        // Product gallery screen
         viewControllers[Screen.products.rawValue] = UINavigationController(rootViewController: productGalleryController)
 
-        /// Cart screen
+        // Cart screen
         viewControllers[Screen.cart.rawValue] = UINavigationController(rootViewController: swiftUICartController)
 
-        /// Account screen
+        // Account screen
         viewControllers[Screen.account.rawValue] = UINavigationController(rootViewController: accountController)
 
-        /// Settings screen
+        // Settings screen
         viewControllers[Screen.settings.rawValue] = UINavigationController(rootViewController: settingsController)
 
         tabBarController.viewControllers = viewControllers.compactMap { $0 }
@@ -86,12 +86,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     private func subscribeToColorSchemeChanges() {
-        /// Subscribe to color scheme changes on the settings screen
+        // Subscribe to color scheme changes on the settings screen
         NotificationCenter.default.addObserver(self, selector: #selector(colorSchemeChanged), name: .colorSchemeChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(navigateToAccountTab), name: .navigateToAccount, object: nil)
+    }
+
+    @objc private func navigateToAccountTab() {
+        navigateTo(.account)
     }
 
     private func setupControllers() {
-        /// Branding Logo
+        // Branding Logo
         let logoImageView = UIImageView(image: UIImage(named: "logo"))
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -100,31 +105,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             logoImageView.heightAnchor.constraint(equalToConstant: 44)
         ])
 
-        /// Catalog grid view
+        // Catalog grid view
         productGridController.tabBarItem.image = UIImage(systemName: "square.grid.2x2")
         productGridController.tabBarItem.title = "Catalog"
         productGridController.navigationItem.titleView = logoImageView
         catalogCartButton = createCartButtonWithBadge()
         productGridController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: catalogCartButton!)
 
-        /// Product Gallery
+        // Product Gallery
         productGalleryController.tabBarItem.image = UIImage(systemName: "appwindow.swipe.rectangle")
         productGalleryController.tabBarItem.title = "Products"
         productGalleryController.navigationItem.titleView = logoImageView
         galleryCartButton = createCartButtonWithBadge()
         productGalleryController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: galleryCartButton!)
 
-        /// Cart (UI Kit)
+        // Cart (UI Kit)
         swiftUICartController.tabBarItem.image = UIImage(systemName: "cart")
         swiftUICartController.tabBarItem.title = "Cart"
         swiftUICartController.navigationItem.title = "Cart (SwiftUI)"
 
-        /// Account
+        // Account
         accountController.tabBarItem.image = UIImage(systemName: "person.circle")
         accountController.tabBarItem.title = "Log in"
         subscribeToAuthStateChanges()
 
-        /// Settings
+        // Settings
         settingsController.tabBarItem.image = UIImage(systemName: "gearshape.2")
         settingsController.tabBarItem.title = "Settings"
     }
@@ -142,7 +147,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     @objc public func present() {
-        if let url = CartManager.shared.cart?.checkoutUrl {
+        if let url = CartManager.shared.cart?.checkoutURL {
             presentCheckout(url)
         }
     }
@@ -256,7 +261,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             userActivity.activityType == NSUserActivityTypeBrowsingWeb,
             let incomingURL = userActivity.webpageURL,
 
-            /// Ensure URL host matches our Storefront domain
+            // Ensure URL host matches our Storefront domain
             let host = incomingURL.host, host == appConfiguration.storefrontDomain
         else {
             return
@@ -269,18 +274,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let storefrontUrl = StorefrontURL(from: url)
 
         switch true {
-        /// Checkout URLs
+        // Checkout URLs
         case appConfiguration.universalLinks.checkout && storefrontUrl.isCheckout() && !storefrontUrl.isThankYouPage():
             presentCheckout(url)
-        /// Cart URLs
+        // Cart URLs
         case appConfiguration.universalLinks.cart && storefrontUrl.isCart():
             navigateTo(.cart)
-        /// Product URLs
+        // Product URLs
         case appConfiguration.universalLinks.products:
             if let slug = storefrontUrl.getProductSlug() {
                 navigateToProduct(with: slug)
             }
-        /// Open everything else in Safari
+        // Open everything else in Safari
         default:
             UIApplication.shared.open(url)
         }
@@ -319,6 +324,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 extension Notification.Name {
     static let colorSchemeChanged = Notification.Name("colorSchemeChanged")
+    static let navigateToAccount = Notification.Name("navigateToAccount")
 }
 
 extension Configuration.ColorScheme {

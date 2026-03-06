@@ -62,5 +62,7 @@
 			</array>
 		</dict>
 	</dict>
+	<key>API_VERSION</key>
+	<string>$(API_VERSION)</string>
 </dict>
 </plist>

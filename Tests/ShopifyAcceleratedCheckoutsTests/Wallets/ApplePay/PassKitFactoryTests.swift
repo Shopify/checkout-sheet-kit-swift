@@ -21,9 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import XCTest
-
 @testable import ShopifyAcceleratedCheckouts
+import XCTest
 
 @available(iOS 17.0, *)
 class PassKitFactoryTests: XCTestCase {

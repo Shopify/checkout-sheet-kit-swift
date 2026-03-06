@@ -22,6 +22,7 @@
  */
 
 import PassKit
+import ShopifyCheckoutSheetKit
 
 /// Encodes PassKit -> Storefront
 @available(iOS 16.0, *)
@@ -83,7 +84,7 @@ class PKEncoder {
         guard let selectedShippingMethod else {
             return .failure(.invariant(expected: "shippingMethod"))
         }
-        /// The deliveryOptionHandle is set as the shippingMethodIdentifier in PKDecoder.swift
+        // The deliveryOptionHandle is set as the shippingMethodIdentifier in PKDecoder.swift
         guard let identifier = selectedShippingMethod.identifier else {
             return .failure(.invariant(expected: "shippingMethodID"))
         }
@@ -247,10 +248,10 @@ class PKEncoder {
             .split { $0 == "\n" }
             .map { String($0) }
 
-        /// Apple Pay forces last & first names to be present on addresses added in the payment sheet (at least it does for
-        /// desktop and >=16.2 iOS), but it's still possible to add addresses without a last name in the Apple Wallet
-        /// settings
-        /// This lines up with what we do for Google Pay & Meta Pay when only a single name is provided
+        // Apple Pay forces last & first names to be present on addresses added in the payment sheet (at least it does for
+        // desktop and >=16.2 iOS), but it's still possible to add addresses without a last name in the Apple Wallet
+        // settings
+        // This lines up with what we do for Google Pay & Meta Pay when only a single name is provided
         let lastName: String? = {
             let familyName = contact?.name?.familyName
             if let familyName, !familyName.isEmpty { return familyName }
@@ -265,7 +266,7 @@ class PKEncoder {
                 country: country,
                 firstName: contact?.name?.givenName,
                 lastName: lastName,
-                phone: contact?.phoneNumber?.stringValue,
+                phone: try? phone.get(),
                 province: province,
                 zip: zip
             )
@@ -298,16 +299,38 @@ class PKEncoder {
         )
     }
 
-    var phoneNumber: Result<String, ShopifyAcceleratedCheckouts.Error> {
-        if let contact = try? shippingContact.get(),
-           let phoneNumber = contact.phoneNumber?.stringValue,
-           !phoneNumber.isEmpty
+    var phone: Result<String, ShopifyAcceleratedCheckouts.Error> {
+        let cart = cart()
+
+        if
+            let customerPhone = configuration.common.customer?.phoneNumber,
+            !customerPhone.isEmpty
         {
-            return .success(phoneNumber)
+            if
+                let buyerIdentity = cart?.buyerIdentity,
+                let biPhone = buyerIdentity.customer?.phone ?? buyerIdentity.phone,
+                !biPhone.isEmpty,
+                biPhone != customerPhone
+            {
+                ShopifyAcceleratedCheckouts.logger
+                    .info("config.customer.phoneNumber overrides buyerIdentity phone")
+            }
+            return .success(customerPhone)
         }
 
-        if let phoneNumber = configuration.common.customer?.phoneNumber {
-            return .success(phoneNumber)
+        if let phone = cart?.buyerIdentity?.customer?.phone, !phone.isEmpty {
+            return .success(phone)
+        }
+
+        if let phone = cart?.buyerIdentity?.phone, !phone.isEmpty {
+            return .success(phone)
+        }
+
+        if let contact = try? shippingContact.get(),
+           let phone = contact.phoneNumber?.stringValue,
+           !phone.isEmpty
+        {
+            return .success(phone)
         }
 
         return .failure(.invariant(expected: "phoneNumber"))
@@ -315,14 +338,33 @@ class PKEncoder {
 
     typealias Email = String
     var email: Result<Email, ShopifyAcceleratedCheckouts.Error> {
+        let cart = cart()
+
+        if let customerEmail = configuration.common.customer?.email, !customerEmail.isEmpty {
+            if
+                let buyerIdentity = cart?.buyerIdentity,
+                let biEmail = buyerIdentity.customer?.email ?? buyerIdentity.email,
+                !biEmail.isEmpty,
+                biEmail != customerEmail
+            {
+                ShopifyAcceleratedCheckouts.logger
+                    .info("config.customer.email overrides buyerIdentity email")
+            }
+            return .success(customerEmail)
+        }
+
+        if let email = cart?.buyerIdentity?.customer?.email, !email.isEmpty {
+            return .success(email)
+        }
+
+        if let email = cart?.buyerIdentity?.email, !email.isEmpty {
+            return .success(email)
+        }
+
         if let contact = try? shippingContact.get(),
            let email = contact.emailAddress,
            !email.isEmpty
         {
-            return .success(email)
-        }
-
-        if let email = configuration.common.customer?.email {
             return .success(email)
         }
 

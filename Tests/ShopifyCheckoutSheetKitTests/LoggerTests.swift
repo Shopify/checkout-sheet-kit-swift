@@ -22,9 +22,8 @@
  */
 
 import os.log
-import XCTest
-
 @testable import ShopifyCheckoutSheetKit
+import XCTest
 
 class TestableOSLogger: OSLogger {
     private(set) var capturedMessages: [(message: String, type: OSLogType)] = []

@@ -46,18 +46,16 @@ extension ShopifyAcceleratedCheckouts {
         /// - See: [Apple Developer Documentation - merchantIdentifier](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest/1619305-merchantidentifier)
         public let merchantIdentifier: String
 
-        /// Fields specified in this array will be marked as required in the Apple Pay sheet.
+        /// Contact fields required by the checkout.
         ///
-        /// These can be omitted if you already have access to a contact field,
-        /// such as the users email / phone number. Instead you may attach it to a cart via
-        /// the storefront `buyerIdentityUpdate` mutation, or passing it to
-        /// ShopifyAccleratedCheckouts.Configuration.customer.
+        /// These act as a hint to the SDK about what contact information is required to complete checkout.
+        /// - If your shop requires customer accounts, include `.email`.
+        /// - If your shop requires a phone number for shipping addresses, include `.phone`.
         ///
-        /// When `contactFields` is set `ShopifyAccleratedCheckouts.Configuration.customer`
-        /// email / phone are ignored respectively.
-        ///
-        /// - Note: Configure this property based on your shop's customer account requirements.
-        ///         For shops requiring customer accounts, include `.email` in the array.
+        /// - Important: `contactFields` that are not already present in `buyerIdentity`,
+        ///   will be requested from the Apple Pay sheet.
+        ///   When the field exists in `cart.buyerIdentity.{email,phone}` or
+        ///   `cart.buyerIdentity.customer.{email,phone}`, then Apple Pay won't request that field.
         public let contactFields: [RequiredContactFields]
 
         /// Countries supported for Apple Pay shipping addresses.

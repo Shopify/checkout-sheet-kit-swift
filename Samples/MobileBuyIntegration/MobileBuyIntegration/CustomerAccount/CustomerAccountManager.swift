@@ -23,7 +23,7 @@
 
 import CommonCrypto
 import Foundation
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyCheckoutSheetKit
 
 enum CustomerAccountError: LocalizedError {
     case missingConfiguration
@@ -86,6 +86,7 @@ final class CustomerAccountManager: ObservableObject {
     @Published var isAuthenticated: Bool = false
     @Published var isLoading: Bool = false
     @Published var customerEmail: String?
+    @Published var tokenExpiresAt: Date?
 
     private var codeVerifier: String?
     private var savedState: String?
@@ -191,6 +192,7 @@ final class CustomerAccountManager: ObservableObject {
         logger.debug("Token exchange successful, expires at: \(tokens.expiresAt)")
         KeychainHelper.shared.saveTokens(tokens)
         isAuthenticated = true
+        tokenExpiresAt = tokens.expiresAt
         extractEmailFromIdToken(tokens.idToken)
 
         CartManager.shared.resetCart()
@@ -239,6 +241,7 @@ final class CustomerAccountManager: ObservableObject {
             tokenType: newTokens.tokenType
         )
         KeychainHelper.shared.saveTokens(tokensToSave)
+        tokenExpiresAt = tokensToSave.expiresAt
         logger.debug("Saved tokens with ID token preserved: \(tokensToSave.idToken != nil)")
 
         if let newIdToken = newTokens.idToken {
@@ -285,6 +288,7 @@ final class CustomerAccountManager: ObservableObject {
         KeychainHelper.shared.clearTokens()
         isAuthenticated = false
         customerEmail = nil
+        tokenExpiresAt = nil
         codeVerifier = nil
         savedState = nil
 
@@ -328,6 +332,7 @@ final class CustomerAccountManager: ObservableObject {
         if !tokens.isExpired {
             logger.debug("Tokens valid, expires at: \(tokens.expiresAt)")
             isAuthenticated = true
+            tokenExpiresAt = tokens.expiresAt
             if customerEmail == nil {
                 logger.debug("No stored email, attempting extraction from ID token")
                 extractEmailFromIdToken(tokens.idToken)

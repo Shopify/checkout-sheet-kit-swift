@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyAcceleratedCheckouts
+@preconcurrency import ShopifyCheckoutSheetKit
 import UIKit
 
 func getLogLevel(key: String) -> LogLevel {
@@ -52,19 +52,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ShopifyAcceleratedCheckouts.logLevel = acceleratedCheckoutsLogLevel
 
         ShopifyCheckoutSheetKit.configure {
-            /// Checkout color scheme setting
+            // Checkout color scheme setting
             $0.colorScheme = .automatic
 
-            /// Customize progress bar color
+            // Customize progress bar color
             $0.tintColor = ColorPalette.primaryColor
 
-            /// Enable preloading
+            // Enable preloading
             $0.preloading.enabled = true
 
-            /// Optional logger used for internal purposes
+            // Optional logger used for internal purposes
             $0.logger = FileLogger("log.txt")
 
-            /// Optional log level for Checkout Sheet Kit
+            // Optional log level for Checkout Sheet Kit
             $0.logLevel = checkoutSheetKitLogLevel
         }
 

@@ -71,8 +71,8 @@ struct SettingsView: View {
             Section("Logging") {
                 Picker(
                     "Log Level",
-                    /// Binding used instead of $logLevel due to property observers (didSet)
-                    /// are not called on published values such as @AppStorage
+                    // Binding used instead of $logLevel due to property observers (didSet)
+                    // are not called on published values such as @AppStorage
                     selection: Binding(
                         get: { logLevel },
                         set: { logLevel = $0 }
@@ -174,7 +174,7 @@ struct CountrySelectionView: View {
         supportedCountriesString = countries.joined(separator: ",")
     }
 
-    // Dynamically generate all country codes with their display names
+    /// Dynamically generate all country codes with their display names
     private static let allCountries: [(code: String, name: String)] = {
         let locale = Locale(identifier: "en_US")
 

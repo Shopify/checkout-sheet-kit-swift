@@ -23,7 +23,7 @@
 
 import Foundation
 
-class LogReader {
+final class LogReader: Sendable {
     static let shared = LogReader("log.txt")
 
     private let logFileUrl: URL
@@ -46,7 +46,7 @@ class LogReader {
     }
 }
 
-class WebPixelsLogReader {
+final class WebPixelsLogReader: Sendable {
     static let shared = WebPixelsLogReader("analytics.txt")
 
     private let logFileUrl: URL

@@ -11,7 +11,7 @@ incorrectly_formatted_files = []
 
 Find.find('.') do |path|
   # Skip build and dependency directories
-  if File.directory?(path) && ['.build', '.swiftpm', 'DerivedData', '.git'].include?(File.basename(path))
+  if File.directory?(path) && ['.build', '.swiftpm', 'DerivedData', '.git', 'Generated'].include?(File.basename(path))
     Find.prune
   end
   

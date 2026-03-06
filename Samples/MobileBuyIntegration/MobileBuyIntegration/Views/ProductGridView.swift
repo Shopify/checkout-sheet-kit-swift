@@ -21,12 +21,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Buy
+import ApolloAPI
 import SwiftUI
 
 struct ProductGridView: View {
     @StateObject private var productCache = ProductCache.shared
-    @State private var selectedProduct: Storefront.Product?
+    @State private var selectedProduct: Product?
     @State private var showProductSheet = false
 
     let columns = [
@@ -62,7 +62,7 @@ struct ProductGridView: View {
         }
     }
 
-    private func selectProductAndShowSheet(for product: Storefront.Product) {
+    private func selectProductAndShowSheet(for product: Product) {
         selectedProduct = product
         if selectedProduct != nil {
             showProductSheet = true
@@ -71,7 +71,7 @@ struct ProductGridView: View {
 }
 
 struct ProductSheetView: View {
-    @Binding var product: Storefront.Product?
+    @Binding var product: Product?
     @Binding var isPresented: Bool
 
     var body: some View {
@@ -95,13 +95,13 @@ struct ProductSheetView: View {
 }
 
 struct ProductGridItem: View {
-    let product: Storefront.Product
+    let product: Product
     let maxWidth = UIScreen.main.bounds.width / 2 - 20
 
     var body: some View {
         VStack {
             ZStack {
-                if let imageURL = product.featuredImage?.url {
+                if let imageURLString = product.featuredImage?.url, let imageURL = URL(string: imageURLString) {
                     AsyncImage(url: thumbnailURL(from: imageURL)) { phase in
                         switch phase {
                         case .empty:
@@ -153,7 +153,7 @@ struct ProductGridItem: View {
                     .padding(.top, 8)
 
                 if let price = product.variants.nodes.first?.price {
-                    Text(price.formattedString()!)
+                    Text(MoneyV2(amount: price.amount, currencyCode: price.currencyCode).formattedString() ?? "")
                         .font(.footnote)
                         .foregroundColor(.secondary)
                 }
@@ -163,14 +163,10 @@ struct ProductGridItem: View {
         }
     }
 
-    // Generate thumbnail URL for faster loading in grid view
     private func thumbnailURL(from originalURL: URL) -> URL {
         let urlString = originalURL.absoluteString
 
-        // Shopify image transformation: add size parameters for thumbnail
-        // Target size: 300x300 (2x the display size for retina screens)
         if urlString.contains("cdn.shopify.com") || urlString.contains("shopify.com") {
-            // Insert size parameters before file extension
             if let lastDotIndex = urlString.lastIndex(of: ".") {
                 let baseURL = String(urlString[..<lastDotIndex])
                 let fileExtension = String(urlString[lastDotIndex...])
@@ -179,7 +175,6 @@ struct ProductGridItem: View {
             }
         }
 
-        // Fallback to original URL if transformation fails
         return originalURL
     }
 }

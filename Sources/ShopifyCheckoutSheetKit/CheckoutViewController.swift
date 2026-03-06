@@ -75,8 +75,8 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     public init(checkout url: URL) {
         checkoutURL = url
 
-        /// Programatic usage of the library will invalidate the cache each time the configuration changes.
-        /// This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
+        // Programatic usage of the library will invalidate the cache each time the configuration changes.
+        // This should not happen in the case of SwiftUI, where the config can change each time a modifier function runs.
         ShopifyCheckoutSheetKit.invalidateOnConfigurationChange = false
     }
 
@@ -100,7 +100,7 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
         webViewController.delegate = delegate
     }
 
-    /// Lifecycle methods
+    // Lifecycle methods
 
     @discardableResult public func onCancel(_ action: @escaping () -> Void) -> Self {
         delegate.onCancel = action
@@ -157,7 +157,7 @@ public class CheckoutDelegateWrapper: CheckoutDelegate {
             return
         }
 
-        /// Use fallback behavior if callback is not provided
+        // Use fallback behavior if callback is not provided
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         }
