@@ -73,8 +73,8 @@ extension GraphQLRequest {
                 )
             else { continue }
 
-            /// pattern matches upto and including the opening brace
-            /// insertIndex is the index of the opening brace
+            // pattern matches upto and including the opening brace
+            // insertIndex is the index of the opening brace
             let insertIndex = line.index(line.startIndex, offsetBy: match.range(at: 1).length)
             let textBeforeOpeningBrace = line[..<insertIndex]
             let textAfterOpeningBrace = line[insertIndex...]

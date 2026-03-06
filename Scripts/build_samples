@@ -16,7 +16,7 @@ EMPTY_ENTITLEMENTS="""
 """
 
 build_app() {
-    touch "$1/Storefront.xcconfig"
+    cp "$1/Storefront.xcconfig.example" "$1/Storefront.xcconfig"
 
     # Create an empty entitlements file if it doesn't already exist
     if [[ ! -f "$1/$1/$1.entitlements" ]]; then

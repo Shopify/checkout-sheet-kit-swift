@@ -21,11 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+@testable import ShopifyAcceleratedCheckouts
 import SwiftUI
 import ViewInspector
 import XCTest
-
-@testable import ShopifyAcceleratedCheckouts
 
 @available(iOS 17.0, *)
 class ShopPayButtonTests: XCTestCase {
@@ -33,7 +32,8 @@ class ShopPayButtonTests: XCTestCase {
 
     private let testConfiguration: ShopifyAcceleratedCheckouts.Configuration = .testConfiguration
     private var validCartIdentifier: CheckoutIdentifier! = .cart(
-        cartID: "gid://Shopify/Cart/test-cart-id")
+        cartID: "gid://Shopify/Cart/test-cart-id"
+    )
     private var validVariantIdentifier: CheckoutIdentifier! = .variant(
         variantID: "gid://Shopify/ProductVariant/test-variant-id", quantity: 1
     )

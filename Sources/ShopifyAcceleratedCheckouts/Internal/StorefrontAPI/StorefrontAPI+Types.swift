@@ -485,7 +485,7 @@ extension StorefrontAPI {
         case paymentsCreditCardYearExpired = "PAYMENTS_CREDIT_CARD_YEAR_EXPIRED"
         case paymentsCreditCardYearInvalidExpiryYear = "PAYMENTS_CREDIT_CARD_YEAR_INVALID_EXPIRY_YEAR"
 
-        // Catch-all for unknown values
+        /// Catch-all for unknown values
         case unknownValue = "UNKNOWN_VALUE"
 
         init(from decoder: Decoder) throws {
@@ -802,10 +802,10 @@ extension StorefrontAPI {
         case deliveryZoneNotFound = "DELIVERY_ZONE_NOT_FOUND"
         case deliveryZoneRequiredForCountry = "DELIVERY_ZONE_REQUIRED_FOR_COUNTRY"
 
-        // General error
+        /// General error
         case error = "ERROR"
 
-        // Payment errors
+        /// Payment errors
         case paymentCardDeclined = "PAYMENT_CARD_DECLINED"
 
         // Merchandise errors
@@ -815,7 +815,7 @@ extension StorefrontAPI {
         case merchandiseOutOfStock = "MERCHANDISE_OUT_OF_STOCK"
         case merchandiseProductNotPublished = "MERCHANDISE_PRODUCT_NOT_PUBLISHED"
 
-        // Delivery group errors
+        /// Delivery group errors
         case noDeliveryGroupSelected = "NO_DELIVERY_GROUP_SELECTED"
 
         // Payment address errors
@@ -874,10 +874,10 @@ extension StorefrontAPI {
         case taxesLineIdNotFound = "TAXES_LINE_ID_NOT_FOUND"
         case taxesMustBeDefined = "TAXES_MUST_BE_DEFINED"
 
-        // Validation errors
+        /// Validation errors
         case validationCustom = "VALIDATION_CUSTOM"
 
-        // Catch-all for unknown values
+        /// Catch-all for unknown values
         case unknownValue = "UNKNOWN_VALUE"
 
         init(from decoder: Decoder) throws {

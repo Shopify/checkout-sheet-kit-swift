@@ -26,12 +26,23 @@ import Foundation
 /**
  * Contains all of the values from the `info.plist`
  */
-class InfoDictionary {
+final class InfoDictionary: Sendable {
     static let shared = InfoDictionary()
 
-    // Required
+    /// Required
     let address1, address2, city, country, firstName, lastName, province, zip,
-        email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
+        email, phone, domain, accessToken, version, buildNumber, merchantIdentifier, apiVersion: String
+
+    // Customer Account API (optional)
+    let customerAccountApiClientId: String?
+    let customerAccountApiShopId: String?
+
+    var customerAccountApiRedirectUri: String? {
+        guard let shopId = customerAccountApiShopId, !shopId.isEmpty else {
+            return nil
+        }
+        return "shop.\(shopId).app://callback"
+    }
 
     init() {
         guard
@@ -55,6 +66,9 @@ class InfoDictionary {
             fatalError("Missing required configuration. Check your info.plist.")
         }
 
+        let apiVersion = infoPlist["API_VERSION"] as? String ?? "2025-07"
+
+        self.apiVersion = apiVersion
         self.address1 = address1
         self.address2 = address2
         self.city = city
@@ -70,5 +84,9 @@ class InfoDictionary {
         self.version = version
         self.buildNumber = buildNumber
         self.merchantIdentifier = merchantIdentifier
+
+        // Customer Account API configuration (optional)
+        customerAccountApiClientId = infoPlist["CustomerAccountApiClientId"] as? String
+        customerAccountApiShopId = infoPlist["CustomerAccountApiShopId"] as? String
     }
 }

@@ -38,7 +38,6 @@ protocol PayController: AnyObject {
 
 @available(iOS 16.0, *)
 class ApplePayViewController: WalletController, PayController {
-    @Published var configuration: ApplePayConfigurationWrapper
     @Published var storefrontJulyRelease: StorefrontAPIProtocol
     @Published var paymentController: PKPaymentAuthorizationController?
 
@@ -135,16 +134,19 @@ class ApplePayViewController: WalletController, PayController {
         identifier: CheckoutIdentifier,
         configuration: ApplePayConfigurationWrapper
     ) {
-        self.configuration = configuration
         storefrontJulyRelease = StorefrontAPI(
             storefrontDomain: configuration.common.storefrontDomain,
             storefrontAccessToken: configuration.common.storefrontAccessToken,
             apiVersion: "2025-07"
         )
-        super.init(identifier: identifier, storefront: StorefrontAPI(
-            storefrontDomain: configuration.common.storefrontDomain,
-            storefrontAccessToken: configuration.common.storefrontAccessToken
-        ))
+        super.init(
+            identifier: identifier,
+            storefront: StorefrontAPI(
+                storefrontDomain: configuration.common.storefrontDomain,
+                storefrontAccessToken: configuration.common.storefrontAccessToken
+            ),
+            configuration: configuration.common
+        )
         __authorizationDelegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
             controller: self
@@ -162,7 +164,7 @@ class ApplePayViewController: WalletController, PayController {
             ShopifyAcceleratedCheckouts.logger.error(
                 "[startPayment] Failed to setup cart: \(error)"
             )
-            await onCheckoutFail?(.sdkError(underlying: error, recoverable: false))
+            checkoutDidFail(error: .sdkError(underlying: error, recoverable: false))
         }
 
         do {
@@ -240,7 +242,7 @@ extension ApplePayViewController: CheckoutDelegate {
 
     func checkoutDidCancel() {
         Task { @MainActor in
-            /// x right button on CSK doesn't dismiss automatically
+            // x right button on CSK doesn't dismiss automatically
             checkoutViewController?.dismiss(animated: true)
             self.onCheckoutCancel?()
             try await authorizationDelegate.transition(to: .completed)

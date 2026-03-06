@@ -22,10 +22,9 @@
  */
 
 import os.log
-import XCTest
-
 @testable import ShopifyAcceleratedCheckouts
 @testable import ShopifyCheckoutSheetKit
+import XCTest
 
 @available(iOS 17.0, *)
 class ShopifyAcceleratedCheckoutsTests: XCTestCase {

@@ -93,26 +93,26 @@ class CollectionTests: XCTestCase {
 
     // MARK: - Set Tests
 
-    func testSetSafeSubscriptWorksCorrectly() {
+    func testSetSafeSubscriptWorksCorrectly() throws {
         let set: Set<String> = ["apple", "banana", "cherry"]
 
         // For Set, we can only test with valid indices from the set itself
         if let firstIndex = set.indices.first {
             XCTAssertNotNil(set[safe: firstIndex])
-            XCTAssertTrue(set.contains(set[safe: firstIndex]!))
+            XCTAssertTrue(try set.contains(XCTUnwrap(set[safe: firstIndex])))
         }
     }
 
     // MARK: - Dictionary Tests
 
-    func testDictionarySafeSubscriptWorksCorrectly() {
+    func testDictionarySafeSubscriptWorksCorrectly() throws {
         let dict = ["a": 1, "b": 2, "c": 3]
 
         // For Dictionary, we test with valid indices from the dictionary itself
         if let firstIndex = dict.indices.first {
             let keyValuePair = dict[safe: firstIndex]
             XCTAssertNotNil(keyValuePair)
-            XCTAssertEqual(dict[keyValuePair!.key], keyValuePair!.value)
+            XCTAssertEqual(try dict[XCTUnwrap(keyValuePair?.key)], keyValuePair?.value)
         }
     }
 
@@ -147,7 +147,7 @@ class CollectionTests: XCTestCase {
 
     // MARK: - Edge Cases
 
-    func testArraySafeSubscriptWithDifferentTypes() {
+    func testArraySafeSubscriptWithDifferentTypes() throws {
         let stringArray = ["first", "second", "third"]
         let optionalArray: [String?] = ["a", nil, "c"]
         let objectArray = [NSObject(), NSObject()]
@@ -157,7 +157,7 @@ class CollectionTests: XCTestCase {
         // Test valid index with nil element - should return .some(nil)
         let elementAtIndex1 = optionalArray[safe: 1]
         XCTAssertNotNil(elementAtIndex1 as Any?) // The optional wrapper exists
-        XCTAssertNil(elementAtIndex1!) // But the actual element is nil
+        XCTAssertNil(try XCTUnwrap(elementAtIndex1)) // But the actual element is nil
 
         XCTAssertEqual(optionalArray[safe: 0], "a")
         let outOfBoundsElement = optionalArray[safe: 3]

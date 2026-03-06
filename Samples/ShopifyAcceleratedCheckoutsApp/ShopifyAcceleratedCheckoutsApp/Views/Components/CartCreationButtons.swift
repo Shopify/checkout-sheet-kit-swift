@@ -67,8 +67,10 @@ struct CartCreationButtons: View {
                     .background(
                         isCreatingCart
                             ? Color.accentColor.opacity(0.8)
-                            : (selectedVariants.isEmpty
-                                ? Color.gray.opacity(0.3) : Color.accentColor)
+                            : (
+                                selectedVariants.isEmpty
+                                    ? Color.gray.opacity(0.3) : Color.accentColor
+                            )
                     )
                     .foregroundColor(.white)
                     .cornerRadius(8)

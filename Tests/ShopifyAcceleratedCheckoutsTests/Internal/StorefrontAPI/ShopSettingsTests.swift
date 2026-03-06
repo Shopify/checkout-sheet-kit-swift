@@ -26,7 +26,7 @@ import XCTest
 
 @available(iOS 17.0, *)
 class ShopSettingsTests: XCTestCase {
-    func testBasicInitialization() throws {
+    func testBasicInitialization() {
         let domain = Domain(host: "test-shop.myshopify.com", url: "https://test-shop.myshopify.com")
         let paymentSettings = PaymentSettings(countryCode: "US")
 
@@ -65,7 +65,7 @@ class ShopSettingsTests: XCTestCase {
         countryCode: String = "US"
     ) throws -> StorefrontAPI.Shop {
         // Create mock data with proper structure
-        let mockShop = StorefrontAPI.Shop(
+        return StorefrontAPI.Shop(
             name: name,
             description: "Mock shop description",
             primaryDomain: StorefrontAPI.ShopDomain(
@@ -81,7 +81,5 @@ class ShopSettingsTests: XCTestCase {
             ),
             moneyFormat: "${{amount}}"
         )
-
-        return mockShop
     }
 }

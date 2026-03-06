@@ -43,7 +43,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         }
     }
 
-    // Specific helper for GraphQLError enum cases
+    /// Specific helper for GraphQLError enum cases
     func XCTAssertThrowsGraphQLError(
         _ expression: @autoclosure () async throws -> some Any,
         _ expectedErrorMatcher: (GraphQLError) -> Bool,
@@ -887,7 +887,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
 
         XCTAssertNotNil(cart)
         XCTAssertEqual(cart?.deliveryGroups.nodes.first?.selectedDeliveryOption?.handle, "express")
-        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "34.99")!)
+        XCTAssertEqual(cart?.cost.totalAmount.amount, Decimal(string: "34.99"))
     }
 
     // MARK: - Cart Payment Update Tests
@@ -939,7 +939,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             lastDigits: "4242"
         )
 
-        let totalAmount = StorefrontAPI.MoneyV2(amount: Decimal(string: "34.99")!, currencyCode: "USD")
+        let totalAmount = try StorefrontAPI.MoneyV2(amount: XCTUnwrap(Decimal(string: "34.99")), currencyCode: "USD")
 
         let cart = try await storefrontAPI.cartPaymentUpdate(
             id: GraphQLScalars.ID("gid://shopify/Cart/123"),
@@ -947,7 +947,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             applePayPayment: applePayPayment
         )
 
-        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "34.99")!)
+        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "34.99"))
         XCTAssertNotNil(cart.cost.totalTaxAmount)
     }
 
@@ -978,7 +978,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             lastDigits: "1234"
         )
 
-        let totalAmount = StorefrontAPI.MoneyV2(amount: Decimal(string: "99.99")!, currencyCode: "USD")
+        let totalAmount = try StorefrontAPI.MoneyV2(amount: XCTUnwrap(Decimal(string: "99.99")), currencyCode: "USD")
 
         do {
             _ = try await storefrontAPI.cartPaymentUpdate(
@@ -1068,7 +1068,7 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             billingAddress: billingAddress
         )
 
-        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "29.99")!)
+        XCTAssertEqual(cart.cost.totalAmount.amount, Decimal(string: "29.99"))
         XCTAssertNotNil(cart.cost.totalTaxAmount)
 
         // Verify that the request was made with correct field names (country/province, not countryCode/provinceCode)

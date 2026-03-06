@@ -44,7 +44,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             var item: UIBarButtonItem
 
             if #available(iOS 26.0, *) {
-                /// Liquid glass renders the icon inside a circular bubble by default
+                // Liquid glass renders the icon inside a circular bubble by default
                 item = UIBarButtonItem(
                     image: UIImage(systemName: "xmark"),
                     style: .plain,
@@ -64,7 +64,7 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
             return item
         }
 
-        /// Use system default if no custom tint color was provided
+        // Use system default if no custom tint color was provided
         return UIBarButtonItem(
             barButtonSystemItem: .close,
             target: self,
@@ -271,7 +271,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
     }
 
     private func isRecoverableError() -> Bool {
-        /// Reuse of multipass tokens will cause 422 errors. A new token must be generated
+        // Reuse of multipass tokens will cause 422 errors. A new token must be generated
         return !CheckoutURL(from: checkoutURL).isMultipassURL()
     }
 }
