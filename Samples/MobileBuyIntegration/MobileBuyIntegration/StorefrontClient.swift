@@ -21,82 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Buy
+import ApolloAPI
 import Foundation
-import PassKit
-
-class StorefrontClient: @unchecked Sendable {
-    static let shared = StorefrontClient()
-
-    private let client: Graph.Client
-
-    private init() {
-        client = Graph
-            .Client(
-                shopDomain: InfoDictionary.shared.domain,
-                apiKey: InfoDictionary.shared.accessToken
-            )
-
-        // Set the caching policy (1 hour)
-        client.cachePolicy = .cacheFirst(expireIn: 60 * 60)
-    }
-
-    typealias QueryResultHandler = (Result<Storefront.QueryRoot, Error>) -> Void
-
-    func execute(query: Storefront.QueryRootQuery, handler: @escaping QueryResultHandler) {
-        let task = client.queryGraphWith(query) { query, error in
-            if let root = query {
-                handler(.success(root))
-            } else {
-                handler(.failure(error ?? URLError(.unknown)))
-            }
-        }
-
-        task.resume()
-    }
-
-    func executeAsync(query: Storefront.QueryRootQuery) async throws -> Storefront.QueryRoot {
-        try await withCheckedThrowingContinuation { continuation in
-            let task = client.queryGraphWith(query) { query, error in
-                guard let query else {
-                    return continuation.resume(throwing: error ?? URLError(.unknown))
-                }
-
-                continuation.resume(returning: query)
-            }
-            task.resume()
-        }
-    }
-
-    typealias MutationResultHandler = (Result<Storefront.Mutation, Error>) -> Void
-
-    func execute(mutation: Storefront.MutationQuery, handler: @escaping MutationResultHandler) {
-        let task = client.mutateGraphWith(mutation) { mutation, error in
-            if let root = mutation {
-                handler(.success(root))
-            } else {
-                handler(.failure(error ?? URLError(.unknown)))
-            }
-        }
-
-        task.resume()
-    }
-
-    func executeAsync(mutation: Storefront.MutationQuery) async throws -> Storefront.Mutation {
-        try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.main.async {
-                let task = self.client.mutateGraphWith(mutation) { mutation, error in
-                    guard let mutation else {
-                        return continuation.resume(throwing: error ?? URLError(.unknown))
-                    }
-
-                    continuation.resume(returning: mutation)
-                }
-                task.resume()
-            }
-        }
-    }
-}
 
 public struct StorefrontURL {
     public let url: URL
@@ -150,78 +76,54 @@ class StorefrontInputFactory {
         case invariant(String)
     }
 
-    public func createCartInput(_ items: [GraphQL.ID] = [], customerAccessToken: String? = nil) -> Storefront.CartInput {
-        let lines = Input(orNull: items.map { Storefront.CartLineInput.create(merchandiseId: $0) })
+    public func createCartInput(_ items: [String] = [], customerAccessToken: String? = nil) -> Storefront.CartInput {
+        let lines: GraphQLNullable<[Storefront.CartLineInput]> = .some(
+            items.map { Storefront.CartLineInput(merchandiseId: $0) }
+        )
 
         switch appConfiguration.buyerIdentityMode {
         case .guest:
-            return Storefront.CartInput.create(lines: lines)
+            return Storefront.CartInput(lines: lines)
 
         case .hardcoded:
-            let deliveryAddress = Storefront.MailingAddressInput.create(
-                address1: Input(orNull: vaultedContactInfo.address1),
-                address2: Input(orNull: vaultedContactInfo.address2),
-                city: Input(orNull: vaultedContactInfo.city),
-                company: Input(orNull: ""),
-                country: Input(orNull: vaultedContactInfo.country),
-                firstName: Input(orNull: vaultedContactInfo.firstName),
-                lastName: Input(orNull: vaultedContactInfo.lastName),
-                phone: Input(orNull: vaultedContactInfo.phone),
-                province: Input(orNull: vaultedContactInfo.province),
-                zip: Input(orNull: vaultedContactInfo.zip)
+            let deliveryAddress = Storefront.MailingAddressInput(
+                address1: .some(vaultedContactInfo.address1),
+                address2: .some(vaultedContactInfo.address2),
+                city: .some(vaultedContactInfo.city),
+                company: .some(""),
+                country: .some(vaultedContactInfo.country),
+                firstName: .some(vaultedContactInfo.firstName),
+                lastName: .some(vaultedContactInfo.lastName),
+                phone: .some(vaultedContactInfo.phone),
+                province: .some(vaultedContactInfo.province),
+                zip: .some(vaultedContactInfo.zip)
             )
 
-            let deliveryAddressPreferences = [
-                Storefront.DeliveryAddressInput.create(
-                    deliveryAddress: Input(orNull: deliveryAddress)
-                )
-            ]
+            let buyerIdentity = Storefront.CartBuyerIdentityInput(
+                email: .some(vaultedContactInfo.email),
+                customerAccessToken: customerAccessToken.map { .some($0) } ?? .none,
+                deliveryAddressPreferences: .some([
+                    Storefront.DeliveryAddressInput(deliveryAddress: .some(deliveryAddress))
+                ])
+            )
 
-            return Storefront.CartInput.create(
-                lines: Input(
-                    orNull: items.map {
-                        Storefront.CartLineInput.create(merchandiseId: $0)
-                    }
-                ),
-                buyerIdentity: Input(
-                    orNull: Storefront.CartBuyerIdentityInput.create(
-                        email: Input(orNull: vaultedContactInfo.email),
-                        customerAccessToken: Input(orNull: customerAccessToken),
-                        deliveryAddressPreferences: Input(
-                            orNull: deliveryAddressPreferences
-                        )
-                    )
-                )
+            return Storefront.CartInput(
+                lines: lines,
+                buyerIdentity: .some(buyerIdentity)
             )
 
         case .customerAccount:
             guard let token = customerAccessToken else {
-                return Storefront.CartInput.create(lines: lines)
+                return Storefront.CartInput(lines: lines)
             }
-            return Storefront.CartInput.create(
+            return Storefront.CartInput(
                 lines: lines,
-                buyerIdentity: Input(
-                    orNull: Storefront.CartBuyerIdentityInput.create(
-                        customerAccessToken: Input(orNull: token)
+                buyerIdentity: .some(
+                    Storefront.CartBuyerIdentityInput(
+                        customerAccessToken: .some(token)
                     )
                 )
             )
         }
-    }
-
-    public func createMailingAddressInput(
-        contact: PKContact, address: CNPostalAddress
-    ) -> Storefront.MailingAddressInput {
-        return Storefront.MailingAddressInput.create(
-            address1: Input(orNull: address.street),
-            address2: Input(orNull: address.subLocality),
-            city: Input(orNull: address.city),
-            country: Input(orNull: address.country),
-            firstName: Input(orNull: contact.name?.givenName ?? ""),
-            lastName: Input(orNull: contact.name?.familyName ?? ""),
-            phone: Input(orNull: contact.phoneNumber?.stringValue ?? ""),
-            province: Input(orNull: address.state),
-            zip: Input(orNull: address.postalCode)
-        )
     }
 }

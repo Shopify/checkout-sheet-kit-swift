@@ -31,7 +31,7 @@ final class InfoDictionary: Sendable {
 
     /// Required
     let address1, address2, city, country, firstName, lastName, province, zip,
-        email, phone, domain, accessToken, version, buildNumber, merchantIdentifier: String
+        email, phone, domain, accessToken, version, buildNumber, merchantIdentifier, apiVersion: String
 
     // Customer Account API (optional)
     let customerAccountApiClientId: String?
@@ -66,6 +66,9 @@ final class InfoDictionary: Sendable {
             fatalError("Missing required configuration. Check your info.plist.")
         }
 
+        let apiVersion = infoPlist["API_VERSION"] as? String ?? "2025-07"
+
+        self.apiVersion = apiVersion
         self.address1 = address1
         self.address2 = address2
         self.city = city
