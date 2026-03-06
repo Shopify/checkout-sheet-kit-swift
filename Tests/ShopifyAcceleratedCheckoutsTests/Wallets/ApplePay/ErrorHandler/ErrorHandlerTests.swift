@@ -241,9 +241,5 @@ class ErrorHandlerTests: XCTestCase {
         init(message: String = "Test error") {
             self.message = message
         }
-
-        static func == (lhs: TestError, rhs: TestError) -> Bool {
-            return lhs.message == rhs.message
-        }
     }
 }

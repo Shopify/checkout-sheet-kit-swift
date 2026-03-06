@@ -55,7 +55,8 @@ extension Task where Failure == Error {
                     return try await operation()
                 } catch {
                     try await clock.sleep(
-                        nanoseconds: exponentialDelay(for: attempt, with: retryDelay))
+                        nanoseconds: exponentialDelay(for: attempt, with: retryDelay)
+                    )
 
                     continue
                 }

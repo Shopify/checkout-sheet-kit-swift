@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -e
+set -eo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+run_codegen() {
+  local dir="$1"
+  local name="$2"
+  echo "🔄 Running codegen for $name..."
+
+  if [ ! -f "$REPO_ROOT/$dir/apollo-ios-cli" ]; then
+    echo "❌ apollo-ios-cli not found in $dir"
+    echo "   Download it from https://github.com/apollographql/apollo-ios/releases"
+    return 1
+  fi
+  if [ ! -f "$REPO_ROOT/$dir/apollo-codegen-config.json" ]; then
+    echo "❌ apollo-codegen-config.json not found in $dir"
+    return 1
+  fi
+
+  local schema_count=$(find "$REPO_ROOT/$dir" -name "*.graphqls" -maxdepth 1 | wc -l | tr -d ' ')
+  if [ "$schema_count" -eq 0 ]; then
+    echo "❌ No .graphqls schema file found in $dir"
+    echo "   Run 'dev apollo download_schema $name' first"
+    return 1
+  fi
+
+  cd "$REPO_ROOT/$dir"
+  ./apollo-ios-cli generate --path apollo-codegen-config.json
+  local status=$?
+  cd "$REPO_ROOT"
+
+  if [ $status -eq 0 ]; then
+    echo "✅ Codegen complete for $name"
+  else
+    echo "❌ Codegen failed for $name"
+    return 1
+  fi
+}
+
+APP="${1:-all}"
+case "$APP" in
+  accelerated)
+    run_codegen "Samples/ShopifyAcceleratedCheckoutsApp" "accelerated"
+    ;;
+  mobile-buy)
+    run_codegen "Samples/MobileBuyIntegration" "mobile-buy"
+    ;;
+  all)
+    run_codegen "Samples/ShopifyAcceleratedCheckoutsApp" "accelerated"
+    run_codegen "Samples/MobileBuyIntegration" "mobile-buy"
+    ;;
+  *)
+    echo "❌ Unknown app: $APP. Use 'accelerated', 'mobile-buy', or 'all'"
+    exit 1
+    ;;
+esac
+
+/opt/dev/bin/dev fix

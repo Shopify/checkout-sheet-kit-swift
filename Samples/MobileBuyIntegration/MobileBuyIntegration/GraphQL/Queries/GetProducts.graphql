@@ -1,0 +1,31 @@
+query GetProducts($first: Int = 20, $country: CountryCode!, $language: LanguageCode!) @inContext(country: $country, language: $language) {
+  products(first: $first) {
+    nodes {
+      id
+      title
+      handle
+      description
+      vendor
+      featuredImage {
+        url
+      }
+      collections(first: 1) {
+        nodes {
+          id
+          title
+        }
+      }
+      variants(first: 1) {
+        nodes {
+          id
+          title
+          availableForSale
+          price {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
+}

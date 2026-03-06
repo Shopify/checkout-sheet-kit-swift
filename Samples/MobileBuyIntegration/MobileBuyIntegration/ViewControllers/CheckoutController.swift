@@ -22,7 +22,7 @@
  */
 
 import OSLog
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyCheckoutSheetKit
 import UIKit
 
 class CheckoutController: UIViewController {
@@ -53,10 +53,11 @@ class CheckoutController: UIViewController {
     }
 }
 
-extension CheckoutController: CheckoutDelegate {
+extension CheckoutController: @preconcurrency CheckoutDelegate {
     func checkoutDidComplete(event: CheckoutCompletedEvent) {
         OSLogger.shared.debug(
-            "[CheckoutDelegate] Checkout completed. Order ID: \(event.orderDetails.id)")
+            "[CheckoutDelegate] Checkout completed. Order ID: \(event.orderDetails.id)"
+        )
         CartManager.shared.resetCart()
     }
 

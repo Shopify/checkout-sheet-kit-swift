@@ -21,24 +21,26 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Buy
-import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+import Apollo
+import ApolloAPI
+@preconcurrency import ShopifyAcceleratedCheckouts
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import UIKit
+
+typealias Product = Storefront.GetProductsQuery.Data.Products.Node
 
 struct ProductView: View {
     // MARK: Properties
 
-    @State private var product: Storefront.Product
-    @State private var handle: String?
+    @State private var product: Product
     @State private var loading = false
     @State private var imageLoaded: Bool = false
     @State private var showingCart = false
     @State private var descriptionExpanded: Bool = false
     @State private var addedToCart: Bool = false
 
-    init(product: Storefront.Product) {
+    init(product: Product) {
         _product = State(initialValue: product)
     }
 
@@ -47,8 +49,8 @@ struct ProductView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                if let imageURL = product.featuredImage?.url {
-                    AsyncImage(url: imageURL) { phase in
+                if let imageURL = product.featuredImage?.url, let url = URL(string: imageURL) {
+                    AsyncImage(url: url) { phase in
                         switch phase {
                         case .empty:
                             Rectangle()
@@ -122,7 +124,7 @@ struct ProductView: View {
                                 }
                                 Spacer()
 
-                                Text((variant.availableForSale ? (addedToCart ? "✓" : (variant.price.formattedString())) : "Out of stock")!)
+                                Text(formattedVariantPrice(variant))
                             }.padding()
                         }
                         .background(addedToCart ? Color(ColorPalette.successColor) : Color(ColorPalette.primaryColor))
@@ -131,7 +133,7 @@ struct ProductView: View {
                         .disabled(!variant.availableForSale || loading)
 
                         if variant.availableForSale {
-                            AcceleratedCheckoutButtons(variantID: variant.id.rawValue, quantity: 1)
+                            AcceleratedCheckoutButtons(variantID: variant.id, quantity: 1)
                                 .wallets([.applePay])
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .onFail { error in
@@ -152,6 +154,16 @@ struct ProductView: View {
     }
 
     // MARK: Methods
+
+    private func formattedVariantPrice(_ variant: Product.Variants.Node) -> String {
+        if !variant.availableForSale {
+            return "Out of stock"
+        }
+        if addedToCart {
+            return "✓"
+        }
+        return MoneyV2(amount: variant.price.amount, currencyCode: variant.price.currencyCode).formattedString() ?? ""
+    }
 
     private func addToCart() {
         _Concurrency.Task {
@@ -174,21 +186,21 @@ struct ProductView: View {
         }
     }
 
-    private func setProduct(_ product: Storefront.Product?) {
+    private func setProduct(_ product: Product?) {
         if let product {
             self.product = product
-            handle = product.handle
         }
     }
 }
 
+@MainActor
 class ProductCache: ObservableObject {
     static let shared = ProductCache()
-    @Published public var cachedProduct: Storefront.Product?
+    @Published public var cachedProduct: Product?
     @Published public var isFetching: Bool = false
-    @Published public var collection: [Storefront.Product]?
+    @Published public var collection: [Product]?
 
-    func getProduct(handle: String?, completion: @escaping (Storefront.Product?) -> Void) {
+    func getProduct(handle: String?, completion: @escaping (Product?) -> Void) {
         if let product = cachedProduct {
             completion(product)
         } else {
@@ -199,36 +211,42 @@ class ProductCache: ObservableObject {
         }
     }
 
-    private func fetchProduct(by handle: String?, completion: @escaping (Storefront.Product?) -> Void) {
-        let context = Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
-        let query = Storefront.buildQuery(inContext: context) { $0
-            .products(first: 1, query: handle) { $0
-                .nodes { $0.productFragment() }
-            }
-        }
+    private func fetchProduct(by _: String?, completion: @escaping (Product?) -> Void) {
+        let network = Network.shared
 
-        StorefrontClient.shared.execute(query: query) { result in
-            if case let .success(query) = result {
-                completion(query.products.nodes.first)
+        let query = Storefront.GetProductsQuery(
+            first: .some(1),
+            country: network.countryCode,
+            language: network.languageCode
+        )
+
+        network.apollo.fetch(query: query) { result in
+            if case let .success(response) = result {
+                DispatchQueue.main.async {
+                    completion(response.data?.products.nodes.first)
+                }
             } else {
-                completion(nil)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
             }
         }
     }
 
-    public func fetchCollection(limit: Int32 = 20) {
-        let context = Storefront.InContextDirective(country: Storefront.CountryCode.inferRegion())
-        let query = Storefront.buildQuery(inContext: context) { $0
-            .products(first: limit) { $0
-                .nodes { $0.productFragment() }
-            }
-        }
+    public func fetchCollection(limit: Int = 20) {
+        let network = Network.shared
 
-        StorefrontClient.shared.execute(query: query) { result in
-            if case let .success(query) = result {
+        let query = Storefront.GetProductsQuery(
+            first: .some(limit),
+            country: network.countryCode,
+            language: network.languageCode
+        )
+
+        network.apollo.fetch(query: query) { result in
+            if case let .success(response) = result {
                 DispatchQueue.main.async {
-                    self.collection = query.products.nodes
-                    self.cachedProduct = query.products.nodes.first
+                    self.collection = response.data?.products.nodes
+                    self.cachedProduct = response.data?.products.nodes.first
                 }
             }
         }

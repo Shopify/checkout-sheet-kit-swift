@@ -23,6 +23,12 @@
 
 import WebKit
 
+protocol ScriptMessageBody {
+    var body: Any { get }
+}
+
+extension WKScriptMessage: ScriptMessageBody {}
+
 enum BridgeError: Swift.Error {
     case invalidBridgeEvent(Swift.Error? = nil)
     case unencodableInstrumentation(Swift.Error? = nil)
@@ -93,7 +99,7 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
         webView.evaluateJavaScript(script)
     }
 
-    static func decode(_ message: WKScriptMessage) throws -> WebEvent {
+    static func decode(_ message: ScriptMessageBody) throws -> WebEvent {
         guard let body = message.body as? String, let data = body.data(using: .utf8) else {
             throw BridgeError.invalidBridgeEvent()
         }

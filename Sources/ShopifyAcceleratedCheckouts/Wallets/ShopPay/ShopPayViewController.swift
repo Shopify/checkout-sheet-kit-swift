@@ -26,7 +26,6 @@ import SwiftUI
 
 @available(iOS 16.0, *)
 class ShopPayViewController: WalletController {
-    var configuration: ShopifyAcceleratedCheckouts.Configuration
     var eventHandlers: EventHandlers
 
     init(
@@ -34,14 +33,14 @@ class ShopPayViewController: WalletController {
         configuration: ShopifyAcceleratedCheckouts.Configuration,
         eventHandlers: EventHandlers = EventHandlers()
     ) {
-        self.configuration = configuration
         self.eventHandlers = eventHandlers
         super.init(
             identifier: identifier,
             storefront: StorefrontAPI(
                 storefrontDomain: configuration.storefrontDomain,
                 storefrontAccessToken: configuration.storefrontAccessToken
-            )
+            ),
+            configuration: configuration
         )
         self.identifier = identifier.parse()
     }
@@ -73,7 +72,7 @@ extension ShopPayViewController: CheckoutDelegate {
     }
 
     func checkoutDidCancel() {
-        /// x right button on CSK doesn't dismiss automatically
+        // x right button on CSK doesn't dismiss automatically
         checkoutViewController?.dismiss(animated: true)
         eventHandlers.checkoutDidCancel?()
     }

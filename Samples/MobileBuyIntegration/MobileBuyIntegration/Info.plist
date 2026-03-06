@@ -8,6 +8,19 @@
 	<string>$(STOREFRONT_DOMAIN)</string>
 	<key>StorefrontAccessToken</key>
 	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
+	<key>CustomerAccountApiClientId</key>
+	<string>$(CUSTOMER_ACCOUNT_API_CLIENT_ID)</string>
+	<key>CustomerAccountApiShopId</key>
+	<string>$(CUSTOMER_ACCOUNT_API_SHOP_ID)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>shop.$(CUSTOMER_ACCOUNT_API_SHOP_ID).app</string>
+			</array>
+		</dict>
+	</array>
 	<key>Address1</key>
 	<string>$(ADDRESS_1)</string>
 	<key>Address2</key>
@@ -49,5 +62,7 @@
 			</array>
 		</dict>
 	</dict>
+	<key>API_VERSION</key>
+	<string>$(API_VERSION)</string>
 </dict>
 </plist>

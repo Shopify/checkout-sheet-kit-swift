@@ -26,8 +26,8 @@ import XCTest
 
 @available(iOS 17.0, *)
 class ErrorHandler_WarningsTests: XCTestCase {
-    func testMap_outOfStock() {
-        let checkoutURL = URL(string: "https://checkout.example.com")!
+    func testMap_outOfStock() throws {
+        let checkoutURL = try XCTUnwrap(URL(string: "https://checkout.example.com"))
         let cart = StorefrontAPI.Cart(
             id: GraphQLScalars.ID("test-cart-id"),
             checkoutUrl: GraphQLScalars.URL(checkoutURL),
@@ -57,8 +57,8 @@ class ErrorHandler_WarningsTests: XCTestCase {
         }
     }
 
-    func testMap_notEnoughStock() {
-        let checkoutURL = URL(string: "https://checkout.example.com")!
+    func testMap_notEnoughStock() throws {
+        let checkoutURL = try XCTUnwrap(URL(string: "https://checkout.example.com"))
         let cart = StorefrontAPI.Cart(
             id: GraphQLScalars.ID("test-cart-id"),
             checkoutUrl: GraphQLScalars.URL(checkoutURL),

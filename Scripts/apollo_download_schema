@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -e
+set -eo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+download_schema() {
+  local dir="$1"
+  local scheme="$2"
+  local name="$3"
+
+  echo "📡 Downloading schema for $name ($scheme)..."
+  cd "$REPO_ROOT/$dir"
+
+  BUILD_SETTINGS=$(xcodebuild -showBuildSettings -scheme "$scheme" -json 2>/dev/null | jq -r '.[0].buildSettings')
+  TOKEN=$(echo "$BUILD_SETTINGS" | jq -r '.STOREFRONT_ACCESS_TOKEN')
+  DOMAIN=$(echo "$BUILD_SETTINGS" | jq -r '.STOREFRONT_DOMAIN')
+  API_VERSION=$(echo "$BUILD_SETTINGS" | jq -r '.API_VERSION')
+
+  if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+    echo "❌ STOREFRONT_ACCESS_TOKEN is not set. Check your Storefront.xcconfig file."
+    exit 1
+  fi
+  if [ -z "$DOMAIN" ] || [ "$DOMAIN" = "null" ]; then
+    echo "❌ STOREFRONT_DOMAIN is not set. Check your Storefront.xcconfig file."
+    exit 1
+  fi
+  if [ -z "$API_VERSION" ] || [ "$API_VERSION" = "null" ]; then
+    echo "❌ API_VERSION is not set. Check your Storefront.xcconfig file."
+    echo "   Add API_VERSION = 2025-07 to your Storefront.xcconfig"
+    exit 1
+  fi
+
+  echo "   Domain: $DOMAIN"
+  echo "   API Version: $API_VERSION"
+
+  rover graph introspect "https://$DOMAIN/api/$API_VERSION/graphql" --header="X-Shopify-Storefront-Access-Token: $TOKEN" --output "schema.$API_VERSION.graphqls"
+
+  if [ $? -eq 0 ]; then
+    echo "✅ Schema downloaded to $dir/schema.$API_VERSION.graphqls"
+  else
+    echo "❌ Schema download failed. Check your network connection and credentials."
+    exit 1
+  fi
+
+  cd "$REPO_ROOT"
+}
+
+APP="${1:-all}"
+case "$APP" in
+  accelerated)
+    download_schema "Samples/ShopifyAcceleratedCheckoutsApp" "ShopifyAcceleratedCheckoutsApp" "accelerated"
+    ;;
+  mobile-buy)
+    download_schema "Samples/MobileBuyIntegration" "MobileBuyIntegration" "mobile-buy"
+    ;;
+  all)
+    download_schema "Samples/ShopifyAcceleratedCheckoutsApp" "ShopifyAcceleratedCheckoutsApp" "accelerated"
+    download_schema "Samples/MobileBuyIntegration" "MobileBuyIntegration" "mobile-buy"
+    ;;
+  *)
+    echo "❌ Unknown app: $APP. Use 'accelerated', 'mobile-buy', or 'all'"
+    exit 1
+    ;;
+esac

@@ -23,7 +23,7 @@
 
 import Foundation
 
-// Reference the LanguageCode enum from Models to avoid namespace conflict
+/// Reference the LanguageCode enum from Models to avoid namespace conflict
 typealias ShopifyLanguageCode = LanguageCode
 
 /// Extension to detect device locale and map to Shopify types

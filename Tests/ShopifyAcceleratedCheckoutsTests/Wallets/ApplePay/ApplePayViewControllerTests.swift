@@ -21,11 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+@testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import UIKit
 import XCTest
-
-@testable import ShopifyAcceleratedCheckouts
 
 @available(iOS 17.0, *)
 class ApplePayViewControllerTests: XCTestCase {
@@ -144,7 +143,7 @@ class ApplePayViewControllerTests: XCTestCase {
             return mockTopViewController
         }
 
-        // Helper methods for test setup
+        /// Helper methods for test setup
         func setMockAuthorizationDelegate(_ mock: MockApplePayAuthorizationDelegate) {
             mockAuthorizationDelegate = mock
         }
@@ -153,7 +152,7 @@ class ApplePayViewControllerTests: XCTestCase {
     // MARK: - Callback Properties
 
     @MainActor
-    func test_checkoutCallbacks_whenDefault_areNil() async {
+    func test_checkoutCallbacks_whenDefault_areNil() {
         XCTAssertNil(viewController.onCheckoutComplete)
         XCTAssertNil(viewController.onCheckoutFail)
         XCTAssertNil(viewController.onCheckoutCancel)
@@ -175,10 +174,10 @@ class ApplePayViewControllerTests: XCTestCase {
 
     func test_configuration_whenInitialized_usesCorrectStorefront() {
         XCTAssertEqual(
-            viewController.configuration.common.storefrontDomain,
+            viewController.configuration.storefrontDomain,
             "test-shop.myshopify.com"
         )
-        XCTAssertEqual(viewController.configuration.common.storefrontAccessToken, "test-token")
+        XCTAssertEqual(viewController.configuration.storefrontAccessToken, "test-token")
     }
 
     func test_createOrfetchCart_whenCalled_usesFetchCartByCheckoutIdentifier() async throws {
@@ -192,7 +191,7 @@ class ApplePayViewControllerTests: XCTestCase {
 
     // MARK: - startPayment()
 
-    func test_onPress_whenSuccess_callsCorrectTransition() async throws {
+    func test_onPress_whenSuccess_callsCorrectTransition() async {
         let mockCart = StorefrontAPI.Cart.testCart()
         mockStorefront.cartResult = .success(mockCart)
         XCTAssertNil(viewController.cart)
@@ -207,7 +206,7 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_onPress_whenCreateOrFetchCartFails_callsOnCheckoutFailAndCompletedTransition() async throws {
+    func test_onPress_whenCreateOrFetchCartFails_callsOnCheckoutFailAndCompletedTransition() async {
         let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
         mockStorefront.cartResult = .failure(expectedError)
 
@@ -241,7 +240,7 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_onPress_whenCartIsNil_callsOnCheckoutFailAndCompletedTransition() async throws {
+    func test_onPress_whenCartIsNil_callsOnCheckoutFailAndCompletedTransition() async {
         mockStorefront.cartResult = .success(nil)
 
         let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail should be called")
@@ -476,9 +475,9 @@ class ApplePayViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_onPress_whenAuthorizationDelegateTransitionThrows_handlesError() async {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "https://test-shop.myshopify.com/checkout")!
+    func test_onPress_whenAuthorizationDelegateTransitionThrows_handlesError() async throws {
+        let mockCart = try StorefrontAPI.Cart.testCart(
+            checkoutUrl: XCTUnwrap(URL(string: "https://test-shop.myshopify.com/checkout"))
         )
         mockStorefront.cartResult = .success(mockCart)
 
@@ -491,5 +490,33 @@ class ApplePayViewControllerTests: XCTestCase {
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.count, 2)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.first, .startPaymentRequest)
         XCTAssertEqual(mockAuthorizationDelegate.transitionHistory.last, .completed)
+    }
+
+    // MARK: - Actor Isolation Tests (Double-Tap Race Condition)
+
+    func test_onPress_whenDoubleTapped_doesNotCrashFromConcurrentActorHops() async throws {
+        let expectedError = NSError(domain: "TestError", code: 500, userInfo: nil)
+        mockStorefront.cartResult = .failure(expectedError)
+
+        let onCheckoutFailExpectation = XCTestExpectation(description: "onCheckoutFail should be called")
+        onCheckoutFailExpectation.expectedFulfillmentCount = 2
+
+        await MainActor.run {
+            viewController.onCheckoutFail = { _ in
+                onCheckoutFailExpectation.fulfill()
+            }
+        }
+
+        let vc = try XCTUnwrap(viewController)
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+            group.addTask { await vc.onPress() }
+        }
+
+        await fulfillment(of: [onCheckoutFailExpectation], timeout: 1.0)
     }
 }

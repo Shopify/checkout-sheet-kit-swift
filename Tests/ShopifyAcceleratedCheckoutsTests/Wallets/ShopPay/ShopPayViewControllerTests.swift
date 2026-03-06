@@ -21,10 +21,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+@testable import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import XCTest
-
-@testable import ShopifyAcceleratedCheckouts
 
 @available(iOS 16.0, *)
 
@@ -85,7 +84,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - onPress() Tests with Cart Identifier
 
-    func test_onPress_withCartIdentifier_shouldCallPresentWithShopPayURL() async throws {
+    func test_onPress_withCartIdentifier_shouldCallPresentWithShopPayURL() async {
         let mockCart = StorefrontAPI.Cart.testCart()
 
         viewController = MockShopPayViewController(
@@ -104,7 +103,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         )
     }
 
-    func test_onPress_withCartIdentifierCartNotFound_shouldNotCallPresent() async throws {
+    func test_onPress_withCartIdentifierCartNotFound_shouldNotCallPresent() async {
         viewController = MockShopPayViewController(
             identifier: .cart(cartID: "non-existent-cart-id"),
             configuration: mockConfiguration,
@@ -119,7 +118,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - onPress() Tests with Variant Identifier
 
-    func test_onPress_withVariantIdentifier_shouldCallPresent() async throws {
+    func test_onPress_withVariantIdentifier_shouldCallPresent() async {
         let mockCart = StorefrontAPI.Cart.testCart()
 
         viewController = MockShopPayViewController(
@@ -142,7 +141,7 @@ final class ShopPayViewControllerTests: XCTestCase {
     }
 
     func test_onPress_withVariantIdentifier_whenCartCreateFails_shouldNotCallPresent()
-        async throws
+        async
     {
         let cartCreateError = NSError(domain: "CartCreateError", code: 400, userInfo: nil)
 
@@ -162,7 +161,7 @@ final class ShopPayViewControllerTests: XCTestCase {
     }
 
     func test_onPress_withInvalidZeroQuantityVariantIdentifier_shouldNotCreateCheckoutController()
-        async throws
+        async
     {
         let mockCart = StorefrontAPI.Cart.testCart()
 
@@ -184,7 +183,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - onPress() Tests with Invariant Identifier
 
-    func test_onPress_withInvariantIdentifier_shouldNotCallPresent() async throws {
+    func test_onPress_withInvariantIdentifier_shouldNotCallPresent() async {
         viewController = MockShopPayViewController(
             identifier: .invariant(reason: "Invalid checkout data"),
             configuration: mockConfiguration,
@@ -198,7 +197,7 @@ final class ShopPayViewControllerTests: XCTestCase {
 
     // MARK: - Error Handling Tests
 
-    func test_onPress_withCartNotFound_shouldCallCheckoutDidFail() async throws {
+    func test_onPress_withCartNotFound_shouldCallCheckoutDidFail() async {
         let checkoutDidFailExpectation = XCTestExpectation(
             description: "checkoutDidFail should be called"
         )
@@ -218,7 +217,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         await fulfillment(of: [checkoutDidFailExpectation], timeout: 1.0)
     }
 
-    func test_onPress_withVariantIdentifierCartCreateFails_shouldCallCheckoutDidFail() async throws {
+    func test_onPress_withVariantIdentifierCartCreateFails_shouldCallCheckoutDidFail() async {
         let checkoutDidFailExpectation = XCTestExpectation(
             description: "checkoutDidFail should be called"
         )
@@ -259,7 +258,7 @@ final class ShopPayViewControllerTests: XCTestCase {
         XCTAssertEqual(nsError.code, 400)
     }
 
-    func test_onPress_withInvariantIdentifier_shouldCallCheckoutDidFail() async throws {
+    func test_onPress_withInvariantIdentifier_shouldCallCheckoutDidFail() async {
         let checkoutDidFailExpectation = XCTestExpectation(
             description: "checkoutDidFail should be called"
         )
@@ -281,8 +280,8 @@ final class ShopPayViewControllerTests: XCTestCase {
     // MARK: - URL Construction Tests
 
     func test_onPress_withInvalidURL_shouldCallPresentWithModifiedURL() async throws {
-        let mockCart = StorefrontAPI.Cart.testCart(
-            checkoutUrl: URL(string: "invalid-url")!
+        let mockCart = try StorefrontAPI.Cart.testCart(
+            checkoutUrl: XCTUnwrap(URL(string: "invalid-url"))
         )
 
         viewController = MockShopPayViewController(

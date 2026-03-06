@@ -43,7 +43,7 @@ final class GraphQLScalarsTests: XCTestCase {
 
         // Test decoding
         let json = "\"gid://shopify/Order/789\""
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let decoded = try JSONDecoder().decode(GraphQLScalars.ID.self, from: data)
         XCTAssertEqual(decoded.rawValue, "gid://shopify/Order/789")
     }
@@ -107,7 +107,7 @@ final class GraphQLScalarsTests: XCTestCase {
         let jsonString = """
         {"amount": 99.99, "currencyCode": "EUR"}
         """
-        let data = jsonString.data(using: .utf8)!
+        let data = try XCTUnwrap(jsonString.data(using: .utf8))
         let decoded = try JSONDecoder().decode(GraphQLScalars.Money.self, from: data)
         XCTAssertEqual(decoded.amount, Decimal(99.99))
         XCTAssertEqual(decoded.currencyCode, "EUR")
@@ -137,31 +137,31 @@ final class GraphQLScalarsTests: XCTestCase {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         let dateString = "2025-06-25T12:30:45.123Z"
-        let date = formatter.date(from: dateString)!
+        let date = try XCTUnwrap(formatter.date(from: dateString))
 
         let dateTime = GraphQLScalars.DateTime(date)
         let encoded = try JSONEncoder().encode(dateTime)
-        let encodedString = String(data: encoded, encoding: .utf8)!
+        let encodedString = try XCTUnwrap(String(data: encoded, encoding: .utf8))
 
         // The encoded string should be a valid ISO8601 date
         XCTAssertTrue(encodedString.contains("2025-06-25"))
 
         // Test decoding with fractional seconds
         let jsonWithFractional = "\"2025-06-25T12:30:45.123Z\""
-        let dataWithFractional = jsonWithFractional.data(using: .utf8)!
+        let dataWithFractional = try XCTUnwrap(jsonWithFractional.data(using: .utf8))
         let decodedWithFractional = try JSONDecoder().decode(GraphQLScalars.DateTime.self, from: dataWithFractional)
         XCTAssertNotNil(decodedWithFractional.date)
 
         // Test decoding without fractional seconds
         let jsonWithoutFractional = "\"2025-06-25T12:30:45Z\""
-        let dataWithoutFractional = jsonWithoutFractional.data(using: .utf8)!
+        let dataWithoutFractional = try XCTUnwrap(jsonWithoutFractional.data(using: .utf8))
         let decodedWithoutFractional = try JSONDecoder().decode(GraphQLScalars.DateTime.self, from: dataWithoutFractional)
         XCTAssertNotNil(decodedWithoutFractional.date)
     }
 
-    func testDateTimeInvalidFormat() {
+    func testDateTimeInvalidFormat() throws {
         let invalidJson = "\"not-a-date\""
-        let data = invalidJson.data(using: .utf8)!
+        let data = try XCTUnwrap(invalidJson.data(using: .utf8))
 
         XCTAssertThrowsError(try JSONDecoder().decode(GraphQLScalars.DateTime.self, from: data)) { error in
             XCTAssertTrue(error is DecodingError)
@@ -182,9 +182,9 @@ final class GraphQLScalarsTests: XCTestCase {
 
     // MARK: - URL Scalar Tests
 
-    func testURLInitialization() {
+    func testURLInitialization() throws {
         // Test with Foundation.URL
-        let foundationURL = Foundation.URL(string: "https://example.com")!
+        let foundationURL = try XCTUnwrap(Foundation.URL(string: "https://example.com"))
         let url1 = GraphQLScalars.URL(foundationURL)
         XCTAssertEqual(url1.url, foundationURL)
 
@@ -200,7 +200,7 @@ final class GraphQLScalarsTests: XCTestCase {
 
     func testURLCodable() throws {
         // Test encoding
-        let url = GraphQLScalars.URL(Foundation.URL(string: "https://example.com/path")!)
+        let url = try GraphQLScalars.URL(XCTUnwrap(Foundation.URL(string: "https://example.com/path")))
         let encoded = try JSONEncoder().encode(url)
         let encodedString = String(data: encoded, encoding: .utf8)
         // JSON encoder may escape forward slashes
@@ -208,20 +208,20 @@ final class GraphQLScalarsTests: XCTestCase {
 
         // Test decoding valid URL
         let json = "\"https://shopify.com/products\""
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let decoded = try JSONDecoder().decode(GraphQLScalars.URL.self, from: data)
         XCTAssertEqual(decoded.url.absoluteString, "https://shopify.com/products")
 
         // Test decoding invalid URL - use actually invalid URL
         let invalidJson = "\"\"" // Empty string is invalid URL
-        let invalidData = invalidJson.data(using: .utf8)!
+        let invalidData = try XCTUnwrap(invalidJson.data(using: .utf8))
         XCTAssertThrowsError(try JSONDecoder().decode(GraphQLScalars.URL.self, from: invalidData))
     }
 
-    func testURLHashable() {
-        let url1 = GraphQLScalars.URL(Foundation.URL(string: "https://example.com")!)
-        let url2 = GraphQLScalars.URL(Foundation.URL(string: "https://example.com")!)
-        let url3 = GraphQLScalars.URL(Foundation.URL(string: "https://different.com")!)
+    func testURLHashable() throws {
+        let url1 = try GraphQLScalars.URL(XCTUnwrap(Foundation.URL(string: "https://example.com")))
+        let url2 = try GraphQLScalars.URL(XCTUnwrap(Foundation.URL(string: "https://example.com")))
+        let url3 = try GraphQLScalars.URL(XCTUnwrap(Foundation.URL(string: "https://different.com")))
 
         XCTAssertEqual(url1, url2)
         XCTAssertNotEqual(url1, url3)
@@ -245,7 +245,7 @@ final class GraphQLScalarsTests: XCTestCase {
 
         // Test decoding
         let json = "\"<h1>Title</h1><p>Paragraph</p>\""
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let decoded = try JSONDecoder().decode(GraphQLScalars.HTML.self, from: data)
         XCTAssertEqual(decoded.rawValue, "<h1>Title</h1><p>Paragraph</p>")
     }
@@ -270,7 +270,7 @@ final class GraphQLScalarsTests: XCTestCase {
 
         // Test decoding
         let json = "\"CA\""
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let decoded = try JSONDecoder().decode(CountryCode.self, from: data)
         XCTAssertEqual(decoded, .CA)
     }
@@ -305,7 +305,7 @@ final class GraphQLScalarsTests: XCTestCase {
 
         // Test decoding
         let json = "\"EUR\""
-        let data = json.data(using: .utf8)!
+        let data = try XCTUnwrap(json.data(using: .utf8))
         let decoded = try JSONDecoder().decode(CurrencyCode.self, from: data)
         XCTAssertEqual(decoded, .eur)
     }
@@ -342,12 +342,12 @@ final class GraphQLScalarsTests: XCTestCase {
             let currencyCode: CurrencyCode
         }
 
-        let product = TestProduct(
+        let product = try TestProduct(
             id: GraphQLScalars.ID("gid://shopify/Product/123"),
             createdAt: GraphQLScalars.DateTime(Date()),
             price: GraphQLScalars.Money(amount: Decimal(29.99), currencyCode: "USD"),
             description: GraphQLScalars.HTML("<p>Great product!</p>"),
-            productUrl: GraphQLScalars.URL(Foundation.URL(string: "https://shop.com/product")!),
+            productUrl: GraphQLScalars.URL(XCTUnwrap(Foundation.URL(string: "https://shop.com/product"))),
             countryCode: .US,
             currencyCode: .usd
         )

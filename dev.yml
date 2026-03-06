@@ -64,18 +64,8 @@ commands:
   apollo:
     subcommands:
       download_schema:
-        desc: Download GraphQL Schema
-        run: |
-          cd Samples/ShopifyAcceleratedCheckoutsApp
-          BUILD_SETTINGS=$(xcodebuild -showBuildSettings -scheme ShopifyAcceleratedCheckoutsApp -json | jq -r '.[0].buildSettings')
-          TOKEN=$(echo "$BUILD_SETTINGS" | jq -r '.STOREFRONT_ACCESS_TOKEN')
-          DOMAIN=$(echo "$BUILD_SETTINGS" | jq -r '.STOREFRONT_DOMAIN')
-          API_VERSION=$(echo "$BUILD_SETTINGS" | jq -r '.API_VERSION')
-          rover graph introspect https://$DOMAIN/api/$API_VERSION/graphql --header="X-Shopify-Storefront-Access-Token: $TOKEN" --output schema.$API_VERSION.graphqls
-
+        desc: "Download GraphQL Schema. Usage: dev apollo download_schema [accelerated|mobile-buy|all]"
+        run: ./Scripts/apollo_download_schema "$1"
       codegen:
-        desc: Generate Apollo Client models and request functions for sample app
-        run: |
-          cd ./Samples/ShopifyAcceleratedCheckoutsApp/
-          ./apollo-ios-cli generate 
-          /opt/dev/bin/dev fix
+        desc: "Generate Apollo Client models. Usage: dev apollo codegen [accelerated|mobile-buy|all]"
+        run: ./Scripts/apollo_codegen "$1"
