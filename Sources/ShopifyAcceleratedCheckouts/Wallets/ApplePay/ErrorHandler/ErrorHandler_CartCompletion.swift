@@ -26,8 +26,66 @@ import PassKit
 
 @available(iOS 16.0, *)
 extension ErrorHandler {
+    enum CompletionStage {
+        case prepare(StorefrontAPI.CartPrepareForCompletionPayload)
+        case submit(StorefrontAPI.CartSubmitForCompletionPayload)
+    }
+
     static func map(
-        payload: StorefrontAPI.CartSubmitForCompletionPayload, shippingCountry: String?, requiredContactFields: Set<PKContactField>? = nil
+        stage: CompletionStage, shippingCountry: String?, requiredContactFields: Set<PKContactField>? = nil
+    ) -> PaymentSheetAction {
+        switch stage {
+        case let .prepare(payload):
+            return map(payload: payload, shippingCountry: shippingCountry, requiredContactFields: requiredContactFields)
+        case let .submit(payload):
+            return map(payload: payload, shippingCountry: shippingCountry, requiredContactFields: requiredContactFields)
+        }
+    }
+
+    // MARK: - Prepare
+
+    private static func map(
+        payload: StorefrontAPI.CartPrepareForCompletionPayload,
+        shippingCountry: String?,
+        requiredContactFields: Set<PKContactField>?
+    ) -> PaymentSheetAction {
+        guard let result = payload.result else { return PaymentSheetAction.interrupt(reason: .other) }
+        switch result {
+        case let .notReady(notReady):
+            guard !notReady.errors.isEmpty else {
+                return PaymentSheetAction.interrupt(reason: .cartNotReady)
+            }
+            let allCodes = notReady.errors.map { $0.rawCode }.joined(separator: ", ")
+            let actionableErrors = filterPIIRedactedViolations(errors: notReady.errors)
+            if actionableErrors.isEmpty {
+                ShopifyAcceleratedCheckouts.logger.debug(
+                    "ErrorHandler: prepare: all violations are PII-redacted, continuing flow. Filtered: [\(allCodes)]"
+                )
+                return PaymentSheetAction.continueFlow
+            }
+            let actionableCodes = actionableErrors.map { $0.rawCode }.joined(separator: ", ")
+            ShopifyAcceleratedCheckouts.logger.error(
+                "ErrorHandler: prepare: actionable violations found: [\(actionableCodes)]. All violations: [\(allCodes)]"
+            )
+            let filteredErrors = filterGenericViolations(errors: actionableErrors)
+            let actions = filteredErrors.map {
+                getErrorAction(error: $0, shippingCountry: shippingCountry, checkoutURL: nil, requiredContactFields: requiredContactFields)
+            }
+            return getHighestPriorityAction(actions: actions)
+        case .throttled:
+            return PaymentSheetAction.interrupt(reason: .cartThrottled)
+        case .ready:
+            ShopifyAcceleratedCheckouts.logger.error("ErrorHandler: map: received unexpected result type from Cart API on prepare")
+            return PaymentSheetAction.interrupt(reason: .other)
+        }
+    }
+
+    // MARK: - Submit
+
+    private static func map(
+        payload: StorefrontAPI.CartSubmitForCompletionPayload,
+        shippingCountry: String?,
+        requiredContactFields: Set<PKContactField>?
     ) -> PaymentSheetAction {
         guard let result = payload.result else { return PaymentSheetAction.interrupt(reason: .other) }
         switch result {
@@ -42,17 +100,20 @@ extension ErrorHandler {
         case .throttled:
             return PaymentSheetAction.interrupt(reason: .cartThrottled)
         case .success:
-            // No-op: error handler not called for success result
-            // Other response type are not possible
             ShopifyAcceleratedCheckouts.logger.error("ErrorHandler: map: received unexpected result type from Cart API on submit")
             return PaymentSheetAction.interrupt(reason: .other)
         }
     }
 
+    // MARK: - Shared Error Code Mapping
+
     // swiftlint:disable:next cyclomatic_complexity
-    private static func getErrorAction(error: StorefrontAPI.SubmissionError, shippingCountry: String?, checkoutURL: URL?, requiredContactFields _: Set<PKContactField>? = nil)
-        -> PaymentSheetAction
-    {
+    private static func getErrorAction(
+        error: StorefrontAPI.CartCompletionError,
+        shippingCountry: String?,
+        checkoutURL: URL?,
+        requiredContactFields _: Set<PKContactField>? = nil
+    ) -> PaymentSheetAction {
         switch error.code {
         // --- Contact information ---
 
@@ -353,28 +414,26 @@ extension ErrorHandler {
 
         // Address missing
         case .deliveryAddressRequired:
-            // No-op: We should not have called SubmitForCompletion with empty address
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
-        // Phone number
+        // Phone number (on buyer identity, billing address, or delivery options — not fixable in Apple Pay)
         case .buyerIdentityPhoneIsInvalid,
              .deliveryOptionsPhoneNumberInvalid,
              .deliveryOptionsPhoneNumberRequired,
              .paymentsPhoneNumberInvalid,
              .paymentsPhoneNumberRequired:
-            // No-op: We save the phone number on delivery address, not buyer identity, billing address or delivery options
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
-        // Company
+        // Company (not available in Apple Pay)
         case .deliveryCompanyRequired,
              .deliveryCompanyInvalid,
              .deliveryCompanyTooLong,
              .paymentsCompanyRequired,
              .paymentsCompanyInvalid,
              .paymentsCompanyTooLong:
-            // No-op: Not possible to get company field from Apple Pay
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
+        // Credit card errors (not applicable to Apple Pay)
         case .paymentsCreditCardBaseExpired,
              .paymentsCreditCardBaseGatewayNotSupported,
              .paymentsCreditCardBaseInvalidStartDateOrIssueNumberForDebit,
@@ -391,16 +450,14 @@ extension ErrorHandler {
              .paymentsCreditCardVerificationValueInvalidForCardType,
              .paymentsCreditCardYearExpired,
              .paymentsCreditCardYearInvalidExpiryYear:
-            // No-op: These are specific to direct payment methods, not Apple Pay
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
-        // Payment Method Errors
+        // Payment method errors
         case .paymentsMethodRequired,
              .paymentsMethodUnavailable,
              .paymentsShopifyPaymentsRequired,
              .paymentsWalletContentMissing,
              .paymentCardDeclined:
-            // Payment method issues - not fixable by user input validation
             return PaymentSheetAction.interrupt(reason: .unhandled, checkoutURL: checkoutURL)
 
         case .paymentsUnacceptablePaymentAmount:
@@ -417,7 +474,7 @@ extension ErrorHandler {
              .deliveryNoDeliveryAvailableForMerchandiseLine:
             return PaymentSheetAction.interrupt(reason: .outOfStock, checkoutURL: checkoutURL)
 
-        // Tax Errors
+        // Tax errors
         case .taxesDeliveryGroupIdNotFound,
              .taxesLineIdNotFound,
              .taxesMustBeDefined:
@@ -427,7 +484,7 @@ extension ErrorHandler {
         case .validationCustom:
             return PaymentSheetAction.interrupt(reason: .other, checkoutURL: checkoutURL)
 
-        // Generic Errors
+        // Generic / unknown errors
         case .error,
              .redirectToCheckoutRequired,
              .unknownValue:
@@ -435,12 +492,22 @@ extension ErrorHandler {
         }
     }
 
-    private static func filterGenericViolations(errors: [StorefrontAPI.SubmissionError]) -> [StorefrontAPI.SubmissionError] {
-        // If the only error is paymentsUnacceptablePaymentAmount, return it
+    // MARK: - Helpers
+
+    private static let piiRedactedCodePrefixes = ["DELIVERY_", "BUYER_IDENTITY_"]
+
+    static func filterPIIRedactedViolations(
+        errors: [StorefrontAPI.CartCompletionError]
+    ) -> [StorefrontAPI.CartCompletionError] {
+        errors.filter { error in
+            !piiRedactedCodePrefixes.contains { error.rawCode.hasPrefix($0) }
+        }
+    }
+
+    private static func filterGenericViolations(errors: [StorefrontAPI.CartCompletionError]) -> [StorefrontAPI.CartCompletionError] {
         if errors.count == 1, errors.first?.code == .paymentsUnacceptablePaymentAmount {
             return errors
         }
-        // Otherwise, filter out paymentsUnacceptablePaymentAmount
         return errors.filter { $0.code != .paymentsUnacceptablePaymentAmount }
     }
 }

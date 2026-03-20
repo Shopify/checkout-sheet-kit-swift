@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "cd &quot;${SRCROOT}&quot;&#10;./Scripts/generate_entitlements.sh&#10;">
+               scriptText = "cd &quot;${SRCROOT}&quot;&#10;echo &quot;${SRCROOT}&quot;&#10;./Scripts/generate_entitlements.sh&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
