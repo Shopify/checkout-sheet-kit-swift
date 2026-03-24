@@ -25,7 +25,9 @@ extension Storefront {
     typealias MutableInlineFragment = Storefront_MutableInlineFragment
 
     enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-        static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+        /// nonisolated(unsafe) is applied manually whilst we're on Apollo v1
+        /// Apollo provides Swift 6 support in v2 - this workaround will be removed then
+        nonisolated(unsafe) static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
         static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
             switch typename {
