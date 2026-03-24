@@ -1201,22 +1201,23 @@ final class StorefrontAPIMutationsTests: XCTestCase {
             _ = try await storefrontAPI.cartPrepareForCompletion(id: GraphQLScalars.ID("gid://shopify/Cart/123"))
             XCTFail("Expected error to be thrown")
         } catch {
-            // Verify error type
-            XCTAssertTrue(
-                error is GraphQLError,
-                "Unexpected error type: \(type(of: error))"
-            )
-
-            guard case let .networkError(message) = error as? GraphQLError else {
-                XCTFail("Expected GraphQLError.networkError but got: \(error)")
+            guard case let .response(requestName, message, payload) = error as? StorefrontAPI.Errors else {
+                XCTFail("Expected StorefrontAPI.Errors.response but got: \(error)")
                 return
             }
 
-            // Check that it contains the expected error format
+            XCTAssertEqual(requestName, "cartPrepareForCompletion")
             XCTAssertTrue(message.contains("Cart not ready"), "Error message should contain 'Cart not ready': \(message)")
-            // The error codes are converted to camelCase in the error message
-            XCTAssertTrue(message.contains("deliveryAddressRequired"), "Error message should contain 'deliveryAddressRequired': \(message)")
-            XCTAssertTrue(message.contains("paymentMethodRequired"), "Error message should contain 'paymentMethodRequired': \(message)")
+
+            guard case let .cartPrepareForCompletion(preparePayload) = payload,
+                  case let .notReady(notReady) = preparePayload.result
+            else {
+                XCTFail("Expected cartPrepareForCompletion payload with notReady result")
+                return
+            }
+
+            XCTAssertEqual(notReady.errors.count, 2)
+            XCTAssertEqual(notReady.errors[0].code, .deliveryAddressRequired)
         }
     }
 

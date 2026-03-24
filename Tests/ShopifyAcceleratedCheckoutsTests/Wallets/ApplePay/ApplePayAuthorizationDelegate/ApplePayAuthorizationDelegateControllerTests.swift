@@ -574,12 +574,10 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
     private class MockPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
-        var storefrontJulyRelease: StorefrontAPIProtocol
 
         init() {
             let cfg = ShopifyAcceleratedCheckouts.Configuration.testConfiguration
             storefront = StorefrontAPI(storefrontDomain: cfg.storefrontDomain, storefrontAccessToken: cfg.storefrontAccessToken)
-            storefrontJulyRelease = storefront
         }
 
         func present(url _: URL) async throws {}

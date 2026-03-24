@@ -3,7 +3,7 @@
 set -e
 
 CONFIG_FILE="Storefront.xcconfig"
-STOREFRONT_DOMAIN=$(grep '^STOREFRONT_DOMAIN' "$CONFIG_FILE" | cut -d '=' -f2 | tr -d ' ')
+STOREFRONT_DOMAIN=$(grep '^[[:space:]]*STOREFRONT_DOMAIN' "$CONFIG_FILE" | cut -d '=' -f2 | tr -d ' ')
 
 TEMPLATE_FILE="MobileBuyIntegration/MobileBuyIntegration.entitlements.template"
 OUTPUT_FILE="MobileBuyIntegration/MobileBuyIntegration.entitlements"

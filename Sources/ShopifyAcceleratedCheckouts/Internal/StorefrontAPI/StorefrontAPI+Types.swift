@@ -594,86 +594,7 @@ extension StorefrontAPI {
     /// Cart status not ready
     struct CartStatusNotReady: Codable {
         let cart: Cart?
-        let errors: [CompletionError]
-    }
-
-    /// Completion error
-    struct CompletionError: Codable {
-        let code: CompletionErrorCode
-        let message: String
-    }
-
-    /// Completion error codes
-    enum CompletionErrorCode: String, Codable {
-        case error = "ERROR"
-        case inventoryLocationNotFound = "INVENTORY_LOCATION_NOT_FOUND"
-        case paymentAmountTooSmall = "PAYMENT_AMOUNT_TOO_SMALL"
-        case paymentCallIssuer = "PAYMENT_CALL_ISSUER"
-        case paymentCardDeclined = "PAYMENT_CARD_DECLINED"
-        case paymentError = "PAYMENT_ERROR"
-        case paymentGatewayNotEnabledForShop = "PAYMENT_GATEWAY_NOT_ENABLED_FOR_SHOP"
-        case paymentInsufficientFunds = "PAYMENT_INSUFFICIENT_FUNDS"
-        case paymentInvalidAmount = "PAYMENT_INVALID_AMOUNT"
-        case paymentInvalidBillingAddress = "PAYMENT_INVALID_BILLING_ADDRESS"
-        case paymentInvalidCreditCard = "PAYMENT_INVALID_CREDIT_CARD"
-        case paymentInvalidCurrency = "PAYMENT_INVALID_CURRENCY"
-        case paymentInvalidPaymentMethod = "PAYMENT_INVALID_PAYMENT_METHOD"
-        case paymentTransientError = "PAYMENT_TRANSIENT_ERROR"
-        case billingAddressInvalid = "BILLING_ADDRESS_INVALID"
-        case checkoutCompletionTargetInvalid = "CHECKOUT_COMPLETION_TARGET_INVALID"
-        case colorInvalid = "COLOR_INVALID"
-        case deliveryAddress1Invalid = "DELIVERY_ADDRESS1_INVALID"
-        case deliveryAddress1Missing = "DELIVERY_ADDRESS1_MISSING"
-        case deliveryAddress1TooLong = "DELIVERY_ADDRESS1_TOO_LONG"
-        case deliveryAddress2Invalid = "DELIVERY_ADDRESS2_INVALID"
-        case deliveryAddress2Required = "DELIVERY_ADDRESS2_REQUIRED"
-        case deliveryAddress2TooLong = "DELIVERY_ADDRESS2_TOO_LONG"
-        case deliveryAddressInvalid = "DELIVERY_ADDRESS_INVALID"
-        case deliveryAddressMissing = "DELIVERY_ADDRESS_MISSING"
-        case deliveryAddressRequired = "DELIVERY_ADDRESS_REQUIRED"
-        case deliveryOptionInvalid = "DELIVERY_OPTION_INVALID"
-        case deliveryOptionsMissing = "DELIVERY_OPTIONS_MISSING"
-        case deliveryPostalCodeInvalid = "DELIVERY_POSTAL_CODE_INVALID"
-        case deliveryPostalCodeRequired = "DELIVERY_POSTAL_CODE_REQUIRED"
-        case deliveryZoneNotFound = "DELIVERY_ZONE_NOT_FOUND"
-        case deliveryZoneRequiredForCountry = "DELIVERY_ZONE_REQUIRED_FOR_COUNTRY"
-        case deliveryCityInvalid = "DELIVERY_CITY_INVALID"
-        case deliveryCityRequired = "DELIVERY_CITY_REQUIRED"
-        case deliveryCityTooLong = "DELIVERY_CITY_TOO_LONG"
-        case deliveryCompanyInvalid = "DELIVERY_COMPANY_INVALID"
-        case deliveryCompanyRequired = "DELIVERY_COMPANY_REQUIRED"
-        case deliveryCompanyTooLong = "DELIVERY_COMPANY_TOO_LONG"
-        case deliveryCountryRequired = "DELIVERY_COUNTRY_REQUIRED"
-        case deliveryFirstNameInvalid = "DELIVERY_FIRST_NAME_INVALID"
-        case deliveryFirstNameRequired = "DELIVERY_FIRST_NAME_REQUIRED"
-        case deliveryFirstNameTooLong = "DELIVERY_FIRST_NAME_TOO_LONG"
-        case deliveryInvalidPostalCodeForCountry = "DELIVERY_INVALID_POSTAL_CODE_FOR_COUNTRY"
-        case deliveryInvalidPostalCodeForZone = "DELIVERY_INVALID_POSTAL_CODE_FOR_ZONE"
-        case deliveryLastNameInvalid = "DELIVERY_LAST_NAME_INVALID"
-        case deliveryLastNameTooLong = "DELIVERY_LAST_NAME_TOO_LONG"
-        case deliveryNoDeliveryAvailable = "DELIVERY_NO_DELIVERY_AVAILABLE"
-        case deliveryNoDeliveryAvailableForMerchandiseLine = "DELIVERY_NO_DELIVERY_AVAILABLE_FOR_MERCHANDISE_LINE"
-        case deliveryOptionsPhoneNumberInvalid = "DELIVERY_OPTIONS_PHONE_NUMBER_INVALID"
-        case deliveryOptionsPhoneNumberRequired = "DELIVERY_OPTIONS_PHONE_NUMBER_REQUIRED"
-        case deliveryPhoneNumberInvalid = "DELIVERY_PHONE_NUMBER_INVALID"
-        case deliveryPhoneNumberRequired = "DELIVERY_PHONE_NUMBER_REQUIRED"
-        case emailInvalid = "EMAIL_INVALID"
-        case firstNameInvalid = "FIRST_NAME_INVALID"
-        case firstNameRequired = "FIRST_NAME_REQUIRED"
-        case firstNameTooLong = "FIRST_NAME_TOO_LONG"
-        case functionInvalid = "FUNCTION_INVALID"
-        case invalidAddress = "INVALID_ADDRESS"
-        case lastNameInvalid = "LAST_NAME_INVALID"
-        case lastNameRequired = "LAST_NAME_REQUIRED"
-        case lastNameTooLong = "LAST_NAME_TOO_LONG"
-        case deliveryLastNameRequired = "DELIVERY_LAST_NAME_REQUIRED"
-        case noDeliveryGroupSelected = "NO_DELIVERY_GROUP_SELECTED"
-        case paymentBillingAddressInvalid = "PAYMENT_BILLING_ADDRESS_INVALID"
-        case paymentInvalid = "PAYMENT_INVALID"
-        case paymentMethodInvalid = "PAYMENT_METHOD_INVALID"
-        case paymentMethodRequired = "PAYMENT_METHOD_REQUIRED"
-        case phoneInvalid = "PHONE_INVALID"
-        case unknown = "UNKNOWN"
+        let errors: [CartCompletionError]
     }
 
     /// Cart submit for completion payload
@@ -742,7 +663,7 @@ extension StorefrontAPI {
     /// Submit failed
     struct SubmitFailed: Codable {
         let checkoutUrl: GraphQLScalars.URL?
-        let errors: [SubmissionError]
+        let errors: [CartCompletionError]
     }
 
     /// Submit already accepted
@@ -755,14 +676,32 @@ extension StorefrontAPI {
         let pollAfter: GraphQLScalars.DateTime
     }
 
-    /// Submission error
-    struct SubmissionError: Codable {
-        let code: SubmissionErrorCode
+    /// Cart completion error (used by both cartPrepareForCompletion and cartSubmitForCompletion)
+    struct CartCompletionError: Codable {
+        let code: CartCompletionErrorCode
+        let rawCode: String
         let message: String
+
+        init(code: CartCompletionErrorCode, message: String) {
+            self.code = code
+            rawCode = code.rawValue
+            self.message = message
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            rawCode = try container.decode(String.self, forKey: .code)
+            code = CartCompletionErrorCode(rawValue: rawCode) ?? .unknownValue
+            message = try container.decode(String.self, forKey: .message)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case code, message
+        }
     }
 
-    /// Submission error codes for cart submit
-    enum SubmissionErrorCode: String, Codable {
+    /// Error codes for cart completion (shared by prepare and submit stages)
+    enum CartCompletionErrorCode: String, Codable {
         // Buyer identity errors
         case buyerIdentityEmailIsInvalid = "BUYER_IDENTITY_EMAIL_IS_INVALID"
         case buyerIdentityEmailRequired = "BUYER_IDENTITY_EMAIL_REQUIRED"
@@ -883,7 +822,7 @@ extension StorefrontAPI {
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(String.self)
-            self = SubmissionErrorCode(rawValue: value) ?? .unknownValue
+            self = CartCompletionErrorCode(rawValue: value) ?? .unknownValue
         }
     }
 
