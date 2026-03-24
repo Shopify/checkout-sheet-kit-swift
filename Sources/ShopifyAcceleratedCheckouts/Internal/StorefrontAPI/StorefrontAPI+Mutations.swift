@@ -398,7 +398,6 @@ extension StorefrontAPI {
 
     /// Remove personal data from cart
     /// - Parameter id: Cart ID
-    /// Available since 2025-07 - must be called with a custom StorefrontAPI
     func cartRemovePersonalData(id: GraphQLScalars.ID) async throws {
         let variables: [String: Any] = [
             "cartId": id.rawValue
@@ -446,11 +445,13 @@ extension StorefrontAPI {
             throw GraphQLError.networkError(
                 "Cart preparation throttled. Poll after: \(throttled.pollAfter.date)"
             )
-        case let .notReady(notReady):
-            let errorMessages = notReady.errors.map { "\($0.code): \($0.message)" }.joined(
-                separator: ", "
+        case .notReady:
+            let errorMessages = payload.result.map { "\($0)" } ?? "unknown"
+            throw Errors.response(
+                requestName: "cartPrepareForCompletion",
+                message: "Cart not ready: \(errorMessages)",
+                payload: .cartPrepareForCompletion(payload)
             )
-            throw GraphQLError.networkError("Cart not ready: \(errorMessages)")
         }
     }
 
