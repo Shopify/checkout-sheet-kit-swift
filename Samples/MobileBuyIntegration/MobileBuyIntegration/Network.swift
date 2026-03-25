@@ -25,7 +25,7 @@ import Apollo
 import ApolloAPI
 import Foundation
 
-final class Network: @unchecked Sendable {
+final class Network: Sendable {
     static let shared = Network()
 
     private static func getLanguageCode() -> GraphQLEnum<Storefront.LanguageCode> {
@@ -66,39 +66,36 @@ final class Network: @unchecked Sendable {
     let apollo: ApolloClient
 
     init() {
-        let client = URLSessionClient()
-        let cache = InMemoryNormalizedCache()
-        let store = ApolloStore(cache: cache)
-        let provider = NetworkInterceptorProvider(client: client, store: store)
-
         let urlString = "https://\(InfoDictionary.shared.domain)/api/\(InfoDictionary.shared.apiVersion)/graphql.json"
         guard let url = URL(string: urlString) else {
             fatalError("Invalid GraphQL endpoint URL: \(urlString)")
         }
 
-        let transport = RequestChainNetworkTransport(interceptorProvider: provider, endpointURL: url)
-        apollo = ApolloClient(networkTransport: transport, store: store)
+        let transport = RequestChainNetworkTransport(
+            interceptorProvider: StorefrontInterceptorProvider(),
+            endpointURL: url
+        )
+        apollo = ApolloClient(networkTransport: transport)
     }
 }
 
-class AuthorizationInterceptor: ApolloInterceptor {
-    public var id: String = UUID().uuidString
-
-    func interceptAsync<Operation: GraphQLOperation>(
-        chain: RequestChain,
-        request: HTTPRequest<Operation>,
-        response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
-    ) {
-        request.addHeader(name: "X-Shopify-Storefront-Access-Token", value: InfoDictionary.shared.accessToken)
-        chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
+struct StorefrontInterceptorProvider: InterceptorProvider {
+    func graphQLInterceptors(
+        for operation: some GraphQLOperation
+    ) -> [any GraphQLInterceptor] {
+        DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [
+            AuthorizationInterceptor()
+        ]
     }
 }
 
-class NetworkInterceptorProvider: DefaultInterceptorProvider {
-    override func interceptors(for operation: some GraphQLOperation) -> [ApolloInterceptor] {
-        var interceptors = super.interceptors(for: operation)
-        interceptors.insert(AuthorizationInterceptor(), at: 0)
-        return interceptors
+struct AuthorizationInterceptor: GraphQLInterceptor {
+    func intercept<Request: GraphQLRequest>(
+        request: Request,
+        next: NextInterceptorFunction<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+        var authenticatedRequest = request
+        authenticatedRequest.additionalHeaders["X-Shopify-Storefront-Access-Token"] = InfoDictionary.shared.accessToken
+        return try await next(authenticatedRequest)
     }
 }
