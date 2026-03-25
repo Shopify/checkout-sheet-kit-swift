@@ -4,6 +4,7 @@
 import ApolloAPI
 
 extension Storefront.Objects {
+    /// Return type for `cartLinesAdd` mutation.
     static let CartLinesAddPayload = ApolloAPI.Object(
         typename: "CartLinesAddPayload",
         implementedInterfaces: [],
