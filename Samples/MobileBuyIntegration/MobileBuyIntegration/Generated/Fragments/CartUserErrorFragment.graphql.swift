@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
     struct CartUserErrorFragment: Storefront.SelectionSet, Fragment {
@@ -10,39 +11,24 @@ extension Storefront {
         }
 
         let __data: DataDict
-        init(_dataDict: DataDict) {
-            __data = _dataDict
-        }
+        init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType {
-            Storefront.Objects.CartUserError
-        }
+        static var __parentType: any ApolloAPI.ParentType { Storefront.Objects.CartUserError }
+        static var __selections: [ApolloAPI.Selection] { [
+            .field("__typename", String.self),
+            .field("code", GraphQLEnum<Storefront.CartErrorCode>?.self),
+            .field("message", String.self),
+            .field("field", [String]?.self)
+        ] }
+        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            CartUserErrorFragment.self
+        ] }
 
-        static var __selections: [ApolloAPI.Selection] {
-            [
-                .field("__typename", String.self),
-                .field("code", String?.self),
-                .field("message", String.self),
-                .field("field", [String]?.self)
-            ]
-        }
-
-        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
-            [
-                CartUserErrorFragment.self
-            ]
-        }
-
-        var code: String? {
-            __data["code"]
-        }
-
-        var message: String {
-            __data["message"]
-        }
-
-        var field: [String]? {
-            __data["field"]
-        }
+        /// The error code.
+        var code: GraphQLEnum<Storefront.CartErrorCode>? { __data["code"] }
+        /// The error message.
+        var message: String { __data["message"] }
+        /// The path to the input field that caused the error.
+        var field: [String]? { __data["field"] }
     }
 }
