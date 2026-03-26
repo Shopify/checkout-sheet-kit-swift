@@ -71,11 +71,14 @@ final class Network: Sendable {
             fatalError("Invalid GraphQL endpoint URL: \(urlString)")
         }
 
+        let store = ApolloStore()
         let transport = RequestChainNetworkTransport(
+            urlSession: URLSession.shared,
             interceptorProvider: StorefrontInterceptorProvider(),
+            store: store,
             endpointURL: url
         )
-        apollo = ApolloClient(networkTransport: transport)
+        apollo = ApolloClient(networkTransport: transport, store: store)
     }
 }
 
@@ -96,6 +99,6 @@ struct AuthorizationInterceptor: GraphQLInterceptor {
     ) async throws -> InterceptorResultStream<Request> {
         var authenticatedRequest = request
         authenticatedRequest.additionalHeaders["X-Shopify-Storefront-Access-Token"] = InfoDictionary.shared.accessToken
-        return try await next(authenticatedRequest)
+        return await next(authenticatedRequest)
     }
 }

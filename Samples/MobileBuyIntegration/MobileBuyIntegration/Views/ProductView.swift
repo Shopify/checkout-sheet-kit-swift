@@ -238,7 +238,7 @@ class ProductCache: ObservableObject {
             let network = Network.shared
 
             let query = Storefront.GetProductsQuery(
-                first: .some(limit),
+                first: .some(Int32(limit)),
                 country: network.countryCode,
                 language: network.languageCode
             )

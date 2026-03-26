@@ -85,12 +85,15 @@ class Network {
             fatalError("Invalid GraphQL endpoint URL: \(urlString)")
         }
 
+        let store = ApolloStore()
         let transport = RequestChainNetworkTransport(
+            urlSession: URLSession.shared,
             interceptorProvider: StorefrontInterceptorProvider(),
+            store: store,
             endpointURL: url
         )
 
-        return ApolloClient(networkTransport: transport)
+        return ApolloClient(networkTransport: transport, store: store)
     }()
 
     func getProducts() async -> Products? {
@@ -121,7 +124,7 @@ class Network {
     ) async -> Cart? {
         let lines = merchandiseQuantities.map { merchandiseId, quantity in
             Storefront.CartLineInput(
-                quantity: .some(quantity),
+                quantity: .some(Int32(quantity)),
                 merchandiseId: merchandiseId
             )
         }
@@ -178,6 +181,6 @@ struct AuthorizationInterceptor: GraphQLInterceptor {
     ) async throws -> InterceptorResultStream<Request> {
         var authenticatedRequest = request
         authenticatedRequest.additionalHeaders["X-Shopify-Storefront-Access-Token"] = EnvironmentVariables.storefrontAccessToken
-        return try await next(authenticatedRequest)
+        return await next(authenticatedRequest)
     }
 }

@@ -114,7 +114,7 @@ class CartManager: ObservableObject {
         }
 
         let lines = [
-            Storefront.CartLineUpdateInput(id: id, quantity: .some(quantity))
+            Storefront.CartLineUpdateInput(id: id, quantity: .some(Int32(quantity)))
         ]
 
         let network = Network.shared
@@ -196,7 +196,9 @@ class CartManager: ObservableObject {
         }
     }
 
-    private func performMutation<T: GraphQLMutation>(_ mutation: T) async throws -> T.Data {
+    private func performMutation<T: GraphQLMutation>(_ mutation: T) async throws -> T.Data
+        where T.ResponseFormat == SingleResponseFormat
+    {
         let response = try await Network.shared.apollo.perform(mutation: mutation)
 
         if let data = response.data {
