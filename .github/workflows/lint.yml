@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # swiftlint is a separate/duplicate effort here, as it will also report to Annotations 
+  # swiftlint is a separate/duplicate effort here, as it will also report to Annotations
   swiftlint:
     name: SwiftLint
     runs-on: ubuntu-latest
@@ -18,10 +18,31 @@ jobs:
   swiftformat:
     name: SwiftFormat & SwiftLint
     runs-on: macos-26
+    env:
+      MINT_PATH: ${{ github.workspace }}/.mint/lib
+      MINT_LINK_PATH: ${{ github.workspace }}/.mint/bin
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - run: |
-          brew install swiftlint swiftformat 
+
+      - name: Cache Mint packages
+        id: mint-cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: .mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
+          restore-keys: |
+            ${{ runner.os }}-mint-
+
+      - name: Install Mint
+        run: brew install mint
+
+      - name: Bootstrap Mint packages
+        if: steps.mint-cache.outputs.cache-hit != 'true'
+        run: mint bootstrap --link
+
+      - name: Add Mint to PATH
+        run: echo "${{ github.workspace }}/.mint/bin" >> "$GITHUB_PATH"
+
       - run: ./Scripts/lint check --verbose
 
   check-license-headers:
