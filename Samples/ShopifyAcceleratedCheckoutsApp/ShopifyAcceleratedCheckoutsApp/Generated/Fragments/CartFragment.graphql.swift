@@ -1,27 +1,8 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
     struct CartFragment: Storefront.SelectionSet, Fragment {
@@ -48,6 +29,12 @@ extension Storefront {
                 .field("deliveryGroups", DeliveryGroups.self, arguments: ["first": 10]),
                 .field("lines", Lines.self, arguments: ["first": 250]),
                 .field("cost", Cost.self)
+            ]
+        }
+
+        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+            [
+                CartFragment.self
             ]
         }
 
@@ -109,6 +96,12 @@ extension Storefront {
                 ]
             }
 
+            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                [
+                    CartFragment.BuyerIdentity.self
+                ]
+            }
+
             /// The email address of the buyer that's interacting with the cart.
             var email: String? {
                 __data["email"]
@@ -145,6 +138,12 @@ extension Storefront {
                     ]
                 }
 
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        CartFragment.BuyerIdentity.Customer.self
+                    ]
+                }
+
                 /// The customer’s email address.
                 var email: String? {
                     __data["email"]
@@ -177,6 +176,12 @@ extension Storefront {
                 ]
             }
 
+            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                [
+                    CartFragment.DeliveryGroups.self
+                ]
+            }
+
             /// A list of the nodes contained in CartDeliveryGroupEdge.
             var nodes: [Node] {
                 __data["nodes"]
@@ -199,6 +204,13 @@ extension Storefront {
                     [
                         .field("__typename", String.self),
                         .fragment(CartDeliveryGroupFragment.self)
+                    ]
+                }
+
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        CartFragment.DeliveryGroups.Node.self,
+                        CartDeliveryGroupFragment.self
                     ]
                 }
 
@@ -266,6 +278,12 @@ extension Storefront {
                 ]
             }
 
+            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                [
+                    CartFragment.Lines.self
+                ]
+            }
+
             /// A list of the nodes contained in BaseCartLineEdge.
             var nodes: [Node] {
                 __data["nodes"]
@@ -288,6 +306,13 @@ extension Storefront {
                     [
                         .field("__typename", String.self),
                         .fragment(CartLineFragment.self)
+                    ]
+                }
+
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        CartFragment.Lines.Node.self,
+                        CartLineFragment.self
                     ]
                 }
 
@@ -350,6 +375,12 @@ extension Storefront {
                 ]
             }
 
+            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                [
+                    CartFragment.Cost.self
+                ]
+            }
+
             /// The total amount for the customer to pay.
             var totalAmount: TotalAmount {
                 __data["totalAmount"]
@@ -387,6 +418,12 @@ extension Storefront {
                     ]
                 }
 
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        CartFragment.Cost.TotalAmount.self
+                    ]
+                }
+
                 /// Decimal money amount.
                 var amount: Storefront.Decimal {
                     __data["amount"]
@@ -419,6 +456,12 @@ extension Storefront {
                     ]
                 }
 
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        CartFragment.Cost.SubtotalAmount.self
+                    ]
+                }
+
                 /// Decimal money amount.
                 var amount: Storefront.Decimal {
                     __data["amount"]
@@ -448,6 +491,12 @@ extension Storefront {
                         .field("__typename", String.self),
                         .field("amount", Storefront.Decimal.self),
                         .field("currencyCode", GraphQLEnum<Storefront.CurrencyCode>.self)
+                    ]
+                }
+
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        CartFragment.Cost.TotalTaxAmount.self
                     ]
                 }
 

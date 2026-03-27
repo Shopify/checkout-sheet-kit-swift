@@ -1,30 +1,11 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
-    class GetCartQuery: GraphQLQuery {
+    struct GetCartQuery: GraphQLQuery {
         static let operationName: String = "GetCart"
         static let operationDocument: ApolloAPI.OperationDocument = .init(
             definition: .init(
@@ -47,7 +28,7 @@ extension Storefront {
             self.language = language
         }
 
-        public var __variables: Variables? {
+        @_spi(Unsafe) public var __variables: Variables? {
             [
                 "id": id,
                 "country": country,
@@ -71,8 +52,15 @@ extension Storefront {
                 ]
             }
 
-            /// Retrieve a cart by its ID. For more information, refer to
-            /// [Manage a cart with the Storefront API](https://shopify.dev/custom-storefronts/cart/manage).
+            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                [
+                    GetCartQuery.Data.self
+                ]
+            }
+
+            /// Returns a [`Cart`](https://shopify.dev/docs/api/storefront/current/objects/Cart) by its ID. The cart contains the merchandise lines a buyer intends to purchase, along with estimated costs, applied discounts, gift cards, and delivery options.
+            ///
+            /// Use the [`checkoutUrl`](https://shopify.dev/docs/api/storefront/latest/queries/cart#returns-Cart.fields.checkoutUrl) field to redirect buyers to Shopify's web checkout when they're ready to complete their purchase. For more information, refer to [Manage a cart with the Storefront API](https://shopify.dev/docs/storefronts/headless/building-with-the-storefront-api/cart/manage).
             var cart: Cart? {
                 __data["cart"]
             }
@@ -94,6 +82,13 @@ extension Storefront {
                     [
                         .field("__typename", String.self),
                         .fragment(CartFragment.self)
+                    ]
+                }
+
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        GetCartQuery.Data.Cart.self,
+                        CartFragment.self
                     ]
                 }
 
