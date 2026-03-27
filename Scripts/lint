@@ -23,28 +23,28 @@ if [[ "$MODE" != "check" && "$MODE" != "fix" ]]; then
     exit 1
 fi
 
-# Function to provide installation instructions
 print_install_instructions() {
     echo "🔧 FIX:"
     echo "   Shopify employee? Run 'dev up'"
-    echo "   Not a Shopify employee? Install via homebrew:"
-    echo "     - SwiftLint: 'brew install swiftlint' / https://github.com/realm/SwiftLint"
-    echo "     - SwiftFormat: 'brew install swiftformat' / https://github.com/nicklockwood/SwiftFormat"
+    echo "   Not a Shopify employee? Install Mint and run 'mint bootstrap':"
+    echo "     brew install mint"
+    echo "     mint bootstrap"
+    echo "   See: https://github.com/yonaskolb/Mint"
 }
 
-# Check for SwiftLint
-if ! which swiftlint >/dev/null; then
-    echo "⚠️ WARN: SwiftLint not installed"
+if ! command -v mint >/dev/null; then
+    echo "❌ Mint is not installed"
     print_install_instructions
     exit 1
 fi
 
-# Check for SwiftFormat
-if ! which swiftformat >/dev/null; then
-    echo "⚠️ WARN: SwiftFormat not installed"
-    print_install_instructions
+if [ ! -f "Mintfile" ]; then
+    echo "❌ Mintfile not found in the current directory"
     exit 1
 fi
+
+SWIFTLINT="mint run swiftlint"
+SWIFTFORMAT="mint run swiftformat"
 
 QUIET_FLAG=""
 if [[ "$VERBOSE" == "false" ]]; then
@@ -52,12 +52,12 @@ if [[ "$VERBOSE" == "false" ]]; then
 fi
 
 if [[ "$MODE" == "fix" ]]; then
-    swiftlint lint --fix $QUIET_FLAG
+    $SWIFTLINT lint --fix $QUIET_FLAG
 fi
 
 # SwiftLint doesn't report errors when running in fix mode
 # Running again in strict mode to ensure no errors are missed
-swiftlint lint --strict $QUIET_FLAG .
+$SWIFTLINT lint --strict $QUIET_FLAG .
 LINT_STATUS=$?
 
 if [ $LINT_STATUS -eq 0 ]; then
@@ -70,11 +70,11 @@ echo ""
 
 # Run SwiftFormat
 if [[ "$MODE" == "fix" ]]; then
-    swiftformat . $QUIET_FLAG
+    $SWIFTFORMAT . $QUIET_FLAG
     FORMAT_STATUS=$?
-else 
-    swiftformat . $QUIET_FLAG --lint
-    FORMAT_STATUS=$? 
+else
+    $SWIFTFORMAT . $QUIET_FLAG --lint
+    FORMAT_STATUS=$?
 fi
 
 if [ $FORMAT_STATUS -eq 0 ]; then
