@@ -105,74 +105,12 @@ class ErrorHandler_CartPrepareForCompletionTests: XCTestCase {
         }
     }
 
-    // MARK: - Apple Pay Resolvable Violation Filtering
+    // MARK: - All prepare violations are ignored (deferred to submit)
 
-    func testMap_whenNotReadyWithOnlyApplePayResolvableErrors_returnsContinueFlow() {
+    func testMap_whenNotReadyWithErrors_returnsContinueFlow() {
         let errors: [StorefrontAPI.CartCompletionError] = [
             .init(code: .deliveryFirstNameRequired, message: "Enter a first name"),
-            .init(code: .deliveryLastNameRequired, message: "Enter a last name"),
-            .init(code: .deliveryAddress1Required, message: "Enter an address"),
-            .init(code: .deliveryPhoneNumberRequired, message: "Enter a phone number")
-        ]
-        let payload = StorefrontAPI.CartPrepareForCompletionPayload(
-            result: .notReady(StorefrontAPI.CartStatusNotReady(cart: nil, errors: errors)),
-            userErrors: []
-        )
-
-        let result = ErrorHandler.map(stage: .prepare(payload), shippingCountry: nil)
-
-        switch result {
-        case .continueFlow:
-            break
-        default:
-            XCTFail("Expected continueFlow when all errors are Apple Pay resolvable, got: \(result)")
-        }
-    }
-
-    func testMap_whenNotReadyWithBuyerIdentityErrors_returnsContinueFlow() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .buyerIdentityEmailRequired, message: "Email required"),
-            .init(code: .buyerIdentityEmailIsInvalid, message: "Email invalid")
-        ]
-        let payload = StorefrontAPI.CartPrepareForCompletionPayload(
-            result: .notReady(StorefrontAPI.CartStatusNotReady(cart: nil, errors: errors)),
-            userErrors: []
-        )
-
-        let result = ErrorHandler.map(stage: .prepare(payload), shippingCountry: nil)
-
-        switch result {
-        case .continueFlow:
-            break
-        default:
-            XCTFail("Expected continueFlow when all errors are BUYER_IDENTITY_*, got: \(result)")
-        }
-    }
-
-    func testMap_whenNotReadyWithMixOfApplePayResolvableAndActionableError_returnsActionForActionableError() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .deliveryFirstNameRequired, message: "Enter a first name"),
-            .init(code: .merchandiseOutOfStock, message: "Item out of stock")
-        ]
-        let payload = StorefrontAPI.CartPrepareForCompletionPayload(
-            result: .notReady(StorefrontAPI.CartStatusNotReady(cart: nil, errors: errors)),
-            userErrors: []
-        )
-
-        let result = ErrorHandler.map(stage: .prepare(payload), shippingCountry: nil)
-
-        switch result {
-        case let .interrupt(reason, _):
-            XCTAssertEqual(reason, .outOfStock)
-        default:
-            XCTFail("Expected interrupt with .outOfStock for actionable error")
-        }
-    }
-
-    func testMap_whenNotReadyWithMultipleActionableErrors_returnsHighestPriorityAction() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .deliveryFirstNameRequired, message: "Apple Pay resolvable - filtered"),
-            .init(code: .merchandiseOutOfStock, message: "Out of stock"),
+            .init(code: .merchandiseOutOfStock, message: "Item out of stock"),
             .init(code: .taxesMustBeDefined, message: "Tax error")
         ]
         let payload = StorefrontAPI.CartPrepareForCompletionPayload(
@@ -183,49 +121,14 @@ class ErrorHandler_CartPrepareForCompletionTests: XCTestCase {
         let result = ErrorHandler.map(stage: .prepare(payload), shippingCountry: nil)
 
         switch result {
-        case let .interrupt(reason, _):
-            XCTAssertEqual(reason, .outOfStock, "outOfStock should take priority over unhandled tax error")
+        case .continueFlow:
+            break
         default:
-            XCTFail("Expected interrupt for multiple actionable errors")
+            XCTFail("Expected continueFlow — all prepare violations are deferred to submit, got: \(result)")
         }
     }
 
-    func testMap_whenNotReadyWithMultipleDeceleration_returnsHighestPriorityInterrupt() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .merchandiseNotEnoughStockAvailable, message: "Not enough stock"),
-            .init(code: .paymentsUnacceptablePaymentAmount, message: "Payment amount issue")
-        ]
-        let payload = StorefrontAPI.CartPrepareForCompletionPayload(
-            result: .notReady(StorefrontAPI.CartStatusNotReady(cart: nil, errors: errors)),
-            userErrors: []
-        )
-
-        let result = ErrorHandler.map(stage: .prepare(payload), shippingCountry: nil)
-
-        switch result {
-        case let .interrupt(reason, _):
-            XCTAssertEqual(reason, .notEnoughStock, "notEnoughStock should win when paymentsUnacceptable is filtered by filterGenericViolations")
-        default:
-            XCTFail("Expected interrupt for multiple deceleration errors")
-        }
-    }
-
-    func testFilterApplePayResolvableViolations_preservesNonResolvableErrors() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .deliveryFirstNameRequired, message: ""),
-            .init(code: .merchandiseOutOfStock, message: ""),
-            .init(code: .buyerIdentityEmailRequired, message: ""),
-            .init(code: .paymentsUnacceptablePaymentAmount, message: "")
-        ]
-
-        let filtered = ErrorHandler.filterApplePayResolvableViolations(errors: errors)
-
-        XCTAssertEqual(filtered.count, 2)
-        XCTAssertEqual(filtered[0].code, .merchandiseOutOfStock)
-        XCTAssertEqual(filtered[1].code, .paymentsUnacceptablePaymentAmount)
-    }
-
-    func testFilterApplePayResolvableViolations_preservesUnknownDeliveryCodes() throws {
+    func testMap_whenNotReadyWithUnknownErrorCodes_returnsContinueFlow() throws {
         let json = """
         {"code": "DELIVERY_DETAIL_CHANGED", "message": "Delivery details changed"}
         """
@@ -234,39 +137,8 @@ class ErrorHandler_CartPrepareForCompletionTests: XCTestCase {
         XCTAssertEqual(error.code, .unknownValue)
         XCTAssertEqual(error.rawCode, "DELIVERY_DETAIL_CHANGED")
 
-        let filtered = ErrorHandler.filterApplePayResolvableViolations(errors: [error])
-        XCTAssertEqual(filtered.count, 1, "Unknown DELIVERY_* codes should not be assumed Apple Pay resolvable")
-    }
-
-    func testFilterApplePayResolvableViolations_filtersDeliveryNoDeliveryAvailableForMerchandiseLine() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .deliveryNoDeliveryAvailableForMerchandiseLine, message: "Can't ship to address")
-        ]
-
-        let filtered = ErrorHandler.filterApplePayResolvableViolations(errors: errors)
-
-        XCTAssertEqual(filtered.count, 0)
-    }
-
-    func testFilterApplePayResolvableViolations_preservesDeliveryNoDeliveryAvailable() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .deliveryNoDeliveryAvailable, message: "No delivery available")
-        ]
-
-        let filtered = ErrorHandler.filterApplePayResolvableViolations(errors: errors)
-
-        XCTAssertEqual(filtered.count, 1)
-        XCTAssertEqual(filtered[0].code, .deliveryNoDeliveryAvailable)
-    }
-
-    func testMap_whenNotReadyWithResolvableAndDeliveryNoDeliveryForMerchandiseLine_returnsContinueFlow() {
-        let errors: [StorefrontAPI.CartCompletionError] = [
-            .init(code: .deliveryLastNameRequired, message: "Enter a last name"),
-            .init(code: .deliveryAddress1Required, message: "Enter an address"),
-            .init(code: .deliveryNoDeliveryAvailableForMerchandiseLine, message: "Can't be shipped to your address")
-        ]
         let payload = StorefrontAPI.CartPrepareForCompletionPayload(
-            result: .notReady(StorefrontAPI.CartStatusNotReady(cart: nil, errors: errors)),
+            result: .notReady(StorefrontAPI.CartStatusNotReady(cart: nil, errors: [error])),
             userErrors: []
         )
 
@@ -276,7 +148,7 @@ class ErrorHandler_CartPrepareForCompletionTests: XCTestCase {
         case .continueFlow:
             break
         default:
-            XCTFail("Expected continueFlow when all errors are Apple Pay resolvable, got: \(result)")
+            XCTFail("Expected continueFlow — unknown codes in prepare are deferred to submit, got: \(result)")
         }
     }
 }
