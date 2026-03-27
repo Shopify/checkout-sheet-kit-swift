@@ -94,6 +94,11 @@ final class CustomerAccountManager: ObservableObject {
     private init() {
         shopId = InfoDictionary.shared.customerAccountApiShopId
         clientId = InfoDictionary.shared.customerAccountApiClientId
+
+        if shopId == nil || clientId == nil {
+            logger.error("Customer Account API configuration incomplete — shopId: \(shopId != nil ? "present" : "missing"), clientId: \(clientId != nil ? "present" : "missing"). Login will be unavailable. See Storefront.xcconfig.example for setup instructions.")
+        }
+
         checkExistingSession()
     }
 
@@ -131,6 +136,7 @@ final class CustomerAccountManager: ObservableObject {
 
     func buildAuthorizationURL() -> URL? {
         guard let authorizationEndpoint, let clientId, let redirectUri else {
+            logger.error("Cannot build authorization URL — authorizationEndpoint: \(authorizationEndpoint != nil ? "present" : "missing"), clientId: \(clientId != nil ? "present" : "missing"), redirectUri: \(redirectUri != nil ? "present" : "missing"). Ensure CUSTOMER_ACCOUNT_API_SHOP_ID and CUSTOMER_ACCOUNT_API_CLIENT_ID are set in Storefront.xcconfig.")
             return nil
         }
 
@@ -304,18 +310,34 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     private func performLogoutRequest(idTokenHint: String) async {
-        guard let logoutEndpoint else { return }
-        guard var components = URLComponents(string: logoutEndpoint) else { return }
+        guard let logoutEndpoint else {
+            logger.error("No logout endpoint available, skipping server-side logout")
+            return
+        }
+        guard var components = URLComponents(string: logoutEndpoint) else {
+            logger.error("Failed to parse logout endpoint URL: \(logoutEndpoint)")
+            return
+        }
         components.queryItems = [
             URLQueryItem(name: "id_token_hint", value: idTokenHint)
         ]
 
-        guard let url = components.url else { return }
+        guard let url = components.url else {
+            logger.error("Failed to construct logout URL from components")
+            return
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
 
-        _ = try? await URLSession.shared.data(for: request)
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+                logger.error("Logout request returned status \(httpResponse.statusCode)")
+            }
+        } catch {
+            logger.error("Logout request failed: \(error)")
+        }
     }
 
     func checkExistingSession() {

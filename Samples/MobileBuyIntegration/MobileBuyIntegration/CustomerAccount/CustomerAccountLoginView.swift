@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 import WebKit
 
@@ -47,6 +48,7 @@ struct CustomerAccountLoginView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, WKNavigationDelegate {
+        private let logger = OSLogger(prefix: "CustomerAccountLogin", logLevel: ShopifyCheckoutSheetKit.configuration.logLevel)
         let callbackScheme: String
         let onCodeReceived: (String) -> Void
         let onCancel: () -> Void
@@ -98,19 +100,20 @@ struct CustomerAccountLoginView: UIViewRepresentable {
             if (error as NSError).code == NSURLErrorCancelled {
                 return
             }
-            print("WebView navigation failed: \(error)")
+            logger.error("WebView navigation failed: \(error)")
         }
 
         func webView(_: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
             if (error as NSError).code == NSURLErrorCancelled {
                 return
             }
-            print("WebView provisional navigation failed: \(error)")
+            logger.error("WebView provisional navigation failed: \(error)")
         }
     }
 }
 
 struct LoginSheetView: View {
+    private let logger = OSLogger(prefix: "CustomerAccountLogin", logLevel: ShopifyCheckoutSheetKit.configuration.logLevel)
     @ObservedObject var accountManager = CustomerAccountManager.shared
     @Environment(\.dismiss) private var dismiss
     @State private var authorizationURL: URL?
@@ -127,13 +130,13 @@ struct LoginSheetView: View {
                     CustomerAccountLoginView(
                         authorizationURL: url,
                         callbackScheme: scheme,
-                        onCodeReceived: { code in
+                        onCodeReceived: { [logger] code in
                             Task {
                                 do {
                                     try await accountManager.exchangeCodeForTokens(code: code)
                                     dismiss()
                                 } catch {
-                                    print("Failed to exchange code: \(error)")
+                                    logger.error("Failed to exchange code for tokens: \(error)")
                                 }
                             }
                         },
@@ -157,6 +160,9 @@ struct LoginSheetView: View {
         }
         .onAppear {
             authorizationURL = accountManager.buildAuthorizationURL()
+            if authorizationURL == nil {
+                logger.error("Authorization URL is nil — customer account login cannot proceed. Check Customer Account API configuration in Storefront.xcconfig.")
+            }
         }
     }
 }
