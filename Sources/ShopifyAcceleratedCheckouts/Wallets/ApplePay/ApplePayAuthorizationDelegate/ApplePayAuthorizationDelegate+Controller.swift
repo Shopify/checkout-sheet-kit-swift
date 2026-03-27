@@ -302,14 +302,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         )
     }
 
-    // `prepareCartForCompletion` filters 'non-terminal' violations
-    // See: `ErrorHandler.filterApplePayResolvableViolations`
-    //
-    // Before `didAuthorizePayment`, Apple Pay redacts PII, these are expected to be resolved by submit
-    // After `didAuthorizePayment`, PII is available, but we continue filtering in `prepareForCompletion` so
-    // `cartSubmitForCompletion` can return all violations at once
-    // This gives the user the best chance to fix everything in a single pass.
-    //
+    /// `prepareCartForCompletion` ignores all violations — submit handles error surfacing.
+    /// Before `didAuthorizePayment`, Apple Pay redacts PII so most violations are expected.
+    /// We rely on `cartSubmitForCompletion` to return all violations at once,
+    /// giving the user the best chance to fix everything in a single pass.
     @discardableResult
     func prepareCartForCompletion(id: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
         do {
@@ -320,11 +316,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             if case let .response(_, _, .cartPrepareForCompletion(payload)) = error,
                case let .notReady(notReady) = payload.result
             {
-                let actionableErrors = ErrorHandler.filterApplePayResolvableViolations(errors: notReady.errors)
-                if actionableErrors.isEmpty {
-                    try setCart(to: notReady.cart)
-                    return notReady.cart
-                }
+                try setCart(to: notReady.cart)
+                return notReady.cart
             }
             throw error
         }

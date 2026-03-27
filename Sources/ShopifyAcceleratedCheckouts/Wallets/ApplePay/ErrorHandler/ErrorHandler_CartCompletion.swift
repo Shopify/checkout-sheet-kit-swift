@@ -46,8 +46,8 @@ extension ErrorHandler {
 
     private static func map(
         payload: StorefrontAPI.CartPrepareForCompletionPayload,
-        shippingCountry: String?,
-        requiredContactFields: Set<PKContactField>?
+        shippingCountry _: String?,
+        requiredContactFields _: Set<PKContactField>?
     ) -> PaymentSheetAction {
         guard let result = payload.result else { return PaymentSheetAction.interrupt(reason: .other) }
         switch result {
@@ -56,22 +56,10 @@ extension ErrorHandler {
                 return PaymentSheetAction.interrupt(reason: .cartNotReady)
             }
             let allCodes = notReady.errors.map { $0.rawCode }.joined(separator: ", ")
-            let actionableErrors = filterApplePayResolvableViolations(errors: notReady.errors)
-            if actionableErrors.isEmpty {
-                ShopifyAcceleratedCheckouts.logger.debug(
-                    "ErrorHandler: prepare: all violations are Apple Pay resolvable, continuing flow. Filtered: [\(allCodes)]"
-                )
-                return PaymentSheetAction.continueFlow
-            }
-            let actionableCodes = actionableErrors.map { $0.rawCode }.joined(separator: ", ")
-            ShopifyAcceleratedCheckouts.logger.error(
-                "ErrorHandler: prepare: actionable violations found: [\(actionableCodes)]. All violations: [\(allCodes)]"
+            ShopifyAcceleratedCheckouts.logger.debug(
+                "ErrorHandler: prepare: ignoring violations, deferring to submit. Codes: [\(allCodes)]"
             )
-            let filteredErrors = filterGenericViolations(errors: actionableErrors)
-            let actions = filteredErrors.map {
-                getErrorAction(error: $0, shippingCountry: shippingCountry, checkoutURL: nil, requiredContactFields: requiredContactFields)
-            }
-            return getHighestPriorityAction(actions: actions)
+            return PaymentSheetAction.continueFlow
         case .throttled:
             return PaymentSheetAction.interrupt(reason: .cartThrottled)
         case .ready:
@@ -493,54 +481,6 @@ extension ErrorHandler {
     }
 
     // MARK: - Helpers
-
-    private static let applePayResolvableViolationCodes: Set<StorefrontAPI.CartCompletionErrorCode> = [
-        .deliveryAddress1Invalid,
-        .deliveryAddress1Required,
-        .deliveryAddress1TooLong,
-        .deliveryAddress2Invalid,
-        .deliveryAddress2Required,
-        .deliveryAddress2TooLong,
-        .deliveryAddressRequired,
-        .deliveryCityInvalid,
-        .deliveryCityRequired,
-        .deliveryCityTooLong,
-        .deliveryCompanyInvalid,
-        .deliveryCompanyRequired,
-        .deliveryCompanyTooLong,
-        .deliveryCountryRequired,
-        .deliveryFirstNameInvalid,
-        .deliveryFirstNameRequired,
-        .deliveryFirstNameTooLong,
-        .deliveryInvalidPostalCodeForCountry,
-        .deliveryInvalidPostalCodeForZone,
-        .deliveryLastNameInvalid,
-        .deliveryLastNameRequired,
-        .deliveryLastNameTooLong,
-        .deliveryOptionsPhoneNumberInvalid,
-        .deliveryOptionsPhoneNumberRequired,
-        .deliveryPhoneNumberInvalid,
-        .deliveryPhoneNumberRequired,
-        .deliveryPostalCodeInvalid,
-        .deliveryPostalCodeRequired,
-        .deliveryZoneNotFound,
-        .deliveryZoneRequiredForCountry,
-        .buyerIdentityEmailIsInvalid,
-        .buyerIdentityEmailRequired,
-        .buyerIdentityPhoneIsInvalid,
-
-        // When default address is non-serviable supported then sheet immediately closes
-        // During #583 - These may be remapped to .showError during completion stage
-        .deliveryNoDeliveryAvailableForMerchandiseLine, .merchandiseNotApplicable
-    ]
-
-    static func filterApplePayResolvableViolations(
-        errors: [StorefrontAPI.CartCompletionError]
-    ) -> [StorefrontAPI.CartCompletionError] {
-        errors.filter { error in
-            !applePayResolvableViolationCodes.contains(error.code)
-        }
-    }
 
     private static func filterGenericViolations(errors: [StorefrontAPI.CartCompletionError]) -> [StorefrontAPI.CartCompletionError] {
         if errors.count == 1, errors.first?.code == .paymentsUnacceptablePaymentAmount {
