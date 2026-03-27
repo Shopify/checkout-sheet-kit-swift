@@ -94,7 +94,7 @@ class CollectionTests: XCTestCase {
     // MARK: - Set Tests
 
     func testSetSafeSubscriptWorksCorrectly() throws {
-        let set: Set<String> = ["apple", "banana", "cherry"]
+        let set: Set = ["apple", "banana", "cherry"]
 
         // For Set, we can only test with valid indices from the set itself
         if let firstIndex = set.indices.first {
