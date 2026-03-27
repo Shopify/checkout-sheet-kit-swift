@@ -55,6 +55,7 @@ class ErrorHandler {
     enum PaymentSheetAction {
         case showError(errors: [Error])
         case interrupt(reason: InterruptReason, checkoutURL: URL? = nil)
+        case continueFlow
     }
 
     static func useEmirate(shippingCountry: String?) -> Bool {
@@ -99,9 +100,9 @@ class ErrorHandler {
             case let .response(_, _, payload):
                 switch payload {
                 case let .cartSubmitForCompletion(submitPayload):
-                    return ErrorHandler.map(payload: submitPayload, shippingCountry: shippingCountry, requiredContactFields: requiredContactFields)
+                    return ErrorHandler.map(stage: .submit(submitPayload), shippingCountry: shippingCountry, requiredContactFields: requiredContactFields)
                 case let .cartPrepareForCompletion(preparePayload):
-                    return ErrorHandler.map(payload: preparePayload)
+                    return ErrorHandler.map(stage: .prepare(preparePayload), shippingCountry: shippingCountry, requiredContactFields: requiredContactFields)
                 }
             case let .userError(userErrors, cart):
                 return ErrorHandler.map(errors: userErrors, shippingCountry: shippingCountry, cart: cart, requiredContactFields: requiredContactFields)
@@ -135,6 +136,8 @@ class ErrorHandler {
             return 1
         case .showError:
             return 2
+        case .continueFlow:
+            return 4
         }
     }
 
