@@ -537,7 +537,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         )
 
         // Note: We can't easily verify that cartRemovePersonalData was NOT called
-        // because it uses storefrontJulyRelease.cartRemovePersonalData which is hard to mock
         // But we can verify the happy path behavior
     }
 
@@ -691,7 +690,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     private class MockPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
-        var storefrontJulyRelease: StorefrontAPIProtocol
 
         var presentCallCount = 0
         var presentCalledWith: URL?
@@ -702,7 +700,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
                 storefrontDomain: config.storefrontDomain,
                 storefrontAccessToken: config.storefrontAccessToken
             )
-            storefrontJulyRelease = storefront
         }
 
         func present(url: URL) async throws {
@@ -714,7 +711,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     private class FailingMockPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
-        var storefrontJulyRelease: StorefrontAPIProtocol
 
         var presentCallCount = 0
 
@@ -724,7 +720,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
                 storefrontDomain: config.storefrontDomain,
                 storefrontAccessToken: config.storefrontAccessToken
             )
-            storefrontJulyRelease = storefront
         }
 
         func present(url _: URL) async throws {
@@ -736,7 +731,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     private class SpyPayController: PayController {
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
-        var storefrontJulyRelease: StorefrontAPIProtocol
 
         var presentCallCount = 0
         var presentCalledWith: URL?
@@ -747,7 +741,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
                 storefrontDomain: config.storefrontDomain,
                 storefrontAccessToken: config.storefrontAccessToken
             )
-            storefrontJulyRelease = storefront
         }
 
         func present(url: URL) async throws {

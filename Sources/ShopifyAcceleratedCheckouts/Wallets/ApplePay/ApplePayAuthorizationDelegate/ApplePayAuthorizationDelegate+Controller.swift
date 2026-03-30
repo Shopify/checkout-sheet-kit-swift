@@ -62,11 +62,10 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             try await upsertShippingAddress(to: shippingAddress)
 
-            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-            try setCart(to: result.cart)
+            try await prepareCartForCompletion(id: cartID)
 
             // If address update cleared delivery groups, revert to previous cart and show error
-            if result.cart?.deliveryGroups.nodes.isEmpty == true, previousCart?.deliveryGroups.nodes.isEmpty == false {
+            if controller.cart?.deliveryGroups.nodes.isEmpty == true, previousCart?.deliveryGroups.nodes.isEmpty == false {
                 try setCart(to: previousCart)
 
                 ShopifyAcceleratedCheckouts.logger.error("ApplePay: didSelectShippingContact deliveryGroups were unexpectedly empty")
@@ -120,8 +119,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 billingAddress: billingPostalAddress
             )
 
-            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-            try setCart(to: result.cart)
+            try await prepareCartForCompletion(id: cartID)
 
             return pkDecoder.paymentRequestPaymentMethodUpdate()
         } catch {
@@ -162,9 +160,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
                 )
 
-            let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-
-            try setCart(to: result.cart)
+            try await prepareCartForCompletion(id: cartID)
 
             return pkDecoder.paymentRequestShippingMethodUpdate()
         } catch {
@@ -198,8 +194,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                         customerAccessToken: configuration.common.customer?.customerAccessToken
                     )
                 )
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
+                try await prepareCartForCompletion(id: cartID)
             }
 
             if try pkDecoder.isShippingRequired() {
@@ -214,8 +209,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     try await reapplySelectedShippingMethod()
                 }
 
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
+                try await prepareCartForCompletion(id: cartID)
             } else {
                 // If the cart is entirely digital updating with a complete billingAddress
                 // allows us to resolve pending terms on taxes prior to cartPaymentUpdate
@@ -230,8 +224,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                     billingAddress: billingPostalAddress
                 )
 
-                let result = try await controller.storefront.cartPrepareForCompletion(id: cartID)
-                try setCart(to: result.cart)
+                try await prepareCartForCompletion(id: cartID)
             }
 
             let totalAmount = try pkEncoder.totalAmount.get()
@@ -301,12 +294,33 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         }
 
         let cartID = try pkEncoder.cartID.get()
-        try await controller.storefront.cartPrepareForCompletion(id: cartID)
+        _ = try await prepareCartForCompletion(id: cartID)
         try await controller.storefront.cartSelectedDeliveryOptionsUpdate(
             id: cartID,
             deliveryGroupId: deliveryGroupID,
             deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
         )
+    }
+
+    /// `prepareCartForCompletion` ignores all violations — submit handles error surfacing.
+    /// Before `didAuthorizePayment`, Apple Pay redacts PII so most violations are expected.
+    /// We rely on `cartSubmitForCompletion` to return all violations at once,
+    /// giving the user the best chance to fix everything in a single pass.
+    @discardableResult
+    func prepareCartForCompletion(id: GraphQLScalars.ID) async throws -> StorefrontAPI.Cart? {
+        do {
+            let result = try await controller.storefront.cartPrepareForCompletion(id: id)
+            try setCart(to: result.cart)
+            return result.cart
+        } catch let error as StorefrontAPI.Errors {
+            if case let .response(_, _, .cartPrepareForCompletion(payload)) = error,
+               case let .notReady(notReady) = payload.result
+            {
+                try setCart(to: notReady.cart)
+                return notReady.cart
+            }
+            throw error
+        }
     }
 
     func handleError<T>(
@@ -329,6 +343,8 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 self.checkoutURL = checkoutURL
             }
             return completion([abortError])
+        case .continueFlow:
+            return completion([])
         }
     }
 }

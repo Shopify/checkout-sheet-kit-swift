@@ -28,7 +28,7 @@ import XCTest
 @available(iOS 17.0, *)
 class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
     struct TestCase {
-        let errorCode: StorefrontAPI.SubmissionErrorCode
+        let errorCode: StorefrontAPI.CartCompletionErrorCode
         let country: String
         let expectedAction: ExpectedAction
         let expectedField: String?
@@ -398,7 +398,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
         ]
 
         for testCase in testCases {
-            let error = StorefrontAPI.SubmissionError(
+            let error = StorefrontAPI.CartCompletionError(
                 code: testCase.errorCode,
                 message: "Test error message"
             )
@@ -412,7 +412,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
                 userErrors: []
             )
 
-            let result = ErrorHandler.map(payload: payload, shippingCountry: testCase.country)
+            let result = ErrorHandler.map(stage: .submit(payload), shippingCountry: testCase.country)
 
             switch (testCase.expectedAction, result) {
             case let (.showError(.emailInvalid), .showError(errors)):
@@ -456,7 +456,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
             userErrors: []
         )
 
-        let result = ErrorHandler.map(payload: payload, shippingCountry: "US")
+        let result = ErrorHandler.map(stage: .submit(payload), shippingCountry: "US")
 
         switch result {
         case let .interrupt(reason, checkoutURL):
@@ -476,7 +476,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
             userErrors: []
         )
 
-        let result = ErrorHandler.map(payload: payload, shippingCountry: "US")
+        let result = ErrorHandler.map(stage: .submit(payload), shippingCountry: "US")
 
         switch result {
         case let .interrupt(reason, checkoutURL):
@@ -496,7 +496,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
             userErrors: []
         )
 
-        let result = ErrorHandler.map(payload: payload, shippingCountry: "US")
+        let result = ErrorHandler.map(stage: .submit(payload), shippingCountry: "US")
 
         switch result {
         case let .interrupt(reason, checkoutURL):
@@ -508,7 +508,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
     }
 
     func testFilterGenericViolations_withOnlyPaymentsUnacceptablePaymentAmount_returnsError() {
-        let error = StorefrontAPI.SubmissionError(
+        let error = StorefrontAPI.CartCompletionError(
             code: .paymentsUnacceptablePaymentAmount,
             message: "Test error"
         )
@@ -521,7 +521,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
             userErrors: []
         )
 
-        let result = ErrorHandler.map(payload: payload, shippingCountry: "US")
+        let result = ErrorHandler.map(stage: .submit(payload), shippingCountry: "US")
 
         switch result {
         case let .interrupt(reason, _):
@@ -532,11 +532,11 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
     }
 
     func testFilterGenericViolations_withMultipleErrorsIncludingPaymentsUnacceptablePaymentAmount_filtersOutPaymentsUnacceptablePaymentAmount() {
-        let error1 = StorefrontAPI.SubmissionError(
+        let error1 = StorefrontAPI.CartCompletionError(
             code: .paymentsUnacceptablePaymentAmount,
             message: "Payment amount error"
         )
-        let error2 = StorefrontAPI.SubmissionError(
+        let error2 = StorefrontAPI.CartCompletionError(
             code: .buyerIdentityEmailRequired,
             message: "Email required"
         )
@@ -549,7 +549,7 @@ class ErrorHandler_CartSubmitForCompletionTests: XCTestCase {
             userErrors: []
         )
 
-        let result = ErrorHandler.map(payload: payload, shippingCountry: "US")
+        let result = ErrorHandler.map(stage: .submit(payload), shippingCountry: "US")
 
         // Should return the email error, not the payment amount error
         switch result {
