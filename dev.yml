@@ -4,11 +4,14 @@ type: ios
 
 up:
   - packages:
-    - swiftlint
-    - swiftformat
+    - mint
     - xcbeautify
     - rover
     - jq
+  - custom:
+      name: Bootstrap Mint packages
+      met?: mint which swiftlint >/dev/null 2>&1 && mint which swiftformat >/dev/null 2>&1
+      meet: mint bootstrap
   - ruby
   - xcode:
       version: "26.2"
