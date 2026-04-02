@@ -40,6 +40,9 @@ struct ProductView: View {
     @State private var descriptionExpanded: Bool = false
     @State private var addedToCart: Bool = false
 
+    @AppStorage(AppStorageKeys.applePayStyle.rawValue)
+    var applePayStyle: ApplePayStyleOption = .automatic
+
     init(product: Product) {
         _product = State(initialValue: product)
     }
@@ -134,6 +137,7 @@ struct ProductView: View {
 
                         if variant.availableForSale {
                             AcceleratedCheckoutButtons(variantID: variant.id, quantity: 1)
+                                .applePayStyle(applePayStyle.style)
                                 .wallets([.applePay])
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .onFail { error in

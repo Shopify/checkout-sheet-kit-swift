@@ -70,11 +70,6 @@ public struct AcceleratedCheckoutButtons: View {
             _currentRenderState = State(initialValue: .error(reason: reason))
         }
     }
-    
-    public init(cartID: String, applePayStyle: PayWithApplePayButtonStyle) {
-        self.init(cartID: cartID)
-        self.applePayStyle = applePayStyle
-    }
 
     /// Initializes an Apple Pay button with a variant ID
     /// - Parameters:
@@ -100,7 +95,7 @@ public struct AcceleratedCheckoutButtons: View {
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
                                 cornerRadius: cornerRadius,
-                                payWithApplePayButtonStyle: applePayStyle
+                                style: applePayStyle
                             )
                             .label(applePayLabel)
                         case .shopPay:
