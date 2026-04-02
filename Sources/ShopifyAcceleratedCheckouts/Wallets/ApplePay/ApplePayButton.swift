@@ -49,17 +49,22 @@ struct ApplePayButton: View {
     /// The Apple Pay button label style
     private var label: PayWithApplePayButtonLabel = .plain
 
+    /// The Apple Pay button style
+    private var style: PayWithApplePayButtonStyle = .automatic
+
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
 
-    public init(
+    init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        style: PayWithApplePayButtonStyle = .automatic
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         self.cornerRadius = cornerRadius
+        self.style = style
     }
 
     var body: some View {
@@ -70,6 +75,7 @@ struct ApplePayButton: View {
             Internal_ApplePayButton(
                 identifier: identifier,
                 label: label,
+                style: style,
                 configuration: ApplePayConfigurationWrapper(
                     common: configuration,
                     applePay: applePayConfiguration,
@@ -81,7 +87,13 @@ struct ApplePayButton: View {
         }
     }
 
-    public func label(_ label: PayWithApplePayButtonLabel) -> some View {
+    func applePayStyle(_ style: PayWithApplePayButtonStyle) -> some View {
+        var view = self
+        view.style = style
+        return view
+    }
+
+    func label(_ label: PayWithApplePayButtonLabel) -> some View {
         var view = self
         view.label = label
         return view
@@ -93,24 +105,15 @@ struct ApplePayButton: View {
 @available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
-    /// The Apple Pay button label style
-    private var label: PayWithApplePayButtonLabel = .plain
-
-    /// The view controller for the Apple Pay button
-    private var controller: ApplePayViewController
-
-    /// The corner radius for the button
+    private let label: PayWithApplePayButtonLabel
+    private let style: PayWithApplePayButtonStyle
+    private let controller: ApplePayViewController
     private let cornerRadius: CGFloat?
 
-    /// Initializes an Apple Pay button
-    /// - Parameters:
-    ///   - identifier: The identifier to use for checkout
-    ///   - label: The label to display on the Apple Pay button
-    ///   - configuration: The configuration for Apple Pay
-    ///   - eventHandlers: The event handlers for checkout events (defaults to EventHandlers())
     init(
         identifier: CheckoutIdentifier,
         label: PayWithApplePayButtonLabel,
+        style: PayWithApplePayButtonStyle,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
@@ -120,6 +123,7 @@ struct Internal_ApplePayButton: View {
             configuration: configuration
         )
         self.label = label
+        self.style = style
         self.cornerRadius = cornerRadius
         controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
         controller.onCheckoutFail = eventHandlers.checkoutDidFail
@@ -130,15 +134,56 @@ struct Internal_ApplePayButton: View {
     }
 
     var body: some View {
-        PayWithApplePayButton(
-            label,
-            action: {
-                Task { await controller.onPress() }
-            },
-            fallback: {
-                Text("errors.applePay.unsupported".localizedString)
-            }
-        )
-        .walletButtonStyle(cornerRadius: cornerRadius)
+        if PKPaymentAuthorizationController.canMakePayments() {
+            ApplePayButtonRepresentable(
+                buttonType: label.pkPaymentButtonType,
+                buttonStyle: style.pkPaymentButtonStyle,
+                cornerRadius: cornerRadius ?? 8,
+                action: { Task { await controller.onPress() } }
+            )
+            .id(style.pkPaymentButtonStyle.rawValue)
+            .frame(height: 48)
+        } else {
+            Text("errors.applePay.unsupported".localizedString)
+        }
+    }
+}
+
+// MARK: - Type Conversions
+
+@available(iOS 16.0, *)
+extension PayWithApplePayButtonStyle {
+    var pkPaymentButtonStyle: PKPaymentButtonStyle {
+        switch self {
+        case .black: .black
+        case .white: .white
+        case .whiteOutline: .whiteOutline
+        case .automatic: .automatic
+        default: .automatic
+        }
+    }
+}
+
+@available(iOS 16.0, *)
+extension PayWithApplePayButtonLabel {
+    var pkPaymentButtonType: PKPaymentButtonType {
+        switch self {
+        case .buy: .buy
+        case .setUp: .setUp
+        case .inStore: .inStore
+        case .donate: .donate
+        case .checkout: .checkout
+        case .book: .book
+        case .subscribe: .subscribe
+        case .reload: .reload
+        case .addMoney: .addMoney
+        case .topUp: .topUp
+        case .order: .order
+        case .rent: .rent
+        case .support: .support
+        case .contribute: .contribute
+        case .tip: .tip
+        default: .plain
+        }
     }
 }

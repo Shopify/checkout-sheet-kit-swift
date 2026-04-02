@@ -38,6 +38,9 @@ struct CartView: View {
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var config: AppConfiguration = appConfiguration
 
+    @AppStorage(AppStorageKeys.applePayStyle.rawValue)
+    var applePayStyle: ApplePayStyleOption = .automatic
+
     var body: some View {
         if let lines = cartManager.cart?.lines.nodes {
             ZStack(alignment: .bottom) {
@@ -51,6 +54,7 @@ struct CartView: View {
                 VStack(spacing: DesignSystem.buttonSpacing) {
                     if let cartId = cartManager.cart?.id {
                         AcceleratedCheckoutButtons(cartID: cartId)
+                            .applePayStyle(applePayStyle.style)
                             .wallets([.shopPay, .applePay])
                             .cornerRadius(DesignSystem.cornerRadius)
                             .onComplete { _ in
