@@ -38,11 +38,6 @@ commands:
     aliases: [style]
     desc: Check format and lint issues across all Swift files using SwiftLint and SwiftFormat
     run: scripts/lint
-    subcommands:
-      pod:
-        aliases: []
-        desc: Check the build for cocoapods deployement
-        run: bundle exec pod lib lint --allow-warnings
 
   fix:
     desc: Automatically fix format and lint issues where possible

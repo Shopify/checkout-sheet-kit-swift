@@ -26,24 +26,22 @@ import SwiftUI
 import UIKit
 
 @available(iOS 16.0, *)
-@MainActor
 struct ApplePayButtonRepresentable: UIViewRepresentable {
     typealias UIViewType = PKPaymentButton
-    typealias Coordinator = Void
 
     let buttonType: PKPaymentButtonType
     let buttonStyle: PKPaymentButtonStyle
     let cornerRadius: CGFloat
     let action: @Sendable () -> Void
 
-    func makeUIView(context _: Context) -> PKPaymentButton {
+    func makeUIView(context _: UIViewRepresentableContext<ApplePayButtonRepresentable>) -> PKPaymentButton {
         let button = PKPaymentButton(paymentButtonType: buttonType, paymentButtonStyle: buttonStyle)
         button.cornerRadius = cornerRadius
         button.addAction(UIAction { _ in action() }, for: .touchUpInside)
         return button
     }
 
-    func updateUIView(_ button: PKPaymentButton, context _: Context) {
+    func updateUIView(_ button: PKPaymentButton, context _: UIViewRepresentableContext<ApplePayButtonRepresentable>) {
         button.cornerRadius = cornerRadius
     }
 }
