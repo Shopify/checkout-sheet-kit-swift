@@ -22,6 +22,7 @@
  */
 
 import Combine
+import PassKit
 @preconcurrency import ShopifyAcceleratedCheckouts
 @preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
@@ -30,6 +31,7 @@ enum AppStorageKeys: String {
     case acceleratedCheckoutsLogLevel
     case checkoutSheetKitLogLevel
     case buyerIdentityMode
+    case applePayStyle
 }
 
 struct SettingsView: View {
@@ -50,6 +52,9 @@ struct SettingsView: View {
             ShopifyAcceleratedCheckouts.logLevel = acceleratedCheckoutsLogLevel
         }
     }
+
+    @AppStorage(AppStorageKeys.applePayStyle.rawValue)
+    var applePayStyle: ApplePayStyleOption = .automatic
 
     @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
@@ -117,6 +122,26 @@ struct SettingsView: View {
                                     name: .colorSchemeChanged, object: nil
                                 )
                             }
+                    }
+                }
+
+                Section(
+                    header: Text("Apple Pay"),
+                    footer: Text("Configures the visual style of the Apple Pay button.")
+                ) {
+                    ForEach(ApplePayStyleOption.allCases, id: \.self) { option in
+                        HStack {
+                            Text(option.title)
+                            Spacer()
+                            if option == applePayStyle {
+                                Text("\u{2713}")
+                            }
+                        }
+                        .background(Color.clear)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            applePayStyle = option
+                        }
                     }
                 }
 
@@ -303,6 +328,31 @@ extension Configuration.ColorScheme {
             return ColorPalette.backgroundColor
         default:
             return .systemBackground
+        }
+    }
+}
+
+enum ApplePayStyleOption: String, CaseIterable {
+    case automatic
+    case black
+    case white
+    case whiteOutline
+
+    var title: String {
+        switch self {
+        case .automatic: return "Automatic"
+        case .black: return "Black"
+        case .white: return "White"
+        case .whiteOutline: return "White Outline"
+        }
+    }
+
+    var style: PayWithApplePayButtonStyle {
+        switch self {
+        case .automatic: return .automatic
+        case .black: return .black
+        case .white: return .white
+        case .whiteOutline: return .whiteOutline
         }
     }
 }
