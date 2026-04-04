@@ -6,9 +6,14 @@ STOREFRONT_DOMAIN = <INSERT_STOREFRONT_DOMAIN>
 STOREFRONT_ACCESS_TOKEN = <INSERT_STOREFRONT_ACCESS_TOKEN>
 STOREFRONT_MERCHANT_IDENTIFIER = <INSERT_STOREFRONT_MERCHANT_IDENTIFIER>
 
-// --- Customer Account API (optional)
-// --- Find these under your Headless app configuration:
+// --- Customer Account API (optional, required for authenticated checkout)
+// --- CUSTOMER_ACCOUNT_API_CLIENT_ID:
+// ----- Found under Headless app > Customer Account API > Application setup > Client ID
 // ----- https://admin.shopify.com/store/{STOREFRONT}/settings/apps/development/{APP_ID}
+// --- CUSTOMER_ACCOUNT_API_SHOP_ID:
+// ----- The numeric Shop ID visible in Settings > Customer accounts > Customer Account API
+// ----- https://admin.shopify.com/store/{STOREFRONT}/settings/customer_accounts
+// ----- Also visible in the shop admin URL: https://admin.shopify.com/store/{STOREFRONT} > Settings
 CUSTOMER_ACCOUNT_API_CLIENT_ID = <INSERT_CLIENT_ID>
 CUSTOMER_ACCOUNT_API_SHOP_ID = <INSERT_SHOP_ID>
 
