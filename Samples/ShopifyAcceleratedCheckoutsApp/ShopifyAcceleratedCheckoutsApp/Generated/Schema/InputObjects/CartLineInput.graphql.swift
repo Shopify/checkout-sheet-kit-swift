@@ -1,30 +1,12 @@
-/*
- MIT License
+// @generated
+// This file was automatically generated and should not be edited.
 
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
-    /// The input fields to create a merchandise line on a cart.
+    /// The input fields for adding a merchandise line to a cart. Each line represents a [`ProductVariant`](https://shopify.dev/docs/api/storefront/current/objects/ProductVariant) the buyer intends to purchase, along with the quantity and optional [`SellingPlan`](https://shopify.dev/docs/api/storefront/current/objects/SellingPlan) for subscriptions.
+    ///
+    /// Used by the [`cartCreate`](https://shopify.dev/docs/api/storefront/current/mutations/cartCreate) mutation when creating a cart with initial items, and the [`cartLinesAdd`](https://shopify.dev/docs/api/storefront/current/mutations/cartLinesAdd) mutation when adding items to an existing cart.
     struct CartLineInput: InputObject {
         private(set) var __data: InputDict
 
@@ -34,7 +16,7 @@ extension Storefront {
 
         init(
             attributes: GraphQLNullable<[AttributeInput]> = nil,
-            quantity: GraphQLNullable<Int> = nil,
+            quantity: GraphQLNullable<Int32> = nil,
             merchandiseId: ID,
             sellingPlanId: GraphQLNullable<ID> = nil
         ) {
@@ -55,7 +37,7 @@ extension Storefront {
         }
 
         /// The quantity of the merchandise.
-        var quantity: GraphQLNullable<Int> {
+        var quantity: GraphQLNullable<Int32> {
             get { __data["quantity"] }
             set { __data["quantity"] = newValue }
         }
