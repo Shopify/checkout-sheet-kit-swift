@@ -1,25 +1,5 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 import ApolloAPI
 
@@ -63,9 +43,6 @@ extension Storefront {
             case "CartLine": return Storefront.Objects.CartLine
             case "CartLineCost": return Storefront.Objects.CartLineCost
             case "CartUserError": return Storefront.Objects.CartUserError
-            case "Checkout": return Storefront.Objects.Checkout
-            case "CheckoutLineItem": return Storefront.Objects.CheckoutLineItem
-            case "CheckoutUserError": return Storefront.Objects.CheckoutUserError
             case "Collection": return Storefront.Objects.Collection
             case "Comment": return Storefront.Objects.Comment
             case "Company": return Storefront.Objects.Company
@@ -93,18 +70,24 @@ extension Storefront {
             case "Mutation": return Storefront.Objects.Mutation
             case "Order": return Storefront.Objects.Order
             case "Page": return Storefront.Objects.Page
-            case "Payment": return Storefront.Objects.Payment
             case "Product": return Storefront.Objects.Product
             case "ProductConnection": return Storefront.Objects.ProductConnection
             case "ProductOption": return Storefront.Objects.ProductOption
+            case "ProductOptionValue": return Storefront.Objects.ProductOptionValue
             case "ProductVariant": return Storefront.Objects.ProductVariant
             case "ProductVariantConnection": return Storefront.Objects.ProductVariantConnection
             case "QueryRoot": return Storefront.Objects.QueryRoot
             case "SearchQuerySuggestion": return Storefront.Objects.SearchQuerySuggestion
+            case "SellingPlan": return Storefront.Objects.SellingPlan
             case "Shop": return Storefront.Objects.Shop
+            case "ShopPayInstallmentsFinancingPlan": return Storefront.Objects.ShopPayInstallmentsFinancingPlan
+            case "ShopPayInstallmentsFinancingPlanTerm": return Storefront.Objects.ShopPayInstallmentsFinancingPlanTerm
+            case "ShopPayInstallmentsProductVariantPricing": return Storefront.Objects.ShopPayInstallmentsProductVariantPricing
             case "ShopPolicy": return Storefront.Objects.ShopPolicy
+            case "TaxonomyCategory": return Storefront.Objects.TaxonomyCategory
             case "UrlRedirect": return Storefront.Objects.UrlRedirect
             case "UserError": return Storefront.Objects.UserError
+            case "UserErrorsShopPayPaymentRequestSessionUserErrors": return Storefront.Objects.UserErrorsShopPayPaymentRequestSessionUserErrors
             case "Video": return Storefront.Objects.Video
             default: return nil
             }
