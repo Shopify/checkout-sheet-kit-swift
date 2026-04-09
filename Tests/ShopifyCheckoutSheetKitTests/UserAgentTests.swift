@@ -25,6 +25,8 @@
 import XCTest
 
 class UserAgentTests: XCTestCase {
+    private let swiftSuffix = "Swift/\(SwiftVersion.languageVersion) SwiftCompiler/\(SwiftVersion.compilerVersion)"
+
     func test_string_withAcceleratedCheckoutsEntryPoint_shouldReturnCorrectUserAgent() {
         let schemaVersion = MetaData.schemaVersion
         let acceleratedCheckoutsUA = UserAgent.string(
@@ -32,7 +34,7 @@ class UserAgentTests: XCTestCase {
             colorScheme: .automatic,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard) AcceleratedCheckouts")
+        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard) AcceleratedCheckouts \(swiftSuffix)")
     }
 
     func test_string_withAcceleratedCheckoutsAndReactNativePlatform_shouldReturnUserAgentWithPlatform() {
@@ -43,7 +45,7 @@ class UserAgentTests: XCTestCase {
             platform: .reactNative,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts")
+        XCTAssertEqual(acceleratedCheckoutsUA, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard) ReactNative AcceleratedCheckouts \(swiftSuffix)")
     }
 
     func test_string_withoutEntryPoint_shouldReturnBasicUserAgent() {
@@ -52,7 +54,7 @@ class UserAgentTests: XCTestCase {
             type: .standard,
             colorScheme: .automatic
         )
-        XCTAssertEqual(checkoutSheetKitUA, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard)")
+        XCTAssertEqual(checkoutSheetKitUA, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard) \(swiftSuffix)")
     }
 
     func test_string_withRecoveryTypeAndDarkColorScheme_shouldReturnRecoveryUserAgent() {
@@ -62,6 +64,36 @@ class UserAgentTests: XCTestCase {
             colorScheme: .dark,
             entryPoint: .acceleratedCheckouts
         )
-        XCTAssertEqual(recoveryUA, "ShopifyCheckoutSDK/3.6.0 (noconnect;dark;standard_recovery) AcceleratedCheckouts")
+        XCTAssertEqual(recoveryUA, "ShopifyCheckoutSDK/3.6.0 (noconnect;dark;standard_recovery) AcceleratedCheckouts \(swiftSuffix)")
+    }
+
+    func test_string_withPlatformVersion_shouldIncludeVersionedPlatform() {
+        let schemaVersion = MetaData.schemaVersion
+        let userAgent = UserAgent.string(
+            type: .standard,
+            colorScheme: .automatic,
+            platform: .reactNative,
+            platformVersion: "0.76.3"
+        )
+        XCTAssertEqual(userAgent, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard) ReactNative/0.76.3 \(swiftSuffix)")
+    }
+
+    func test_string_withPlatformButNoPlatformVersion_shouldOmitVersion() {
+        let schemaVersion = MetaData.schemaVersion
+        let userAgent = UserAgent.string(
+            type: .standard,
+            colorScheme: .automatic,
+            platform: .reactNative
+        )
+        XCTAssertEqual(userAgent, "ShopifyCheckoutSDK/3.6.0 (\(schemaVersion);automatic;standard) ReactNative \(swiftSuffix)")
+    }
+
+    func test_string_alwaysIncludesSwiftVersions() {
+        let userAgent = UserAgent.string(
+            type: .standard,
+            colorScheme: .automatic
+        )
+        XCTAssertTrue(userAgent.contains("Swift/"), "User agent should contain Swift language version")
+        XCTAssertTrue(userAgent.contains("SwiftCompiler/"), "User agent should contain Swift compiler version")
     }
 }

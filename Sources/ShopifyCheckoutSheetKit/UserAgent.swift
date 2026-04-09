@@ -48,6 +48,7 @@ public enum UserAgent {
         type: CheckoutType,
         colorScheme: ColorScheme,
         platform: MetaData.Platform? = nil,
+        platformVersion: String? = nil,
         entryPoint: MetaData.EntryPoint? = nil
     ) -> String {
         var parameters: String
@@ -61,12 +62,19 @@ public enum UserAgent {
         var userAgentString = "\(baseUserAgent) (\(parameters))"
 
         if let platform {
-            userAgentString.append(" \(platform.rawValue)")
+            if let platformVersion {
+                userAgentString.append(" \(platform.rawValue)/\(platformVersion)")
+            } else {
+                userAgentString.append(" \(platform.rawValue)")
+            }
         }
 
         if let entryPoint {
             userAgentString.append(" \(entryPoint.rawValue)")
         }
+
+        userAgentString.append(" Swift/\(SwiftVersion.languageVersion)")
+        userAgentString.append(" SwiftCompiler/\(SwiftVersion.compilerVersion)")
 
         return userAgentString
     }

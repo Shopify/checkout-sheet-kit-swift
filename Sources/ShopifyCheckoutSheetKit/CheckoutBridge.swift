@@ -49,11 +49,13 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
     static func applicationName(entryPoint: MetaData.EntryPoint?) -> String {
         let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
         let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
+        let platformVersion = ShopifyCheckoutSheetKit.configuration.platformVersion
 
         return UserAgent.string(
             type: .standard,
             colorScheme: colorScheme,
             platform: platform,
+            platformVersion: platformVersion,
             entryPoint: entryPoint
         )
     }
@@ -65,11 +67,13 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
     static func recoveryAgent(entryPoint: MetaData.EntryPoint?) -> String {
         let colorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
         let platform = mapPlatform(ShopifyCheckoutSheetKit.configuration.platform)
+        let platformVersion = ShopifyCheckoutSheetKit.configuration.platformVersion
 
         return UserAgent.string(
             type: .recovery,
             colorScheme: colorScheme,
             platform: platform,
+            platformVersion: platformVersion,
             entryPoint: entryPoint
         )
     }

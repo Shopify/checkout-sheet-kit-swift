@@ -60,6 +60,11 @@ public struct Configuration {
     /// Custom enum for identifying traffic from alternative platforms
     public var platform: Platform?
 
+    /// The version of the platform (e.g. React Native version "0.76.3").
+    /// This API is intended for internal use by platform integration libraries (e.g. React Native).
+    @_spi(ReactNative)
+    public var platformVersion: String?
+
     /// Levels: all, debug, error, none
     /// Default: .error - which will emit "error" and "fault" logs
     public var logLevel: LogLevel = .error
