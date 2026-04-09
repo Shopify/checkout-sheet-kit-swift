@@ -41,7 +41,7 @@ class ShopifyAcceleratedCheckoutsTests: XCTestCase {
     }
 
     func test_apiVersion_whenAccessed_shouldBePublic() {
-        XCTAssertEqual(ShopifyAcceleratedCheckouts.apiVersion, "2025-10")
+        XCTAssertEqual(ShopifyAcceleratedCheckouts.apiVersion, "2026-04")
     }
 
     func test_logLevel_withDefaultConfiguration_shouldDefaultToError() {

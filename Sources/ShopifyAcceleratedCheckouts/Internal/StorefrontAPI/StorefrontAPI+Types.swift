@@ -442,6 +442,8 @@ extension StorefrontAPI {
         case invalidIncrement = "INVALID_INCREMENT"
         case invalidMerchandiseLine = "INVALID_MERCHANDISE_LINE"
         case invalidMetafields = "INVALID_METAFIELDS"
+        case giftCardRecipientInvalid = "GIFT_CARD_RECIPIENT_INVALID"
+        case merchandiseLineTransformersRunError = "MERCHANDISE_LINE_TRANSFORMERS_RUN_ERROR"
         case invalidZipCodeForCountry = "INVALID_ZIP_CODE_FOR_COUNTRY"
         case invalidZipCodeForProvince = "INVALID_ZIP_CODE_FOR_PROVINCE"
         case lessThan = "LESS_THAN"
@@ -746,6 +748,7 @@ extension StorefrontAPI {
         case merchandiseNotApplicable = "MERCHANDISE_NOT_APPLICABLE"
         case merchandiseNotEnoughStockAvailable = "MERCHANDISE_NOT_ENOUGH_STOCK_AVAILABLE"
         case merchandiseOutOfStock = "MERCHANDISE_OUT_OF_STOCK"
+        case merchandiseLineTransformersRunError = "MERCHANDISE_LINE_TRANSFORMERS_RUN_ERROR"
         case merchandiseProductNotPublished = "MERCHANDISE_PRODUCT_NOT_PUBLISHED"
 
         /// Delivery group errors
@@ -926,7 +929,7 @@ extension StorefrontAPI {
 }
 
 /// Represents shop settings data fetched from the Storefront API
-/// https://shopify.dev/docs/api/storefront/2025-10/objects/Shop
+/// https://shopify.dev/docs/api/storefront/2026-04/objects/Shop
 @available(iOS 16.0, *)
 class ShopSettings: ObservableObject {
     /// The shop's name (merchant name for display)
