@@ -508,14 +508,8 @@ extension StorefrontAPI {
     /// Cart buyer identity update payload
     typealias CartBuyerIdentityUpdatePayload = CartPayload
 
-    /// Cart delivery addresses add payload
-    typealias CartDeliveryAddressesAddPayload = CartPayload
-
-    /// Cart delivery addresses update payload
-    typealias CartDeliveryAddressesUpdatePayload = CartPayload
-
-    /// Cart delivery addresses remove payload
-    typealias CartDeliveryAddressesRemovePayload = CartPayload
+    /// Cart delivery addresses replace payload
+    typealias CartDeliveryAddressesReplacePayload = CartPayload
 
     /// Cart selected delivery options update payload
     typealias CartSelectedDeliveryOptionsUpdatePayload = CartPayload
@@ -932,7 +926,7 @@ extension StorefrontAPI {
 }
 
 /// Represents shop settings data fetched from the Storefront API
-/// https://shopify.dev/docs/api/storefront/2025-07/objects/Shop
+/// https://shopify.dev/docs/api/storefront/2025-10/objects/Shop
 @available(iOS 16.0, *)
 class ShopSettings: ObservableObject {
     /// The shop's name (merchant name for display)

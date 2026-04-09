@@ -174,8 +174,8 @@ final class GraphQLClientTests: XCTestCase {
         let updateBuyerOp = Operations.cartBuyerIdentityUpdate()
         XCTAssertTrue(updateBuyerOp.responseType == StorefrontAPI.CartBuyerIdentityUpdateResponse.self)
 
-        let addAddressOp = Operations.cartDeliveryAddressesAdd()
-        XCTAssertTrue(addAddressOp.responseType == StorefrontAPI.CartDeliveryAddressesAddResponse.self)
+        let replaceAddressOp = Operations.cartDeliveryAddressesReplace()
+        XCTAssertTrue(replaceAddressOp.responseType == StorefrontAPI.CartDeliveryAddressesReplaceResponse.self)
 
         let updateDeliveryOp = Operations.cartSelectedDeliveryOptionsUpdate()
         XCTAssertTrue(updateDeliveryOp.responseType == StorefrontAPI.CartSelectedDeliveryOptionsUpdateResponse.self)
@@ -271,7 +271,7 @@ final class GraphQLClientTests: XCTestCase {
         // Mutation response types
         _ = StorefrontAPI.CartCreateResponse.self
         _ = StorefrontAPI.CartBuyerIdentityUpdateResponse.self
-        _ = StorefrontAPI.CartDeliveryAddressesAddResponse.self
+        _ = StorefrontAPI.CartDeliveryAddressesReplaceResponse.self
         _ = StorefrontAPI.CartSelectedDeliveryOptionsUpdateResponse.self
         _ = StorefrontAPI.CartPaymentUpdateResponse.self
         _ = StorefrontAPI.CartRemovePersonalDataResponse.self

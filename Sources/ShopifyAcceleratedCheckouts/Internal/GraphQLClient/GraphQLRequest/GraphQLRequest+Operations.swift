@@ -43,32 +43,12 @@ enum Operations {
         )
     }
 
-    static func cartDeliveryAddressesAdd(
+    static func cartDeliveryAddressesReplace(
         variables: [String: Any] = [:]
-    ) -> GraphQLRequest<StorefrontAPI.CartDeliveryAddressesAddResponse> {
+    ) -> GraphQLRequest<StorefrontAPI.CartDeliveryAddressesReplaceResponse> {
         return GraphQLRequest(
-            operation: .cartDeliveryAddressesAdd,
-            responseType: StorefrontAPI.CartDeliveryAddressesAddResponse.self,
-            variables: variables
-        )
-    }
-
-    static func cartDeliveryAddressesUpdate(
-        variables: [String: Any] = [:]
-    ) -> GraphQLRequest<StorefrontAPI.CartDeliveryAddressesUpdateResponse> {
-        return GraphQLRequest(
-            operation: .cartDeliveryAddressesUpdate,
-            responseType: StorefrontAPI.CartDeliveryAddressesUpdateResponse.self,
-            variables: variables
-        )
-    }
-
-    static func cartDeliveryAddressesRemove(
-        variables: [String: Any] = [:]
-    ) -> GraphQLRequest<StorefrontAPI.CartDeliveryAddressesRemoveResponse> {
-        return GraphQLRequest(
-            operation: .cartDeliveryAddressesRemove,
-            responseType: StorefrontAPI.CartDeliveryAddressesRemoveResponse.self,
+            operation: .cartDeliveryAddressesReplace,
+            responseType: StorefrontAPI.CartDeliveryAddressesReplaceResponse.self,
             variables: variables
         )
     }
