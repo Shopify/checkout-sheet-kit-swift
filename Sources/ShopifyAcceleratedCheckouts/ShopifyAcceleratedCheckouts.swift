@@ -25,7 +25,7 @@ import ShopifyCheckoutSheetKit
 
 public enum ShopifyAcceleratedCheckouts {
     /// Storefront API version used for cart operations
-    internal static let apiVersion = "2025-10"
+    internal static let apiVersion = "2026-04"
 
     internal static let name = "ShopifyAcceleratedCheckouts"
 

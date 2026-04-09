@@ -32,7 +32,7 @@ class StorefrontAPI: ObservableObject, StorefrontAPIProtocol {
     /// - Parameters:
     ///   - storefrontDomain: The shop domain (e.g., "example.myshopify.com")
     ///   - storefrontAccessToken: The storefront access token
-    ///   - apiVersion: The API version to use (defaults to "2025-10")
+    ///   - apiVersion: The API version to use (defaults to "2026-04")
     ///   - countryCode: Optional country code for localization
     ///   - languageCode: Optional language code for localization
     init(

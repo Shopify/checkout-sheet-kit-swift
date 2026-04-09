@@ -330,6 +330,16 @@ extension ErrorHandler {
             return PaymentSheetAction.interrupt(
                 reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
             )
+        case .merchandiseLineTransformersRunError:
+            // Cart transform function failed — buyer cannot resolve this
+            return PaymentSheetAction.interrupt(
+                reason: .other, checkoutURL: cart?.checkoutUrl.url
+            )
+        case .giftCardRecipientInvalid:
+            // Gift card recipient validation — not applicable in Apple Pay flow
+            return PaymentSheetAction.interrupt(
+                reason: .unhandled, checkoutURL: cart?.checkoutUrl.url
+            )
         case .invalidPayment:
             switch field {
             case "amount", "payment.amount":
