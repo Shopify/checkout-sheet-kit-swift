@@ -146,13 +146,13 @@ extension StorefrontAPI {
         return cart
     }
 
-    /// Add delivery addresses to cart
+    /// Replace all delivery addresses on cart
     /// - Parameters:
     ///   - id: Cart ID
-    ///   - address: Delivery address
+    ///   - address: Replacement delivery address
     ///   - validate: Whether to validate the address
     /// - Returns: Updated cart
-    func cartDeliveryAddressesAdd(
+    func cartDeliveryAddressesReplace(
         id: GraphQLScalars.ID,
         address: Address,
         validate: Bool = false
@@ -171,85 +171,14 @@ extension StorefrontAPI {
         ]
 
         let response = try await client.mutate(
-            Operations.cartDeliveryAddressesAdd(variables: variables)
+            Operations.cartDeliveryAddressesReplace(variables: variables)
         )
 
-        guard let payload = response.data?.cartDeliveryAddressesAdd else {
+        guard let payload = response.data?.cartDeliveryAddressesReplace else {
             throw GraphQLError.invalidResponse
         }
 
-        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesAdd")
-
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
-
-        return cart
-    }
-
-    /// Update delivery addresses on cart
-    /// - Parameters:
-    ///   - id: Cart ID
-    ///   - addressId: ID of the address to update
-    ///   - address: Updated delivery address
-    ///   - validate: Whether to validate the address
-    /// - Returns: Updated cart
-    func cartDeliveryAddressesUpdate(
-        id: GraphQLScalars.ID,
-        addressId: GraphQLScalars.ID,
-        address: Address,
-        validate: Bool = false
-    ) async throws -> Cart {
-        let variables: [String: Any] = [
-            "cartId": id.rawValue,
-            "addresses": [
-                [
-                    "id": addressId.rawValue,
-                    "address": [
-                        "deliveryAddress": address.asShippingAddressDict.compactMapValues { $0 }
-                    ],
-                    "selected": true,
-                    "validationStrategy": validate ? "STRICT" : "COUNTRY_CODE_ONLY"
-                ]
-            ]
-        ]
-
-        let response = try await client.mutate(
-            Operations.cartDeliveryAddressesUpdate(variables: variables)
-        )
-
-        guard let payload = response.data?.cartDeliveryAddressesUpdate else {
-            throw GraphQLError.invalidResponse
-        }
-
-        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesUpdate")
-
-        try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
-
-        return cart
-    }
-
-    /// Remove delivery addresses from cart
-    /// - Parameters:
-    ///   - id: Cart ID
-    ///   - addressId: ID of the address to remove
-    /// - Returns: Updated cart
-    func cartDeliveryAddressesRemove(
-        id: GraphQLScalars.ID,
-        addressId: GraphQLScalars.ID
-    ) async throws -> Cart {
-        let variables: [String: Any] = [
-            "cartId": id.rawValue,
-            "addressIds": [addressId.rawValue]
-        ]
-
-        let response = try await client.mutate(
-            Operations.cartDeliveryAddressesRemove(variables: variables)
-        )
-
-        guard let payload = response.data?.cartDeliveryAddressesRemove else {
-            throw GraphQLError.invalidResponse
-        }
-
-        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesRemove")
+        let cart = try validateCart(payload.cart, requestName: "cartDeliveryAddressesReplace")
 
         try validateUserErrors(payload.userErrors, checkoutURL: cart.checkoutUrl.url)
 
@@ -529,16 +458,8 @@ extension StorefrontAPI {
         let cartBuyerIdentityUpdate: CartBuyerIdentityUpdatePayload
     }
 
-    struct CartDeliveryAddressesAddResponse: Codable {
-        let cartDeliveryAddressesAdd: CartDeliveryAddressesAddPayload
-    }
-
-    struct CartDeliveryAddressesUpdateResponse: Codable {
-        let cartDeliveryAddressesUpdate: CartDeliveryAddressesUpdatePayload
-    }
-
-    struct CartDeliveryAddressesRemoveResponse: Codable {
-        let cartDeliveryAddressesRemove: CartDeliveryAddressesRemovePayload
+    struct CartDeliveryAddressesReplaceResponse: Codable {
+        let cartDeliveryAddressesReplace: CartDeliveryAddressesReplacePayload
     }
 
     struct CartSelectedDeliveryOptionsUpdateResponse: Codable {

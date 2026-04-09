@@ -334,9 +334,9 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         }
     }
 
-    // MARK: - upsertShippingAddress Strategy Tests
+    // MARK: - upsertShippingAddress Tests
 
-    func test_upsertShippingAddress_withExistingAddressID_shouldFollowRemoveThenAddStrategy() async throws {
+    func test_upsertShippingAddress_withExistingAddressID_shouldReplaceAddress() async throws {
         let address = StorefrontAPI.Address(
             address1: "123 New Street",
             city: "New City",
@@ -351,10 +351,10 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         let result = try await delegate.upsertShippingAddress(to: address)
         XCTAssertNotNil(result)
         XCTAssertEqual(delegate.selectedShippingAddressID, GraphQLScalars.ID("gid://shopify/CartSelectableAddress/1"))
-        XCTAssertNotNil(MockURLProtocol.lastOperation)
+        XCTAssertEqual(MockURLProtocol.lastOperation, "cartDeliveryAddressesReplace")
     }
 
-    func test_upsertShippingAddress_withNoExistingAddressID_shouldOnlyAdd() async throws {
+    func test_upsertShippingAddress_withNoExistingAddressID_shouldReplaceAddress() async throws {
         let address = StorefrontAPI.Address(
             address1: "123 New Street",
             city: "New City",
@@ -368,10 +368,10 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         let result = try await delegate.upsertShippingAddress(to: address)
         XCTAssertNotNil(result)
         XCTAssertEqual(delegate.selectedShippingAddressID, GraphQLScalars.ID("gid://shopify/CartSelectableAddress/1"))
-        XCTAssertNotNil(MockURLProtocol.lastOperation)
+        XCTAssertEqual(MockURLProtocol.lastOperation, "cartDeliveryAddressesReplace")
     }
 
-    func test_upsertShippingAddress_errorHandlingStrategy_shouldHandleRemoveFailures() async {
+    func test_upsertShippingAddress_shouldThrowOnReplaceFailure() async {
         let address = StorefrontAPI.Address(
             address1: "123 Test Street",
             city: "Test City",
@@ -382,12 +382,15 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
 
         delegate.selectedShippingAddressID = GraphQLScalars.ID("test-address-id")
 
-        MockURLProtocol.failRemove = true
+        MockURLProtocol.failReplace = true
         MockURLProtocol.lastOperation = nil
-        _ = try? await delegate.upsertShippingAddress(to: address)
-        XCTAssertEqual(delegate.selectedShippingAddressID, GraphQLScalars.ID("gid://shopify/CartSelectableAddress/1"))
-        XCTAssertNotNil(MockURLProtocol.lastOperation)
-        MockURLProtocol.failRemove = false
+        do {
+            _ = try await delegate.upsertShippingAddress(to: address)
+            XCTFail("Expected upsertShippingAddress to throw")
+        } catch {
+            XCTAssertEqual(MockURLProtocol.lastOperation, "cartDeliveryAddressesReplace")
+        }
+        MockURLProtocol.failReplace = false
     }
 
     // MARK: - Shipping Method Selection – Delegate Validation
@@ -632,8 +635,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
             "\"cost\":{\"totalAmount\":{\"amount\":\"0.00\",\"currencyCode\":\"USD\"}}," +
             "\"discountCodes\":[],\"discountAllocations\":[]}"
 
-        static var failRemove = false
-        static var failAdd = false
+        static var failReplace = false
         static var failDeliveryUpdate = false
         static var failPrepareForCompletion = false
         static var returnMappableCartUserError = false
@@ -645,9 +647,9 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
                 let json = "{" +
                     "\"data\":{\"cartPrepareForCompletion\":{\"result\":{\"__typename\":\"CartStatusReady\",\"cart\":" + mockCartResponse + "},\"userErrors\":[]}}}"
                 return Data(json.utf8)
-            } else if op == "cartDeliveryAddressesAdd" {
+            } else if op == "cartDeliveryAddressesReplace" {
                 let json = "{" +
-                    "\"data\":{\"cartDeliveryAddressesAdd\":{\"cart\":" + mockCartWithAddressResponse + ",\"userErrors\":[]}}}"
+                    "\"data\":{\"\(op)\":{\"cart\":" + mockCartWithAddressResponse + ",\"userErrors\":[]}}}"
                 return Data(json.utf8)
             } else {
                 let json = "{" +
@@ -666,18 +668,17 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
 
         override func startLoading() {
             let bodyStr = request.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-            let ops = ["cartDeliveryAddressesAdd", "cartDeliveryAddressesRemove", "cartSelectedDeliveryOptionsUpdate", "cartPrepareForCompletion"]
+            let ops = ["cartDeliveryAddressesReplace", "cartSelectedDeliveryOptionsUpdate", "cartPrepareForCompletion"]
             let op = ops.first { bodyStr.contains($0) } ?? {
                 // Fallback: if returnMappableCartUserError is true, assume it's cartSelectedDeliveryOptionsUpdate
                 if Self.returnMappableCartUserError {
                     return "cartSelectedDeliveryOptionsUpdate"
                 }
-                return "cartDeliveryAddressesAdd"
+                return "cartDeliveryAddressesReplace"
             }()
             Self.lastOperation = op
 
-            let shouldFail = (op == "cartDeliveryAddressesRemove" && Self.failRemove) ||
-                (op == "cartDeliveryAddressesAdd" && Self.failAdd) ||
+            let shouldFail = (op == "cartDeliveryAddressesReplace" && Self.failReplace) ||
                 (op == "cartSelectedDeliveryOptionsUpdate" && Self.failDeliveryUpdate) ||
                 (op == "cartPrepareForCompletion" && Self.failPrepareForCompletion)
             let data: Data
@@ -701,8 +702,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
         override func stopLoading() {}
         static func reset() {
             lastOperation = nil
-            failRemove = false
-            failAdd = false
+            failReplace = false
             failDeliveryUpdate = false
             failPrepareForCompletion = false
             returnMappableCartUserError = false
