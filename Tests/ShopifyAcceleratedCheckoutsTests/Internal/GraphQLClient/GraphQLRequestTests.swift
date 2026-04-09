@@ -93,12 +93,12 @@ final class GraphQLRequestTests: XCTestCase {
         XCTAssertTrue(operation.query.contains("cartBuyerIdentityUpdate("))
     }
 
-    func testCartDeliveryAddressesAddOperation() {
-        let operation = Operations.cartDeliveryAddressesAdd()
+    func testCartDeliveryAddressesReplaceOperation() {
+        let operation = Operations.cartDeliveryAddressesReplace()
 
-        XCTAssertTrue(operation.responseType == StorefrontAPI.CartDeliveryAddressesAddResponse.self)
-        XCTAssertTrue(operation.query.contains("mutation CartDeliveryAddressesAdd("))
-        XCTAssertTrue(operation.query.contains("cartDeliveryAddressesAdd("))
+        XCTAssertTrue(operation.responseType == StorefrontAPI.CartDeliveryAddressesReplaceResponse.self)
+        XCTAssertTrue(operation.query.contains("mutation CartDeliveryAddressesReplace("))
+        XCTAssertTrue(operation.query.contains("cartDeliveryAddressesReplace("))
     }
 
     func testCartSelectedDeliveryOptionsUpdateOperation() {

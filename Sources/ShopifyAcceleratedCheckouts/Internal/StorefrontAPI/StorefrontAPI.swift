@@ -32,7 +32,7 @@ class StorefrontAPI: ObservableObject, StorefrontAPIProtocol {
     /// - Parameters:
     ///   - storefrontDomain: The shop domain (e.g., "example.myshopify.com")
     ///   - storefrontAccessToken: The storefront access token
-    ///   - apiVersion: The API version to use (defaults to "2025-07")
+    ///   - apiVersion: The API version to use (defaults to "2025-10")
     ///   - countryCode: Optional country code for localization
     ///   - languageCode: Optional language code for localization
     init(
@@ -73,22 +73,10 @@ protocol StorefrontAPIProtocol {
         input buyerIdentity: StorefrontAPI.CartBuyerIdentityUpdateInput
     ) async throws -> StorefrontAPI.Cart
 
-    @discardableResult func cartDeliveryAddressesAdd(
+    @discardableResult func cartDeliveryAddressesReplace(
         id: GraphQLScalars.ID,
         address: StorefrontAPI.Address,
         validate: Bool
-    ) async throws -> StorefrontAPI.Cart
-
-    @discardableResult func cartDeliveryAddressesUpdate(
-        id: GraphQLScalars.ID,
-        addressId: GraphQLScalars.ID,
-        address: StorefrontAPI.Address,
-        validate: Bool
-    ) async throws -> StorefrontAPI.Cart
-
-    @discardableResult func cartDeliveryAddressesRemove(
-        id: GraphQLScalars.ID,
-        addressId: GraphQLScalars.ID
     ) async throws -> StorefrontAPI.Cart
 
     @discardableResult func cartSelectedDeliveryOptionsUpdate(

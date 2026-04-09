@@ -199,15 +199,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
 
             if try pkDecoder.isShippingRequired() {
                 let shippingAddress = try pkEncoder.shippingAddress.get()
-                let cart = try await upsertShippingAddress(to: shippingAddress, validate: true)
-
-                // TEMPORARY WORKAROUND: Re-apply the selected shipping method after upserting the address
-                // This is necessary because we're using cartDeliveryAddressesRemove + cartDeliveryAddressesAdd
-                // instead of cartDeliveryAddressesUpdate, which resets the selected shipping method.
-                // We only reapply if the selected shipping method has actually changed.
-                if shouldReapplyShippingMethod(cart: cart) {
-                    try await reapplySelectedShippingMethod()
-                }
+                try await upsertShippingAddress(to: shippingAddress, validate: true)
 
                 try await prepareCartForCompletion(id: cartID)
             } else {
@@ -260,46 +252,6 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         controller.dismiss {
             Task { try? await self.transition(to: .completed) }
         }
-    }
-
-    internal func shouldReapplyShippingMethod(cart: StorefrontAPI.Cart?) -> Bool {
-        // Check if we have a selected shipping method to reapply
-        guard let selectedDeliveryOptionHandle = try? pkEncoder.selectedDeliveryOptionHandle.get() else {
-            return false
-        }
-
-        // Check if the cart already has the correct shipping method selected
-        guard let cart else {
-            // If we can't determine the cart state, reapply to be safe
-            return true
-        }
-
-        let deliveryGroups = cart.deliveryGroups.nodes
-        guard !deliveryGroups.isEmpty else {
-            // If we can't determine the cart state, reapply to be safe
-            return true
-        }
-
-        // Use contains instead of manual loop for better performance
-        return !deliveryGroups.contains { group in
-            group.selectedDeliveryOption?.handle == selectedDeliveryOptionHandle.rawValue
-        }
-    }
-
-    internal func reapplySelectedShippingMethod() async throws {
-        guard let selectedDeliveryOptionHandle = try? pkEncoder.selectedDeliveryOptionHandle.get(),
-              let deliveryGroupID = try? pkEncoder.deliveryGroupID.get()
-        else {
-            return
-        }
-
-        let cartID = try pkEncoder.cartID.get()
-        _ = try await prepareCartForCompletion(id: cartID)
-        try await controller.storefront.cartSelectedDeliveryOptionsUpdate(
-            id: cartID,
-            deliveryGroupId: deliveryGroupID,
-            deliveryOptionHandle: selectedDeliveryOptionHandle.rawValue
-        )
     }
 
     /// `prepareCartForCompletion` ignores all violations — submit handles error surfacing.
