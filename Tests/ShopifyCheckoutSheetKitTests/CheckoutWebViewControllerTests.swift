@@ -193,6 +193,22 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertTrue(viewController.dismissAnimated)
     }
 
+    func test_checkoutViewDidFailWithError_doesNotAttemptRecoveryAfterCheckoutCompleted() {
+        let defaultDelegate = DefaultCheckoutDelegate()
+        let viewController = TestableCheckoutWebViewController(checkoutURL: url, delegate: defaultDelegate, entryPoint: nil)
+
+        // Simulate checkout completing before an error arrives
+        let completedEvent = createEmptyCheckoutCompletedEvent(id: "test-order-id")
+        viewController.checkoutViewDidCompleteCheckout(event: completedEvent)
+
+        // Now simulate a recoverable error (e.g. connection dropped after completion)
+        viewController.checkoutViewDidFailWithError(error: recoverableError)
+
+        XCTAssertEqual(viewController.checkoutViewDidFailWithErrorCount, 1)
+        XCTAssertFalse(viewController.presentFallbackViewControllerCalled, "Should not attempt recovery after checkout completed")
+        XCTAssertTrue(viewController.dismissCalled, "Should dismiss after checkout completed")
+    }
+
     func test_checkoutViewDidFailWithError_respectsErrorRecoverableProperty() {
         struct TestCase {
             let name: String
