@@ -66,7 +66,9 @@ extension KeyedDecodingContainer {
         var dictionary = [String: Any]()
 
         for key in allKeys {
-            if let boolValue = try? decode(Bool.self, forKey: key) {
+            if try decodeNil(forKey: key) {
+                dictionary[key.stringValue] = NSNull()
+            } else if let boolValue = try? decode(Bool.self, forKey: key) {
                 dictionary[key.stringValue] = boolValue
             } else if let stringValue = try? decode(String.self, forKey: key) {
                 dictionary[key.stringValue] = stringValue
@@ -88,7 +90,9 @@ extension UnkeyedDecodingContainer {
     mutating func decode(_: [Any].Type) throws -> [Any] {
         var array: [Any] = []
         while isAtEnd == false {
-            if let value = try? decode(Bool.self) {
+            if try decodeNil() {
+                array.append(NSNull())
+            } else if let value = try? decode(Bool.self) {
                 array.append(value)
             } else if let value = try? decode(Double.self) {
                 array.append(value)
@@ -98,6 +102,9 @@ extension UnkeyedDecodingContainer {
                 array.append(nestedDictionary)
             } else if let nestedArray = try? decode([Any].self) {
                 array.append(nestedArray)
+            } else {
+                // Skip unrecognized values to prevent infinite loops
+                break
             }
         }
         return array
