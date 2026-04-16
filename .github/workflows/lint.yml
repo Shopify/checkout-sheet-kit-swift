@@ -17,7 +17,7 @@ jobs:
 
   swiftformat:
     name: SwiftFormat & SwiftLint
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     env:
       MINT_PATH: ${{ github.workspace }}/.mint/lib
       MINT_LINK_PATH: ${{ github.workspace }}/.mint/bin
@@ -47,14 +47,14 @@ jobs:
 
   check-license-headers:
     name: License Headers
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: ./Scripts/ensure_license
 
   lint-podspec:
     name: CocoaPods
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ruby/setup-ruby@dffb23f65a78bba8db45d387d5ea1bbd6be3ef18 # v1.293.0

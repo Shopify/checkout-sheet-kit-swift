@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     timeout-minutes: 20
 
     steps:
