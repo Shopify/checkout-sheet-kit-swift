@@ -104,9 +104,19 @@ jobs:
             BODY+="- **SwiftFormat**: \`${{ steps.current.outputs.swiftformat }}\` → \`${{ steps.latest.outputs.swiftformat }}\`\n"
             BODY+="  [Release notes](https://github.com/nicklockwood/SwiftFormat/releases/tag/${{ steps.latest.outputs.swiftformat }})\n"
           fi
-          BODY+="\n---\n"
-          BODY+="\`./Scripts/lint fix\` has been run to apply formatting changes.\n"
-          BODY+="Review the diff and merge when ready."
+          BODY+="\n---\n\n"
+          BODY+="\`./Scripts/lint fix\` has been run to apply formatting changes.\n\n"
+          BODY+="### ⚠️ CI checks need to be triggered manually\n\n"
+          BODY+="This PR was created by GitHub Actions using \`GITHUB_TOKEN\`, which "
+          BODY+="[does not trigger other workflows](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow). "
+          BODY+="To run CI checks, either:\n\n"
+          BODY+="1. **Close and reopen this PR** — this fires a new \`pull_request\` event from your user, which triggers all checks.\n"
+          BODY+="2. **Trigger workflows via CLI:**\n"
+          BODY+="\`\`\`bash\n"
+          BODY+="gh workflow run build-samples.yml --ref auto/update-linters\n"
+          BODY+="gh workflow run lint.yml --ref auto/update-linters\n"
+          BODY+="gh workflow run test-package.yml --ref auto/update-linters\n"
+          BODY+="\`\`\`\n"
 
           gh pr create \
             --title "chore: bump linter versions" \
