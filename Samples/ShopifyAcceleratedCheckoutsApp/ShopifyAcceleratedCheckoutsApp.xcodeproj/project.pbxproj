@@ -629,9 +629,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		CBCDA6652E2117AF000463E9 /* XCLocalSwiftPackageReference "../../../checkout-sheet-kit-swift" */ = {
+		CBCDA6652E2117AF000463E9 /* XCLocalSwiftPackageReference "../.." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../checkout-sheet-kit-swift";
+			relativePath = "../..";
 		};
 /* End XCLocalSwiftPackageReference section */
 
