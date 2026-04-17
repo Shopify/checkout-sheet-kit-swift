@@ -116,17 +116,18 @@ struct CartBuilderView: View {
     private func createCustomCart() {
         isCreatingCart = true
 
-        Network.shared.createCart(merchandiseQuantities: selectedVariants, configuration: configuration) { cart in
+        Task {
+            let cart = await Network.shared.createCart(
+                merchandiseQuantities: selectedVariants,
+                configuration: configuration
+            )
             withAnimation {
                 self.cart = cart
                 isCreatingCart = false
-                // Clear selections after creating cart
                 selectedVariants.removeAll()
             }
-            // Trigger scroll to cart after creation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                scrollTo(element: .cartDetails)
-            }
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            scrollTo(element: .cartDetails)
         }
     }
 
@@ -154,20 +155,14 @@ struct CartBuilderView: View {
             isLoadingProducts = false
         }
 
-        await withCheckedContinuation { continuation in
-            Network.shared.getProducts { products in
-                DispatchQueue.main.async {
-                    if let products {
-                        print("Loaded \(products.nodes.count) products")
-                        withAnimation {
-                            allProducts = products.nodes
-                        }
-                    } else {
-                        print("Warning: No products returned from API")
-                    }
-                    continuation.resume()
-                }
+        let products = await Network.shared.getProducts()
+        if let products {
+            print("Loaded \(products.nodes.count) products")
+            withAnimation {
+                allProducts = products.nodes
             }
+        } else {
+            print("Warning: No products returned from API")
         }
     }
 }

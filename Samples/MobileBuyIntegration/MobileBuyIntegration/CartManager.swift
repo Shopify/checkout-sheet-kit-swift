@@ -21,8 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@preconcurrency import Apollo
-@preconcurrency import ApolloAPI
+import Apollo
+import ApolloAPI
 import Combine
 import Foundation
 import PassKit
@@ -114,7 +114,7 @@ class CartManager: ObservableObject {
         }
 
         let lines = [
-            Storefront.CartLineUpdateInput(id: id, quantity: .some(quantity))
+            Storefront.CartLineUpdateInput(id: id, quantity: .some(Int32(quantity)))
         ]
 
         let network = Network.shared
@@ -196,27 +196,20 @@ class CartManager: ObservableObject {
         }
     }
 
-    private func performMutation<T: GraphQLMutation>(_ mutation: T) async throws -> T.Data {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<T.Data, Error>) in
-            Network.shared.apollo.perform(mutation: mutation) { result in
-                switch result {
-                case let .success(response):
-                    if let data = response.data {
-                        continuation.resume(returning: data)
-                    } else if let errors = response.errors {
-                        continuation.resume(
-                            throwing: Errors.apiErrors(
-                                requestName: String(describing: T.self),
-                                message: errors.map { $0.message ?? "" }.joined(separator: ", ")
-                            )
-                        )
-                    } else {
-                        continuation.resume(throwing: Errors.payloadUnwrap)
-                    }
-                case let .failure(error):
-                    continuation.resume(throwing: error)
-                }
-            }
+    private func performMutation<T: GraphQLMutation>(_ mutation: T) async throws -> T.Data
+        where T.ResponseFormat == SingleResponseFormat
+    {
+        let response = try await Network.shared.apollo.perform(mutation: mutation)
+
+        if let data = response.data {
+            return data
+        } else if let errors = response.errors {
+            throw Errors.apiErrors(
+                requestName: String(describing: T.self),
+                message: errors.map { $0.message ?? "" }.joined(separator: ", ")
+            )
+        } else {
+            throw Errors.payloadUnwrap
         }
     }
 

@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
     struct CartUserErrorFragment: Storefront.SelectionSet, Fragment {
@@ -21,7 +22,7 @@ extension Storefront {
         static var __selections: [ApolloAPI.Selection] {
             [
                 .field("__typename", String.self),
-                .field("code", String?.self),
+                .field("code", GraphQLEnum<Storefront.CartErrorCode>?.self),
                 .field("message", String.self),
                 .field("field", [String]?.self)
             ]
@@ -33,14 +34,17 @@ extension Storefront {
             ]
         }
 
-        var code: String? {
+        /// The error code.
+        var code: GraphQLEnum<Storefront.CartErrorCode>? {
             __data["code"]
         }
 
+        /// The error message.
         var message: String {
             __data["message"]
         }
 
+        /// The path to the input field that caused the error.
         var field: [String]? {
             __data["field"]
         }

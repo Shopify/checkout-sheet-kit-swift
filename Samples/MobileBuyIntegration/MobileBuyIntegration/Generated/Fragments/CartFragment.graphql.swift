@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
     struct CartFragment: Storefront.SelectionSet, Fragment {
@@ -22,7 +23,7 @@ extension Storefront {
             [
                 .field("__typename", String.self),
                 .field("id", Storefront.ID.self),
-                .field("checkoutUrl", String.self),
+                .field("checkoutUrl", Storefront.URL.self),
                 .field("totalQuantity", Int.self),
                 .field("buyerIdentity", BuyerIdentity.self),
                 .field("deliveryGroups", DeliveryGroups.self, arguments: ["first": 10]),
@@ -37,30 +38,38 @@ extension Storefront {
             ]
         }
 
+        /// A globally-unique ID.
         var id: Storefront.ID {
             __data["id"]
         }
 
-        var checkoutUrl: String {
+        /// The URL of the checkout for the cart.
+        var checkoutUrl: Storefront.URL {
             __data["checkoutUrl"]
         }
 
+        /// The total number of items in the cart.
         var totalQuantity: Int {
             __data["totalQuantity"]
         }
 
+        /// Information about the buyer that's interacting with the cart.
         var buyerIdentity: BuyerIdentity {
             __data["buyerIdentity"]
         }
 
+        /// The delivery groups available for the cart, based on the buyer identity default
+        /// delivery address preference or the default address of the logged-in customer.
         var deliveryGroups: DeliveryGroups {
             __data["deliveryGroups"]
         }
 
+        /// A list of lines containing information about the items the customer intends to purchase.
         var lines: Lines {
             __data["lines"]
         }
 
+        /// The estimated costs that the buyer will pay at checkout. The costs are subject to change and changes will be reflected at checkout. The `cost` field uses the `buyerIdentity` field to determine [international pricing](https://shopify.dev/custom-storefronts/internationalization/international-pricing).
         var cost: Cost {
             __data["cost"]
         }
@@ -93,14 +102,17 @@ extension Storefront {
                 ]
             }
 
+            /// The email address of the buyer that's interacting with the cart.
             var email: String? {
                 __data["email"]
             }
 
+            /// The phone number of the buyer that's interacting with the cart.
             var phone: String? {
                 __data["phone"]
             }
 
+            /// The customer account associated with the cart.
             var customer: Customer? {
                 __data["customer"]
             }
@@ -132,10 +144,12 @@ extension Storefront {
                     ]
                 }
 
+                /// The customer’s email address.
                 var email: String? {
                     __data["email"]
                 }
 
+                /// The customer’s phone number.
                 var phone: String? {
                     __data["phone"]
                 }
@@ -168,6 +182,7 @@ extension Storefront {
                 ]
             }
 
+            /// A list of the nodes contained in CartDeliveryGroupEdge.
             var nodes: [Node] {
                 __data["nodes"]
             }
@@ -199,22 +214,27 @@ extension Storefront {
                     ]
                 }
 
+                /// The ID for the delivery group.
                 var id: Storefront.ID {
                     __data["id"]
                 }
 
-                var groupType: GraphQLEnum<Storefront.CartDeliveryGroupType>? {
+                /// The type of merchandise in the delivery group.
+                var groupType: GraphQLEnum<Storefront.CartDeliveryGroupType> {
                     __data["groupType"]
                 }
 
-                var deliveryAddress: DeliveryAddress? {
+                /// The destination address for the delivery group.
+                var deliveryAddress: DeliveryAddress {
                     __data["deliveryAddress"]
                 }
 
+                /// The delivery options available for the delivery group.
                 var deliveryOptions: [DeliveryOption] {
                     __data["deliveryOptions"]
                 }
 
+                /// The selected delivery option for the delivery group.
                 var selectedDeliveryOption: SelectedDeliveryOption? {
                     __data["selectedDeliveryOption"]
                 }
@@ -264,6 +284,7 @@ extension Storefront {
                 ]
             }
 
+            /// A list of the nodes contained in BaseCartLineEdge.
             var nodes: [Node] {
                 __data["nodes"]
             }
@@ -295,18 +316,22 @@ extension Storefront {
                     ]
                 }
 
+                /// A globally-unique ID.
                 var id: Storefront.ID {
                     __data["id"]
                 }
 
+                /// The quantity of the merchandise that the customer intends to purchase.
                 var quantity: Int {
                     __data["quantity"]
                 }
 
+                /// The merchandise that the buyer intends to purchase.
                 var merchandise: Merchandise {
                     __data["merchandise"]
                 }
 
+                /// The cost of the merchandise that the buyer will pay for at checkout. The costs are subject to change and changes will be reflected at checkout.
                 var cost: Cost {
                     __data["cost"]
                 }
@@ -356,14 +381,18 @@ extension Storefront {
                 ]
             }
 
+            /// The total amount for the customer to pay.
             var totalAmount: TotalAmount {
                 __data["totalAmount"]
             }
 
+            /// The amount, before taxes and cart-level discounts, for the customer to pay.
             var subtotalAmount: SubtotalAmount {
                 __data["subtotalAmount"]
             }
 
+            /// The tax amount for the customer to pay at checkout.
+            @available(*, deprecated, message: "Tax and duty amounts are no longer available and will be removed in a future version.\nPlease see [the changelog](https://shopify.dev/changelog/tax-and-duties-are-deprecated-in-storefront-cart-api)\nfor more information.")
             var totalTaxAmount: TotalTaxAmount? {
                 __data["totalTaxAmount"]
             }
@@ -384,7 +413,7 @@ extension Storefront {
                 static var __selections: [ApolloAPI.Selection] {
                     [
                         .field("__typename", String.self),
-                        .field("amount", String.self),
+                        .field("amount", Storefront.Decimal.self),
                         .field("currencyCode", GraphQLEnum<Storefront.CurrencyCode>.self)
                     ]
                 }
@@ -395,10 +424,12 @@ extension Storefront {
                     ]
                 }
 
-                var amount: String {
+                /// Decimal money amount.
+                var amount: Storefront.Decimal {
                     __data["amount"]
                 }
 
+                /// Currency of the money.
                 var currencyCode: GraphQLEnum<Storefront.CurrencyCode> {
                     __data["currencyCode"]
                 }
@@ -420,7 +451,7 @@ extension Storefront {
                 static var __selections: [ApolloAPI.Selection] {
                     [
                         .field("__typename", String.self),
-                        .field("amount", String.self),
+                        .field("amount", Storefront.Decimal.self),
                         .field("currencyCode", GraphQLEnum<Storefront.CurrencyCode>.self)
                     ]
                 }
@@ -431,10 +462,12 @@ extension Storefront {
                     ]
                 }
 
-                var amount: String {
+                /// Decimal money amount.
+                var amount: Storefront.Decimal {
                     __data["amount"]
                 }
 
+                /// Currency of the money.
                 var currencyCode: GraphQLEnum<Storefront.CurrencyCode> {
                     __data["currencyCode"]
                 }
@@ -456,7 +489,7 @@ extension Storefront {
                 static var __selections: [ApolloAPI.Selection] {
                     [
                         .field("__typename", String.self),
-                        .field("amount", String.self),
+                        .field("amount", Storefront.Decimal.self),
                         .field("currencyCode", GraphQLEnum<Storefront.CurrencyCode>.self)
                     ]
                 }
@@ -467,10 +500,12 @@ extension Storefront {
                     ]
                 }
 
-                var amount: String {
+                /// Decimal money amount.
+                var amount: Storefront.Decimal {
                     __data["amount"]
                 }
 
+                /// Currency of the money.
                 var currencyCode: GraphQLEnum<Storefront.CurrencyCode> {
                     __data["currencyCode"]
                 }
