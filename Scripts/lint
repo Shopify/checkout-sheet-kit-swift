@@ -108,3 +108,26 @@ if [ $FORMAT_STATUS -ne 0 ]; then
     print_linting_error "SwiftFormat"
     exit 1
 fi
+
+# Run CocoaPods lint (check mode only, not applicable to fix)
+# Skip with --skip-pod (e.g. in CI where pod lint runs as a separate job)
+SKIP_POD=false
+if [[ "$*" == *"--skip-pod"* ]]; then
+    SKIP_POD=true
+fi
+
+if [[ "$MODE" == "check" && "$SKIP_POD" == "false" ]]; then
+    echo ""
+    echo "🔍 Running CocoaPods lint..."
+    bundle exec pod lib lint --allow-warnings
+    POD_STATUS=$?
+
+    if [ $POD_STATUS -eq 0 ]; then
+        echo "✅ CocoaPods lint exit status: $POD_STATUS"
+    else
+        echo "❌ CocoaPods lint exit status: $POD_STATUS"
+        echo "❌ CocoaPods detected issues that need to be fixed."
+        echo "🔧 Run 'bundle exec pod lib lint --allow-warnings --verbose' for details"
+        exit 1
+    fi
+fi

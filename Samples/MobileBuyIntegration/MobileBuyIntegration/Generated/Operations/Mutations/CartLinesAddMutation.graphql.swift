@@ -2,9 +2,10 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
-    class CartLinesAddMutation: GraphQLMutation {
+    struct CartLinesAddMutation: GraphQLMutation {
         static let operationName: String = "CartLinesAdd"
         static let operationDocument: ApolloAPI.OperationDocument = .init(
             definition: .init(
@@ -30,7 +31,7 @@ extension Storefront {
             self.language = language
         }
 
-        public var __variables: Variables? {
+        @_spi(Unsafe) public var __variables: Variables? {
             [
                 "cartId": cartId,
                 "lines": lines,
@@ -64,6 +65,9 @@ extension Storefront {
                 ]
             }
 
+            /// Adds one or more merchandise lines to an existing [`Cart`](https://shopify.dev/docs/api/storefront/current/objects/Cart). Each line specifies the [product variant](https://shopify.dev/docs/api/storefront/current/objects/ProductVariant) to purchase. Quantity defaults to `1` if not provided.
+            ///
+            /// You can add up to 250 lines in a single request. Use [`CartLineInput`](https://shopify.dev/docs/api/storefront/current/input-objects/CartLineInput) to configure each line's merchandise, quantity, selling plan, custom attributes, and any parent relationships for nested line items such as warranties or add-ons.
             var cartLinesAdd: CartLinesAdd? {
                 __data["cartLinesAdd"]
             }
@@ -95,10 +99,12 @@ extension Storefront {
                     ]
                 }
 
+                /// The updated cart.
                 var cart: Cart? {
                     __data["cart"]
                 }
 
+                /// The list of errors that occurred from executing the mutation.
                 var userErrors: [UserError] {
                     __data["userErrors"]
                 }
@@ -130,30 +136,38 @@ extension Storefront {
                         ]
                     }
 
+                    /// A globally-unique ID.
                     var id: Storefront.ID {
                         __data["id"]
                     }
 
-                    var checkoutUrl: String {
+                    /// The URL of the checkout for the cart.
+                    var checkoutUrl: Storefront.URL {
                         __data["checkoutUrl"]
                     }
 
+                    /// The total number of items in the cart.
                     var totalQuantity: Int {
                         __data["totalQuantity"]
                     }
 
+                    /// Information about the buyer that's interacting with the cart.
                     var buyerIdentity: BuyerIdentity {
                         __data["buyerIdentity"]
                     }
 
+                    /// The delivery groups available for the cart, based on the buyer identity default
+                    /// delivery address preference or the default address of the logged-in customer.
                     var deliveryGroups: DeliveryGroups {
                         __data["deliveryGroups"]
                     }
 
+                    /// A list of lines containing information about the items the customer intends to purchase.
                     var lines: Lines {
                         __data["lines"]
                     }
 
+                    /// The estimated costs that the buyer will pay at checkout. The costs are subject to change and changes will be reflected at checkout. The `cost` field uses the `buyerIdentity` field to determine [international pricing](https://shopify.dev/custom-storefronts/internationalization/international-pricing).
                     var cost: Cost {
                         __data["cost"]
                     }
@@ -205,14 +219,17 @@ extension Storefront {
                         ]
                     }
 
-                    var code: String? {
+                    /// The error code.
+                    var code: GraphQLEnum<Storefront.CartErrorCode>? {
                         __data["code"]
                     }
 
+                    /// The error message.
                     var message: String {
                         __data["message"]
                     }
 
+                    /// The path to the input field that caused the error.
                     var field: [String]? {
                         __data["field"]
                     }

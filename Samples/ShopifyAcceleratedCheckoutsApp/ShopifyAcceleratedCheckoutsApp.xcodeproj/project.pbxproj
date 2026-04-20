@@ -629,9 +629,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		CBCDA6652E2117AF000463E9 /* XCLocalSwiftPackageReference "../../../checkout-sheet-kit-swift" */ = {
+		CBCDA6652E2117AF000463E9 /* XCLocalSwiftPackageReference "../.." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../checkout-sheet-kit-swift";
+			relativePath = "../..";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -641,7 +641,7 @@
 			repositoryURL = "https://github.com/apollographql/apollo-ios.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.23.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

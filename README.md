@@ -45,6 +45,7 @@
   - [Render accelerated checkout buttons](#render-accelerated-checkout-buttons)
     - [Customize wallet options](#customize-wallet-options)
     - [Modify the Apple Pay button label](#modify-the-apple-pay-button-label)
+    - [Customize the Apple Pay button style](#customize-the-apple-pay-button-style)
     - [Customize button corners](#customize-button-corners)
   - [Handle loading, errors, and lifecycle events](#handle-loading-errors-and-lifecycle-events)
   - [Troubleshooting](#troubleshooting)
@@ -586,7 +587,7 @@ Update your package manifest to import `ShopifyAcceleratedCheckouts` alongside `
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "3.6.0")
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "3.8.0")
 ]
 ```
 
@@ -733,6 +734,15 @@ Use `.applePayLabel(_:)` to map to the native `PayWithApplePayButtonLabel` value
 ```swift
 AcceleratedCheckoutButtons(cartID: cartID)
     .applePayLabel(.buy)
+```
+
+#### Customize the Apple Pay button style
+
+Use `.applePayStyle(_:)` to set the color style of the Apple Pay button. The modifier accepts a `PayWithApplePayButtonStyle` value. The default is `.automatic`, which adapts to the current appearance (light/dark mode).
+
+```swift
+AcceleratedCheckoutButtons(cartID: cartID)
+    .applePayStyle(.whiteOutline)
 ```
 
 #### Customize button corners

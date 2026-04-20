@@ -323,28 +323,11 @@ class MockStorefrontAPI: StorefrontAPIProtocol {
         )
     }
 
-    func cartDeliveryAddressesAdd(
+    func cartDeliveryAddressesReplace(
         id _: GraphQLScalars.ID, address _: StorefrontAPI.Address, validate _: Bool
     ) async throws -> StorefrontAPI.Cart {
         fatalError(
-            "cartDeliveryAddressesAdd(id:address:validate:) not implemented in test. Override this method in your test class."
-        )
-    }
-
-    func cartDeliveryAddressesUpdate(
-        id _: GraphQLScalars.ID, addressId _: GraphQLScalars.ID, address _: StorefrontAPI.Address,
-        validate _: Bool
-    ) async throws -> StorefrontAPI.Cart {
-        fatalError(
-            "cartDeliveryAddressesUpdate(id:addressId:address:validate:) not implemented in test. Override this method in your test class."
-        )
-    }
-
-    func cartDeliveryAddressesRemove(id _: GraphQLScalars.ID, addressId _: GraphQLScalars.ID)
-        async throws -> StorefrontAPI.Cart
-    {
-        fatalError(
-            "cartDeliveryAddressesRemove(id:addressId:) not implemented in test. Override this method in your test class."
+            "cartDeliveryAddressesReplace(id:address:validate:) not implemented in test. Override this method in your test class."
         )
     }
 

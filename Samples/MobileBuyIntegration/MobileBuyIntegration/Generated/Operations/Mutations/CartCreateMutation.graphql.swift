@@ -2,9 +2,10 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
-    class CartCreateMutation: GraphQLMutation {
+    struct CartCreateMutation: GraphQLMutation {
         static let operationName: String = "CartCreate"
         static let operationDocument: ApolloAPI.OperationDocument = .init(
             definition: .init(
@@ -27,7 +28,7 @@ extension Storefront {
             self.language = language
         }
 
-        public var __variables: Variables? {
+        @_spi(Unsafe) public var __variables: Variables? {
             [
                 "input": input,
                 "country": country,
@@ -57,6 +58,9 @@ extension Storefront {
                 ]
             }
 
+            /// Creates a new [`Cart`](https://shopify.dev/docs/api/storefront/current/objects/Cart) for a buyer session. You can optionally initialize the cart with merchandise lines, discount codes, gift card codes, buyer identity for international pricing, and custom attributes.
+            ///
+            /// The returned cart includes a `checkoutUrl` that directs the buyer to complete their purchase.
             var cartCreate: CartCreate? {
                 __data["cartCreate"]
             }
@@ -88,10 +92,12 @@ extension Storefront {
                     ]
                 }
 
+                /// The new cart.
                 var cart: Cart? {
                     __data["cart"]
                 }
 
+                /// The list of errors that occurred from executing the mutation.
                 var userErrors: [UserError] {
                     __data["userErrors"]
                 }
@@ -123,30 +129,38 @@ extension Storefront {
                         ]
                     }
 
+                    /// A globally-unique ID.
                     var id: Storefront.ID {
                         __data["id"]
                     }
 
-                    var checkoutUrl: String {
+                    /// The URL of the checkout for the cart.
+                    var checkoutUrl: Storefront.URL {
                         __data["checkoutUrl"]
                     }
 
+                    /// The total number of items in the cart.
                     var totalQuantity: Int {
                         __data["totalQuantity"]
                     }
 
+                    /// Information about the buyer that's interacting with the cart.
                     var buyerIdentity: BuyerIdentity {
                         __data["buyerIdentity"]
                     }
 
+                    /// The delivery groups available for the cart, based on the buyer identity default
+                    /// delivery address preference or the default address of the logged-in customer.
                     var deliveryGroups: DeliveryGroups {
                         __data["deliveryGroups"]
                     }
 
+                    /// A list of lines containing information about the items the customer intends to purchase.
                     var lines: Lines {
                         __data["lines"]
                     }
 
+                    /// The estimated costs that the buyer will pay at checkout. The costs are subject to change and changes will be reflected at checkout. The `cost` field uses the `buyerIdentity` field to determine [international pricing](https://shopify.dev/custom-storefronts/internationalization/international-pricing).
                     var cost: Cost {
                         __data["cost"]
                     }
@@ -198,14 +212,17 @@ extension Storefront {
                         ]
                     }
 
-                    var code: String? {
+                    /// The error code.
+                    var code: GraphQLEnum<Storefront.CartErrorCode>? {
                         __data["code"]
                     }
 
+                    /// The error message.
                     var message: String {
                         __data["message"]
                     }
 
+                    /// The path to the input field that caused the error.
                     var field: [String]? {
                         __data["field"]
                     }

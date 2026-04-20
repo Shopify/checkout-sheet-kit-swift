@@ -4,9 +4,10 @@
 import ApolloAPI
 
 extension Storefront.Objects {
+    /// Represents an error that happens during execution of a cart mutation.
     static let CartUserError = ApolloAPI.Object(
         typename: "CartUserError",
-        implementedInterfaces: [],
+        implementedInterfaces: [Storefront.Interfaces.DisplayableError.self],
         keyFields: nil
     )
 }

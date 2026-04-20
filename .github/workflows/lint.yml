@@ -17,7 +17,7 @@ jobs:
 
   swiftformat:
     name: SwiftFormat & SwiftLint
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     env:
       MINT_PATH: ${{ github.workspace }}/.mint/lib
       MINT_LINK_PATH: ${{ github.workspace }}/.mint/bin
@@ -26,7 +26,7 @@ jobs:
 
       - name: Cache Mint packages
         id: mint-cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: .mint
           key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
@@ -43,18 +43,18 @@ jobs:
       - name: Add Mint to PATH
         run: echo "${{ github.workspace }}/.mint/bin" >> "$GITHUB_PATH"
 
-      - run: ./Scripts/lint check --verbose
+      - run: ./Scripts/lint check --verbose --skip-pod
 
   check-license-headers:
     name: License Headers
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: ./Scripts/ensure_license
 
   lint-podspec:
     name: CocoaPods
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ruby/setup-ruby@dffb23f65a78bba8db45d387d5ea1bbd6be3ef18 # v1.293.0
