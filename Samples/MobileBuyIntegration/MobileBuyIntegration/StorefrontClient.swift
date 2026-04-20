@@ -102,7 +102,8 @@ class StorefrontInputFactory {
             )
 
             let buyerIdentity = Storefront.CartBuyerIdentityInput(
-                email: .some(vaultedContactInfo.email),
+                email: vaultedContactInfo.email.isEmpty ? .none : .some(vaultedContactInfo.email),
+                phone: vaultedContactInfo.phone.isEmpty ? .none : .some(vaultedContactInfo.phone),
                 customerAccessToken: customerAccessToken.map { .some($0) } ?? .none
             )
 
