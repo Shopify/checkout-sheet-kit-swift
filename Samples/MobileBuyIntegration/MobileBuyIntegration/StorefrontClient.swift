@@ -86,30 +86,42 @@ class StorefrontInputFactory {
             return Storefront.CartInput(lines: lines)
 
         case .hardcoded:
-            let deliveryAddress = Storefront.MailingAddressInput(
+            let deliveryAddress = Storefront.CartDeliveryAddressInput(
                 address1: .some(vaultedContactInfo.address1),
                 address2: .some(vaultedContactInfo.address2),
                 city: .some(vaultedContactInfo.city),
                 company: .some(""),
-                country: .some(vaultedContactInfo.country),
+                countryCode: .some(GraphQLEnum(
+                    Storefront.CountryCode(rawValue: vaultedContactInfo.country) ?? .us
+                )),
                 firstName: .some(vaultedContactInfo.firstName),
                 lastName: .some(vaultedContactInfo.lastName),
                 phone: .some(vaultedContactInfo.phone),
-                province: .some(vaultedContactInfo.province),
+                provinceCode: .some(vaultedContactInfo.province),
                 zip: .some(vaultedContactInfo.zip)
             )
 
             let buyerIdentity = Storefront.CartBuyerIdentityInput(
                 email: .some(vaultedContactInfo.email),
-                customerAccessToken: customerAccessToken.map { .some($0) } ?? .none,
-                deliveryAddressPreferences: .some([
-                    Storefront.DeliveryAddressInput(deliveryAddress: .some(deliveryAddress))
+                customerAccessToken: customerAccessToken.map { .some($0) } ?? .none
+            )
+
+            let delivery = Storefront.CartDeliveryInput(
+                addresses: .some([
+                    Storefront.CartSelectableAddressInput(
+                        address: Storefront.CartAddressInput(
+                            deliveryAddress: .some(deliveryAddress)
+                        ),
+                        selected: .some(true),
+                        oneTimeUse: .some(true)
+                    )
                 ])
             )
 
             return Storefront.CartInput(
                 lines: lines,
-                buyerIdentity: .some(buyerIdentity)
+                buyerIdentity: .some(buyerIdentity),
+                delivery: .some(delivery)
             )
 
         case .customerAccount:

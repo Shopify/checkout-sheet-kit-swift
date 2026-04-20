@@ -1,33 +1,10 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 import ApolloAPI
 
 extension Storefront.Interfaces {
-    /// An object with an ID field to support global identification, in accordance with the
-    /// [Relay specification](https://relay.dev/graphql/objectidentification.htm#sec-Node-Interface).
-    /// This interface is used by the [node](/docs/api/storefront/latest/queries/node)
-    /// and [nodes](/docs/api/storefront/latest/queries/nodes) queries.
+    /// Enables global object identification following the [Relay specification](https://relay.dev/graphql/objectidentification.htm#sec-Node-Interface). Any type implementing this interface has a globally-unique `id` field and can be fetched directly using the [`node`](https://shopify.dev/docs/api/storefront/current/queries/node) or [`nodes`](https://shopify.dev/docs/api/storefront/current/queries/nodes) queries.
     static let Node = ApolloAPI.Interface(
         name: "Node",
         keyFields: nil,
@@ -37,8 +14,6 @@ extension Storefront.Interfaces {
             "Blog",
             "Cart",
             "CartLine",
-            "Checkout",
-            "CheckoutLineItem",
             "Collection",
             "Comment",
             "Company",
@@ -59,12 +34,16 @@ extension Storefront.Interfaces {
             "Model3d",
             "Order",
             "Page",
-            "Payment",
             "Product",
             "ProductOption",
+            "ProductOptionValue",
             "ProductVariant",
             "Shop",
+            "ShopPayInstallmentsFinancingPlan",
+            "ShopPayInstallmentsFinancingPlanTerm",
+            "ShopPayInstallmentsProductVariantPricing",
             "ShopPolicy",
+            "TaxonomyCategory",
             "UrlRedirect",
             "Video"
         ]

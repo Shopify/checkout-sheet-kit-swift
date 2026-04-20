@@ -1,9 +1,12 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
+    /// The input fields for creating a [`Cart`](https://shopify.dev/docs/api/storefront/current/objects/Cart). Used by the [`cartCreate`](https://shopify.dev/docs/api/storefront/current/mutations/cartCreate) mutation.
+    ///
+    /// Accepts merchandise lines, discount codes, gift card codes, and a note. You can also set custom attributes, metafields, buyer identity for international pricing, and delivery addresses.
     struct CartInput: InputObject {
         private(set) var __data: InputDict
 
@@ -12,23 +15,85 @@ extension Storefront {
         }
 
         init(
+            attributes: GraphQLNullable<[AttributeInput]> = nil,
             lines: GraphQLNullable<[CartLineInput]> = nil,
-            buyerIdentity: GraphQLNullable<CartBuyerIdentityInput> = nil
+            discountCodes: GraphQLNullable<[String]> = nil,
+            giftCardCodes: GraphQLNullable<[String]> = nil,
+            note: GraphQLNullable<String> = nil,
+            buyerIdentity: GraphQLNullable<CartBuyerIdentityInput> = nil,
+            delivery: GraphQLNullable<CartDeliveryInput> = nil,
+            metafields: GraphQLNullable<[CartInputMetafieldInput]> = nil
         ) {
             __data = InputDict([
+                "attributes": attributes,
                 "lines": lines,
-                "buyerIdentity": buyerIdentity
+                "discountCodes": discountCodes,
+                "giftCardCodes": giftCardCodes,
+                "note": note,
+                "buyerIdentity": buyerIdentity,
+                "delivery": delivery,
+                "metafields": metafields
             ])
         }
 
+        /// An array of key-value pairs that contains additional information about the cart.
+        ///
+        /// The input must not contain more than `250` values.
+        var attributes: GraphQLNullable<[AttributeInput]> {
+            get { __data["attributes"] }
+            set { __data["attributes"] = newValue }
+        }
+
+        /// A list of merchandise lines to add to the cart.
+        ///
+        /// The input must not contain more than `250` values.
         var lines: GraphQLNullable<[CartLineInput]> {
             get { __data["lines"] }
             set { __data["lines"] = newValue }
         }
 
+        /// The case-insensitive discount codes that the customer added at checkout.
+        ///
+        /// The input must not contain more than `250` values.
+        var discountCodes: GraphQLNullable<[String]> {
+            get { __data["discountCodes"] }
+            set { __data["discountCodes"] = newValue }
+        }
+
+        /// The case-insensitive gift card codes.
+        ///
+        /// The input must not contain more than `250` values.
+        var giftCardCodes: GraphQLNullable<[String]> {
+            get { __data["giftCardCodes"] }
+            set { __data["giftCardCodes"] = newValue }
+        }
+
+        /// A note that's associated with the cart. For example, the note can be a personalized message to the buyer.
+        var note: GraphQLNullable<String> {
+            get { __data["note"] }
+            set { __data["note"] = newValue }
+        }
+
+        /// The customer associated with the cart. Used to determine [international pricing]
+        /// (https://shopify.dev/custom-storefronts/internationalization/international-pricing).
+        /// Buyer identity should match the customer's shipping address.
         var buyerIdentity: GraphQLNullable<CartBuyerIdentityInput> {
             get { __data["buyerIdentity"] }
             set { __data["buyerIdentity"] = newValue }
+        }
+
+        /// The delivery-related fields for the cart.
+        var delivery: GraphQLNullable<CartDeliveryInput> {
+            get { __data["delivery"] }
+            set { __data["delivery"] = newValue }
+        }
+
+        /// The metafields to associate with this cart.
+        ///
+        /// The input must not contain more than `250` values.
+        var metafields: GraphQLNullable<[CartInputMetafieldInput]> {
+            get { __data["metafields"] }
+            set { __data["metafields"] = newValue }
         }
     }
 }
