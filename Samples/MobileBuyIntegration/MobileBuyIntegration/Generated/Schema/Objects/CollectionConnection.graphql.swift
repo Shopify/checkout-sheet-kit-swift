@@ -4,6 +4,7 @@
 import ApolloAPI
 
 extension Storefront.Objects {
+    /// An auto-generated type for paginating through multiple Collections.
     static let CollectionConnection = ApolloAPI.Object(
         typename: "CollectionConnection",
         implementedInterfaces: [],

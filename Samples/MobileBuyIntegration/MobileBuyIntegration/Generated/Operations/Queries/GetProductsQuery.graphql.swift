@@ -2,9 +2,10 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
-    class GetProductsQuery: GraphQLQuery {
+    struct GetProductsQuery: GraphQLQuery {
         static let operationName: String = "GetProducts"
         static let operationDocument: ApolloAPI.OperationDocument = .init(
             definition: .init(
@@ -12,12 +13,12 @@ extension Storefront {
             )
         )
 
-        public var first: GraphQLNullable<Int>
+        public var first: GraphQLNullable<Int32>
         public var country: GraphQLEnum<CountryCode>
         public var language: GraphQLEnum<LanguageCode>
 
         public init(
-            first: GraphQLNullable<Int> = 20,
+            first: GraphQLNullable<Int32> = 20,
             country: GraphQLEnum<CountryCode>,
             language: GraphQLEnum<LanguageCode>
         ) {
@@ -26,7 +27,7 @@ extension Storefront {
             self.language = language
         }
 
-        public var __variables: Variables? {
+        @_spi(Unsafe) public var __variables: Variables? {
             [
                 "first": first,
                 "country": country,
@@ -41,7 +42,7 @@ extension Storefront {
             }
 
             static var __parentType: any ApolloAPI.ParentType {
-                Storefront.Objects.Query
+                Storefront.Objects.QueryRoot
             }
 
             static var __selections: [ApolloAPI.Selection] {
@@ -56,6 +57,9 @@ extension Storefront {
                 ]
             }
 
+            /// Returns a paginated list of the shop's [products](https://shopify.dev/docs/api/storefront/current/objects/Product).
+            ///
+            /// For full-text storefront search, use the [`search`](https://shopify.dev/docs/api/storefront/current/queries/search) query instead.
             var products: Products {
                 __data["products"]
             }
@@ -86,6 +90,7 @@ extension Storefront {
                     ]
                 }
 
+                /// A list of the nodes contained in ProductEdge.
                 var nodes: [Node] {
                     __data["nodes"]
                 }
@@ -123,34 +128,47 @@ extension Storefront {
                         ]
                     }
 
+                    /// A globally-unique ID.
                     var id: Storefront.ID {
                         __data["id"]
                     }
 
+                    /// The name for the product that displays to customers. The title is used to construct the product's handle.
+                    /// For example, if a product is titled "Black Sunglasses", then the handle is `black-sunglasses`.
                     var title: String {
                         __data["title"]
                     }
 
+                    /// A unique, human-readable string of the product's title.
+                    /// A handle can contain letters, hyphens (`-`), and numbers, but no spaces.
+                    /// The handle is used in the online store URL for the product.
                     var handle: String {
                         __data["handle"]
                     }
 
+                    /// A single-line description of the product, with [HTML tags](https://developer.mozilla.org/en-US/docs/Web/HTML) removed.
                     var description: String {
                         __data["description"]
                     }
 
+                    /// The name of the product's vendor.
                     var vendor: String {
                         __data["vendor"]
                     }
 
+                    /// The featured image for the product.
+                    ///
+                    /// This field is functionally equivalent to `images(first: 1)`.
                     var featuredImage: FeaturedImage? {
                         __data["featuredImage"]
                     }
 
+                    /// A list of [collections](/docs/api/storefront/latest/objects/Collection) that include the product.
                     var collections: Collections {
                         __data["collections"]
                     }
 
+                    /// A list of [variants](/docs/api/storefront/latest/objects/ProductVariant) that are associated with the product.
                     var variants: Variants {
                         __data["variants"]
                     }
@@ -171,7 +189,7 @@ extension Storefront {
                         static var __selections: [ApolloAPI.Selection] {
                             [
                                 .field("__typename", String.self),
-                                .field("url", String.self)
+                                .field("url", Storefront.URL.self)
                             ]
                         }
 
@@ -181,7 +199,14 @@ extension Storefront {
                             ]
                         }
 
-                        var url: String {
+                        /// The location of the image as a URL.
+                        ///
+                        /// If no transform options are specified, then the original image will be preserved including any pre-applied transforms.
+                        ///
+                        /// All transformation options are considered "best-effort". Any transformation that the original image type doesn't support will be ignored.
+                        ///
+                        /// If you need multiple variations of the same image, then you can use [GraphQL aliases](https://graphql.org/learn/queries/#aliases).
+                        var url: Storefront.URL {
                             __data["url"]
                         }
                     }
@@ -212,6 +237,7 @@ extension Storefront {
                             ]
                         }
 
+                        /// A list of the nodes contained in CollectionEdge.
                         var nodes: [Node] {
                             __data["nodes"]
                         }
@@ -243,10 +269,12 @@ extension Storefront {
                                 ]
                             }
 
+                            /// A globally-unique ID.
                             var id: Storefront.ID {
                                 __data["id"]
                             }
 
+                            /// The collection’s name. Limit of 255 characters.
                             var title: String {
                                 __data["title"]
                             }
@@ -279,6 +307,7 @@ extension Storefront {
                             ]
                         }
 
+                        /// A list of the nodes contained in ProductVariantEdge.
                         var nodes: [Node] {
                             __data["nodes"]
                         }
@@ -312,18 +341,22 @@ extension Storefront {
                                 ]
                             }
 
+                            /// A globally-unique ID.
                             var id: Storefront.ID {
                                 __data["id"]
                             }
 
+                            /// The product variant’s title.
                             var title: String {
                                 __data["title"]
                             }
 
+                            /// Indicates if the product variant is available for sale.
                             var availableForSale: Bool {
                                 __data["availableForSale"]
                             }
 
+                            /// The product variant’s price.
                             var price: Price {
                                 __data["price"]
                             }
@@ -344,7 +377,7 @@ extension Storefront {
                                 static var __selections: [ApolloAPI.Selection] {
                                     [
                                         .field("__typename", String.self),
-                                        .field("amount", String.self),
+                                        .field("amount", Storefront.Decimal.self),
                                         .field("currencyCode", GraphQLEnum<Storefront.CurrencyCode>.self)
                                     ]
                                 }
@@ -355,10 +388,12 @@ extension Storefront {
                                     ]
                                 }
 
-                                var amount: String {
+                                /// Decimal money amount.
+                                var amount: Storefront.Decimal {
                                     __data["amount"]
                                 }
 
+                                /// Currency of the money.
                                 var currencyCode: GraphQLEnum<Storefront.CurrencyCode> {
                                     __data["currencyCode"]
                                 }

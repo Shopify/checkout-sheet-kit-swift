@@ -28,15 +28,31 @@ When in doubt about whether we will be interested in including a new feature in 
 
 **NOTE**: Issues that have not been active for 30 days will be marked as stale, and subsequently closed after a further 7 days of inactivity.
 
+## Prerequisites
+
+This project uses [Mint](https://github.com/yonaskolb/Mint) to manage Swift linting tools (SwiftLint and SwiftFormat) at pinned versions via the `Mintfile`. This ensures consistent formatting across all contributors and CI.
+
+**Shopify employees:**
+```bash
+dev up
+```
+
+**External contributors:**
+```bash
+brew install mint
+mint bootstrap
+```
+
 ## How To Contribute
 
 1. Fork the repo and branch off of main
 2. Create a feature branch in your fork
 3. Make changes and add any relevant relevant tests
-4. Verify the changes locally (e.g. via the sample app)
-5. Commit your changes and push
-6. Ensure all checks (e.g. tests) are passing in GitHub
-7. Create a new pull request with a detailed description of what is changing and why
+4. Run `./Scripts/lint fix` to auto-fix formatting issues
+5. Verify the changes locally (e.g. via the sample app)
+6. Commit your changes and push
+7. Ensure all checks (e.g. tests) are passing in GitHub
+8. Create a new pull request with a detailed description of what is changing and why
 
 ## Releasing a new version
 

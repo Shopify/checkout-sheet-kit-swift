@@ -462,6 +462,10 @@ extension ErrorHandler {
              .deliveryNoDeliveryAvailableForMerchandiseLine:
             return PaymentSheetAction.interrupt(reason: .outOfStock, checkoutURL: checkoutURL)
 
+        case .merchandiseLineTransformersRunError:
+            // Cart transform function failed — buyer cannot resolve this
+            return PaymentSheetAction.interrupt(reason: .other, checkoutURL: checkoutURL)
+
         // Tax errors
         case .taxesDeliveryGroupIdNotFound,
              .taxesLineIdNotFound,

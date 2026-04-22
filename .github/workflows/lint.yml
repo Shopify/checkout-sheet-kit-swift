@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # swiftlint is a separate/duplicate effort here, as it will also report to Annotations 
+  # swiftlint is a separate/duplicate effort here, as it will also report to Annotations
   swiftlint:
     name: SwiftLint
     runs-on: ubuntu-latest
@@ -17,23 +17,44 @@ jobs:
 
   swiftformat:
     name: SwiftFormat & SwiftLint
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
+    env:
+      MINT_PATH: ${{ github.workspace }}/.mint/lib
+      MINT_LINK_PATH: ${{ github.workspace }}/.mint/bin
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - run: |
-          brew install swiftlint swiftformat 
-      - run: ./Scripts/lint check --verbose
+
+      - name: Cache Mint packages
+        id: mint-cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: .mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
+          restore-keys: |
+            ${{ runner.os }}-mint-
+
+      - name: Install Mint
+        run: brew install mint
+
+      - name: Bootstrap Mint packages
+        if: steps.mint-cache.outputs.cache-hit != 'true'
+        run: mint bootstrap --link
+
+      - name: Add Mint to PATH
+        run: echo "${{ github.workspace }}/.mint/bin" >> "$GITHUB_PATH"
+
+      - run: ./Scripts/lint check --verbose --skip-pod
 
   check-license-headers:
     name: License Headers
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: ./Scripts/ensure_license
 
   lint-podspec:
     name: CocoaPods
-    runs-on: macos-26
+    runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0

@@ -1,30 +1,12 @@
-/*
- MIT License
+// @generated
+// This file was automatically generated and should not be edited.
 
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
-    /// The input fields to create a cart.
+    /// The input fields for creating a [`Cart`](https://shopify.dev/docs/api/storefront/current/objects/Cart). Used by the [`cartCreate`](https://shopify.dev/docs/api/storefront/current/mutations/cartCreate) mutation.
+    ///
+    /// Accepts merchandise lines, discount codes, gift card codes, and a note. You can also set custom attributes, metafields, buyer identity for international pricing, and delivery addresses.
     struct CartInput: InputObject {
         private(set) var __data: InputDict
 
@@ -36,16 +18,20 @@ extension Storefront {
             attributes: GraphQLNullable<[AttributeInput]> = nil,
             lines: GraphQLNullable<[CartLineInput]> = nil,
             discountCodes: GraphQLNullable<[String]> = nil,
+            giftCardCodes: GraphQLNullable<[String]> = nil,
             note: GraphQLNullable<String> = nil,
             buyerIdentity: GraphQLNullable<CartBuyerIdentityInput> = nil,
+            delivery: GraphQLNullable<CartDeliveryInput> = nil,
             metafields: GraphQLNullable<[CartInputMetafieldInput]> = nil
         ) {
             __data = InputDict([
                 "attributes": attributes,
                 "lines": lines,
                 "discountCodes": discountCodes,
+                "giftCardCodes": giftCardCodes,
                 "note": note,
                 "buyerIdentity": buyerIdentity,
+                "delivery": delivery,
                 "metafields": metafields
             ])
         }
@@ -74,6 +60,14 @@ extension Storefront {
             set { __data["discountCodes"] = newValue }
         }
 
+        /// The case-insensitive gift card codes.
+        ///
+        /// The input must not contain more than `250` values.
+        var giftCardCodes: GraphQLNullable<[String]> {
+            get { __data["giftCardCodes"] }
+            set { __data["giftCardCodes"] = newValue }
+        }
+
         /// A note that's associated with the cart. For example, the note can be a personalized message to the buyer.
         var note: GraphQLNullable<String> {
             get { __data["note"] }
@@ -86,6 +80,12 @@ extension Storefront {
         var buyerIdentity: GraphQLNullable<CartBuyerIdentityInput> {
             get { __data["buyerIdentity"] }
             set { __data["buyerIdentity"] = newValue }
+        }
+
+        /// The delivery-related fields for the cart.
+        var delivery: GraphQLNullable<CartDeliveryInput> {
+            get { __data["delivery"] }
+            set { __data["delivery"] = newValue }
         }
 
         /// The metafields to associate with this cart.

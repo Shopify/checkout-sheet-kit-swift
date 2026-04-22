@@ -4,11 +4,14 @@ type: ios
 
 up:
   - packages:
-    - swiftlint
-    - swiftformat
+    - mint
     - xcbeautify
     - rover
     - jq
+  - custom:
+      name: Bootstrap Mint packages
+      met?: mint which swiftlint >/dev/null 2>&1 && mint which swiftformat >/dev/null 2>&1
+      meet: mint bootstrap
   - ruby
   - xcode:
       version: "26.2"
@@ -35,11 +38,6 @@ commands:
     aliases: [style]
     desc: Check format and lint issues across all Swift files using SwiftLint and SwiftFormat
     run: scripts/lint
-    subcommands:
-      pod:
-        aliases: []
-        desc: Check the build for cocoapods deployement
-        run: bundle exec pod lib lint --allow-warnings
 
   fix:
     desc: Automatically fix format and lint issues where possible

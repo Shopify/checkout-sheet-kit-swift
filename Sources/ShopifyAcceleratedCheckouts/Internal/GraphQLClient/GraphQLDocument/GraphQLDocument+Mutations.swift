@@ -49,35 +49,9 @@ extension GraphQLDocument {
         }
         """
 
-        case cartDeliveryAddressesAdd = """
-        mutation CartDeliveryAddressesAdd($cartId: ID!, $addresses: [CartSelectableAddressInput!]!) {
-          cartDeliveryAddressesAdd(cartId: $cartId, addresses: $addresses) {
-            cart {
-              ...CartFragment
-            }
-            userErrors {
-              ...CartUserErrorFragment
-            }
-          }
-        }
-        """
-
-        case cartDeliveryAddressesUpdate = """
-        mutation CartDeliveryAddressesUpdate($cartId: ID!, $addresses: [CartSelectableAddressUpdateInput!]!) {
-          cartDeliveryAddressesUpdate(cartId: $cartId, addresses: $addresses) {
-            cart {
-              ...CartFragment
-            }
-            userErrors {
-              ...CartUserErrorFragment
-            }
-          }
-        }
-        """
-
-        case cartDeliveryAddressesRemove = """
-        mutation CartDeliveryAddressesRemove($cartId: ID!, $addressIds: [ID!]!) {
-          cartDeliveryAddressesRemove(cartId: $cartId, addressIds: $addressIds) {
+        case cartDeliveryAddressesReplace = """
+        mutation CartDeliveryAddressesReplace($cartId: ID!, $addresses: [CartSelectableAddressInput!]!) {
+          cartDeliveryAddressesReplace(cartId: $cartId, addresses: $addresses) {
             cart {
               ...CartFragment
             }

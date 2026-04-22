@@ -40,6 +40,9 @@ struct ProductView: View {
     @State private var descriptionExpanded: Bool = false
     @State private var addedToCart: Bool = false
 
+    @AppStorage(AppStorageKeys.applePayStyle.rawValue)
+    var applePayStyle: ApplePayStyleOption = .automatic
+
     init(product: Product) {
         _product = State(initialValue: product)
     }
@@ -134,6 +137,7 @@ struct ProductView: View {
 
                         if variant.availableForSale {
                             AcceleratedCheckoutButtons(variantID: variant.id, quantity: 1)
+                                .applePayStyle(applePayStyle.style)
                                 .wallets([.applePay])
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .onFail { error in
@@ -204,14 +208,15 @@ class ProductCache: ObservableObject {
         if let product = cachedProduct {
             completion(product)
         } else {
-            fetchProduct(by: handle) { product in
+            Task {
+                let product = await fetchProduct(by: handle)
                 self.cachedProduct = product
                 completion(product)
             }
         }
     }
 
-    private func fetchProduct(by _: String?, completion: @escaping (Product?) -> Void) {
+    private func fetchProduct(by _: String?) async -> Product? {
         let network = Network.shared
 
         let query = Storefront.GetProductsQuery(
@@ -220,34 +225,30 @@ class ProductCache: ObservableObject {
             language: network.languageCode
         )
 
-        network.apollo.fetch(query: query) { result in
-            if case let .success(response) = result {
-                DispatchQueue.main.async {
-                    completion(response.data?.products.nodes.first)
-                }
-            } else {
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
-            }
+        do {
+            let response = try await network.apollo.fetch(query: query)
+            return response.data?.products.nodes.first
+        } catch {
+            return nil
         }
     }
 
     public func fetchCollection(limit: Int = 20) {
-        let network = Network.shared
+        Task {
+            let network = Network.shared
 
-        let query = Storefront.GetProductsQuery(
-            first: .some(limit),
-            country: network.countryCode,
-            language: network.languageCode
-        )
+            let query = Storefront.GetProductsQuery(
+                first: .some(Int32(limit)),
+                country: network.countryCode,
+                language: network.languageCode
+            )
 
-        network.apollo.fetch(query: query) { result in
-            if case let .success(response) = result {
-                DispatchQueue.main.async {
-                    self.collection = response.data?.products.nodes
-                    self.cachedProduct = response.data?.products.nodes.first
-                }
+            do {
+                let response = try await network.apollo.fetch(query: query)
+                self.collection = response.data?.products.nodes
+                self.cachedProduct = response.data?.products.nodes.first
+            } catch {
+                // Fetch failed silently
             }
         }
     }

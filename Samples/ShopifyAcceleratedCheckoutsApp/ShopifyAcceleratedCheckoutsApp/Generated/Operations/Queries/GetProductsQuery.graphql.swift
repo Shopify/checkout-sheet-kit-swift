@@ -1,30 +1,11 @@
-/*
- MIT License
-
- Copyright 2023 - Present, Shopify Inc.
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// @generated
+// This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 extension Storefront {
-    class GetProductsQuery: GraphQLQuery {
+    struct GetProductsQuery: GraphQLQuery {
         static let operationName: String = "GetProducts"
         static let operationDocument: ApolloAPI.OperationDocument = .init(
             definition: .init(
@@ -32,12 +13,12 @@ extension Storefront {
             )
         )
 
-        public var first: GraphQLNullable<Int>
+        public var first: GraphQLNullable<Int32>
         public var country: GraphQLEnum<CountryCode>
         public var language: GraphQLEnum<LanguageCode>
 
         public init(
-            first: GraphQLNullable<Int> = 10,
+            first: GraphQLNullable<Int32> = 10,
             country: GraphQLEnum<CountryCode>,
             language: GraphQLEnum<LanguageCode>
         ) {
@@ -46,7 +27,7 @@ extension Storefront {
             self.language = language
         }
 
-        public var __variables: Variables? {
+        @_spi(Unsafe) public var __variables: Variables? {
             [
                 "first": first,
                 "country": country,
@@ -70,7 +51,15 @@ extension Storefront {
                 ]
             }
 
-            /// Returns a list of the shop's products. For storefront search, use the [`search`](https://shopify.dev/docs/api/storefront/latest/queries/search) query.
+            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                [
+                    GetProductsQuery.Data.self
+                ]
+            }
+
+            /// Returns a paginated list of the shop's [products](https://shopify.dev/docs/api/storefront/current/objects/Product).
+            ///
+            /// For full-text storefront search, use the [`search`](https://shopify.dev/docs/api/storefront/current/queries/search) query instead.
             var products: Products {
                 __data["products"]
             }
@@ -92,6 +81,12 @@ extension Storefront {
                     [
                         .field("__typename", String.self),
                         .field("nodes", [Node].self)
+                    ]
+                }
+
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                    [
+                        GetProductsQuery.Data.Products.self
                     ]
                 }
 
@@ -120,6 +115,12 @@ extension Storefront {
                             .field("title", String.self),
                             .field("featuredImage", FeaturedImage?.self),
                             .field("variants", Variants.self, arguments: ["first": 10])
+                        ]
+                    }
+
+                    static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                        [
+                            GetProductsQuery.Data.Products.Node.self
                         ]
                     }
 
@@ -166,6 +167,12 @@ extension Storefront {
                             ]
                         }
 
+                        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                            [
+                                GetProductsQuery.Data.Products.Node.FeaturedImage.self
+                            ]
+                        }
+
                         /// The location of the image as a URL.
                         ///
                         /// If no transform options are specified, then the original image will be preserved including any pre-applied transforms.
@@ -198,6 +205,12 @@ extension Storefront {
                             ]
                         }
 
+                        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                            [
+                                GetProductsQuery.Data.Products.Node.Variants.self
+                            ]
+                        }
+
                         /// A list of the nodes contained in ProductVariantEdge.
                         var nodes: [Node] {
                             __data["nodes"]
@@ -224,6 +237,12 @@ extension Storefront {
                                     .field("requiresShipping", Bool.self),
                                     .field("image", Image?.self),
                                     .field("price", Price.self)
+                                ]
+                            }
+
+                            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                                [
+                                    GetProductsQuery.Data.Products.Node.Variants.Node.self
                                 ]
                             }
 
@@ -272,6 +291,12 @@ extension Storefront {
                                     ]
                                 }
 
+                                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                                    [
+                                        GetProductsQuery.Data.Products.Node.Variants.Node.Image.self
+                                    ]
+                                }
+
                                 /// The location of the image as a URL.
                                 ///
                                 /// If no transform options are specified, then the original image will be preserved including any pre-applied transforms.
@@ -302,6 +327,12 @@ extension Storefront {
                                         .field("__typename", String.self),
                                         .field("amount", Storefront.Decimal.self),
                                         .field("currencyCode", GraphQLEnum<Storefront.CurrencyCode>.self)
+                                    ]
+                                }
+
+                                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] {
+                                    [
+                                        GetProductsQuery.Data.Products.Node.Variants.Node.Price.self
                                     ]
                                 }
 
