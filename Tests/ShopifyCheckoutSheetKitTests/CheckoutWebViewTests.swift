@@ -174,6 +174,40 @@ class CheckoutWebViewTests: XCTestCase {
         }
     }
 
+    func test4xxResponseOnPreloadDoesNotFireFatalError() throws {
+        // A preload (Shopify-Purpose: prefetch) is speculative — the buyer has
+        // not opened the checkout sheet, the host is just warming the cache.
+        // Surfacing a 4xx here as `checkoutViewDidFailWithError(.checkoutUnavailable,
+        // recoverable: false)` forces hosts into error UI or retry loops for a
+        // failure the buyer never saw. Common triggers we should not propagate:
+        //   - operational killswitches (e.g. `checkout_sheet_kit_preload_killswitch`)
+        //   - merchant CSP / WAF blocks on prefetch requests
+        //   - transient errors during the preload window
+        //
+        // This test currently FAILS on `main`. It documents the desired contract;
+        // the fix is to early-return from the `>= 400` branch in `handleResponse`
+        // when `isPreloadRequest` is true, after `CheckoutWebView.invalidate()`.
+        try view.load(checkout: XCTUnwrap(URL(string: "http://shopify1.shopify.com/checkouts/cn/123")), isPreload: true)
+        let link = try XCTUnwrap(view.url)
+
+        let didNotFailExpectation = expectation(description: "checkoutViewDidFailWithError must NOT be called for preload 4xx")
+        didNotFailExpectation.isInverted = true
+        mockDelegate.didFailWithErrorExpectation = didNotFailExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(url: link, statusCode: 403, httpVersion: nil, headerFields: nil))
+
+        let policy = view.handleResponse(urlResponse)
+
+        // Cache must still be invalidated (don't serve a forbidden response on next show).
+        // Navigation must still be cancelled (don't render the 403 body in the WebView).
+        // Delegate must NOT be notified — preload is speculative; failure is not user-visible.
+        XCTAssertEqual(policy, .cancel, "Preload 4xx still cancels navigation")
+        waitForExpectations(timeout: 1) { _ in
+            XCTAssertNil(self.mockDelegate.errorReceived, "Preload failures must not surface as fatal checkout errors")
+        }
+    }
+
     func testObtainsOrderIDFromQuery() throws {
         let urls = [
             "http://shopify1.shopify.com/checkouts/c/12345/thank-you?order_id=1234",
