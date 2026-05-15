@@ -24,7 +24,7 @@
 import ApolloAPI
 import PassKit
 import ShopifyAcceleratedCheckouts
-import ShopifyCheckoutSheetKit
+@preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI
 
 typealias CartLineNode = Storefront.CartFragment.Lines.Node
@@ -103,7 +103,7 @@ struct CartView: View {
             .sheet(isPresented: $showCheckoutSheet) {
                 if let url = cartManager.cart?.checkoutURL {
                     CheckoutSheet(checkout: url)
-                        .colorScheme(.automatic)
+                        .colorScheme(ShopifyCheckoutSheetKit.configuration.colorScheme)
                         .onCancel {
                             print("[ShopifyCheckoutKit] CANCEL")
                             showCheckoutSheet = false
