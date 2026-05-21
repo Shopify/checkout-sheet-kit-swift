@@ -729,7 +729,8 @@ AcceleratedCheckoutButtons(cartID: cartID)
 
 #### Modify the Apple Pay button label
 
-Use `.applePayLabel(_:)` to map to the native `PayWithApplePayButtonLabel` values. The default is `.plain`.
+Use `.applePayLabel(_:)` to pass a native `PKPaymentButtonType` value directly to the Apple Pay button. The default is
+`.plain`.
 
 ```swift
 AcceleratedCheckoutButtons(cartID: cartID)
@@ -738,7 +739,8 @@ AcceleratedCheckoutButtons(cartID: cartID)
 
 #### Customize the Apple Pay button style
 
-Use `.applePayStyle(_:)` to set the color style of the Apple Pay button. The modifier accepts a `PayWithApplePayButtonStyle` value. The default is `.automatic`, which adapts to the current appearance (light/dark mode).
+Use `.applePayStyle(_:)` to pass a native `PKPaymentButtonStyle` value directly to the Apple Pay button. The default is
+`.automatic`, which adapts to the current appearance (light/dark mode).
 
 ```swift
 AcceleratedCheckoutButtons(cartID: cartID)

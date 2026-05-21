@@ -22,6 +22,7 @@
  */
 
 import Apollo
+import PassKit
 import ShopifyAcceleratedCheckouts
 import ShopifyCheckoutSheetKit
 import SwiftUI

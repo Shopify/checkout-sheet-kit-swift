@@ -23,6 +23,7 @@
 
 import Apollo
 import ApolloAPI
+import PassKit
 @preconcurrency import ShopifyAcceleratedCheckouts
 @preconcurrency import ShopifyCheckoutSheetKit
 import SwiftUI

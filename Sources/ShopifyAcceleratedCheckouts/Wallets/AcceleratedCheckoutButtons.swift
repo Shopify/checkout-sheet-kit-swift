@@ -48,9 +48,9 @@ public struct AcceleratedCheckoutButtons: View {
     var eventHandlers: EventHandlers = .init()
     var cornerRadius: CGFloat?
 
-    /// The Apple Pay button label style
-    private var applePayLabel: PayWithApplePayButtonLabel = .plain
-    private var applePayStyle: PayWithApplePayButtonStyle = .automatic
+    /// The Apple Pay button type
+    private var applePayLabel: PKPaymentButtonType = .plain
+    private var applePayStyle: PKPaymentButtonStyle = .automatic
 
     @State private var shopSettings: ShopSettings?
     @State private var currentRenderState: RenderState = .loading {
@@ -139,13 +139,13 @@ public struct AcceleratedCheckoutButtons: View {
 
 @available(iOS 16.0, *)
 extension AcceleratedCheckoutButtons {
-    public func applePayStyle(_ color: PayWithApplePayButtonStyle) -> AcceleratedCheckoutButtons {
+    public func applePayStyle(_ color: PKPaymentButtonStyle) -> AcceleratedCheckoutButtons {
         var view = self
         view.applePayStyle = color
         return view
     }
 
-    public func applePayLabel(_ label: PayWithApplePayButtonLabel) -> AcceleratedCheckoutButtons {
+    public func applePayLabel(_ label: PKPaymentButtonType) -> AcceleratedCheckoutButtons {
         var view = self
         view.applePayLabel = label
         return view
