@@ -33,6 +33,9 @@ final class InfoDictionary: Sendable {
     let address1, address2, city, country, firstName, lastName, province, zip,
         email, phone, domain, accessToken, version, buildNumber, merchantIdentifier, apiVersion: String
 
+    /// When set in `Storefront.xcconfig`, checkout always uses this URL instead of the cart's `checkoutUrl`.
+    let fixedCheckoutURL: URL?
+
     // Customer Account API (optional)
     let customerAccountApiClientId: String?
     let customerAccountApiShopId: String?
@@ -84,6 +87,26 @@ final class InfoDictionary: Sendable {
         self.version = version
         self.buildNumber = buildNumber
         self.merchantIdentifier = merchantIdentifier
+
+        if let checkoutURLString = infoPlist["CheckoutURL"] as? String,
+           !checkoutURLString.isEmpty,
+           !checkoutURLString.hasPrefix("$("),
+           let url = URL(string: checkoutURLString),
+           url.host != nil
+        {
+            fixedCheckoutURL = url
+        } else {
+            if let checkoutURLString = infoPlist["CheckoutURL"] as? String,
+               !checkoutURLString.isEmpty,
+               !checkoutURLString.hasPrefix("$(")
+            {
+                print(
+                    "[MobileBuyIntegration] CHECKOUT_URL is set but invalid (got \"\(checkoutURLString)\"). " +
+                        "In Storefront.xcconfig use https:/$()/host/path — plain https:// is truncated by // comments."
+                )
+            }
+            fixedCheckoutURL = nil
+        }
 
         // Customer Account API configuration (optional)
         customerAccountApiClientId = infoPlist["CustomerAccountApiClientId"] as? String

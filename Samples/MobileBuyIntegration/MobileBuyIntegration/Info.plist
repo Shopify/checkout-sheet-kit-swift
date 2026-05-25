@@ -8,6 +8,8 @@
 	<string>$(STOREFRONT_DOMAIN)</string>
 	<key>StorefrontAccessToken</key>
 	<string>$(STOREFRONT_ACCESS_TOKEN)</string>
+	<key>CheckoutURL</key>
+	<string>$(CHECKOUT_URL)</string>
 	<key>CustomerAccountApiClientId</key>
 	<string>$(CUSTOMER_ACCOUNT_API_CLIENT_ID)</string>
 	<key>CustomerAccountApiShopId</key>

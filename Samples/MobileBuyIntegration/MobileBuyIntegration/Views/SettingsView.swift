@@ -69,6 +69,20 @@ struct SettingsView: View {
                         .onChange(of: preloadingEnabled) { newValue in
                             ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
                         }
+
+                    if let fixedCheckoutURL = CheckoutURLProvider.fixedCheckoutURL {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Fixed checkout URL")
+                                .font(.subheadline)
+                            Text(fixedCheckoutURL.absoluteString)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        Text("Set CHECKOUT_URL in Storefront.xcconfig to use a fixed checkout URL.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Section(

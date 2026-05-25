@@ -42,7 +42,11 @@ struct CartView: View {
     var applePayStyle: ApplePayStyleOption = .automatic
 
     var body: some View {
-        if let lines = cartManager.cart?.lines.nodes {
+        if CheckoutURLProvider.usesFixedCheckoutURL,
+           cartManager.cart?.lines.nodes.isEmpty != false
+        {
+            FixedCheckoutView(showCheckoutSheet: $showCheckoutSheet)
+        } else if let lines = cartManager.cart?.lines.nodes, !lines.isEmpty {
             ZStack(alignment: .bottom) {
                 ScrollView {
                     VStack {
@@ -101,7 +105,7 @@ struct CartView: View {
                 preloadCheckout()
             }
             .sheet(isPresented: $showCheckoutSheet) {
-                if let url = cartManager.cart?.checkoutURL {
+                if let url = CheckoutURLProvider.resolvedURL(cart: cartManager.cart) {
                     CheckoutSheet(checkout: url)
                         .colorScheme(ShopifyCheckoutSheetKit.configuration.colorScheme)
                         .onCancel {
@@ -155,9 +159,69 @@ struct CartView: View {
     }
 
     private func presentCheckout() {
-        guard let url = CartManager.shared.cart?.checkoutURL else { return }
+        guard let url = CheckoutURLProvider.resolvedURL(cart: cartManager.cart) else { return }
 
         CheckoutController.shared?.present(checkout: url)
+    }
+}
+
+struct FixedCheckoutView: View {
+    @Binding var showCheckoutSheet: Bool
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Using a fixed checkout URL from Storefront.xcconfig")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            if let url = CheckoutURLProvider.fixedCheckoutURL {
+                Text(url.absoluteString)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+
+            Button(
+                action: { showCheckoutSheet = true },
+                label: {
+                    Text("Open checkout")
+                        .fontWeight(.bold)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(ColorPalette.primaryColor))
+                        .cornerRadius(DesignSystem.cornerRadius)
+                }
+            )
+            .foregroundColor(.white)
+            .padding(.horizontal, 20)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            CheckoutURLProvider.preloadFixedCheckoutIfConfigured()
+        }
+        .sheet(isPresented: $showCheckoutSheet) {
+            if let url = CheckoutURLProvider.fixedCheckoutURL {
+                CheckoutSheet(checkout: url)
+                    .colorScheme(ShopifyCheckoutSheetKit.configuration.colorScheme)
+                    .onCancel {
+                        showCheckoutSheet = false
+                    }
+                    .onComplete { event in
+                        print(
+                            "[ShopifyCheckoutKit] COMPLETE - Checkout completed with order ID: \(event.orderDetails.id)"
+                        )
+                    }
+                    .onFail { error in
+                        showCheckoutSheet = false
+                        print("[ShopifyCheckoutKit] FAIL - Checkout failed: \(error)")
+                    }
+                    .edgesIgnoringSafeArea(.all)
+            }
+        }
     }
 }
 
@@ -283,9 +347,7 @@ struct CartLines: View {
                                             CartManager.shared.cart = cart
                                             updating = nil
 
-                                            if let checkoutUrl = cart.checkoutURL {
-                                                ShopifyCheckoutSheetKit.preload(checkout: checkoutUrl)
-                                            }
+                                            CartManager.shared.preloadCheckout()
                                         }
                                     },
                                     label: {

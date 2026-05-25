@@ -53,9 +53,13 @@ class CartManager: ObservableObject {
     init() {}
 
     public func preloadCheckout() {
-        if let url = cart?.checkoutURL, isDirty {
+        guard let url = CheckoutURLProvider.resolvedURL(cart: cart) else { return }
+
+        if CheckoutURLProvider.usesFixedCheckoutURL || isDirty {
             ShopifyCheckoutSheetKit.preload(checkout: url)
-            markCartAsReady()
+            if !CheckoutURLProvider.usesFixedCheckoutURL {
+                markCartAsReady()
+            }
         }
     }
 

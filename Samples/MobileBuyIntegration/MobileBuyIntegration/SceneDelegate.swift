@@ -147,8 +147,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     @objc public func present() {
-        if let url = CartManager.shared.cart?.checkoutURL {
-            presentCheckout(url)
+        Task { @MainActor in
+            if let url = CheckoutURLProvider.resolvedURL(cart: CartManager.shared.cart) {
+                presentCheckout(url)
+            }
         }
     }
 
