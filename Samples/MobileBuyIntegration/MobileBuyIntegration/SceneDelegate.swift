@@ -275,7 +275,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         switch true {
         // Checkout URLs
-        case appConfiguration.universalLinks.checkout && storefrontUrl.isCheckout() && !storefrontUrl.isThankYouPage():
+        case appConfiguration.universalLinks.checkout && storefrontUrl.isCheckout():
             presentCheckout(url)
         // Cart URLs
         case appConfiguration.universalLinks.cart && storefrontUrl.isCart():
