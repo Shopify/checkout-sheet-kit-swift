@@ -71,12 +71,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("[MobileBuyIntegration] AcceleratedCheckout Log level set to \(acceleratedCheckoutsLogLevel)")
         print("[MobileBuyIntegration] CheckoutSheetKit Log level set to \(checkoutSheetKitLogLevel)")
 
-        if let fixedCheckoutURL = CheckoutURLProvider.fixedCheckoutURL {
-            print("[MobileBuyIntegration] Using fixed checkout URL: \(fixedCheckoutURL.absoluteString)")
-            ShopifyCheckoutSheetKit.invalidate()
-            CheckoutURLProvider.preloadFixedCheckoutIfConfigured()
-        }
-
         UIBarButtonItem.appearance().tintColor = ColorPalette.primaryColor
 
         return true

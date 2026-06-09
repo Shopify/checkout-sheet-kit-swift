@@ -57,6 +57,7 @@ struct SettingsView: View {
     var applePayStyle: ApplePayStyleOption = .automatic
 
     @State private var preloadingEnabled = ShopifyCheckoutSheetKit.configuration.preloading.enabled
+    @State private var checkoutURL = ""
     @State private var logs: [String?] = LogReader.shared.readLogs() ?? []
     @State private var selectedColorScheme = ShopifyCheckoutSheetKit.configuration.colorScheme
     @State private var colorScheme: ColorScheme = .light
@@ -69,20 +70,20 @@ struct SettingsView: View {
                         .onChange(of: preloadingEnabled) { newValue in
                             ShopifyCheckoutSheetKit.configuration.preloading.enabled = newValue
                         }
+                }
 
-                    if let fixedCheckoutURL = CheckoutURLProvider.fixedCheckoutURL {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Fixed checkout URL")
-                                .font(.subheadline)
-                            Text(fixedCheckoutURL.absoluteString)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                Section(header: Text("Debug")) {
+                    TextField("Checkout URL", text: $checkoutURL)
+                        .textContentType(.URL)
+                        .autocapitalization(.none)
+                        .keyboardType(.URL)
+
+                    Button("Present") {
+                        if let url = URL(string: checkoutURL) {
+                            CheckoutController.shared?.present(checkout: url)
                         }
-                    } else {
-                        Text("Set CHECKOUT_URL in Storefront.xcconfig to use a fixed checkout URL.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                     }
+                    .disabled(checkoutURL.isEmpty)
                 }
 
                 Section(

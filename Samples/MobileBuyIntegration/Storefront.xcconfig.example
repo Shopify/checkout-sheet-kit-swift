@@ -27,6 +27,3 @@ ZIP = T1X 0L3
 PHONE = +155565708743
 
 API_VERSION = 2025-07
-
-// Optional: always use this checkout URL (preload on launch). Escape // in URLs: https:/$()/example.com/...
-// CHECKOUT_URL = https:/$()/your-store.myshopify.com/cart/c/...

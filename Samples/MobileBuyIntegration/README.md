@@ -65,9 +65,6 @@ MobileBuyIntegration/
    STOREFRONT_DOMAIN = your-store.myshopify.com
    STOREFRONT_ACCESS_TOKEN = your-token
    API_VERSION = 2025-07
-
-   // Optional: fixed checkout URL (escape // as https:/$()/...)
-   // CHECKOUT_URL = https:/$()/your-store.myshopify.com/cart/c/...
    ```
 
 2. Open the project in Xcode and let SPM resolve the Apollo dependency.
