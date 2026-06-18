@@ -347,7 +347,7 @@ enum ApplePayStyleOption: String, CaseIterable {
         }
     }
 
-    var style: PayWithApplePayButtonStyle {
+    var style: PKPaymentButtonStyle {
         switch self {
         case .automatic: return .automatic
         case .black: return .black
