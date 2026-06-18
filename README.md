@@ -736,7 +736,7 @@ AcceleratedCheckoutButtons(cartID: cartID)
     .applePayButtonType(.buy)
 ```
 
-The previous `.applePayLabel(_:)` modifier is deprecated. It remains source-compatible, but prefer `.applePayButtonType(_:)` to avoid the iOS 18 runtime crash when building with the iOS 26 SDK ([issue #566](https://github.com/Shopify/checkout-sheet-kit-swift/issues/566)).
+The previous `.applePayLabel(_:)` modifier is deprecated and remains source-compatible in 3.9.1 through a compatibility shim. Prefer `.applePayButtonType(_:)` for new code because it uses native PassKit values directly, is the planned stable API for V4, and avoids depending on SwiftUI wrapper internals. See [issue #566](https://github.com/Shopify/checkout-sheet-kit-swift/issues/566) for the iOS 18 runtime crash context when building with the iOS 26 SDK.
 
 #### Customize the Apple Pay button style
 
@@ -747,7 +747,7 @@ AcceleratedCheckoutButtons(cartID: cartID)
     .applePayButtonStyle(.whiteOutline)
 ```
 
-The previous `.applePayStyle(_:)` modifier is deprecated. It remains source-compatible, but prefer `.applePayButtonStyle(_:)` to avoid the iOS 18 runtime crash when building with the iOS 26 SDK ([issue #566](https://github.com/Shopify/checkout-sheet-kit-swift/issues/566)).
+The previous `.applePayStyle(_:)` modifier is deprecated and remains source-compatible in 3.9.1 through a compatibility shim. Prefer `.applePayButtonStyle(_:)` for new code because it uses native PassKit values directly, is the planned stable API for V4, and avoids depending on SwiftUI wrapper internals. See [issue #566](https://github.com/Shopify/checkout-sheet-kit-swift/issues/566) for the iOS 18 runtime crash context when building with the iOS 26 SDK.
 
 #### Customize button corners
 
