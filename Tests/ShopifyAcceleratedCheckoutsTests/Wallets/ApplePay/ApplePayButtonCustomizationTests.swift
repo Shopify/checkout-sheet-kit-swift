@@ -73,7 +73,8 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
             (.rent, .rent),
             (.support, .support),
             (.contribute, .contribute),
-            (.tip, .tip)
+            (.tip, .tip),
+            (.continue, .continue)
         ]
 
         for (label, expectedType) in mappings {
@@ -135,6 +136,28 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
 
         XCTAssertEqual(storedButtonType(in: representable)?.rawValue, PKPaymentButtonType.buy.rawValue)
         XCTAssertEqual(storedButtonStyle(in: representable)?.rawValue, PKPaymentButtonStyle.whiteOutline.rawValue)
+    }
+
+    func testInternalApplePayButtonIdentityChangesWhenButtonTypeChanges() {
+        let plainButton = Internal_ApplePayButton(
+            identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
+            buttonType: .plain,
+            buttonStyle: .automatic,
+            configuration: .testConfiguration,
+            cornerRadius: nil
+        )
+        let buyButton = Internal_ApplePayButton(
+            identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
+            buttonType: .buy,
+            buttonStyle: .automatic,
+            configuration: .testConfiguration,
+            cornerRadius: nil
+        )
+
+        XCTAssertNotEqual(
+            plainButton.buttonIdentity(colorScheme: .light),
+            buyButton.buttonIdentity(colorScheme: .light)
+        )
     }
 
     private func storedApplePayButtonType(in view: AcceleratedCheckoutButtons) -> PKPaymentButtonType? {

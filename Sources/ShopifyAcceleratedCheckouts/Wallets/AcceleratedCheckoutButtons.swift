@@ -169,14 +169,14 @@ extension AcceleratedCheckoutButtons {
         return view
     }
 
-    @available(iOS, deprecated: 16.0, message: "Prefer applePayButtonStyle(_:) for new code. It uses native PassKit values directly and is the planned stable API for V4; this deprecated API remains source-compatible through a compatibility shim. See https://github.com/Shopify/checkout-sheet-kit-swift/issues/566.")
+    @available(iOS, deprecated: 16.0, message: "Prefer applePayButtonStyle(_:) for new code. It uses native PassKit values directly and is the planned stable API for V4; this deprecated API remains patched backwards-compatible through a compatibility shim. See https://github.com/Shopify/checkout-sheet-kit-swift/issues/566.")
     public func applePayStyle(_ color: PayWithApplePayButtonStyle) -> AcceleratedCheckoutButtons {
         var view = self
         view.applePayButtonStyle = ApplePayCompatibility.passKitButtonStyle(from: color)
         return view
     }
 
-    @available(iOS, deprecated: 16.0, message: "Prefer applePayButtonType(_:) for new code. It uses native PassKit values directly and is the planned stable API for V4; this deprecated API remains source-compatible through a compatibility shim. See https://github.com/Shopify/checkout-sheet-kit-swift/issues/566.")
+    @available(iOS, deprecated: 16.0, message: "Prefer applePayButtonType(_:) for new code. It uses native PassKit values directly and is the planned stable API for V4; this deprecated API remains patched backwards-compatible through a compatibility shim. See https://github.com/Shopify/checkout-sheet-kit-swift/issues/566.")
     public func applePayLabel(_ label: PayWithApplePayButtonLabel) -> AcceleratedCheckoutButtons {
         var view = self
         view.applePayButtonType = ApplePayCompatibility.passKitButtonType(from: label)

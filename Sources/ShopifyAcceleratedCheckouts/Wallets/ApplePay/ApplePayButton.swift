@@ -101,6 +101,10 @@ struct Internal_ApplePayButton: View {
     private let cornerRadius: CGFloat?
     @Environment(\.colorScheme) private var colorScheme
 
+    func buttonIdentity(colorScheme: ColorScheme) -> String {
+        return "\(colorScheme)-\(buttonType.rawValue)-\(buttonStyle.rawValue)"
+    }
+
     init(
         identifier: CheckoutIdentifier,
         buttonType: PKPaymentButtonType,
@@ -132,7 +136,7 @@ struct Internal_ApplePayButton: View {
                 cornerRadius: cornerRadius ?? 8,
                 action: { Task { await controller.onPress() } }
             )
-            .id("\(colorScheme)-\(buttonStyle.rawValue)")
+            .id(buttonIdentity(colorScheme: colorScheme))
             .frame(height: 48)
         } else {
             Text("errors.applePay.unsupported".localizedString)

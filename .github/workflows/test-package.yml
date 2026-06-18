@@ -11,4 +11,6 @@ jobs:
   call-workflow-passing-data:
     uses: ./.github/workflows/test-workflow.yml
     with:
-      test-path: ./scripts/xcode_run test ShopifyCheckoutSheetKit-Package
+      test-path: |
+        ./scripts/xcode_run test ShopifyCheckoutSheetKit-Package
+        ./scripts/check_accelerated_checkouts_symbols
