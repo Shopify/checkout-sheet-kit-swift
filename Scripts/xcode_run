@@ -12,6 +12,18 @@ SCHEME="${2:-ShopifyCheckoutSheetKit-Package}"
 TEST_FILTER="${3:-}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+DERIVED_DATA_PATH="${DERIVED_DATA_PATH:-$PROJECT_ROOT/.build/xcode-derived-data}"
+
+prepare_swiftlint_plugin_output_directories() {
+    local package_output_name
+    package_output_name="$(basename "$PROJECT_ROOT").output"
+    local plugin_output_base="$DERIVED_DATA_PATH/Build/Intermediates.noindex/BuildToolPluginIntermediates/$package_output_name"
+
+    mkdir -p \
+        "$plugin_output_base/ShopifyAcceleratedCheckoutsTests/SwiftLint/Output" \
+        "$plugin_output_base/ShopifyCheckoutSheetKitTests/SwiftLint/Output"
+}
 
 # Validate action contains at least one of: build, test, or clean
 if [[ "$ACTION" != *"build"* && "$ACTION" != *"test"* && "$ACTION" != *"clean"* ]]; then
@@ -27,7 +39,11 @@ else
     dest="id=$DEVICE_ID"
 fi
 
-xcodebuild_cmd="xcodebuild $ACTION -scheme $SCHEME -sdk iphonesimulator -destination \"$dest\" -skipPackagePluginValidation"
+if [[ "$ACTION" == *"test"* ]]; then
+    prepare_swiftlint_plugin_output_directories
+fi
+
+xcodebuild_cmd="xcodebuild $ACTION -scheme $SCHEME -sdk iphonesimulator -destination \"$dest\" -derivedDataPath \"$DERIVED_DATA_PATH\" -skipPackagePluginValidation"
 
 # Add test filtering if specified
 if [[ "$ACTION" == *"test"* && -n "$TEST_FILTER" ]]; then
@@ -37,12 +53,11 @@ if [[ "$ACTION" == *"test"* && -n "$TEST_FILTER" ]]; then
         xcodebuild_cmd="$xcodebuild_cmd -only-testing:$TEST_FILTER"
     else
         # Find which test target contains this test class (search all test targets automatically)
-        project_root="$(cd "$SCRIPT_DIR/.." && pwd)"
         test_target=""
         
         # Discover all test targets by looking for *Tests directories
         test_file=""
-        for test_dir in "$project_root/Tests"/*Tests; do
+        for test_dir in "$PROJECT_ROOT/Tests"/*Tests; do
             if [[ -d "$test_dir" ]]; then
                 target_name=$(basename "$test_dir")
                 # Check if TEST_FILTER matches a .swift filename
