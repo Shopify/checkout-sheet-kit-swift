@@ -47,10 +47,10 @@ struct ApplePayButton: View {
     private let eventHandlers: EventHandlers
 
     /// The Apple Pay button type
-    private let buttonType: PKPaymentButtonType
+    private let label: PKPaymentButtonType
 
     /// The Apple Pay button style
-    private let buttonStyle: PKPaymentButtonStyle
+    private let style: PKPaymentButtonStyle
 
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
@@ -59,14 +59,14 @@ struct ApplePayButton: View {
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?,
-        buttonType: PKPaymentButtonType = .plain,
-        buttonStyle: PKPaymentButtonStyle = .automatic
+        label: PKPaymentButtonType = .plain,
+        style: PKPaymentButtonStyle = .automatic
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         self.cornerRadius = cornerRadius
-        self.buttonType = buttonType
-        self.buttonStyle = buttonStyle
+        self.label = label
+        self.style = style
     }
 
     var body: some View {
@@ -76,8 +76,8 @@ struct ApplePayButton: View {
         default:
             Internal_ApplePayButton(
                 identifier: identifier,
-                buttonType: buttonType,
-                buttonStyle: buttonStyle,
+                label: label,
+                style: style,
                 configuration: ApplePayConfigurationWrapper(
                     common: configuration,
                     applePay: applePayConfiguration,
@@ -95,20 +95,20 @@ struct ApplePayButton: View {
 @available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
-    private let buttonType: PKPaymentButtonType
-    private let buttonStyle: PKPaymentButtonStyle
+    private let label: PKPaymentButtonType
+    private let style: PKPaymentButtonStyle
     private let controller: ApplePayViewController
     private let cornerRadius: CGFloat?
     @Environment(\.colorScheme) private var colorScheme
 
     func buttonIdentity(colorScheme: ColorScheme) -> String {
-        return "\(colorScheme)-\(buttonType.rawValue)-\(buttonStyle.rawValue)"
+        return "\(colorScheme)-\(label.rawValue)-\(style.rawValue)"
     }
 
     init(
         identifier: CheckoutIdentifier,
-        buttonType: PKPaymentButtonType,
-        buttonStyle: PKPaymentButtonStyle,
+        label: PKPaymentButtonType,
+        style: PKPaymentButtonStyle,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
@@ -117,8 +117,8 @@ struct Internal_ApplePayButton: View {
             identifier: identifier,
             configuration: configuration
         )
-        self.buttonType = buttonType
-        self.buttonStyle = buttonStyle
+        self.label = label
+        self.style = style
         self.cornerRadius = cornerRadius
         controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
         controller.onCheckoutFail = eventHandlers.checkoutDidFail
@@ -131,8 +131,8 @@ struct Internal_ApplePayButton: View {
     var body: some View {
         if PKPaymentAuthorizationController.canMakePayments() {
             ApplePayButtonRepresentable(
-                buttonType: buttonType,
-                buttonStyle: buttonStyle,
+                buttonType: label,
+                buttonStyle: style,
                 cornerRadius: cornerRadius ?? 8,
                 action: { Task { await controller.onPress() } }
             )

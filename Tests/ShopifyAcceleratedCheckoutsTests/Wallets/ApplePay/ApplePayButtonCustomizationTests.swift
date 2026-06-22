@@ -105,8 +105,8 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         let button = ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             cornerRadius: nil,
-            buttonType: .buy,
-            buttonStyle: .whiteOutline
+            label: .buy,
+            style: .whiteOutline
         )
 
         XCTAssertEqual(storedButtonType(in: button)?.rawValue, PKPaymentButtonType.buy.rawValue)
@@ -116,8 +116,8 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
     func testInternalApplePayButtonStoresPassKitValuesDirectly() {
         let button = Internal_ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            buttonType: .buy,
-            buttonStyle: .whiteOutline,
+            label: .buy,
+            style: .whiteOutline,
             configuration: .testConfiguration,
             cornerRadius: nil
         )
@@ -134,22 +134,22 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
             action: {}
         )
 
-        XCTAssertEqual(storedButtonType(in: representable)?.rawValue, PKPaymentButtonType.buy.rawValue)
-        XCTAssertEqual(storedButtonStyle(in: representable)?.rawValue, PKPaymentButtonStyle.whiteOutline.rawValue)
+        XCTAssertEqual(storedRepresentableButtonType(in: representable)?.rawValue, PKPaymentButtonType.buy.rawValue)
+        XCTAssertEqual(storedRepresentableButtonStyle(in: representable)?.rawValue, PKPaymentButtonStyle.whiteOutline.rawValue)
     }
 
     func testInternalApplePayButtonIdentityChangesWhenButtonTypeChanges() {
         let plainButton = Internal_ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            buttonType: .plain,
-            buttonStyle: .automatic,
+            label: .plain,
+            style: .automatic,
             configuration: .testConfiguration,
             cornerRadius: nil
         )
         let buyButton = Internal_ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            buttonType: .buy,
-            buttonStyle: .automatic,
+            label: .buy,
+            style: .automatic,
             configuration: .testConfiguration,
             cornerRadius: nil
         )
@@ -161,18 +161,26 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
     }
 
     private func storedApplePayButtonType(in view: AcceleratedCheckoutButtons) -> PKPaymentButtonType? {
-        return childValue(named: "applePayButtonType", in: view)
+        return childValue(named: "applePayLabel", in: view)
     }
 
     private func storedApplePayButtonStyle(in view: AcceleratedCheckoutButtons) -> PKPaymentButtonStyle? {
-        return childValue(named: "applePayButtonStyle", in: view)
+        return childValue(named: "applePayStyle", in: view)
     }
 
     private func storedButtonType(in value: some Any) -> PKPaymentButtonType? {
-        return childValue(named: "buttonType", in: value)
+        return childValue(named: "label", in: value)
     }
 
     private func storedButtonStyle(in value: some Any) -> PKPaymentButtonStyle? {
+        return childValue(named: "style", in: value)
+    }
+
+    private func storedRepresentableButtonType(in value: some Any) -> PKPaymentButtonType? {
+        return childValue(named: "buttonType", in: value)
+    }
+
+    private func storedRepresentableButtonStyle(in value: some Any) -> PKPaymentButtonStyle? {
         return childValue(named: "buttonStyle", in: value)
     }
 
