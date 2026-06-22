@@ -128,8 +128,8 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
 
     func test_applePayButtonRepresentable_withPassKitValues_shouldStoreValuesDirectly() {
         let representable = ApplePayButtonRepresentable(
-            buttonType: .buy,
-            buttonStyle: .whiteOutline,
+            buttonType: PKPaymentButtonType.buy,
+            buttonStyle: PKPaymentButtonStyle.whiteOutline,
             cornerRadius: 8,
             action: {}
         )
