@@ -28,35 +28,35 @@ import XCTest
 
 @available(iOS 16.0, *)
 final class ApplePayButtonCustomizationTests: XCTestCase {
-    func testApplePayButtonTypeModifierStoresPassKitButtonType() {
+    func test_applePayButtonType_withPassKitButtonTypeModifier_shouldStorePassKitButtonType() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .applePayButtonType(.buy)
 
         XCTAssertEqual(storedApplePayButtonType(in: view)?.rawValue, PKPaymentButtonType.buy.rawValue)
     }
 
-    func testApplePayButtonStyleModifierStoresPassKitButtonStyle() {
+    func test_applePayButtonStyle_withPassKitButtonStyleModifier_shouldStorePassKitButtonStyle() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .applePayButtonStyle(.black)
 
         XCTAssertEqual(storedApplePayButtonStyle(in: view)?.rawValue, PKPaymentButtonStyle.black.rawValue)
     }
 
-    func testDeprecatedApplePayLabelModifierMapsToPassKitButtonType() {
+    func test_applePayLabel_withDeprecatedLabelModifier_shouldStoreMappedPassKitButtonType() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .applePayLabel(.buy)
 
         XCTAssertEqual(storedApplePayButtonType(in: view)?.rawValue, PKPaymentButtonType.buy.rawValue)
     }
 
-    func testDeprecatedApplePayStyleModifierMapsToPassKitButtonStyle() {
+    func test_applePayStyle_withDeprecatedStyleModifier_shouldStoreMappedPassKitButtonStyle() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .applePayStyle(.black)
 
         XCTAssertEqual(storedApplePayButtonStyle(in: view)?.rawValue, PKPaymentButtonStyle.black.rawValue)
     }
 
-    func testDeprecatedApplePayLabelModifierMapsSupportedLabelsToPassKitButtonTypes() {
+    func test_applePayLabel_withSupportedDeprecatedLabels_shouldMapToPassKitButtonTypes() {
         let mappings: [(PayWithApplePayButtonLabel, PKPaymentButtonType)] = [
             (.plain, .plain),
             (.buy, .buy),
@@ -85,7 +85,7 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         }
     }
 
-    func testDeprecatedApplePayStyleModifierMapsSupportedStylesToPassKitButtonStyles() {
+    func test_applePayStyle_withSupportedDeprecatedStyles_shouldMapToPassKitButtonStyles() {
         let mappings: [(PayWithApplePayButtonStyle, PKPaymentButtonStyle)] = [
             (.automatic, .automatic),
             (.black, .black),
@@ -101,7 +101,7 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         }
     }
 
-    func testApplePayButtonPassesPassKitValuesToInternalButton() {
+    func test_applePayButton_withPassKitValues_shouldPassValuesToInternalButton() {
         let button = ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             cornerRadius: nil,
@@ -113,7 +113,7 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         XCTAssertEqual(storedButtonStyle(in: button)?.rawValue, PKPaymentButtonStyle.whiteOutline.rawValue)
     }
 
-    func testInternalApplePayButtonStoresPassKitValuesDirectly() {
+    func test_internalApplePayButton_withPassKitValues_shouldStoreValuesDirectly() {
         let button = Internal_ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             label: .buy,
@@ -126,7 +126,7 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         XCTAssertEqual(storedButtonStyle(in: button)?.rawValue, PKPaymentButtonStyle.whiteOutline.rawValue)
     }
 
-    func testApplePayButtonRepresentableStoresPassKitValuesDirectly() {
+    func test_applePayButtonRepresentable_withPassKitValues_shouldStoreValuesDirectly() {
         let representable = ApplePayButtonRepresentable(
             buttonType: .buy,
             buttonStyle: .whiteOutline,
@@ -138,7 +138,7 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         XCTAssertEqual(storedRepresentableButtonStyle(in: representable)?.rawValue, PKPaymentButtonStyle.whiteOutline.rawValue)
     }
 
-    func testInternalApplePayButtonIdentityChangesWhenButtonTypeChanges() {
+    func test_buttonIdentity_withDifferentButtonTypes_shouldChangeIdentity() {
         let plainButton = Internal_ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             label: .plain,
