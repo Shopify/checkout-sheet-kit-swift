@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# Temporary compatibility test for iOS 18 accelerated checkout coverage.
+# Remove this once iOS 18 end-to-end tests cover the Apple Pay accelerated checkout path.
+
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GENERATED_DERIVED_DATA=false
 
@@ -36,13 +39,13 @@ if [[ -z "$BINARY_PATH" ]]; then
 fi
 
 UNDEFINED_SYMBOLS="$(xcrun nm -u "$BINARY_PATH" | xcrun swift-demangle)"
-PASSKIT_SWIFTUI_SYMBOLS="$(echo "$UNDEFINED_SYMBOLS" | grep -E '_PassKit_SwiftUI\.PayWithApplePay' || true)"
-DISALLOWED_SYMBOLS="$(echo "$PASSKIT_SWIFTUI_SYMBOLS" | grep -v -E '^type metadata accessor for _PassKit_SwiftUI\.PayWithApplePayButton(Label|Style)$' || true)"
+PASSKIT_SWIFTUI_APPLE_PAY_SYMBOLS="$(echo "$UNDEFINED_SYMBOLS" | grep -E '_PassKit_SwiftUI\.PayWithApplePay' || true)"
+DISALLOWED_SYMBOLS="$(echo "$PASSKIT_SWIFTUI_APPLE_PAY_SYMBOLS" | grep -v -E '^type metadata accessor for _PassKit_SwiftUI\.PayWithApplePayButton(Label|Style)$' || true)"
 
 if [[ -n "$DISALLOWED_SYMBOLS" ]]; then
-    echo "❌ Found disallowed SwiftUI Apple Pay button symbols:"
+    echo "❌ Found disallowed PassKit SwiftUI Apple Pay symbols for iOS 18 accelerated checkout coverage:"
     echo "$DISALLOWED_SYMBOLS"
     exit 1
 fi
 
-echo "✅ No disallowed SwiftUI Apple Pay button symbols found"
+echo "✅ No disallowed PassKit SwiftUI Apple Pay symbols found for iOS 18 accelerated checkout coverage"

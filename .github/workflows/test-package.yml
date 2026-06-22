@@ -12,5 +12,6 @@ jobs:
     uses: ./.github/workflows/test-workflow.yml
     with:
       test-path: |
+        ./Tests/Scripts/test_accelerated_checkout_symbols_ios18
         ./scripts/xcode_run test ShopifyCheckoutSheetKit-Package
-        ./scripts/check_accelerated_checkouts_symbols
+        ./scripts/test_accelerated_checkout_symbols_ios18
