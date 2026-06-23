@@ -708,7 +708,7 @@ Use `AcceleratedCheckoutButtons` to attach accelerated checkout calls-to-action 
 ```swift
 if #available(iOS 16.0, *) {
     AcceleratedCheckoutButtons(cartID: cartID)
-        .wallets([..shopPay, .applePay])
+        .wallets([.shopPay, .applePay])
 }
 ```
 
