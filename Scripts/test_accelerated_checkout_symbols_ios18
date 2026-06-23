@@ -1,0 +1,51 @@
+#!/bin/bash
+set -euo pipefail
+
+# Temporary compatibility test for iOS 18 accelerated checkout coverage.
+# Remove this once iOS 18 end-to-end tests cover the Apple Pay accelerated checkout path.
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+GENERATED_DERIVED_DATA=false
+
+if [[ -z "${DERIVED_DATA_PATH:-}" ]]; then
+    DERIVED_DATA_PATH="$(mktemp -d)"
+    GENERATED_DERIVED_DATA=true
+fi
+
+cleanup() {
+    if [[ "$GENERATED_DERIVED_DATA" == "true" ]]; then
+        rm -rf "$DERIVED_DATA_PATH"
+    fi
+}
+trap cleanup EXIT
+
+cd "$PROJECT_ROOT"
+
+XCODEBUILD_DESTINATION="${XCODEBUILD_DESTINATION:-generic/platform=iOS Simulator}"
+
+xcodebuild_cmd="xcodebuild build -scheme ShopifyCheckoutSheetKit-Package -sdk iphonesimulator -destination \"$XCODEBUILD_DESTINATION\" -derivedDataPath \"$DERIVED_DATA_PATH\" -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO"
+
+if command -v xcbeautify >/dev/null 2>&1; then
+    eval "$xcodebuild_cmd" | xcbeautify --renderer github-actions
+else
+    eval "$xcodebuild_cmd"
+fi
+
+BINARY_PATH="$(find "$DERIVED_DATA_PATH/Build/Products" -name ShopifyAcceleratedCheckouts.o -type f | head -n 1)"
+
+if [[ -z "$BINARY_PATH" ]]; then
+    echo "❌ Could not find ShopifyAcceleratedCheckouts.o in $DERIVED_DATA_PATH"
+    exit 1
+fi
+
+UNDEFINED_SYMBOLS="$(xcrun nm -u "$BINARY_PATH" | xcrun swift-demangle)"
+PASSKIT_SWIFTUI_APPLE_PAY_SYMBOLS="$(echo "$UNDEFINED_SYMBOLS" | grep -E '_PassKit_SwiftUI\.PayWithApplePay' || true)"
+DISALLOWED_SYMBOLS="$(echo "$PASSKIT_SWIFTUI_APPLE_PAY_SYMBOLS" | grep -v -E '^type metadata accessor for _PassKit_SwiftUI\.PayWithApplePayButton(Label|Style)$' || true)"
+
+if [[ -n "$DISALLOWED_SYMBOLS" ]]; then
+    echo "❌ Found disallowed PassKit SwiftUI Apple Pay symbols for iOS 18 accelerated checkout coverage:"
+    echo "$DISALLOWED_SYMBOLS"
+    exit 1
+fi
+
+echo "✅ No disallowed PassKit SwiftUI Apple Pay symbols found for iOS 18 accelerated checkout coverage"

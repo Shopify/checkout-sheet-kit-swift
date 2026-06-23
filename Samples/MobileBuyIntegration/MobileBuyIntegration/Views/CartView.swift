@@ -54,7 +54,7 @@ struct CartView: View {
                 VStack(spacing: DesignSystem.buttonSpacing) {
                     if let cartId = cartManager.cart?.id {
                         AcceleratedCheckoutButtons(cartID: cartId)
-                            .applePayStyle(applePayStyle.style)
+                            .applePayButtonStyle(applePayStyle.style)
                             .wallets([.shopPay, .applePay])
                             .cornerRadius(DesignSystem.cornerRadius)
                             .onComplete { _ in

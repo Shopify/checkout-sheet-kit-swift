@@ -137,7 +137,7 @@ struct ProductView: View {
 
                         if variant.availableForSale {
                             AcceleratedCheckoutButtons(variantID: variant.id, quantity: 1)
-                                .applePayStyle(applePayStyle.style)
+                                .applePayButtonStyle(applePayStyle.style)
                                 .wallets([.applePay])
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .onFail { error in

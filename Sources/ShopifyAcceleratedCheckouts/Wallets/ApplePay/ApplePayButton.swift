@@ -46,11 +46,11 @@ struct ApplePayButton: View {
     /// The event handlers for checkout events
     private let eventHandlers: EventHandlers
 
-    /// The Apple Pay button label style
-    private var label: PayWithApplePayButtonLabel = .plain
+    /// The Apple Pay button type
+    private let label: PKPaymentButtonType
 
     /// The Apple Pay button style
-    private var style: PayWithApplePayButtonStyle = .automatic
+    private let style: PKPaymentButtonStyle
 
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
@@ -59,11 +59,13 @@ struct ApplePayButton: View {
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?,
-        style: PayWithApplePayButtonStyle = .automatic
+        label: PKPaymentButtonType = .plain,
+        style: PKPaymentButtonStyle = .automatic
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         self.cornerRadius = cornerRadius
+        self.label = label
         self.style = style
     }
 
@@ -86,18 +88,6 @@ struct ApplePayButton: View {
             )
         }
     }
-
-    func applePayStyle(_ style: PayWithApplePayButtonStyle) -> some View {
-        var view = self
-        view.style = style
-        return view
-    }
-
-    func label(_ label: PayWithApplePayButtonLabel) -> some View {
-        var view = self
-        view.label = label
-        return view
-    }
 }
 
 /// A view that displays an Apple Pay button for checkout
@@ -105,16 +95,20 @@ struct ApplePayButton: View {
 @available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct Internal_ApplePayButton: View {
-    private let label: PayWithApplePayButtonLabel
-    private let style: PayWithApplePayButtonStyle
+    private let label: PKPaymentButtonType
+    private let style: PKPaymentButtonStyle
     private let controller: ApplePayViewController
     private let cornerRadius: CGFloat?
     @Environment(\.colorScheme) private var colorScheme
 
+    func buttonIdentity(colorScheme: ColorScheme) -> String {
+        return "\(colorScheme)-\(label.rawValue)-\(style.rawValue)"
+    }
+
     init(
         identifier: CheckoutIdentifier,
-        label: PayWithApplePayButtonLabel,
-        style: PayWithApplePayButtonStyle,
+        label: PKPaymentButtonType,
+        style: PKPaymentButtonStyle,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
@@ -137,54 +131,15 @@ struct Internal_ApplePayButton: View {
     var body: some View {
         if PKPaymentAuthorizationController.canMakePayments() {
             ApplePayButtonRepresentable(
-                buttonType: label.pkPaymentButtonType,
-                buttonStyle: style.pkPaymentButtonStyle,
+                buttonType: label,
+                buttonStyle: style,
                 cornerRadius: cornerRadius ?? 8,
                 action: { Task { await controller.onPress() } }
             )
-            .id("\(colorScheme)-\(style.pkPaymentButtonStyle.rawValue)")
+            .id(buttonIdentity(colorScheme: colorScheme))
             .frame(height: 48)
         } else {
             Text("errors.applePay.unsupported".localizedString)
-        }
-    }
-}
-
-// MARK: - Type Conversions
-
-@available(iOS 16.0, *)
-extension PayWithApplePayButtonStyle {
-    var pkPaymentButtonStyle: PKPaymentButtonStyle {
-        switch self {
-        case .black: .black
-        case .white: .white
-        case .whiteOutline: .whiteOutline
-        case .automatic: .automatic
-        default: .automatic
-        }
-    }
-}
-
-@available(iOS 16.0, *)
-extension PayWithApplePayButtonLabel {
-    var pkPaymentButtonType: PKPaymentButtonType {
-        switch self {
-        case .buy: .buy
-        case .setUp: .setUp
-        case .inStore: .inStore
-        case .donate: .donate
-        case .checkout: .checkout
-        case .book: .book
-        case .subscribe: .subscribe
-        case .reload: .reload
-        case .addMoney: .addMoney
-        case .topUp: .topUp
-        case .order: .order
-        case .rent: .rent
-        case .support: .support
-        case .contribute: .contribute
-        case .tip: .tip
-        default: .plain
         }
     }
 }

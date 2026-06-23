@@ -324,7 +324,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             .flatMap(ApplePayStyleOption.init(rawValue:)) ?? .automatic
 
         let acceleratedCheckoutButtonsView = AcceleratedCheckoutButtons(cartID: cartId)
-            .applePayStyle(savedStyle.style)
+            .applePayButtonStyle(savedStyle.style)
             .wallets([.shopPay, .applePay])
             .cornerRadius(10)
             .onComplete { _ in

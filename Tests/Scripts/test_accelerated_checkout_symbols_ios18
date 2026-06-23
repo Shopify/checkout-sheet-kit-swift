@@ -1,0 +1,77 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SCRIPT_UNDER_TEST="$PROJECT_ROOT/Scripts/test_accelerated_checkout_symbols_ios18"
+
+assert_contains() {
+    local haystack="$1"
+    local needle="$2"
+
+    if [[ "$haystack" != *"$needle"* ]]; then
+        echo "Expected output to contain: $needle"
+        echo "Actual output:"
+        echo "$haystack"
+        exit 1
+    fi
+}
+
+run_symbol_test() {
+    local symbols="$1"
+    local expected_status="$2"
+    local expected_output="$3"
+    local temp_dir
+    temp_dir="$(mktemp -d)"
+
+    mkdir -p "$temp_dir/bin"
+
+    cat > "$temp_dir/bin/xcodebuild" <<'FAKE_XCODEBUILD'
+#!/bin/bash
+set -euo pipefail
+mkdir -p "$DERIVED_DATA_PATH/Build/Products/Debug-iphonesimulator"
+touch "$DERIVED_DATA_PATH/Build/Products/Debug-iphonesimulator/ShopifyAcceleratedCheckouts.o"
+FAKE_XCODEBUILD
+
+    cat > "$temp_dir/bin/xcrun" <<'FAKE_XCRUN'
+#!/bin/bash
+set -euo pipefail
+case "$1" in
+    nm)
+        printf '%s\n' "$TEST_SYMBOLS"
+        ;;
+    swift-demangle)
+        cat
+        ;;
+    *)
+        echo "Unexpected xcrun command: $*" >&2
+        exit 1
+        ;;
+esac
+FAKE_XCRUN
+
+    chmod +x "$temp_dir/bin/xcodebuild" "$temp_dir/bin/xcrun"
+
+    set +e
+    output="$(DERIVED_DATA_PATH="$temp_dir/DerivedData" TEST_SYMBOLS="$symbols" PATH="$temp_dir/bin:/usr/bin:/bin" "$SCRIPT_UNDER_TEST" 2>&1)"
+    status=$?
+    set -e
+
+    rm -rf "$temp_dir"
+
+    if [[ "$status" -ne "$expected_status" ]]; then
+        echo "Expected status $expected_status but got $status"
+        echo "$output"
+        exit 1
+    fi
+
+    assert_contains "$output" "$expected_output"
+}
+
+allowed_symbols=$'type metadata accessor for _PassKit_SwiftUI.PayWithApplePayButtonLabel\ntype metadata accessor for _PassKit_SwiftUI.PayWithApplePayButtonStyle'
+run_symbol_test "$allowed_symbols" 0 "No disallowed PassKit SwiftUI Apple Pay symbols found for iOS 18 accelerated checkout coverage"
+
+disallowed_symbols=$'protocol witness for static Swift.Equatable.== infix(A, A) -> Swift.Bool in conformance _PassKit_SwiftUI.PayWithApplePayButtonLabel : Swift.Equatable in _PassKit_SwiftUI\ntype metadata accessor for _PassKit_SwiftUI.PayWithApplePayButtonLabel'
+run_symbol_test "$disallowed_symbols" 1 "Found disallowed PassKit SwiftUI Apple Pay symbols for iOS 18 accelerated checkout coverage"
+
+echo "✅ test_accelerated_checkout_symbols_ios18 passed"
