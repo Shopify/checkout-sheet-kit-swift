@@ -247,6 +247,144 @@ class CheckoutBridgeTests: XCTestCase {
         XCTAssertEqual([1, 2, 3], customData.wrapper.attr2)
     }
 
+    func testDecodeCustomWebPixelEventWithNullInArray() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"x\": [null]}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        let array = try XCTUnwrap(json?["x"] as? [Any])
+        XCTAssertEqual(1, array.count)
+        XCTAssertTrue(array[0] is NSNull)
+    }
+
+    func testDecodeCustomWebPixelEventWithNestedArray() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"x\": [[1]]}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        let outer = try XCTUnwrap(json?["x"] as? [Any])
+        let inner = try XCTUnwrap(outer.first as? [Any])
+        XCTAssertEqual(1, inner.first as? Int)
+    }
+
+    func testDecodeCustomWebPixelEventWithMixedArrayContent() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"x\": [{\"y\": null}, [1, 2], true, \"value\"]}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        let array = try XCTUnwrap(json?["x"] as? [Any])
+        XCTAssertEqual(4, array.count)
+        let object = try XCTUnwrap(array[0] as? [String: Any])
+        XCTAssertTrue(object["y"] is NSNull)
+        XCTAssertEqual([1, 2], array[1] as? [Int])
+        XCTAssertEqual(true, array[2] as? Bool)
+        XCTAssertEqual("value", array[3] as? String)
+    }
+
+    func testDecodeCustomWebPixelEventWithDoubleValues() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"price\": 9.99, \"ratios\": [1.5, 2.5]}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        XCTAssertEqual(9.99, json?["price"] as? Double)
+        let ratios = try XCTUnwrap(json?["ratios"] as? [Double])
+        XCTAssertEqual([1.5, 2.5], ratios)
+    }
+
+    func testDecodeCustomWebPixelEventWithEmptyArrayAndObject() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"arr\": [], \"obj\": {}}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        let array = try XCTUnwrap(json?["arr"] as? [Any])
+        XCTAssertEqual(0, array.count)
+        let object = try XCTUnwrap(json?["obj"] as? [String: Any])
+        XCTAssertEqual(0, object.count)
+    }
+
+    func testDecodeCustomWebPixelEventWithDeeplyNestedStructure() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"a\": {\"b\": {\"c\": {\"d\": [1, [2, [3]]]}}}}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        let a = try XCTUnwrap(json?["a"] as? [String: Any])
+        let b = try XCTUnwrap(a["b"] as? [String: Any])
+        let c = try XCTUnwrap(b["c"] as? [String: Any])
+        let d = try XCTUnwrap(c["d"] as? [Any])
+        XCTAssertEqual(1, d[0] as? Int)
+        let inner = try XCTUnwrap(d[1] as? [Any])
+        XCTAssertEqual(2, inner[0] as? Int)
+        let innermost = try XCTUnwrap(inner[1] as? [Any])
+        XCTAssertEqual(3, innermost[0] as? Int)
+    }
+
+    func testDecodeCustomWebPixelEventWithTopLevelNullValue() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"x\": null, \"y\": \"value\"}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        XCTAssertTrue(json?["x"] is NSNull)
+        XCTAssertEqual("value", json?["y"] as? String)
+    }
+
+    func testDecodeCustomWebPixelEventWithLargeNumbers() throws {
+        let event = createEventPayload(name: "webPixels", "{\"name\": \"my_custom_event\",\"event\": {\"id\": \"123\",\"name\": \"my_custom_event\",\"type\":\"custom\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"customData\": {\"maxInt\": 9223372036854775807, \"overflow\": 9999999999999999999}, \"context\": {}}}")
+
+        let result = try CheckoutBridge.decode(event)
+
+        guard case let .webPixels(pixelEvent) = result, case let .customEvent(customEvent) = pixelEvent else {
+            XCTFail("Expected .webPixels(.customEvent), got \(result)")
+            return
+        }
+
+        let json = try JSONSerialization.jsonObject(with: XCTUnwrap(customEvent.customData?.data(using: .utf8))) as? [String: Any]
+        XCTAssertEqual(Int.max, json?["maxInt"] as? Int)
+        XCTAssertNil(json?["overflow"] as? Int)
+        XCTAssertNotNil(json?["overflow"] as? Double)
+    }
+
     func testDecodeSupportsWebPixelsEventWithAdditionalDataAttributes() throws {
         let body = "{\"name\": \"checkout_completed\",\"event\": {\"id\": \"123\",\"name\": \"checkout_completed\",\"type\":\"standard\",\"timestamp\": \"2024-01-04T09:48:53.358Z\",\"data\": { \"checkout\": {\"currencyCode\": \"USD\", \"order\": {\"customer\": { \"id\":\"456\",\"isFirstOrder\":true }}}}, \"context\": {}}}"
             .replacingOccurrences(of: "\"", with: "\\\"")
