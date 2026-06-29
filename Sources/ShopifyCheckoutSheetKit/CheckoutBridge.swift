@@ -113,13 +113,51 @@ enum CheckoutBridge: CheckoutBridgeProtocol {
 
     static func dispatchMessageTemplate(body: String) -> String {
         return """
-        if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-        	window.MobileCheckoutSdk.dispatchMessage(\(body));
-        } else {
-        	window.addEventListener('mobileCheckoutBridgeReady', function () {
+        (function () {
+        	var maxAttempts = 50;
+        	var intervalMs = 100;
+        	var attempts = 0;
+        	var intervalId;
+        	var didDispatch = false;
+
+        	function bridgeReady() {
+        		return window.MobileCheckoutSdk && typeof window.MobileCheckoutSdk.dispatchMessage === 'function';
+        	}
+
+        	function cleanup() {
+        		window.removeEventListener('mobileCheckoutBridgeReady', onBridgeReady);
+        		if (intervalId) {
+        			window.clearInterval(intervalId);
+        		}
+        	}
+
+        	function dispatchMessage() {
+        		if (didDispatch || !bridgeReady()) {
+        			return false;
+        		}
+
+        		didDispatch = true;
+        		cleanup();
         		window.MobileCheckoutSdk.dispatchMessage(\(body));
-        	}, {passive: true, once: true});
-        }
+        		return true;
+        	}
+
+        	function onBridgeReady() {
+        		dispatchMessage();
+        	}
+
+        	if (dispatchMessage()) {
+        		return;
+        	}
+
+        	window.addEventListener('mobileCheckoutBridgeReady', onBridgeReady, {passive: true});
+        	intervalId = window.setInterval(function () {
+        		attempts += 1;
+        		if (dispatchMessage() || attempts >= maxAttempts) {
+        			cleanup();
+        		}
+        	}, intervalMs);
+        })();
         """
     }
 }

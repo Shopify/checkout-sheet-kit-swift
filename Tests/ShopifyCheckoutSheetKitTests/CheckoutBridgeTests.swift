@@ -471,27 +471,85 @@ class CheckoutBridgeTests: XCTestCase {
         wait(for: [evaluateJavaScriptExpectation], timeout: 2)
     }
 
+    func testDispatchMessageTemplateWaitsForDelayedBridgeAvailability() {
+        let script = CheckoutBridge.dispatchMessageTemplate(body: "'presented'")
+
+        XCTAssertTrue(script.contains("window.addEventListener('mobileCheckoutBridgeReady', onBridgeReady, {passive: true});"))
+        XCTAssertTrue(script.contains("intervalId = window.setInterval(function () {"))
+        XCTAssertTrue(script.contains("typeof window.MobileCheckoutSdk.dispatchMessage === 'function';"))
+    }
+
+    func testDispatchMessageTemplatePreventsDuplicateDispatches() {
+        let script = CheckoutBridge.dispatchMessageTemplate(body: "'presented'")
+
+        XCTAssertTrue(script.contains("if (didDispatch || !bridgeReady()) {"))
+        XCTAssertTrue(script.contains("didDispatch = true;"))
+        XCTAssertTrue(script.contains("window.removeEventListener('mobileCheckoutBridgeReady', onBridgeReady);"))
+    }
+
+    func testDispatchMessageTemplateStopsPollingAfterTimeout() {
+        let script = CheckoutBridge.dispatchMessageTemplate(body: "'presented'")
+
+        XCTAssertTrue(script.contains("var maxAttempts = 50;"))
+        XCTAssertTrue(script.contains("attempts >= maxAttempts"))
+        XCTAssertTrue(script.contains("window.clearInterval(intervalId);"))
+    }
+
     private func expectedPresentedScript() -> String {
-        return """
-        if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-        	window.MobileCheckoutSdk.dispatchMessage('presented');
-        } else {
-        	window.addEventListener('mobileCheckoutBridgeReady', function () {
-        		window.MobileCheckoutSdk.dispatchMessage('presented');
-        	}, {passive: true, once: true});
-        }
-        """
+        return expectedDispatchScript(body: "'presented'")
     }
 
     private func expectedPayloadScript() -> String {
+        return expectedDispatchScript(body: "'payload', {\"one\": true}")
+    }
+
+    private func expectedDispatchScript(body: String) -> String {
         return """
-        if (window.MobileCheckoutSdk && window.MobileCheckoutSdk.dispatchMessage) {
-        	window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
-        } else {
-        	window.addEventListener('mobileCheckoutBridgeReady', function () {
-        		window.MobileCheckoutSdk.dispatchMessage('payload', {"one": true});
-        	}, {passive: true, once: true});
-        }
+        (function () {
+        	var maxAttempts = 50;
+        	var intervalMs = 100;
+        	var attempts = 0;
+        	var intervalId;
+        	var didDispatch = false;
+
+        	function bridgeReady() {
+        		return window.MobileCheckoutSdk && typeof window.MobileCheckoutSdk.dispatchMessage === 'function';
+        	}
+
+        	function cleanup() {
+        		window.removeEventListener('mobileCheckoutBridgeReady', onBridgeReady);
+        		if (intervalId) {
+        			window.clearInterval(intervalId);
+        		}
+        	}
+
+        	function dispatchMessage() {
+        		if (didDispatch || !bridgeReady()) {
+        			return false;
+        		}
+
+        		didDispatch = true;
+        		cleanup();
+        		window.MobileCheckoutSdk.dispatchMessage(\(body));
+        		return true;
+        	}
+
+        	function onBridgeReady() {
+        		dispatchMessage();
+        	}
+
+        	if (dispatchMessage()) {
+        		return;
+        	}
+
+        	window.addEventListener('mobileCheckoutBridgeReady', onBridgeReady, {passive: true});
+        	intervalId = window.setInterval(function () {
+        		attempts += 1;
+        		if (dispatchMessage() || attempts >= maxAttempts) {
+        			cleanup();
+        		}
+        	}, intervalMs);
+        })();
         """
     }
 
