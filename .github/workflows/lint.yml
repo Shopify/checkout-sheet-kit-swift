@@ -10,7 +10,7 @@ jobs:
     name: SwiftLint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: norio-nomura/action-swiftlint@9f4dcd7fd46b4e75d7935cf2f4df406d5cae3684 # 3.2.1
         with:
           args: --strict
@@ -22,7 +22,7 @@ jobs:
       MINT_PATH: ${{ github.workspace }}/.mint/lib
       MINT_LINK_PATH: ${{ github.workspace }}/.mint/bin
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Cache Mint packages
         id: mint-cache
@@ -49,14 +49,14 @@ jobs:
     name: License Headers
     runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - run: ./Scripts/ensure_license
 
   lint-podspec:
     name: CocoaPods
     runs-on: ${{ vars.MACOS_RUNNER }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ruby/setup-ruby@dffb23f65a78bba8db45d387d5ea1bbd6be3ef18 # v1.293.0
         with:
           bundler-cache: true
