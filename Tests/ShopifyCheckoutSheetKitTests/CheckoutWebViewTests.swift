@@ -247,6 +247,88 @@ class CheckoutWebViewTests: XCTestCase {
         }
     }
 
+    func test404responseOnSameOriginCheckoutURLCodeDelegation() throws {
+        try view.load(checkout: XCTUnwrap(URL(string: "http://shopify1.shopify.com/checkouts/cn/123")))
+        let link = try XCTUnwrap(URL(string: "http://shopify1.shopify.com/cart/c/123?key=value"))
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: nil))
+
+        let policy = view.handleResponse(urlResponse)
+        XCTAssertEqual(policy, .cancel)
+
+        waitForExpectations(timeout: 5) { _ in
+            switch self.mockDelegate.errorReceived {
+            case let .some(.checkoutUnavailable(message, _, recoverable)):
+                XCTAssertEqual(message, "not found")
+                XCTAssertFalse(recoverable)
+            default:
+                XCTFail("Unhandled error case received")
+            }
+        }
+    }
+
+    func test404responseOnCheckoutShapedShopAppTransitionCodeDelegation() throws {
+        try view.load(checkout: XCTUnwrap(URL(string: "https://shop.app/checkout/123/cn/123")))
+        let link = try XCTUnwrap(URL(string: "https://shopify1.shopify.com/checkouts/cn/123"))
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: nil))
+
+        let policy = view.handleResponse(urlResponse)
+        XCTAssertEqual(policy, .cancel)
+
+        waitForExpectations(timeout: 5) { _ in
+            switch self.mockDelegate.errorReceived {
+            case let .some(.checkoutUnavailable(message, _, recoverable)):
+                XCTAssertEqual(message, "not found")
+                XCTAssertFalse(recoverable)
+            default:
+                XCTFail("Unhandled error case received")
+            }
+        }
+    }
+
+    func test404responseOnThirdPartyURLIsAllowed() throws {
+        try view.load(checkout: XCTUnwrap(URL(string: "http://shopify1.shopify.com/checkouts/cn/123")))
+        let link = try XCTUnwrap(URL(string: "https://process.paypo.pl/smartplan/123"))
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+        didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: nil))
+
+        let policy = view.handleResponse(urlResponse)
+        XCTAssertEqual(policy, .allow)
+
+        waitForExpectations(timeout: 0.5, handler: nil)
+    }
+
+    func test404responseOnThirdPartyURLAfterShopAppCheckoutIsAllowed() throws {
+        try view.load(checkout: XCTUnwrap(URL(string: "https://shop.app/checkout/123/cn/123")))
+        let link = try XCTUnwrap(URL(string: "https://process.paypo.pl/smartplan/123"))
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+        didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(url: link, statusCode: 404, httpVersion: nil, headerFields: nil))
+
+        let policy = view.handleResponse(urlResponse)
+        XCTAssertEqual(policy, .allow)
+
+        waitForExpectations(timeout: 0.5, handler: nil)
+    }
+
     func test410responseOnCheckoutURLCodeDelegation() throws {
         try view.load(checkout: XCTUnwrap(URL(string: "http://shopify1.shopify.com/checkouts/cn/123")))
         let link = try XCTUnwrap(view.url)
