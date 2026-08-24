@@ -332,6 +332,11 @@ extension CheckoutWebView: WKNavigationDelegate {
             return .allow
         }
 
+        if isCloudflareManagedChallenge(response) {
+            OSLogger.shared.debug("Allowing Cloudflare managed challenge response to render")
+            return .allow
+        }
+
         if statusCode >= 400 {
             // Invalidate cache for any sort of error
             CheckoutWebView.invalidate()
@@ -374,6 +379,12 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         return .allow
+    }
+
+    private func isCloudflareManagedChallenge(_ response: HTTPURLResponse) -> Bool {
+        response.value(forHTTPHeaderField: "cf-mitigated")?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .caseInsensitiveCompare("challenge") == .orderedSame
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {

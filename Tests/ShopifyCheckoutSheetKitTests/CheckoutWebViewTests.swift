@@ -174,6 +174,27 @@ class CheckoutWebViewTests: XCTestCase {
         }
     }
 
+    func testCloudflareManagedChallengeResponseIsAllowedToRender() throws {
+        try view.load(checkout: XCTUnwrap(URL(string: "http://shopify1.shopify.com/checkouts/cn/123")))
+        let link = try XCTUnwrap(view.url)
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+        didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(
+            url: link,
+            statusCode: 403,
+            httpVersion: nil,
+            headerFields: ["Cf-Mitigated": " Challenge "]
+        ))
+
+        XCTAssertEqual(view.handleResponse(urlResponse), .allow)
+        waitForExpectations(timeout: 0.5)
+        XCTAssertNil(mockDelegate.errorReceived)
+    }
+
     func testObtainsOrderIDFromQuery() throws {
         let urls = [
             "http://shopify1.shopify.com/checkouts/c/12345/thank-you?order_id=1234",
