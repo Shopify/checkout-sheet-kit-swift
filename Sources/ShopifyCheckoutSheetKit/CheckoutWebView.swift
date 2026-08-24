@@ -117,6 +117,8 @@ class CheckoutWebView: WKWebView {
         }
     }
 
+    var checkoutIsVisible = false
+
     var checkoutDidLoad: Bool = false {
         didSet {
             dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
@@ -332,7 +334,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         if isCloudflareManagedChallenge(response) {
-            if isPreloadRequest, !checkoutDidPresent {
+            if isPreloadRequest, !checkoutIsVisible {
                 OSLogger.shared.debug("Discarding preloaded Cloudflare managed challenge response")
                 CheckoutWebView.invalidate()
                 return .cancel

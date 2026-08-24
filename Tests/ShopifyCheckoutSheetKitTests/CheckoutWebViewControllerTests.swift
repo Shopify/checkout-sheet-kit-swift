@@ -111,6 +111,18 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
     }
 
+    func test_viewVisibility_tracksAppearanceLifecycle() {
+        let viewController = CheckoutWebViewController(checkoutURL: url)
+
+        XCTAssertFalse(viewController.checkoutView.checkoutIsVisible)
+
+        viewController.viewDidAppear(false)
+        XCTAssertTrue(viewController.checkoutView.checkoutIsVisible)
+
+        viewController.viewDidDisappear(false)
+        XCTAssertFalse(viewController.checkoutView.checkoutIsVisible)
+    }
+
     func test_checkoutViewDidFailWithError_incrementsErrorCount() {
         let mockDelegate = MockCheckoutDelegate()
         let viewController = CheckoutWebViewController(checkoutURL: url, delegate: mockDelegate, entryPoint: nil)
