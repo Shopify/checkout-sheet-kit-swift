@@ -110,12 +110,8 @@ class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControl
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
-    }
-
-    override public func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         checkoutView.checkoutIsVisible = true
+        view.backgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
     }
 
     override public func viewDidDisappear(_ animated: Bool) {

@@ -111,12 +111,12 @@ class CheckoutWebViewControllerTests: XCTestCase {
         XCTAssertEqual(viewController.checkoutView.configuration.applicationNameForUserAgent, expectedUserAgent)
     }
 
-    func test_viewVisibility_tracksAppearanceLifecycle() {
+    func test_viewVisibility_isSetBeforePresentationAndResetAfterDisappearance() {
         let viewController = CheckoutWebViewController(checkoutURL: url)
 
         XCTAssertFalse(viewController.checkoutView.checkoutIsVisible)
 
-        viewController.viewDidAppear(false)
+        viewController.viewWillAppear(false)
         XCTAssertTrue(viewController.checkoutView.checkoutIsVisible)
 
         viewController.viewDidDisappear(false)
