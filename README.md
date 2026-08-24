@@ -587,7 +587,7 @@ Update your package manifest to import `ShopifyAcceleratedCheckouts` alongside `
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "3.8.1")
+  .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "3.8.2")
 ]
 ```
 
