@@ -174,9 +174,9 @@ class CheckoutWebViewTests: XCTestCase {
         }
     }
 
-    func testCloudflareManagedChallengeResponseIsAllowedToRender() throws {
-        try view.load(checkout: XCTUnwrap(URL(string: "http://shopify1.shopify.com/checkouts/cn/123")))
-        let link = try XCTUnwrap(view.url)
+    func testPresentedCloudflareManagedChallengeResponseIsAllowedToRender() throws {
+        view.load(checkout: url, isPreload: true)
+        view.checkoutDidPresent = true
         let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
         didFailWithErrorExpectation.isInverted = true
 
@@ -184,13 +184,34 @@ class CheckoutWebViewTests: XCTestCase {
         view.viewDelegate = mockDelegate
 
         let urlResponse = try XCTUnwrap(HTTPURLResponse(
-            url: link,
+            url: url,
             statusCode: 403,
             httpVersion: nil,
             headerFields: ["Cf-Mitigated": " Challenge "]
         ))
 
         XCTAssertEqual(view.handleResponse(urlResponse), .allow)
+        waitForExpectations(timeout: 0.5)
+        XCTAssertNil(mockDelegate.errorReceived)
+    }
+
+    func testPreloadedCloudflareManagedChallengeResponseIsDiscarded() throws {
+        view.load(checkout: url, isPreload: true)
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+        didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(
+            url: url,
+            statusCode: 403,
+            httpVersion: nil,
+            headerFields: ["Cf-Mitigated": " Challenge "]
+        ))
+
+        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
+        XCTAssertEqual(view.handleResponse(urlResponse), .cancel)
+        XCTAssertFalse(CheckoutWebView.hasCacheEntry())
         waitForExpectations(timeout: 0.5)
         XCTAssertNil(mockDelegate.errorReceived)
     }

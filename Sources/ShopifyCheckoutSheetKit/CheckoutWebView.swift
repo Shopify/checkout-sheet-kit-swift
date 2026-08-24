@@ -322,7 +322,6 @@ extension CheckoutWebView: WKNavigationDelegate {
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
         let allowRecoverable = !isRecovery
-        let headers = response.allHeaderFields
         let statusCode = response.statusCode
         let errorMessageForStatusCode = HTTPURLResponse.localizedString(
             forStatusCode: statusCode
@@ -333,6 +332,12 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         if isCloudflareManagedChallenge(response) {
+            if isPreloadRequest, !checkoutDidPresent {
+                OSLogger.shared.debug("Discarding preloaded Cloudflare managed challenge response")
+                CheckoutWebView.invalidate()
+                return .cancel
+            }
+
             OSLogger.shared.debug("Allowing Cloudflare managed challenge response to render")
             return .allow
         }
