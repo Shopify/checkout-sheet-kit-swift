@@ -117,6 +117,8 @@ class CheckoutWebView: WKWebView {
         }
     }
 
+    var checkoutIsVisible = false
+
     var checkoutDidLoad: Bool = false {
         didSet {
             dispatchPresentedMessage(checkoutDidLoad, checkoutDidPresent)
@@ -322,13 +324,23 @@ extension CheckoutWebView: WKNavigationDelegate {
 
     func handleResponse(_ response: HTTPURLResponse) -> WKNavigationResponsePolicy {
         let allowRecoverable = !isRecovery
-        let headers = response.allHeaderFields
         let statusCode = response.statusCode
         let errorMessageForStatusCode = HTTPURLResponse.localizedString(
             forStatusCode: statusCode
         )
 
         guard isCheckout(url: response.url) else {
+            return .allow
+        }
+
+        if isCloudflareManagedChallenge(response) {
+            if isPreloadRequest, !checkoutIsVisible {
+                OSLogger.shared.debug("Discarding preloaded Cloudflare managed challenge response")
+                CheckoutWebView.invalidate()
+                return .cancel
+            }
+
+            OSLogger.shared.debug("Allowing Cloudflare managed challenge response to render")
             return .allow
         }
 
@@ -374,6 +386,12 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         return .allow
+    }
+
+    private func isCloudflareManagedChallenge(_ response: HTTPURLResponse) -> Bool {
+        response.value(forHTTPHeaderField: "cf-mitigated")?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .caseInsensitiveCompare("challenge") == .orderedSame
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {

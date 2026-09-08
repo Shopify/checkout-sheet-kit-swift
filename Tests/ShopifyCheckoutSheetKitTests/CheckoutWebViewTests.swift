@@ -174,6 +174,77 @@ class CheckoutWebViewTests: XCTestCase {
         }
     }
 
+    func testPresentedCloudflareManagedChallengeResponseIsAllowedToRender() throws {
+        view.load(checkout: url, isPreload: true)
+        view.checkoutDidPresent = true
+        view.checkoutIsVisible = true
+        let checkoutURL = try XCTUnwrap(view.url)
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+        didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+        view.viewDelegate = mockDelegate
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(
+            url: checkoutURL,
+            statusCode: 403,
+            httpVersion: nil,
+            headerFields: ["Cf-Mitigated": " Challenge "]
+        ))
+
+        XCTAssertEqual(view.handleResponse(urlResponse), .allow)
+        waitForExpectations(timeout: 0.5)
+        XCTAssertNil(mockDelegate.errorReceived)
+    }
+
+    func testPreloadedCloudflareManagedChallengeResponseIsDiscarded() throws {
+        view.load(checkout: url, isPreload: true)
+        view.checkoutDidPresent = true
+        let checkoutURL = try XCTUnwrap(view.url)
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+        didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(
+            url: checkoutURL,
+            statusCode: 403,
+            httpVersion: nil,
+            headerFields: ["Cf-Mitigated": " Challenge "]
+        ))
+
+        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
+        XCTAssertEqual(view.handleResponse(urlResponse), .cancel)
+        XCTAssertFalse(CheckoutWebView.hasCacheEntry())
+        waitForExpectations(timeout: 0.5)
+        XCTAssertNil(mockDelegate.errorReceived)
+    }
+
+    func testDismissedPreloadedCloudflareManagedChallengeResponseIsDiscarded() throws {
+        view.load(checkout: url, isPreload: true)
+        view.checkoutDidPresent = true
+        view.checkoutIsVisible = true
+        view.checkoutIsVisible = false
+        let checkoutURL = try XCTUnwrap(view.url)
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was not called")
+        didFailWithErrorExpectation.isInverted = true
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(
+            url: checkoutURL,
+            statusCode: 403,
+            httpVersion: nil,
+            headerFields: ["Cf-Mitigated": " Challenge "]
+        ))
+
+        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
+        XCTAssertEqual(view.handleResponse(urlResponse), .cancel)
+        XCTAssertFalse(CheckoutWebView.hasCacheEntry())
+        waitForExpectations(timeout: 0.5)
+        XCTAssertNil(mockDelegate.errorReceived)
+    }
+
     func testObtainsOrderIDFromQuery() throws {
         let urls = [
             "http://shopify1.shopify.com/checkouts/c/12345/thank-you?order_id=1234",
