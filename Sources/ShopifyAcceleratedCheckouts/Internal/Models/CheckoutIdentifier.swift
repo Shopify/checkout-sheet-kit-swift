@@ -57,7 +57,9 @@ enum CheckoutIdentifier {
     /// Checks for valid ID signature,
     /// Returns .invariant if validation fails
     func isValid() -> Bool {
-        if case .invariant = parse() { return false }
+        if case .invariant = parse() {
+            return false
+        }
         return true
     }
 
