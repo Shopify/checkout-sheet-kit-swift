@@ -25,11 +25,11 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 @available(iOS 16.0, *)
-class WalletController: ObservableObject {
+public class WalletController: ObservableObject {
     @Published var identifier: CheckoutIdentifier
     @Published var storefront: StorefrontAPIProtocol
     @Published var checkoutViewController: CheckoutViewController?
-    @Published var configuration: ShopifyAcceleratedCheckouts.Configuration
+    @Published public var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     init(identifier: CheckoutIdentifier, storefront: StorefrontAPIProtocol, configuration: ShopifyAcceleratedCheckouts.Configuration) {
         self.identifier = identifier

@@ -24,7 +24,7 @@
 // MARK: Identifier helpers
 
 /// Type of identifier used for checkout
-enum CheckoutIdentifier {
+public enum CheckoutIdentifier {
     case variant(variantID: String, quantity: Int)
     case cart(cartID: String)
     case invariant(reason: String)

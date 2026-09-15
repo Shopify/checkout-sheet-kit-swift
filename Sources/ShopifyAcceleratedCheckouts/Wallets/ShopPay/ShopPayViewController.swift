@@ -25,10 +25,10 @@ import ShopifyCheckoutSheetKit
 import SwiftUI
 
 @available(iOS 16.0, *)
-class ShopPayViewController: WalletController {
+public class ShopPayViewController: WalletController {
     var eventHandlers: EventHandlers
 
-    init(
+    public init(
         identifier: CheckoutIdentifier,
         configuration: ShopifyAcceleratedCheckouts.Configuration,
         eventHandlers: EventHandlers = EventHandlers()
@@ -45,7 +45,8 @@ class ShopPayViewController: WalletController {
         self.identifier = identifier.parse()
     }
 
-    func onPress() async {
+    @MainActor
+    public func onPress() async {
         do {
             let cart = try await fetchCartByCheckoutIdentifier()
             guard let url = cart.checkoutUrl.url.appendQueryParam(name: "payment", value: "shop_pay") else {
@@ -62,30 +63,30 @@ class ShopPayViewController: WalletController {
 
 @available(iOS 16.0, *)
 extension ShopPayViewController: CheckoutDelegate {
-    func checkoutDidComplete(event: CheckoutCompletedEvent) {
+    public func checkoutDidComplete(event: CheckoutCompletedEvent) {
         eventHandlers.checkoutDidComplete?(event)
     }
 
-    func checkoutDidFail(error: CheckoutError) {
+    public func checkoutDidFail(error: CheckoutError) {
         checkoutViewController?.dismiss(animated: true)
         eventHandlers.checkoutDidFail?(error)
     }
 
-    func checkoutDidCancel() {
+    public func checkoutDidCancel() {
         // x right button on CSK doesn't dismiss automatically
         checkoutViewController?.dismiss(animated: true)
         eventHandlers.checkoutDidCancel?()
     }
 
-    func shouldRecoverFromError(error: CheckoutError) -> Bool {
+    public func shouldRecoverFromError(error: CheckoutError) -> Bool {
         return eventHandlers.shouldRecoverFromError?(error) ?? error.isRecoverable
     }
 
-    func checkoutDidClickLink(url: URL) {
+    public func checkoutDidClickLink(url: URL) {
         eventHandlers.checkoutDidClickLink?(url)
     }
 
-    func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
+    public func checkoutDidEmitWebPixelEvent(event: PixelEvent) {
         eventHandlers.checkoutDidEmitWebPixelEvent?(event)
     }
 }

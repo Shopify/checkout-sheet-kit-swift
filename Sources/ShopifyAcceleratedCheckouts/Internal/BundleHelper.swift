@@ -25,7 +25,7 @@ import Foundation
 
 extension Bundle {
     /// Cross-platform bundle accessor for ShopifyAcceleratedCheckouts resources
-    package static var acceleratedCheckouts: Bundle {
+    public static var acceleratedCheckouts: Bundle {
         #if COCOAPODS
             // For CocoaPods, look for the resource bundle
             if let bundlePath = Bundle.main.path(forResource: "ShopifyAcceleratedCheckouts", ofType: "bundle"),
