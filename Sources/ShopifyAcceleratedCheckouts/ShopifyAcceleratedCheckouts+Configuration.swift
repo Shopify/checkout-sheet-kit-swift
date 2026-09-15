@@ -27,6 +27,27 @@ import SwiftUI
 @available(iOS 16.0, *)
 extension ShopifyAcceleratedCheckouts {
     public class Configuration: ObservableObject, Copyable {
+        
+        @Published
+        internal var shopSettings: ShopSettings?
+        
+        /// Loads shop settings.
+        public func loadShopSettings() async throws {
+            guard shopSettings == nil else { return }
+            do {
+                let storefront = StorefrontAPI(
+                    storefrontDomain: storefrontDomain,
+                    storefrontAccessToken: storefrontAccessToken
+                )
+                let shop = try await storefront.shop()
+                shopSettings = ShopSettings(from: shop)
+            } catch {
+                let reason = "Error loading shop settings: \(error)"
+                ShopifyAcceleratedCheckouts.logger.error(reason)
+                throw error
+            }
+        }
+        
         /// The domain of the shop without the protocol.
         ///
         /// Example: `my-shop.myshopify.com`
@@ -45,14 +66,19 @@ extension ShopifyAcceleratedCheckouts {
         ///
         /// See: https://shopify.dev/docs/api/storefront/latest/mutations/cartBuyerIdentityUpdate
         @Published public var customer: Customer?
+        
+        /// The Shopify ApplePay configuration.
+        @Published public var applePay: ApplePayConfiguration?
 
         public init(
             storefrontDomain: String,
             storefrontAccessToken: String,
-            customer: Customer? = nil
+            customer: Customer? = nil,
+            applePay: ApplePayConfiguration? = nil
         ) {
             self.storefrontDomain = storefrontDomain
             self.storefrontAccessToken = storefrontAccessToken
+            self.applePay = applePay
             self.customer = customer
         }
 
@@ -60,6 +86,7 @@ extension ShopifyAcceleratedCheckouts {
             storefrontDomain = copy.storefrontDomain
             storefrontAccessToken = copy.storefrontAccessToken
             customer = copy.customer?.copy()
+            applePay = copy.applePay?.copy()
         }
     }
 

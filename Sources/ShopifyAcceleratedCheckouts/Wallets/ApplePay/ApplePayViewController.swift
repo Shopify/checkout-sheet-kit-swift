@@ -147,10 +147,13 @@ class ApplePayViewController: WalletController, PayController {
 
     func onPress() async {
         do {
-            let cart = try await createOrfetchCart()
-
-            self.cart = cart
-
+            try await configuration.loadShopSettings()
+        } catch {
+            checkoutDidFail(error: .sdkError(underlying: error, recoverable: false))
+        }
+        
+        do {
+            self.cart = try await createOrfetchCart()
             return try await authorizationDelegate.transition(to: .startPaymentRequest)
         } catch {
             ShopifyAcceleratedCheckouts.logger.error(

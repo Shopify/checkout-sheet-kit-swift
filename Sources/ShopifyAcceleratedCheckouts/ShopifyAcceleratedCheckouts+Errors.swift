@@ -27,6 +27,7 @@ extension ShopifyAcceleratedCheckouts {
     enum Error: LocalizedError {
         case invariant(expected: String)
         case cartAcquisition(identifier: CheckoutIdentifier)
+        case configuration(missing: String)
 
         func toString() -> String {
             return switch self {
@@ -34,6 +35,8 @@ extension ShopifyAcceleratedCheckouts {
                 "received nil, expected: \(expected)"
             case let .cartAcquisition(identifier):
                 "unable to get cart for CheckoutIdentifier: \(identifier)"
+            case let .configuration(missing):
+                "missing configuration: \(missing)"
             }
         }
     }
