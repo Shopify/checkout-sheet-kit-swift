@@ -52,22 +52,11 @@ public struct AcceleratedCheckoutButtons: View {
     private var applePayLabel: PKPaymentButtonType = .plain
     private var applePayStyle: PKPaymentButtonStyle = .automatic
 
-    @State private var shopSettings: ShopSettings?
-    @State private var currentRenderState: RenderState = .loading {
-        didSet {
-            eventHandlers.renderStateDidChange?(currentRenderState)
-        }
-    }
-
     /// Initializes accelerated checkout buttons with a cart ID
     /// - Parameters:
     ///   - cartID: The cart ID to checkout (must start with gid://shopify/Cart/)
     public init(cartID: String) {
         identifier = .cart(cartID: cartID).parse()
-        if case let .invariant(reason) = identifier {
-            ShopifyAcceleratedCheckouts.logger.error(reason)
-            _currentRenderState = State(initialValue: .error(reason: reason))
-        }
     }
 
     /// Initializes accelerated checkout buttons with a variant ID
@@ -76,59 +65,28 @@ public struct AcceleratedCheckoutButtons: View {
     ///  - quantity: The quantity of the variant to checkout
     public init(variantID: String, quantity: Int) {
         identifier = .variant(variantID: variantID, quantity: quantity).parse()
-        if case let .invariant(reason) = identifier {
-            _currentRenderState = State(initialValue: .error(reason: reason))
-            ShopifyAcceleratedCheckouts.logger.error(reason)
-        }
     }
 
     public var body: some View {
         VStack {
-            if let shopSettings {
-                VStack {
-                    ForEach(wallets, id: \.self) {
-                        switch $0 {
-                        case .applePay:
-                            ApplePayButton(
-                                identifier: identifier,
-                                eventHandlers: eventHandlers,
-                                cornerRadius: cornerRadius,
-                                label: applePayLabel,
-                                style: applePayStyle
-                            )
-                        case .shopPay:
-                            ShopPayButton(
-                                identifier: identifier,
-                                eventHandlers: eventHandlers,
-                                cornerRadius: cornerRadius
-                            )
-                        }
-                    }
-                }.environmentObject(shopSettings)
+            ForEach(wallets, id: \.self) {
+                switch $0 {
+                case .applePay:
+                    ApplePayButton(
+                        identifier: identifier,
+                        eventHandlers: eventHandlers,
+                        cornerRadius: cornerRadius,
+                        label: applePayLabel,
+                        style: applePayStyle
+                    )
+                case .shopPay:
+                    ShopPayButton(
+                        identifier: identifier,
+                        eventHandlers: eventHandlers,
+                        cornerRadius: cornerRadius
+                    )
+                }
             }
-        }
-        .task { await loadShopSettings() }
-        .onAppear {
-            eventHandlers.renderStateDidChange?(currentRenderState)
-        }
-    }
-
-    private func loadShopSettings() async {
-        guard identifier.isValid() else { return }
-
-        do {
-            currentRenderState = .loading
-            let storefront = StorefrontAPI(
-                storefrontDomain: configuration.storefrontDomain,
-                storefrontAccessToken: configuration.storefrontAccessToken
-            )
-            let shop = try await storefront.shop()
-            shopSettings = ShopSettings(from: shop)
-            currentRenderState = .rendered
-        } catch {
-            let reason = "Error loading shop settings: \(error)"
-            ShopifyAcceleratedCheckouts.logger.error(reason)
-            currentRenderState = .error(reason: reason)
         }
     }
 }
@@ -331,34 +289,6 @@ extension AcceleratedCheckoutButtons {
     {
         var newView = self
         newView.eventHandlers.checkoutDidEmitWebPixelEvent = action
-        return newView
-    }
-
-    /// Adds an action to perform when the render state changes.
-    ///
-    /// Use this modifier to handle render state changes:
-    ///
-    /// ```swift
-    /// AcceleratedCheckoutButtons(cartID: cartId)
-    ///     .onRenderStateChange { state in
-    ///         switch state {
-    ///         case .loading:
-    ///             // Show skeleton loading state
-    ///         case .rendered:
-    ///             // Show rendered buttons
-    ///         case .fallback:
-    ///             // Show error fallback state
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameter action: The action to perform when render state changes
-    /// - Returns: A view with the render state change handler set
-    public func onRenderStateChange(_ action: @escaping (RenderState) -> Void)
-        -> AcceleratedCheckoutButtons
-    {
-        var newView = self
-        newView.eventHandlers.renderStateDidChange = action
         return newView
     }
 }
