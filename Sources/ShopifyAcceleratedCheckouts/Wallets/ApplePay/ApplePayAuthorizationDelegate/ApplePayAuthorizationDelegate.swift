@@ -42,7 +42,7 @@ typealias PKAuthorizationControllerFactory = (PKPaymentRequest) -> PaymentAuthor
 
 @available(iOS 16.0, *)
 class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
-    let configuration: ApplePayConfigurationWrapper
+    let configuration: ShopifyAcceleratedCheckouts.Configuration
     let abortError = ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
     var controller: PayController
 
@@ -81,7 +81,7 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
     var pkDecoder: PKDecoder
 
     init(
-        configuration: ApplePayConfigurationWrapper,
+        configuration: ShopifyAcceleratedCheckouts.Configuration,
         controller: PayController,
         paymentControllerFactory: @escaping PKAuthorizationControllerFactory = {
             PKPaymentAuthorizationController(paymentRequest: $0)
@@ -184,16 +184,16 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
                 // This removes some data potentially provided externally
                 // e.g. via ShopifyAcceleratedCheckouts.Configuration.Customer
                 // It is safe for us to re-attach this prior to displaying CSK
-                if let customer = configuration.common.customer,
+                if let customer = configuration.customer,
                    customer.email != nil || customer.phoneNumber != nil
                    || customer.customerAccessToken != nil
                 {
                     try await controller.storefront.cartBuyerIdentityUpdate(
                         id: cartID,
                         input: .init(
-                            email: configuration.common.customer?.email,
-                            phoneNumber: configuration.common.customer?.phoneNumber,
-                            customerAccessToken: configuration.common.customer?.customerAccessToken
+                            email: configuration.customer?.email,
+                            phoneNumber: configuration.customer?.phoneNumber,
+                            customerAccessToken: configuration.customer?.customerAccessToken
                         )
                     )
 

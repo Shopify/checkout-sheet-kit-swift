@@ -129,20 +129,27 @@ class ApplePayViewController: WalletController, PayController {
 
     init(
         identifier: CheckoutIdentifier,
-        configuration: ApplePayConfigurationWrapper
+        configuration: ShopifyAcceleratedCheckouts.Configuration,
+        eventHandlers: EventHandlers,
     ) {
         super.init(
             identifier: identifier,
             storefront: StorefrontAPI(
-                storefrontDomain: configuration.common.storefrontDomain,
-                storefrontAccessToken: configuration.common.storefrontAccessToken
+                storefrontDomain: configuration.storefrontDomain,
+                storefrontAccessToken: configuration.storefrontAccessToken
             ),
-            configuration: configuration.common
+            configuration: configuration
         )
         __authorizationDelegate = ApplePayAuthorizationDelegate(
             configuration: configuration,
             controller: self
         )
+        onCheckoutComplete = eventHandlers.checkoutDidComplete
+        onCheckoutFail = eventHandlers.checkoutDidFail
+        onCheckoutCancel = eventHandlers.checkoutDidCancel
+        onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
+        onCheckoutClickLink = eventHandlers.checkoutDidClickLink
+        onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
     }
 
     func onPress() async {

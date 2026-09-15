@@ -41,7 +41,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
         pkDecoder.selectedShippingMethod = nil
 
         // Validate country if restrictions are configured
-        if let supportedCountries = configuration.applePay.supportedShippingCountries,
+        if let supportedCountries = configuration.applePay?.supportedShippingCountries,
            !supportedCountries.isEmpty
         {
             let contactCountryCode = contact.postalAddress?.isoCountryCode
@@ -110,7 +110,7 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
                 id: cartID,
                 input: .init(
                     countryCode: country,
-                    customerAccessToken: configuration.common.customer?.customerAccessToken
+                    customerAccessToken: configuration.customer?.customerAccessToken
                 )
             )
 
@@ -182,16 +182,16 @@ extension ApplePayAuthorizationDelegate: PKPaymentAuthorizationControllerDelegat
             let cartID = try pkEncoder.cartID.get()
 
             if pkDecoder.requiredContactFields.count > 0
-                || configuration.common.customer?.email != nil
-                || configuration.common.customer?.phoneNumber != nil
-                || configuration.common.customer?.customerAccessToken != nil
+                || configuration.customer?.email != nil
+                || configuration.customer?.phoneNumber != nil
+                || configuration.customer?.customerAccessToken != nil
             {
                 try await controller.storefront.cartBuyerIdentityUpdate(
                     id: cartID,
                     input: .init(
                         email: try? pkEncoder.email.get(),
                         phoneNumber: try? pkEncoder.phone.get(),
-                        customerAccessToken: configuration.common.customer?.customerAccessToken
+                        customerAccessToken: configuration.customer?.customerAccessToken
                     )
                 )
                 try await prepareCartForCompletion(id: cartID)

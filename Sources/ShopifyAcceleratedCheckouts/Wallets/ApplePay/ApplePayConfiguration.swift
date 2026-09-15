@@ -95,30 +95,3 @@ extension ShopifyAcceleratedCheckouts {
         }
     }
 }
-
-/// Internal wrapper that combines Apple Pay configuration with common checkout settings.
-///
-/// This class is used internally to bundle the Apple Pay-specific configuration
-/// with the general accelerated checkout configuration and shop settings.
-@available(iOS 16.0, *)
-class ApplePayConfigurationWrapper: Copyable {
-    var common: ShopifyAcceleratedCheckouts.Configuration
-    var applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration
-    var shopSettings: ShopSettings
-
-    init(
-        common: ShopifyAcceleratedCheckouts.Configuration,
-        applePay: ShopifyAcceleratedCheckouts.ApplePayConfiguration,
-        shopSettings: ShopSettings
-    ) {
-        self.common = common
-        self.applePay = applePay
-        self.shopSettings = shopSettings
-    }
-
-    package required init(copy: ApplePayConfigurationWrapper) {
-        common = copy.common.copy()
-        applePay = copy.applePay.copy()
-        shopSettings = copy.shopSettings
-    }
-}

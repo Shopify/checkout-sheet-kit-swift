@@ -48,11 +48,11 @@ class PKDecoder {
     var cart: () -> StorefrontAPI.Types.Cart?
 
     var selectedShippingMethod: PKShippingMethod?
-    var configuration: ApplePayConfigurationWrapper
+    var configuration: ShopifyAcceleratedCheckouts.Configuration
     var initialCurrencyCode: String?
 
     init(
-        configuration: ApplePayConfigurationWrapper,
+        configuration: ShopifyAcceleratedCheckouts.Configuration,
         cart: @escaping () -> StorefrontAPI.Types.Cart?
     ) {
         self.configuration = configuration
@@ -64,16 +64,23 @@ class PKDecoder {
         guard let cart = cart() else {
             throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
         }
+        guard let applePay = configuration.applePay else {
+            throw ShopifyAcceleratedCheckouts.Error.configuration(missing: "applePay")
+        }
+        guard let shopSettings = configuration.shopSettings else {
+            throw ShopifyAcceleratedCheckouts.Error.configuration(missing: "shopSettings")
+        }
+        
         let paymentRequest = PKPaymentRequest()
         let currencyCode = cart.cost.totalAmount.currencyCode
 
-        paymentRequest.merchantIdentifier = configuration.applePay.merchantIdentifier
+        paymentRequest.merchantIdentifier = applePay.merchantIdentifier
 
         // Map accepted card brands from Shopify to PKPaymentNetwork
-        let acceptedCardBrands = configuration.shopSettings.paymentSettings.acceptedCardBrands
+        let acceptedCardBrands = shopSettings.paymentSettings.acceptedCardBrands
         paymentRequest.supportedNetworks = CardBrandMapper.mapToPKPaymentNetworks(acceptedCardBrands)
 
-        paymentRequest.countryCode = configuration.shopSettings.paymentSettings.countryCode
+        paymentRequest.countryCode = shopSettings.paymentSettings.countryCode
         paymentRequest.currencyCode = currencyCode
         initialCurrencyCode = currencyCode
         paymentRequest.merchantCapabilities = [.threeDSecure]
@@ -100,7 +107,7 @@ class PKDecoder {
         return PassKitFactory.shared.mapToApplePayLineItems(
             cart: cart(),
             shippingMethod: selectedShippingMethod,
-            merchantName: configuration.shopSettings.name
+            merchantName: configuration.shopSettings?.name ?? ""
         )
     }
 
@@ -195,12 +202,12 @@ class PKDecoder {
         let isPhoneEmpty = phone?.isEmpty ?? true
 
         // Only request email if it's not already provided
-        if configuration.applePay.contactFields.contains(.email), isEmailEmpty {
+        if configuration.applePay?.contactFields.contains(.email) == true, isEmailEmpty {
             fields.insert(.emailAddress)
         }
 
         // Only request phone if it's not already provided
-        if configuration.applePay.contactFields.contains(.phone), isPhoneEmpty {
+        if configuration.applePay?.contactFields.contains(.phone) == true, isPhoneEmpty {
             fields.insert(.phoneNumber)
         }
 
@@ -214,13 +221,13 @@ class PKDecoder {
     }
 
     private func getContactEmail(buyerIdentity: StorefrontAPI.CartBuyerIdentity?) -> String? {
-        configuration.common.customer?.email ??
+        configuration.customer?.email ??
             buyerIdentity?.customer?.email ??
             buyerIdentity?.email
     }
 
     private func getContactPhone(buyerIdentity: StorefrontAPI.CartBuyerIdentity?) -> String? {
-        configuration.common.customer?.phoneNumber ??
+        configuration.customer?.phoneNumber ??
             buyerIdentity?.customer?.phone ??
             buyerIdentity?.phone
     }

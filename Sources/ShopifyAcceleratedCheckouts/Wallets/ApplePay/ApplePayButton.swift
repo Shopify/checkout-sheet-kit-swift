@@ -29,16 +29,8 @@ import SwiftUI
 @available(iOS 16.0, *)
 @available(macOS, unavailable)
 struct ApplePayButton: View {
-    /// The configuration for Apple Pay
     @EnvironmentObject
     private var configuration: ShopifyAcceleratedCheckouts.Configuration
-
-    /// The shop settings
-    @EnvironmentObject
-    private var shopSettings: ShopSettings
-
-    @EnvironmentObject
-    private var applePayConfiguration: ShopifyAcceleratedCheckouts.ApplePayConfiguration
 
     /// The identifier to use for checkout
     private let identifier: CheckoutIdentifier
@@ -78,11 +70,7 @@ struct ApplePayButton: View {
                 identifier: identifier,
                 label: label,
                 style: style,
-                configuration: ApplePayConfigurationWrapper(
-                    common: configuration,
-                    applePay: applePayConfiguration,
-                    shopSettings: shopSettings
-                ),
+                configuration: configuration,
                 eventHandlers: eventHandlers,
                 cornerRadius: cornerRadius
             )
@@ -109,23 +97,18 @@ struct Internal_ApplePayButton: View {
         identifier: CheckoutIdentifier,
         label: PKPaymentButtonType,
         style: PKPaymentButtonStyle,
-        configuration: ApplePayConfigurationWrapper,
+        configuration: ShopifyAcceleratedCheckouts.Configuration,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?
     ) {
         controller = ApplePayViewController(
             identifier: identifier,
-            configuration: configuration
+            configuration: configuration,
+            eventHandlers: eventHandlers
         )
         self.label = label
         self.style = style
         self.cornerRadius = cornerRadius
-        controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
-        controller.onCheckoutFail = eventHandlers.checkoutDidFail
-        controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
-        controller.onShouldRecoverFromError = eventHandlers.shouldRecoverFromError
-        controller.onCheckoutClickLink = eventHandlers.checkoutDidClickLink
-        controller.onCheckoutWebPixelEvent = eventHandlers.checkoutDidEmitWebPixelEvent
     }
 
     var body: some View {

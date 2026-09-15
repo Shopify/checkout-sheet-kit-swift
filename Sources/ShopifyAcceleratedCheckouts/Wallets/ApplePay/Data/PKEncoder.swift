@@ -41,10 +41,10 @@ class PKEncoder {
         .failure(
             .invariant(expected: "shippingContact")
         )
-    var configuration: ApplePayConfigurationWrapper
+    var configuration: ShopifyAcceleratedCheckouts.Configuration
 
     init(
-        configuration: ApplePayConfigurationWrapper,
+        configuration: ShopifyAcceleratedCheckouts.Configuration,
         cart: @escaping () -> StorefrontAPI.Types.Cart?
     ) {
         self.configuration = configuration
@@ -303,7 +303,7 @@ class PKEncoder {
         let cart = cart()
 
         if
-            let customerPhone = configuration.common.customer?.phoneNumber,
+            let customerPhone = configuration.customer?.phoneNumber,
             !customerPhone.isEmpty
         {
             if
@@ -340,7 +340,7 @@ class PKEncoder {
     var email: Result<Email, ShopifyAcceleratedCheckouts.Error> {
         let cart = cart()
 
-        if let customerEmail = configuration.common.customer?.email, !customerEmail.isEmpty {
+        if let customerEmail = configuration.customer?.email, !customerEmail.isEmpty {
             if
                 let buyerIdentity = cart?.buyerIdentity,
                 let biEmail = buyerIdentity.customer?.email ?? buyerIdentity.email,
