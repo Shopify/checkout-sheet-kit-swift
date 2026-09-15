@@ -32,7 +32,7 @@ import ShopifyCheckoutSheetKit
 protocol PaymentAuthorizationController {
     var delegate: PKPaymentAuthorizationControllerDelegate? { get set }
     func present() async -> Bool
-    func dismiss(completion: (() -> Void)?)
+    func dismiss(completion: (@Sendable () -> Void)?)
 }
 
 extension PKPaymentAuthorizationController: PaymentAuthorizationController {}

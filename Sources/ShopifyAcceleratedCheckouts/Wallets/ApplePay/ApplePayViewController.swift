@@ -234,7 +234,7 @@ extension ApplePayViewController: @preconcurrency CheckoutDelegate {
     public func checkoutDidComplete(event: CheckoutCompletedEvent) {
         Task { @MainActor in
             self.onCheckoutComplete?(event)
-            try await authorizationDelegate.transition(to: .completed)
+            try? await authorizationDelegate.transition(to: .completed)
         }
     }
 
@@ -249,7 +249,7 @@ extension ApplePayViewController: @preconcurrency CheckoutDelegate {
             // x right button on CSK doesn't dismiss automatically
             checkoutViewController?.dismiss(animated: true)
             self.onCheckoutCancel?()
-            try await authorizationDelegate.transition(to: .completed)
+            try? await authorizationDelegate.transition(to: .completed)
         }
     }
 
