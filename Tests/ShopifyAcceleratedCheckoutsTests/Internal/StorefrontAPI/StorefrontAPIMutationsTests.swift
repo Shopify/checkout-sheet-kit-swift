@@ -284,7 +284,13 @@ final class StorefrontAPIMutationsTests: XCTestCase {
         await XCTAssertThrowsGraphQLError(
             try await storefrontAPI
                 .cartCreate(with: [GraphQLScalars.ID("gid://shopify/ProductVariant/1")]),
-            { if case .invalidResponse = $0 { return true } else { return false } },
+            {
+                if case .invalidResponse = $0 {
+                    return true
+                } else {
+                    return false
+                }
+            },
             "Expected GraphQLError.invalidResponse to be thrown"
         )
     }
@@ -464,7 +470,13 @@ final class StorefrontAPIMutationsTests: XCTestCase {
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
                 input: .init(email: "invalid-email", phoneNumber: "")
             ),
-            { if case .invalidResponse = $0 { return true } else { return false } },
+            {
+                if case .invalidResponse = $0 {
+                    return true
+                } else {
+                    return false
+                }
+            },
             "Expected GraphQLError.invalidResponse to be thrown"
         )
     }
@@ -1607,7 +1619,13 @@ final class StorefrontAPIMutationsTests: XCTestCase {
                 id: GraphQLScalars.ID("gid://shopify/Cart/123"),
                 input: emptyInput
             ),
-            { if case .invalidVariables = $0 { return true } else { return false } }
+            {
+                if case .invalidVariables = $0 {
+                    return true
+                } else {
+                    return false
+                }
+            }
         )
     }
 }

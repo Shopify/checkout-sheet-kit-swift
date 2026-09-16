@@ -92,8 +92,12 @@ private func createApplePayConfiguration(
 ) -> ShopifyAcceleratedCheckouts.ApplePayConfiguration {
     var fields: [ShopifyAcceleratedCheckouts.RequiredContactFields] = []
 
-    if requireEmail { fields.append(.email) }
-    if requirePhone { fields.append(.phone) }
+    if requireEmail {
+        fields.append(.email)
+    }
+    if requirePhone {
+        fields.append(.phone)
+    }
 
     return ShopifyAcceleratedCheckouts.ApplePayConfiguration(
         merchantIdentifier: "merchant.com.shopify.example.ShopifyAcceleratedCheckoutsApp",

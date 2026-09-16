@@ -254,7 +254,9 @@ class PKEncoder {
         // This lines up with what we do for Google Pay & Meta Pay when only a single name is provided
         let lastName: String? = {
             let familyName = contact?.name?.familyName
-            if let familyName, !familyName.isEmpty { return familyName }
+            if let familyName, !familyName.isEmpty {
+                return familyName
+            }
             return contact?.name?.givenName
         }()
 

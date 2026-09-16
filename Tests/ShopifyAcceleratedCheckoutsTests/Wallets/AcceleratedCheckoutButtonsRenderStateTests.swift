@@ -53,7 +53,11 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should eventually be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for invalid cart ID")
+        XCTAssertTrue(receivedStates.contains {
+            if case .error = $0 {
+                return true
+            }; return false
+        }, "onRenderStateChange should be called with .error state for invalid cart ID")
     }
 
     func testOnRenderStateChange_CalledWithErrorStateForEmptyCartID() {
@@ -80,7 +84,11 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for empty cart ID")
+        XCTAssertTrue(receivedStates.contains {
+            if case .error = $0 {
+                return true
+            }; return false
+        }, "onRenderStateChange should be called with .error state for empty cart ID")
     }
 
     func testOnRenderStateChange_CalledWithErrorStateForInvalidVariantID() {
@@ -107,7 +115,11 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for invalid variant ID")
+        XCTAssertTrue(receivedStates.contains {
+            if case .error = $0 {
+                return true
+            }; return false
+        }, "onRenderStateChange should be called with .error state for invalid variant ID")
     }
 
     func testOnRenderStateChange_CalledWithErrorStateForZeroQuantity() {
@@ -134,7 +146,11 @@ final class AcceleratedCheckoutButtonsRenderStateTests: XCTestCase {
 
         // Then: Callback should be called with error state
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(receivedStates.contains { if case .error = $0 { return true }; return false }, "onRenderStateChange should be called with .error state for zero quantity")
+        XCTAssertTrue(receivedStates.contains {
+            if case .error = $0 {
+                return true
+            }; return false
+        }, "onRenderStateChange should be called with .error state for zero quantity")
     }
 
     func testOnRenderStateChange_CalledWithLoadingStateForValidCartID() {
