@@ -174,7 +174,8 @@ final class StorefrontAPIQueriesTests: XCTestCase {
                             "cost": {
                                 "totalAmount": {"amount": "39.98", "currencyCode": "USD"},
                                 "subtotalAmount": {"amount": "39.98", "currencyCode": "USD"}
-                            }
+                            },
+                            "discountAllocations": []
                         }]
                     },
                     "cost": {
@@ -182,7 +183,8 @@ final class StorefrontAPIQueriesTests: XCTestCase {
                         "subtotalAmount": {"amount": "39.98", "currencyCode": "USD"},
                         "totalTaxAmount": null
                     },
-                    "discountApplications": []
+                    "discountCodes": [],
+                    "discountAllocations": []
                 }
             }
         }
@@ -233,7 +235,8 @@ final class StorefrontAPIQueriesTests: XCTestCase {
                         "subtotalAmount": null,
                         "totalTaxAmount": null
                     },
-                    "discountApplications": []
+                    "discountCodes": [],
+                    "discountAllocations": []
                 }
             }
         }
@@ -366,7 +369,8 @@ final class StorefrontAPIQueriesTests: XCTestCase {
                         "subtotalAmount": null,
                         "totalTaxAmount": null
                     },
-                    "discountApplications": []
+                    "discountCodes": [],
+                    "discountAllocations": []
                 }
             },
             "errors": [
@@ -463,7 +467,8 @@ final class StorefrontAPIQueriesTests: XCTestCase {
                     "cost": {
                         "totalAmount": {"amount": "10.00", "currencyCode": "USD"},
                         "subtotalAmount": {"amount": "10.00", "currencyCode": "USD"}
-                    }
+                    },
+                    "discountAllocations": []
                 }
             """)
         }
@@ -486,7 +491,8 @@ final class StorefrontAPIQueriesTests: XCTestCase {
                         "subtotalAmount": {"amount": "1000.00", "currencyCode": "USD"},
                         "totalTaxAmount": null
                     },
-                    "discountApplications": []
+                    "discountCodes": [],
+                    "discountAllocations": []
                 }
             }
         }

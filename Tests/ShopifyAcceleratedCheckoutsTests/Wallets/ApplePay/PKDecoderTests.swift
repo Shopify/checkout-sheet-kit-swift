@@ -61,7 +61,8 @@ class PKDecoderTests: XCTestCase {
                 totalTaxAmount: nil,
                 totalDutyAmount: nil
             ),
-            discountApplications: []
+            discountCodes: [],
+            discountAllocations: []
         )
     }
 

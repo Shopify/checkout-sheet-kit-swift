@@ -42,7 +42,8 @@ class ErrorHandler_WarningsTests: XCTestCase {
                 totalTaxAmount: nil,
                 totalDutyAmount: nil
             ),
-            discountApplications: []
+            discountCodes: [],
+            discountAllocations: []
         )
 
         let result = ErrorHandler.map(warningType: StorefrontAPI.WarningType.outOfStock, cart: cart)
@@ -72,7 +73,8 @@ class ErrorHandler_WarningsTests: XCTestCase {
                 totalTaxAmount: nil,
                 totalDutyAmount: nil
             ),
-            discountApplications: []
+            discountCodes: [],
+            discountAllocations: []
         )
 
         let result = ErrorHandler.map(warningType: StorefrontAPI.WarningType.notEnoughStock, cart: cart)
