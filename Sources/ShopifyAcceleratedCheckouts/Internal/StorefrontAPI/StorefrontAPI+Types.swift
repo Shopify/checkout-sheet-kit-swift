@@ -929,7 +929,7 @@ extension StorefrontAPI {
 }
 
 /// Represents shop settings data fetched from the Storefront API
-/// https://shopify.dev/docs/api/storefront/2026-04/objects/Shop
+/// https://shopify.dev/docs/api/storefront/2026-07/objects/Shop
 @available(iOS 16.0, *)
 class ShopSettings: ObservableObject {
     /// The shop's name (merchant name for display)
