@@ -230,8 +230,7 @@ class ErrorHandlerTests: XCTestCase {
                 totalTaxAmount: nil,
                 totalDutyAmount: nil
             ),
-            discountCodes: [],
-            discountAllocations: []
+            discountApplications: []
         )
     }
 

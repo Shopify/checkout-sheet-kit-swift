@@ -50,14 +50,7 @@ extension StorefrontAPI {
         let delivery: CartDelivery?
         let lines: BaseCartLineConnection
         let cost: CartCost
-        let discountCodes: [CartDiscountCode]
-        let discountAllocations: [CartDiscountAllocation]
-    }
-
-    /// Cart discount code
-    struct CartDiscountCode: Codable {
-        let code: String
-        let applicable: Bool
+        let discountApplications: [CartDiscountApplication]
     }
 
     /// Cart buyer identity
@@ -159,85 +152,11 @@ extension StorefrontAPI {
         let nodes: [BaseCartLine]
     }
 
-    /// Cart discount allocation
-    enum CartDiscountAllocation: Codable {
-        case automatic(CartAutomaticDiscountAllocation)
-        case code(CartCodeDiscountAllocation)
-        case custom(CartCustomDiscountAllocation)
-
-        private enum CodingKeys: String, CodingKey {
-            case __typename
-        }
-
-        private enum TypeName: String, Codable {
-            case cartAutomaticDiscountAllocation = "CartAutomaticDiscountAllocation"
-            case cartCodeDiscountAllocation = "CartCodeDiscountAllocation"
-            case cartCustomDiscountAllocation = "CartCustomDiscountAllocation"
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typename = try container.decode(TypeName.self, forKey: .__typename)
-
-            switch typename {
-            case .cartAutomaticDiscountAllocation:
-                let allocation = try CartAutomaticDiscountAllocation(from: decoder)
-                self = .automatic(allocation)
-            case .cartCodeDiscountAllocation:
-                let allocation = try CartCodeDiscountAllocation(from: decoder)
-                self = .code(allocation)
-            case .cartCustomDiscountAllocation:
-                let allocation = try CartCustomDiscountAllocation(from: decoder)
-                self = .custom(allocation)
-            }
-        }
-
-        func encode(to encoder: Encoder) throws {
-            switch self {
-            case let .automatic(allocation):
-                try allocation.encode(to: encoder)
-            case let .code(allocation):
-                try allocation.encode(to: encoder)
-            case let .custom(allocation):
-                try allocation.encode(to: encoder)
-            }
-        }
-    }
-
-    /// Automatic discount allocation
-    struct CartAutomaticDiscountAllocation: Codable {
-        let discountApplication: CartDiscountApplication
-        let discountedAmount: MoneyV2
-        let targetType: DiscountApplicationTargetType
-    }
-
-    /// Code discount allocation
-    struct CartCodeDiscountAllocation: Codable {
-        let code: String
-        let discountApplication: CartDiscountApplication
-        let discountedAmount: MoneyV2
-        let targetType: DiscountApplicationTargetType
-    }
-
-    /// Custom discount allocation
-    struct CartCustomDiscountAllocation: Codable {
-        let discountApplication: CartDiscountApplication
-        let discountedAmount: MoneyV2
-        let targetType: DiscountApplicationTargetType
-    }
-
     /// Cart discount application
     struct CartDiscountApplication: Codable {
-        let targetSelection: DiscountApplicationTargetSelection
         let targetType: DiscountApplicationTargetType
-        let value: PricingValue
-    }
-
-    /// Discount application target selection
-    enum DiscountApplicationTargetSelection: String, Codable {
-        case all = "ALL"
-        case entitled = "ENTITLED"
-        case explicit = "EXPLICIT"
+        let totalAllocatedAmount: MoneyV2
+        let code: String?
     }
 
     /// Discount application target type
@@ -246,56 +165,12 @@ extension StorefrontAPI {
         case shippingLine = "SHIPPING_LINE"
     }
 
-    /// Pricing value (union type for percentage or fixed amount)
-    enum PricingValue: Codable {
-        case percentage(PricingPercentageValue)
-        case fixedAmount(MoneyV2)
-
-        private enum CodingKeys: String, CodingKey {
-            case __typename
-        }
-
-        private enum TypeName: String, Codable {
-            case pricingPercentageValue = "PricingPercentageValue"
-            case moneyV2 = "MoneyV2"
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typename = try container.decode(TypeName.self, forKey: .__typename)
-
-            switch typename {
-            case .pricingPercentageValue:
-                let percentage = try PricingPercentageValue(from: decoder)
-                self = .percentage(percentage)
-            case .moneyV2:
-                let amount = try MoneyV2(from: decoder)
-                self = .fixedAmount(amount)
-            }
-        }
-
-        func encode(to encoder: Encoder) throws {
-            switch self {
-            case let .percentage(percentage):
-                try percentage.encode(to: encoder)
-            case let .fixedAmount(amount):
-                try amount.encode(to: encoder)
-            }
-        }
-    }
-
-    /// Pricing percentage value
-    struct PricingPercentageValue: Codable {
-        let percentage: Double
-    }
-
     /// Base cart line
     struct BaseCartLine: Codable {
         let id: Types.ID
         let quantity: Int
         let merchandise: ProductVariant?
         let cost: CartLineCost
-        let discountAllocations: [CartDiscountAllocation]
     }
 
     /// Cart line cost
