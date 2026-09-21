@@ -401,11 +401,26 @@ extension CheckoutWebView: WKNavigationDelegate {
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
-    /// No need to emit checkoutDidFail error here as it has been handled in handleResponse already
     func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
+
+        let nsError = error as NSError
+
+        if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
+            OSLogger.shared.debug("Ignoring cancelled URL redirect. code:NSURLErrorCancelled")
+            return
+        }
+
+        CheckoutWebView.invalidate()
+        viewDelegate?.checkoutViewDidFailWithError(
+            error: .checkoutUnavailable(
+                message: error.localizedDescription,
+                code: .httpError(statusCode: nsError.code),
+                recoverable: !isRecovery
+            )
+        )
     }
 
     func webView(_: WKWebView, didFinish _: WKNavigation!) {
