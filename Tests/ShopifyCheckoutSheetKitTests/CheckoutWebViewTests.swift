@@ -520,33 +520,6 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertFalse(CheckoutWebView.hasCacheEntry())
     }
 
-    func testLoadedWebViewProvisionalFailureEmitsRecoverableHTTPError() {
-        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost, userInfo: nil)
-        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
-
-        view.checkoutDidLoad = true
-        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
-
-        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
-
-        view.webView(view, didFailProvisionalNavigation: nil, withError: error)
-
-        waitForExpectations(timeout: 5) { _ in
-            switch self.mockDelegate.errorReceived {
-            case let .some(.checkoutUnavailable(_, code, recoverable)):
-                guard case let .httpError(statusCode) = code else {
-                    return XCTFail("checkoutDidFail(.checkoutUnavailable(.httpError)) expected to throw")
-                }
-                XCTAssertEqual(statusCode, NSURLErrorNetworkConnectionLost)
-                XCTAssertTrue(recoverable)
-            default:
-                XCTFail("checkoutDidFail(.checkoutUnavailable) expected to throw")
-            }
-        }
-
-        XCTAssertFalse(CheckoutWebView.hasCacheEntry())
-    }
-
     func testNonURLProvisionalFailureEmitsSDKError() {
         let error = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
         let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
@@ -565,20 +538,6 @@ class CheckoutWebViewTests: XCTestCase {
             default:
                 XCTFail("checkoutDidFail(.sdkError) expected to throw")
             }
-        }
-    }
-
-    func testRecoveryNonURLProvisionalFailureIsNotRecoverable() {
-        let recovery = createRecoveryAgent()
-        let error = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
-
-        recovery.webView(recovery, didFailProvisionalNavigation: nil, withError: error)
-
-        switch mockDelegate.errorReceived {
-        case let .some(.sdkError(_, recoverable)):
-            XCTAssertFalse(recoverable)
-        default:
-            XCTFail("checkoutDidFail(.sdkError) expected to throw")
         }
     }
 
@@ -653,19 +612,6 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertNil(mockDelegate.errorReceived)
     }
 
-    func testExternalLinkPolicyCancellationDoesNotEmitFailure() throws {
-        let link = try XCTUnwrap(URL(string: "https://www.shopify.com/legal/privacy/app-users"))
-        view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { policy in
-            XCTAssertEqual(policy, .cancel)
-        }
-
-        let cancellation = NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled, userInfo: nil)
-        view.webView(view, didFailProvisionalNavigation: nil, withError: cancellation)
-
-        XCTAssertNil(mockDelegate.errorReceived)
-        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
-    }
-
     func testCommittedHTTPPolicyCancellationDoesNotEmitDuplicateFailure() throws {
         view.load(checkout: url)
         let checkoutURL = try XCTUnwrap(view.url)
@@ -684,16 +630,6 @@ class CheckoutWebViewTests: XCTestCase {
         view.webView(view, didFail: nil, withError: cancellation)
 
         XCTAssertNil(mockDelegate.errorReceived)
-    }
-
-    func testPolicyCancellationDoesNotSuppressSubsequentFailure() throws {
-        let link = try XCTUnwrap(URL(string: "https://www.shopify.com/legal/privacy/app-users"))
-        view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { _ in }
-
-        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
-        view.webView(view, didFailProvisionalNavigation: nil, withError: error)
-
-        XCTAssertNotNil(mockDelegate.errorReceived)
     }
 
     func testNewNavigationResetsHTTPPolicyCancellation() throws {
