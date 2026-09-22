@@ -612,26 +612,6 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertNil(mockDelegate.errorReceived)
     }
 
-    func testCommittedHTTPPolicyCancellationDoesNotEmitDuplicateFailure() throws {
-        view.load(checkout: url)
-        let checkoutURL = try XCTUnwrap(view.url)
-        let response = try XCTUnwrap(HTTPURLResponse(
-            url: checkoutURL,
-            statusCode: 500,
-            httpVersion: nil,
-            headerFields: nil
-        ))
-
-        XCTAssertEqual(view.handleResponse(response), .cancel)
-        XCTAssertNotNil(mockDelegate.errorReceived)
-
-        mockDelegate.errorReceived = nil
-        let cancellation = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
-        view.webView(view, didFail: nil, withError: cancellation)
-
-        XCTAssertNil(mockDelegate.errorReceived)
-    }
-
     func testNewNavigationResetsHTTPPolicyCancellation() throws {
         view.load(checkout: url)
         let checkoutURL = try XCTUnwrap(view.url)
@@ -662,6 +642,29 @@ class CheckoutWebViewTests: XCTestCase {
         view.webView(view, didFailProvisionalNavigation: nil, withError: error)
 
         XCTAssertFalse(CheckoutWebView.hasCacheEntry())
+    }
+
+    func testCloudflarePolicyCancellationDoesNotEmitFailure() throws {
+        view.load(checkout: url, isPreload: true)
+        view.checkoutDidPresent = true
+        view.checkoutIsVisible = true
+        view.checkoutIsVisible = false
+        let checkoutURL = try XCTUnwrap(view.url)
+        let urlResponse = try XCTUnwrap(HTTPURLResponse(
+            url: checkoutURL,
+            statusCode: 403,
+            httpVersion: nil,
+            headerFields: ["Cf-Mitigated": "challenge"]
+        ))
+
+        XCTAssertEqual(view.handleResponse(urlResponse), .cancel)
+        XCTAssertNil(mockDelegate.errorReceived)
+
+        // WebKit follows a response-policy cancel with a provisional failure (WebKitErrorDomain 102).
+        let cancellation = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
+        view.webView(view, didFailProvisionalNavigation: nil, withError: cancellation)
+
+        XCTAssertNil(mockDelegate.errorReceived)
     }
 
     func testWebViewDidFailWithError() throws {
