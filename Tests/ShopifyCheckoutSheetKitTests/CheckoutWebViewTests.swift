@@ -647,7 +647,7 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertNotNil(mockDelegate.errorReceived)
 
         mockDelegate.errorReceived = nil
-        let cancellation = NSError(domain: "WebKitErrorDomain", code: 102, userInfo: nil)
+        let cancellation = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
         view.webView(view, didFailProvisionalNavigation: nil, withError: cancellation)
 
         XCTAssertNil(mockDelegate.errorReceived)
@@ -659,25 +659,56 @@ class CheckoutWebViewTests: XCTestCase {
             XCTAssertEqual(policy, .cancel)
         }
 
-        let cancellation = NSError(domain: "WebKitErrorDomain", code: 102, userInfo: nil)
+        let cancellation = NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled, userInfo: nil)
         view.webView(view, didFailProvisionalNavigation: nil, withError: cancellation)
 
         XCTAssertNil(mockDelegate.errorReceived)
         XCTAssertTrue(CheckoutWebView.hasCacheEntry())
     }
 
-    func testCommittedPolicyCancellationDoesNotEmitFailure() {
-        let cancellation = NSError(domain: "WebKitErrorDomain", code: 102, userInfo: nil)
+    func testCommittedHTTPPolicyCancellationDoesNotEmitDuplicateFailure() throws {
+        view.load(checkout: url)
+        let checkoutURL = try XCTUnwrap(view.url)
+        let response = try XCTUnwrap(HTTPURLResponse(
+            url: checkoutURL,
+            statusCode: 500,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
+        XCTAssertEqual(view.handleResponse(response), .cancel)
+        XCTAssertNotNil(mockDelegate.errorReceived)
+
+        mockDelegate.errorReceived = nil
+        let cancellation = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
         view.webView(view, didFail: nil, withError: cancellation)
 
         XCTAssertNil(mockDelegate.errorReceived)
-        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
     }
 
     func testPolicyCancellationDoesNotSuppressSubsequentFailure() throws {
         let link = try XCTUnwrap(URL(string: "https://www.shopify.com/legal/privacy/app-users"))
         view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { _ in }
+
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        view.webView(view, didFailProvisionalNavigation: nil, withError: error)
+
+        XCTAssertNotNil(mockDelegate.errorReceived)
+    }
+
+    func testNewNavigationResetsHTTPPolicyCancellation() throws {
+        view.load(checkout: url)
+        let checkoutURL = try XCTUnwrap(view.url)
+        let response = try XCTUnwrap(HTTPURLResponse(
+            url: checkoutURL,
+            statusCode: 500,
+            httpVersion: nil,
+            headerFields: nil
+        ))
+
+        XCTAssertEqual(view.handleResponse(response), .cancel)
+        mockDelegate.errorReceived = nil
+        view.webView(view, didStartProvisionalNavigation: nil)
 
         let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         view.webView(view, didFailProvisionalNavigation: nil, withError: error)
