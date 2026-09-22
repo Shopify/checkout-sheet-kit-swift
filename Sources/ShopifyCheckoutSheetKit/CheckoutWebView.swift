@@ -37,7 +37,10 @@ protocol CheckoutWebViewDelegate: AnyObject {
 class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
     var timer: Date?
-    private var didCancelNavigationForHTTPError = false
+    /// Set when `handleResponse` cancels a navigation. A response-policy cancel always happens
+    /// before commit, and WebKit always echoes it as a single `didFailProvisionalNavigation`
+    /// (WebKitErrorDomain 102) that must not be surfaced to clients as a failure.
+    private var didCancelNavigationByPolicy = false
 
     static var preloadingActivatedByClient: Bool = false
 
@@ -338,6 +341,7 @@ extension CheckoutWebView: WKNavigationDelegate {
             if isPreloadRequest, !checkoutIsVisible {
                 OSLogger.shared.debug("Discarding preloaded Cloudflare managed challenge response")
                 CheckoutWebView.invalidate()
+                didCancelNavigationByPolicy = true
                 return .cancel
             }
 
@@ -383,7 +387,7 @@ extension CheckoutWebView: WKNavigationDelegate {
                 )
             }
 
-            didCancelNavigationForHTTPError = true
+            didCancelNavigationByPolicy = true
             return .cancel
         }
 
@@ -404,7 +408,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
         timer = Date()
-        didCancelNavigationForHTTPError = false
+        didCancelNavigationByPolicy = false
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
@@ -413,9 +417,9 @@ extension CheckoutWebView: WKNavigationDelegate {
         OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
 
-        if didCancelNavigationForHTTPError {
-            didCancelNavigationForHTTPError = false
-            OSLogger.shared.debug("Ignoring provisional navigation cancelled by HTTP response policy")
+        if didCancelNavigationByPolicy {
+            didCancelNavigationByPolicy = false
+            OSLogger.shared.debug("Ignoring provisional navigation cancelled by SDK policy decision")
             return
         }
 
@@ -471,12 +475,6 @@ extension CheckoutWebView: WKNavigationDelegate {
 
     func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         timer = nil
-
-        if didCancelNavigationForHTTPError {
-            didCancelNavigationForHTTPError = false
-            OSLogger.shared.debug("Ignoring committed navigation cancelled by HTTP response policy")
-            return
-        }
 
         let nsError = error as NSError
 
