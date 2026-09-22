@@ -37,6 +37,7 @@ protocol CheckoutWebViewDelegate: AnyObject {
 class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
     var timer: Date?
+    private var didCancelNavigationForPolicy = false
 
     static var preloadingActivatedByClient: Bool = false
 
@@ -307,6 +308,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         if isExternalLink(action) || CheckoutURL(from: url).isDeepLink() {
             OSLogger.shared.debug("External or deep link clicked: \(url.absoluteString) - request intercepted")
             viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
+            didCancelNavigationForPolicy = true
             decisionHandler(.cancel)
             return
         }
@@ -337,6 +339,7 @@ extension CheckoutWebView: WKNavigationDelegate {
             if isPreloadRequest, !checkoutIsVisible {
                 OSLogger.shared.debug("Discarding preloaded Cloudflare managed challenge response")
                 CheckoutWebView.invalidate()
+                didCancelNavigationForPolicy = true
                 return .cancel
             }
 
@@ -382,6 +385,7 @@ extension CheckoutWebView: WKNavigationDelegate {
                 )
             }
 
+            didCancelNavigationForPolicy = true
             return .cancel
         }
 
@@ -398,6 +402,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
         timer = Date()
+        didCancelNavigationForPolicy = false
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
@@ -405,6 +410,12 @@ extension CheckoutWebView: WKNavigationDelegate {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
+
+        if didCancelNavigationForPolicy {
+            didCancelNavigationForPolicy = false
+            OSLogger.shared.debug("Ignoring provisional navigation cancelled by policy")
+            return
+        }
 
         let nsError = error as NSError
 
@@ -457,6 +468,12 @@ extension CheckoutWebView: WKNavigationDelegate {
 
     func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         timer = nil
+
+        if didCancelNavigationForPolicy {
+            didCancelNavigationForPolicy = false
+            OSLogger.shared.debug("Ignoring committed navigation cancelled by policy")
+            return
+        }
 
         let nsError = error as NSError
 

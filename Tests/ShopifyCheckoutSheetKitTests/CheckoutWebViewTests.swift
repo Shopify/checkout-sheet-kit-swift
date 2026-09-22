@@ -598,6 +598,50 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertTrue(CheckoutWebView.hasCacheEntry())
     }
 
+    func testHTTPPolicyCancellationDoesNotEmitDuplicateFailure() throws {
+        view.load(checkout: url)
+        let checkoutURL = try XCTUnwrap(view.url)
+        let response = try XCTUnwrap(HTTPURLResponse(
+            url: checkoutURL,
+            statusCode: 500,
+            httpVersion: nil,
+            headerFields: nil
+        ))
+
+        XCTAssertEqual(view.handleResponse(response), .cancel)
+        XCTAssertNotNil(mockDelegate.errorReceived)
+
+        mockDelegate.errorReceived = nil
+        let cancellation = NSError(domain: "WebKitErrorDomain", code: 102, userInfo: nil)
+        view.webView(view, didFailProvisionalNavigation: nil, withError: cancellation)
+
+        XCTAssertNil(mockDelegate.errorReceived)
+    }
+
+    func testExternalLinkPolicyCancellationDoesNotEmitFailure() throws {
+        let link = try XCTUnwrap(URL(string: "https://www.shopify.com/legal/privacy/app-users"))
+        view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { policy in
+            XCTAssertEqual(policy, .cancel)
+        }
+
+        let cancellation = NSError(domain: "WebKitErrorDomain", code: 102, userInfo: nil)
+        view.webView(view, didFailProvisionalNavigation: nil, withError: cancellation)
+
+        XCTAssertNil(mockDelegate.errorReceived)
+        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
+    }
+
+    func testNewNavigationResetsPolicyCancellation() throws {
+        let link = try XCTUnwrap(URL(string: "https://www.shopify.com/legal/privacy/app-users"))
+        view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { _ in }
+        view.webView(view, didStartProvisionalNavigation: nil)
+
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        view.webView(view, didFailProvisionalNavigation: nil, withError: error)
+
+        XCTAssertNotNil(mockDelegate.errorReceived)
+    }
+
     func testPreloadProvisionalFailureInvalidatesCacheWithoutDelegate() {
         let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         view.viewDelegate = nil
