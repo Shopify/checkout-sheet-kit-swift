@@ -414,13 +414,19 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         CheckoutWebView.invalidate()
-        viewDelegate?.checkoutViewDidFailWithError(
-            error: .checkoutUnavailable(
+
+        let checkoutError: CheckoutError
+        if nsError.domain == NSURLErrorDomain {
+            checkoutError = .checkoutUnavailable(
                 message: error.localizedDescription,
                 code: .httpError(statusCode: nsError.code),
                 recoverable: !isRecovery
             )
-        )
+        } else {
+            checkoutError = .sdkError(underlying: error, recoverable: !isRecovery)
+        }
+
+        viewDelegate?.checkoutViewDidFailWithError(error: checkoutError)
     }
 
     func webView(_: WKWebView, didFinish _: WKNavigation!) {
