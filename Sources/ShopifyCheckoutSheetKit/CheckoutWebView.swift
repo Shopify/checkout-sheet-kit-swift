@@ -35,9 +35,10 @@ protocol CheckoutWebViewDelegate: AnyObject {
 }
 
 class CheckoutWebView: WKWebView {
+    private static let webKitErrorDomain = "WebKitErrorDomain"
+    private static let frameLoadInterruptedByPolicyChange = 102
     private static var cache: CacheEntry?
     var timer: Date?
-    private var didCancelNavigationForPolicy = false
 
     static var preloadingActivatedByClient: Bool = false
 
@@ -308,7 +309,6 @@ extension CheckoutWebView: WKNavigationDelegate {
         if isExternalLink(action) || CheckoutURL(from: url).isDeepLink() {
             OSLogger.shared.debug("External or deep link clicked: \(url.absoluteString) - request intercepted")
             viewDelegate?.checkoutViewDidClickLink(url: removeExternalParam(url))
-            didCancelNavigationForPolicy = true
             decisionHandler(.cancel)
             return
         }
@@ -339,7 +339,6 @@ extension CheckoutWebView: WKNavigationDelegate {
             if isPreloadRequest, !checkoutIsVisible {
                 OSLogger.shared.debug("Discarding preloaded Cloudflare managed challenge response")
                 CheckoutWebView.invalidate()
-                didCancelNavigationForPolicy = true
                 return .cancel
             }
 
@@ -385,7 +384,6 @@ extension CheckoutWebView: WKNavigationDelegate {
                 )
             }
 
-            didCancelNavigationForPolicy = true
             return .cancel
         }
 
@@ -398,11 +396,16 @@ extension CheckoutWebView: WKNavigationDelegate {
             .caseInsensitiveCompare("challenge") == .orderedSame
     }
 
+    private func isCancelledNavigationError(_ error: NSError) -> Bool {
+        let isURLCancellation = error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled
+        let isPolicyCancellation = error.domain == Self.webKitErrorDomain && error.code == Self.frameLoadInterruptedByPolicyChange
+        return isURLCancellation || isPolicyCancellation
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
         timer = Date()
-        didCancelNavigationForPolicy = false
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
@@ -411,16 +414,10 @@ extension CheckoutWebView: WKNavigationDelegate {
         OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
 
-        if didCancelNavigationForPolicy {
-            didCancelNavigationForPolicy = false
-            OSLogger.shared.debug("Ignoring provisional navigation cancelled by policy")
-            return
-        }
-
         let nsError = error as NSError
 
-        if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
-            OSLogger.shared.debug("Ignoring cancelled URL redirect. code:NSURLErrorCancelled")
+        if isCancelledNavigationError(nsError) {
+            OSLogger.shared.debug("Ignoring cancelled provisional navigation. domain:\(nsError.domain) code:\(nsError.code)")
             return
         }
 
@@ -428,10 +425,11 @@ extension CheckoutWebView: WKNavigationDelegate {
 
         let checkoutError: CheckoutError
         if nsError.domain == NSURLErrorDomain {
+            let recoverable = !isRecovery && nsError.code != NSURLErrorBadURL
             checkoutError = .checkoutUnavailable(
                 message: error.localizedDescription,
                 code: .httpError(statusCode: nsError.code),
-                recoverable: !isRecovery
+                recoverable: recoverable
             )
         } else {
             checkoutError = .sdkError(underlying: error, recoverable: !isRecovery)
@@ -469,19 +467,12 @@ extension CheckoutWebView: WKNavigationDelegate {
     func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         timer = nil
 
-        if didCancelNavigationForPolicy {
-            didCancelNavigationForPolicy = false
-            OSLogger.shared.debug("Ignoring committed navigation cancelled by policy")
-            return
-        }
-
         let nsError = error as NSError
 
         OSLogger.shared.debug("WebView navigation failed with error: description:\(nsError.localizedDescription) domain:\(nsError.domain) code:\(nsError.code)")
 
-        // Ignore cancelled redirects
-        if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
-            OSLogger.shared.debug("Ignoring cancelled URL redirect. code:NSURLErrorCancelled")
+        if isCancelledNavigationError(nsError) {
+            OSLogger.shared.debug("Ignoring cancelled committed navigation. domain:\(nsError.domain) code:\(nsError.code)")
             return
         }
 

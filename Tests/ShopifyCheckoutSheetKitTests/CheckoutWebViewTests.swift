@@ -527,6 +527,8 @@ class CheckoutWebViewTests: XCTestCase {
         view.checkoutDidLoad = true
         mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
 
+        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
+
         view.webView(view, didFailProvisionalNavigation: nil, withError: error)
 
         waitForExpectations(timeout: 5) { _ in
@@ -541,6 +543,8 @@ class CheckoutWebViewTests: XCTestCase {
                 XCTFail("checkoutDidFail(.checkoutUnavailable) expected to throw")
             }
         }
+
+        XCTAssertFalse(CheckoutWebView.hasCacheEntry())
     }
 
     func testNonURLProvisionalFailureEmitsSDKError() {
@@ -561,6 +565,37 @@ class CheckoutWebViewTests: XCTestCase {
             default:
                 XCTFail("checkoutDidFail(.sdkError) expected to throw")
             }
+        }
+    }
+
+    func testRecoveryNonURLProvisionalFailureIsNotRecoverable() {
+        let recovery = createRecoveryAgent()
+        let error = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
+
+        recovery.webView(recovery, didFailProvisionalNavigation: nil, withError: error)
+
+        switch mockDelegate.errorReceived {
+        case let .some(.sdkError(_, recoverable)):
+            XCTAssertFalse(recoverable)
+        default:
+            XCTFail("checkoutDidFail(.sdkError) expected to throw")
+        }
+    }
+
+    func testBadURLProvisionalFailureIsNotRecoverable() {
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorBadURL, userInfo: nil)
+
+        view.webView(view, didFailProvisionalNavigation: nil, withError: error)
+
+        switch mockDelegate.errorReceived {
+        case let .some(.checkoutUnavailable(_, code, recoverable)):
+            guard case let .httpError(statusCode) = code else {
+                return XCTFail("checkoutDidFail(.checkoutUnavailable(.httpError)) expected to throw")
+            }
+            XCTAssertEqual(statusCode, NSURLErrorBadURL)
+            XCTAssertFalse(recoverable)
+        default:
+            XCTFail("checkoutDidFail(.checkoutUnavailable) expected to throw")
         }
     }
 
@@ -631,10 +666,18 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertTrue(CheckoutWebView.hasCacheEntry())
     }
 
-    func testNewNavigationResetsPolicyCancellation() throws {
+    func testCommittedPolicyCancellationDoesNotEmitFailure() {
+        let cancellation = NSError(domain: "WebKitErrorDomain", code: 102, userInfo: nil)
+
+        view.webView(view, didFail: nil, withError: cancellation)
+
+        XCTAssertNil(mockDelegate.errorReceived)
+        XCTAssertTrue(CheckoutWebView.hasCacheEntry())
+    }
+
+    func testPolicyCancellationDoesNotSuppressSubsequentFailure() throws {
         let link = try XCTUnwrap(URL(string: "https://www.shopify.com/legal/privacy/app-users"))
         view.webView(view, decidePolicyFor: MockExternalNavigationAction(url: link)) { _ in }
-        view.webView(view, didStartProvisionalNavigation: nil)
 
         let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         view.webView(view, didFailProvisionalNavigation: nil, withError: error)
