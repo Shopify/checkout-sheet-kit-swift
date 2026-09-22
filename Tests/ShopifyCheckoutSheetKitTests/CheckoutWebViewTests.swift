@@ -520,6 +520,50 @@ class CheckoutWebViewTests: XCTestCase {
         XCTAssertFalse(CheckoutWebView.hasCacheEntry())
     }
 
+    func testLoadedWebViewProvisionalFailureEmitsRecoverableHTTPError() {
+        let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost, userInfo: nil)
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+        view.checkoutDidLoad = true
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+
+        view.webView(view, didFailProvisionalNavigation: nil, withError: error)
+
+        waitForExpectations(timeout: 5) { _ in
+            switch self.mockDelegate.errorReceived {
+            case let .some(.checkoutUnavailable(_, code, recoverable)):
+                guard case let .httpError(statusCode) = code else {
+                    return XCTFail("checkoutDidFail(.checkoutUnavailable(.httpError)) expected to throw")
+                }
+                XCTAssertEqual(statusCode, NSURLErrorNetworkConnectionLost)
+                XCTAssertTrue(recoverable)
+            default:
+                XCTFail("checkoutDidFail(.checkoutUnavailable) expected to throw")
+            }
+        }
+    }
+
+    func testNonURLProvisionalFailureEmitsSDKError() {
+        let error = NSError(domain: WKErrorDomain, code: WKError.Code.unknown.rawValue, userInfo: nil)
+        let didFailWithErrorExpectation = expectation(description: "checkoutViewDidFailWithError was called")
+
+        mockDelegate.didFailWithErrorExpectation = didFailWithErrorExpectation
+
+        view.webView(view, didFailProvisionalNavigation: nil, withError: error)
+
+        waitForExpectations(timeout: 5) { _ in
+            switch self.mockDelegate.errorReceived {
+            case let .some(.sdkError(underlying, recoverable)):
+                let underlyingError = underlying as NSError
+                XCTAssertEqual(underlyingError.domain, WKErrorDomain)
+                XCTAssertEqual(underlyingError.code, WKError.Code.unknown.rawValue)
+                XCTAssertTrue(recoverable)
+            default:
+                XCTFail("checkoutDidFail(.sdkError) expected to throw")
+            }
+        }
+    }
+
     func testRecoveryProvisionalFailureIsNotRecoverable() {
         let recovery = createRecoveryAgent()
         let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
