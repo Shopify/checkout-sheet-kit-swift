@@ -394,6 +394,25 @@ extension CheckoutWebView: WKNavigationDelegate {
             .caseInsensitiveCompare("challenge") == .orderedSame
     }
 
+    private func isCancelledNavigationError(_ error: NSError) -> Bool {
+        return error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled
+    }
+
+    /// URL transport failures (offline, DNS, timeout, TLS) are reported as an HTTP error carrying
+    /// the native `NSURLError` code, matching Android's `HttpException`. Returns nil for any other
+    /// error domain, including WebKit's own echo of a `.cancel` policy decision.
+    private func transportError(for nsError: NSError) -> CheckoutError? {
+        guard nsError.domain == NSURLErrorDomain else {
+            return nil
+        }
+
+        return .checkoutUnavailable(
+            message: nsError.localizedDescription,
+            code: .httpError(statusCode: nsError.code),
+            recoverable: !isRecovery && nsError.code != NSURLErrorBadURL
+        )
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
@@ -401,11 +420,25 @@ extension CheckoutWebView: WKNavigationDelegate {
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
-    /// No need to emit checkoutDidFail error here as it has been handled in handleResponse already
     func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
+
+        let nsError = error as NSError
+
+        if isCancelledNavigationError(nsError) {
+            OSLogger.shared.debug("Ignoring cancelled provisional navigation. code:NSURLErrorCancelled")
+            return
+        }
+
+        guard let checkoutError = transportError(for: nsError) else {
+            OSLogger.shared.debug("Ignoring non-transport provisional navigation failure. domain:\(nsError.domain) code:\(nsError.code)")
+            return
+        }
+
+        CheckoutWebView.invalidate()
+        viewDelegate?.checkoutViewDidFailWithError(error: checkoutError)
     }
 
     func webView(_: WKWebView, didFinish _: WKNavigation!) {
@@ -441,14 +474,13 @@ extension CheckoutWebView: WKNavigationDelegate {
 
         OSLogger.shared.debug("WebView navigation failed with error: description:\(nsError.localizedDescription) domain:\(nsError.domain) code:\(nsError.code)")
 
-        // Ignore cancelled redirects
-        if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
-            OSLogger.shared.debug("Ignoring cancelled URL redirect. code:NSURLErrorCancelled")
+        if isCancelledNavigationError(nsError) {
+            OSLogger.shared.debug("Ignoring cancelled committed navigation. code:NSURLErrorCancelled")
             return
         }
 
         viewDelegate?.checkoutViewDidFailWithError(
-            error: .sdkError(underlying: error, recoverable: !isRecovery)
+            error: transportError(for: nsError) ?? .sdkError(underlying: error, recoverable: !isRecovery)
         )
     }
 
