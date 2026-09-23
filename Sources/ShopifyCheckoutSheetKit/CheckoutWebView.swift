@@ -37,10 +37,6 @@ protocol CheckoutWebViewDelegate: AnyObject {
 class CheckoutWebView: WKWebView {
     private static var cache: CacheEntry?
     var timer: Date?
-    /// Set when `handleResponse` cancels a navigation. A response-policy cancel always happens
-    /// before commit, and WebKit always echoes it as a single `didFailProvisionalNavigation`
-    /// (WebKitErrorDomain 102) that must not be surfaced to clients as a failure.
-    private var didCancelNavigationByPolicy = false
 
     static var preloadingActivatedByClient: Bool = false
 
@@ -341,7 +337,6 @@ extension CheckoutWebView: WKNavigationDelegate {
             if isPreloadRequest, !checkoutIsVisible {
                 OSLogger.shared.debug("Discarding preloaded Cloudflare managed challenge response")
                 CheckoutWebView.invalidate()
-                didCancelNavigationByPolicy = true
                 return .cancel
             }
 
@@ -387,7 +382,6 @@ extension CheckoutWebView: WKNavigationDelegate {
                 )
             }
 
-            didCancelNavigationByPolicy = true
             return .cancel
         }
 
@@ -404,11 +398,25 @@ extension CheckoutWebView: WKNavigationDelegate {
         return error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled
     }
 
+    /// URL transport failures (offline, DNS, timeout, TLS) are reported as an HTTP error carrying
+    /// the native `NSURLError` code, matching Android's `HttpException`. Returns nil for any other
+    /// error domain, including WebKit's own echo of a `.cancel` policy decision.
+    private func transportError(for nsError: NSError) -> CheckoutError? {
+        guard nsError.domain == NSURLErrorDomain else {
+            return nil
+        }
+
+        return .checkoutUnavailable(
+            message: nsError.localizedDescription,
+            code: .httpError(statusCode: nsError.code),
+            recoverable: !isRecovery && nsError.code != NSURLErrorBadURL
+        )
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         let url = webView.url?.absoluteString ?? ""
         OSLogger.shared.info("Started provisional navigation - url:\(url)")
         timer = Date()
-        didCancelNavigationByPolicy = false
         viewDelegate?.checkoutViewDidStartNavigation()
     }
 
@@ -417,12 +425,6 @@ extension CheckoutWebView: WKNavigationDelegate {
         OSLogger.shared.debug("Failed provisional navigation with error: \(error.localizedDescription) url:\(url)")
         timer = nil
 
-        if didCancelNavigationByPolicy {
-            didCancelNavigationByPolicy = false
-            OSLogger.shared.debug("Ignoring provisional navigation cancelled by SDK policy decision")
-            return
-        }
-
         let nsError = error as NSError
 
         if isCancelledNavigationError(nsError) {
@@ -430,20 +432,12 @@ extension CheckoutWebView: WKNavigationDelegate {
             return
         }
 
-        CheckoutWebView.invalidate()
-
-        let checkoutError: CheckoutError
-        if nsError.domain == NSURLErrorDomain {
-            let recoverable = !isRecovery && nsError.code != NSURLErrorBadURL
-            checkoutError = .checkoutUnavailable(
-                message: error.localizedDescription,
-                code: .httpError(statusCode: nsError.code),
-                recoverable: recoverable
-            )
-        } else {
-            checkoutError = .sdkError(underlying: error, recoverable: !isRecovery)
+        guard let checkoutError = transportError(for: nsError) else {
+            OSLogger.shared.debug("Ignoring non-transport provisional navigation failure. domain:\(nsError.domain) code:\(nsError.code)")
+            return
         }
 
+        CheckoutWebView.invalidate()
         viewDelegate?.checkoutViewDidFailWithError(error: checkoutError)
     }
 
@@ -486,7 +480,7 @@ extension CheckoutWebView: WKNavigationDelegate {
         }
 
         viewDelegate?.checkoutViewDidFailWithError(
-            error: .sdkError(underlying: error, recoverable: !isRecovery)
+            error: transportError(for: nsError) ?? .sdkError(underlying: error, recoverable: !isRecovery)
         )
     }
 
