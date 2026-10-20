@@ -31,15 +31,18 @@ internal struct ShopPayButton: View {
     let identifier: CheckoutIdentifier
     let eventHandlers: EventHandlers
     let cornerRadius: CGFloat?
+    let buttonHeight: CGFloat?
 
     init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        buttonHeight: CGFloat?
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         self.cornerRadius = cornerRadius
+        self.buttonHeight = buttonHeight
     }
 
     var body: some View {
@@ -51,7 +54,8 @@ internal struct ShopPayButton: View {
                 identifier: identifier,
                 configuration: configuration,
                 eventHandlers: eventHandlers,
-                cornerRadius: cornerRadius
+                cornerRadius: cornerRadius,
+                buttonHeight: buttonHeight
             )
         }
     }
@@ -63,12 +67,14 @@ internal struct ShopPayButton: View {
 internal struct Internal_ShopPayButton: View {
     private var controller: ShopPayViewController
     private let cornerRadius: CGFloat?
+    private let buttonHeight: CGFloat?
 
     init(
         identifier: CheckoutIdentifier,
         configuration: ShopifyAcceleratedCheckouts.Configuration,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        buttonHeight: CGFloat?
     ) {
         controller = ShopPayViewController(
             identifier: identifier,
@@ -76,6 +82,7 @@ internal struct Internal_ShopPayButton: View {
             eventHandlers: eventHandlers
         )
         self.cornerRadius = cornerRadius
+        self.buttonHeight = buttonHeight
     }
 
     var body: some View {
@@ -92,12 +99,12 @@ internal struct Internal_ShopPayButton: View {
                         .frame(maxWidth: .infinity)
                         .accessibilityLabel("Shop Pay")
                 }
-                .frame(height: 48)
+                .frame(height: walletButtonHeight(buttonHeight))
                 // This ensures that the blue background is clickable
                 .background(Color.shopPayBlue)
             }
         )
-        .walletButtonStyle(bg: Color.shopPayBlue, cornerRadius: cornerRadius)
+        .walletButtonStyle(bg: Color.shopPayBlue, cornerRadius: cornerRadius, height: buttonHeight)
         .buttonStyle(ContentFadeButtonStyle())
     }
 }

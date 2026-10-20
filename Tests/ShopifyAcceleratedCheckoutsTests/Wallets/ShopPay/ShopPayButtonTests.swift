@@ -44,7 +44,8 @@ class ShopPayButtonTests: XCTestCase {
         let button = ShopPayButton(
             identifier: validCartIdentifier,
             eventHandlers: EventHandlers(),
-            cornerRadius: nil
+            cornerRadius: nil,
+            buttonHeight: nil
         )
         .environmentObject(testConfiguration)
 
@@ -58,7 +59,8 @@ class ShopPayButtonTests: XCTestCase {
         let button = ShopPayButton(
             identifier: validVariantIdentifier,
             eventHandlers: EventHandlers(),
-            cornerRadius: nil
+            cornerRadius: nil,
+            buttonHeight: nil
         )
         .environmentObject(testConfiguration)
 
@@ -74,7 +76,8 @@ class ShopPayButtonTests: XCTestCase {
         let button = ShopPayButton(
             identifier: validCartIdentifier,
             eventHandlers: EventHandlers(),
-            cornerRadius: nil
+            cornerRadius: nil,
+            buttonHeight: nil
         )
         .environmentObject(testConfiguration)
 
@@ -99,7 +102,8 @@ class ShopPayButtonTests: XCTestCase {
                 let button = ShopPayButton(
                     identifier: validCartIdentifier,
                     eventHandlers: EventHandlers(),
-                    cornerRadius: testCase.input
+                    cornerRadius: testCase.input,
+                    buttonHeight: nil
                 )
                 .environmentObject(testConfiguration)
 
@@ -107,6 +111,51 @@ class ShopPayButtonTests: XCTestCase {
                 XCTAssertEqual(try buttonElement.cornerRadius(), testCase.expected)
             }
         }
+    }
+
+    func test_shopPayButton_buttonHeight_shouldApplyExpectedValues() throws {
+        let testCases: [(input: CGFloat?, expected: CGFloat, description: String)] = [
+            (input: 56, expected: 56, description: "custom button height"),
+            (input: 48, expected: 48, description: "default-sized button height"),
+            (input: 47, expected: 47, description: "height below default is applied"),
+            (input: 40, expected: 40, description: "small positive height is applied"),
+            (input: 10, expected: 10, description: "tiny positive height is applied"),
+            (input: nil, expected: 48, description: "nil button height uses default"),
+            (input: 0, expected: 48, description: "zero button height uses default"),
+            (input: -5, expected: 48, description: "negative button height uses default"),
+            (input: CGFloat.infinity, expected: 48, description: "infinite button height uses default"),
+            (input: CGFloat.nan, expected: 48, description: "NaN button height uses default")
+        ]
+
+        for testCase in testCases {
+            try XCTContext.runActivity(named: "Testing \(testCase.description)") { _ in
+                let button = ShopPayButton(
+                    identifier: validCartIdentifier,
+                    eventHandlers: EventHandlers(),
+                    cornerRadius: nil,
+                    buttonHeight: testCase.input
+                )
+                .environmentObject(testConfiguration)
+
+                let buttonElement = try button.inspect().find(ViewType.Button.self)
+                XCTAssertEqual(try buttonElement.fixedHeight(), testCase.expected)
+            }
+        }
+    }
+
+    func test_shopPayButton_withCustomButtonHeight_shouldApplyHeightToLabel() throws {
+        let button = ShopPayButton(
+            identifier: validCartIdentifier,
+            eventHandlers: EventHandlers(),
+            cornerRadius: nil,
+            buttonHeight: 56
+        )
+        .environmentObject(testConfiguration)
+
+        // The label's background is what makes the blue area clickable, so it needs to match the button height
+        let buttonElement = try button.inspect().find(ViewType.Button.self)
+        let hStack = try buttonElement.labelView().hStack()
+        XCTAssertEqual(try hStack.fixedHeight(), 56)
     }
 
     // MARK: - Identifier Validation Tests
@@ -130,7 +179,8 @@ class ShopPayButtonTests: XCTestCase {
                 let button = ShopPayButton(
                     identifier: identifier,
                     eventHandlers: EventHandlers(),
-                    cornerRadius: nil
+                    cornerRadius: nil,
+                    buttonHeight: nil
                 )
                 .environmentObject(testConfiguration)
 

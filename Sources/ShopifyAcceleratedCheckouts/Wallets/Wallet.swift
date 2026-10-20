@@ -59,11 +59,22 @@ public struct EventHandlers {
     }
 }
 
+/// Resolves the height applied to wallet buttons.
+///
+/// Falls back to the 48pt default when `height` is `nil`, non-finite, or non-positive.
+func walletButtonHeight(_ height: CGFloat?) -> CGFloat {
+    let defaultHeight: CGFloat = 48
+    guard let height, height.isFinite, height > 0 else {
+        return defaultHeight
+    }
+    return height
+}
+
 extension View {
-    func walletButtonStyle(bg: Color = Color.black, cornerRadius: CGFloat? = nil) -> some View {
+    func walletButtonStyle(bg: Color = Color.black, cornerRadius: CGFloat? = nil, height: CGFloat? = nil) -> some View {
         let defaultCornerRadius: CGFloat = 8
         let radius = cornerRadius ?? defaultCornerRadius
-        return frame(height: 48)
+        return frame(height: walletButtonHeight(height))
             .background(bg)
             .clipShape(RoundedRectangle(cornerRadius: radius >= 0 ? radius : defaultCornerRadius))
     }

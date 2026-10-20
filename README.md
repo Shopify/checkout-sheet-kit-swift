@@ -766,6 +766,20 @@ AcceleratedCheckoutButtons(cartID: cartID)
     .cornerRadius(0)
 ```
 
+#### Customize button height
+
+The `.buttonHeight(_:)` modifier lets you set the height of the buttons to match other calls-to-action in your app.
+Buttons default to 48 pt. Non-positive or non-finite values fall back to that default. Each button sets its own height,
+so use `.buttonHeight(_:)` rather than `.frame(height:)` to resize them.
+
+```swift
+AcceleratedCheckoutButtons(cartID: cartID)
+    .buttonHeight(56)
+```
+
+Very small heights may cause clipping or overlap: the native Apple Pay button and Shop Pay logo have their own sizing
+constraints.
+
 For custom layouts, compose the buttons inside your own SwiftUI view and reuse that view across surfaces.
 
 ### Handle loading, errors, and lifecycle events

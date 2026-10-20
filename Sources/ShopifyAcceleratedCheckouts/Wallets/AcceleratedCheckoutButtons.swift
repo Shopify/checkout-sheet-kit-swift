@@ -47,6 +47,7 @@ public struct AcceleratedCheckoutButtons: View {
     public var wallets: [Wallet] = [.shopPay, .applePay]
     var eventHandlers: EventHandlers = .init()
     var cornerRadius: CGFloat?
+    var buttonHeight: CGFloat?
 
     /// The Apple Pay button type
     private var applePayLabel: PKPaymentButtonType = .plain
@@ -93,6 +94,7 @@ public struct AcceleratedCheckoutButtons: View {
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
                                 cornerRadius: cornerRadius,
+                                buttonHeight: buttonHeight,
                                 label: applePayLabel,
                                 style: applePayStyle
                             )
@@ -100,7 +102,8 @@ public struct AcceleratedCheckoutButtons: View {
                             ShopPayButton(
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
-                                cornerRadius: cornerRadius
+                                cornerRadius: cornerRadius,
+                                buttonHeight: buttonHeight
                             )
                         }
                     }
@@ -205,6 +208,24 @@ extension AcceleratedCheckoutButtons {
     public func cornerRadius(_ radius: CGFloat) -> AcceleratedCheckoutButtons {
         var newView = self
         newView.cornerRadius = radius
+        return newView
+    }
+
+    /// Sets the height for all checkout buttons
+    ///
+    /// Use this modifier to customize the height of the buttons:
+    ///
+    /// ```swift
+    /// AcceleratedCheckoutButtons(cartID: cartId)
+    ///     .buttonHeight(56)
+    /// ```
+    ///
+    /// - Parameter height: The height to apply to all buttons (default: 48). Non-positive or non-finite values use the default.
+    ///   Very small heights may not render consistently because wallet content has its own sizing constraints.
+    /// - Returns: A view with the custom button height applied
+    public func buttonHeight(_ height: CGFloat) -> AcceleratedCheckoutButtons {
+        var newView = self
+        newView.buttonHeight = height
         return newView
     }
 
