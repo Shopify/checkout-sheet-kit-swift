@@ -212,11 +212,9 @@ class CheckoutWebView: WKWebView {
         navigationObserver = observe(\.url, options: [.new]) { [weak self] _, change in
             guard let self else { return }
 
-            if let url = change.newValue as? URL {
-                if CheckoutURL(from: url).isConfirmationPage() {
-                    self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
-                    navigationObserver?.invalidate()
-                }
+            if let url = change.newValue as? URL, CheckoutURL(from: url).isConfirmationPage() {
+                self.viewDelegate?.checkoutViewDidCompleteCheckout(event: createEmptyCheckoutCompletedEvent(id: getOrderIdFromQuery(url: url)))
+                navigationObserver?.invalidate()
             }
         }
     }
@@ -489,10 +487,7 @@ extension CheckoutWebView: WKNavigationDelegate {
             return true
         }
 
-        guard let url = action.request.url else { return false }
-        guard let url = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
-
-        guard let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?.value else { return false }
+        guard let url = action.request.url, let url = URLComponents(url: url, resolvingAgainstBaseURL: false), let openExternally = url.queryItems?.first(where: { $0.name == "open_externally" })?.value else { return false }
 
         return openExternally.lowercased() == "true" || openExternally == "1"
     }

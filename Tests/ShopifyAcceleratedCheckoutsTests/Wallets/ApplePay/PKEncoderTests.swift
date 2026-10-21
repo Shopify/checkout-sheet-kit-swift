@@ -1191,7 +1191,7 @@ class PKEncoderTests: XCTestCase {
         XCTAssertEqual(expected, "payment")
     }
 
-    func test_applePayPayment_withFailedLastDigits_shouldReturnFailure() {
+    func test_applePayPayment_withFailedLastDigits_shouldReturnFailure() throws {
         let testEncoder = encoder
         let payment = PKPayment()
         let token = PKPaymentToken()
@@ -1212,7 +1212,7 @@ class PKEncoderTests: XCTestCase {
         payment.setValue(billingContact, forKey: "billingContact")
 
         // Create valid JSON payment data to pass paymentData check
-        let validPaymentData = """
+        let validPaymentData = try XCTUnwrap("""
         {
             "header": {
                 "ephemeralPublicKey": "test-key",
@@ -1223,7 +1223,7 @@ class PKEncoderTests: XCTestCase {
             "signature": "test-signature",
             "version": "EC_v1"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8))
         token.setValue(validPaymentData, forKey: "paymentData")
 
         testEncoder.payment = payment
@@ -1265,7 +1265,7 @@ class PKEncoderTests: XCTestCase {
         payment.setValue(billingContact, forKey: "billingContact")
 
         // Create valid JSON payment data
-        let validPaymentData = """
+        let validPaymentData = try XCTUnwrap("""
         {
             "header": {
                 "ephemeralPublicKey": "BFz948MTG3OQ0Q7PyL1SvZzFZ7jd8+yV1CJ5cXEk8mbfw7XxuTHyGvYM2e1cMqo45Z+1wBTTgc8aNYj5Qhg2SWY=",
@@ -1276,7 +1276,7 @@ class PKEncoderTests: XCTestCase {
             "signature": "MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIIC7TCCAukwggJkAgEAMIIB8TCCAR0CAQAwXDBNMQ==",
             "version": "EC_v1"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8))
         token.setValue(validPaymentData, forKey: "paymentData")
 
         testEncoder.payment = payment
