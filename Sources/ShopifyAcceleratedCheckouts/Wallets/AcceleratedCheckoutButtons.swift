@@ -49,6 +49,10 @@ public struct AcceleratedCheckoutButtons: View {
     var cornerRadius: CGFloat?
     var buttonHeight: CGFloat?
 
+    var resolvedButtonHeight: CGFloat {
+        WalletButtonHeight.resolve(buttonHeight)
+    }
+
     /// The Apple Pay button type
     private var applePayLabel: PKPaymentButtonType = .plain
     private var applePayStyle: PKPaymentButtonStyle = .automatic
@@ -94,7 +98,7 @@ public struct AcceleratedCheckoutButtons: View {
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
                                 cornerRadius: cornerRadius,
-                                buttonHeight: buttonHeight,
+                                buttonHeight: resolvedButtonHeight,
                                 label: applePayLabel,
                                 style: applePayStyle
                             )
@@ -103,7 +107,7 @@ public struct AcceleratedCheckoutButtons: View {
                                 identifier: identifier,
                                 eventHandlers: eventHandlers,
                                 cornerRadius: cornerRadius,
-                                buttonHeight: buttonHeight
+                                buttonHeight: resolvedButtonHeight
                             )
                         }
                     }
@@ -220,8 +224,7 @@ extension AcceleratedCheckoutButtons {
     ///     .buttonHeight(56)
     /// ```
     ///
-    /// - Parameter height: The height to apply to all buttons (default: 48). Non-positive or non-finite values use the default.
-    ///   Very small heights may not render consistently because wallet content has its own sizing constraints.
+    /// - Parameter height: The height to apply to all buttons (default: 48). Values are clamped to 30–64. Non-positive values use the default.
     /// - Returns: A view with the custom button height applied
     public func buttonHeight(_ height: CGFloat) -> AcceleratedCheckoutButtons {
         var newView = self

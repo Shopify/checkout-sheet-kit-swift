@@ -59,22 +59,29 @@ public struct EventHandlers {
     }
 }
 
-/// Resolves the height applied to wallet buttons.
-///
-/// Falls back to the 48pt default when `height` is `nil`, non-finite, or non-positive.
-func walletButtonHeight(_ height: CGFloat?) -> CGFloat {
-    let defaultHeight: CGFloat = 48
-    guard let height, height.isFinite, height > 0 else {
-        return defaultHeight
+enum WalletButtonHeight {
+    static let defaultHeight: CGFloat = 48
+    // PKPaymentButton draws at 30pt even when framed smaller.
+    static let minimum: CGFloat = 30
+    static let maximum: CGFloat = 64
+
+    static func resolve(_ requested: CGFloat?) -> CGFloat {
+        guard let requested, requested.isFinite, requested > 0 else {
+            return defaultHeight
+        }
+        return min(max(requested, minimum), maximum)
     }
-    return height
 }
 
 extension View {
-    func walletButtonStyle(bg: Color = Color.black, cornerRadius: CGFloat? = nil, height: CGFloat? = nil) -> some View {
+    func walletButtonStyle(
+        bg: Color = Color.black,
+        cornerRadius: CGFloat? = nil,
+        height: CGFloat = WalletButtonHeight.defaultHeight
+    ) -> some View {
         let defaultCornerRadius: CGFloat = 8
         let radius = cornerRadius ?? defaultCornerRadius
-        return frame(height: walletButtonHeight(height))
+        return frame(height: height)
             .background(bg)
             .clipShape(RoundedRectangle(cornerRadius: radius >= 0 ? radius : defaultCornerRadius))
     }

@@ -49,6 +49,20 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         XCTAssertEqual(storedButtonHeight(in: view), 56)
     }
 
+    func test_resolvedButtonHeight_shouldDefaultAndClampRequestedHeight() {
+        let cartID = "gid://Shopify/Cart/test-cart-id"
+        XCTAssertEqual(AcceleratedCheckoutButtons(cartID: cartID).resolvedButtonHeight, 48)
+
+        let testCases: [(input: CGFloat, expected: CGFloat)] = [(56, 56), (10, 30), (90, 64), (0, 48), (.nan, 48)]
+        for testCase in testCases {
+            XCTAssertEqual(
+                AcceleratedCheckoutButtons(cartID: cartID).buttonHeight(testCase.input).resolvedButtonHeight,
+                testCase.expected,
+                "\(testCase.input)"
+            )
+        }
+    }
+
     func test_applePayLabel_withDeprecatedLabelModifier_shouldStoreMappedPassKitButtonType() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .applePayLabel(.buy)
@@ -112,7 +126,6 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         let button = ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             cornerRadius: nil,
-            buttonHeight: nil,
             label: .buy,
             style: .whiteOutline
         )
@@ -127,8 +140,7 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
             label: .buy,
             style: .whiteOutline,
             configuration: .testConfiguration,
-            cornerRadius: nil,
-            buttonHeight: nil
+            cornerRadius: nil
         )
 
         XCTAssertEqual(storedButtonType(in: button)?.rawValue, PKPaymentButtonType.buy.rawValue)
@@ -176,16 +188,14 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
             label: .plain,
             style: .automatic,
             configuration: .testConfiguration,
-            cornerRadius: nil,
-            buttonHeight: nil
+            cornerRadius: nil
         )
         let buyButton = Internal_ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
             label: .buy,
             style: .automatic,
             configuration: .testConfiguration,
-            cornerRadius: nil,
-            buttonHeight: nil
+            cornerRadius: nil
         )
 
         XCTAssertNotEqual(

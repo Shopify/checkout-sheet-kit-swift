@@ -31,13 +31,13 @@ internal struct ShopPayButton: View {
     let identifier: CheckoutIdentifier
     let eventHandlers: EventHandlers
     let cornerRadius: CGFloat?
-    let buttonHeight: CGFloat?
+    let buttonHeight: CGFloat
 
     init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?,
-        buttonHeight: CGFloat?
+        buttonHeight: CGFloat = WalletButtonHeight.defaultHeight
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
@@ -67,14 +67,14 @@ internal struct ShopPayButton: View {
 internal struct Internal_ShopPayButton: View {
     private var controller: ShopPayViewController
     private let cornerRadius: CGFloat?
-    private let buttonHeight: CGFloat?
+    private let buttonHeight: CGFloat
 
     init(
         identifier: CheckoutIdentifier,
         configuration: ShopifyAcceleratedCheckouts.Configuration,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?,
-        buttonHeight: CGFloat?
+        buttonHeight: CGFloat = WalletButtonHeight.defaultHeight
     ) {
         controller = ShopPayViewController(
             identifier: identifier,
@@ -99,7 +99,7 @@ internal struct Internal_ShopPayButton: View {
                         .frame(maxWidth: .infinity)
                         .accessibilityLabel("Shop Pay")
                 }
-                .frame(height: walletButtonHeight(buttonHeight))
+                .frame(height: buttonHeight)
                 // This ensures that the blue background is clickable
                 .background(Color.shopPayBlue)
             }

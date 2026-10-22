@@ -44,8 +44,7 @@ class ShopPayButtonTests: XCTestCase {
         let button = ShopPayButton(
             identifier: validCartIdentifier,
             eventHandlers: EventHandlers(),
-            cornerRadius: nil,
-            buttonHeight: nil
+            cornerRadius: nil
         )
         .environmentObject(testConfiguration)
 
@@ -59,8 +58,7 @@ class ShopPayButtonTests: XCTestCase {
         let button = ShopPayButton(
             identifier: validVariantIdentifier,
             eventHandlers: EventHandlers(),
-            cornerRadius: nil,
-            buttonHeight: nil
+            cornerRadius: nil
         )
         .environmentObject(testConfiguration)
 
@@ -76,8 +74,7 @@ class ShopPayButtonTests: XCTestCase {
         let button = ShopPayButton(
             identifier: validCartIdentifier,
             eventHandlers: EventHandlers(),
-            cornerRadius: nil,
-            buttonHeight: nil
+            cornerRadius: nil
         )
         .environmentObject(testConfiguration)
 
@@ -102,8 +99,7 @@ class ShopPayButtonTests: XCTestCase {
                 let button = ShopPayButton(
                     identifier: validCartIdentifier,
                     eventHandlers: EventHandlers(),
-                    cornerRadius: testCase.input,
-                    buttonHeight: nil
+                    cornerRadius: testCase.input
                 )
                 .environmentObject(testConfiguration)
 
@@ -117,9 +113,10 @@ class ShopPayButtonTests: XCTestCase {
         let testCases: [(input: CGFloat?, expected: CGFloat, description: String)] = [
             (input: 56, expected: 56, description: "custom button height"),
             (input: 48, expected: 48, description: "default-sized button height"),
-            (input: 47, expected: 47, description: "height below default is applied"),
-            (input: 40, expected: 40, description: "small positive height is applied"),
-            (input: 10, expected: 10, description: "tiny positive height is applied"),
+            (input: 30, expected: 30, description: "minimum height is applied"),
+            (input: 64, expected: 64, description: "maximum height is applied"),
+            (input: 10, expected: 30, description: "short height is raised to the minimum"),
+            (input: 90, expected: 64, description: "tall height is capped at the maximum"),
             (input: nil, expected: 48, description: "nil button height uses default"),
             (input: 0, expected: 48, description: "zero button height uses default"),
             (input: -5, expected: 48, description: "negative button height uses default"),
@@ -133,7 +130,7 @@ class ShopPayButtonTests: XCTestCase {
                     identifier: validCartIdentifier,
                     eventHandlers: EventHandlers(),
                     cornerRadius: nil,
-                    buttonHeight: testCase.input
+                    buttonHeight: WalletButtonHeight.resolve(testCase.input)
                 )
                 .environmentObject(testConfiguration)
 
@@ -179,8 +176,7 @@ class ShopPayButtonTests: XCTestCase {
                 let button = ShopPayButton(
                     identifier: identifier,
                     eventHandlers: EventHandlers(),
-                    cornerRadius: nil,
-                    buttonHeight: nil
+                    cornerRadius: nil
                 )
                 .environmentObject(testConfiguration)
 

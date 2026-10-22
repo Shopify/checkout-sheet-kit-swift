@@ -144,7 +144,7 @@ final class ApplePayIntegrationTests: XCTestCase {
     func testInvariantIdentifierHandling() {
         let identifier = CheckoutIdentifier.invariant(reason: "Test invariant")
 
-        let button = ApplePayButton(identifier: identifier, eventHandlers: EventHandlers(), cornerRadius: nil, buttonHeight: nil)
+        let button = ApplePayButton(identifier: identifier, eventHandlers: EventHandlers(), cornerRadius: nil)
 
         // Create hosting controller to render the view
         let hostingController = UIHostingController(
@@ -167,8 +167,7 @@ final class ApplePayIntegrationTests: XCTestCase {
         let button = await ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart"),
             eventHandlers: EventHandlers(checkoutDidComplete: successHandler),
-            cornerRadius: nil,
-            buttonHeight: nil
+            cornerRadius: nil
         )
 
         // Apply additional modifiers (simulating view updates)
