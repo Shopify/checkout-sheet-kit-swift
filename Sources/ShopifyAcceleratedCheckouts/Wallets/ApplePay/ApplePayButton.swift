@@ -55,16 +55,20 @@ struct ApplePayButton: View {
     /// The corner radius for the button
     private let cornerRadius: CGFloat?
 
+    private let buttonHeight: CGFloat
+
     init(
         identifier: CheckoutIdentifier,
         eventHandlers: EventHandlers = EventHandlers(),
         cornerRadius: CGFloat?,
+        buttonHeight: CGFloat = WalletButtonHeight.defaultHeight,
         label: PKPaymentButtonType = .plain,
         style: PKPaymentButtonStyle = .automatic
     ) {
         self.identifier = identifier.parse()
         self.eventHandlers = eventHandlers
         self.cornerRadius = cornerRadius
+        self.buttonHeight = buttonHeight
         self.label = label
         self.style = style
     }
@@ -84,7 +88,8 @@ struct ApplePayButton: View {
                     shopSettings: shopSettings
                 ),
                 eventHandlers: eventHandlers,
-                cornerRadius: cornerRadius
+                cornerRadius: cornerRadius,
+                buttonHeight: buttonHeight
             )
         }
     }
@@ -99,6 +104,7 @@ struct Internal_ApplePayButton: View {
     private let style: PKPaymentButtonStyle
     private let controller: ApplePayViewController
     private let cornerRadius: CGFloat?
+    private let buttonHeight: CGFloat
     @Environment(\.colorScheme) private var colorScheme
 
     func buttonIdentity(colorScheme: ColorScheme) -> String {
@@ -111,7 +117,8 @@ struct Internal_ApplePayButton: View {
         style: PKPaymentButtonStyle,
         configuration: ApplePayConfigurationWrapper,
         eventHandlers: EventHandlers = EventHandlers(),
-        cornerRadius: CGFloat?
+        cornerRadius: CGFloat?,
+        buttonHeight: CGFloat = WalletButtonHeight.defaultHeight
     ) {
         controller = ApplePayViewController(
             identifier: identifier,
@@ -120,6 +127,7 @@ struct Internal_ApplePayButton: View {
         self.label = label
         self.style = style
         self.cornerRadius = cornerRadius
+        self.buttonHeight = buttonHeight
         controller.onCheckoutComplete = eventHandlers.checkoutDidComplete
         controller.onCheckoutFail = eventHandlers.checkoutDidFail
         controller.onCheckoutCancel = eventHandlers.checkoutDidCancel
@@ -137,7 +145,7 @@ struct Internal_ApplePayButton: View {
                 action: { Task { await controller.onPress() } }
             )
             .id(buttonIdentity(colorScheme: colorScheme))
-            .frame(height: 48)
+            .frame(height: buttonHeight)
         } else {
             Text("errors.applePay.unsupported".localizedString)
         }

@@ -42,6 +42,28 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         XCTAssertEqual(storedApplePayButtonStyle(in: view)?.rawValue, PKPaymentButtonStyle.black.rawValue)
     }
 
+    func test_walletButtonHeight_resolve_shouldDefaultAndClampHeight() {
+        let testCases: [(input: CGFloat?, expected: CGFloat)] = [
+            (nil, 48), (0, 48), (-5, 48), (.nan, 48), (.infinity, 48),
+            (10, 30), (30, 30), (56, 56), (64, 64), (90, 64)
+        ]
+
+        for testCase in testCases {
+            XCTAssertEqual(
+                WalletButtonHeight.resolve(testCase.input),
+                testCase.expected,
+                "\(String(describing: testCase.input))"
+            )
+        }
+    }
+
+    func test_buttonHeight_withButtonHeightModifier_shouldSetResolvedButtonHeight() {
+        let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
+
+        XCTAssertEqual(view.resolvedButtonHeight, 48)
+        XCTAssertEqual(view.buttonHeight(56).resolvedButtonHeight, 56)
+    }
+
     func test_applePayLabel_withDeprecatedLabelModifier_shouldStoreMappedPassKitButtonType() {
         let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
             .applePayLabel(.buy)
@@ -126,6 +148,16 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         XCTAssertEqual(storedButtonStyle(in: button)?.rawValue, PKPaymentButtonStyle.whiteOutline.rawValue)
     }
 
+    func test_applePayButton_withButtonHeight_shouldStoreButtonHeight() {
+        let button = ApplePayButton(
+            identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
+            cornerRadius: nil,
+            buttonHeight: 56
+        )
+
+        XCTAssertEqual(storedButtonHeight(in: button), 56)
+    }
+
     func test_applePayButtonRepresentable_withPassKitValues_shouldStoreValuesDirectly() {
         let representable = ApplePayButtonRepresentable(
             buttonType: PKPaymentButtonType.buy,
@@ -174,6 +206,10 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
 
     private func storedButtonStyle(in value: some Any) -> PKPaymentButtonStyle? {
         return childValue(named: "style", in: value)
+    }
+
+    private func storedButtonHeight(in value: some Any) -> CGFloat? {
+        return childValue(named: "buttonHeight", in: value)
     }
 
     private func storedRepresentableButtonType(in value: some Any) -> PKPaymentButtonType? {

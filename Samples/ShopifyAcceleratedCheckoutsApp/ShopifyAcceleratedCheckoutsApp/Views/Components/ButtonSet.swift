@@ -83,7 +83,7 @@ struct ButtonSet: View {
                     title: "AcceleratedCheckoutButtons(variantID: quantity:)",
                     renderState: $variantRenderState
                 ) {
-                    // Variant-based checkout with separate handlers and custom corner radius
+                    // Variant-based checkout with separate handlers, custom corner radius and custom button height
                     AcceleratedCheckoutButtons(
                         variantID: productVariant.id,
                         quantity: firstVariantQuantity
@@ -91,6 +91,7 @@ struct ButtonSet: View {
                     .applePayButtonStyle(.whiteOutline)
                     .applePayButtonType(.buy)
                     .cornerRadius(24)
+                    .buttonHeight(56)
                     .wallets([.applePay, .shopPay])
                     .onComplete { event in
                         print("✅ Variant checkout completed")

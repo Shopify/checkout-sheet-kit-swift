@@ -109,6 +109,20 @@ class ShopPayButtonTests: XCTestCase {
         }
     }
 
+    func test_shopPayButton_withButtonHeight_shouldApplyHeightToButtonAndLabel() throws {
+        let button = ShopPayButton(
+            identifier: validCartIdentifier,
+            eventHandlers: EventHandlers(),
+            cornerRadius: nil,
+            buttonHeight: 56
+        )
+        .environmentObject(testConfiguration)
+
+        let buttonElement = try button.inspect().find(ViewType.Button.self)
+        XCTAssertEqual(try buttonElement.fixedHeight(), 56)
+        XCTAssertEqual(try buttonElement.labelView().hStack().fixedHeight(), 56)
+    }
+
     // MARK: - Identifier Validation Tests
 
     func test_shopPayButton_withInvalidIdentifiers_shouldRenderEmptyView() throws {
