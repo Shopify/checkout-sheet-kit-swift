@@ -120,7 +120,6 @@ class ShopPayButtonTests: XCTestCase {
 
         let buttonElement = try button.inspect().find(ViewType.Button.self)
         XCTAssertEqual(try buttonElement.fixedHeight(), 56)
-        // The label's background makes the blue area tappable, so it needs the same height
         XCTAssertEqual(try buttonElement.labelView().hStack().fixedHeight(), 56)
     }
 
