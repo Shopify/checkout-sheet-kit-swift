@@ -224,7 +224,7 @@ extension AcceleratedCheckoutButtons {
     ///     .buttonHeight(56)
     /// ```
     ///
-    /// - Parameter height: The height to apply to all buttons (default: 48). Values are clamped to 30–64. Non-positive values use the default.
+    /// - Parameter height: The height to apply to all buttons (default: 48). Values are clamped to 30–64; zero or negative values use the default.
     /// - Returns: A view with the custom button height applied
     public func buttonHeight(_ height: CGFloat) -> AcceleratedCheckoutButtons {
         var newView = self

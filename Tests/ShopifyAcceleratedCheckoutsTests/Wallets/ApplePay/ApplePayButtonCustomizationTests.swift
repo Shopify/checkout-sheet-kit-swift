@@ -42,25 +42,26 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
         XCTAssertEqual(storedApplePayButtonStyle(in: view)?.rawValue, PKPaymentButtonStyle.black.rawValue)
     }
 
-    func test_buttonHeight_withButtonHeightModifier_shouldStoreButtonHeight() {
-        let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
-            .buttonHeight(56)
+    func test_walletButtonHeight_resolve_shouldDefaultAndClampHeight() {
+        let testCases: [(input: CGFloat?, expected: CGFloat)] = [
+            (nil, 48), (0, 48), (-5, 48), (.nan, 48), (.infinity, 48),
+            (10, 30), (30, 30), (56, 56), (64, 64), (90, 64)
+        ]
 
-        XCTAssertEqual(storedButtonHeight(in: view), 56)
-    }
-
-    func test_resolvedButtonHeight_shouldDefaultAndClampRequestedHeight() {
-        let cartID = "gid://Shopify/Cart/test-cart-id"
-        XCTAssertEqual(AcceleratedCheckoutButtons(cartID: cartID).resolvedButtonHeight, 48)
-
-        let testCases: [(input: CGFloat, expected: CGFloat)] = [(56, 56), (10, 30), (90, 64), (0, 48), (.nan, 48)]
         for testCase in testCases {
             XCTAssertEqual(
-                AcceleratedCheckoutButtons(cartID: cartID).buttonHeight(testCase.input).resolvedButtonHeight,
+                WalletButtonHeight.resolve(testCase.input),
                 testCase.expected,
-                "\(testCase.input)"
+                "\(String(describing: testCase.input))"
             )
         }
+    }
+
+    func test_buttonHeight_withButtonHeightModifier_shouldSetResolvedButtonHeight() {
+        let view = AcceleratedCheckoutButtons(cartID: "gid://Shopify/Cart/test-cart-id")
+
+        XCTAssertEqual(view.resolvedButtonHeight, 48)
+        XCTAssertEqual(view.buttonHeight(56).resolvedButtonHeight, 56)
     }
 
     func test_applePayLabel_withDeprecatedLabelModifier_shouldStoreMappedPassKitButtonType() {
@@ -150,19 +151,6 @@ final class ApplePayButtonCustomizationTests: XCTestCase {
     func test_applePayButton_withButtonHeight_shouldStoreButtonHeight() {
         let button = ApplePayButton(
             identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            cornerRadius: nil,
-            buttonHeight: 56
-        )
-
-        XCTAssertEqual(storedButtonHeight(in: button), 56)
-    }
-
-    func test_internalApplePayButton_withButtonHeight_shouldStoreButtonHeight() {
-        let button = Internal_ApplePayButton(
-            identifier: .cart(cartID: "gid://Shopify/Cart/test-cart-id"),
-            label: .plain,
-            style: .automatic,
-            configuration: .testConfiguration,
             cornerRadius: nil,
             buttonHeight: 56
         )

@@ -769,9 +769,9 @@ AcceleratedCheckoutButtons(cartID: cartID)
 #### Customize button height
 
 The `.buttonHeight(_:)` modifier lets you set the height of the buttons to match other calls-to-action in your app.
-Buttons default to 48 pt and accept heights from 30 to 64 pt. Values outside that range are clamped, and non-positive
-or non-finite values use the default. Each button sets its own height, so use `.buttonHeight(_:)` rather than
-`.frame(height:)` to resize them.
+Buttons default to 48 pt and accept heights from 30 pt to 64 pt. Values outside that range are clamped; zero or negative
+values use the default. Each button sets its own height, so use `.buttonHeight(_:)` rather than `.frame(height:)` to
+resize them.
 
 ```swift
 AcceleratedCheckoutButtons(cartID: cartID)

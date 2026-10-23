@@ -109,38 +109,7 @@ class ShopPayButtonTests: XCTestCase {
         }
     }
 
-    func test_shopPayButton_buttonHeight_shouldApplyExpectedValues() throws {
-        let testCases: [(input: CGFloat?, expected: CGFloat, description: String)] = [
-            (input: 56, expected: 56, description: "custom button height"),
-            (input: 48, expected: 48, description: "default-sized button height"),
-            (input: 30, expected: 30, description: "minimum height is applied"),
-            (input: 64, expected: 64, description: "maximum height is applied"),
-            (input: 10, expected: 30, description: "short height is raised to the minimum"),
-            (input: 90, expected: 64, description: "tall height is capped at the maximum"),
-            (input: nil, expected: 48, description: "nil button height uses default"),
-            (input: 0, expected: 48, description: "zero button height uses default"),
-            (input: -5, expected: 48, description: "negative button height uses default"),
-            (input: CGFloat.infinity, expected: 48, description: "infinite button height uses default"),
-            (input: CGFloat.nan, expected: 48, description: "NaN button height uses default")
-        ]
-
-        for testCase in testCases {
-            try XCTContext.runActivity(named: "Testing \(testCase.description)") { _ in
-                let button = ShopPayButton(
-                    identifier: validCartIdentifier,
-                    eventHandlers: EventHandlers(),
-                    cornerRadius: nil,
-                    buttonHeight: WalletButtonHeight.resolve(testCase.input)
-                )
-                .environmentObject(testConfiguration)
-
-                let buttonElement = try button.inspect().find(ViewType.Button.self)
-                XCTAssertEqual(try buttonElement.fixedHeight(), testCase.expected)
-            }
-        }
-    }
-
-    func test_shopPayButton_withCustomButtonHeight_shouldApplyHeightToLabel() throws {
+    func test_shopPayButton_withButtonHeight_shouldApplyHeightToButtonAndLabel() throws {
         let button = ShopPayButton(
             identifier: validCartIdentifier,
             eventHandlers: EventHandlers(),
@@ -149,10 +118,10 @@ class ShopPayButtonTests: XCTestCase {
         )
         .environmentObject(testConfiguration)
 
-        // The label's background is what makes the blue area clickable, so it needs to match the button height
         let buttonElement = try button.inspect().find(ViewType.Button.self)
-        let hStack = try buttonElement.labelView().hStack()
-        XCTAssertEqual(try hStack.fixedHeight(), 56)
+        XCTAssertEqual(try buttonElement.fixedHeight(), 56)
+        // The label's background makes the blue area tappable, so it needs the same height
+        XCTAssertEqual(try buttonElement.labelView().hStack().fixedHeight(), 56)
     }
 
     // MARK: - Identifier Validation Tests
