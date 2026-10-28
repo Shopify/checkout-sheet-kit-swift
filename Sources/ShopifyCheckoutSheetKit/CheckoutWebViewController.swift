@@ -27,6 +27,7 @@ import WebKit
 class CheckoutWebViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
     weak var delegate: CheckoutDelegate?
     var checkoutViewDidFailWithErrorCount = 0
+    private var checkoutCompleted = false
     var checkoutView: CheckoutWebView
 
     lazy var progressBar: ProgressBarView = {
@@ -235,6 +236,7 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
     }
 
     func checkoutViewDidCompleteCheckout(event: CheckoutCompletedEvent) {
+        checkoutCompleted = true
         ConfettiCannon.fire(in: view)
         CheckoutWebView.invalidate(disconnect: false)
         delegate?.checkoutDidComplete(event: event)
@@ -256,6 +258,10 @@ extension CheckoutWebViewController: CheckoutWebViewDelegate {
     /// recovery mode *once* with CheckoutBridge disabled to avoid
     /// excessive load on potentially degraded services.
     func shouldAttemptRecovery(for error: CheckoutError) -> Bool {
+        guard !checkoutCompleted else {
+            OSLogger.shared.info("Skipping recovery — checkout already completed")
+            return false
+        }
         let isWithinRetryLimit = checkoutViewDidFailWithErrorCount < 2
         let delegateWantsRecovery = delegate?.shouldRecoverFromError(error: error) ?? false
 
