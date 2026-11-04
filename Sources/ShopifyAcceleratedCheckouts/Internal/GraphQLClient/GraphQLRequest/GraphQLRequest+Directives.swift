@@ -63,14 +63,10 @@ extension GraphQLRequest {
 
         for (i, line) in zip(lines.indices, lines) {
             let trimmedLine = line.trimmingCharacters(in: .whitespaces)
-            guard trimmedLine.hasPrefix("query ") || trimmedLine.hasPrefix("mutation ") else {
-                continue
-            }
-
-            guard
-                let match = regex.firstMatch(
-                    in: line, options: [], range: NSRange(line.startIndex..., in: line)
-                )
+            guard trimmedLine.hasPrefix("query ") || trimmedLine.hasPrefix("mutation "),
+                  let match = regex.firstMatch(
+                      in: line, options: [], range: NSRange(line.startIndex..., in: line)
+                  )
             else { continue }
 
             // pattern matches upto and including the opening brace

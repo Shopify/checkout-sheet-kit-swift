@@ -192,13 +192,13 @@ final class GraphQLTypesTests: XCTestCase {
 
     // MARK: - GraphQLError Tests
 
-    func testGraphQLErrorDescriptions() {
+    func testGraphQLErrorDescriptions() throws {
         // Test network error
         let networkError = GraphQLError.networkError("Connection timeout")
         XCTAssertEqual(networkError.errorDescription, "Network error: Connection timeout")
 
         // Test HTTP error
-        let httpData = "Bad Request".data(using: .utf8)!
+        let httpData = try XCTUnwrap("Bad Request".data(using: .utf8))
         let httpError = GraphQLError.httpError(statusCode: 400, data: httpData)
         XCTAssertEqual(httpError.errorDescription, "HTTP error 400: Bad Request")
 
@@ -280,41 +280,41 @@ final class GraphQLTypesTests: XCTestCase {
 
     func testAnyCodableDecodingPrimitives() throws {
         // Test Bool
-        let boolData = "true".data(using: .utf8)!
+        let boolData = try XCTUnwrap("true".data(using: .utf8))
         let boolValue = try JSONDecoder().decode(AnyCodable.self, from: boolData)
         XCTAssertEqual(boolValue.value as? Bool, true)
 
         // Test Int
-        let intData = "42".data(using: .utf8)!
+        let intData = try XCTUnwrap("42".data(using: .utf8))
         let intValue = try JSONDecoder().decode(AnyCodable.self, from: intData)
         XCTAssertEqual(intValue.value as? Int, 42)
 
         // Test Double
-        let doubleData = "3.14".data(using: .utf8)!
+        let doubleData = try XCTUnwrap("3.14".data(using: .utf8))
         let doubleValue = try JSONDecoder().decode(AnyCodable.self, from: doubleData)
         XCTAssertEqual(doubleValue.value as? Double, 3.14)
 
         // Test String
-        let stringData = "\"Hello\"".data(using: .utf8)!
+        let stringData = try XCTUnwrap("\"Hello\"".data(using: .utf8))
         let stringValue = try JSONDecoder().decode(AnyCodable.self, from: stringData)
         XCTAssertEqual(stringValue.value as? String, "Hello")
 
         // Test Null
-        let nullData = "null".data(using: .utf8)!
+        let nullData = try XCTUnwrap("null".data(using: .utf8))
         let nullValue = try JSONDecoder().decode(AnyCodable.self, from: nullData)
         XCTAssertTrue(nullValue.value is NSNull)
     }
 
     func testAnyCodableDecodingCollections() throws {
         // Test Dictionary
-        let dictData = "{\"key\":\"value\",\"number\":123}".data(using: .utf8)!
+        let dictData = try XCTUnwrap("{\"key\":\"value\",\"number\":123}".data(using: .utf8))
         let dictValue = try JSONDecoder().decode(AnyCodable.self, from: dictData)
         let dict = dictValue.value as? [String: Any]
         XCTAssertEqual(dict?["key"] as? String, "value")
         XCTAssertEqual(dict?["number"] as? Int, 123)
 
         // Test Array
-        let arrayData = "[\"a\",1,true]".data(using: .utf8)!
+        let arrayData = try XCTUnwrap("[\"a\",1,true]".data(using: .utf8))
         let arrayValue = try JSONDecoder().decode(AnyCodable.self, from: arrayData)
         let array = arrayValue.value as? [Any]
         XCTAssertEqual(array?.count, 3)

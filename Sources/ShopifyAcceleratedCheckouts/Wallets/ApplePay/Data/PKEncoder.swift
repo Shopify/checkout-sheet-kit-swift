@@ -171,11 +171,11 @@ class PKEncoder {
         }
         guard
             let digits = payment
-            .token
-            .paymentMethod
-            .displayName?
-            .components(separatedBy: " ")
-            .last
+                .token
+                .paymentMethod
+                .displayName?
+                .components(separatedBy: " ")
+                .last
         else {
             return .failure(.invariant(expected: "displayName"))
         }

@@ -304,8 +304,7 @@ final class CustomerAccountManager: ObservableObject {
     }
 
     private func performLogoutRequest(idTokenHint: String) async {
-        guard let logoutEndpoint else { return }
-        guard var components = URLComponents(string: logoutEndpoint) else { return }
+        guard let logoutEndpoint, var components = URLComponents(string: logoutEndpoint) else { return }
         components.queryItems = [
             URLQueryItem(name: "id_token_hint", value: idTokenHint)
         ]
@@ -447,12 +446,8 @@ final class CustomerAccountManager: ObservableObject {
         guard let callbackScheme,
               let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               components.scheme == callbackScheme,
-              components.host == "callback"
+              components.host == "callback", let queryItems = components.queryItems
         else {
-            return false
-        }
-
-        guard let queryItems = components.queryItems else {
             return false
         }
 
@@ -461,11 +456,7 @@ final class CustomerAccountManager: ObservableObject {
             return (item.name, value)
         })
 
-        guard let state = queryDict["state"], validateState(state) else {
-            return false
-        }
-
-        guard let code = queryDict["code"] else {
+        guard let state = queryDict["state"], validateState(state), let code = queryDict["code"] else {
             return false
         }
 

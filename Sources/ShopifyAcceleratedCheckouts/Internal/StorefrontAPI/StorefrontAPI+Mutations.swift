@@ -357,11 +357,7 @@ extension StorefrontAPI {
             Operations.cartPrepareForCompletion(variables: variables)
         )
 
-        guard let payload = response.data?.cartPrepareForCompletion else {
-            throw GraphQLError.invalidResponse
-        }
-
-        guard let result = payload.result else {
+        guard let payload = response.data?.cartPrepareForCompletion, let result = payload.result else {
             throw GraphQLError.invalidResponse
         }
 
