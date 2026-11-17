@@ -29,6 +29,7 @@ import SwiftUI
 protocol PayController: AnyObject {
     var cart: StorefrontAPI.Types.Cart? { get set }
     var storefront: StorefrontAPIProtocol { get set }
+    @MainActor var onCheckoutFail: ((CheckoutError) -> Void)? { get }
 
     /// Opens ShopifyCheckoutSheetKit
     func present(url: URL) async throws
