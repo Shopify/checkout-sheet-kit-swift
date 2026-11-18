@@ -544,12 +544,27 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         try await assertPersonalDataRemovalRetry(failures: 1)
     }
 
-    func test_onCompleted_whenPersonalDataRemovalFailsTwice_shouldReportFailureWithoutPresenting() async throws {
+    func test_onCompleted_whenPersonalDataRemovalFailsTwice_shouldPresentWithoutFailure() async throws {
         try await assertPersonalDataRemovalRetry(failures: 2)
+    }
+
+    func test_onCompleted_withUnexpectedError_whenPersonalDataRemovalFailsTwice_shouldPresentWithoutFailure() async throws {
+        try await assertPersonalDataRemovalRetry(
+            failures: 2,
+            recoveryState: .unexpectedError(error: NSError(domain: "test", code: 1))
+        )
+    }
+
+    func test_onCompleted_withPaymentAuthorizationFailed_whenPersonalDataRemovalFailsTwice_shouldPresentWithoutFailure() async throws {
+        try await assertPersonalDataRemovalRetry(
+            failures: 2,
+            recoveryState: .paymentAuthorizationFailed(error: NSError(domain: "test", code: 1))
+        )
     }
 
     private func assertPersonalDataRemovalRetry(
         failures: Int,
+        recoveryState: ApplePayState = .interrupt(reason: .currencyChanged),
         file: StaticString = #filePath,
         line: UInt = #line
     ) async throws {
@@ -559,7 +574,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         mockController.storefront = CleanupStorefrontAPI(cleanup: cleanup)
         var receivedErrors: [CheckoutError] = []
         mockController.onCheckoutFail = {
-            XCTAssertTrue(Thread.isMainThread, "Cleanup failure must reach the app on the main thread", file: file, line: line)
             receivedErrors.append($0)
         }
         delegate = ApplePayAuthorizationDelegate(
@@ -569,7 +583,6 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
             clock: cleanup
         )
         try delegate.setCart(to: mockController.cart)
-        let recoveryState = ApplePayState.interrupt(reason: .currencyChanged)
         let expectedURL = delegate.createSheetKitURL(for: recoveryState)
         try await delegate.transition(to: .startPaymentRequest)
         try await delegate.transition(to: recoveryState)
@@ -590,25 +603,14 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         let waits = await cleanup.waits
         XCTAssertEqual(events.filter { $0 == .removalStarted }.count, 2, file: file, line: line)
         XCTAssertEqual(waits, [1_000_000_000], file: file, line: line)
-        if failures == 1 {
-            XCTAssertEqual(events, [.removalStarted, .removalStarted, .removalFinished, .identityUpdated], file: file, line: line)
-            XCTAssertEqual(mockController.presentCallCount, 1, file: file, line: line)
-            XCTAssertEqual(mockController.presentCalledWith, expectedURL, file: file, line: line)
-            XCTAssertTrue(receivedErrors.isEmpty, file: file, line: line)
-        } else {
-            XCTAssertEqual(events, [.removalStarted, .removalStarted], file: file, line: line)
-            XCTAssertEqual(mockController.presentCallCount, 0, file: file, line: line)
-            XCTAssertEqual(receivedErrors.count, 1, file: file, line: line)
-            if let error = receivedErrors.first {
-                guard case let .sdkError(underlying, recoverable) = error else {
-                    return XCTFail("Expected SDK failure", file: file, line: line)
-                }
-                XCTAssertFalse(recoverable, file: file, line: line)
-                XCTAssertEqual((underlying as NSError).domain, "PersonalDataRemoval", file: file, line: line)
-                XCTAssertEqual((underlying as NSError).code, 2, file: file, line: line)
-            }
-            XCTAssertEqual(delegate.state, .idle, file: file, line: line)
-        }
+        let expectedEvents: [CleanupSpy.Event] = failures == 1
+            ? [.removalStarted, .removalStarted, .removalFinished, .identityUpdated]
+            : [.removalStarted, .removalStarted, .identityUpdated]
+        XCTAssertEqual(events, expectedEvents, file: file, line: line)
+        XCTAssertEqual(mockController.presentCallCount, 1, file: file, line: line)
+        XCTAssertEqual(mockController.presentCalledWith, expectedURL, file: file, line: line)
+        XCTAssertTrue(receivedErrors.isEmpty, file: file, line: line)
+        XCTAssertEqual(delegate.state, .presentingCSK(url: expectedURL), file: file, line: line)
     }
 
     private func assertRecoveryWaitsForPersonalDataRemoval(

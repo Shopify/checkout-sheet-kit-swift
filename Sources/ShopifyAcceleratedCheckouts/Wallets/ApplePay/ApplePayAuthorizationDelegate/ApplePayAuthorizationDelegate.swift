@@ -165,9 +165,14 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
 
     private func prepareCartForRecovery() async throws {
         let cartID = try pkEncoder.cartID.get()
-        try await _Concurrency.Task.retrying(maxRetryCount: 1, clock: clock) {
-            try await self.controller.storefront.cartRemovePersonalData(id: cartID)
-        }.value
+        do {
+            try await _Concurrency.Task.retrying(maxRetryCount: 1, clock: clock) {
+                try await self.controller.storefront.cartRemovePersonalData(id: cartID)
+            }.value
+            ShopifyAcceleratedCheckouts.logger.debug("Cleared PII from cart")
+        } catch {
+            ShopifyAcceleratedCheckouts.logger.error("Failed to clear personal data from cart; continuing to checkout")
+        }
 
         do {
             if let customer = configuration.common.customer,
@@ -200,19 +205,11 @@ class ApplePayAuthorizationDelegate: NSObject, ObservableObject {
         case .paymentAuthorizationFailed,
              .unexpectedError,
              .interrupt:
-            let url = createSheetKitURL(for: previousState)
-            if url != nil {
-                do {
-                    try await prepareCartForRecovery()
-                } catch {
-                    try await transition(to: .terminalError(error: error))
-                    try await transition(to: .completed)
-                    await MainActor.run {
-                        controller.onCheckoutFail?(.sdkError(underlying: error, recoverable: false))
-                    }
-                    return
-                }
+            guard let url = createSheetKitURL(for: previousState) else {
+                try await transition(to: .presentingCSK(url: nil))
+                return
             }
+            try await prepareCartForRecovery()
             try await transition(to: .presentingCSK(url: url))
 
         case let .cartSubmittedForCompletion(redirectURL):
