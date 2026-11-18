@@ -510,39 +510,135 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         async throws
     {
         let redirectURL = try XCTUnwrap(URL(string: "https://shop.example.com/thank-you"))
+        let cleanup = CleanupSpy()
+        mockController.storefront = CleanupStorefrontAPI(cleanup: cleanup)
 
-        // Create a spy controller to track personal data removal calls
-        let spyController = SpyPayController()
-        spyController.cart = StorefrontAPI.Cart.testCart
+        try await delegate.transition(to: .startPaymentRequest)
+        try await delegate.transition(to: .paymentAuthorized(payment: PKPayment()))
+        try await delegate.transition(to: .cartSubmittedForCompletion(redirectURL: redirectURL))
+        try await delegate.transition(to: .completed)
 
-        let spyDelegate = ApplePayAuthorizationDelegate(
-            configuration: configuration,
-            controller: spyController,
-            paymentControllerFactory: mockPaymentControllerFactory,
-            clock: MockClock()
+        let cleanupEvents = await cleanup.events
+        XCTAssertEqual(cleanupEvents, [])
+        XCTAssertEqual(mockController.presentCallCount, 1)
+        XCTAssertEqual(mockController.presentCalledWith, redirectURL)
+    }
+
+    func test_onCompleted_withPaymentAuthorizationFailed_shouldWaitForPersonalDataRemovalBeforePresenting() async throws {
+        try await assertRecoveryWaitsForPersonalDataRemoval(
+            from: .paymentAuthorizationFailed(error: NSError(domain: "test", code: 1))
         )
-        try spyDelegate.setCart(to: spyController.cart)
+    }
 
-        // Follow valid state transitions: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorized -> cartSubmittedForCompletion
-        try await spyDelegate.transition(to: .startPaymentRequest)
-        try await spyDelegate.transition(to: .paymentAuthorized(payment: PKPayment()))
-        try await spyDelegate.transition(to: .cartSubmittedForCompletion(redirectURL: redirectURL))
-        try await spyDelegate.transition(to: .completed)
+    func test_onCompleted_withUnexpectedError_shouldWaitForPersonalDataRemovalBeforePresenting() async throws {
+        try await assertRecoveryWaitsForPersonalDataRemoval(
+            from: .unexpectedError(error: NSError(domain: "test", code: 1))
+        )
+    }
 
-        // Should be in presentingCSK state
-        guard case let .presentingCSK(url) = spyDelegate.state else {
-            XCTFail("Expected presentingCSK state but got \(spyDelegate.state)")
-            return
+    func test_onCompleted_withInterrupt_shouldWaitForPersonalDataRemovalBeforePresenting() async throws {
+        try await assertRecoveryWaitsForPersonalDataRemoval(from: .interrupt(reason: .currencyChanged))
+    }
+
+    func test_onCompleted_whenPersonalDataRemovalSucceedsOnRetry_shouldPresentWithoutFailure() async throws {
+        try await assertPersonalDataRemovalRetry(failures: 1)
+    }
+
+    func test_onCompleted_whenPersonalDataRemovalFailsTwice_shouldPresentWithoutFailure() async throws {
+        try await assertPersonalDataRemovalRetry(failures: 2)
+    }
+
+    func test_onCompleted_withUnexpectedError_whenPersonalDataRemovalFailsTwice_shouldPresentWithoutFailure() async throws {
+        try await assertPersonalDataRemovalRetry(
+            failures: 2,
+            recoveryState: .unexpectedError(error: NSError(domain: "test", code: 1))
+        )
+    }
+
+    func test_onCompleted_withPaymentAuthorizationFailed_whenPersonalDataRemovalFailsTwice_shouldPresentWithoutFailure() async throws {
+        try await assertPersonalDataRemovalRetry(
+            failures: 2,
+            recoveryState: .paymentAuthorizationFailed(error: NSError(domain: "test", code: 1))
+        )
+    }
+
+    private func assertPersonalDataRemovalRetry(
+        failures: Int,
+        recoveryState: ApplePayState = .interrupt(reason: .currencyChanged),
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async throws {
+        let firstAttempt = expectation(description: "First removal attempt started")
+        let retry = expectation(description: "Removal retry started")
+        let cleanup = CleanupSpy(removalStarts: [firstAttempt, retry], failures: failures)
+        mockController.storefront = CleanupStorefrontAPI(cleanup: cleanup)
+        var receivedErrors: [CheckoutError] = []
+        mockController.onCheckoutFail = {
+            receivedErrors.append($0)
         }
-
-        XCTAssertEqual(url, redirectURL, "Should use redirect URL")
-        XCTAssertEqual(spyController.presentCallCount, 1, "Should call present")
-        XCTAssertEqual(
-            spyController.presentCalledWith, redirectURL, "Should present with redirect URL"
+        delegate = ApplePayAuthorizationDelegate(
+            configuration: configuration,
+            controller: mockController,
+            paymentControllerFactory: mockPaymentControllerFactory,
+            clock: cleanup
         )
+        try delegate.setCart(to: mockController.cart)
+        let expectedURL = delegate.createSheetKitURL(for: recoveryState)
+        try await delegate.transition(to: .startPaymentRequest)
+        try await delegate.transition(to: recoveryState)
+        let completion = Task { try await delegate.transition(to: .completed) }
 
-        // Note: We can't easily verify that cartRemovePersonalData was NOT called
-        // But we can verify the happy path behavior
+        await fulfillment(of: [firstAttempt], timeout: 2)
+        XCTAssertEqual(mockController.presentCallCount, 0, file: file, line: line)
+        XCTAssertTrue(receivedErrors.isEmpty, file: file, line: line)
+        await cleanup.finishRemoval()
+
+        await fulfillment(of: [retry], timeout: 2)
+        XCTAssertEqual(mockController.presentCallCount, 0, file: file, line: line)
+        XCTAssertTrue(receivedErrors.isEmpty, file: file, line: line)
+        await cleanup.finishRemoval()
+        try await completion.value
+
+        let events = await cleanup.events
+        let waits = await cleanup.waits
+        XCTAssertEqual(events.filter { $0 == .removalStarted }.count, 2, file: file, line: line)
+        XCTAssertEqual(waits, [1_000_000_000], file: file, line: line)
+        let expectedEvents: [CleanupSpy.Event] = failures == 1
+            ? [.removalStarted, .removalStarted, .removalFinished, .identityUpdated]
+            : [.removalStarted, .removalStarted, .identityUpdated]
+        XCTAssertEqual(events, expectedEvents, file: file, line: line)
+        XCTAssertEqual(mockController.presentCallCount, 1, file: file, line: line)
+        XCTAssertEqual(mockController.presentCalledWith, expectedURL, file: file, line: line)
+        XCTAssertTrue(receivedErrors.isEmpty, file: file, line: line)
+        XCTAssertEqual(delegate.state, .presentingCSK(url: expectedURL), file: file, line: line)
+    }
+
+    private func assertRecoveryWaitsForPersonalDataRemoval(
+        from recoveryState: ApplePayState,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async throws {
+        let removalStarted = expectation(description: "Personal data removal started")
+        let cleanup = CleanupSpy(removalStarted: removalStarted)
+        mockController.storefront = CleanupStorefrontAPI(cleanup: cleanup)
+        let expectedURL = delegate.createSheetKitURL(for: recoveryState)
+
+        try await delegate.transition(to: .startPaymentRequest)
+        try await delegate.transition(to: recoveryState)
+        let completion = Task { try await delegate.transition(to: .completed) }
+
+        await fulfillment(of: [removalStarted], timeout: 2)
+        XCTAssertEqual(mockController.presentCallCount, 0, file: file, line: line)
+        let pendingEvents = await cleanup.events
+        XCTAssertEqual(pendingEvents, [.removalStarted], file: file, line: line)
+
+        await cleanup.finishRemoval()
+        try await completion.value
+
+        let completedEvents = await cleanup.events
+        XCTAssertEqual(completedEvents, [.removalStarted, .removalFinished, .identityUpdated], file: file, line: line)
+        XCTAssertEqual(mockController.presentCallCount, 1, file: file, line: line)
+        XCTAssertEqual(mockController.presentCalledWith, expectedURL, file: file, line: line)
     }
 
     func test_onPresentingCSK_withNonCartSubmittedState_shouldCallPresentSuccessfully() async throws {
@@ -692,7 +788,77 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         }
     }
 
+    private actor CleanupSpy: Clock {
+        enum Event: Equatable {
+            case removalStarted
+            case removalFinished
+            case identityUpdated
+        }
+
+        private(set) var events: [Event] = []
+        private let removalStarts: [XCTestExpectation]
+        private var failures: Int
+        private(set) var waits: [UInt64] = []
+        private var pendingRemoval: CheckedContinuation<Void, Never>?
+
+        init(removalStarted: XCTestExpectation? = nil, removalStarts: [XCTestExpectation] = [], failures: Int = 0) {
+            self.removalStarts = removalStarted.map { [$0] } ?? removalStarts
+            self.failures = failures
+        }
+
+        func sleep(nanoseconds: UInt64) async throws {
+            waits.append(nanoseconds)
+        }
+
+        func removePersonalData() async throws {
+            events.append(.removalStarted)
+            let attempt = events.filter { $0 == .removalStarted }.count
+            if attempt <= removalStarts.count {
+                let removalStarted = removalStarts[attempt - 1]
+                await withCheckedContinuation {
+                    pendingRemoval = $0
+                    removalStarted.fulfill()
+                }
+            }
+            if failures > 0 {
+                failures -= 1
+                throw NSError(domain: "PersonalDataRemoval", code: attempt)
+            }
+            events.append(.removalFinished)
+        }
+
+        func finishRemoval() {
+            pendingRemoval?.resume()
+            pendingRemoval = nil
+        }
+
+        func updateIdentity() {
+            events.append(.identityUpdated)
+        }
+    }
+
+    private final class CleanupStorefrontAPI: MockStorefrontAPI, @unchecked Sendable {
+        private let cleanup: CleanupSpy
+
+        init(cleanup: CleanupSpy) {
+            self.cleanup = cleanup
+        }
+
+        override func cartRemovePersonalData(id _: GraphQLScalars.ID) async throws {
+            try await cleanup.removePersonalData()
+        }
+
+        override func cartBuyerIdentityUpdate(
+            id _: GraphQLScalars.ID,
+            input _: StorefrontAPI.CartBuyerIdentityUpdateInput
+        ) async throws -> StorefrontAPI.Cart {
+            await cleanup.updateIdentity()
+            return .testCart
+        }
+    }
+
     private class MockPayController: PayController {
+        var onCheckoutFail: ((CheckoutError) -> Void)?
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
 
@@ -700,11 +866,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         var presentCalledWith: URL?
 
         init() {
-            let config = ShopifyAcceleratedCheckouts.Configuration.testConfiguration
-            storefront = StorefrontAPI(
-                storefrontDomain: config.storefrontDomain,
-                storefrontAccessToken: config.storefrontAccessToken
-            )
+            storefront = CleanupStorefrontAPI(cleanup: CleanupSpy())
         }
 
         func present(url: URL) async throws {
@@ -714,17 +876,14 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     }
 
     private class FailingMockPayController: PayController {
+        var onCheckoutFail: ((CheckoutError) -> Void)?
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
 
         var presentCallCount = 0
 
         init() {
-            let config = ShopifyAcceleratedCheckouts.Configuration.testConfiguration
-            storefront = StorefrontAPI(
-                storefrontDomain: config.storefrontDomain,
-                storefrontAccessToken: config.storefrontAccessToken
-            )
+            storefront = CleanupStorefrontAPI(cleanup: CleanupSpy())
         }
 
         func present(url _: URL) async throws {
@@ -734,6 +893,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     }
 
     private class SpyPayController: PayController {
+        var onCheckoutFail: ((CheckoutError) -> Void)?
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
 
@@ -741,11 +901,7 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         var presentCalledWith: URL?
 
         init() {
-            let config = ShopifyAcceleratedCheckouts.Configuration.testConfiguration
-            storefront = StorefrontAPI(
-                storefrontDomain: config.storefrontDomain,
-                storefrontAccessToken: config.storefrontAccessToken
-            )
+            storefront = CleanupStorefrontAPI(cleanup: CleanupSpy())
         }
 
         func present(url: URL) async throws {
@@ -759,6 +915,9 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
     func test_onPresentingCSK_fromCartSubmittedForCompletion_shouldNotModifyCustomerInfo() async throws {
         let redirectURL = try XCTUnwrap(URL(string: "https://shop.example.com/thank-you"))
 
+        let cleanup = CleanupSpy()
+        mockController.storefront = CleanupStorefrontAPI(cleanup: cleanup)
+
         // Follow valid state transition path: idle -> startPaymentRequest -> appleSheetPresented -> paymentAuthorized -> cartSubmittedForCompletion -> completed
         // The completed state will automatically transition to presentingCSK
         try await delegate.transition(to: .startPaymentRequest)
@@ -767,6 +926,8 @@ final class ApplePayAuthorizationDelegateTests: XCTestCase {
         try await delegate.transition(to: .completed)
 
         // Should call present with the redirect URL through the completed -> presentingCSK transition
+        let cleanupEvents = await cleanup.events
+        XCTAssertFalse(cleanupEvents.contains(.identityUpdated))
         XCTAssertEqual(mockController.presentCallCount, 1)
         XCTAssertEqual(mockController.presentCalledWith, redirectURL)
     }

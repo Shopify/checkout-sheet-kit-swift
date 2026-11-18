@@ -575,6 +575,7 @@ final class ApplePayAuthorizationDelegateControllerTests: XCTestCase {
     // MARK: - Mock Classes
 
     private class MockPayController: PayController {
+        var onCheckoutFail: ((CheckoutError) -> Void)?
         var cart: StorefrontAPI.Types.Cart?
         var storefront: StorefrontAPIProtocol
 
