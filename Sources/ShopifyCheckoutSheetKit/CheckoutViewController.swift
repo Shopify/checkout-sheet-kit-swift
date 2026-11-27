@@ -46,8 +46,8 @@ public class CheckoutViewController: UINavigationController {
 }
 
 /// Deprecated
+@available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
 extension CheckoutViewController {
-    @available(*, deprecated, message: "Use \"CheckoutSheet\" instead.")
     public struct Representable: UIViewControllerRepresentable {
         @Binding var checkoutURL: URL?
 
@@ -87,9 +87,9 @@ public struct CheckoutSheet: UIViewControllerRepresentable, CheckoutConfigurable
     public func updateUIViewController(_ uiViewController: CheckoutViewController, context _: Self.Context) {
         guard
             let webViewController = uiViewController
-            .viewControllers
-            .compactMap({ $0 as? CheckoutWebViewController })
-            .first
+                .viewControllers
+                .compactMap({ $0 as? CheckoutWebViewController })
+                .first
         else {
             OSLogger.shared.debug(
                 "[CheckoutViewController#updateUIViewController]: No ViewControllers matching CheckoutWebViewController \(uiViewController.viewControllers.map { String(describing: $0.self) }.joined(separator: ""))"
