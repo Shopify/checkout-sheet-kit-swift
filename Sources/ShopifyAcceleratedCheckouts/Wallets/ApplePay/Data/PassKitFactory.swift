@@ -126,10 +126,9 @@ class PassKitFactory {
         }
     }
 
-    /// Gets all discount allocations for line items, including applicable discount codes
-    /// that are not already accounted for in cart or line item allocations.
+    /// Gets the cart's applied discount totals for display.
     ///
-    /// - Parameter cart: The cart to get discount allocations from
+    /// - Parameter cart: The cart to get discount totals from
     /// - Returns: An array of DiscountAllocationInfo representing all discounts
     /// - Throws: ShopifyAcceleratedCheckouts.Error if cart is nil
     func createDiscountAllocations(cart: StorefrontAPI.Cart?) throws
@@ -139,105 +138,13 @@ class PassKitFactory {
             throw ShopifyAcceleratedCheckouts.Error.invariant(expected: "cart")
         }
 
-        let currencyCode = cart.cost.totalAmount.currencyCode
-
-        // Get all discount allocations from line items
-        let lineItemDiscountAllocations = cart.lines.nodes.flatMap { $0.discountAllocations }
-
-        // Find discount codes that are applicable but not already accounted for
-        let applicableOtherDiscountCodes = findApplicableUnaccountedDiscountCodes(
-            cart: cart,
-            lineItemDiscountAllocations: lineItemDiscountAllocations
-        )
-
-        // Map applicable discount codes to synthetic discount allocations with 0 amount
-        // These are typically shipping discounts that don't show up in other allocations
-        let shippingDiscounts = createShippingDiscounts(
-            discountCodes: applicableOtherDiscountCodes,
-            currencyCode: currencyCode
-        )
-
-        // Convert cart discount allocations
-        let cartDiscounts = convertDiscountAllocations(cart.discountAllocations)
-
-        // Convert line item discount allocations
-        let productDiscounts = convertDiscountAllocations(lineItemDiscountAllocations)
-
-        // Return combined array: shipping discounts + cart discounts + product discounts
-        return shippingDiscounts + cartDiscounts + productDiscounts
-    }
-
-    /// Finds discount codes that are applicable but not already accounted for in allocations
-    private func findApplicableUnaccountedDiscountCodes(
-        cart: StorefrontAPI.Cart,
-        lineItemDiscountAllocations: [StorefrontAPI.CartDiscountAllocation]
-    ) -> [StorefrontAPI.CartDiscountCode] {
-        return cart.discountCodes.filter { discountCode in
-            guard discountCode.applicable else { return false }
-
-            // Check if not in cart discount allocations
-            let allocations =
-                (lineItemDiscountAllocations + cart.discountAllocations)
-                    .contains { allocation in
-                        if case let .code(codeAllocation) = allocation {
-                            return codeAllocation.code == discountCode.code
-                        }
-                        return false
-                    }
-
-            return !allocations
-        }
-    }
-
-    /// Creates shipping discount allocations with 0 amount for applicable discount codes
-    private func createShippingDiscounts(
-        discountCodes: [StorefrontAPI.CartDiscountCode],
-        currencyCode: String
-    ) -> [DiscountAllocationInfo] {
-        return discountCodes.map { discountCode in
+        return cart.discountApplications.map { application in
             DiscountAllocationInfo(
-                code: discountCode.code,
-                amount: 0,
-                currencyCode: currencyCode
+                code: application.code,
+                amount: application.totalAllocatedAmount.amount,
+                currencyCode: application.totalAllocatedAmount.currencyCode
             )
         }
-    }
-
-    /// Converts cart discount allocations to DiscountAllocationInfo
-    private func convertDiscountAllocations(
-        _ allocations: [StorefrontAPI.CartDiscountAllocation]
-    ) -> [DiscountAllocationInfo] {
-        return allocations.compactMap { allocation in
-            convertSingleDiscountAllocation(allocation)
-        }
-    }
-
-    /// Converts a single discount allocation to DiscountAllocationInfo
-    private func convertSingleDiscountAllocation(
-        _ allocation: StorefrontAPI.CartDiscountAllocation
-    ) -> DiscountAllocationInfo {
-        let code: String? =
-            if case let .code(codeAllocation) = allocation {
-                codeAllocation.code
-            } else {
-                nil
-            }
-
-        let (discountedAmount, currencyCode) =
-            switch allocation {
-            case let .automatic(auto):
-                (auto.discountedAmount.amount, auto.discountedAmount.currencyCode)
-            case let .code(code):
-                (code.discountedAmount.amount, code.discountedAmount.currencyCode)
-            case let .custom(custom):
-                (custom.discountedAmount.amount, custom.discountedAmount.currencyCode)
-            }
-
-        return DiscountAllocationInfo(
-            code: code,
-            amount: discountedAmount,
-            currencyCode: currencyCode
-        )
     }
 
     /// Computes the cartesian product of a 2D array. The cartesian product is the set of all possible
